@@ -1,0 +1,73 @@
+
+# Install docker
+```
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg lsb-release -y 
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+
+sudo groupadd docker
+sudo usermod -aG docker ${USER}
+newgrp docker
+```
+
+# Install gVisor
+```
+sudo apt-get update && \
+sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg
+curl -fsSL https://gvisor.dev/archive.key | sudo gpg --dearmor -o /usr/share/keyrings/gvisor-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gvisor-archive-keyring.gpg] https://storage.googleapis.com/gvisor/releases release main" | sudo tee /etc/apt/sources.list.d/gvisor.list > /dev/null
+sudo apt-get update && sudo apt-get install -y runsc
+
+sudo runsc install
+sudo systemctl reload docker
+```
+
+# Install NPM
+```
+sudo apt-get install npm
+sudo npm install -g http-server
+```
+
+# Clone NNG interface
+```
+( 
+  git clone https://github.com/hhu-adam/nng4-interface.git
+  cd nng4-interface
+  rm package-lock.json
+  npm install
+  npm run build
+)
+```
+
+```
+git clone https://github.com/hhu-adam/NNG4.git
+cd NNG4
+docker rmi nng4:latest
+docker build --pull --rm -f "Dockerfile" -t nng4:latest "."
+```
+
+
+# Start HTTP server
+```
+http-server ./nng4-interface/build
+```
+
+# Start WebSocket server
+```
+cd NNG4 && python3 ./gameserver.py
+```
+
+# Test docker
+```
+docker run --runtime=runsc --network=none --rm -it nng4:latest
+```

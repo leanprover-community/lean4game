@@ -1,0 +1,67 @@
+{
+  "name": "lean4-game",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": ".",
+  "dependencies": {
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@fontsource/roboto": "^4.5.8",
+    "@fontsource/roboto-mono": "^4.5.8",
+    "@mui/icons-material": "^5.10.6",
+    "@mui/material": "^5.10.9",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.8",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "better-react-mathjax": "^2.0.2",
+    "concurrently": "^7.4.0",
+    "express": "^4.18.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^8.0.3",
+    "react-refresh": "^0.14.0",
+    "react-use-websocket": "^4.2.0",
+    "web-vitals": "^3.0.3",
+    "ws": "^8.9.0"
+  },
+  "scripts": {
+    "start": "concurrently -n server,client -c blue,green \"npm run start_server\" \"npm run start_client\"",
+    "start_server": "cd server && node ./index.js",
+    "start_client": "webpack-dev-server --env.NODE_ENV=development --hot",
+    "build": "npm run build_server && npm run build_client",
+    "build_server": "cd server && lake build",
+    "build_client": "webpack --env.NODE_ENV=production"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.2",
+    "css-loader": "^1.0.0",
+    "file-loader": "^6.2.0",
+    "style-loader": "^0.23.0",
+    "webpack": "^4.19.1",
+    "webpack-cli": "^3.1.1",
+    "webpack-dev-server": "^3.1.8"
+  }
+}
