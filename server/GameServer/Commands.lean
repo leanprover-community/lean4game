@@ -1,7 +1,7 @@
 import Lean
 
-import NNG.GameServer.Utils
-import NNG.GameServer.EnvExtensions
+import GameServer.Utils
+import GameServer.EnvExtensions
 
 open Lean Meta
 

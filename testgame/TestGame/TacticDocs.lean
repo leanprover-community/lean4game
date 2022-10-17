@@ -1,6 +1,6 @@
-import NNG.GameServer.Commands
+import GameServer.Commands
 
-import NNG.Tactics
+import TestGame.Tactics
 
 TacticDoc rfl
 "

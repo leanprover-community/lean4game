@@ -1,9 +1,9 @@
-import NNG.GameServer.Commands
-import NNG.MyNat
-import NNG.TacticDocs
-import NNG.LemmaDocs
+import GameServer.Commands
+import TestGame.MyNat
+import TestGame.TacticDocs
+import TestGame.LemmaDocs
 
-Game "NNG"
+Game "TestGame"
 
 Title "The Natural Number Game"
 

@@ -1,5 +1,5 @@
-import NNG.GameServer.HashMapExtension
-import NNG.GameServer.SingleValPersistentEnvExtension
+import GameServer.HashMapExtension
+import GameServer.SingleValPersistentEnvExtension
 
 /-! # Environment extensions
 

@@ -6,8 +6,8 @@ It is based on lean-gym by Daniel Selsam.
 -/
 import Lean.Data.Json.Basic
 
-import NNG.GameServer.Utils
-import NNG.GameServer.EnvExtensions
+import GameServer.Utils
+import GameServer.EnvExtensions
 
 open Lean Meta Elab Tactic Std
 
@@ -223,7 +223,7 @@ where
 open System Lean Std in
 partial def runGame (GameName : Name) (paths : List FilePath): IO Unit := do
   searchPathRef.set paths
-  let env ← importModules [{ module := `Init : Import }, { module := GameName ++ GameName : Import }] {} 0    
+  let env ← importModules [{ module := `Init : Import }, { module := GameName : Import }] {} 0    
   let termElabM : TermElabM Unit := do
     let levels := levelsExt.getState env
     let game := {← gameExt.get with nb_levels := levels.size }

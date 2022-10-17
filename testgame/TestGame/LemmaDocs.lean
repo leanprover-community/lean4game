@@ -1,5 +1,5 @@
-import NNG.GameServer.Commands
-import NNG.MyNat
+import GameServer.Commands
+import TestGame.MyNat
 
 LemmaDoc zero_add as zero_add in "Addition"
 "This lemma says `∀ a : ℕ, 0 + a = a`."

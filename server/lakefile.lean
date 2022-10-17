@@ -1,20 +1,12 @@
 import Lake
 open Lake DSL
 
-package nng {
-  -- add package configuration options here
-}
+package GameServer
 
-lean_lib NNG {
-  -- add library configuration options here
-}
-
-lean_lib NNG.levels {
-  -- add library configuration options here
-}
+lean_lib GameServer
 
 @[defaultTarget]
-lean_exe nng {
+lean_exe gameserver {
   root := `Main
   supportInterpreter := true
 }

@@ -1,5 +1,5 @@
-import NNG.Metadata
-import NNG.Tactics
+import TestGame.Metadata
+import TestGame.Tactics
 
 Level 5
 
