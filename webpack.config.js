@@ -1,11 +1,11 @@
 const path = require("path");
-const webpack = require("webpack");
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 
 module.exports = env => {
   const environment = process.env.NODE_ENV
   const isDevelopment = environment === 'development'
-  
+
   const babelOptions = {
     presets: ['@babel/preset-env', '@babel/preset-react'],
     plugins: [
@@ -17,7 +17,7 @@ module.exports = env => {
   global.$RefreshSig$ = () => () => {};
 
   return {
-    entry: "./client/src/index.js",
+    entry: ["./client/src/index.js"],
     mode: isDevelopment ? 'development' : 'production',
     module: {
       rules: [
@@ -32,33 +32,28 @@ module.exports = env => {
         {
           test: /\.css$/,
           use: ["style-loader", "css-loader"]
-        },
-        {
-          test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-          use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'fonts/'
-            }
-          }
-          ]
         }
       ]
     },
     resolve: { extensions: ["*", ".js", ".jsx"] },
     output: {
       path: path.resolve(__dirname, "client/dist/"),
-      publicPath: "/client/dist/",
-      filename: "bundle.js"
+      filename: "bundle.js",
     },
     devServer: {
-      contentBase: path.join(__dirname, "client/public/"),
+      static: path.join(__dirname, 'client/public/'),
       port: 3000,
-      publicPath: "http://localhost:3000/dist/",
-      hotOnly: true
+      hot: true,
     },
-    plugins: [isDevelopment && new ReactRefreshWebpackPlugin()].filter(Boolean),
+    plugins: [
+      !isDevelopment && new WebpackShellPluginNext({
+        onBuildEnd:{
+          scripts: ['cp client/public/index.html client/dist/'],
+          blocking: false,
+          parallel: true
+        }
+      }),
+      isDevelopment && new ReactRefreshWebpackPlugin()
+    ].filter(Boolean),
   };
 }

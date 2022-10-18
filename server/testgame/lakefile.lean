@@ -1,7 +1,7 @@
 import Lake
 open Lake DSL
 
-require GameServer from ".."/"server"
+require GameServer from ".."/"leanserver"
 
 package TestGame
 

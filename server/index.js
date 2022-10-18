@@ -19,8 +19,8 @@ const isDevelopment = environment === 'development'
 
 let cmd, cmdArgs;
 if (isDevelopment) {
-    cmd = "./build/bin/gameserver";
-    cmdArgs = ["TestGame","../testgame"];
+    cmd = "./leanserver/build/bin/gameserver";
+    cmdArgs = ["TestGame","testgame"];
 } else{
     cmd = "docker";
     cmdArgs = ["run", "--runtime=runsc", "--network=none", "--rm", "-i", "testgame:latest"];
