@@ -71,3 +71,15 @@ cd NNG4 && python3 ./gameserver.py
 ```
 docker run --runtime=runsc --network=none --rm -it nng4:latest
 ```
+
+# Running on port 80
+
+## Set environment variable
+```
+export PORT=80
+```
+## Enable running on port 80:
+```
+sudo apt-get install libcap2-bin
+sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
+```
