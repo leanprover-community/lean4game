@@ -14,10 +14,17 @@ const server = app
 
 const wss = new WebSocket.Server({ server })
 
-let cmd = "./build/bin/gameserver";
-let cmdArgs = ["TestGame","../testgame"];
-// let cmd = "docker";
-// let cmdArgs = ["run", "--runtime=runsc", "--network=none", "--rm", "-i", "nng4:latest"];
+const environment = process.env.NODE_ENV
+const isDevelopment = environment === 'development'
+
+let cmd, cmdArgs;
+if (isDevelopment) {
+    cmd = "./build/bin/gameserver";
+    cmdArgs = ["TestGame","../testgame"];
+} else{
+    cmd = "docker";
+    cmdArgs = ["run", "--runtime=runsc", "--network=none", "--rm", "-i", "testgame:latest"];
+}
 
 class ClientConnection {
 

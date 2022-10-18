@@ -3,7 +3,8 @@ const webpack = require("webpack");
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = env => {
-  const isDevelopment = env.NODE_ENV !== 'production';
+  const environment = process.env.NODE_ENV
+  const isDevelopment = environment === 'development'
   
   const babelOptions = {
     presets: ['@babel/preset-env', '@babel/preset-react'],
