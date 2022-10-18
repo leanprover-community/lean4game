@@ -14,8 +14,8 @@ const server = app
 
 const wss = new WebSocket.Server({ server })
 
-let cmd = "./build/bin/nng";
-let cmdArgs = [];
+let cmd = "./build/bin/gameserver";
+let cmdArgs = ["TestGame","../testgame"];
 // let cmd = "docker";
 // let cmdArgs = ["run", "--runtime=runsc", "--network=none", "--rm", "-i", "nng4:latest"];
 
