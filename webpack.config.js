@@ -41,6 +41,12 @@ module.exports = env => {
       filename: "bundle.js",
     },
     devServer: {
+      proxy: {
+        '/websocket': {
+           target: 'ws://localhost:8080',
+           ws: true
+        },
+      },
       static: path.join(__dirname, 'client/public/'),
       port: 3000,
       hot: true,

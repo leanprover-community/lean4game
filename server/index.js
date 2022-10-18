@@ -2,14 +2,12 @@ const WebSocket = require("ws");
 const express = require("express");
 const app = express()
 const path = require("path")
-const fs = require("fs");
 const { spawn } = require('child_process');
 
-
-const PORT = 8765;
+const PORT = process.env.PORT || 8080;
 
 const server = app
-  .use(express.static('./build'))
+  .use(express.static(path.join(__dirname, '../client/dist/')))
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const wss = new WebSocket.Server({ server })

@@ -22,7 +22,7 @@ function App() {
 	const [curLevel, setCurLevel] = useState(0)
 	const [finished, setFinished] = useState(false)
 
-	const socketUrl = 'ws://' + window.location.hostname + ':8765'
+	const socketUrl = 'ws://' + window.location.host + '/websocket/'
 	const { sendJsonMessage, lastMessage, lastJsonMessage } = useWebSocket(socketUrl)
 
 	const mathJaxConfig = {
