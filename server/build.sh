@@ -6,7 +6,6 @@ cd $(dirname $0)
 # Build elan image if not already present
 docker build --pull --rm -f elan.Dockerfile -t elan:latest .
 
-(cd leanserver && lake build)
 (cd testgame && lake build)
 docker rmi testgame:latest || true
 docker build --rm -f server.Dockerfile -t testgame:latest .
