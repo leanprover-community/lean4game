@@ -11,9 +11,18 @@ import GameServer.EnvExtensions
 
 open Lean Meta Elab Tactic Std
 
-/- Convert JSON to string without line breaks -/
--- TODO: this is too slow...
-instance instToStringJsonOneLine : ToString Json := ToString.mk (fun o => (toString o).replace "\n" "")
+/-- Convert format to string without line breaks -/
+def Std.Format.oneline : Format → String
+| .nil => ""
+| .line => ""
+| .text s => s
+| .nest _ f => f.oneline
+| .append f g => f.oneline ++ g.oneline
+| .group f _ => f.oneline
+| .tag _ f => f.oneline
+
+/-- Convert JSON to string without line breaks -/
+instance instToStringJsonOneLine : ToString Json := ⟨fun o => o.render.oneline⟩
 attribute [-instance] Lean.Json.instToStringJson
 
 /-! ## GameGoal -/
