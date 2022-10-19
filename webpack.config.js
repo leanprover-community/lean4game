@@ -17,7 +17,7 @@ module.exports = env => {
   global.$RefreshSig$ = () => () => {};
 
   return {
-    entry: ["./client/src/index.js"],
+    entry: ["./client/src/index.tsx"],
     mode: isDevelopment ? 'development' : 'production',
     module: {
       rules: [
