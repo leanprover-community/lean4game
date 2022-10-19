@@ -18,3 +18,9 @@ Internally, websocket requests to `ws://localhost:3000/websockets` will be forwa
 On the server side, the command will set up a docker image containing the Lean server. The two parts can be built separately using `npm run build_client` and `npm run build_server`.
 
 * `npm run production`: Start the project in production mode. This requires that the build script has been run. It will start a server on the port specified in the `PORT` environment variable or by default on `8080`. You can run on a specifiv port by running `PORT=80 npm run production`. The server will serve the files in `client/dist` via http and give access to the docker-contained Lean server via the web socket protocol.
+
+
+## Security
+
+Providing the use access to a Lean instance running on the server is a severe security risk. That is why we start the Lean server in a Docker container
+secured by [gVisor](https://gvisor.dev/).
