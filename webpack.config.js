@@ -30,12 +30,17 @@ module.exports = env => {
           }]
         },
         {
+          test: /\.tsx?$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
+        },
+        {
           test: /\.css$/,
           use: ["style-loader", "css-loader"]
         }
       ]
     },
-    resolve: { extensions: ["*", ".js", ".jsx"] },
+    resolve: { extensions: ["*", ".js", ".jsx", ".tsx", ".ts"] },
     output: {
       path: path.resolve(__dirname, "client/dist/"),
       filename: "bundle.js",
