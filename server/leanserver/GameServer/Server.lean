@@ -141,7 +141,7 @@ def coreCtx : Core.Context := {
   fileMap := { source := "", positions := #[0], lines := #[1] } }
 
 
-partial def runLevel (GameName : Name) (levels : HashMap Nat GameLevel) (idx : Nat) : IO Unit := do
+partial def runLevel (env : Environment) (GameName : Name) (levels : HashMap Nat GameLevel) (idx : Nat) : IO Unit := do
   let levelName : Name := s!"Level{toString idx}"
   let termElabM : TermElabM Unit := do
     let some lvl := levels.find? idx | throwError s!"Cannot find level {idx}"
@@ -164,7 +164,6 @@ partial def runLevel (GameName : Name) (levels : HashMap Nat GameLevel) (idx : N
       levelM.run lvl |>.run' state
   let metaM : MetaM Unit := termElabM.run' (ctx := {})
   try
-    let env ← importModules [{ module := `Init : Import }, { module := GameName ++ "Levels" ++ levelName : Import }] {} 0    
     discard <| metaM.run'.toIO coreCtx { env := env }
   catch 
   | .userError s => output s!"Could not run level {idx}: {s}"
@@ -217,11 +216,11 @@ where
   mainLoop : LevelM Unit := do
     match ← Action.get with
     | Action.runTactic tac => do let resp ← runTactic tac; output s!"{← resp.toJson}"
-    | Action.loadLevel n => runLevel GameName levels n
+    | Action.loadLevel n => runLevel env GameName levels n
     | Action.undo => do modify fun s => s.pop; output s!"{← (← mkResponse).toJson}"
-    | Action.restartLevel => runLevel GameName levels idx
-    | Action.prev => runLevel GameName levels idx.pred
-    | Action.next => runLevel GameName levels idx.succ
+    | Action.restartLevel => runLevel env GameName levels idx
+    | Action.prev => runLevel env GameName levels idx.pred
+    | Action.next => runLevel env GameName levels idx.succ
     | Action.quit => IO.Process.exit 0
     | Action.restartGame => output "Can't restart game now"
     | Action.info => output "Can't get info now"
@@ -236,17 +235,17 @@ partial def runGame (GameName : Name) (paths : List FilePath): IO Unit := do
   let termElabM : TermElabM Unit := do
     let levels := levelsExt.getState env
     let game := {← gameExt.get with nb_levels := levels.size }
-    mainLoop game levels
+    mainLoop env game levels
   let metaM : MetaM Unit := termElabM.run' (ctx := {})
   discard <| metaM.run'.toIO coreCtx { env := env }
 where
-  mainLoop (game : Game) (levels : HashMap Nat GameLevel): IO Unit := do
+  mainLoop (env : Environment) (game : Game) (levels : HashMap Nat GameLevel): IO Unit := do
     match ← Action.get with
     | Action.info => output (toJson game)
-    | Action.loadLevel n => runLevel GameName levels n
+    | Action.loadLevel n => runLevel env GameName levels n
     | Action.quit => IO.Process.exit 0
     | Action.invalid s => output s!"Invalid action: {s}"
     | _ => output "Invalid action"
-    mainLoop game levels
+    mainLoop env game levels
     
 end Server
