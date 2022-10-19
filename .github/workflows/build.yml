@@ -20,4 +20,4 @@ jobs:
           ./elan-init -y --default-toolchain none
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
       - uses: actions/checkout@v3
-      - run: npm run build_client
+      - run: npm run build_server
