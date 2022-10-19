@@ -7,7 +7,7 @@ module.exports = env => {
   const isDevelopment = environment === 'development'
 
   const babelOptions = {
-    presets: ['@babel/preset-env', '@babel/preset-react'],
+      presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
     plugins: [
       isDevelopment && require.resolve('react-refresh/babel'),
     ].filter(Boolean),
