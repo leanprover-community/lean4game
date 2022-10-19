@@ -59,6 +59,8 @@ module.exports = env => {
     plugins: [
       !isDevelopment && new WebpackShellPluginNext({
         onBuildEnd:{
+          // It's hard to set up webpack to copy the index.html correctly,
+          // so we copy it explicitly after every build:
           scripts: ['cp client/public/index.html client/dist/'],
           blocking: false,
           parallel: true
