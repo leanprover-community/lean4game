@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -15,7 +15,7 @@ function Goal({ goal }) {
 	const hasAssumption = typeof goal.assumptions === "object" && goal.assumptions.length > 0
 	return (
 		<Box sx={{ pl: 2 }}>
-			{hasObject && <Box><Typography variant="h7">Objects</Typography>
+			{hasObject && <Box><Typography>Objects</Typography>
 				<List>
 					{goal.objects.map((item) =>
 						<ListItem key={item[0]}>
@@ -23,12 +23,12 @@ function Goal({ goal }) {
 							<Typography color="secondary" sx={{ ml: 1 }}>{item[1]}</Typography>
 						</ListItem>)}
 				</List></Box>}
-			{hasAssumption && <Box><Typography variant="h7">Assumptions</Typography>
+			{hasAssumption && <Box><Typography>Assumptions</Typography>
 				<List>
 					{goal.assumptions.map((item) => <ListItem key={item}><Typography color="primary" sx={{ mr: 1 }}>{item[0]}</Typography> :
 						<Typography color="secondary" sx={{ ml: 1 }}>{item[1]}</Typography></ListItem>)}
 				</List></Box>}
-			<Typography variant="h7">Prove:</Typography>
+			<Typography>Prove:</Typography>
 			<Typography color="primary" sx={{ ml: 2 }}>{goal.goal}</Typography>
 		</Box>)
 }

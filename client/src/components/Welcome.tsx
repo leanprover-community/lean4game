@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { MathJax } from "better-react-mathjax";
 import '@fontsource/roboto/300.css';
@@ -9,7 +10,7 @@ import '@fontsource/roboto/700.css';
 import { Box, Typography, Button, CircularProgress, Grid } from '@mui/material';
 
 
-function Welcome({ sendJsonMessage, lastJsonMessage, setNbLevels, setTitle, startGame, setConclusion }) {
+function Welcome({ sendJsonMessage, lastJsonMessage, lastMessage, setNbLevels, setTitle, startGame, setConclusion }) {
 
 	const [leanData, setLeanData] = useState({})
 

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -10,8 +11,8 @@ import { Typography, Button, Paper, TextField, List, ListItem } from '@mui/mater
 function InputZone({ index, history, messageOpen, setMessageOpen, completed, sendTactic, nbLevels, loadNextLevel, errors, lastTactic, undo, finishGame }) {
   const [curInput, setCurInput] = useState("")
 
-  const inputRef = React.createRef()
-  const nextRef = React.createRef()
+  const inputRef = React.createRef<HTMLInputElement>()
+  const nextRef = React.createRef<HTMLButtonElement>()
 
   function handleCurInputChange(evt) { setCurInput(evt.target.value) }
 

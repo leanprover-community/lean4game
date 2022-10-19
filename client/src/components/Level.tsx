@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -18,7 +19,7 @@ function Level({ sendJsonMessage, lastMessage, lastJsonMessage, nbLevels, level,
 	const [tacticDocs, setTacticDocs] = useState([])
 	const [lemmaDocs, setLemmaDocs] = useState([])
 
-	const [leanData, setLeanData] = useState({})
+	const [leanData, setLeanData] = useState({goals: []})
 	const [history, setHistory] = useState([])
 	const [lastTactic, setLastTactic] = useState("")
 	const [errors, setErrors] = useState([])

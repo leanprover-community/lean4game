@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { MathJax } from "better-react-mathjax";
 import '@fontsource/roboto/300.css';
