@@ -30,8 +30,7 @@ class ClientConnection {
 
     constructor(ws){
         console.log("Socket opened.")
-        this.ws = ws    
-        this.ws.send("ok");
+        this.ws = ws
 
         this.ws.on("message", (msg) => {
             this.send(JSON.parse(msg.toString("utf8")));
@@ -68,7 +67,7 @@ class ClientConnection {
     send(data) {
         const str = JSON.stringify(data) + "\n";
         const byteLength = Buffer.byteLength(str, "utf-8");
-    
+
         this.lean.stdin.cork();
         this.lean.stdin.write(str);
         this.lean.stdin.uncork();

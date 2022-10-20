@@ -1,5 +1,5 @@
 /-
-This is the Lean 4 game server. It offers a way to interact with Lean 4 which 
+This is the Lean 4 game server. It offers a way to interact with Lean 4 which
 is completely distinct from running the command-line lean or the language server protocol.
 
 It is based on lean-gym by Daniel Selsam.
@@ -8,6 +8,7 @@ import Lean.Data.Json.Basic
 
 import GameServer.Utils
 import GameServer.EnvExtensions
+import GameServer.Communication
 
 open Lean Meta Elab Tactic Std
 
@@ -54,10 +55,10 @@ match (← getMCtx).findDecl? goal with
     return {objects := objects, assumptions := assumptions, goal := toString (← Meta.ppExpr mvarDecl.type),
             mvarid := goal }
 
-def GameGoal.toJson (gameGoal : GameGoal) : MetaM Json := 
+def GameGoal.toJson (gameGoal : GameGoal) : MetaM Json :=
 gameGoal.mvarid.withContext do
-  return Json.mkObj [("objects", Lean.ToJson.toJson (← gameGoal.objects.mapM Lean.LocalDecl.toJson)), 
-                     ("assumptions", Lean.ToJson.toJson (← gameGoal.assumptions.mapM Lean.LocalDecl.toJson)), 
+  return Json.mkObj [("objects", Lean.ToJson.toJson (← gameGoal.objects.mapM Lean.LocalDecl.toJson)),
+                     ("assumptions", Lean.ToJson.toJson (← gameGoal.assumptions.mapM Lean.LocalDecl.toJson)),
                      ("goal", gameGoal.goal)]
 
 
@@ -77,7 +78,7 @@ inductive Action where
 deriving ToJson, FromJson, Repr
 
 def Action.parse (s : String) : Action :=
-  let e : Except String Action := 
+  let e : Except String Action :=
     try
       return ← fromJson? (← Json.parse s)
     catch _ => return Action.invalid s
@@ -85,7 +86,7 @@ def Action.parse (s : String) : Action :=
   | Except.ok a => a
   | _ => Action.info
 
-def Action.get : IO Action := 
+def Action.get : IO Action :=
   return Action.parse (← (← IO.getStdin).getLine)
 
 
@@ -116,7 +117,7 @@ structure SavedState where
 abbrev LevelM := ReaderT GameLevel StateRefT (Array SavedState) TermElabM
 
 /-- Returns the most recent SavedState. -/
-def getState : LevelM SavedState := do 
+def getState : LevelM SavedState := do
   let some state := (← get).back? | throwError "Couldn't find tactic state"
   return state
 
@@ -134,8 +135,8 @@ def Response.toJson (resp : Response) : MetaM Json :=
 /-! ## Main running functions -/
 
 /-- Dummy `Core.Context` value to be fed to `Lean.Core.CoreM.toIO` -/
-def coreCtx : Core.Context := { 
-  currNamespace := Name.anonymous, 
+def coreCtx : Core.Context := {
+  currNamespace := Name.anonymous,
   openDecls := [],
   fileName := "<Game>",
   fileMap := { source := "", positions := #[0], lines := #[1] } }
@@ -147,9 +148,9 @@ partial def runLevel (env : Environment) (GameName : Name) (levels : HashMap Nat
     let some lvl := levels.find? idx | throwError s!"Cannot find level {idx}"
     let mvar ← mkFreshExprMVar (some lvl.goal) (kind := MetavarKind.synthetic)
     let (_, mvar) ← mvar.mvarId!.introNP lvl.intro_nb
-    mvar.withContext do 
+    mvar.withContext do
       let state := #[{tacticState := { term := ← Term.saveState, tactic := { goals := [mvar] }}}]
-      let levelM : LevelM Unit := do 
+      let levelM : LevelM Unit := do
           let resp := {← mkResponse with message := lvl.introduction}
           let levelInfo : LevelInfo :=
               { index := lvl.index,
@@ -165,15 +166,15 @@ partial def runLevel (env : Environment) (GameName : Name) (levels : HashMap Nat
   let metaM : MetaM Unit := termElabM.run' (ctx := {})
   try
     discard <| metaM.run'.toIO coreCtx { env := env }
-  catch 
+  catch
   | .userError s => output s!"Could not run level {idx}: {s}"
   | _ => output s!"Could not run level {idx}"
-  
+
 where
 
   mkResponse (errors : Array String := #[]) : LevelM Response := do
     let savedState ← getState
-    let goals := savedState.tacticState.tactic.goals     
+    let goals := savedState.tacticState.tactic.goals
     return { goals := (← liftM $ goals.mapM Lean.MVarId.toGameGoal), message := savedState.message, errors := errors }
 
   /-- Try to parse the given String as a single line tactic invocation. Update the LevelM state only
@@ -182,7 +183,7 @@ where
   runTactic (tacticString : String) : LevelM Response := do
     let lvl ← read
     let tacticNames := (lvl.tactics.map (·.name.toString)).toList
-    let tacName := (tacticString.trim.splitOn " ").headD "" 
+    let tacName := (tacticString.trim.splitOn " ").headD ""
     if not (tacticNames.contains tacName) then mkResponse #["Unrecognized tactic"] else
       let savedState ← getState
       match Parser.runParserCategory (← getEnv) `tactic tacticString "<stdin>" with
@@ -191,7 +192,7 @@ where
         savedState.tacticState.term.restore
         let mvarId : MVarId := savedState.tacticState.tactic.goals.head!
         try
-          let unsolvedGoals ← Tactic.run mvarId do set savedState.tacticState.tactic 
+          let unsolvedGoals ← Tactic.run mvarId do set savedState.tacticState.tactic
                                                    evalTactic stx
           if (← getThe Core.State).messages.hasErrors then
             let messages := (← getThe Core.State).messages.getErrorMessages.toList.toArray
@@ -211,7 +212,7 @@ where
               message := (← read).conclusion
             modify fun s => s.push {tacticState := savedState, message := message}
             mkResponse
-        catch ex => mkResponse #[← ex.toMessageData.toString]        
+        catch ex => mkResponse #[← ex.toMessageData.toString]
 
   mainLoop : LevelM Unit := do
     match ← Action.get with
@@ -227,25 +228,30 @@ where
     | Action.invalid s => output s!"{← { ← mkResponse with errors := #[s!"Invalid action: {s}"] : Response}.toJson}"
     mainLoop
 
+#check (toJson "").compress
 
 open System Lean Std in
-partial def runGame (GameName : Name) (paths : List FilePath): IO Unit := do
-  searchPathRef.set paths
-  let env ← importModules [{ module := `Init : Import }, { module := GameName : Import }] {} 0    
-  let termElabM : TermElabM Unit := do
-    let levels := levelsExt.getState env
-    let game := {← gameExt.get with nb_levels := levels.size }
-    mainLoop env game levels
-  let metaM : MetaM Unit := termElabM.run' (ctx := {})
-  discard <| metaM.run'.toIO coreCtx { env := env }
-where
-  mainLoop (env : Environment) (game : Game) (levels : HashMap Nat GameLevel): IO Unit := do
-    match ← Action.get with
-    | Action.info => output (toJson game)
-    | Action.loadLevel n => runLevel env GameName levels n
-    | Action.quit => IO.Process.exit 0
-    | Action.invalid s => output s!"Invalid action: {s}"
-    | _ => output "Invalid action"
-    mainLoop env game levels
-    
+partial def runGame (GameName : Name) : IO Unit := do
+  let hIn ← IO.getStdin
+  let hOut ← IO.getStdout
+  let hLog ← IO.getStderr
+  hLog.putStr s!"{toJson $ ← hIn.readGspMessage}"
+  hOut.writeGspNotification ⟨"Hello!", "s"⟩
+--   let env ← importModules [{ module := `Init : Import }, { module := GameName : Import }] {} 0
+--   let termElabM : TermElabM Unit := do
+--     let levels := levelsExt.getState env
+--     let game := {← gameExt.get with nb_levels := levels.size }
+--     mainLoop env game levels
+--   let metaM : MetaM Unit := termElabM.run' (ctx := {})
+--   discard <| metaM.run'.toIO coreCtx { env := env }
+-- where
+--   mainLoop (env : Environment) (game : Game) (levels : HashMap Nat GameLevel): IO Unit := do
+--     match ← Action.get with
+--     | Action.info => output (toJson game)
+--     | Action.loadLevel n => runLevel env GameName levels n
+--     | Action.quit => IO.Process.exit 0
+--     | Action.invalid s => output s!"Invalid action: {s}"
+--     | _ => output "Invalid action"
+--     mainLoop env game levels
+
 end Server
