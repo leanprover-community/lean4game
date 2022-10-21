@@ -8,16 +8,16 @@ import { Box, Typography, Grid } from '@mui/material';
 
 
 function GoodBye({ message }) {
-	return (<Grid container
-		direction="row"
-		justifyContent="center"
-		alignItems="center">
-		<Grid item xs={12} sm={6}>
-			<Box sx={{ m: 3 }}>
-				<Typography variant="body1" component="div">{message}</Typography>
-			</Box>
-		</Grid>
-	</Grid>)
+  return (<Grid container
+    direction="row"
+    justifyContent="center"
+    alignItems="center">
+    <Grid item xs={12} sm={6}>
+      <Box sx={{ m: 3 }}>
+        <Typography variant="body1" component="div">{message}</Typography>
+      </Box>
+    </Grid>
+  </Grid>)
 }
 
 export default GoodBye
