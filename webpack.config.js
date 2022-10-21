@@ -44,6 +44,7 @@ module.exports = env => {
     output: {
       path: path.resolve(__dirname, "client/dist/"),
       filename: "bundle.js",
+      sourceMapFilename: "[name].js.map"
     },
     devServer: {
       proxy: {
@@ -56,6 +57,7 @@ module.exports = env => {
       port: 3000,
       hot: true,
     },
+    devtool: "source-map",
     plugins: [
       !isDevelopment && new WebpackShellPluginNext({
         onBuildEnd:{
