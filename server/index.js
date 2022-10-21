@@ -33,6 +33,7 @@ class ClientConnection {
         this.ws = ws
 
         this.ws.on("message", (msg) => {
+            console.log(msg.toString("utf8"));
             this.send(JSON.parse(msg.toString("utf8")));
         })
 

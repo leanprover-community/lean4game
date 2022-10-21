@@ -6,32 +6,44 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import * as rpc from 'vscode-ws-jsonrpc';
 
 import { Box, Typography, Button, CircularProgress, Grid } from '@mui/material';
 
+interface WelcomeProps {
+  rpcConnection: null|rpc.MessageConnection;
+  setNbLevels: any;
+	setTitle: any;
+	startGame: any;
+	setConclusion: any;
+}
 
-function Welcome({ sendJsonMessage, lastJsonMessage, lastMessage, setNbLevels, setTitle, startGame, setConclusion }) {
+type infoResultType = {
+	title: string,
+	nb_levels: any[],
+	conclusion: string
+}
 
-	const [leanData, setLeanData] = useState({})
+const infoRequestType = new rpc.RequestType0<infoResultType, void>("info")
 
-	// Will run at the very beginning
+function Welcome({ rpcConnection, setNbLevels, setTitle, startGame, setConclusion }: WelcomeProps) {
+
+	const [leanData, setLeanData] = useState<null|infoResultType>(null)
+
 	useEffect(() => {
-		sendJsonMessage('info')
-	}, [sendJsonMessage])
-
-	// Will run when a Json message arrives
-	useEffect(() => {
-		if (lastJsonMessage != null && lastJsonMessage.hasOwnProperty("nb_levels")) {
-			setLeanData(lastJsonMessage)
-			setNbLevels(lastJsonMessage.nb_levels)
-			setTitle(lastJsonMessage.title)
-			document.title = lastJsonMessage.title
-			setConclusion(lastJsonMessage.conclusion)
+		if (rpcConnection) { // Will run in the beginning as soon as RPC connection is established
+			rpcConnection.sendRequest(infoRequestType).then((res: infoResultType) =>{
+				setLeanData(res)
+				setNbLevels(res.nb_levels)
+				setTitle(res.title)
+				document.title = res.title
+				setConclusion(res.conclusion)
+			});
 		}
-	}, [lastJsonMessage, setNbLevels, setTitle, setConclusion])
+	}, [rpcConnection, setLeanData, setNbLevels, setTitle, setConclusion])
 
 	let content
-	if ("introduction" in leanData) {
+	if (leanData) {
 		content = (<Box sx={{ m: 3 }}>
 			<Typography variant="body1" component="div">
 			  <MathJax>

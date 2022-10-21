@@ -22,21 +22,17 @@ function App() {
 	const [nbLevels, setNbLevels] = useState(0)
 	const [curLevel, setCurLevel] = useState(0)
 	const [finished, setFinished] = useState(false)
-	const [rpcConnection, setRpcConnection] = useState(null)
+	const [rpcConnection, setRpcConnection] = useState<null|rpc.MessageConnection>(null)
 
 	const socketUrl = 'ws://' + window.location.host + '/websocket/'
 
-	const { sendJsonMessage, getWebSocket } = useWebSocket(socketUrl, {
+	useWebSocket(socketUrl, {
 		onOpen: function (ev) {
     	const logger = new rpc.ConsoleLogger();
       const socket = rpc.toSocket(ev.target as WebSocket);
 			let rpcConnection = rpc.createWebSocketConnection(socket, logger)
       setRpcConnection(rpcConnection);
 			rpcConnection.listen();
-			rpcConnection.onNotification("Hello!", () => {
-				console.log("Yes"); // This prints Hello World
-			});
-			rpcConnection.sendNotification("Hello!", 'Hello World');
 		}
 	})
 
@@ -56,14 +52,14 @@ function App() {
 		setCurLevel(1)
 	}
 
-	// let mainComponent;
-	// if (finished) {
-	//   mainComponent = <GoodBye message={conclusion} />
-	// } else if (curLevel > 0) {
-	//   mainComponent = <Level sendJsonMessage={sendJsonMessage} lastMessage={lastMessage} lastJsonMessage={lastJsonMessage} nbLevels={nbLevels} level={curLevel} setCurLevel={setCurLevel} setLevelTitle={setLevelTitle} setFinished={setFinished}/>
-	// } else {
-  //     mainComponent = <Welcome sendJsonMessage={sendJsonMessage} lastMessage={lastMessage} lastJsonMessage={lastJsonMessage} setNbLevels={setNbLevels} setTitle={setTitle} startGame={startGame} setConclusion={setConclusion}/>
-	// }
+	let mainComponent;
+	if (finished) {
+	  mainComponent = <GoodBye message={conclusion} />
+	} else if (curLevel > 0) {
+	  mainComponent = <Level rpcConnection={rpcConnection} nbLevels={nbLevels} level={curLevel} setCurLevel={setCurLevel} setLevelTitle={setLevelTitle} setFinished={setFinished}/>
+	} else {
+    mainComponent = <Welcome rpcConnection={rpcConnection} setNbLevels={setNbLevels} setTitle={setTitle} startGame={startGame} setConclusion={setConclusion}/>
+	}
 
   return (
     <div className="App">
@@ -79,7 +75,7 @@ function App() {
 				</Typography>
 				</Toolbar>
 			</AppBar>
-			{/* {mainComponent} */}
+			{mainComponent}
 		</MathJaxContext>
     </div>
   )

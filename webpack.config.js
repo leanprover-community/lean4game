@@ -44,7 +44,6 @@ module.exports = env => {
     output: {
       path: path.resolve(__dirname, "client/dist/"),
       filename: "bundle.js",
-      sourceMapFilename: "[name].js.map"
     },
     devServer: {
       proxy: {

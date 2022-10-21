@@ -142,7 +142,15 @@ def coreCtx : Core.Context := {
   fileMap := { source := "", positions := #[0], lines := #[1] } }
 
 
-partial def runLevel (env : Environment) (GameName : Name) (levels : HashMap Nat GameLevel) (idx : Nat) : IO Unit := do
+structure RunTacticParams where
+  tactic : String
+deriving FromJson
+
+structure LoadLevelParams where
+  number : Nat
+deriving FromJson
+
+partial def runLevel (requestId : JsonRpc.RequestID) (env : Environment) (GameName : Name) (levels : HashMap Nat GameLevel) (idx : Nat) : IO Unit := do
   let levelName : Name := s!"Level{toString idx}"
   let termElabM : TermElabM Unit := do
     let some lvl := levels.find? idx | throwError s!"Cannot find level {idx}"
@@ -160,7 +168,8 @@ partial def runLevel (env : Environment) (GameName : Name) (levels : HashMap Nat
                 errors := resp.errors,
                 goals := resp.goals,
                 message := resp.message }
-          output (← levelInfo.toJson)
+          let hOut ← IO.getStdout
+          hOut.writeGspResponse ⟨requestId, ← levelInfo.toJson⟩
           mainLoop
       levelM.run lvl |>.run' state
   let metaM : MetaM Unit := termElabM.run' (ctx := {})
@@ -215,43 +224,66 @@ where
         catch ex => mkResponse #[← ex.toMessageData.toString]
 
   mainLoop : LevelM Unit := do
-    match ← Action.get with
-    | Action.runTactic tac => do let resp ← runTactic tac; output s!"{← resp.toJson}"
-    | Action.loadLevel n => runLevel env GameName levels n
-    | Action.undo => do modify fun s => s.pop; output s!"{← (← mkResponse).toJson}"
-    | Action.restartLevel => runLevel env GameName levels idx
-    | Action.prev => runLevel env GameName levels idx.pred
-    | Action.next => runLevel env GameName levels idx.succ
-    | Action.quit => IO.Process.exit 0
-    | Action.restartGame => output "Can't restart game now"
-    | Action.info => output "Can't get info now"
-    | Action.invalid s => output s!"{← { ← mkResponse with errors := #[s!"Invalid action: {s}"] : Response}.toJson}"
+    let hIn ← IO.getStdin
+    let hOut ← IO.getStdout
+    let hLog ← IO.getStderr
+    let m ← hIn.readGspMessage
+    match m with
+    | .request id "runTactic" params => do
+      match fromJson? (toJson (params)) with
+      | Except.ok (v : RunTacticParams) =>
+        let resp ← runTactic v.tactic
+        hOut.writeGspResponse ⟨id, ← resp.toJson⟩
+      | Except.error inner =>
+        hLog.putStr s!"Invalid params: {inner}"
+        hLog.flush
+    | .request id "loadLevel" (some params) =>
+      match fromJson? (toJson (params)) with
+      | Except.ok (v : LoadLevelParams) =>
+        runLevel id env GameName levels v.number
+      | Except.error inner =>
+        hLog.putStr s!"Invalid params: {inner}"
+        hLog.flush
+    | .request id "undo" _ => do
+       modify fun s => s.pop
+       hOut.writeGspResponse ⟨id, ← (← mkResponse).toJson⟩
+    | _ =>
+      hLog.putStr s!"Invalid action: {toJson m}"
+      hLog.flush
     mainLoop
-
-#check (toJson "").compress
 
 open System Lean Std in
 partial def runGame (GameName : Name) : IO Unit := do
-  let hIn ← IO.getStdin
-  let hOut ← IO.getStdout
-  let hLog ← IO.getStderr
-  hLog.putStr s!"{toJson $ ← hIn.readGspMessage}"
-  hOut.writeGspNotification ⟨"Hello!", "s"⟩
---   let env ← importModules [{ module := `Init : Import }, { module := GameName : Import }] {} 0
---   let termElabM : TermElabM Unit := do
---     let levels := levelsExt.getState env
---     let game := {← gameExt.get with nb_levels := levels.size }
---     mainLoop env game levels
---   let metaM : MetaM Unit := termElabM.run' (ctx := {})
---   discard <| metaM.run'.toIO coreCtx { env := env }
--- where
---   mainLoop (env : Environment) (game : Game) (levels : HashMap Nat GameLevel): IO Unit := do
---     match ← Action.get with
---     | Action.info => output (toJson game)
---     | Action.loadLevel n => runLevel env GameName levels n
---     | Action.quit => IO.Process.exit 0
---     | Action.invalid s => output s!"Invalid action: {s}"
---     | _ => output "Invalid action"
---     mainLoop env game levels
+  let env ← importModules [{ module := `Init : Import }, { module := GameName : Import }] {} 0
+  let termElabM : TermElabM Unit := do
+    let levels := levelsExt.getState env
+    let game := {← gameExt.get with nb_levels := levels.size }
+    mainLoop env game levels
+  let metaM : MetaM Unit := termElabM.run' (ctx := {})
+  discard <| metaM.run'.toIO coreCtx { env := env }
+where
+  mainLoop (env : Environment) (game : Game) (levels : HashMap Nat GameLevel): IO Unit := do
+    let hIn ← IO.getStdin
+    let hOut ← IO.getStdout
+    let hLog ← IO.getStderr
+    let m ← hIn.readGspMessage
+    match m with
+    | .request id "info" params =>
+      hOut.writeGspResponse ⟨id, game⟩
+    | .request id "loadLevel" (some params) =>
+      match fromJson? (toJson (params)) with
+      | Except.ok (v : LoadLevelParams) =>
+        runLevel id env GameName levels v.number
+      | Except.error inner =>
+        hLog.putStr s!"Invalid params: {inner}"
+        hLog.flush
+    | .request id m _ =>
+      hOut.writeGspResponseError
+        ⟨id, JsonRpc.ErrorCode.methodNotFound, s!"Method not found: {m}", none⟩
+    | _ =>
+      hLog.putStr s!"Invalid action: {toJson m}"
+      hLog.flush
+
+    mainLoop env game levels
 
 end Server

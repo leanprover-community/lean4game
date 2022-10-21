@@ -76,8 +76,8 @@ section
   variable [ToJson α]
 
   def writeGspMessage (h : FS.Stream) (m : Message) : IO Unit := do
-    h.writeMessage m
-    h.putStr "\n"
+    h.putStr ((toJson m).compress ++ "\n")
+    h.flush
 
   def writeGspRequest (h : FS.Stream) (r : Request α) : IO Unit :=
     h.writeGspMessage r

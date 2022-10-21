@@ -11,10 +11,18 @@ import LeftPanel from './LeftPanel';
 import InputZone from './InputZone';
 import Message from './Message';
 import TacticState from './TacticState';
+import * as rpc from 'vscode-ws-jsonrpc';
 
+interface LevelProps {
+  rpcConnection: null|rpc.MessageConnection;
+  nbLevels: any;
+	level: any;
+	setCurLevel: any;
+	setLevelTitle: any;
+	setFinished: any
+}
 
-
-function Level({ sendJsonMessage, lastMessage, lastJsonMessage, nbLevels, level, setCurLevel, setLevelTitle, setFinished }) {
+function Level({ rpcConnection, nbLevels, level, setCurLevel, setLevelTitle, setFinished }: LevelProps) {
 	const [index, setIndex] = useState(level) // Level number
 	const [tacticDocs, setTacticDocs] = useState([])
 	const [lemmaDocs, setLemmaDocs] = useState([])
@@ -30,46 +38,40 @@ function Level({ sendJsonMessage, lastMessage, lastJsonMessage, nbLevels, level,
 
 	const [completed, setCompleted] = useState(false)
 
-	// The next function will be called when the level changes
-	useEffect(() => {
-		sendJsonMessage({ "loadLevel": level });
-	}, [level, sendJsonMessage])
-
-	// The next function will be called when a message arrives or the level title changes
-	useEffect(() => {
-		console.log(lastMessage)
-		console.log(lastJsonMessage)
-		if ("nb_levels" in lastJsonMessage) { return } // this is an old message from starting the game
-		const data = lastJsonMessage;
-		if ("title" in data) { // This is the level metadata coming in
-			setLevelTitle("Level " + data["index"] + ": " + data["title"])
-			setIndex(parseInt(data["index"]))
-			setTacticDocs(data["tactics"])
-			setLemmaDocs(data["lemmas"])
-		}
-
-		if (data["message"] !== "" && data.errors.length === 0) {
-			setMessage(data["message"])
+	const processResponse = (res:any) => {
+		setLeanData(res);
+		setErrors(res.errors);
+		if (res.message !== "" && res.errors?.length === 0) {
+			setMessage(res.message)
 			setMessageOpen(true)
 		}
-		setLeanData(data);
-		setErrors(data.errors);
-		if (data.goals.length === 0 && data.errors.length === 0) {
+		if (res.goals?.length === 0 && res.errors?.length === 0) {
 			setCompleted(true)
 		}
+	}
 
-	}, [lastJsonMessage, lastMessage, setLevelTitle])
-
+	// The next function will be called when the level changes
+	useEffect(() => {
+		if (rpcConnection) {
+			rpcConnection.sendRequest("loadLevel", {number: level}).then((res) => {
+				setLevelTitle("Level " + res["index"] + ": " + res["title"])
+				setIndex(parseInt(res["index"]))
+				setTacticDocs(res["tactics"])
+				setLemmaDocs(res["lemmas"])
+				processResponse(res)
+			});
+		}
+	}, [level, rpcConnection])
 
 	function sendTactic(input) {
-		sendJsonMessage({ "runTactic": input });
+		rpcConnection.sendRequest("runTactic", {tactic: input}).then(processResponse);
 		setLastTactic(input);
 		setHistory(history.concat([input]));
 	}
 
 	function undo() {
 		if (errors.length === 0) {
-			sendJsonMessage('undo');
+			rpcConnection.sendRequest('undo').then(processResponse);
 		}
 		if (history.length > 1) {
 			setLastTactic(history[history.length - 1]);
