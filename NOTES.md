@@ -2,7 +2,7 @@
 # Install docker
 ```
 sudo apt-get update
-sudo apt-get install ca-certificates curl gnupg lsb-release -y 
+sudo apt-get install ca-certificates curl gnupg lsb-release -y
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo \
@@ -34,13 +34,16 @@ sudo systemctl reload docker
 
 # Install NPM
 ```
-sudo apt-get install npm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+source ~/.bashrc
+nvm install node npm
+
 sudo npm install -g http-server
 ```
 
 # Clone NNG interface
 ```
-( 
+(
   git clone https://github.com/hhu-adam/nng4-interface.git
   cd nng4-interface
   rm package-lock.json
