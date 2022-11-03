@@ -86,3 +86,11 @@ export PORT=80
 sudo apt-get install libcap2-bin
 sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
 ```
+
+
+
+# Install PM2
+
+```
+sudo npm i -g pm2
+```
