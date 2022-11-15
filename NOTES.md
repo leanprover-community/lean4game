@@ -86,3 +86,17 @@ export PORT=80
 sudo apt-get install libcap2-bin
 sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
 ```
+
+
+
+# Install PM2
+
+```
+sudo npm i -g pm2
+
+pm2 start ecosystem.config.js
+pm2 save
+pm2 startup
+pm2 install pm2-logrotate
+
+```
