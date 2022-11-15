@@ -100,3 +100,57 @@ pm2 startup
 pm2 install pm2-logrotate
 
 ```
+
+
+# Nginx installieren
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install nginx nginx-extras
+```
+
+Konfigurieren als reverse proxy:
+```
+sudo unlink /etc/nginx/sites-enabled/default
+cd /etc/nginx/sites-available
+sudo vim reverse-proxy.conf
+```
+
+```
+server {
+        server_name lean.math.uni-duesseldorf.de;
+        location / {
+                proxy_pass      http://localhost:8001;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+
+        }
+        client_max_body_size 0;
+
+        listen 443 ssl;
+        ssl_certificate /home/adam/adam_math_uni-duesseldorf_de_cert.cer;
+        ssl_certificate_key /home/adam/private_ssl_key.pem;
+}
+
+server {
+        server_name adam.math.uni-duesseldorf.de;
+        location / {
+                proxy_pass      http://localhost:8002;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        client_max_body_size 0;
+}
+```
+
+Activate config:
+```
+  sudo ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/reverse-proxy.conf
+  sudo nginx -t
+  sudo nginx -s reload
+```
