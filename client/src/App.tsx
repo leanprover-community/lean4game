@@ -24,7 +24,7 @@ function App() {
   const [finished, setFinished] = useState(false)
   const [rpcConnection, setRpcConnection] = useState<null|rpc.MessageConnection>(null)
 
-  const socketUrl = 'ws://' + window.location.host + '/websocket/'
+  const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/'
 
   useWebSocket(socketUrl, {
     onOpen: function (ev) {
