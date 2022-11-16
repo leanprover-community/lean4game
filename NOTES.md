@@ -117,6 +117,19 @@ sudo vim reverse-proxy.conf
 ```
 
 ```
+# Anonymize IP addresses
+map $remote_addr $remote_addr_anon {
+    ~(?P<ip>\d+\.\d+\.\d+)\.    $ip.0;
+    ~(?P<ip>[^:]+:[^:]+):       $ip::;
+    127.0.0.1                   $remote_addr;
+    ::1                         $remote_addr;
+    default                     0.0.0.0;
+}
+
+log_format  main  '$remote_addr_anon - $remote_user [$time_local] "$request" '
+    '$status $body_bytes_sent "$http_referer" '
+    '"$http_user_agent" "$http_x_forwarded_for"';
+
 server {
         server_name lean.math.uni-duesseldorf.de;
         location / {
@@ -134,6 +147,9 @@ server {
         listen 443 ssl;
         ssl_certificate /home/adam/adam_math_uni-duesseldorf_de_cert.cer;
         ssl_certificate_key /home/adam/private_ssl_key.pem;
+
+        access_log /var/log/nginx/access.log main;
+        error_log /dev/null crit;
 }
 
 server {
@@ -143,8 +159,26 @@ server {
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+
         }
         client_max_body_size 0;
+
+        listen 443 ssl;
+        ssl_certificate /home/adam/adam_math_uni-duesseldorf_de_cert.cer;
+        ssl_certificate_key /home/adam/private_ssl_key.pem;
+
+        access_log /var/log/nginx/access.log main;
+        error_log /dev/null crit;
+}
+
+# Redirect HTTP to HTTPS
+server {
+    listen 80 default_server;
+    server_name _;
+    return 301 https://$host$request_uri;
 }
 ```
 
