@@ -24,7 +24,9 @@ type infoResultType = {
   conclusion: string
 }
 
-const infoRequestType = new rpc.RequestType0<infoResultType, void>("info")
+const initializeRequestType = new rpc.RequestType0<any, void>("initialize")
+const initializedNotificationType = new rpc.NotificationType0("initialized")
+const infoRequestType = new rpc.RequestType1<string, infoResultType, void>("info")
 
 function Welcome({ rpcConnection, setNbLevels, setTitle, startGame, setConclusion }: WelcomeProps) {
 
@@ -32,12 +34,16 @@ function Welcome({ rpcConnection, setNbLevels, setTitle, startGame, setConclusio
 
   useEffect(() => {
     if (rpcConnection) { // Will run in the beginning as soon as RPC connection is established
-      rpcConnection.sendRequest(infoRequestType).then((res: infoResultType) =>{
-        setLeanData(res)
-        setNbLevels(res.nb_levels)
-        setTitle(res.title)
-        document.title = res.title
-        setConclusion(res.conclusion)
+      rpcConnection.sendRequest(initializeRequestType).then((res: any) => {
+        rpcConnection.onRequest("client/registerCapability", () => {})
+        rpcConnection.sendNotification(initializedNotificationType)
+        rpcConnection.sendRequest(infoRequestType, "hello").then((res: infoResultType) =>{
+          setLeanData(res)
+          setNbLevels(res.nb_levels)
+          setTitle(res.title)
+          document.title = res.title
+          setConclusion(res.conclusion)
+        });
       });
     }
   }, [rpcConnection, setLeanData, setNbLevels, setTitle, setConclusion])

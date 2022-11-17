@@ -33,6 +33,9 @@ function App() {
       let rpcConnection = rpc.createWebSocketConnection(socket, logger)
       setRpcConnection(rpcConnection);
       rpcConnection.listen();
+    },
+    onMessage: (msg) => {
+      console.log(msg)
     }
   })
 

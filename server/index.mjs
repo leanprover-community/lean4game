@@ -34,16 +34,23 @@ if (isDevelopment) {
 
 wss.addListener("connection", function(ws) {
     const socket = {
-        onMessage: (cb) => {ws.on("message", cb)},
-        onError: (cb) => {ws.on("error", cb)},
-        onClose: (cb) => {ws.on("onclose", cb)},
-        send: ws.send
+        onMessage: (cb) => { ws.on("message", cb) },
+        onError: (cb) => { ws.on("error", cb) },
+        onClose: (cb) => { ws.on("onclose", cb) },
+        send: (data, cb) => { ws.send(data,cb) }
     }
     const reader = new rpc.WebSocketMessageReader(socket);
     const writer = new rpc.WebSocketMessageWriter(socket);
     const socketConnection = jsonrpcserver.createConnection(reader, writer, () => ws.close())
     const serverConnection = jsonrpcserver.createServerProcess('Lean Server', cmd, cmdArgs);
-    jsonrpcserver.forward(socketConnection, serverConnection, message => {
+    socketConnection.forward(serverConnection, message => {
+        console.log(`CLIENT: ${JSON.stringify(message)}`)
         return message;
     });
+    serverConnection.forward(socketConnection, message => {
+        console.log(`SERVER: ${JSON.stringify(message)}`)
+        return message;
+    });
+    socketConnection.onClose(() => serverConnection.dispose());
+    serverConnection.onClose(() => socketConnection.dispose());
 })
