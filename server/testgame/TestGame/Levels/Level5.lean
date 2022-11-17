@@ -63,12 +63,13 @@ Start by casting `induction_on n`.
 "
 
 Statement (n : ℕ) : 0 + n = n := by
-  induction_on n
-  rewrite [add_zero]
-  rfl
-  rewrite [add_succ]
-  rewrite [ind_hyp]
-  rfl
+  sorry
+  -- induction_on n
+  -- rewrite [add_zero]
+  -- rfl
+  -- rewrite [add_succ]
+  -- rewrite [ind_hyp]
+  -- rfl
 
 Message : (0 : ℕ) + 0 = 0  => "
 We now have *two goals!* The

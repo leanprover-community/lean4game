@@ -5,5 +5,5 @@ require GameServer from ".."/"leanserver"
 
 package TestGame
 
-@[defaultTarget]
+@[default_target]
 lean_lib TestGame

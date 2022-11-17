@@ -5,7 +5,7 @@ package GameServer
 
 lean_lib GameServer
 
-@[defaultTarget]
+@[default_target]
 lean_exe gameserver {
   root := `Main
   supportInterpreter := true
