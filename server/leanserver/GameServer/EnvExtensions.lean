@@ -16,7 +16,7 @@ open Lean
 structure GoalMessageEntry where
   ctx_size : Nat
   normalized_goal : Expr
-  intro_nb : Nat 
+  intro_nb : Nat
   message : String
   deriving Repr
 
@@ -37,7 +37,7 @@ initialize tacticDocExt : SimplePersistentEnvExtension TacticDocEntry (Array Tac
 
 open Elab Command in
 /-- Print a registered tactic doc for debugging purposes. -/
-elab "#print_tactic_doc" : command => do 
+elab "#print_tactic_doc" : command => do
   for entry in tacticDocExt.getState (← getEnv) do
     dbg_trace "{entry.name} : {entry.content}"
 
@@ -56,7 +56,7 @@ initialize tacticSetExt : SimplePersistentEnvExtension TacticSetEntry (Array Tac
 
 open Elab Command in
 /-- Print all registered tactic sets for debugging purposes. -/
-elab "#print_tactic_set" : command => do 
+elab "#print_tactic_set" : command => do
   for entry in tacticSetExt.getState (← getEnv) do
     dbg_trace "{entry.name} : {entry.tactics.map TacticDocEntry.name}"
 
@@ -79,7 +79,7 @@ initialize lemmaDocExt : SimplePersistentEnvExtension LemmaDocEntry (Array Lemma
 
 open Elab Command in
 /-- Print a lemma doc for debugging purposes. -/
-elab "#print_lemma_doc" : command => do 
+elab "#print_lemma_doc" : command => do
   for entry in lemmaDocExt.getState (← getEnv) do
     dbg_trace "{entry.userName} ({entry.name}) in {entry.category}: {entry.content}"
 
@@ -99,7 +99,7 @@ initialize lemmaSetExt : SimplePersistentEnvExtension LemmaSetEntry (Array Lemma
 
 open Elab Command in
 /-- Print all registered lemma sets for debugging purposes. -/
-elab "#print_lemma_set" : command => do 
+elab "#print_lemma_set" : command => do
   for entry in lemmaSetExt.getState (← getEnv) do
     dbg_trace "{entry.name} : {entry.lemmas.map LemmaDocEntry.name}"
 
@@ -123,7 +123,7 @@ initialize curLevelExt : EnvExtension Nat ← registerEnvExtension (pure 0)
 
 variable {m: Type → Type} [Monad m] [MonadEnv m]
 
-def setCurLevelIdx (lvl : Nat) :  m Unit := 
+def setCurLevelIdx (lvl : Nat) :  m Unit :=
   modifyEnv (curLevelExt.setState · lvl)
 
 def getCurLevelIdx :  m Nat := do
@@ -148,4 +148,3 @@ def getCurLevel [MonadError m] :  m GameLevel := do
   match (← levelsExt.find? idx) with
   | some level => return level
   | none => throwError "Couldn't find level {idx}"
-

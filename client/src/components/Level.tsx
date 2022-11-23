@@ -40,14 +40,14 @@ function Level({ rpcConnection, nbLevels, level, setCurLevel, setLevelTitle, set
 
   const processResponse = (res:any) => {
     setLeanData(res);
-    setErrors(res.errors);
-    if (res.message !== "" && res.errors?.length === 0) {
-      setMessage(res.message)
-      setMessageOpen(true)
-    }
-    if (res.goals?.length === 0 && res.errors?.length === 0) {
-      setCompleted(true)
-    }
+    // setErrors(res.errors);
+    // if (res.message !== "" && res.errors?.length === 0) {
+    //   setMessage(res.message)
+    //   setMessageOpen(true)
+    // }
+    // if (res.goals?.length === 0 && res.errors?.length === 0) {
+    //   setCompleted(true)
+    // }
   }
 
   // The next function will be called when the level changes

@@ -11,7 +11,7 @@ open Lsp
 open JsonRpc
 open System.Uri
 
-  partial def mainLoop (clientTask : Task ServerEvent) : ServerM Unit := do
+  partial def mainLoop (clientTask : Task ServerEvent) : GameServerM Unit := do
     let st ← read
     let workers ← st.fileWorkersRef.get
     let mut workerTasks := #[]
@@ -90,7 +90,7 @@ open System.Uri
         | WorkerEvent.terminated =>
           throwServerError "Internal server error: got termination event for worker that should have been removed"
 
-def initAndRunWatchdogAux : ServerM Unit := do
+def initAndRunWatchdogAux : GameServerM Unit := do
   let st ← read
   try
     discard $ st.hIn.readLspNotificationAs "initialized" InitializedParams
@@ -105,6 +105,27 @@ def initAndRunWatchdogAux : ServerM Unit := do
     try st.hIn.readLspMessage
     catch _ => pure (Message.notification "exit" none)
     | throwServerError "Got `shutdown` request, expected an `exit` notification"
+
+def createEnv : IO Environment := do
+  let gameDir := "testgame"
+
+  -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
+  let out ← IO.Process.output
+    { cwd := gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
+  if out.exitCode != 0 then
+    throwServerError s!"Error while running Lake: {out.stderr}"
+
+  -- Make the paths relative to the current directory
+  let paths : List System.FilePath := System.SearchPath.parse out.stdout.trim
+  let currentDir ← IO.currentDir
+  let paths := paths.map fun p => currentDir / (gameDir : System.FilePath) / p
+
+  -- Set the search path
+  Lean.searchPathRef.set paths
+
+  let gameName := `TestGame
+  let env ← importModules [{ module := `Init : Import }, { module := gameName : Import }] {} 0
+  return env
 
 def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
   -- TODO: Do the following commands slow us down?
@@ -127,7 +148,8 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
       : InitializeResult
     }
   }
-  ReaderT.run initAndRunWatchdogAux {
+  let state := {env := ← createEnv}
+  let context : ServerContext := {
     hIn            := i
     hOut           := o
     hLog           := e
@@ -138,8 +160,8 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
     workerPath
     srcSearchPath
     references
-    : ServerContext
   }
+  discard $ ReaderT.run (StateT.run initAndRunWatchdogAux state) context
 
 def watchdogMain (args : List String) : IO UInt32 := do
   let i ← IO.getStdin
