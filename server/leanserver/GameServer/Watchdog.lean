@@ -107,6 +107,7 @@ def initAndRunWatchdogAux : ServerM Unit := do
     | throwServerError "Got `shutdown` request, expected an `exit` notification"
 
 def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
+  -- TODO: Do the following commands slow us down?
   let workerPath ← findWorkerPath
   let srcSearchPath ← initSrcSearchPath (← getBuildDir)
   let references ← IO.mkRef (← loadReferences)
