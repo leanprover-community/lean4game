@@ -269,7 +269,7 @@ section Initialization
         if path.fileName != "lakefile.lean" && (← System.FilePath.pathExists lakePath) then
           let pkgSearchPath ← lakeSetupSearchPath lakePath m (Lean.Elab.headerToImports headerStx).toArray hOut
           srcSearchPath ← initSrcSearchPath (← getBuildDir) pkgSearchPath
-      let env ← importModules [{module := `Init}, {module := `Lib}] opts 0
+      let env ← importModules [{module := `Init}] opts 0
       pure (env, msgLog)
     catch e =>  -- should be from `lake print-paths`
       let msgs := MessageLog.empty.add { fileName := "<ignored>", pos := ⟨0, 0⟩, data := e.toString }

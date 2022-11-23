@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
     "outDir": "./client/dist/",
-    "module": "es6",
+    "module": "esnext",
     "target": "es5",
     "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "jsx": "react",
+    "downlevelIteration": true,
+    "experimentalDecorators": true
   }
 }

@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require('webpack');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 
@@ -31,8 +32,12 @@ module.exports = env => {
         },
         {
           test: /\.tsx?$/,
-          use: 'ts-loader',
-          exclude: /node_modules/,
+          use: [{
+            loader: 'ts-loader',
+            options: { allowTsInNodeModules: true }
+          }],
+          exclude: /node_modules(?!\/(lean4web|lean4))/,
+          // Allow .ts imports from node_modules/lean4web and node_modules/lean4
         },
         {
           test: /\.css$/,
@@ -40,7 +45,13 @@ module.exports = env => {
         }
       ]
     },
-    resolve: { extensions: ["*", ".js", ".jsx", ".tsx", ".ts"] },
+    resolve: {
+      extensions: ["*", ".js", ".jsx", ".tsx", ".ts"],
+      fallback: {
+        "http": require.resolve("stream-http") ,
+        "path": require.resolve("path-browserify")
+      },
+    },
     output: {
       path: path.resolve(__dirname, "client/dist/"),
       filename: "bundle.js",
@@ -60,14 +71,27 @@ module.exports = env => {
     plugins: [
       !isDevelopment && new WebpackShellPluginNext({
         onBuildEnd:{
-          // It's hard to set up webpack to copy the index.html correctly,
-          // so we copy it explicitly after every build:
-          scripts: ['cp client/public/index.html client/dist/'],
+          scripts: [
+            // It's hard to set up webpack to copy the index.html correctly,
+            // so we copy it explicitly after every build:
+            'cp client/public/index.html client/dist/',
+            // Similarly, I haven't been able to load `onigasm.wasm` properly:
+            'cp client/public/onigasm.wasm client/dist/',],
           blocking: false,
           parallel: true
         }
       }),
-      isDevelopment && new ReactRefreshWebpackPlugin()
+      isDevelopment && new ReactRefreshWebpackPlugin(),
+      new webpack.ContextReplacementPlugin(
+        /\/@leanprover\/infoview\//,
+        (data) => {
+          // Webpack is not happy about the dynamically loaded widget code in the function
+          // `dynamicallyLoadComponent` in `infoview/userWidget.tsx`. If we want to support
+          // dynamically loaded widget code, we need to make sure that the files are available.
+          delete data.dependencies[0].critical;
+          return data;
+        },
+      ),
     ].filter(Boolean),
   };
 }

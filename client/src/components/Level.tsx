@@ -12,6 +12,7 @@ import InputZone from './InputZone';
 import Message from './Message';
 import TacticState from './TacticState';
 import * as rpc from 'vscode-ws-jsonrpc';
+import Editor from 'lean4web/client/src/Editor'
 
 interface LevelProps {
   rpcConnection: null|rpc.MessageConnection;
@@ -103,8 +104,10 @@ function Level({ rpcConnection, nbLevels, level, setCurLevel, setLevelTitle, set
         <LeftPanel spells={tacticDocs} inventory={lemmaDocs} />
       </Grid>
       <Grid xs={4}>
-        <InputZone index={index} history={history} messageOpen={messageOpen} setMessageOpen={setMessageOpen} completed={completed} sendTactic={sendTactic} nbLevels={nbLevels} loadNextLevel={loadNextLevel}
-          errors={errors} lastTactic={lastTactic} undo={undo} finishGame={finishGame} />
+        <Editor setRestart={() => {}}
+          value={""} onDidChangeContent={() => {}}/>
+        {/* <InputZone index={index} history={history} messageOpen={messageOpen} setMessageOpen={setMessageOpen} completed={completed} sendTactic={sendTactic} nbLevels={nbLevels} loadNextLevel={loadNextLevel}
+          errors={errors} lastTactic={lastTactic} undo={undo} finishGame={finishGame} /> */}
         <Message isOpen={messageOpen} content={message} close={closeMessage} />
       </Grid>
       <Grid xs={4}>
