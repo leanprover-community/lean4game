@@ -23,13 +23,15 @@ const wss = new WebSocketServer({ server })
 const environment = process.env.NODE_ENV
 const isDevelopment = environment === 'development'
 
-let cmd, cmdArgs;
+let cmd, cmdArgs, cwd;
 if (isDevelopment) {
-    cmd = "./leanserver/build/bin/gameserver";
-    cmdArgs = ["--server"];
+    cmd = "lake";
+    cmdArgs = ["exe", "gameserver", "--server"];
+    cwd = "./leanserver"
 } else{
     cmd = "docker";
     cmdArgs = ["run", "--runtime=runsc", "--network=none", "--rm", "-i", "testgame:latest"];
+    cwd = "."
 }
 
 wss.addListener("connection", function(ws) {
@@ -42,7 +44,7 @@ wss.addListener("connection", function(ws) {
     const reader = new rpc.WebSocketMessageReader(socket);
     const writer = new rpc.WebSocketMessageWriter(socket);
     const socketConnection = jsonrpcserver.createConnection(reader, writer, () => ws.close())
-    const serverConnection = jsonrpcserver.createServerProcess('Lean Server', cmd, cmdArgs);
+    const serverConnection = jsonrpcserver.createServerProcess('Lean Server', cmd, cmdArgs, { cwd });
     socketConnection.forward(serverConnection, message => {
         console.log(`CLIENT: ${JSON.stringify(message)}`)
         return message;
