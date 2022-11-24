@@ -12,6 +12,10 @@ import InputZone from './InputZone';
 import Message from './Message';
 import TacticState from './TacticState';
 import { LeanClient } from 'lean4web/client/src/editor/leanclient';
+import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
+import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
+import { InfoProvider } from 'lean4web/client/src/editor/infoview';
+import { renderInfoview } from '@leanprover/infoview'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
 interface LevelProps {
@@ -33,6 +37,7 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
   const [lastTactic, setLastTactic] = useState("")
   const [errors, setErrors] = useState([])
   const codeviewRef = useRef<HTMLDivElement>(null)
+  const infoviewRef = useRef<HTMLDivElement>(null)
 
   const [message, setMessage] = useState("")
   const [messageOpen, setMessageOpen] = useState(false)
@@ -74,12 +79,13 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
       theme: 'vs-code-theme-converted'
     })
     // setEditor(editor)
-    // new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
+    new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
-
-    // const infoProvider = new InfoProvider(leanClient)
-    // const div: HTMLElement = infoviewRef.current!
-    // const infoviewApi = renderInfoview(infoProvider.getApi(), div)
+    const infoProvider = new InfoProvider(leanClient)
+    const div: HTMLElement = infoviewRef.current!
+    const infoviewApi = renderInfoview(infoProvider.getApi(), div)
+    infoviewApi.serverRestarted(leanClient.initializeResult)
+    infoProvider.openPreview(editor, infoviewApi)
     // setInfoProvider(infoProvider)
     // setInfoviewApi(infoviewApi)
 
@@ -138,6 +144,7 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
         <Message isOpen={messageOpen} content={message} close={closeMessage} />
       </Grid>
       <Grid xs={4}>
+        <div ref={infoviewRef} className="infoview"></div>
         <TacticState goals={leanData.goals} errors={errors} lastTactic={lastTactic} completed={completed} />
       </Grid>
     </Grid>
