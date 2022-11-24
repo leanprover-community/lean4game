@@ -9,9 +9,10 @@ import '@fontsource/roboto/700.css';
 import * as rpc from 'vscode-ws-jsonrpc';
 
 import { Box, Typography, Button, CircularProgress, Grid } from '@mui/material';
+import { LeanClient } from 'lean4web/client/src/editor/leanclient';
 
 interface WelcomeProps {
-  rpcConnection: null|rpc.MessageConnection;
+  leanClient: null|LeanClient;
   setNbLevels: any;
   setTitle: any;
   startGame: any;
@@ -24,29 +25,25 @@ type infoResultType = {
   conclusion: string
 }
 
-const initializeRequestType = new rpc.RequestType0<any, void>("initialize")
-const initializedNotificationType = new rpc.NotificationType0("initialized")
-const infoRequestType = new rpc.RequestType1<string, infoResultType, void>("info")
-
-function Welcome({ rpcConnection, setNbLevels, setTitle, startGame, setConclusion }: WelcomeProps) {
+function Welcome({ leanClient, setNbLevels, setTitle, startGame, setConclusion }: WelcomeProps) {
 
   const [leanData, setLeanData] = useState<null|infoResultType>(null)
 
   useEffect(() => {
-    if (rpcConnection) { // Will run in the beginning as soon as RPC connection is established
-      rpcConnection.sendRequest(initializeRequestType).then((res: any) => {
-        rpcConnection.onRequest("client/registerCapability", () => {})
-        rpcConnection.sendNotification(initializedNotificationType)
-        rpcConnection.sendRequest(infoRequestType, "hello").then((res: infoResultType) =>{
-          setLeanData(res)
-          setNbLevels(res.nb_levels)
-          setTitle(res.title)
-          document.title = res.title
-          setConclusion(res.conclusion)
-        });
+    if (!leanClient) return;
+
+    const getInfo = async () => {
+      await leanClient.start() // TODO: need a way to wait for start without restarting
+      leanClient.sendRequest("info", "hello").then((res: infoResultType) =>{
+        setLeanData(res)
+        setNbLevels(res.nb_levels)
+        setTitle(res.title)
+        document.title = res.title
+        setConclusion(res.conclusion)
       });
     }
-  }, [rpcConnection, setLeanData, setNbLevels, setTitle, setConclusion])
+    getInfo()
+  }, [leanClient])
 
   let content
   if (leanData) {

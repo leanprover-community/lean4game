@@ -10,7 +10,7 @@
     "@mui/material": "^5.10.9",
     "better-react-mathjax": "^2.0.2",
     "express": "^4.18.2",
-    "lean4web": "git+https://github.com/hhu-adam/lean4web.git",
+    "lean4web": "github:hhu-adam/lean4web",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
