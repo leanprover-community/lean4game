@@ -107,7 +107,7 @@ def initAndRunWatchdogAux : GameServerM Unit := do
     | throwServerError "Got `shutdown` request, expected an `exit` notification"
 
 def createEnv : IO Environment := do
-  let gameDir := "../testgame"
+  let gameDir := "../../../testgame"
 
   -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
   let out ← IO.Process.output
@@ -128,7 +128,7 @@ def createEnv : IO Environment := do
   return env
 
 def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
-  let workerPath := "./build/bin/gameserver"
+  let workerPath := "./gameserver"
   -- TODO: Do the following commands slow us down?
   let srcSearchPath ← initSrcSearchPath (← getBuildDir)
   let references ← IO.mkRef (← loadReferences)
