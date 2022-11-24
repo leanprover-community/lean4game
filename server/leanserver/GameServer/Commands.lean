@@ -48,12 +48,7 @@ elab "Statement" sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
   let declName : Name := (← gameExt.get).name ++ ("level" ++ toString lvlIdx : String)
   elabCommand (← `(theorem $(mkIdent declName) $sig $val))
-  let (binders, _) := expandDeclSig sig
-  let mut nb : Nat := 0
-  for arg in binders.getArgs do
-    nb := nb + arg[1].getArgs.size
-  let some cInfo := (← getEnv).find? declName | throwError "Declaration not found"
-  levelsExt.update lvlIdx {← getCurLevel with goal := cInfo.type, intro_nb := nb}
+  levelsExt.update lvlIdx {← getCurLevel with goal := sig}
   
 /-- Define the conclusion of the current game or current level if some
 building a level. -/

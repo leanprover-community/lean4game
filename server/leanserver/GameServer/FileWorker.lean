@@ -1,6 +1,7 @@
 /- This file is mostly copied from `Lean/Server/FileWorker.lean`. -/
 
 import Lean
+import GameServer.EnvExtensions
 
 namespace MyModule
 open Lean
@@ -88,11 +89,11 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
     let (output, _) ← IO.FS.withIsolatedStreams (isolateStderr := server.stderrAsMessages.get scope.opts) <| liftM (m := BaseIO) do
       Elab.Command.catchExceptions
         (getResetInfoTrees *> do
-          -- let level := `level1
+          let levels := levelsExt.getState (← getEnv)
           let done := Syntax.node (.synthetic cmdParserState.pos cmdParserState.pos) ``Lean.Parser.Tactic.done #[]
           let tacticStx := (tacticStx.getArgs.push done).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
-          let cmdStx ← `(command| example : 0 = 0 := by {$(⟨tacticStx⟩)} )
+          let cmdStx ← `(command| theorem mythm $(levels[1].get!.goal) := by {$(⟨tacticStx⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
         cmdCtx cmdStateRef
     let postNew := (← tacticCacheNew.get).post
@@ -251,62 +252,46 @@ section Initialization
     fileName := (System.Uri.fileUriToPath? doc.uri).getD doc.uri |>.toString
     fileMap  := default
 
+  -- TODO: Duplicate in Watchdog?
+  def createEnv : IO (Environment × SearchPath) := do
+    let gameDir := "../../../testgame"
+
+    -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
+    let out ← IO.Process.output
+      { cwd := gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
+    if out.exitCode != 0 then
+      throwServerError s!"Error while running Lake: {out.stderr}"
+
+    -- Make the paths relative to the current directory
+    let paths : List System.FilePath := System.SearchPath.parse out.stdout.trim
+    let currentDir ← IO.currentDir
+    let paths := paths.map fun p => currentDir / (gameDir : System.FilePath) / p
+
+    -- Set the search path
+    Lean.searchPathRef.set paths
+
+    let gameName := `TestGame
+    let env ← importModules [{ module := `Init : Import }, { module := gameName : Import }] {} 0
+    return (env, paths)
+
   def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
       : IO (Snapshot × SearchPath) := do
-    let (headerStx, headerParserState, msgLog) ← Parser.parseHeader m.mkInputContext
-    let mut srcSearchPath ← initSrcSearchPath (← getBuildDir)
-    searchPathRef.set [(← Lean.findSysroot) / "lib" / "lean", (← getBuildDir) / "lib"]
-    let lakePath ← match (← IO.getEnv "LAKE") with
-      | some path => pure <| System.FilePath.mk path
-      | none =>
-        let lakePath ← match (← IO.getEnv "LEAN_SYSROOT") with
-          | some path => pure <| System.FilePath.mk path / "bin" / "lake"
-          | _         => pure <| (← appDir) / "lake"
-        pure <| lakePath.withExtension System.FilePath.exeExtension
-    let (headerEnv, msgLog) ← try
-      if let some path := System.Uri.fileUriToPath? m.uri then
-        -- NOTE: we assume for now that `lakefile.lean` does not have any non-stdlib deps
-        -- NOTE: lake does not exist in stage 0 (yet?)
-        if path.fileName != "lakefile.lean" && (← System.FilePath.pathExists lakePath) then
-          let pkgSearchPath ← lakeSetupSearchPath lakePath m (Lean.Elab.headerToImports headerStx).toArray hOut
-          srcSearchPath ← initSrcSearchPath (← getBuildDir) pkgSearchPath
-      let env ← importModules [{module := `Init}] opts 0
-      pure (env, msgLog)
-    catch e =>  -- should be from `lake print-paths`
-      let msgs := MessageLog.empty.add { fileName := "<ignored>", pos := ⟨0, 0⟩, data := e.toString }
-      pure (← mkEmptyEnvironment, msgs)
-    let mut headerEnv := headerEnv
+    let mut (headerEnv, paths) ← createEnv
     try
       if let some path := System.Uri.fileUriToPath? m.uri then
         headerEnv := headerEnv.setMainModule (← moduleNameOfFileName path none)
     catch _ => pure ()
-    let cmdState := Elab.Command.mkState headerEnv msgLog opts
-    let cmdState := { cmdState with infoState := {
-      enabled := true
-      trees := #[Elab.InfoTree.context ({
-        env     := headerEnv
-        fileMap := m.text
-        ngen    := { namePrefix := `_worker }
-      }) (Elab.InfoTree.node
-          (Elab.Info.ofCommandInfo { elaborator := `header, stx := headerStx })
-          (headerStx[1].getArgs.toList.map (fun importStx =>
-            Elab.InfoTree.node (Elab.Info.ofCommandInfo {
-              elaborator := `import
-              stx := importStx
-            }) #[].toPArray'
-          )).toPArray'
-      )].toPArray'
-    }}
+    let cmdState := Elab.Command.mkState headerEnv {} opts
     let headerSnap := {
       beginPos := 0
-      stx := headerStx
-      mpState := headerParserState
+      stx := Syntax.missing
+      mpState := {}
       cmdState := cmdState
       interactiveDiags := ← cmdState.messages.msgs.mapM (Widget.msgToInteractiveDiagnostic m.text · hasWidgets)
       tacticCache := (← IO.mkRef {})
     }
     publishDiagnostics m headerSnap.diagnostics.toArray hOut
-    return (headerSnap, srcSearchPath)
+    return (headerSnap, paths)
 
 
   def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)

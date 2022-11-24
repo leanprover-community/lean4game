@@ -137,8 +137,7 @@ structure GameLevel where
   tactics: Array TacticDocEntry := default
   lemmas: Array LemmaDocEntry := default
   messages: Array GoalMessageEntry := default
-  goal : Expr := default
-  intro_nb : Nat := default
+  goal : TSyntax `Lean.Parser.Command.declSig := default
   deriving Inhabited, Repr
 
 initialize levelsExt : HashMapExtension Nat GameLevel ← mkHashMapExtension `levels Nat GameLevel
