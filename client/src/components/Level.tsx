@@ -135,10 +135,10 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
     setHistory(history.slice(0, -1));
   }
 
-  function loadNextLevel() {
+  function loadLevel(index) {
     setCompleted(false)
     setHistory([])
-    setCurLevel(index + 1)
+    setCurLevel(index)
   }
 
   function closeMessage() {
@@ -163,7 +163,8 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
       </Grid>
       <Grid xs={4}>
         <div ref={infoviewRef} className="infoview"></div>
-        <Button onClick={loadNextLevel} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Go to Next Level</Button>
+        {index > 1 ? <Button onClick={() => { loadLevel(index - 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button> : null}
+        {index < nbLevels ? <Button onClick={() => { loadLevel(index + 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button> : null}
         {/* <TacticState goals={leanData.goals} errors={errors} lastTactic={lastTactic} completed={completed} /> */}
       </Grid>
     </Grid>
