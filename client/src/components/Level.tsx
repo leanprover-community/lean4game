@@ -5,6 +5,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
+import { Button } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 
 import LeftPanel from './LeftPanel';
@@ -15,6 +16,7 @@ import { LeanClient } from 'lean4web/client/src/editor/leanclient';
 import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
 import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
 import { InfoProvider } from 'lean4web/client/src/editor/infoview';
+import 'lean4web/client/src/editor/infoview.css'
 import { renderInfoview } from '@leanprover/infoview'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
@@ -31,6 +33,9 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
   const [index, setIndex] = useState(level) // Level number
   const [tacticDocs, setTacticDocs] = useState([])
   const [lemmaDocs, setLemmaDocs] = useState([])
+  const [editor, setEditor] = useState(null)
+  const [infoProvider, setInfoProvider] = useState(null)
+  const [infoviewApi, setInfoviewApi] = useState(null)
 
   const [leanData, setLeanData] = useState({goals: []})
   const [history, setHistory] = useState([])
@@ -57,12 +62,8 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
     // }
   }
 
-  // The next function will be called when the level changes
   useEffect(() => {
-    const uri = monaco.Uri.parse('file:///LeanProject/Level1.lean')
-    const model = monaco.editor.createModel('', 'lean4', uri)
     const editor = monaco.editor.create(codeviewRef.current!, {
-      model,
       glyphMargin: true,
       lightbulb: {
         enabled: true
@@ -78,25 +79,42 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
       'semanticHighlighting.enabled': true,
       theme: 'vs-code-theme-converted'
     })
-    // setEditor(editor)
-    new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
     const infoProvider = new InfoProvider(leanClient)
     const div: HTMLElement = infoviewRef.current!
     const infoviewApi = renderInfoview(infoProvider.getApi(), div)
-    infoviewApi.serverRestarted(leanClient.initializeResult)
-    infoProvider.openPreview(editor, infoviewApi)
-    // setInfoProvider(infoProvider)
-    // setInfoviewApi(infoviewApi)
 
-    leanClient.sendRequest("loadLevel", {number: level}).then((res) => {
-      setLevelTitle("Level " + res["index"] + ": " + res["title"])
-      setIndex(parseInt(res["index"]))
-      setTacticDocs(res["tactics"])
-      setLemmaDocs(res["lemmas"])
-      processResponse(res)
-    });
-  }, [level, leanClient])
+    setEditor(editor)
+    setInfoProvider(infoProvider)
+    setInfoviewApi(infoviewApi)
+  }, [])
+
+  // The next function will be called when the level changes
+  useEffect(() => {
+    if (editor) {
+      const uri = monaco.Uri.parse(`file:///level${level}`)
+      const model = monaco.editor.createModel('', 'lean4', uri)
+
+      editor.setModel(model)
+      infoviewApi.serverRestarted(leanClient.initializeResult)
+      infoProvider.openPreview(editor, infoviewApi)
+
+      new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
+
+      // setInfoProvider(infoProvider)
+      // setInfoviewApi(infoviewApi)
+
+      leanClient.sendRequest("loadLevel", {number: level}).then((res) => {
+        setLevelTitle("Level " + res["index"] + ": " + res["title"])
+        setIndex(parseInt(res["index"]))
+        setTacticDocs(res["tactics"])
+        setLemmaDocs(res["lemmas"])
+        processResponse(res)
+      });
+
+      return () => { model.dispose(); }
+    }
+  }, [editor, level, leanClient])
 
   function sendTactic(input) {
     leanClient.sendRequest("runTactic", {tactic: input}).then(processResponse);
@@ -145,7 +163,8 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
       </Grid>
       <Grid xs={4}>
         <div ref={infoviewRef} className="infoview"></div>
-        <TacticState goals={leanData.goals} errors={errors} lastTactic={lastTactic} completed={completed} />
+        <Button onClick={loadNextLevel} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Go to Next Level</Button>
+        {/* <TacticState goals={leanData.goals} errors={errors} lastTactic={lastTactic} completed={completed} /> */}
       </Grid>
     </Grid>
   )

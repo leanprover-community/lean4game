@@ -32,7 +32,7 @@ function App() {
   const [leanClient, setLeanClient] = useState<null|LeanClient>(null)
 
   useEffect(() => {
-    const uri = monaco.Uri.parse('file:///LeanProject/Level1.lean')
+    const uri = monaco.Uri.parse('file:///')
     const leanClient = new LeanClient(socketUrl, undefined, uri, () => {})
     setLeanClient(leanClient)
   }, [])

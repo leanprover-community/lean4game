@@ -55,6 +55,14 @@ open JsonRpc
 
 section Elab
 
+-- TODO: Find a better way to pass on the file name?
+def levelIdFromFileName (fileName : String) : IO Nat := do
+  if fileName.startsWith "/level" then
+    if let some id := (fileName.drop "/level".length).toNat? then
+      return id
+  throwServerError s!"Could not find level ID in file name: {fileName}"
+  return 1
+
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool) (couldBeEndSnap : Bool) : IO Snapshot := do
   let cmdState := snap.cmdState
@@ -85,15 +93,15 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
       fileMap      := inputCtx.fileMap
       tacticCache? := some tacticCacheNew
     }
-    IO.FS.writeFile "test.txt" s!"{tacticStx}"
     let (output, _) ← IO.FS.withIsolatedStreams (isolateStderr := server.stderrAsMessages.get scope.opts) <| liftM (m := BaseIO) do
       Elab.Command.catchExceptions
         (getResetInfoTrees *> do
           let levels := levelsExt.getState (← getEnv)
+          let levelId ← levelIdFromFileName inputCtx.fileName
           let done := Syntax.node (.synthetic cmdParserState.pos cmdParserState.pos) ``Lean.Parser.Tactic.done #[]
           let tacticStx := (tacticStx.getArgs.push done).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
-          let cmdStx ← `(command| theorem mythm $(levels[1].get!.goal) := by {$(⟨tacticStx⟩)} )
+          let cmdStx ← `(command| theorem mythm $(levels[levelId].get!.goal) := by {$(⟨tacticStx⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
         cmdCtx cmdStateRef
     let postNew := (← tacticCacheNew.get).post

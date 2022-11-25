@@ -30,6 +30,10 @@ structure LevelInfo where
   lemmas: Array LemmaDocEntry
 deriving ToJson
 
+structure LoadLevelParams where
+  number : Nat
+  deriving ToJson, FromJson
+
 partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
   match ev with
   | ServerEvent.clientMsg msg =>
@@ -41,8 +45,9 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let game := {← gameExt.get with nb_levels := levels.size }
       c.hOut.writeLspResponse ⟨id, game⟩
       return true
-    | Message.request id "loadLevel" _ =>
-      let idx := 1
+    | Message.request id "loadLevel" params =>
+      let p ← parseParams LoadLevelParams (toJson params)
+      let idx := p.number
       let s ← get
       let c ← read
       let levels := levelsExt.getState s.env
