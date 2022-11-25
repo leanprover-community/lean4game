@@ -67,7 +67,7 @@ function App() {
     <div className="App">
     <MathJaxContext config={mathJaxConfig}>
       <CssBaseline />
-      <AppBar position="sticky" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar className="AppBar" position="sticky" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
         <Typography variant="h6" noWrap component="div">
           {title}

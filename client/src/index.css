@@ -9,3 +9,13 @@ code {
   font-family: Roboto Mono;
   color: rgba(0, 32, 90, 0.87);
 }
+
+.App {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.AppBar {
+  flex: 0;
+}

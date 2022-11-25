@@ -21,6 +21,7 @@ import { InfoProvider } from 'lean4web/client/src/editor/infoview';
 import 'lean4web/client/src/editor/infoview.css'
 import { renderInfoview } from '@leanprover/infoview'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
+import './level.css'
 
 interface LevelProps {
   leanClient: null|LeanClient;
@@ -46,6 +47,7 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
   const [errors, setErrors] = useState([])
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
+  const messagePanelRef = useRef<HTMLDivElement>(null)
 
   const [message, setMessage] = useState("")
   const [messageOpen, setMessageOpen] = useState(false)
@@ -64,6 +66,11 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
     //   setCompleted(true)
     // }
   }
+
+  useEffect(() => {
+    // Scroll to top when loading a new level
+    messagePanelRef.current!.scrollTo(0,0)
+  }, [level])
 
   useEffect(() => {
     const editor = monaco.editor.create(codeviewRef.current!, {
@@ -155,21 +162,24 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
   }
 
   return (
-    <Grid container sx={{ mt: 3, ml: 1, mr: 1 }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-      <Grid xs={4}>
+    <Grid className="level" container sx={{ mt: 3, ml: 1, mr: 1 }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+      <Grid xs={4} className="doc-panel">
         <LeftPanel spells={tacticDocs} inventory={lemmaDocs} />
       </Grid>
-      <Grid xs={4}>
-        <MathJax><ReactMarkdown>{introduction}</ReactMarkdown></MathJax>
-        <div ref={codeviewRef} className="codeview" style={{height: "20em"}}></div>
-        {/* <InputZone index={index} history={history} messageOpen={messageOpen} setMessageOpen={setMessageOpen} completed={completed} sendTactic={sendTactic} nbLevels={nbLevels} loadNextLevel={loadNextLevel}
-          errors={errors} lastTactic={lastTactic} undo={undo} finishGame={finishGame} /> */}
-        <Message isOpen={messageOpen} content={message} close={closeMessage} />
+      <Grid xs={4} className="main-panel">
+        <div ref={messagePanelRef} className="message-panel">
+          <MathJax><ReactMarkdown>{introduction}</ReactMarkdown></MathJax>
+        </div>
+        <div ref={codeviewRef} className="codeview">
+          {/* <InputZone index={index} history={history} messageOpen={messageOpen} setMessageOpen={setMessageOpen} completed={completed} sendTactic={sendTactic} nbLevels={nbLevels} loadNextLevel={loadNextLevel}
+            errors={errors} lastTactic={lastTactic} undo={undo} finishGame={finishGame} /> */}
+          {/* <Message isOpen={messageOpen} content={message} close={closeMessage} /> */}
+        </div>
       </Grid>
-      <Grid xs={4}>
+      <Grid xs={4} className="info-panel">
+        <Button disabled={index <= 1} onClick={() => { loadLevel(index - 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
+        <Button disabled={index >= nbLevels} onClick={() => { loadLevel(index + 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
         <div ref={infoviewRef} className="infoview vscode-light"></div>
-        {index > 1 ? <Button onClick={() => { loadLevel(index - 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button> : null}
-        {index < nbLevels ? <Button onClick={() => { loadLevel(index + 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button> : null}
         {/* <TacticState goals={leanData.goals} errors={errors} lastTactic={lastTactic} completed={completed} /> */}
       </Grid>
     </Grid>
