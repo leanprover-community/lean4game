@@ -28,6 +28,7 @@ structure LevelInfo where
   title : String
   tactics: Array TacticDocEntry
   lemmas: Array LemmaDocEntry
+  introduction : String
 deriving ToJson
 
 structure LoadLevelParams where
@@ -56,7 +57,8 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
           { index := lvl.index,
             title := lvl.title,
             tactics := lvl.tactics,
-            lemmas := lvl.lemmas }
+            lemmas := lvl.lemmas,
+            introduction := lvl.introduction }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson levelInfo⟩
       return true
     | _ => return false

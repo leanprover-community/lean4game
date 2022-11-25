@@ -4,6 +4,8 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import ReactMarkdown from 'react-markdown';
+import { MathJax } from "better-react-mathjax";
 
 import { Button } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -40,6 +42,7 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
   const [leanData, setLeanData] = useState({goals: []})
   const [history, setHistory] = useState([])
   const [lastTactic, setLastTactic] = useState("")
+  const [introduction, setIntroduction] = useState("")
   const [errors, setErrors] = useState([])
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
@@ -109,6 +112,7 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
         setIndex(parseInt(res["index"]))
         setTacticDocs(res["tactics"])
         setLemmaDocs(res["lemmas"])
+        setIntroduction(res["introduction"])
         processResponse(res)
       });
 
@@ -156,13 +160,14 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
         <LeftPanel spells={tacticDocs} inventory={lemmaDocs} />
       </Grid>
       <Grid xs={4}>
+        <MathJax><ReactMarkdown>{introduction}</ReactMarkdown></MathJax>
         <div ref={codeviewRef} className="codeview" style={{height: "20em"}}></div>
         {/* <InputZone index={index} history={history} messageOpen={messageOpen} setMessageOpen={setMessageOpen} completed={completed} sendTactic={sendTactic} nbLevels={nbLevels} loadNextLevel={loadNextLevel}
           errors={errors} lastTactic={lastTactic} undo={undo} finishGame={finishGame} /> */}
         <Message isOpen={messageOpen} content={message} close={closeMessage} />
       </Grid>
       <Grid xs={4}>
-        <div ref={infoviewRef} className="infoview"></div>
+        <div ref={infoviewRef} className="infoview vscode-light"></div>
         {index > 1 ? <Button onClick={() => { loadLevel(index - 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button> : null}
         {index < nbLevels ? <Button onClick={() => { loadLevel(index + 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button> : null}
         {/* <TacticState goals={leanData.goals} errors={errors} lastTactic={lastTactic} completed={completed} /> */}
