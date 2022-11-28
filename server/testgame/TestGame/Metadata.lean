@@ -19,3 +19,6 @@ with a level 1 spell book. Good luck."
 
 Conclusion
 "There is nothing else so far. Thanks for rescuing natural numbers!"
+
+Path w1 → w2 → w3
+Path w1 → v2 → w3

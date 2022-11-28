@@ -217,7 +217,7 @@ new.fold (fun acc a b =>
   else acc.insert a b) old
 
 def GameLevel.merge (old : GameLevel) (new : GameLevel) : GameLevel :=
-  new
+  new -- simply override old level
 
 def World.merge (old : World) (new : World) : World :=
 { new with
@@ -227,7 +227,12 @@ def Game.merge (old : Game) (new : Game) : Game :=
 { new with
   worlds := {
     nodes := HashMap.merge old.worlds.nodes new.worlds.nodes World.merge
-    edges := old.worlds.edges ++ new.worlds.edges
+    edges := Id.run do
+      let mut res := old.worlds.edges
+      for e in new.worlds.edges do
+        if ¬ res.contains e then
+          res := res.push e
+      return res
   } }
 
 initialize gameExt : PersistentEnvExtension (Name × Game) (Name × Game) (HashMap Name Game) ←

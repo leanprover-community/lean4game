@@ -70,9 +70,24 @@ elab "Conclusion" t:str : command => do
 elab "PrintCurLevel" : command => do
   logInfo (repr (← getCurLevel))
 
+#check Syntax.SepArray
+
 -- /-- Print levels for debugging purposes. -/
 elab "PrintLevels" : command => do
   logInfo $ repr $ (← getCurWorld).levels.toArray
+
+def Parser.path := Parser.sepBy1Indent Parser.ident "→"
+
+elab "Path" s:Parser.path : command => do
+  let mut last : Option Name := none
+  for stx in s.raw.getArgs.getEvenElems do
+    let some l := last
+      | do
+          last := some stx.getId
+          continue
+    modifyCurGame fun game =>
+      pure {game with worlds := {game.worlds with edges := game.worlds.edges.push (l, stx.getId)}}
+    last := some stx.getId
 
 end metadata
 
