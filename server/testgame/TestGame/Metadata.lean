@@ -20,5 +20,15 @@ with a level 1 spell book. Good luck."
 Conclusion
 "There is nothing else so far. Thanks for rescuing natural numbers!"
 
-Path w1 → w2 → w3
-Path w1 → v2 → w3
+World "w1"
+World "w2"
+World "w3"
+World "v1"
+World "v2"
+World "v3"
+World "v4"
+
+
+Path TestWorld → w1 → w2 → w3
+Path w1 → v1 → v2 → v3 → w3
+Path v3 → v4
