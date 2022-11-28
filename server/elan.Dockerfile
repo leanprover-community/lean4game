@@ -4,7 +4,7 @@ WORKDIR /
 
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install -y git curl
+RUN apt-get install -y git curl libatomic1
 
 # Install elan
 RUN curl -sSfL https://github.com/leanprover/elan/releases/download/v1.4.2/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
