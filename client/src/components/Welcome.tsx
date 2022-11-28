@@ -34,7 +34,8 @@ function Welcome({ leanClient, setNbLevels, setTitle, startGame, setConclusion }
 
     const getInfo = async () => {
       await leanClient.start() // TODO: need a way to wait for start without restarting
-      leanClient.sendRequest("info", "hello").then((res: infoResultType) =>{
+      leanClient.sendRequest("info", {}).then((res: infoResultType) =>{
+        console.log(res)
         setLeanData(res)
         setNbLevels(res.nb_levels)
         setTitle(res.title)

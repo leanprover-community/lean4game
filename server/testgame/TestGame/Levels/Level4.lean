@@ -1,5 +1,7 @@
 import TestGame.Metadata
 
+Game "TestGame"
+World "TestWorld"
 Level 4
 
 Title "Addition"

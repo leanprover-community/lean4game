@@ -114,7 +114,7 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
       // setInfoProvider(infoProvider)
       // setInfoviewApi(infoviewApi)
 
-      leanClient.sendRequest("loadLevel", {number: level}).then((res) => {
+      leanClient.sendRequest("loadLevel", {world: "TestWorld", level}).then((res) => {
         setLevelTitle("Level " + res["index"] + ": " + res["title"])
         setIndex(parseInt(res["index"]))
         setTacticDocs(res["tactics"])

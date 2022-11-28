@@ -1,6 +1,8 @@
 import TestGame.Metadata
 import TestGame.Tactics
 
+Game "TestGame"
+World "TestWorld"
 Level 5
 
 Title "The induction_on spell"

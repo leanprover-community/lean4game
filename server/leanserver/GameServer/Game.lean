@@ -6,6 +6,7 @@ open Lean
 
 structure GameServerState :=
 (env : Lean.Environment)
+(game : Name)
 
 abbrev GameServerM := StateT GameServerState Server.Watchdog.ServerM
 
@@ -23,6 +24,11 @@ open Lsp
 open JsonRpc
 open IO
 
+def getGame (game : Name): GameServerM Game := do
+  let some game ← getGame? game
+    | throwServerError "Game not found"
+  return game
+
 structure LevelInfo where
   index : Nat
   title : String
@@ -32,7 +38,8 @@ structure LevelInfo where
 deriving ToJson
 
 structure LoadLevelParams where
-  number : Nat
+  world : Name
+  level : Nat
   deriving ToJson, FromJson
 
 partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
@@ -42,17 +49,14 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
     | Message.request id "info" _ =>
       let s ← get
       let c ← read
-      let levels := levelsExt.getState s.env
-      let game := {← gameExt.get with nb_levels := levels.size }
-      c.hOut.writeLspResponse ⟨id, game⟩
+      c.hOut.writeLspResponse ⟨id, (← getGame s.game)⟩
       return true
     | Message.request id "loadLevel" params =>
       let p ← parseParams LoadLevelParams (toJson params)
-      let idx := p.number
       let s ← get
       let c ← read
-      let levels := levelsExt.getState s.env
-      let some lvl := levels.find? idx | throwServerError s!"Cannot find level {idx}"
+      let some lvl ← getLevel? {game := s.game, world := p.world, level := p.level}
+        | throwServerError s!"Level not found {(← getGame s.game).name} {p.world} {p.level}"
       let levelInfo : LevelInfo :=
           { index := lvl.index,
             title := lvl.title,

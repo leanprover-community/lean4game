@@ -148,7 +148,7 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
       : InitializeResult
     }
   }
-  let state := {env := ← createEnv}
+  let state := {env := ← createEnv, game := `TestGame}
   let context : ServerContext := {
     hIn            := i
     hOut           := o

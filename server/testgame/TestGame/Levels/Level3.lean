@@ -1,5 +1,7 @@
 import TestGame.Metadata
 
+Game "TestGame"
+World "TestWorld"
 Level 3
 
 Title "Peano's axioms"
