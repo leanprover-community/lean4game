@@ -22,9 +22,9 @@ import 'lean4web/client/src/editor/infoview.css'
 import { renderInfoview } from '@leanprover/infoview'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import './level.css'
+import { ConnectionContext } from '../connection';
 
 interface LevelProps {
-  leanClient: null|LeanClient;
   nbLevels: any;
   level: any;
   setCurLevel: any;
@@ -32,7 +32,7 @@ interface LevelProps {
   setFinished: any
 }
 
-function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFinished }: LevelProps) {
+function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: LevelProps) {
   const [index, setIndex] = useState(level) // Level number
   const [tacticDocs, setTacticDocs] = useState([])
   const [lemmaDocs, setLemmaDocs] = useState([])
@@ -71,6 +71,8 @@ function Level({ leanClient, nbLevels, level, setCurLevel, setLevelTitle, setFin
     // Scroll to top when loading a new level
     messagePanelRef.current!.scrollTo(0,0)
   }, [level])
+
+  const leanClient = React.useContext(ConnectionContext)
 
   useEffect(() => {
     const editor = monaco.editor.create(codeviewRef.current!, {

@@ -14,29 +14,15 @@ import { AppBar, CssBaseline, Toolbar, Typography } from '@mui/material';
 import Welcome from './components/Welcome';
 import Level from './components/Level';
 import GoodBye from './components/GoodBye';
-import useWebSocket from 'react-use-websocket';
-import { LeanClient } from 'lean4web/client/src/editor/leanclient';
 import { monacoSetup } from 'lean4web/client/src/monacoSetup'
-
-const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/'
-
-monacoSetup()
+import { useAppSelector } from './hooks';
 
 function App() {
-  const [title, setTitle] = useState("")
   const [conclusion, setConclusion] = useState("")
   const [levelTitle, setLevelTitle] = useState("")
   const [nbLevels, setNbLevels] = useState(0)
   const [curLevel, setCurLevel] = useState(0)
   const [finished, setFinished] = useState(false)
-  const [leanClient, setLeanClient] = useState<null|LeanClient>(null)
-
-  useEffect(() => {
-    const uri = monaco.Uri.parse('file:///')
-    const leanClient = new LeanClient(socketUrl, undefined, uri, () => {})
-    setLeanClient(leanClient)
-  }, [])
-
 
   const mathJaxConfig = {
     loader: {
@@ -58,10 +44,12 @@ function App() {
   if (finished) {
     mainComponent = <GoodBye message={conclusion} />
   } else if (curLevel > 0) {
-    mainComponent = <Level leanClient={leanClient} nbLevels={nbLevels} level={curLevel} setCurLevel={setCurLevel} setLevelTitle={setLevelTitle} setFinished={setFinished}/>
+    mainComponent = <Level nbLevels={nbLevels} level={curLevel} setCurLevel={setCurLevel} setLevelTitle={setLevelTitle} setFinished={setFinished}/>
   } else {
-    mainComponent = <Welcome leanClient={leanClient} setNbLevels={setNbLevels} setTitle={setTitle} startGame={startGame} setConclusion={setConclusion}/>
+    mainComponent = <Welcome setNbLevels={setNbLevels} startGame={startGame} setConclusion={setConclusion}/>
   }
+
+  const title = useAppSelector(state => state.game.title)
 
   return (
     <div className="App">

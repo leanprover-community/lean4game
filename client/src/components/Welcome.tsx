@@ -9,30 +9,25 @@ import '@fontsource/roboto/700.css';
 import * as rpc from 'vscode-ws-jsonrpc';
 import cytoscape from 'cytoscape'
 import klay from 'cytoscape-klay';
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchGame } from '../game/gameSlice'
 
 cytoscape.use( klay );
 
 import { Box, Typography, Button, CircularProgress, Grid } from '@mui/material';
 import { LeanClient } from 'lean4web/client/src/editor/leanclient';
+import { ConnectionContext } from '../connection';
+import { useAppDispatch, useAppSelector } from '../hooks';
 
 interface WelcomeProps {
-  leanClient: null|LeanClient;
   setNbLevels: any;
-  setTitle: any;
   startGame: any;
   setConclusion: any;
 }
 
-type infoResultType = {
-  title: string,
-  nb_levels: any[],
-  conclusion: string
-  worlds: {edges: string[][], nodes: string[]}
-}
+function Welcome({ setNbLevels, startGame, setConclusion }: WelcomeProps) {
+  const dispatch = useAppDispatch()
 
-function Welcome({ leanClient, setNbLevels, setTitle, startGame, setConclusion }: WelcomeProps) {
-
-  const [leanData, setLeanData] = useState<null|infoResultType>(null)
   const worldsRef = useRef<HTMLDivElement>(null)
 
   const drawWorlds = (worlds) => {
@@ -78,42 +73,34 @@ function Welcome({ leanClient, setNbLevels, setTitle, startGame, setConclusion }
     })
   }
 
-  useEffect(() => {
-    if (!leanClient) return;
+  useEffect(() => { dispatch(fetchGame); }, [])
 
-    const getInfo = async () => {
-      await leanClient.start() // TODO: need a way to wait for start without restarting
-      leanClient.sendRequest("info", {}).then((res: infoResultType) =>{
-        console.log(res)
-        setLeanData(res)
-        setNbLevels(res.nb_levels)
-        setTitle(res.title)
-        document.title = res.title
-        setConclusion(res.conclusion)
-        drawWorlds(res.worlds)
-      });
-    }
-    getInfo()
-  }, [leanClient])
+  const worlds = useAppSelector(state => state.game.worlds)
+  useEffect(() => { if (worlds) { drawWorlds(worlds); } }, [worlds])
 
-  let content
-  if (leanData) {
-    content = (<Box sx={{ m: 3 }}>
-      <Typography variant="body1" component="div">
-        <MathJax>
-          <ReactMarkdown>{leanData["introduction"]}</ReactMarkdown>
-        </MathJax>
-      </Typography>
+  const title = useAppSelector(state => state.game.title)
+  useEffect(() => { window.document.title = title }, [title])
+
+  const introduction = useAppSelector(state => state.game.introduction)
+
+  return <div>
+  { introduction?// TODO: find a better way to mark loading state?
+    <div>
+      <Box sx={{ m: 3 }}>
+        <Typography variant="body1" component="div">
+          <MathJax>
+            <ReactMarkdown>{introduction}</ReactMarkdown>
+          </MathJax>
+        </Typography>
+      </Box>
       <Box textAlign='center' sx={{ m: 5 }}>
         <Button onClick={startGame} variant="contained">Start rescue mission</Button>
       </Box>
-    </Box>)
-  } else {
-    content = <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
+      <div ref={worldsRef} style={{"width": "100%","height": "50em"}} />
+    </div>
+    : <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
   }
-  return <div>
-    <div>{content}</div>
-    <div ref={worldsRef} style={{"width": "100%","height": "50em"}} />
+
   </div>
 }
 
