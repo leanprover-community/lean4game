@@ -1,23 +1,29 @@
 import TestGame.Metadata
 
-Game "Introduction"
-World "Tactic"
-Level 4
+Game "TestGame"
+World "TestWorld"
+Level 5
 
 Title "Rewrite"
 
 Introduction
 "
-Oft sind aber die Annahmen nicht genau das, was man zeigen will, sondern helfen einem
-nur, dorthin zu kommen.
+Oft sind aber die Annahmen nicht genau das, was man zeigen will, sondern man braucht
+mehrere Schritte im Beweis.
 
-Wenn man eine Annahme `(h : X = Y)` hat, die sagt, dass `X` und `Y` gleich sind,
+Wenn man eine Annahme `(h : X = Y)` hat die sagt, dass `X` und `Y` gleich sind,
 kann man die Taktik `rw` (steht für 'rewrite') brauchen um im Goal
 das eine durch das andere zu ersetzen.
 "
 
-Statement (a b c d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c := by
-  rewrite [h₁]
+Statement umschreiben
+    "
+    Angenommen man hat die Gleichheiten
+    `a = b`, `a = d`, `c = d`.
+    Zeige dass `b = c`.
+    "
+    (a b c d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c := by
+  rw [h₁]
   rw [←h₂]
   assumption
 
@@ -35,16 +41,7 @@ Message (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h
 `(h₂ : a = b)` rückwärts anwenden und `b` durch `a` ersetzen."
 
 -- TODO: Muss ich das wirklich mehrmals auflisten?
-Message (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : a = a =>
-"Der Hauptunterschied zwischen `rw` und `rewrite` ist, dass das erste automatisch versucht,
-anschliessend `rfl` anzuwenden. Bei `rewrite` musst du `rfl` explizit noch aufrufen."
-Message (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = b =>
-"Der Hauptunterschied zwischen `rw` und `rewrite` ist, dass das erste automatisch versucht,
-anschliessend `rfl` anzuwenden. Bei `rewrite` musst du `rfl` explizit noch aufrufen."
-Message (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : c = c =>
-"Der Hauptunterschied zwischen `rw` und `rewrite` ist, dass das erste automatisch versucht,
-anschliessend `rfl` anzuwenden. Bei `rewrite` musst du `rfl` explizit noch aufrufen."
-Message (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : d = d =>
+Message (x : ℕ) : x = x =>
 "Der Hauptunterschied zwischen `rw` und `rewrite` ist, dass das erste automatisch versucht,
 anschliessend `rfl` anzuwenden. Bei `rewrite` musst du `rfl` explizit noch aufrufen."
 
@@ -53,4 +50,4 @@ anstatt dem Goal."
 -- TODO: Das macht es doch unmöglich mit den Messages...
 
 Tactics assumption
---Tactics rw
+Tactics rw

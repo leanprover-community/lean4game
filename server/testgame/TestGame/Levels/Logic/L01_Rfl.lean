@@ -1,7 +1,7 @@
 import TestGame.Metadata
 
-Game "Introduction"
-World "Tactic"
+Game "TestGame"
+World "TestWorld"
 Level 1
 
 Title "Aller Anfang ist... ein Einzeiler?"
@@ -21,7 +21,7 @@ ersten offenen Goal zu machen.
 Wenn der Beweis komplett ist, erscheint \"goals accomplished\".
 "
 
-Statement : 42 = 42 := by
+Statement "Zeige `42 = 42`." : 42 = 42 := by
   rfl
 
 Message : 42 = 42 =>

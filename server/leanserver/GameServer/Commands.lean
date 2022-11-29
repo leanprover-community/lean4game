@@ -48,7 +48,7 @@ elab "Introduction" t:str : command => do
   | .Game => modifyCurGame  fun game => pure {game with introduction := t.getString}
 
 /-- Define the statement of the current level. -/
-elab "Statement" name:ident ? sig:declSig val:declVal : command => do
+elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
   let declName : Name := (← getCurGame).name ++ (← getCurWorld).name ++ ("level" ++ toString lvlIdx : String)
   elabCommand (← `(theorem $(mkIdent declName) $sig $val))
