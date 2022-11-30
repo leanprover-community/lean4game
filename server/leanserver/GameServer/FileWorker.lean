@@ -293,6 +293,17 @@ section Initialization
         headerEnv := headerEnv.setMainModule (← moduleNameOfFileName path none)
     catch _ => pure ()
     let cmdState := Elab.Command.mkState headerEnv {} opts
+    let cmdState := { cmdState with infoState := {
+      enabled := true
+      trees := #[Elab.InfoTree.context ({
+        env     := headerEnv
+        fileMap := m.text
+        ngen    := { namePrefix := `_worker }
+      }) (Elab.InfoTree.node
+          (Elab.Info.ofCommandInfo { elaborator := `header, stx := Syntax.missing })
+          #[].toPArray'
+      )].toPArray'
+    }}
     let headerSnap := {
       beginPos := 0
       stx := Syntax.missing
