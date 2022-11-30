@@ -7,7 +7,7 @@ import '@fontsource/roboto/700.css';
 import ReactMarkdown from 'react-markdown';
 import { MathJax } from "better-react-mathjax";
 
-import { Button } from '@mui/material';
+import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 
 import LeftPanel from './LeftPanel';
@@ -40,6 +40,8 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
   const [infoviewApi, setInfoviewApi] = useState(null)
+  const [expertInfoview, setExpertInfoview] = useState(false)
+
 
   const [leanData, setLeanData] = useState({goals: []})
   const [history, setHistory] = useState([])
@@ -129,7 +131,7 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
         processResponse(res)
       });
 
-      return () => { model.dispose(); }
+      return () => { model.dispose(); setReady(false) }
     }
   }, [editor, level, leanClient])
 
@@ -157,9 +159,13 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
       <Grid xs={4} className="info-panel">
         <Button disabled={index <= 1} onClick={() => { loadLevel(index - 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
         <Button disabled={index >= nbLevels} onClick={() => { loadLevel(index + 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
-        <div ref={infoviewRef} className="infoview vscode-light"></div>
-        <Infoview ready={ready} leanClient={leanClient} editor={editor} editorApi={infoProvider?.getApi()} uri={uri} />
-        {/* <TacticState goals={leanData.goals} errors={errors} lastTactic={lastTactic} completed={completed} /> */}
+        <div style={{display: expertInfoview ? 'block' : 'none' }} ref={infoviewRef} className="infoview vscode-light"></div>
+        <div style={{display: expertInfoview ? 'none' : 'block' }}>
+          <Infoview leanClient={leanClient} editor={editor} editorApi={infoProvider?.getApi()} />
+        </div>
+        <FormGroup>
+          <FormControlLabel onChange={() => { setExpertInfoview(!expertInfoview) }} control={<Switch />} label="Expert mode" />
+        </FormGroup>
       </Grid>
     </Grid>
   )

@@ -25,8 +25,8 @@ function Goal({ goal }) {
         </List></Box>}
       {hasAssumption && <Box><Typography>Assumptions</Typography>
         <List>
-          {goal.assumptions.map((item) => <ListItem key={item}><Typography color="primary" sx={{ mr: 1 }}>{item[0]}</Typography> :
-            <Typography color="secondary" sx={{ ml: 1 }}>{item[1]}</Typography></ListItem>)}
+          {goal.assumptions.map((item) => <ListItem key={item}><Typography color="primary" sx={{ mr: 1 }}>{item.userName}</Typography> :
+            <Typography color="secondary" sx={{ ml: 1 }}>{item.type}</Typography></ListItem>)}
         </List></Box>}
       <Typography>Prove:</Typography>
       <Typography color="primary" sx={{ ml: 2 }}>{goal.goal}</Typography>
@@ -51,7 +51,8 @@ function TacticState({ goals, errors, completed }) {
   }
   return (
     <Box sx={{ height: "100%" }}>
-      {hasGoal && <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}><Typography variant="h5">Current goal</Typography> <Goal goal={goals[0]} /></Paper>}
+      {goals === null && <Typography variant="h6">No goals at cursor position</Typography>}
+      {hasGoal && <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}><Typography variant="h5">Main goal at cursor</Typography> <Goal goal={goals[0]} /></Paper>}
       {completed && <Typography variant="h6">Level completed ! 🎉</Typography>}
       {hasError && <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}><Typography variant="h5" color="error">Spell invocation failed</Typography>
         <Typography component="pre" sx={{ my: 1 }}>{col}{msg}</Typography>

@@ -11,43 +11,63 @@ function toLanguageServerPosition (pos: monaco.Position): ls.Position {
   return {line : pos.lineNumber - 1, character: pos.column - 1}
 }
 
-function Infoview({ ready, editor, editorApi, uri, leanClient } : {ready: boolean, editor: monaco.editor.IStandaloneCodeEditor, editorApi: EditorApi, uri: any, leanClient: LeanClient}) {
+function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.IStandaloneCodeEditor, editorApi: EditorApi, leanClient: LeanClient}) {
   const [rpcSession, setRpcSession] = useState<string>()
   const [goals, setGoals] = useState<any[]>(null)
-  const liftOff = async () => {
-    const rpcSession = await editorApi.createRpcSession(uri)
-    const fetchInteractiveGoals = () => {
+  const [uri, setUri] = useState<string>()
+  console.log(rpcSession)
+  const fetchInteractiveGoals = () => {
+    console.log(rpcSession)
+    if (editor && rpcSession) {
       const pos = toLanguageServerPosition(editor.getPosition())
       leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getGoals",
         "params":{"textDocument":{uri}, "position": pos},
         "sessionId":rpcSession,
         "textDocument":{uri},
         "position": pos
-      }).then(({ goals }) => {
-        setGoals(goals)
+      }).then((res) => {
+        setGoals(res ? res.goals : null)
         console.log(goals)
       }).catch((err) => {
         console.error(err)
       })
     }
-    setRpcSession(rpcSession)
-    editor.onDidChangeCursorPosition((ev) => {
-      fetchInteractiveGoals()
-    })
-    leanClient.didChange(async (ev) => {
-      fetchInteractiveGoals()
-    })
   }
 
   useEffect(() => {
-    if (ready) {
-      liftOff()
+    if (editor) {
+      const t = editor.onDidChangeModel((ev) => {
+        if (ev.newModelUrl) {
+          setRpcSession(undefined)
+          setUri(ev.newModelUrl.toString())
+          editorApi.createRpcSession(ev.newModelUrl.toString()).then((rpcSession) => {
+            setRpcSession(rpcSession)
+            fetchInteractiveGoals()
+          })
+        }
+      })
+      return () => {t.dispose()}
     }
-  }, [ready])
-   // Lean.Widget.getInteractiveGoals
+  }, [editor, rpcSession]);
+
+  useEffect(() => {
+    if (editor) {
+      const t = editor.onDidChangeCursorPosition(async (ev) => {
+        fetchInteractiveGoals()
+      })
+      return () => { t.dispose() }
+    }
+  }, [editor, rpcSession])
+
+  useEffect(() => {
+    const t = leanClient.didChange(async (ev) => {
+      fetchInteractiveGoals()
+    })
+    return () => { t.dispose() }
+  }, [editor, leanClient, rpcSession])
 
   return (<div>
-    <TacticState goals={goals} errors={[]} completed={false}></TacticState>
+    <TacticState goals={goals} errors={[]} completed={goals?.length === 0}></TacticState>
   </div>)
 }
 
