@@ -2,6 +2,7 @@
 
 import Lean
 import GameServer.EnvExtensions
+import GameServer.RpcHandlers
 
 namespace MyModule
 open Lean

@@ -18,9 +18,9 @@ function Goal({ goal }) {
       {hasObject && <Box><Typography>Objects</Typography>
         <List>
           {goal.objects.map((item) =>
-            <ListItem key={item[0]}>
-              <Typography color="primary" sx={{ mr: 1 }}>{item[0]}</Typography> :
-              <Typography color="secondary" sx={{ ml: 1 }}>{item[1]}</Typography>
+            <ListItem key={item.userName}>
+              <Typography color="primary" sx={{ mr: 1 }}>{item.userName}</Typography> :
+              <Typography color="secondary" sx={{ ml: 1 }}>{item.type}</Typography>
             </ListItem>)}
         </List></Box>}
       {hasAssumption && <Box><Typography>Assumptions</Typography>
@@ -33,9 +33,9 @@ function Goal({ goal }) {
     </Box>)
 }
 
-function TacticState({ goals, errors, lastTactic, completed }) {
+function TacticState({ goals, errors, completed }) {
   const hasError = typeof errors === "object" && errors.length > 0
-  const hasGoal = typeof goals === "object" && goals.length > 0
+  const hasGoal = goals !== null && goals.length > 0
   const hasManyGoal = hasGoal && goals.length > 1
   var col = ""
   var msg = ""
@@ -54,7 +54,6 @@ function TacticState({ goals, errors, lastTactic, completed }) {
       {hasGoal && <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}><Typography variant="h5">Current goal</Typography> <Goal goal={goals[0]} /></Paper>}
       {completed && <Typography variant="h6">Level completed ! 🎉</Typography>}
       {hasError && <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}><Typography variant="h5" color="error">Spell invocation failed</Typography>
-        <Typography sx={{ my: 1 }}>{lastTactic}</Typography>
         <Typography component="pre" sx={{ my: 1 }}>{col}{msg}</Typography>
         <Typography>Use the undo button to go back to a sane state.</Typography>
         </Paper>}

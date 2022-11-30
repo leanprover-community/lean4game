@@ -4,6 +4,7 @@ import { EditorApi } from '@leanprover/infoview-api'
 import { LeanClient } from 'lean4web/client/src/editor/leanclient';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import * as ls from 'vscode-languageserver-protocol'
+import TacticState from './TacticState';
 
 // TODO: move into Lean 4 web
 function toLanguageServerPosition (pos: monaco.Position): ls.Position {
@@ -17,13 +18,14 @@ function Infoview({ ready, editor, editorApi, uri, leanClient } : {ready: boolea
     const rpcSession = await editorApi.createRpcSession(uri)
     const fetchInteractiveGoals = () => {
       const pos = toLanguageServerPosition(editor.getPosition())
-      leanClient.sendRequest("$/lean/rpc/call", {"method":"Lean.Widget.getInteractiveGoals",
+      leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getGoals",
         "params":{"textDocument":{uri}, "position": pos},
         "sessionId":rpcSession,
         "textDocument":{uri},
         "position": pos
       }).then(({ goals }) => {
         setGoals(goals)
+        console.log(goals)
       }).catch((err) => {
         console.error(err)
       })
@@ -44,7 +46,9 @@ function Infoview({ ready, editor, editorApi, uri, leanClient } : {ready: boolea
   }, [ready])
    // Lean.Widget.getInteractiveGoals
 
-  return (<div>Number of Goals: {goals !== null ? goals.length : "None"}</div>)
+  return (<div>
+    <TacticState goals={goals} errors={[]} completed={false}></TacticState>
+  </div>)
 }
 
 export default Infoview
