@@ -99,6 +99,8 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
     setEditor(editor)
     setInfoProvider(infoProvider)
     setInfoviewApi(infoviewApi)
+
+    return () => { editor.dispose() }
   }, [])
 
   // The next function will be called when the level changes
@@ -129,38 +131,10 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
     }
   }, [editor, level, leanClient])
 
-  function sendTactic(input) {
-    leanClient.sendRequest("runTactic", {tactic: input}).then(processResponse);
-    setLastTactic(input);
-    setHistory(history.concat([input]));
-  }
-
-  function undo() {
-    if (errors.length === 0) {
-      leanClient.sendRequest('undo', {}).then(processResponse);
-    }
-    if (history.length > 1) {
-      setLastTactic(history[history.length - 1]);
-    } else {
-      setLastTactic("");
-    };
-    setErrors([]);
-    setHistory(history.slice(0, -1));
-  }
-
   function loadLevel(index) {
     setCompleted(false)
     setHistory([])
     setCurLevel(index)
-  }
-
-  function closeMessage() {
-    setMessageOpen(false)
-  }
-
-  function finishGame() {
-    setLevelTitle("")
-    setFinished(true)
   }
 
   return (
