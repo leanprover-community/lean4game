@@ -23,6 +23,7 @@ import { renderInfoview } from '@leanprover/infoview'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import './level.css'
 import { ConnectionContext } from '../connection';
+import Infoview from './Infoview';
 
 interface LevelProps {
   nbLevels: any;
@@ -36,8 +37,8 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
   const [index, setIndex] = useState(level) // Level number
   const [tacticDocs, setTacticDocs] = useState([])
   const [lemmaDocs, setLemmaDocs] = useState([])
-  const [editor, setEditor] = useState(null)
-  const [infoProvider, setInfoProvider] = useState(null)
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
+  const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
   const [infoviewApi, setInfoviewApi] = useState(null)
 
   const [leanData, setLeanData] = useState({goals: []})
@@ -48,6 +49,8 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
   const messagePanelRef = useRef<HTMLDivElement>(null)
+
+  const [ready, setReady] = useState(false)
 
   const [message, setMessage] = useState("")
   const [messageOpen, setMessageOpen] = useState(false)
@@ -103,20 +106,19 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
     return () => { editor.dispose() }
   }, [])
 
+  const uri = `file:///level${level}`
+
   // The next function will be called when the level changes
   useEffect(() => {
     if (editor) {
-      const uri = monaco.Uri.parse(`file:///level${level}`)
-      const model = monaco.editor.createModel('', 'lean4', uri)
+      const model = monaco.editor.createModel('', 'lean4', monaco.Uri.parse(uri))
 
       editor.setModel(model)
       infoviewApi.serverRestarted(leanClient.initializeResult)
       infoProvider.openPreview(editor, infoviewApi)
+      setReady(true)
 
       new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
-
-      // setInfoProvider(infoProvider)
-      // setInfoviewApi(infoviewApi)
 
       leanClient.sendRequest("loadLevel", {world: "TestWorld", level}).then((res) => {
         setLevelTitle("Level " + res["index"] + ": " + res["title"])
@@ -156,6 +158,7 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
         <Button disabled={index <= 1} onClick={() => { loadLevel(index - 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
         <Button disabled={index >= nbLevels} onClick={() => { loadLevel(index + 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
         <div ref={infoviewRef} className="infoview vscode-light"></div>
+        <Infoview ready={ready} leanClient={leanClient} editor={editor} editorApi={infoProvider?.getApi()} uri={uri} />
         {/* <TacticState goals={leanData.goals} errors={errors} lastTactic={lastTactic} completed={completed} /> */}
       </Grid>
     </Grid>
