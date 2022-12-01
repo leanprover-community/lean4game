@@ -36,13 +36,13 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
 
   useEffect(() => {
     if (editor) {
+      fetchInteractiveGoals()
       const t = editor.onDidChangeModel((ev) => {
         if (ev.newModelUrl) {
           setRpcSession(undefined)
           setUri(ev.newModelUrl.toString())
           editorApi.createRpcSession(ev.newModelUrl.toString()).then((rpcSession) => {
             setRpcSession(rpcSession)
-            fetchInteractiveGoals()
           })
         }
       })

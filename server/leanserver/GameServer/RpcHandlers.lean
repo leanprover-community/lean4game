@@ -60,8 +60,9 @@ def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal
   let doc ← readDoc
   let text := doc.meta.text
   let hoverPos := text.lspPosToUtf8Pos p.position
-  -- NOTE: use `>=` since the cursor can be *after* the input
-  withWaitFindSnap doc (fun s => s.endPos >= hoverPos)
+  -- TODO: Couldn't find a good condition to find the correct snap. So we are looking
+  -- for the first snap with goals here:
+  withWaitFindSnap doc (fun s => ¬ (s.infoTree.goalsAt? doc.meta.text hoverPos).isEmpty)
     (notFoundX := return none) fun snap => do
       if let rs@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text hoverPos then
         let goals ← rs.mapM fun { ctxInfo := ci, tacticInfo := ti, useAfter := useAfter, .. } => do

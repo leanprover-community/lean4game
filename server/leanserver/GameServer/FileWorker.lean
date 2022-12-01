@@ -18,17 +18,20 @@ private def mkEOI (pos : String.Pos) : Syntax :=
   let atom := mkAtom (SourceInfo.original "".toSubstring pos "".toSubstring pos) ""
   mkNode `Lean.Parser.Module.eoi #[atom]
 
-partial def parseTactic (inputCtx : InputContext) (pmctx : ParserModuleContext) (mps : ModuleParserState) (messages : MessageLog) (couldBeEndSnap : Bool) : Syntax × ModuleParserState × MessageLog := Id.run do
+partial def parseTactic (inputCtx : InputContext) (pmctx : ParserModuleContext)
+  (mps : ModuleParserState) (messages : MessageLog) (couldBeEndSnap : Bool) :
+    Syntax × ModuleParserState × MessageLog × String.Pos := Id.run do
   let mut pos := mps.pos
   let mut recovering := mps.recovering
   let mut messages := messages
   let mut stx := Syntax.missing  -- will always be assigned below
   if inputCtx.input.atEnd pos ∧ couldBeEndSnap then
     stx := mkEOI pos
-    return (stx, { pos, recovering }, messages)
+    return (stx, { pos, recovering }, messages, 0)
   let c := mkParserContext inputCtx pmctx
   let s := { cache := initCacheForInput c.input, pos := pos : ParserState }
   let s := whitespace c s
+  let endOfWhitespace := s.pos
   let s := (Tactic.sepByIndentSemicolon tacticParser).fn c s
   pos := s.pos
   match s.errorMsg with
@@ -41,7 +44,7 @@ partial def parseTactic (inputCtx : InputContext) (pmctx : ParserModuleContext) 
     stx := s.stxStack.back
     if ¬ c.input.atEnd s.pos then
       messages := messages.add <| mkErrorMessage c s.pos "end of input"
-  return (stx, { pos := c.input.endPos, recovering }, messages)
+  return (stx, { pos := c.input.endPos, recovering }, messages, endOfWhitespace)
 
 end MyModule
 
@@ -69,7 +72,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
   let cmdState := snap.cmdState
   let scope := cmdState.scopes.head!
   let pmctx := { env := cmdState.env, options := scope.opts, currNamespace := scope.currNamespace, openDecls := scope.openDecls }
-  let (tacticStx, cmdParserState, msgLog) :=
+  let (tacticStx, cmdParserState, msgLog, endOfWhitespace) :=
     MyModule.parseTactic inputCtx pmctx snap.mpState snap.msgLog couldBeEndSnap
   let cmdPos := tacticStx.getPos?.get!
   if Parser.isEOI tacticStx then
@@ -101,8 +104,11 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           -- TODO: make world and game configurable
           let some level ← getLevel? {game := `TestGame, world := `TestWorld, level := levelId}
             | throwServerError "Level not found"
+          -- Insert invisible `skip` command to make sure we always display the initial goal
+          let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
+          -- Insert final `done` command to display unsolved goal error in the end
           let done := Syntax.node (.synthetic cmdParserState.pos cmdParserState.pos) ``Lean.Parser.Tactic.done #[]
-          let tacticStx := (tacticStx.getArgs.push done).map (⟨.⟩)
+          let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
           let cmdStx ← `(command| theorem my_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
