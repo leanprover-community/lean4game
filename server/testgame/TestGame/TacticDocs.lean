@@ -89,7 +89,19 @@ TacticDoc apply
 TODO
 "
 
+TacticDoc constructor
+"
+## Beschreibung
 
+TODO
+"
+
+TacticDoc rcases
+"
+## Beschreibung
+
+TODO
+"
 
 
 

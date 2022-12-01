@@ -29,5 +29,9 @@ Statement
   apply g
   assumption
 
+Message (A : Prop) (B : Prop) (hA : A) (g : A → B) : A =>
+"Nachdem du die Implikation `A → B` angewendet hast, musst du nur noch `A` zeigen,
+dafür hast du bereits einen Beweis in den Annahmen."
+
 Tactics apply
 Tactics assumption
