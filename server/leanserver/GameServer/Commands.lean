@@ -48,11 +48,12 @@ elab "Introduction" t:str : command => do
   | .Game => modifyCurGame  fun game => pure {game with introduction := t.getString}
 
 /-- Define the statement of the current level. -/
-elab "Statement" sig:declSig val:declVal : command => do
+elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
   let declName : Name := (← getCurGame).name ++ (← getCurWorld).name ++ ("level" ++ toString lvlIdx : String)
   elabCommand (← `(theorem $(mkIdent declName) $sig $val))
   modifyCurLevel fun level => pure {level with goal := sig}
+-- TODO: Do something with the lemma name.
 
 /-- Define the conclusion of the current game or current level if some
 building a level. -/
@@ -131,6 +132,10 @@ local elab "Message'" decls:mydecl* ":" goal:term "=>" msg:str : command => do
 macro "Message" decls:mydecl* ":" goal:term "=>" msg:str : command => do
   `(set_option linter.unusedVariables false in Message' $decls* : $goal => $msg)
 
+/-- Declare a hint in reaction to a given tactic state in the current level. -/
+macro "Hint" decls:mydecl* ":" goal:term "=>" msg:str : command => do
+  `(set_option linter.unusedVariables false in Message' $decls* : $goal => $msg)
+  -- TODO: implement me?
 
 /-! ## Tactics -/
 
