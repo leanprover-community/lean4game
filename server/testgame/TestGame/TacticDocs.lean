@@ -103,6 +103,19 @@ TacticDoc rcases
 TODO
 "
 
+TacticDoc left
+"
+## Beschreibung
+
+TODO
+"
+
+TacticDoc right
+"
+## Beschreibung
+
+TODO
+"
 
 
 

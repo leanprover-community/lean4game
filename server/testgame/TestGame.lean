@@ -5,3 +5,12 @@ import TestGame.Levels.Logic.L03_Assumption
 import TestGame.Levels.Logic.L03b_Assumption
 import TestGame.Levels.Logic.L04_Rewrite
 import TestGame.Levels.Logic.L05_Apply
+import TestGame.Levels.Logic.L05b_Apply
+import TestGame.Levels.Logic.L05c_Apply
+import TestGame.Levels.Logic.L06_Iff
+import TestGame.Levels.Logic.L06b_Iff
+import TestGame.Levels.Logic.L06c_Iff
+import TestGame.Levels.Logic.L06d_Iff
+import TestGame.Levels.Logic.L07_And
+import TestGame.Levels.Logic.L08_Or
+import TestGame.Levels.Logic.L08b_Or

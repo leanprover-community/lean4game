@@ -1,4 +1,5 @@
 import TestGame.Metadata
+import Mathlib
 
 Game "TestGame"
 World "TestWorld"

@@ -13,12 +13,10 @@ und das Goal wird zu `B`.
 "
 
 Statement
-    (A B C: Prop) (f : A → B) (g : B → C) : A → C := by
+    (A B C : Prop) (f : A → B) (g : B → C) : A → C := by
   intro hA
   apply g
   apply f
   assumption
 
-Tactics intro
-Tactics apply
-Tactics assumption
+Tactics intro apply assumption

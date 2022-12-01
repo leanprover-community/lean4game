@@ -1,5 +1,8 @@
 import TestGame.Metadata
 import Std.Tactic.RCases
+import Mathlib.Tactic.Cases
+
+set_option tactic.hygienic false
 
 Game "TestGame"
 World "TestWorld"
@@ -19,9 +22,8 @@ man explizit an, wie die neuen Annahmen heissen sollen, die Klammern sind `\\<` 
 Statement
     (A B : Prop) : (A ↔ B) → (A → B) := by
   intro h
-  cases h
-  case intro x y =>
-  assumption
+  rcases h
+  exact mp
 
 Message (A : Prop) (B : Prop) : (A ↔ B) → A → B =>
 "Angefangen mit `intro h` kannst du annehmen, dass `(h : A ↔ B)` wahr ist."
@@ -40,3 +42,21 @@ mehreren Teilen.
 "
 
 Tactics intro apply rcases assumption
+
+
+
+
+
+
+
+-- TODO: The new `cases` works differntly. There is also `cases'`
+example (A B : Prop) : (A ↔ B) → (A → B) := by
+  intro h
+  cases h with
+  | intro a b =>
+    assumption
+
+example (A B : Prop) : (A ↔ B) → (A → B) := by
+  intro h
+  cases' h with a b
+  assumption
