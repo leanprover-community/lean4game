@@ -26,5 +26,4 @@ Statement
   rw [←h₂]
   assumption
 
-Tactics rw
-Tactics assumption
+Tactics rw assumption

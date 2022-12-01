@@ -55,4 +55,4 @@ Message (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) : C ∧ A =>
 Message (A : Prop) (B : Prop) (C : Prop) (h : A → C) : C ∧ A =>
 "Ein UND im Goal kann mit `constructor` aufgeteilt werden."
 
-Tactics left right assumption constructor rcases
+Tactics left right assumption constructor rcases apply

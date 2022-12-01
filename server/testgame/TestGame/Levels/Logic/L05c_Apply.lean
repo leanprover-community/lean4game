@@ -1,5 +1,7 @@
 import TestGame.Metadata
 
+set_option tactic.hygienic false
+
 Game "TestGame"
 World "TestWorld"
 Level 8
@@ -8,7 +10,8 @@ Title "Implikation"
 
 Introduction
 "
-Wenn das Goal von der Form `A → B` ist, kann man mit `intro` annehmen, dass `A` wahr ist
+Wenn das Goal von der Form `A → B` ist, kann man mit `intro hA` annehmen, dass `A` wahr ist
+(i.e. erstellt eine Annahme `(hA : A)`)
 und das Goal wird zu `B`.
 "
 
