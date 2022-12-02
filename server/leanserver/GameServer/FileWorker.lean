@@ -59,14 +59,6 @@ open JsonRpc
 
 section Elab
 
--- TODO: Find a better way to pass on the file name?
-def levelIdFromFileName (fileName : String) : IO Nat := do
-  if fileName.startsWith "/level" then
-    if let some id := (fileName.drop "/level".length).toNat? then
-      return id
-  throwServerError s!"Could not find level ID in file name: {fileName}"
-  return 1
-
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool) (couldBeEndSnap : Bool) : IO Snapshot := do
   let cmdState := snap.cmdState
@@ -100,10 +92,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
     let (output, _) ← IO.FS.withIsolatedStreams (isolateStderr := server.stderrAsMessages.get scope.opts) <| liftM (m := BaseIO) do
       Elab.Command.catchExceptions
         (getResetInfoTrees *> do
-          let levelId ← levelIdFromFileName inputCtx.fileName
-          -- TODO: make world and game configurable
-          let some level ← getLevel? {game := `TestGame, world := `TestWorld, level := levelId}
-            | throwServerError "Level not found"
+          let level ← GameServer.getLevelByFileName inputCtx.fileName
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
           -- Insert final `done` command to display unsolved goal error in the end
