@@ -116,16 +116,10 @@ def mkGoalSyntax (s : Term) : List (Ident × Term) → MacroM Term
 /-- Declare a message. This version doesn't prevent the unused linter variable from running. -/
 local elab "Message'" decls:mydecl* ":" goal:term "=>" msg:str : command => do
   let g ← liftMacroM $ mkGoalSyntax goal (decls.map (λ decl => (getIdent decl, getType decl))).toList
-  let g ← liftTermElabM do (return ← instantiateMVars (← elabTerm g none))
-  let (ctx_size, normalized_goal) ← liftTermElabM do
-    let msg_mvar ← mkFreshExprMVar g MetavarKind.syntheticOpaque
-    msg_mvar.mvarId!.withContext do
-      let (_, msg_mvar) ← msg_mvar.mvarId!.introNP decls.size
-      return ((← msg_mvar.getDecl).lctx.size,  (← normalizedRevertExpr msg_mvar))
+  let g ← liftTermElabM do (return ← elabTermAndSynthesize g none)
   modifyCurLevel fun level => pure {level with messages := level.messages.push {
-    ctx_size := ctx_size,
-    normalized_goal := normalized_goal,
-    intro_nb := decls.size,
+    goal := g,
+    intros := decls.size,
     message := msg.getString }}
 
 /-- Declare a message in reaction to a given tactic state in the current level. -/

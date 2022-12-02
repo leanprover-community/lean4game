@@ -11,9 +11,8 @@ open Lean
 /-! ## Messages -/
 
 structure GoalMessageEntry where
-  ctx_size : Nat
-  normalized_goal : Expr
-  intro_nb : Nat
+  goal : Expr
+  intros : Nat
   message : String
   deriving Repr
 

@@ -73,10 +73,18 @@ def getLevelByFileName [Monad m] [MonadError m] [MonadEnv m] (fileName : String)
     | throwError "Level not found"
   return level
 
+open Meta in
+/-- Find all messages whose trigger matches the current goal -/
 def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array String) := do
   let level ← getLevelByFileName doc.meta.mkInputContext.fileName
-  return level.messages.map GoalMessageEntry.message
+  let messages ← level.messages.filterMapM fun message => do
+    let (declMvars, binderInfo, messageGoal) ← forallMetaBoundedTelescope message.goal message.intros
+    if ← isDefEq messageGoal (← inferType $ mkMVar goal) -- TODO: also check assumptions
+    then return some message.message
+    else return none
+  return messages
 
+/-- Get goals and messages at a given position -/
 def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal)) := do
   let doc ← readDoc
   let text := doc.meta.text
