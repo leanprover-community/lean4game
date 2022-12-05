@@ -9,11 +9,10 @@ open Lean
 open Elab
 open Parser
 
-private def mkErrorMessage (c : ParserContext) (pos : String.Pos) (errorMsg : String) : Message :=
+private def mkErrorMessage (c : InputContext) (pos : String.Pos) (errorMsg : String) : Message :=
   let pos := c.fileMap.toPosition pos
   { fileName := c.fileName, pos := pos, data := errorMsg }
 
-open Parser in
 private def mkEOI (pos : String.Pos) : Syntax :=
   let atom := mkAtom (SourceInfo.original "".toSubstring pos "".toSubstring pos) ""
   mkNode `Lean.Parser.Module.eoi #[atom]
@@ -28,23 +27,27 @@ partial def parseTactic (inputCtx : InputContext) (pmctx : ParserModuleContext)
   if inputCtx.input.atEnd pos ∧ couldBeEndSnap then
     stx := mkEOI pos
     return (stx, { pos, recovering }, messages, 0)
-  let c := mkParserContext inputCtx pmctx
-  let s := { cache := initCacheForInput c.input, pos := pos : ParserState }
-  let s := whitespace c s
+
+  let tokens := getTokenTable pmctx.env
+
+  let s   := whitespace.run inputCtx pmctx tokens { cache := initCacheForInput inputCtx.input, pos }
   let endOfWhitespace := s.pos
-  let s := (Tactic.sepByIndentSemicolon tacticParser).fn c s
+
+  let p   :=  (Tactic.sepByIndentSemicolon tacticParser).fn
+  let s   := p.run inputCtx pmctx tokens { cache := initCacheForInput inputCtx.input, pos }
+
   pos := s.pos
   match s.errorMsg with
   | none =>
     stx := s.stxStack.back
     recovering := false
   | some errorMsg =>
-    messages := messages.add <| mkErrorMessage c s.pos (toString errorMsg)
+    messages := messages.add <|  mkErrorMessage inputCtx s.pos (toString errorMsg)
     recovering := true
     stx := s.stxStack.back
-    if ¬ c.input.atEnd s.pos then
-      messages := messages.add <| mkErrorMessage c s.pos "end of input"
-  return (stx, { pos := c.input.endPos, recovering }, messages, endOfWhitespace)
+    if ¬ inputCtx.input.atEnd s.pos then
+      messages := messages.add <|  mkErrorMessage inputCtx s.pos "end of input"
+  return (stx, { pos := inputCtx.input.endPos, recovering }, messages, endOfWhitespace)
 
 end MyModule
 
@@ -329,10 +332,11 @@ section Initialization
       | Except.error e   => throw (e : ElabTaskError))
     let doc : EditableDocument := ⟨meta, AsyncList.delayed snaps, cancelTk⟩
     return (ctx,
-    { doc             := doc
-      pendingRequests := RBMap.empty
-      rpcSessions     := RBMap.empty
-    })
+        { doc             := doc
+          initHeaderStx   := Syntax.missing
+          pendingRequests := RBMap.empty
+          rpcSessions     := RBMap.empty
+        })
 
 end Initialization
 
