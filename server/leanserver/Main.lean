@@ -2,8 +2,11 @@ import GameServer.Watchdog
 import GameServer.FileWorker
 
 
-def main : List String → IO UInt32 := fun args => do
+unsafe def main : List String → IO UInt32 := fun args => do
   let e ← IO.getStderr
+
+  Lean.enableInitializersExecution
+
   if args[0]? == some "--server" then
     MyServer.Watchdog.watchdogMain []
   else if args[0]? == some "--worker" then
