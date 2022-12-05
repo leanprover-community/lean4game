@@ -1,0 +1,4 @@
+- `trivial` uses a bunch of other tactics:
+  (contradiction, assumption, rfl, decide, True.intro, And.intro)
+  so it's maybe not a good candidate to introduce at the beginning of the level.
+- Ringschluss (tfae) is not in mathlib4 yet.
