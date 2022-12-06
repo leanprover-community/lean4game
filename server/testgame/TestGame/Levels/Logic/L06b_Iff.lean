@@ -33,7 +33,6 @@ aus mehreren Einzelteilen besteht: `⟨A → B, B → A⟩`. Man sagt also Lean,
 ob das Goal aus solchen Einzelteilen \"konstruiert\" werden kann.
 "
 
-Tactics constructor
-Tactics assumption
+Tactics constructor assumption
 
 -- TODO : `case mpr =>` ist mathematisch noch sinnvoll.

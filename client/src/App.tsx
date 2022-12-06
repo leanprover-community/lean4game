@@ -44,7 +44,7 @@ function App() {
   if (finished) {
     mainComponent = <GoodBye message={conclusion} />
   } else if (curLevel > 0) {
-    mainComponent = <Level nbLevels={5} level={curLevel} setCurLevel={setCurLevel} setLevelTitle={setLevelTitle} setFinished={setFinished}/>
+    mainComponent = <Level nbLevels={99} level={curLevel} setCurLevel={setCurLevel} setLevelTitle={setLevelTitle} setFinished={setFinished}/>
   } else {
     mainComponent = <Welcome setNbLevels={setNbLevels} startGame={startGame} setConclusion={setConclusion}/>
   }
