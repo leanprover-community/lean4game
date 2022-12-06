@@ -77,14 +77,19 @@ def getLevelByFileName [Monad m] [MonadError m] [MonadEnv m] (fileName : String)
 def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool := do
   -- We iterate through the array backwards hoping that this will find us faster results
   -- TODO: implement backtracking
+  let mut usedFvars := (List.replicate declFvars.size false).toArray
+  -- `usedFvars` keeps track of the fvars that were already used to match an mvar.
   for i in [:declMvars.size] do
     let declMvar := declMvars[declMvars.size - i - 1]!
     let mut found := false
     for j in [:declFvars.size] do
       let declFvar := declFvars[declFvars.size - j - 1]!
-      if ← isDefEq declMvar declFvar then
-        found := true
-        break
+      let usedFvar := usedFvars[declFvars.size - j - 1]!
+      if ¬ usedFvar then
+        if ← isDefEq declMvar declFvar then
+          usedFvars := usedFvars.set! (declFvars.size - j - 1) true
+          found := true
+          break
       else
         continue
     if ¬ found then return false
