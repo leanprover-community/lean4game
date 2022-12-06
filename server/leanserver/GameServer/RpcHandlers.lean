@@ -73,21 +73,46 @@ def getLevelByFileName [Monad m] [MonadError m] [MonadEnv m] (fileName : String)
     | throwError "Level not found"
   return level
 
+/-- Check if each meta variable in `declMvars` has a matching fvar in `declFvars` -/
+def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool := do
+  -- We iterate through the array backwards hoping that this will find us faster results
+  -- TODO: implement backtracking
+  for i in [:declMvars.size] do
+    let declMvar := declMvars[declMvars.size - i - 1]!
+    let mut found := false
+    for j in [:declFvars.size] do
+      let declFvar := declFvars[declFvars.size - j - 1]!
+      if ← isDefEq declMvar declFvar then
+        found := true
+        break
+      else
+        continue
+    if ¬ found then return false
+  return true
+
 open Meta in
 /-- Find all messages whose trigger matches the current goal -/
-def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array String) := do
+def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) (hLog : IO.FS.Stream) : MetaM (Array String) := do
   goal.withContext do
     let level ← getLevelByFileName doc.meta.mkInputContext.fileName
     let messages ← level.messages.filterMapM fun message => do
       let (declMvars, binderInfo, messageGoal) ← forallMetaBoundedTelescope message.goal message.intros
+      -- TODO: Protext mvars in the type of `goal` to be instantiated?
       if ← isDefEq messageGoal (← inferType $ mkMVar goal) -- TODO: also check assumptions
-      then return some message.message
+      then
+        let lctx ← getLCtx -- Local context of the `goal`
+        hLog.putStr s!"{← declMvars.mapM inferType} =?= {← lctx.getFVars.mapM inferType}"
+        if ← matchDecls declMvars lctx.getFVars
+        then
+          return some message.message
+        else return none
       else return none
     return messages
 
 /-- Get goals and messages at a given position -/
 def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal)) := do
   let doc ← readDoc
+  let hLog := (← read).hLog
   let text := doc.meta.text
   let hoverPos := text.lspPosToUtf8Pos p.position
   -- TODO: I couldn't find a good condition to find the correct snap. So we are looking
@@ -99,7 +124,7 @@ def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal
           let ci := if useAfter then { ci with mctx := ti.mctxAfter } else { ci with mctx := ti.mctxBefore }
           let goals := List.toArray <| if useAfter then ti.goalsAfter else ti.goalsBefore
           let goals ← ci.runMetaM {} $ goals.mapM fun goal => do
-            let messages ← findMessages goal doc
+            let messages ← findMessages goal doc hLog
             return ← goal.toGameGoal messages
           return goals
         return some { goals := goals.foldl (· ++ ·) ∅ }
