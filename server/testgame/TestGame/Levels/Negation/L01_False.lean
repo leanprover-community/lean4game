@@ -6,7 +6,7 @@ Game "TestGame"
 World "Contradiction"
 Level 1
 
-Title "Widerspruch"
+Title "Widerspruch beweist alles."
 
 Introduction
 "

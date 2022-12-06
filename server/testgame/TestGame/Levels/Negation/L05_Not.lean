@@ -5,16 +5,19 @@ Game "TestGame"
 World "Contradiction"
 Level 5
 
-Title "Widerspruch"
+Title "Nicht-nicht"
 
 Introduction
 "
+Wenn man ein Nicht (`¬`) im Goal hat, will man meistens einen Widerspruch starten,
+wie im nächsten Level dann gezeigt wird. Manchmal aber hat man Terme der Form
+`¬ (¬ A)`, in welchem Fall das Lemma `not_not` nützlich ist.
 "
 
-
 Statement
-    (A : Prop) : A := by
-  not_not
+    (A : Prop) : ¬ (¬ A) ↔ A := by
+  rw [not_not]
 
+Tactics rw
 
-Tactics contradiction
+Lemmas not_not

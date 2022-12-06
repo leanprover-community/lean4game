@@ -1,31 +1,41 @@
 import TestGame.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
+import Mathlib.Tactic.Contrapose
+import Mathlib.Tactic.Use
+import Mathlib.Tactic.Ring
+
+import TestGame.ToBePorted
 
 Game "TestGame"
 World "Contradiction"
 Level 3
 
-Title "Widerspruch"
+Title "Ad absurdum"
 
 Introduction
 "
-Im weiteren kann man auch Widersprüche erhalten, wenn man Annahmen der Form
-`A = B` hat, wo Lean weiss, dass `A und `B` unterschiedlich sind, z.B. `0 = 1` in `ℕ`
-oder auch Annahmen der Form `A ≠ A` (`\\ne`).
+Aber, die Aussagen müssen wirklich exakte Gegenteile sein.
+
+Hier musst du zuerst eines der Lemmas `not_odd : ¬ odd n ↔ even n` oder
+`not_even : ¬ even n ↔ odd n` benützen, um einer der Terme umzuschreiben.
 "
 
 Statement
   "Ein Widerspruch impliziert alles."
-    (A : Prop) (a b c : ℕ) (g₁ : a = b) (g₂ : b = c) (h : a ≠ c) : A := by
-  rw [g₁] at h
+  (n : ℕ) (h₁ : even n) (h₂ : odd n) : n = 128 := by
+  rw [← not_even] at h₂
   contradiction
 
-Message (A : Prop) (a : ℕ) (b : ℕ) (c : ℕ) (g₁ : a = b) (g₂ : b = c) (h : a ≠ c) : A =>
-  "Recap: `rw [...] at h` hilft dir hier."
+Message (n : ℕ) (h₁ : even n) (h₂ : odd n) : n = 128 =>
+"Schreibe zuerst eine der Aussagen mit `rw [←not_even] at h₂` um, damit diese genaue
+Gegenteile sind."
 
-Message (A : Prop) (a : ℕ) (b : ℕ) (c : ℕ) (g₁ : a = b) (g₂ : b = c) (h : b ≠ c) : A =>
-  "`b ≠ c` muss man als `¬ (b = c)` lesen. Deshalb findet `contradiction` hier direkt
-  einen Widerspruch."
+Conclusion
+"
+Detail: `¬ A` ist übrigens als `A → false` implementiert, was aussagt, dass
+\"falls `A` wahr ist, impliziert das `false` und damit einen Widerspruch\".
+"
+-- TODO: Oder doch ganz entfernen?
 
 Tactics contradiction
