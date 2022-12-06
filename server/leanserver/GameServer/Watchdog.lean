@@ -18,12 +18,10 @@ open System.Uri
     for (_, fw) in workers do
       if let WorkerState.running := fw.state then
         workerTasks := workerTasks.push <| fw.commTask.map (ServerEvent.workerEvent fw)
-        if let some ge ← fw.groupedEditsRef.get then
-          workerTasks := workerTasks.push <| ge.signalTask.map (ServerEvent.workerEvent fw)
 
     let ev ← IO.waitAny (clientTask :: workerTasks.toList)
 
-    if ← Game.handleServerEvent ev then
+    if ← Game.handleServerEvent ev then -- handle Game requests
       mainLoop (←runClientTask)
     else
       match ev with
@@ -35,60 +33,28 @@ open System.Uri
         | Message.request id method (some params) =>
           handleRequest id method (toJson params)
           mainLoop (←runClientTask)
-        | Message.notification "textDocument/didChange" (some params) =>
-          let p ← parseParams DidChangeTextDocumentParams (toJson params)
-          let fw ← findFileWorker! p.textDocument.uri
-          let now ← monoMsNow
-          /- We wait `editDelay`ms since last edit before applying the changes. -/
-          let applyTime := now + st.editDelay
-          let queuedMsgs? ← fw.groupedEditsRef.modifyGet fun
-            | some ge => (some ge.queuedMsgs, some { ge with
-              applyTime := applyTime
-              params.textDocument := p.textDocument
-              params.contentChanges := ge.params.contentChanges ++ p.contentChanges
-              -- drain now-outdated messages and respond with `contentModified` below
-              queuedMsgs := #[] })
-            | none    => (none, some {
-              applyTime := applyTime
-              params := p
-              /- This is overwritten just below. -/
-              signalTask := Task.pure WorkerEvent.processGroupedEdits
-              queuedMsgs := #[] })
-          match queuedMsgs? with
-          | some queuedMsgs =>
-            for msg in queuedMsgs do
-              match msg with
-              | JsonRpc.Message.request id _ _ =>
-                fw.erasePendingRequest id
-                (← read).hOut.writeLspResponseError {
-                  id := id
-                  code := ErrorCode.contentModified
-                  message := "File changed."
-                }
-              | _ => pure () -- notifications do not need to be cancelled
-          | _ =>
-            let t ← fw.runEditsSignalTask
-            fw.groupedEditsRef.modify (Option.map fun ge => { ge with signalTask := t } )
+        | Message.response .. =>
+          -- TODO: handle client responses
           mainLoop (←runClientTask)
+        | Message.responseError _ _ e .. =>
+          throwServerError s!"Unhandled response error: {e}"
         | Message.notification method (some params) =>
           handleNotification method (toJson params)
-          mainLoop (←runClientTask)
-        | Message.response "register_ilean_watcher" _      =>
           mainLoop (←runClientTask)
         | _ => throwServerError "Got invalid JSON-RPC message"
       | ServerEvent.clientError e => throw e
       | ServerEvent.workerEvent fw ev =>
         match ev with
-        | WorkerEvent.processGroupedEdits =>
-          handleEdits fw
-          mainLoop clientTask
         | WorkerEvent.ioError e =>
-          throwServerError s!"IO error while processing events for {fw.doc.meta.uri}: {e}"
+          throwServerError s!"IO error while processing events for {fw.doc.uri}: {e}"
         | WorkerEvent.crashed _ =>
-          handleCrash fw.doc.meta.uri #[]
+          handleCrash fw.doc.uri #[]
           mainLoop clientTask
         | WorkerEvent.terminated =>
           throwServerError "Internal server error: got termination event for worker that should have been removed"
+        | .importsChanged =>
+          startFileWorker fw.doc
+          mainLoop clientTask
 
 def initAndRunWatchdogAux : GameServerM Unit := do
   let st ← read
@@ -156,7 +122,6 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
     args           := args
     fileWorkersRef := fileWorkersRef
     initParams     := initRequest.param
-    editDelay      := initRequest.param.initializationOptions? |>.bind InitializationOptions.editDelay? |>.getD 200
     workerPath
     srcSearchPath
     references

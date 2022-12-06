@@ -9,11 +9,10 @@ open Lean
 open Elab
 open Parser
 
-private def mkErrorMessage (c : ParserContext) (pos : String.Pos) (errorMsg : String) : Message :=
+private def mkErrorMessage (c : InputContext) (pos : String.Pos) (errorMsg : String) : Message :=
   let pos := c.fileMap.toPosition pos
   { fileName := c.fileName, pos := pos, data := errorMsg }
 
-open Parser in
 private def mkEOI (pos : String.Pos) : Syntax :=
   let atom := mkAtom (SourceInfo.original "".toSubstring pos "".toSubstring pos) ""
   mkNode `Lean.Parser.Module.eoi #[atom]
@@ -28,23 +27,27 @@ partial def parseTactic (inputCtx : InputContext) (pmctx : ParserModuleContext)
   if inputCtx.input.atEnd pos ∧ couldBeEndSnap then
     stx := mkEOI pos
     return (stx, { pos, recovering }, messages, 0)
-  let c := mkParserContext inputCtx pmctx
-  let s := { cache := initCacheForInput c.input, pos := pos : ParserState }
-  let s := whitespace c s
+
+  let tokens := getTokenTable pmctx.env
+
+  let s   := whitespace.run inputCtx pmctx tokens { cache := initCacheForInput inputCtx.input, pos }
   let endOfWhitespace := s.pos
-  let s := (Tactic.sepByIndentSemicolon tacticParser).fn c s
+
+  let p   :=  (Tactic.sepByIndentSemicolon tacticParser).fn
+  let s   := p.run inputCtx pmctx tokens { cache := initCacheForInput inputCtx.input, pos }
+
   pos := s.pos
   match s.errorMsg with
   | none =>
     stx := s.stxStack.back
     recovering := false
   | some errorMsg =>
-    messages := messages.add <| mkErrorMessage c s.pos (toString errorMsg)
+    messages := messages.add <|  mkErrorMessage inputCtx s.pos (toString errorMsg)
     recovering := true
     stx := s.stxStack.back
-    if ¬ c.input.atEnd s.pos then
-      messages := messages.add <| mkErrorMessage c s.pos "end of input"
-  return (stx, { pos := c.input.endPos, recovering }, messages, endOfWhitespace)
+    if ¬ inputCtx.input.atEnd s.pos then
+      messages := messages.add <|  mkErrorMessage inputCtx s.pos "end of input"
+  return (stx, { pos := inputCtx.input.endPos, recovering }, messages, endOfWhitespace)
 
 end MyModule
 
@@ -58,14 +61,6 @@ open Snapshots
 open JsonRpc
 
 section Elab
-
--- TODO: Find a better way to pass on the file name?
-def levelIdFromFileName (fileName : String) : IO Nat := do
-  if fileName.startsWith "/level" then
-    if let some id := (fileName.drop "/level".length).toNat? then
-      return id
-  throwServerError s!"Could not find level ID in file name: {fileName}"
-  return 1
 
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool) (couldBeEndSnap : Bool) : IO Snapshot := do
@@ -100,10 +95,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
     let (output, _) ← IO.FS.withIsolatedStreams (isolateStderr := server.stderrAsMessages.get scope.opts) <| liftM (m := BaseIO) do
       Elab.Command.catchExceptions
         (getResetInfoTrees *> do
-          let levelId ← levelIdFromFileName inputCtx.fileName
-          -- TODO: make world and game configurable
-          let some level ← getLevel? {game := `TestGame, world := `TestWorld, level := levelId}
-            | throwServerError "Level not found"
+          let level ← GameServer.getLevelByFileName inputCtx.fileName
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
           -- Insert final `done` command to display unsolved goal error in the end
@@ -340,10 +332,11 @@ section Initialization
       | Except.error e   => throw (e : ElabTaskError))
     let doc : EditableDocument := ⟨meta, AsyncList.delayed snaps, cancelTk⟩
     return (ctx,
-    { doc             := doc
-      pendingRequests := RBMap.empty
-      rpcSessions     := RBMap.empty
-    })
+        { doc             := doc
+          initHeaderStx   := Syntax.missing
+          pendingRequests := RBMap.empty
+          rpcSessions     := RBMap.empty
+        })
 
 end Initialization
 

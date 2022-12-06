@@ -3,10 +3,12 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import ReactMarkdown from 'react-markdown';
+import { MathJax } from "better-react-mathjax";
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import { Paper, Box, Typography } from '@mui/material';
+import { Paper, Box, Typography, Alert } from '@mui/material';
 
 const errorRegex = /<stdin>:1:(?<col>[^:]*): (?<msg>.*)/;
 
@@ -30,6 +32,7 @@ function Goal({ goal }) {
         </List></Box>}
       <Typography>Prove:</Typography>
       <Typography color="primary" sx={{ ml: 2 }}>{goal.goal}</Typography>
+      {goal.messages.map((message) => <Alert severity="info" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message}</ReactMarkdown></MathJax></Alert>)}
     </Box>)
 }
 
