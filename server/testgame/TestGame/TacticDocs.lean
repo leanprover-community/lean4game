@@ -117,10 +117,33 @@ TacticDoc right
 TODO
 "
 
+TacticDoc contradiction
+"
+## Beschreibung
 
+TODO
+"
 
+TacticDoc ring
+"
+## Beschreibung
 
+TODO
+"
 
+TacticDoc unfold
+"
+## Beschreibung
+
+TODO
+"
+
+TacticDoc use
+"
+## Beschreibung
+
+TODO
+"
 
 
 
