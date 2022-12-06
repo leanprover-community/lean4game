@@ -2,7 +2,7 @@ import TestGame.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 
-set_option tactic.hygienic false
+--set_option tactic.hygienic false
 
 Game "TestGame"
 World "TestWorld"

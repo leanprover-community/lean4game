@@ -1,5 +1,5 @@
 node_modules
 client/dist
 server/build
-**/lean_packages/
+**/lake-packages/
 

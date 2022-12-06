@@ -29,6 +29,7 @@ erfüllt.
 
 -- TODO: `even`/`odd` sind in Algebra.Parity. Not ported yet
 def even (a : ℕ) : Prop := ∃ r, a = r + r
+
 def odd (a : ℕ) : Prop := ∃ k, a = 2*k + 1
 
 Statement (n : ℕ) (h : even n) : even (n ^ 2) := by
