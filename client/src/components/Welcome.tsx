@@ -11,6 +11,8 @@ import cytoscape from 'cytoscape'
 import klay from 'cytoscape-klay';
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchGame } from '../game/gameSlice'
+import { Link as RouterLink } from 'react-router-dom';
+
 
 cytoscape.use( klay );
 
@@ -19,13 +21,8 @@ import { LeanClient } from 'lean4web/client/src/editor/leanclient';
 import { ConnectionContext } from '../connection';
 import { useAppDispatch, useAppSelector } from '../hooks';
 
-interface WelcomeProps {
-  setNbLevels: any;
-  startGame: any;
-  setConclusion: any;
-}
 
-function Welcome({ setNbLevels, startGame, setConclusion }: WelcomeProps) {
+function Welcome() {
   const dispatch = useAppDispatch()
 
   const worldsRef = useRef<HTMLDivElement>(null)
@@ -94,7 +91,7 @@ function Welcome({ setNbLevels, startGame, setConclusion }: WelcomeProps) {
         </Typography>
       </Box>
       <Box textAlign='center' sx={{ m: 5 }}>
-        <Button onClick={startGame} variant="contained">Start rescue mission</Button>
+        <Button component={RouterLink} to="/level/1" variant="contained">Start rescue mission</Button>
       </Box>
       <div ref={worldsRef} style={{"width": "100%","height": "50em"}} />
     </div>

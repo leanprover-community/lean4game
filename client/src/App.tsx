@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { MathJaxContext } from "better-react-mathjax";
-import * as rpc from 'vscode-ws-jsonrpc';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { Outlet } from "react-router-dom";
 
 import '@fontsource/roboto/300.css';
@@ -12,9 +10,6 @@ import '@fontsource/roboto/700.css';
 
 import { AppBar, CssBaseline, Toolbar, Typography } from '@mui/material';
 
-import Welcome from './components/Welcome';
-import Level from './components/Level';
-import GoodBye from './components/GoodBye';
 import { useAppSelector } from './hooks';
 
 function App() {

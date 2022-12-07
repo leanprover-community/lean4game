@@ -6,6 +6,8 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import ReactMarkdown from 'react-markdown';
 import { MathJax } from "better-react-mathjax";
+import { Link as RouterLink } from 'react-router-dom';
+
 
 import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -20,10 +22,16 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import './level.css'
 import { ConnectionContext } from '../connection';
 import Infoview from './Infoview';
+import { useParams } from 'react-router-dom';
+import { MonacoServices } from 'monaco-languageclient';
+
+
 
 function Level() {
-  const level = 1
-  const [index, setIndex] = useState(level) // Level number
+
+  const params = useParams();
+  const levelId = parseInt(params.levelId)
+
   const [tacticDocs, setTacticDocs] = useState([])
   const [lemmaDocs, setLemmaDocs] = useState([])
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
@@ -64,7 +72,7 @@ function Level() {
   useEffect(() => {
     // Scroll to top when loading a new level
     messagePanelRef.current!.scrollTo(0,0)
-  }, [level])
+  }, [levelId])
 
   const connection = React.useContext(ConnectionContext)
 
@@ -97,12 +105,13 @@ function Level() {
     return () => { editor.dispose() }
   }, [])
 
-  const uri = `file:///level${level}`
+  const uri = `file:///level${levelId}`
 
   // The next function will be called when the level changes
   useEffect(() => {
     connection.whenLeanClientStarted((leanClient) => {
       if (editor) {
+
         const model = monaco.editor.createModel('', 'lean4', monaco.Uri.parse(uri))
 
         editor.setModel(model)
@@ -112,9 +121,10 @@ function Level() {
 
         new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
-        leanClient.sendRequest("loadLevel", {world: "TestWorld", level}).then((res) => {
+
+        leanClient.sendRequest("loadLevel", {world: "TestWorld", level: levelId}).then((res) => {
           // setLevelTitle("Level " + res["index"] + ": " + res["title"])
-          setIndex(parseInt(res["index"]))
+          // setIndex(parseInt(res["index"]))
           setTacticDocs(res["tactics"])
           setLemmaDocs(res["lemmas"])
           setIntroduction(res["introduction"])
@@ -124,7 +134,8 @@ function Level() {
         return () => { model.dispose(); setReady(false) }
       }
     })
-  }, [editor, level, connection])
+
+  }, [editor, levelId, connection])
 
   function loadLevel(index) {
     setCompleted(false)
@@ -148,8 +159,10 @@ function Level() {
         </div>
       </Grid>
       <Grid xs={4} className="info-panel">
-        <Button disabled={index <= 1} onClick={() => { loadLevel(index - 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
-        <Button disabled={index >= 99} onClick={() => { loadLevel(index + 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
+
+        <Button disabled={levelId <= 1} component={RouterLink} to={`/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
+        <Button disabled={false} component={RouterLink} to={`/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
+
         <div style={{display: expertInfoview ? 'block' : 'none' }} ref={infoviewRef} className="infoview vscode-light"></div>
         <div style={{display: expertInfoview ? 'none' : 'block' }}>
           <Infoview leanClient={connection.getLeanClient()} editor={editor} editorApi={infoProvider?.getApi()} />
