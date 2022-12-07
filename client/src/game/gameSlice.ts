@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { LeanClient } from 'lean4web/client/src/editor/leanclient'
+import { Connection } from '../connection'
 import type { RootState } from '../store'
 
 interface GameState {
@@ -34,23 +35,11 @@ export const gameSlice = createSlice({
 
 export const { loadedGame } = gameSlice.actions
 
-// TODO: Move this into LeanClient?
-/** Call `callback` when the leanClient has started. If not already started, start it. */
-const whenLeanClientStarted = (leanClient, callback) => {
-  if (leanClient.isRunning()) {
-    callback()
-  } else {
-    if (!leanClient.isStarted()) {
-      leanClient.start()
-    }
-    leanClient.restarted(callback)
-  }
-}
 
 export const fetchGame = (dispatch, getState, extraArgument) => {
-  const leanClient : LeanClient = extraArgument.leanClient
-  whenLeanClientStarted(leanClient, () => {
-    leanClient.sendRequest("info", {}).then((res) =>{
+  const connection : Connection = extraArgument.connection
+  connection.whenLeanClientStarted(() => {
+    connection.getLeanClient().sendRequest("info", {}).then((res) =>{
       dispatch(loadedGame(res))
     })
   })

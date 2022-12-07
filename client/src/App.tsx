@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { MathJaxContext } from "better-react-mathjax";
 import * as rpc from 'vscode-ws-jsonrpc';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
+import { Outlet } from "react-router-dom";
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -14,7 +15,6 @@ import { AppBar, CssBaseline, Toolbar, Typography } from '@mui/material';
 import Welcome from './components/Welcome';
 import Level from './components/Level';
 import GoodBye from './components/GoodBye';
-import { monacoSetup } from 'lean4web/client/src/monacoSetup'
 import { useAppSelector } from './hooks';
 
 function App() {
@@ -40,15 +40,6 @@ function App() {
     setCurLevel(1)
   }
 
-  let mainComponent;
-  if (finished) {
-    mainComponent = <GoodBye message={conclusion} />
-  } else if (curLevel > 0) {
-    mainComponent = <Level nbLevels={99} level={curLevel} setCurLevel={setCurLevel} setLevelTitle={setLevelTitle} setFinished={setFinished}/>
-  } else {
-    mainComponent = <Welcome setNbLevels={setNbLevels} startGame={startGame} setConclusion={setConclusion}/>
-  }
-
   const title = useAppSelector(state => state.game.title)
 
   return (
@@ -65,7 +56,7 @@ function App() {
         </Typography>
         </Toolbar>
       </AppBar>
-      {mainComponent}
+      <Outlet />
     </MathJaxContext>
     </div>
   )

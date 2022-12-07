@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import gameReducer from './game/gameSlice';
-import { leanClient } from './connection'
+import { connection } from './connection'
 import thunkMiddleware from 'redux-thunk'
 
 
-const thunkMiddlewareWithArg = thunkMiddleware.withExtraArgument({ leanClient })
+const thunkMiddlewareWithArg = thunkMiddleware.withExtraArgument({ connection })
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +13,7 @@ export const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       thunk: {
-        extraArgument: { leanClient }
+        extraArgument: { connection }
       }
     })
 });

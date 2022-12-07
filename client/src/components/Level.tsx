@@ -11,10 +11,6 @@ import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 
 import LeftPanel from './LeftPanel';
-import InputZone from './InputZone';
-import Message from './Message';
-import TacticState from './TacticState';
-import { LeanClient } from 'lean4web/client/src/editor/leanclient';
 import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
 import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
 import { InfoProvider } from 'lean4web/client/src/editor/infoview';
@@ -25,15 +21,8 @@ import './level.css'
 import { ConnectionContext } from '../connection';
 import Infoview from './Infoview';
 
-interface LevelProps {
-  nbLevels: any;
-  level: any;
-  setCurLevel: any;
-  setLevelTitle: any;
-  setFinished: any
-}
-
-function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: LevelProps) {
+function Level() {
+  const level = 1
   const [index, setIndex] = useState(level) // Level number
   const [tacticDocs, setTacticDocs] = useState([])
   const [lemmaDocs, setLemmaDocs] = useState([])
@@ -77,7 +66,7 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
     messagePanelRef.current!.scrollTo(0,0)
   }, [level])
 
-  const leanClient = React.useContext(ConnectionContext)
+  const connection = React.useContext(ConnectionContext)
 
   useEffect(() => {
     const editor = monaco.editor.create(codeviewRef.current!, {
@@ -97,7 +86,7 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
       theme: 'vs-code-theme-converted'
     })
 
-    const infoProvider = new InfoProvider(leanClient)
+    const infoProvider = new InfoProvider(connection.getLeanClient())
     const div: HTMLElement = infoviewRef.current!
     const infoviewApi = renderInfoview(infoProvider.getApi(), div)
 
@@ -112,33 +101,35 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
 
   // The next function will be called when the level changes
   useEffect(() => {
-    if (editor) {
-      const model = monaco.editor.createModel('', 'lean4', monaco.Uri.parse(uri))
+    connection.whenLeanClientStarted((leanClient) => {
+      if (editor) {
+        const model = monaco.editor.createModel('', 'lean4', monaco.Uri.parse(uri))
 
-      editor.setModel(model)
-      infoviewApi.serverRestarted(leanClient.initializeResult)
-      infoProvider.openPreview(editor, infoviewApi)
-      setReady(true)
+        editor.setModel(model)
+        infoviewApi.serverRestarted(leanClient.initializeResult)
+        infoProvider.openPreview(editor, infoviewApi)
+        setReady(true)
 
-      new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
+        new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
-      leanClient.sendRequest("loadLevel", {world: "TestWorld", level}).then((res) => {
-        setLevelTitle("Level " + res["index"] + ": " + res["title"])
-        setIndex(parseInt(res["index"]))
-        setTacticDocs(res["tactics"])
-        setLemmaDocs(res["lemmas"])
-        setIntroduction(res["introduction"])
-        processResponse(res)
-      });
+        leanClient.sendRequest("loadLevel", {world: "TestWorld", level}).then((res) => {
+          // setLevelTitle("Level " + res["index"] + ": " + res["title"])
+          setIndex(parseInt(res["index"]))
+          setTacticDocs(res["tactics"])
+          setLemmaDocs(res["lemmas"])
+          setIntroduction(res["introduction"])
+          processResponse(res)
+        });
 
-      return () => { model.dispose(); setReady(false) }
-    }
-  }, [editor, level, leanClient])
+        return () => { model.dispose(); setReady(false) }
+      }
+    })
+  }, [editor, level, connection])
 
   function loadLevel(index) {
     setCompleted(false)
     setHistory([])
-    setCurLevel(index)
+    // setCurLevel(index)
   }
 
   return (
@@ -158,10 +149,10 @@ function Level({ nbLevels, level, setCurLevel, setLevelTitle, setFinished }: Lev
       </Grid>
       <Grid xs={4} className="info-panel">
         <Button disabled={index <= 1} onClick={() => { loadLevel(index - 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
-        <Button disabled={index >= nbLevels} onClick={() => { loadLevel(index + 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
+        <Button disabled={index >= 99} onClick={() => { loadLevel(index + 1) }} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
         <div style={{display: expertInfoview ? 'block' : 'none' }} ref={infoviewRef} className="infoview vscode-light"></div>
         <div style={{display: expertInfoview ? 'none' : 'block' }}>
-          <Infoview leanClient={leanClient} editor={editor} editorApi={infoProvider?.getApi()} />
+          <Infoview leanClient={connection.getLeanClient()} editor={editor} editorApi={infoProvider?.getApi()} />
         </div>
         <FormGroup>
           <FormControlLabel onChange={() => { setExpertInfoview(!expertInfoview) }} control={<Switch />} label="Expert mode" />
