@@ -91,7 +91,7 @@ function Welcome() {
         </Typography>
       </Box>
       <Box textAlign='center' sx={{ m: 5 }}>
-        <Button component={RouterLink} to="/level/1" variant="contained">Start rescue mission</Button>
+        <Button component={RouterLink} to="/world/TestWorld/level/1" variant="contained">Start rescue mission</Button>
       </Box>
       <div ref={worldsRef} style={{"width": "100%","height": "50em"}} />
     </div>

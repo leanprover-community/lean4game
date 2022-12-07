@@ -29,7 +29,7 @@ const router = createHashRouter([
         element: <Welcome />,
       },
       {
-        path: "/level/:levelId",
+        path: "/world/:worldId/level/:levelId",
         element: <Level />,
       },
     ],
