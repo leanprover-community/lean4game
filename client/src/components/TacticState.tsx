@@ -12,6 +12,8 @@ import { Paper, Box, Typography, Alert } from '@mui/material';
 
 const errorRegex = /<stdin>:1:(?<col>[^:]*): (?<msg>.*)/;
 
+// TODO: Dead variables (x✝) are not displayed correctly.
+
 function Goal({ goal }) {
   const hasObject = typeof goal.objects === "object" && goal.objects.length > 0
   const hasAssumption = typeof goal.assumptions === "object" && goal.assumptions.length > 0
