@@ -8,6 +8,8 @@ The project is currently mostly copied from Patrick Massot's [NNG4](https://gith
 Building this requires a [npm](https://www.npmjs.com/) toolchain. After cloning the repository you should run
 `npm install` to pull in all dependencies. For development and experimentation, you can run `npm start` that will perform a non-optimized build and then run a local webserver on port 3000.
 
+### Progress
+This is a work in progress. In the future there are plans to host a server managing different public learning games for Lean4, but for now the target is to provide the first games (in German and eventually English) by April 2023.
 
 ## NPM Scripts
 

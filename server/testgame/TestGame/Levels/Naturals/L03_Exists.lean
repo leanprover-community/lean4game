@@ -4,6 +4,7 @@ import Mathlib.Tactic.Contrapose
 import Mathlib.Tactic.Use
 import Mathlib.Tactic.Ring
 
+import TestGame.ToBePorted
 
 Game "TestGame"
 World "Nat"
@@ -32,12 +33,7 @@ Hierzu gibt es 3 wichtige Taktiken:
    soll. Das macht man mit `use y`
 "
 
--- TODO: `even`/`odd` sind in Algebra.Parity. Not ported yet
-def even (a : ℕ) : Prop := ∃ r, a = 2 * r
-
-def odd (a : ℕ) : Prop := ∃ k, a = 2 * k + 1
-
-Statement (n : ℕ) (h : even n) : even (n ^ 2) := by
+Statement even_square (n : ℕ) (h : even n) : even (n ^ 2) := by
   unfold even at *
   rcases h with ⟨x, hx⟩
   use 2 * x ^ 2

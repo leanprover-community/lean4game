@@ -4,6 +4,9 @@ import Mathlib.Tactic.LeftRight
 
 --set_option tactic.hygienic false
 
+--set_option autoImplicit false
+
+
 Game "TestGame"
 World "TestWorld"
 Level 15

@@ -117,7 +117,44 @@ TacticDoc right
 TODO
 "
 
+TacticDoc simp
+"
+## Beschreibung
+
+TODO
+"
+
 TacticDoc contradiction
+"
+## Beschreibung
+
+TODO
+"
+
+TacticDoc push_neg
+"
+## Beschreibung
+
+TODO
+"
+
+
+TacticDoc contrapose
+"
+## Beschreibung
+
+TODO
+"
+
+TacticDoc revert
+"
+## Beschreibung
+
+TODO
+"
+
+
+TacticDoc by_contra
 "
 ## Beschreibung
 

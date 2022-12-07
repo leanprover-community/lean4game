@@ -2,11 +2,13 @@ import TestGame.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 
+import TestGame.ToBePorted
+
 Game "TestGame"
 World "Contradiction"
 Level 2
 
-Title "Widerspruch"
+Title "Ad absurdum"
 
 Introduction
 "
@@ -16,14 +18,11 @@ also `(h : A)` und `(g : ¬ A)`. (`\\not`)
 
 Statement
   "Ein Widerspruch impliziert alles."
-    (A : Prop) (n : ℕ) (h : ∃ x, 2 * x = n) (g : ¬ (∃ x, 2 * x = n)) : A := by
+    (n : ℕ) (h : even n) (g : ¬ (even n)) : n = 128 := by
   contradiction
 
 Conclusion
 "
-Detail: `¬ A` ist übrigens als `A → false` implementiert, was aussagt, dass
-\"falls `A` wahr ist, impliziert das `false` und damit einen Widerspruch\".
 "
--- TODO: Oder doch ganz entfernen?
 
 Tactics contradiction

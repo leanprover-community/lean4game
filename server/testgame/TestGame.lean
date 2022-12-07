@@ -14,3 +14,17 @@ import TestGame.Levels.Logic.L06d_Iff
 import TestGame.Levels.Logic.L07_And
 import TestGame.Levels.Logic.L08_Or
 import TestGame.Levels.Logic.L08b_Or
+import TestGame.Levels.Logic.L08c_Or
+import TestGame.Levels.Naturals.L01_Ring
+import TestGame.Levels.Naturals.L02_Ring
+import TestGame.Levels.Naturals.L03_Exists
+import TestGame.Levels.Naturals.L04_Forall
+import TestGame.Levels.Negation.L01_False
+import TestGame.Levels.Negation.L02_Contra
+import TestGame.Levels.Negation.L03_Contra
+import TestGame.Levels.Negation.L04_Contra
+import TestGame.Levels.Negation.L05_Not
+import TestGame.Levels.Negation.L06_ByContra
+import TestGame.Levels.Negation.L07_Contrapose
+import TestGame.Levels.Negation.L08_Contrapose
+import TestGame.Levels.Negation.L09_PushNeg
