@@ -110,7 +110,7 @@ function Level() {
 
   // The next function will be called when the level changes
   useEffect(() => {
-    connection.whenLeanClientStarted((leanClient) => {
+    connection.startLeanClient().then((leanClient) => {
       if (editor) {
 
         const model = monaco.editor.createModel('', 'lean4', monaco.Uri.parse(uri))

@@ -35,7 +35,7 @@ function App() {
     setCurLevel(1)
   }
 
-  const title = useAppSelector(state => state.game.title)
+  const title = ""//useAppSelector(state => state.gameApi.data.title)
 
   return (
     <div className="App">

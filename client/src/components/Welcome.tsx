@@ -6,24 +6,18 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import * as rpc from 'vscode-ws-jsonrpc';
 import cytoscape from 'cytoscape'
 import klay from 'cytoscape-klay';
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchGame } from '../game/gameSlice'
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 
 cytoscape.use( klay );
 
 import { Box, Typography, Button, CircularProgress, Grid } from '@mui/material';
-import { LeanClient } from 'lean4web/client/src/editor/leanclient';
-import { ConnectionContext } from '../connection';
-import { useAppDispatch, useAppSelector } from '../hooks';
+import { useGetGameInfoQuery } from '../game/api';
 
 
 function Welcome() {
-  const dispatch = useAppDispatch()
   const navigate = useNavigate();
 
   const worldsRef = useRef<HTMLDivElement>(null)
@@ -75,23 +69,25 @@ function Welcome() {
     });
   }
 
-  useEffect(() => { dispatch(fetchGame); }, [])
+  const gameInfo = useGetGameInfoQuery()
 
-  const worlds = useAppSelector(state => state.game.worlds)
-  useEffect(() => { if (worlds) { drawWorlds(worlds); } }, [worlds])
+  useEffect(() => {
+    if (gameInfo.data?.worlds) { drawWorlds(gameInfo.data.worlds); }
+  }, [gameInfo.data?.worlds])
 
-  const title = useAppSelector(state => state.game.title)
-  useEffect(() => { window.document.title = title }, [title])
-
-  const introduction = useAppSelector(state => state.game.introduction)
+  useEffect(() => {
+    if (gameInfo.data?.title) window.document.title = gameInfo.data.title
+  }, [gameInfo.data?.title])
 
   return <div>
-  { introduction?// TODO: find a better way to mark loading state?
+  { gameInfo.isLoading?
+    <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
+    :
     <div>
       <Box sx={{ m: 3 }}>
         <Typography variant="body1" component="div">
           <MathJax>
-            <ReactMarkdown>{introduction}</ReactMarkdown>
+            <ReactMarkdown>{gameInfo.data.introduction}</ReactMarkdown>
           </MathJax>
         </Typography>
       </Box>
@@ -100,7 +96,6 @@ function Welcome() {
       </Box>
       <div ref={worldsRef} style={{"width": "100%","height": "50em"}} />
     </div>
-    : <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
   }
 
   </div>

@@ -18,17 +18,21 @@ export class Connection {
     return this.leanClient
   }
 
-  /** Call `callback` when the leanClient has started. If not already started, start it. */
-  whenLeanClientStarted = (callback) => {
-    const leanClient = this.getLeanClient()
-    if (leanClient.isRunning()) {
-      callback(leanClient)
-    } else {
-      if (!leanClient.isStarted()) {
-        leanClient.start()
+  /** If not already started, starts the Lean client. resolves the returned promise as soon as a
+   * Lean client is running.
+   */
+  startLeanClient = () => {
+    return new Promise<LeanClient>((resolve) => {
+      const leanClient = this.getLeanClient()
+      if (leanClient.isRunning()) {
+        resolve(leanClient)
+      } else {
+        if (!leanClient.isStarted()) {
+          leanClient.start()
+        }
+       leanClient.restarted(() => { resolve(leanClient) })
       }
-     leanClient.restarted(() => { callback(leanClient) })
-    }
+    })
   }
 }
 
