@@ -31,6 +31,7 @@ function Level() {
 
   const params = useParams();
   const levelId = parseInt(params.levelId)
+  const worldId = params.worldId
 
   const [tacticDocs, setTacticDocs] = useState([])
   const [lemmaDocs, setLemmaDocs] = useState([])
@@ -105,7 +106,7 @@ function Level() {
     return () => { editor.dispose() }
   }, [])
 
-  const uri = `file:///level${levelId}`
+  const uri = `file:///${worldId}/${levelId}`
 
   // The next function will be called when the level changes
   useEffect(() => {
@@ -122,7 +123,7 @@ function Level() {
         new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
 
-        leanClient.sendRequest("loadLevel", {world: "TestWorld", level: levelId}).then((res) => {
+        leanClient.sendRequest("loadLevel", {world: worldId, level: levelId}).then((res) => {
           // setLevelTitle("Level " + res["index"] + ": " + res["title"])
           // setIndex(parseInt(res["index"]))
           setTacticDocs(res["tactics"])
@@ -160,8 +161,8 @@ function Level() {
       </Grid>
       <Grid xs={4} className="info-panel">
 
-        <Button disabled={levelId <= 1} component={RouterLink} to={`/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
-        <Button disabled={false} component={RouterLink} to={`/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
+        <Button disabled={levelId <= 1} component={RouterLink} to={`/world/${worldId}/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
+        <Button disabled={false} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
 
         <div style={{display: expertInfoview ? 'block' : 'none' }} ref={infoviewRef} className="infoview vscode-light"></div>
         <div style={{display: expertInfoview ? 'none' : 'block' }}>

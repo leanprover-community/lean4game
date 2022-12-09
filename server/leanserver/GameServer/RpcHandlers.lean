@@ -58,18 +58,20 @@ structure PlainGoal where
   goals : Array GameGoal
   deriving FromJson, ToJson
 
+#check String.split
+
 -- TODO: Find a better way to pass on the file name?
-def levelIdFromFileName [Monad m] [MonadError m] [MonadEnv m] (fileName : String) : m Nat := do
-  if fileName.startsWith "/level" then
-    if let some id := (fileName.drop "/level".length).toNat? then
-      return id
+def levelIdFromFileName [Monad m] [MonadError m] [MonadEnv m] (fileName : String) : m LevelId := do
+  let fileParts := fileName.splitOn "/"
+  if fileParts.length == 3 then
+    if let some level := fileParts[2]!.toNat? then
+      return {game := `TestGame, world := fileParts[1]!, level := level}
   throwError s!"Could not find level ID in file name: {fileName}"
-  return 1
 
 def getLevelByFileName [Monad m] [MonadError m] [MonadEnv m] (fileName : String) : m GameLevel := do
   let levelId ← levelIdFromFileName fileName
   -- TODO: make world and game configurable
-  let some level ← getLevel? {game := `TestGame, world := `TestWorld, level := levelId}
+  let some level ← getLevel? levelId
     | throwError "Level not found"
   return level
 

@@ -11,7 +11,7 @@ import cytoscape from 'cytoscape'
 import klay from 'cytoscape-klay';
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchGame } from '../game/gameSlice'
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 
 cytoscape.use( klay );
@@ -24,6 +24,7 @@ import { useAppDispatch, useAppSelector } from '../hooks';
 
 function Welcome() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate();
 
   const worldsRef = useRef<HTMLDivElement>(null)
 
@@ -42,7 +43,7 @@ function Welcome() {
       })
     }
     const layout : any = {name: "klay", klay: {direction: "DOWN"}}
-    cytoscape({ container: worldsRef.current!, elements, layout,
+    const cy = cytoscape({ container: worldsRef.current!, elements, layout,
       style: [ // the stylesheet for the graph
         {
           selector: 'node',
@@ -68,6 +69,10 @@ function Welcome() {
       autoungrabify: true,
       autounselectify: true,
     })
+
+    cy.on('click', 'node', function(evt){
+      navigate(`/world/${this.id()}/level/1`);
+    });
   }
 
   useEffect(() => { dispatch(fetchGame); }, [])
@@ -91,7 +96,7 @@ function Welcome() {
         </Typography>
       </Box>
       <Box textAlign='center' sx={{ m: 5 }}>
-        <Button component={RouterLink} to="/level/1" variant="contained">Start rescue mission</Button>
+        <Button component={RouterLink} to="/world/TestWorld/level/1" variant="contained">Start rescue mission</Button>
       </Box>
       <div ref={worldsRef} style={{"width": "100%","height": "50em"}} />
     </div>
