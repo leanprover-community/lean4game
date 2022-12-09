@@ -1,6 +1,5 @@
 import Lean
 
-import GameServer.Utils
 import GameServer.EnvExtensions
 
 open Lean Meta
