@@ -58,8 +58,11 @@ function Level() {
         <div ref={messagePanelRef} className="message-panel">
           <MathJax><ReactMarkdown>{level?.data?.introduction}</ReactMarkdown></MathJax>
         </div>
-        <div ref={codeviewRef} className="codeview">
-        </div>
+        <p><b>Aufgabe:</b></p>
+        <div><MathJax><ReactMarkdown>{level?.data?.descrText}</ReactMarkdown></MathJax></div>
+        <div className="statement"><code>{level?.data?.descrFormat}</code></div>
+          {/*NOTE(TODO): currently this looks bad, so I disabled it. Maybe have a drop-down for it of Syntax highlighting... */}
+        <div ref={codeviewRef} className="codeview"></div>
       </Grid>
       <Grid xs={4} className="info-panel">
 

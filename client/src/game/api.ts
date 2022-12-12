@@ -14,7 +14,9 @@ interface LevelInfo {
   introduction: null|string,
   index: number,
   tactics: any[],
-  lemmas: any[]
+  lemmas: any[],
+  descrText: null|string,
+  descrFormat: null|string,
 }
 
 const customBaseQuery = async (

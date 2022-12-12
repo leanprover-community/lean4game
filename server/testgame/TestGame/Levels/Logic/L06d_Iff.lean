@@ -17,9 +17,7 @@ Implikation `A → B` auf ein Goal `B` anwenden.
 "
 
 Statement
-    "
-    Benütze nur `apply` und `assumption` um das gleiche Resultat zu zeigen.
-    "
+    "Benütze nur `apply` und `assumption` um das gleiche Resultat zu zeigen."
     (A B C : Prop) (h : A ↔ B) (g : B → C) : A → C := by
   intro hA
   apply g

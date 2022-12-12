@@ -64,7 +64,7 @@ The names of the proofs tell you what the theorems are. Anyway, let's prove `0 +
 Start by casting `induction_on n`.
 "
 
-Statement (n : ℕ) : 0 + n = n := by
+Statement "" (n : ℕ) : 0 + n = n := by
   sorry
   -- induction_on n
   -- rewrite [add_zero]

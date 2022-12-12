@@ -22,8 +22,8 @@ Hier musst du zuerst eines der Lemmas `not_odd : ¬ odd n ↔ even n` oder
 "
 
 Statement
-  "Ein Widerspruch impliziert alles."
-  (n : ℕ) (h₁ : even n) (h₂ : odd n) : n = 128 := by
+    "Ein Widerspruch impliziert alles."
+    (n : ℕ) (h₁ : even n) (h₂ : odd n) : n = 128 := by
   rw [← not_even] at h₂
   contradiction
 

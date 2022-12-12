@@ -18,7 +18,7 @@ Wenn das Goal ein `∨` ist kann man mit `left` oder `right` entscheiden,
 welche Seite man beweisen möchte.
 "
 
-Statement (A B : Prop) (hA : A) : A ∨ (¬ B) := by
+Statement "" (A B : Prop) (hA : A) : A ∨ (¬ B) := by
   left
   assumption
 

@@ -13,7 +13,7 @@ TODO: Induktion (& induktion vs rcases)
 
 "
 
-Statement : True := by
+Statement "" : True := by
   trivial
 
 Conclusion

@@ -22,7 +22,7 @@ Der einfachste Widerspruch ist wenn man einen Beweis von `false` hat:
 "
 
 Statement
-  "Ein Widerspruch impliziert alles."
+    "Ein Widerspruch impliziert alles."
     (A : Prop) (h : false) : A := by
   contradiction
 

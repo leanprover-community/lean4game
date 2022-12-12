@@ -20,7 +20,7 @@ Implikationsannahme ins Goal schreiben.
 "
 
 Statement
-  "Ist n² ungerade, so ist auch n ungerade. Beweise durch Kontraposition."
+    "Ist n² ungerade, so ist auch n ungerade. Beweise durch Kontraposition."
     (n : ℕ) (h : odd (n ^ 2)): odd n := by
   revert h
   contrapose

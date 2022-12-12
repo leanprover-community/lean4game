@@ -46,13 +46,47 @@ elab "Introduction" t:str : command => do
   | .World => modifyCurWorld  fun world => pure {world with introduction := t.getString}
   | .Game => modifyCurGame  fun game => pure {game with introduction := t.getString}
 
-/-- Define the statement of the current level. -/
-elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
+-- TODO: Instead of this, it would be nice to have a proper syntax parser that enables
+-- us highlighting on the client side.
+partial def reprintCore : Syntax → Option Format
+  | Syntax.missing => none
+  | Syntax.atom _ val => val.trim
+  | Syntax.ident _ rawVal _ _ => rawVal.toString
+  | Syntax.node _ kind args =>
+    match args.toList.filterMap reprintCore with
+    | [] => none
+    | [arg] => arg
+    | args => Format.group <| Format.nest 2 <| Format.joinSep args " "
+
+def reprint (stx : Syntax) : Format :=
+  reprintCore stx |>.getD ""
+
+-- macro mods:declModifiers "lemma" n:declId sig:declSig val:declVal : command => `($mods:declModifiers theorem $n $sig $val)
+
+/-- Define the statement of the current level.
+
+Arguments:
+- ident: (Optional) The name of the statemtent.
+- descr: The human-readable version of the lemma as string. Accepts Markdown and Mathjax.
+-/
+elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : command => do
+
   let lvlIdx ← getCurLevelIdx
-  let declName : Name := (← getCurGame).name ++ (← getCurWorld).name ++ ("level" ++ toString lvlIdx : String)
-  elabCommand (← `(theorem $(mkIdent declName) $sig $val))
-  modifyCurLevel fun level => pure {level with goal := sig}
--- TODO: Do something with the lemma name.
+  let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
+    ("level" ++ toString lvlIdx : String)
+  let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
+  -- let thmStatement' ← match statementName with
+  -- | none => `(lemma $(mkIdent "XX") $sig $val) -- TODO: Make it into an `example`
+  -- | some name => `(lemma $name $sig $val)
+
+  elabCommand thmStatement
+  modifyCurLevel fun level => pure {level with
+    goal := sig,
+    descrText := descr.getString,
+    descrFormat := match statementName with
+    | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
+    | some name => (Format.join ["lemma ", reprint name.raw, " ", reprint sig.raw, " := by"]).pretty 10  -- "lemma "  ++ (toString <| reprint name.raw) ++ " " ++ (Format.pretty (reprint sig.raw) 40) ++ " := by"
+  } -- Format.pretty <| format thmStatement.raw }
 
 /-- Define the conclusion of the current game or current level if some
 building a level. -/

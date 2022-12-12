@@ -33,7 +33,7 @@ Hierzu gibt es 3 wichtige Taktiken:
    soll. Das macht man mit `use y`
 "
 
-Statement even_square (n : ℕ) (h : even n) : even (n ^ 2) := by
+Statement even_square "" (n : ℕ) (h : even n) : even (n ^ 2) := by
   unfold even at *
   rcases h with ⟨x, hx⟩
   use 2 * x ^ 2

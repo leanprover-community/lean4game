@@ -20,6 +20,7 @@ man explizit an, wie die neuen Annahmen heissen sollen, die Klammern sind `\\<` 
 
 "
 Statement
+    ""
     (A B : Prop) : (A ↔ B) → (A → B) := by
   intro h
   rcases h
