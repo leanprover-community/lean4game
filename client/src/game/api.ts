@@ -1,12 +1,20 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Connection } from '../connection'
 
-interface GameState {
+interface GameInfo {
   title: null|string,
   introduction: null|string,
   worlds: null|{nodes: string[], edges: string[][2]},
   authors: null|string[],
   conclusion: null|string,
+}
+
+interface LevelInfo {
+  title: null|string,
+  introduction: null|string,
+  index: number,
+  tactics: any[],
+  lemmas: any[]
 }
 
 const customBaseQuery = async (
@@ -27,12 +35,15 @@ export const gameApi = createApi({
   reducerPath: 'gameApi',
   baseQuery: customBaseQuery,
   endpoints: (builder) => ({
-    getGameInfo: builder.query<GameState, void>({
+    getGameInfo: builder.query<GameInfo, void>({
       query: () => {return {method: 'info', params: {}}},
+    }),
+    loadLevel: builder.query<LevelInfo, {world: string, level: number}>({
+      query: ({world, level}) => {return {method: "loadLevel", params: {world, level}}},
     }),
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetGameInfoQuery } = gameApi
+export const { useGetGameInfoQuery, useLoadLevelQuery } = gameApi

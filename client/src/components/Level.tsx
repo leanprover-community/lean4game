@@ -9,7 +9,7 @@ import { MathJax } from "better-react-mathjax";
 import { Link as RouterLink } from 'react-router-dom';
 
 
-import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
+import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 
 import LeftPanel from './LeftPanel';
@@ -24,6 +24,7 @@ import { ConnectionContext } from '../connection';
 import Infoview from './Infoview';
 import { useParams } from 'react-router-dom';
 import { MonacoServices } from 'monaco-languageclient';
+import { useLoadLevelQuery } from '../game/api';
 
 
 
@@ -33,42 +34,14 @@ function Level() {
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
 
-  const [tacticDocs, setTacticDocs] = useState([])
-  const [lemmaDocs, setLemmaDocs] = useState([])
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
   const [infoviewApi, setInfoviewApi] = useState(null)
   const [expertInfoview, setExpertInfoview] = useState(false)
 
-
-  const [leanData, setLeanData] = useState({goals: []})
-  const [history, setHistory] = useState([])
-  const [lastTactic, setLastTactic] = useState("")
-  const [introduction, setIntroduction] = useState("")
-  const [errors, setErrors] = useState([])
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
   const messagePanelRef = useRef<HTMLDivElement>(null)
-
-  const [ready, setReady] = useState(false)
-
-  const [message, setMessage] = useState("")
-  const [messageOpen, setMessageOpen] = useState(false)
-
-
-  const [completed, setCompleted] = useState(false)
-
-  const processResponse = (res:any) => {
-    setLeanData(res);
-    // setErrors(res.errors);
-    // if (res.message !== "" && res.errors?.length === 0) {
-    //   setMessage(res.message)
-    //   setMessageOpen(true)
-    // }
-    // if (res.goals?.length === 0 && res.errors?.length === 0) {
-    //   setCompleted(true)
-    // }
-  }
 
   useEffect(() => {
     // Scroll to top when loading a new level
@@ -106,57 +79,43 @@ function Level() {
     return () => { editor.dispose() }
   }, [])
 
-  const uri = `file:///${worldId}/${levelId}`
 
   // The next function will be called when the level changes
   useEffect(() => {
     connection.startLeanClient().then((leanClient) => {
       if (editor) {
 
-        const model = monaco.editor.createModel('', 'lean4', monaco.Uri.parse(uri))
+        const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
+        const model = monaco.editor.getModel(uri) ??
+          monaco.editor.createModel('', 'lean4', uri)
 
         editor.setModel(model)
         infoviewApi.serverRestarted(leanClient.initializeResult)
         infoProvider.openPreview(editor, infoviewApi)
-        setReady(true)
 
         new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
 
-        leanClient.sendRequest("loadLevel", {world: worldId, level: levelId}).then((res) => {
-          // setLevelTitle("Level " + res["index"] + ": " + res["title"])
-          // setIndex(parseInt(res["index"]))
-          setTacticDocs(res["tactics"])
-          setLemmaDocs(res["lemmas"])
-          setIntroduction(res["introduction"])
-          processResponse(res)
-        });
-
-        return () => { model.dispose(); setReady(false) }
+        return () => { model.dispose(); }
       }
     })
 
   }, [editor, levelId, connection])
 
-  function loadLevel(index) {
-    setCompleted(false)
-    setHistory([])
-    // setCurLevel(index)
-  }
 
-  return (
-    <Grid className="level" container sx={{ mt: 3, ml: 1, mr: 1 }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+  const level = useLoadLevelQuery({world: worldId, level: levelId})
+
+  return <>
+    <Box style={level.isLoading ? null : {display: "none"}} display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
+    <Grid style={level.isLoading ? {display: "none"} : null} className="level" container sx={{ mt: 3, ml: 1, mr: 1 }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
       <Grid xs={4} className="doc-panel">
-        <LeftPanel spells={tacticDocs} inventory={lemmaDocs} />
+        <LeftPanel spells={level?.data?.tactics} inventory={level?.data?.tactics} />
       </Grid>
       <Grid xs={4} className="main-panel">
         <div ref={messagePanelRef} className="message-panel">
-          <MathJax><ReactMarkdown>{introduction}</ReactMarkdown></MathJax>
+          <MathJax><ReactMarkdown>{level?.data?.introduction}</ReactMarkdown></MathJax>
         </div>
         <div ref={codeviewRef} className="codeview">
-          {/* <InputZone index={index} history={history} messageOpen={messageOpen} setMessageOpen={setMessageOpen} completed={completed} sendTactic={sendTactic} nbLevels={nbLevels} loadNextLevel={loadNextLevel}
-            errors={errors} lastTactic={lastTactic} undo={undo} finishGame={finishGame} /> */}
-          {/* <Message isOpen={messageOpen} content={message} close={closeMessage} /> */}
         </div>
       </Grid>
       <Grid xs={4} className="info-panel">
@@ -173,7 +132,7 @@ function Level() {
         </FormGroup>
       </Grid>
     </Grid>
-  )
+    </>
 }
 
 export default Level

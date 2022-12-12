@@ -71,12 +71,12 @@ function LemmaDocs({ lemmas }) {
 function LeftPanel({ spells, inventory }) {
   return (
     <Box>
-      {spells.length > 0 &&
+      {spells && spells.length > 0 &&
         <Paper sx={{ px: 2, py: 1 }}>
           <Typography variant="h5" sx={{ mb: 2 }}>Spell book</Typography>
           {spells.map((spell) => <TacticDoc key={spell.name} tactic={spell} />)}
         </Paper>}
-      {inventory.length > 0 && <LemmaDocs lemmas={inventory} />}
+      {inventory && inventory.length > 0 && <LemmaDocs lemmas={inventory} />}
     </Box>)
 }
 
