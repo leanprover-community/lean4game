@@ -8,15 +8,22 @@ import { MathJax } from "better-react-mathjax";
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import { Paper, Box, Typography, Alert } from '@mui/material';
-
+import { Paper, Box, Typography, Alert, FormControlLabel, FormGroup, Switch, Collapse } from '@mui/material';
 const errorRegex = /<stdin>:1:(?<col>[^:]*): (?<msg>.*)/;
 
 // TODO: Dead variables (x✝) are not displayed correctly.
 
 function Goal({ goal }) {
+
+  const [showHints, setShowHints] = React.useState(false);
+
+  const handleHintsChange = () => {
+    setShowHints((prev) => !prev);
+  };
+
   const hasObject = typeof goal.objects === "object" && goal.objects.length > 0
   const hasAssumption = typeof goal.assumptions === "object" && goal.assumptions.length > 0
+  const hasHints = typeof goal.hints === "object" && goal.hints.length > 0
   return (
     <Box sx={{ pl: 2 }}>
       {hasObject && <Box><Typography>Objects</Typography>
@@ -35,7 +42,11 @@ function Goal({ goal }) {
       <Typography>Prove:</Typography>
       <Typography color="primary" sx={{ ml: 2 }}>{goal.goal}</Typography>
       {goal.messages.map((message) => <Alert severity="info" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message}</ReactMarkdown></MathJax></Alert>)}
-      {goal.hints.map((message) => <Alert severity="warning" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message}</ReactMarkdown></MathJax></Alert>)}
+      <FormControlLabel
+        control={<Switch checked={showHints} onChange={handleHintsChange} />}
+        label="Help"
+      />
+      {goal.hints.map((message) => <Collapse in={showHints}><Alert severity="warning" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message}</ReactMarkdown></MathJax></Alert></Collapse>)}
     </Box>)
 }
 
