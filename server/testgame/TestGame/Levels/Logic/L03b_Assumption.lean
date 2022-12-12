@@ -2,7 +2,7 @@ import TestGame.Metadata
 import Mathlib.Data.Nat.Basic -- TODO
 
 Game "TestGame"
-World "TestWorld"
+World "Logic"
 Level 4
 
 Title "Logische Aussagen: `Prop`"

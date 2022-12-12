@@ -2,7 +2,7 @@ import TestGame.Metadata
 import TestGame.Tactics
 
 Game "TestGame"
-World "TestWorld"
+World "Old"
 Level 5
 
 Title "The induction_on spell"
@@ -26,7 +26,7 @@ a reminder of the things you're now equipped with which we'll need in this world
   * `add_zero (a : ℕ) : a + 0 = a`. Use with `rewrite [add_zero]`.
   * `add_succ (a b : ℕ) : a + succ(b) = succ(a + b)`. Use with `rewrite [add_succ]`.
   * The principle of mathematical induction. Use with `induction_on` (see below)
-  
+
 
 ## Spells:
 
@@ -34,17 +34,17 @@ a reminder of the things you're now equipped with which we'll need in this world
   * `rewrite [h]` : if h is a proof of `A = B`, changes all A's in the goal to B's.
   * `induction_on n with d hd` : we're going to learn this right now.
 
-# Important thing: 
+# Important thing:
 
 This is a *really* good time to check you understand about the spell book and the inventory on
-the left. Eveything you need is collected in those lists. They 
+the left. Eveything you need is collected in those lists. They
 will prove invaluable as the number of theorems we prove gets bigger. On the other hand,
 we only need to learn one more spell to really start going places, so let's learn about
 that spell right now.
 
 OK so let's see induction in action. We're going to prove
 
-  `zero_add (n : ℕ) : 0 + n = n`. 
+  `zero_add (n : ℕ) : 0 + n = n`.
 
 That is: for all natural numbers $n$, $0+n=n$. Wait $-$ what is going on here?
 Didn't we already prove that adding zero to $n$ gave us $n$?
@@ -89,13 +89,13 @@ focussing on the top goal, ignore the other one for now, it's not changing
 and we're not working on it.
 "
 
-Message (n : ℕ) (ind_hyp: 0 + n = n) : 0 + succ n = succ n => 
+Message (n : ℕ) (ind_hyp: 0 + n = n) : 0 + succ n = succ n =>
 "
 Great! You solved the base case. We are now be back down
-to one goal -- the inductive step. 
+to one goal -- the inductive step.
 
 We have a fixed natural number `n`, and the inductive hypothesis `ind_hyp : 0 + n = n`
-saying that we have a proof of `0 + n = n`.  
+saying that we have a proof of `0 + n = n`.
 Our goal is to prove `0 + succ n = succ n`. In words, we're showing that
 if the lemma is true for `n`, then it's also true for the number after `n`.
 That's the inductive step. Once we've proved this inductive step, we will have proved
@@ -112,7 +112,7 @@ goal with the right hand side. We do this with the `rewrite` spell. You can writ
 figure them out itself).
 "
 
-Message (n : ℕ) (ind_hyp: 0 + n = n) : succ (0 + n) = succ n => 
+Message (n : ℕ) (ind_hyp: 0 + n = n) : succ (0 + n) = succ n =>
 "Well-done! We're almost there. It's time to use our induction hypothesis.
 Cast
 

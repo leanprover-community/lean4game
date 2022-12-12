@@ -1,5 +1,4 @@
 import GameServer.Commands
---import TestGame.MyNat
 import TestGame.TacticDocs
 import TestGame.LemmaDocs
 import Mathlib.Init.Data.Nat.Basic -- Imports the notation ℕ.
@@ -21,15 +20,6 @@ with a level 1 spell book. Good luck."
 Conclusion
 "There is nothing else so far. Thanks for rescuing natural numbers!"
 
-World "w1"
-World "w2"
-World "w3"
-World "v1"
-World "v2"
-World "v3"
-World "v4"
 
-
-Path TestWorld → w1 → w2 → w3
-Path w1 → v1 → v2 → v3 → w3
-Path v3 → v4
+Path Logic → Nat → Contradiction
+Path Nat → Nat2

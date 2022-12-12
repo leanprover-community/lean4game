@@ -5,7 +5,7 @@ import Mathlib.Tactic.LeftRight
 --set_option tactic.hygienic false
 
 Game "TestGame"
-World "TestWorld"
+World "Logic"
 Level 14
 
 Title "Oder"

@@ -55,7 +55,7 @@
     "build_server": "server/build.sh",
     "build_client": "NODE_ENV=production webpack",
     "production": "NODE_ENV=production node server/index.mjs",
-    "update_lean": "cd server && (cd testgame && lake update) && cp testgame/lean-toolchain leanserver/lean-toolchain"
+    "update_lean": "./UPDATE_LEAN.sh"
   },
   "eslintConfig": {
     "extends": [

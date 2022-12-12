@@ -1,7 +1,7 @@
 import TestGame.Metadata
 
 Game "TestGame"
-World "TestWorld"
+World "Logic"
 Level 7
 
 Title "Implikation"

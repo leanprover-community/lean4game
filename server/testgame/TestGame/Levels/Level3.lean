@@ -1,7 +1,7 @@
 import TestGame.Metadata
 
 Game "TestGame"
-World "TestWorld"
+World "Old"
 Level 3
 
 Title "Peano's axioms"
@@ -40,9 +40,9 @@ This game is all about seeing how far these axioms of Peano can take us.
 Let's practice our use of the `rewrite` tactic in the following example.
 Our hypothesis `h` is a proof that `succ(a) = b` and we want to prove that
 `succ(succ(a))=succ(b)`. In words, we're going to prove that if
-`b` is the number after `a` then `succ(b)` is the number after `succ(a)`. 
+`b` is the number after `a` then `succ(b)` is the number after `succ(a)`.
 Note that the system drops brackets when they're not
-necessary, so `succ b` just means `succ(b)`. 
+necessary, so `succ b` just means `succ(b)`.
 
 Now here's a tricky question. Knowing that our goal is `succ (succ a) = succ b`,
 and our assumption is `h : succ a = b`, then what will the goal change
@@ -56,23 +56,23 @@ the *right* hand side. Try and figure out how the goal will change, and
 then try it.
 "
 
-Statement (a b : ℕ) (h : succ a = b) : succ (succ a) = succ b := by 
+Statement (a b : ℕ) (h : succ a = b) : succ (succ a) = succ b := by
   rewrite [h]
   rfl
 
-Message (a : ℕ) (b : ℕ) (h : succ a = b) : succ b = succ b => 
+Message (a : ℕ) (b : ℕ) (h : succ a = b) : succ b = succ b =>
 "
 Look: Lean changed `succ a` into `b`, so the goal became `succ b = succ b`.
 That goal is of the form `X = X`, so you know what to do.
 "
 
 
-Conclusion "Congratulations for completing the third level! 
+Conclusion "Congratulations for completing the third level!
 You may be wondering whether we could have just substituted in the definition of `b`
 and proved the goal that way. To do that, we would want to replace the right hand
 side of `h` with the left hand side. You do this in Lean by writing `rewrite [<- h]`. You get the
 left-arrow by typing `\\l` and then a space; note that this is a small letter L,
-not a number 1. You can just edit your proof and try it. 
+not a number 1. You can just edit your proof and try it.
 
 You may also be wondering why we keep writing `succ(b)` instead of `b+1`. This
 is because we haven't defined addition yet! On the next level, the final level

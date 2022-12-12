@@ -4,7 +4,7 @@ import Std.Tactic.RCases
 set_option tactic.hygienic false
 
 Game "TestGame"
-World "TestWorld"
+World "Logic"
 Level 13
 
 Title "Und"

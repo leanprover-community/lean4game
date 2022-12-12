@@ -2,7 +2,7 @@ import TestGame.Metadata
 import Mathlib
 
 Game "TestGame"
-World "TestWorld"
+World "Logic"
 Level 5
 
 Title "Rewrite"

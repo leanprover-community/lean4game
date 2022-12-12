@@ -4,7 +4,7 @@ import Init.Data.ToString
 #check List UInt8
 
 Game "TestGame"
-World "TestWorld"
+World "Logic"
 Level 9
 
 Title "Genau dann wenn"

@@ -2,7 +2,7 @@ import TestGame.Metadata
 import Mathlib
 
 Game "TestGame"
-World "TestWorld"
+World "Logic"
 Level 6
 
 Title "Implikation"

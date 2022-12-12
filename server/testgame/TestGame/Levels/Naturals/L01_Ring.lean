@@ -1,14 +1,6 @@
 import TestGame.Metadata
 import Mathlib.Tactic.Ring
 
--- TODOs:
--- Natural numbers
--- even / odd
--- prime
--- `ring`
--- sum
--- induction
-
 --set_option tactic.hygienic false
 
 Game "TestGame"

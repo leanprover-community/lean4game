@@ -19,6 +19,10 @@ import TestGame.Levels.Naturals.L01_Ring
 import TestGame.Levels.Naturals.L02_Ring
 import TestGame.Levels.Naturals.L03_Exists
 import TestGame.Levels.Naturals.L04_Forall
+import TestGame.Levels.Naturals.L31_Sum
+import TestGame.Levels.Naturals.L32_Induction
+import TestGame.Levels.Naturals.L33_Prime
+import TestGame.Levels.Naturals.L34_ExistsUnique
 import TestGame.Levels.Negation.L01_False
 import TestGame.Levels.Negation.L02_Contra
 import TestGame.Levels.Negation.L03_Contra

@@ -5,7 +5,7 @@ import Mathlib.Tactic.Cases
 set_option tactic.hygienic false
 
 Game "TestGame"
-World "TestWorld"
+World "Logic"
 Level 11
 
 Title "Genau dann wenn"
