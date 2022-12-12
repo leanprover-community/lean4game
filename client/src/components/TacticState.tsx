@@ -35,6 +35,7 @@ function Goal({ goal }) {
       <Typography>Prove:</Typography>
       <Typography color="primary" sx={{ ml: 2 }}>{goal.goal}</Typography>
       {goal.messages.map((message) => <Alert severity="info" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message}</ReactMarkdown></MathJax></Alert>)}
+      {goal.hints.map((message) => <Alert severity="warning" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message}</ReactMarkdown></MathJax></Alert>)}
     </Box>)
 }
 

@@ -10,10 +10,18 @@ open Lean
 
 /-! ## Messages -/
 
+/--
+A message to be displayed to the user as instruction/hint.
+
+Fields
+  (TODO)
+  spoiler: If true, then message should be hidden by default
+-/
 structure GoalMessageEntry where
   goal : Expr
   intros : Nat
   message : String
+  spoiler : Bool := false
   deriving Repr
 
 /-! ## Tactic documentation -/
