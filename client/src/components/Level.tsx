@@ -10,6 +10,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import LeftPanel from './LeftPanel';
+import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter';
 import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
 import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
 import { InfoProvider } from 'lean4web/client/src/editor/infoview';
@@ -130,6 +131,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
         editor.setModel(model)
         infoviewApi.serverRestarted(leanClient.initializeResult)
         infoProvider.openPreview(editor, infoviewApi)
+        new LeanTaskGutter(infoProvider.client, editor)
 
         new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
       }
