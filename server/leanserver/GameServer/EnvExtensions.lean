@@ -202,7 +202,8 @@ structure GameLevel where
   lemmas: Array LemmaDocEntry := default
   messages: Array GoalMessageEntry := default
   goal : TSyntax `Lean.Parser.Command.declSig := default
-  ppStatement : String := default
+  descrText: String := default
+  descrFormat : String := default
   deriving Inhabited, Repr
 
 /-! ## World -/

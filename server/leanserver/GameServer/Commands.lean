@@ -82,8 +82,8 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
   elabCommand thmStatement
   modifyCurLevel fun level => pure {level with
     goal := sig,
-    description := descr.getString,
-    ppStatement := match statementName with
+    descrText := descr.getString,
+    descrFormat := match statementName with
     | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
     | some name => (Format.join ["lemma ", reprint name.raw, " ", reprint sig.raw, " := by"]).pretty 10  -- "lemma "  ++ (toString <| reprint name.raw) ++ " " ++ (Format.pretty (reprint sig.raw) 40) ++ " := by"
   } -- Format.pretty <| format thmStatement.raw }

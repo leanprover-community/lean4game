@@ -41,8 +41,8 @@ structure LevelInfo where
   tactics: Array TacticDocEntry
   lemmas: Array LemmaDocEntry
   introduction : String
-  description : String
-  ppStatement : String
+  descrText : String := ""
+  descrFormat : String := ""
 deriving ToJson
 
 structure LoadLevelParams where
@@ -70,8 +70,8 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             title := lvl.title,
             tactics := lvl.tactics,
             lemmas := lvl.lemmas,
-            description := lvl.description,
-            ppStatement := lvl.ppStatement --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
+            descrText := lvl.descrText,
+            descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson levelInfo⟩
       return true

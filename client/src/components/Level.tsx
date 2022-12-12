@@ -7,12 +7,10 @@ import '@fontsource/roboto/700.css';
 import ReactMarkdown from 'react-markdown';
 import { MathJax } from "better-react-mathjax";
 import { Link as RouterLink } from 'react-router-dom';
-
-
-import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
+import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
-
 import LeftPanel from './LeftPanel';
+import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter';
 import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
 import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
 import { InfoProvider } from 'lean4web/client/src/editor/infoview';
@@ -23,7 +21,7 @@ import './level.css'
 import { ConnectionContext } from '../connection';
 import Infoview from './Infoview';
 import { useParams } from 'react-router-dom';
-import { MonacoServices } from 'monaco-languageclient';
+import { useLoadLevelQuery } from '../game/api';
 
 
 
@@ -33,44 +31,11 @@ function Level() {
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
 
-  const [tacticDocs, setTacticDocs] = useState([])
-  const [lemmaDocs, setLemmaDocs] = useState([])
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
-  const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
-  const [infoviewApi, setInfoviewApi] = useState(null)
   const [expertInfoview, setExpertInfoview] = useState(false)
 
-
-  const [leanData, setLeanData] = useState({goals: [], description: "Loading..."})
-  const [history, setHistory] = useState([])
-  const [lastTactic, setLastTactic] = useState("")
-  const [introduction, setIntroduction] = useState("")
-  const [description, setDescription] = useState("Loading...")
-  const [ppStatement, setPPStatement] = useState("")
-  const [errors, setErrors] = useState([])
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
   const messagePanelRef = useRef<HTMLDivElement>(null)
-
-  const [ready, setReady] = useState(false)
-
-  const [message, setMessage] = useState("")
-  const [messageOpen, setMessageOpen] = useState(false)
-
-
-  const [completed, setCompleted] = useState(false)
-
-  const processResponse = (res:any) => {
-    setLeanData(res);
-    // setErrors(res.errors);
-    // if (res.message !== "" && res.errors?.length === 0) {
-    //   setMessage(res.message)
-    //   setMessageOpen(true)
-    // }
-    // if (res.goals?.length === 0 && res.errors?.length === 0) {
-    //   setCompleted(true)
-    // }
-  }
 
   useEffect(() => {
     // Scroll to top when loading a new level
@@ -79,6 +44,55 @@ function Level() {
 
   const connection = React.useContext(ConnectionContext)
 
+  const level = useLoadLevelQuery({world: worldId, level: levelId})
+
+  const {editor, infoProvider} = useLevelEditor(worldId, levelId, codeviewRef, infoviewRef)
+
+  return <>
+    <Box style={level.isLoading ? null : {display: "none"}} display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
+    <Grid style={level.isLoading ? {display: "none"} : null} className="level" container sx={{ mt: 3, ml: 1, mr: 1 }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+      <Grid xs={4} className="doc-panel">
+        <LeftPanel spells={level?.data?.tactics} inventory={level?.data?.tactics} />
+      </Grid>
+      <Grid xs={4} className="main-panel">
+        <div ref={messagePanelRef} className="message-panel">
+          <MathJax><ReactMarkdown>{level?.data?.introduction}</ReactMarkdown></MathJax>
+        </div>
+        <p><b>Aufgabe:</b></p>
+        <div><MathJax><ReactMarkdown>{level?.data?.descrText}</ReactMarkdown></MathJax></div>
+        <div className="statement"><code>{level?.data?.descrFormat}</code></div>
+          {/*NOTE(TODO): currently this looks bad, so I disabled it. Maybe have a drop-down for it of Syntax highlighting... */}
+        <div ref={codeviewRef} className="codeview"></div>
+      </Grid>
+      <Grid xs={4} className="info-panel">
+
+        <Button disabled={levelId <= 1} component={RouterLink} to={`/world/${worldId}/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
+        <Button disabled={false} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
+
+        <div style={{display: expertInfoview ? 'block' : 'none' }} ref={infoviewRef} className="infoview vscode-light"></div>
+        <div style={{display: expertInfoview ? 'none' : 'block' }}>
+          <Infoview leanClient={connection.getLeanClient()} editor={editor} editorApi={infoProvider?.getApi()} />
+        </div>
+        <FormGroup>
+          <FormControlLabel onChange={() => { setExpertInfoview(!expertInfoview) }} control={<Switch />} label="Expert mode" />
+        </FormGroup>
+      </Grid>
+    </Grid>
+    </>
+}
+
+export default Level
+
+
+function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewRef) {
+
+  const connection = React.useContext(ConnectionContext)
+
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
+  const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
+  const [infoviewApi, setInfoviewApi] = useState(null)
+
+  // Create Editor
   useEffect(() => {
     const editor = monaco.editor.create(codeviewRef.current!, {
       glyphMargin: true,
@@ -105,83 +119,28 @@ function Level() {
     setInfoProvider(infoProvider)
     setInfoviewApi(infoviewApi)
 
-    return () => { editor.dispose() }
+    return () => { editor.setModel(null); infoProvider.dispose(); }
   }, [])
 
-  const uri = `file:///${worldId}/${levelId}`
-
-  // The next function will be called when the level changes
+  // Create model when level changes
   useEffect(() => {
     connection.startLeanClient().then((leanClient) => {
       if (editor) {
 
-        const model = monaco.editor.createModel('', 'lean4', monaco.Uri.parse(uri))
+        const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
+        const model = monaco.editor.getModel(uri) ??
+          monaco.editor.createModel('', 'lean4', uri)
 
         editor.setModel(model)
         infoviewApi.serverRestarted(leanClient.initializeResult)
         infoProvider.openPreview(editor, infoviewApi)
-        setReady(true)
+        new LeanTaskGutter(infoProvider.client, editor)
 
         new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
-
-
-        leanClient.sendRequest("loadLevel", {world: worldId, level: levelId}).then((res) => {
-          // setLevelTitle("Level " + res["index"] + ": " + res["title"])
-          // setIndex(parseInt(res["index"]))
-          setTacticDocs(res["tactics"])
-          setLemmaDocs(res["lemmas"])
-          setIntroduction(res["introduction"])
-          setDescription(res["description"])
-          setPPStatement(res["ppStatement"])
-          processResponse(res)
-        });
-
-        return () => { model.dispose(); setReady(false) }
       }
     })
 
   }, [editor, levelId, connection])
 
-  function loadLevel(index) {
-    setCompleted(false)
-    setHistory([])
-    // setCurLevel(index)
-  }
-
-  return (
-    <Grid className="level" container sx={{ mt: 3, ml: 1, mr: 1 }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-      <Grid xs={4} className="doc-panel">
-        <LeftPanel spells={tacticDocs} inventory={lemmaDocs} />
-      </Grid>
-      <Grid xs={4} className="main-panel">
-        <div ref={messagePanelRef} className="message-panel">
-          <MathJax><ReactMarkdown>{introduction}</ReactMarkdown></MathJax>
-        </div>
-        <p><b>Aufgabe:</b></p>
-        <div><MathJax><ReactMarkdown>{description}</ReactMarkdown></MathJax></div>
-        {/* <div className="statement"><code>{ppStatement}</code></div>
-          NOTE(TODO): currently this looks bad, so I disabled it. Maybe have a drop-down for it of Syntax highlighting... */}
-        <div ref={codeviewRef} className="codeview">
-          {/* <InputZone index={index} history={history} messageOpen={messageOpen} setMessageOpen={setMessageOpen} completed={completed} sendTactic={sendTactic} nbLevels={nbLevels} loadNextLevel={loadNextLevel}
-            errors={errors} lastTactic={lastTactic} undo={undo} finishGame={finishGame} /> */}
-          {/* <Message isOpen={messageOpen} content={message} close={closeMessage} /> */}
-        </div>
-      </Grid>
-      <Grid xs={4} className="info-panel">
-
-        <Button disabled={levelId <= 1} component={RouterLink} to={`/world/${worldId}/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
-        <Button disabled={false} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
-
-        <div style={{display: expertInfoview ? 'block' : 'none' }} ref={infoviewRef} className="infoview vscode-light"></div>
-        <div style={{display: expertInfoview ? 'none' : 'block' }}>
-          <Infoview leanClient={connection.getLeanClient()} editor={editor} editorApi={infoProvider?.getApi()} />
-        </div>
-        <FormGroup>
-          <FormControlLabel onChange={() => { setExpertInfoview(!expertInfoview) }} control={<Switch />} label="Expert mode" />
-        </FormGroup>
-      </Grid>
-    </Grid>
-  )
+  return {editor, infoProvider}
 }
-
-export default Level
