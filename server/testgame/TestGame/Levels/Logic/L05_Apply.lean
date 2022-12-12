@@ -22,10 +22,8 @@ Auf Papier würde man schreiben, \"es genügt zu zeigen, dass `A` stimmt, denn `
 "
 
 Statement
-    "
-    Seien `A`, `B` logische Aussagen, wobei `A` wahr ist und `A` impliziert `B`.
-    Zeige, dass `B` wahr ist.
-    "
+    "Seien `A`, `B` logische Aussagen, wobei `A` wahr ist und `A` impliziert `B`.
+    Zeige, dass `B` wahr ist."
     (A B : Prop) (hA : A) (g : A → B) : B := by
   apply g
   assumption

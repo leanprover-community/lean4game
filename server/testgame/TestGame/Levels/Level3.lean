@@ -56,7 +56,7 @@ the *right* hand side. Try and figure out how the goal will change, and
 then try it.
 "
 
-Statement (a b : ℕ) (h : succ a = b) : succ (succ a) = succ b := by
+Statement "" (a b : ℕ) (h : succ a = b) : succ (succ a) = succ b := by
   rewrite [h]
   rfl
 

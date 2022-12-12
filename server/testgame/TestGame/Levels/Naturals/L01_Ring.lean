@@ -18,7 +18,7 @@ bereits mit `rfl` bewiesen werden können.
 Algemeinere Gleichungen mit Variablen kann man mit der Taktik `ring` lösen.
 "
 
-Statement (x y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
+Statement "" (x y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
   ring
 
 Conclusion

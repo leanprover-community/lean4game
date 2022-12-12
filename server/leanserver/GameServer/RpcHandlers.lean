@@ -24,8 +24,8 @@ structure GameGoal where
 deriving FromJson, ToJson
 
 
-def Lean.MVarId.toGameGoal (goal : MVarId) (messages : Array String)
-    (hints : Array String) : MetaM GameGoal := do
+def Lean.MVarId.toGameGoal (goal : MVarId)
+    (messages : Array String) (hints : Array String) : MetaM GameGoal := do
 match (← getMCtx).findDecl? goal with
 | none          => throwError "unknown goal"
 | some mvarDecl => do

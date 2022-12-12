@@ -18,10 +18,8 @@ Beweise Aussage `F`.
 "
 
 Statement
-    "
-    Seien `A`, `B` logische Aussagen, wobei `A` wahr ist und `A` impliziert `B`.
-    Zeige, dass `B` wahr ist.
-    "
+    "Seien `A`, `B` logische Aussagen, wobei `A` wahr ist und `A` impliziert `B`.
+    Zeige, dass `B` wahr ist."
     (A B C D E F : Prop) (hA : A) (f : A → B) (g : C → B) (h : B → E)
      (i : D → E) (k : E → F) (m : C → F) : F := by
   apply k

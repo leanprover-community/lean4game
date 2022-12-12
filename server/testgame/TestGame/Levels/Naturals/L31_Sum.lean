@@ -13,7 +13,7 @@ TODO: Summe
 
 "
 
-Statement : True := by
+Statement "" : True := by
   trivial
 
 Conclusion

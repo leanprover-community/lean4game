@@ -20,7 +20,7 @@ After closing this message, type rfl in the invocation zone and hit Enter or cli
 the \"Cast spell\" button.
 "
 
-Statement (x y z : ℕ) :  x * y + z = x * y + z := by
+Statement "" (x y z : ℕ) :  x * y + z = x * y + z := by
 rfl
 
 Conclusion "Congratulations for completing your first level! You can now click on the *Go to next level* button."

@@ -16,10 +16,8 @@ ob die Aussage `A` wahr oder falsch ist. Mit einer Annahme `(hA : A)` nimmt man 
 
 -- TODO: Macht es Sinn mehrere Aufgaben auf einer Seite zu haben?
 Statement mehr_triviales
-    "
-    Sei `A` eine logische Aussage und angenommen man hat einen Beweis für `A`.
-    Zeige, dass `A` wahr ist.
-    "
+    "Sei $ A $ eine logische Aussage und sei `hA` ein Beweis für $A$.
+    Zeige, dass $ A $ wahr ist."
     (A : Prop) (hA : A) : A := by
   assumption
 

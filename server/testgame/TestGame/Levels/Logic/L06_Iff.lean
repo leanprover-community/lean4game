@@ -21,9 +21,7 @@ Gleichungen von natürlichen Zahlen.
 "
 
 Statement
-    "
-    Zeige dass `B ↔ C`.
-    "
+    "Zeige dass `B ↔ C`."
     (A B C D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : B ↔ C := by
   rw [h₁]
   rw [←h₂]

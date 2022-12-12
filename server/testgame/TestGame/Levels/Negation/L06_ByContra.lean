@@ -19,7 +19,7 @@ dass das Gegenteil des Goals wahr sei, und dann einen Widerspruch erzeugen.
 "
 
 Statement
-  "Ist n² ungerade, so ist auch n ungerade. Beweise durch Widerspruch."
+    "Ist n² ungerade, so ist auch n ungerade. Beweise durch Widerspruch."
     (n : ℕ) (h : odd (n ^ 2)) : odd n := by
   by_contra g
   rw [not_odd] at g

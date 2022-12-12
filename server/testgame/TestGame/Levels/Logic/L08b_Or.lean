@@ -25,6 +25,7 @@ Diese Annahme benennt man dann mit `rcases h with hA | hB`.
 "
 
 Statement
+    ""
     (A B C D : Prop) (h : (A ∧ B) ∨ (D ∨ C)) : (A ∧ B) ∨ (C ∨ D) := by
   rcases h with ⟨ha, hb⟩ | (h | h)
   left

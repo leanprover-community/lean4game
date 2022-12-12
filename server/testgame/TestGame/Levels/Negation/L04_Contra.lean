@@ -16,7 +16,7 @@ oder auch Annahmen der Form `A ≠ A` (`\\ne`).
 "
 
 Statement
-  "Ein Widerspruch impliziert alles."
+    "Ein Widerspruch impliziert alles."
     (A : Prop) (a b c : ℕ) (g₁ : a = b) (g₂ : b = c) (h : a ≠ c) : A := by
   rw [g₁] at h
   contradiction

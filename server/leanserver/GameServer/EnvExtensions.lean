@@ -182,15 +182,27 @@ deriving Inhabited
 def getCurLevelId [MonadError m] : m LevelId := do
   return { game := ← getCurGameId, world := ← getCurWorldId, level := ← getCurLevelIdx}
 
+/--
+
+
+Fields:
+- TODO
+- introduction: Theory block shown all the time.
+- description:  The mathematical statemtent in mathematician-readable form.
+- goal:         The statement in Lean.
+- conclusion:   Displayed when level is completed.
+-/
 structure GameLevel where
   index: Nat
   title: String := default
   introduction: String := default
+  description: String := default
   conclusion: String := default
   tactics: Array TacticDocEntry := default
   lemmas: Array LemmaDocEntry := default
   messages: Array GoalMessageEntry := default
   goal : TSyntax `Lean.Parser.Command.declSig := default
+  ppStatement : String := default
   deriving Inhabited, Repr
 
 /-! ## World -/

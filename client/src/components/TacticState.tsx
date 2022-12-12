@@ -42,11 +42,12 @@ function Goal({ goal }) {
       <Typography>Prove:</Typography>
       <Typography color="primary" sx={{ ml: 2 }}>{goal.goal}</Typography>
       {goal.messages.map((message) => <Alert severity="info" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message}</ReactMarkdown></MathJax></Alert>)}
-      <FormControlLabel
-        control={<Switch checked={showHints} onChange={handleHintsChange} />}
-        label="Help"
-      />
-      {goal.hints.map((message) => <Collapse in={showHints}><Alert severity="warning" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message}</ReactMarkdown></MathJax></Alert></Collapse>)}
+      {hasHints &&
+        <FormControlLabel
+          control={<Switch checked={showHints} onChange={handleHintsChange} />}
+          label="Help"
+        />}
+        {goal.hints.map((hint) => <Collapse in={showHints}><Alert severity="warning" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{hint}</ReactMarkdown></MathJax></Alert></Collapse>)}
     </Box>)
 }
 

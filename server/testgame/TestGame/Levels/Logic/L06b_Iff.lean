@@ -17,9 +17,7 @@ Wenn das Goal `A ↔ B` ist, kann man mit der `constructor` Taktik, dieses in di
 "
 
 Statement
-    "
-    Zeige dass `B ↔ C`.
-    "
+    "Zeige dass `B ↔ C`."
     (A B : Prop) (mp : A → B) (mpr : B → A) : A ↔ B := by
   constructor
   assumption

@@ -43,7 +43,7 @@ Observe that the goal mentions `... + succ ...`. So type
 and hit enter; see the goal change.
 "
 
-Statement (a : ℕ ) : a + succ 0 = succ a := by
+Statement "" (a : ℕ ) : a + succ 0 = succ a := by
   rewrite [add_succ]
   rewrite [add_zero]
   rfl

@@ -29,12 +29,20 @@ def getGame (game : Name): GameServerM Game := do
     | throwServerError "Game not found"
   return game
 
+/--
+
+Fields:
+- description: Lemma in mathematical language.
+- descriptionGoal: Lemma printed as Lean-Code.
+-/
 structure LevelInfo where
   index : Nat
   title : String
   tactics: Array TacticDocEntry
   lemmas: Array LemmaDocEntry
   introduction : String
+  description : String
+  ppStatement : String
 deriving ToJson
 
 structure LoadLevelParams where
@@ -62,6 +70,8 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             title := lvl.title,
             tactics := lvl.tactics,
             lemmas := lvl.lemmas,
+            description := lvl.description,
+            ppStatement := lvl.ppStatement --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson levelInfo⟩
       return true

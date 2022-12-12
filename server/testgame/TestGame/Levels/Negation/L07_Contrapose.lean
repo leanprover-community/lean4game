@@ -22,7 +22,7 @@ Wenn das Goal eine Implikation ist, kann man `contrapose` anwenden.
 "
 
 Statement
-  "Ist n² ungerade, so ist auch n ungerade. Beweise durch Kontraposition."
+    "Ist n² ungerade, so ist auch n ungerade. Beweise durch Kontraposition."
     (n : ℕ) : odd (n ^ 2) → odd n := by
   contrapose
   rw [not_odd]

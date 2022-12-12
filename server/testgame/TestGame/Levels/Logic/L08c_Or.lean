@@ -16,7 +16,7 @@ Introduction
 "
 
 Statement and_or_imp
-  "Benutze alle vier Methoden mit UND und ODER umzugehen um folgende Aussage zu beweisen."
+    "Benutze alle vier Methoden mit UND und ODER umzugehen um folgende Aussage zu beweisen."
     (A B C : Prop) (h : (A ∧ B) ∨ (A → C)) (hA : A) : (B ∨ (C ∧ A)) := by
   rcases h with h₁ | h₂
   left

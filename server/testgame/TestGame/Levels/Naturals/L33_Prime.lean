@@ -13,7 +13,7 @@ TODO: Primzahl
 
 "
 
-Statement : True := by
+Statement "" : True := by
   trivial
 
 Conclusion

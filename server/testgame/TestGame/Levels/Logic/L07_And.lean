@@ -20,6 +20,7 @@ Man can also genau gleich `constructor` und `rcases` anwenden, ebenso kann man
 "
 
 Statement
+    ""
     (A B : Prop) : (A ∧ (A → B)) ↔ (A ∧ B) := by
   constructor
   intro h

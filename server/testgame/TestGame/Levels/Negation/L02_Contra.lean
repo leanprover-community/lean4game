@@ -17,7 +17,7 @@ also `(h : A)` und `(g : ¬ A)`. (`\\not`)
 "
 
 Statement
-  "Ein Widerspruch impliziert alles."
+    "Ein Widerspruch impliziert alles."
     (n : ℕ) (h : even n) (g : ¬ (even n)) : n = 128 := by
   contradiction
 

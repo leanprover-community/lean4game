@@ -41,10 +41,12 @@ function Level() {
   const [expertInfoview, setExpertInfoview] = useState(false)
 
 
-  const [leanData, setLeanData] = useState({goals: []})
+  const [leanData, setLeanData] = useState({goals: [], description: "Loading..."})
   const [history, setHistory] = useState([])
   const [lastTactic, setLastTactic] = useState("")
   const [introduction, setIntroduction] = useState("")
+  const [description, setDescription] = useState("Loading...")
+  const [ppStatement, setPPStatement] = useState("")
   const [errors, setErrors] = useState([])
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
@@ -129,6 +131,8 @@ function Level() {
           setTacticDocs(res["tactics"])
           setLemmaDocs(res["lemmas"])
           setIntroduction(res["introduction"])
+          setDescription(res["description"])
+          setPPStatement(res["ppStatement"])
           processResponse(res)
         });
 
@@ -153,6 +157,10 @@ function Level() {
         <div ref={messagePanelRef} className="message-panel">
           <MathJax><ReactMarkdown>{introduction}</ReactMarkdown></MathJax>
         </div>
+        <p><b>Aufgabe:</b></p>
+        <div><MathJax><ReactMarkdown>{description}</ReactMarkdown></MathJax></div>
+        {/* <div className="statement"><code>{ppStatement}</code></div>
+          NOTE(TODO): currently this looks bad, so I disabled it. Maybe have a drop-down for it of Syntax highlighting... */}
         <div ref={codeviewRef} className="codeview">
           {/* <InputZone index={index} history={history} messageOpen={messageOpen} setMessageOpen={setMessageOpen} completed={completed} sendTactic={sendTactic} nbLevels={nbLevels} loadNextLevel={loadNextLevel}
             errors={errors} lastTactic={lastTactic} undo={undo} finishGame={finishGame} /> */}

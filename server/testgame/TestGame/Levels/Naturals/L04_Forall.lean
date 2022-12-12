@@ -19,7 +19,7 @@ Zum `∃` gehört auch das \"für alle\" `∀` (`\\forall`).
 Ein `∀` im Goal kann man mit `intro` angehen, genau wie bei einer Implikation `→`.
 "
 
-Statement : ∀ (x : ℕ), (even x) → odd (1 + x) := by
+Statement "" : ∀ (x : ℕ), (even x) → odd (1 + x) := by
   intro x h
   unfold even at h
   unfold odd

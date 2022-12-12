@@ -21,7 +21,7 @@ ersten offenen Goal zu machen.
 Wenn der Beweis komplett ist, erscheint \"goals accomplished\".
 "
 
-Statement "Zeige `42 = 42`." : 42 = 42 := by
+Statement "Zeige $ 42 = 42 $." : 42 = 42 := by
   rfl
 
 Message : 42 = 42 =>

@@ -15,6 +15,7 @@ wie im nächsten Level dann gezeigt wird. Manchmal aber hat man Terme der Form
 "
 
 Statement
+    ""
     (A : Prop) : ¬ (¬ A) ↔ A := by
   rw [not_not]
 

@@ -17,8 +17,8 @@ mit `push_neg` das `¬` durch den Quantor hindurchschieben.
 "
 
 Statement
-  "Es existiert keine natürliche Zahl, die grösser als alle anderen."
-  : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , odd (n + k) := by
+    "Es existiert keine natürliche Zahl, die grösser als alle anderen.":
+    ¬ ∃ (n : ℕ), ∀ (k : ℕ) , odd (n + k) := by
   push_neg
   intro n
   use 3*n + 6
