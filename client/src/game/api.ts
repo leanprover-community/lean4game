@@ -24,12 +24,16 @@ const customBaseQuery = async (
   { signal, dispatch, getState, extra },
   extraOptions
 ) => {
-  const connection : Connection = extra.connection
-  let leanClient = await connection.startLeanClient()
-  console.log(`Sending request ${args.method}`)
-  let res = await leanClient.sendRequest(args.method, args.params)
-  console.log('Received response', res)
-  return {'data': res}
+  try {
+    const connection : Connection = extra.connection
+    let leanClient = await connection.startLeanClient()
+    console.log(`Sending request ${args.method}`)
+    let res = await leanClient.sendRequest(args.method, args.params)
+    console.log('Received response', res)
+    return {'data': res}
+   } catch (e) {
+    return {'error': e}
+   }
 }
 
 // Define a service using a base URL and expected endpoints

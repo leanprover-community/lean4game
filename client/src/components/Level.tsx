@@ -45,13 +45,12 @@ function Level() {
   const connection = React.useContext(ConnectionContext)
 
   const level = useLoadLevelQuery({world: worldId, level: levelId})
-
   const {editor, infoProvider} = useLevelEditor(worldId, levelId, codeviewRef, infoviewRef)
 
   return <>
     <Box style={level.isLoading ? null : {display: "none"}} display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
     <Grid style={level.isLoading ? {display: "none"} : null} className="level" container sx={{ mt: 0, ml: 0, mr: 0 }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-      <Grid xs={0} sm={3} className="doc-panel">
+      <Grid xs={4} className="doc-panel">
         <LeftPanel spells={level?.data?.tactics} inventory={level?.data?.tactics} />
       </Grid>
       <Grid xs={9} sm={6} className="main-panel">
