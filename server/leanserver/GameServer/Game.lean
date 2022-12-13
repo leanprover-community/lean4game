@@ -64,7 +64,9 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let s ← get
       let c ← read
       let some lvl ← getLevel? {game := s.game, world := p.world, level := p.level}
-        | throwServerError s!"Level not found {(← getGame s.game).name} {p.world} {p.level}"
+        | do
+            c.hOut.writeLspResponseError ⟨id, .invalidParams, s!"Level not found: world {p.world}, level {p.level}", none⟩
+            return true
       let levelInfo : LevelInfo :=
           { index := lvl.index,
             title := lvl.title,
