@@ -50,21 +50,22 @@ function Level() {
 
   return <>
     <Box style={level.isLoading ? null : {display: "none"}} display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
-    <Grid style={level.isLoading ? {display: "none"} : null} className="level" container sx={{ mt: 3, ml: 1, mr: 1 }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-      <Grid xs={4} className="doc-panel">
+    <Grid style={level.isLoading ? {display: "none"} : null} className="level" container sx={{ mt: 0, ml: 0, mr: 0 }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+      <Grid xs={0} sm={3} className="doc-panel">
         <LeftPanel spells={level?.data?.tactics} inventory={level?.data?.tactics} />
       </Grid>
-      <Grid xs={4} className="main-panel">
+      <Grid xs={9} sm={6} className="main-panel">
         <div ref={messagePanelRef} className="message-panel">
           <MathJax><ReactMarkdown>{level?.data?.introduction}</ReactMarkdown></MathJax>
         </div>
-        <p><b>Aufgabe:</b></p>
-        <div><MathJax><ReactMarkdown>{level?.data?.descrText}</ReactMarkdown></MathJax></div>
-        <div className="statement"><code>{level?.data?.descrFormat}</code></div>
-          {/*NOTE(TODO): currently this looks bad, so I disabled it. Maybe have a drop-down for it of Syntax highlighting... */}
-        <div ref={codeviewRef} className="codeview"></div>
+        <div className="exercise">
+          <h4>Aufgabe:</h4>
+          <MathJax><ReactMarkdown>{level?.data?.descrText}</ReactMarkdown></MathJax>
+          <div className="statement"><code>{level?.data?.descrFormat}</code></div>
+          <div ref={codeviewRef} className="codeview"></div>
+        </div>
       </Grid>
-      <Grid xs={4} className="info-panel">
+      <Grid xs={3} className="info-panel">
 
         <Button disabled={levelId <= 1} component={RouterLink} to={`/world/${worldId}/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
         <Button disabled={false} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>

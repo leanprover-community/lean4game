@@ -18,12 +18,12 @@ Als allererstes der Widerspruch.
 Wenn man in den Annahmen einen Widerspruch hat, kann man mit `contradiction` den Beweis
 schliessen, denn ein Widerspruch beweist alles.
 
-Der einfachste Widerspruch ist wenn man einen Beweis von `false` hat:
+Der einfachste Widerspruch ist wenn man einen Beweis von `False` hat:
 "
 
 Statement
     "Ein Widerspruch impliziert alles."
-    (A : Prop) (h : false) : A := by
+    (A : Prop) (h : False) : A := by
   contradiction
 
 Tactics contradiction

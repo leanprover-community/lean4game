@@ -9,8 +9,55 @@
   overflow: auto;
 }
 
-.codeview, .message-panel {
+.main-panel {
+  display: flex;
+  flex-flow: column;
+}
+
+.message-panel {
   width: 100%;
-  height: 50%;
-  overflow: auto;
+}
+
+.exercise {
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+}
+
+.codeview {
+  flex: 1 1 auto;
+  min-height: 192px;
+
+}
+
+.exercise h4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/***************************************/
+/* TODO: For development purposes only */
+/***************************************/
+.doc-panel {
+  border: 1px solid red;
+}
+
+.main-panel {
+  border: 1px solid rgb(41, 112, 0);
+}
+
+.info-panel {
+  border: 1px solid rgb(230, 122, 0);
+}
+
+.message-panel {
+  border: 1px solid rgb(192, 18, 178);
+}
+
+.exercise {
+  border: 1px solid rgb(102, 243, 67);
+}
+
+.codeview {
+  border: 1px solid rgb(98, 148, 255);
 }
