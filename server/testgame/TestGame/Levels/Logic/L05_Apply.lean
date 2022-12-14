@@ -8,7 +8,9 @@ Level 6
 Title "Implikation"
 
 Introduction
-"
+"Als nächstes widmen wir uns der Implikation &A \\Rightarrow B&. TODO
+
+Logische Aussagen `(A : Prop)`, `(B : Prop)`
 Wie wir schon gesehen haben, wir eine logische Aussage als `(A : Prop)` geschrieben, und
 die Annahme, dass `A` wahr ist als `(hA : A)`, also `hA` ist sozusagens ein Beweis der
 Aussage `A`.
@@ -18,8 +20,7 @@ Logische Aussagen können einander implizieren. Wir kennen hauptsächlich zwei Z
 
 Wenn man Aussage `B` beweisen will und eine Implikationsannahme `(h : A → B)` hat, dann kann man
 diese mit `apply h` anwenden.
-Auf Papier würde man schreiben, \"es genügt zu zeigen, dass `A` stimmt, denn `A` impliziert `B`\".
-"
+Auf Papier würde man schreiben, \"es genügt zu zeigen, dass `A` stimmt, denn `A` impliziert `B`\"."
 
 Statement
     "Seien `A`, `B` logische Aussagen, wobei `A` wahr ist und `A` impliziert `B`.
@@ -32,5 +33,4 @@ Message (A : Prop) (B : Prop) (hA : A) (g : A → B) : A =>
 "Nachdem du die Implikation `A → B` angewendet hast, musst du nur noch `A` zeigen,
 dafür hast du bereits einen Beweis in den Annahmen."
 
-Tactics apply
-Tactics assumption
+Tactics apply assumption
