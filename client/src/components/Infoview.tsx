@@ -14,7 +14,8 @@ function toLanguageServerPosition (pos: monaco.Position): ls.Position {
 function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.IStandaloneCodeEditor, editorApi: EditorApi, leanClient: LeanClient}) {
   const [rpcSession, setRpcSession] = useState<string>()
   const [goals, setGoals] = useState<any[]>(null)
-  const [errors, setErrors] = useState<any[]>(undefined)
+  const [completed, setCompleted] = useState<boolean>(false)
+  const [diagnostics, setDiagnostics] = useState<any[]>(undefined)
   const [uri, setUri] = useState<string>()
   console.log(rpcSession)
   const fetchInteractiveGoals = () => {
@@ -34,18 +35,34 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
       })
 
       leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getDiagnostics",
-        "params":{"textDocument":{uri}, "position": pos},
+        "params":{"textDocument":{uri}, "lineRange": {start: pos.line, end: pos.line + 1}},
         "sessionId":rpcSession,
         "textDocument":{uri},
         "position": pos
       }).then((res) => {
-        setErrors(res ? res : undefined)
+        setDiagnostics(res ? res : undefined)
         console.log(res)
       }).catch((err) => {
         console.error(err)
       })
 
     }
+  }
+
+  const checkCompleted = () => {
+    const pos = toLanguageServerPosition(editor.getPosition())
+    // Get all diagnostics independent of cursor position
+    leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getDiagnostics",
+      "params":{"textDocument":{uri},},
+      "sessionId":rpcSession,
+      "textDocument":{uri},
+      "position": pos
+    }).then((res) => {
+      // Check that there are no errors and no warnings
+      setCompleted(!res.some(({severity}) => severity <= 2))
+    }).catch((err) => {
+      console.error(err)
+    })
   }
 
   useEffect(() => {
@@ -76,12 +93,13 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
   useEffect(() => {
     const t = leanClient.didChange(async (ev) => {
       fetchInteractiveGoals()
+      checkCompleted()
     })
     return () => { t.dispose() }
   }, [editor, leanClient, rpcSession])
 
   return (<div>
-    <TacticState goals={goals} errors={errors} completed={goals?.length === 0 && errors?.length === 0}></TacticState>
+    <TacticState goals={goals} diagnostics={diagnostics} completed={completed}></TacticState>
   </div>)
 }
 

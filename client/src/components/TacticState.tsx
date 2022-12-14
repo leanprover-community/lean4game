@@ -52,8 +52,8 @@ function Goal({ goal }) {
     </Box>)
 }
 
-function TacticState({ goals, errors, completed }) {
-  const hasError = typeof errors === "object" && errors.length > 0
+function TacticState({ goals, diagnostics, completed }) {
+  const hasError = typeof diagnostics === "object" && diagnostics.length > 0
   const hasGoal = goals !== null && goals.length > 0
   const hasManyGoal = hasGoal && goals.length > 1
   return (
@@ -62,7 +62,7 @@ function TacticState({ goals, errors, completed }) {
       {hasGoal && <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}><Typography variant="h5">Main goal at cursor</Typography> <Goal goal={goals[0]} /></Paper>}
       {completed && <Typography variant="h6">Level completed ! 🎉</Typography>}
       {hasError && <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}>
-        {errors.map(({severity, message}) => <Typography color={{1: "red", 2:"orange", 3:"blue", 4:"gray"}[severity]}>{message}</Typography>)}
+        {diagnostics.map(({severity, message}) => <Typography color={{1: "red", 2:"orange", 3:"blue", 4:"gray"}[severity]}>{message}</Typography>)}
         </Paper>}
       {hasManyGoal && <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, mt: 1 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>Other goals</Typography>
