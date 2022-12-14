@@ -77,7 +77,7 @@ function LeftPanel({ spells, inventory, showSidePanel, setShowSidePanel }) {
           <ListItemIcon sx={{minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
             <FontAwesomeIcon icon={faHammer}></FontAwesomeIcon>
           </ListItemIcon>
-          <ListItemText primary="Tactics" sx={{ display: showSidePanel ? null : "none" }} />
+          <ListItemText primary="Known Tactics" sx={{ display: showSidePanel ? null : "none" }} />
         </ListItemButton>
         {spells && spells.length > 0 &&
           <Paper sx={{ px: 2, py: 1, display: showSidePanel ? null : "none" }} elevation={0} >
@@ -89,7 +89,7 @@ function LeftPanel({ spells, inventory, showSidePanel, setShowSidePanel }) {
           <ListItemIcon sx={{minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
             <FontAwesomeIcon icon={faBook}></FontAwesomeIcon>
           </ListItemIcon>
-          <ListItemText primary="Lemmas" sx={{ display: showSidePanel ? null : "none" }} />
+          <ListItemText primary="Known Lemmas" sx={{ display: showSidePanel ? null : "none" }} />
         </ListItemButton>
         {inventory && inventory.length > 0 &&
           <Paper sx={{ px: 2, py: 1, mt: 2, display: showSidePanel ? null : "none" }} elevation={0} >
