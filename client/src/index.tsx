@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { ConnectionContext, connection } from './connection'
-import { store } from './store';
+import { store } from './state/store';
 import { Provider } from 'react-redux';
 import {
   createHashRouter,

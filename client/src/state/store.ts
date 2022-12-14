@@ -1,19 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { connection } from './connection'
+import { connection } from '../connection'
 import thunkMiddleware from 'redux-thunk'
-import { gameApi } from './game/api'
+import { apiSlice } from './api'
+import { progressSlice } from './progress'
 
 
 export const store = configureStore({
   reducer: {
-    [gameApi.reducerPath]: gameApi.reducer,
+    [apiSlice.reducerPath]: apiSlice.reducer,
+    [progressSlice.name]: progressSlice.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       thunk: {
         extraArgument: { connection }
       }
-    }).concat(gameApi.middleware),
+    }).concat(apiSlice.middleware),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

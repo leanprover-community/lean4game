@@ -22,30 +22,22 @@ import './level.css'
 import { ConnectionContext } from '../connection';
 import Infoview from './Infoview';
 import { useParams } from 'react-router-dom';
-import { useLoadLevelQuery } from '../game/api';
+import { useLoadLevelQuery } from '../state/api';
+import { codeEdited, selectCode } from '../state/progress';
+import { useAppDispatch } from '../hooks';
+import { useSelector } from 'react-redux';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, faDownload } from '@fortawesome/free-solid-svg-icons'
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import CssBaseline from '@mui/material/CssBaseline';
-import Typography from '@mui/material/Typography';
+import { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Divider from '@mui/material/Divider';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+
 
 
 /** Drawer Test */
-const drawerWidth = 400;
+const drawerWidth = 400; /* TODO: This width is hard-coded. Fix me. */
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -130,7 +122,17 @@ function Level() {
   const connection = React.useContext(ConnectionContext)
 
   const level = useLoadLevelQuery({world: worldId, level: levelId})
-  const {editor, infoProvider} = useLevelEditor(worldId, levelId, codeviewRef, infoviewRef)
+
+  const dispatch = useAppDispatch()
+
+  const onDidChangeContent = (code) => {
+    dispatch(codeEdited({world: worldId, level: levelId, code}))
+  }
+
+  const initialCode = useSelector(selectCode(worldId, levelId))
+
+  const {editor, infoProvider} =
+    useLevelEditor(worldId, levelId, codeviewRef, infoviewRef, initialCode, onDidChangeContent)
 
   return <>
     <Box style={level.isLoading ? null : {display: "none"}} display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
@@ -177,7 +179,7 @@ function Level() {
 export default Level
 
 
-function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewRef) {
+function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewRef, initialCode, onDidChangeContent) {
 
   const connection = React.useContext(ConnectionContext)
 
@@ -221,8 +223,11 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
       if (editor) {
 
         const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
-        const model = monaco.editor.getModel(uri) ??
-          monaco.editor.createModel('', 'lean4', uri)
+        let model = monaco.editor.getModel(uri)
+        if (!model) {
+          model = monaco.editor.createModel(initialCode, 'lean4', uri)
+          model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
+        }
 
         editor.setModel(model)
         infoviewApi.serverRestarted(leanClient.initializeResult)
@@ -232,7 +237,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
         new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
       }
     })
-
+    // TODO: Properly close the file to stop send "keepAlive" calls to the server
   }, [editor, levelId, connection])
 
   return {editor, infoProvider}

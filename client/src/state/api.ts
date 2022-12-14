@@ -4,7 +4,7 @@ import { Connection } from '../connection'
 interface GameInfo {
   title: null|string,
   introduction: null|string,
-  worlds: null|{nodes: string[], edges: string[][2]},
+  worlds: null|{nodes: string[], edges: string[][]},
   authors: null|string[],
   conclusion: null|string,
 }
@@ -37,7 +37,7 @@ const customBaseQuery = async (
 }
 
 // Define a service using a base URL and expected endpoints
-export const gameApi = createApi({
+export const apiSlice = createApi({
   reducerPath: 'gameApi',
   baseQuery: customBaseQuery,
   endpoints: (builder) => ({
@@ -52,4 +52,4 @@ export const gameApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetGameInfoQuery, useLoadLevelQuery } = gameApi
+export const { useGetGameInfoQuery, useLoadLevelQuery } = apiSlice
