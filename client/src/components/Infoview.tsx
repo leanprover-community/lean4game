@@ -14,12 +14,13 @@ function toLanguageServerPosition (pos: monaco.Position): ls.Position {
 function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.IStandaloneCodeEditor, editorApi: EditorApi, leanClient: LeanClient}) {
   const [rpcSession, setRpcSession] = useState<string>()
   const [goals, setGoals] = useState<any[]>(null)
+  const [errors, setErrors] = useState<any[]>(undefined)
   const [uri, setUri] = useState<string>()
   console.log(rpcSession)
   const fetchInteractiveGoals = () => {
-    console.log(rpcSession)
     if (editor && rpcSession) {
       const pos = toLanguageServerPosition(editor.getPosition())
+
       leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getGoals",
         "params":{"textDocument":{uri}, "position": pos},
         "sessionId":rpcSession,
@@ -31,6 +32,19 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
       }).catch((err) => {
         console.error(err)
       })
+
+      leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getDiagnostics",
+        "params":{"textDocument":{uri}, "position": pos},
+        "sessionId":rpcSession,
+        "textDocument":{uri},
+        "position": pos
+      }).then((res) => {
+        setErrors(res ? res : undefined)
+        console.log(res)
+      }).catch((err) => {
+        console.error(err)
+      })
+
     }
   }
 
@@ -67,7 +81,7 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
   }, [editor, leanClient, rpcSession])
 
   return (<div>
-    <TacticState goals={goals} errors={[]} completed={goals?.length === 0}></TacticState>
+    <TacticState goals={goals} errors={errors} completed={goals?.length === 0 && errors?.length === 0}></TacticState>
   </div>)
 }
 
