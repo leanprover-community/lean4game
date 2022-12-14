@@ -21,7 +21,10 @@ import './level.css'
 import { ConnectionContext } from '../connection';
 import Infoview from './Infoview';
 import { useParams } from 'react-router-dom';
-import { useLoadLevelQuery } from '../game/api';
+import { useLoadLevelQuery } from '../state/api';
+import { codeEdited, selectCode } from '../state/progress';
+import { useAppDispatch } from '../hooks';
+import { useSelector } from 'react-redux';
 
 
 
@@ -45,7 +48,17 @@ function Level() {
   const connection = React.useContext(ConnectionContext)
 
   const level = useLoadLevelQuery({world: worldId, level: levelId})
-  const {editor, infoProvider} = useLevelEditor(worldId, levelId, codeviewRef, infoviewRef)
+
+  const dispatch = useAppDispatch()
+
+  const onDidChangeContent = (code) => {
+    dispatch(codeEdited({world: worldId, level: levelId, code}))
+  }
+
+  const initialCode = useSelector(selectCode(worldId, levelId))
+
+  const {editor, infoProvider} =
+    useLevelEditor(worldId, levelId, codeviewRef, infoviewRef, initialCode, onDidChangeContent)
 
   return <>
     <Box style={level.isLoading ? null : {display: "none"}} display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
@@ -84,7 +97,7 @@ function Level() {
 export default Level
 
 
-function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewRef) {
+function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewRef, initialCode, onDidChangeContent) {
 
   const connection = React.useContext(ConnectionContext)
 
@@ -128,8 +141,11 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
       if (editor) {
 
         const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
-        const model = monaco.editor.getModel(uri) ??
-          monaco.editor.createModel('', 'lean4', uri)
+        let model = monaco.editor.getModel(uri)
+        if (!model) {
+          model = monaco.editor.createModel(initialCode, 'lean4', uri)
+          model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
+        }
 
         editor.setModel(model)
         infoviewApi.serverRestarted(leanClient.initializeResult)
@@ -139,7 +155,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
         new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
       }
     })
-
+    // TODO: Properly close the file to stop send "keepAlive" calls to the server
   }, [editor, levelId, connection])
 
   return {editor, infoProvider}

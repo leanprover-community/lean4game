@@ -14,7 +14,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 cytoscape.use( klay );
 
 import { Box, Typography, Button, CircularProgress, Grid } from '@mui/material';
-import { useGetGameInfoQuery } from '../game/api';
+import { useGetGameInfoQuery } from '../state/api';
 import { Link } from 'react-router-dom';
 
 
