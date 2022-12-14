@@ -1,17 +1,17 @@
 import GameServer.Commands
 -- import TestGame.MyNat
 
--- LemmaDoc zero_add as zero_add in "Addition"
--- "This lemma says `∀ a : ℕ, 0 + a = a`."
+LemmaDoc zero_add as zero_add in "Addition"
+"This lemma says `∀ a : ℕ, 0 + a = a`."
 
--- LemmaDoc add_zero as add_zero in "Addition"
--- "This lemma says `∀ a : ℕ, a + 0 = a`."
+LemmaDoc add_zero as add_zero in "Addition"
+"This lemma says `∀ a : ℕ, a + 0 = a`."
 
--- LemmaDoc add_succ as add_succ in "Addition"
--- "This lemma says `∀ a b : ℕ, a + succ b = succ (a + b)`."
+LemmaDoc add_succ as add_succ in "Addition"
+"This lemma says `∀ a b : ℕ, a + succ b = succ (a + b)`."
 
--- LemmaSet addition : "Addition lemmas" :=
--- zero_add add_zero
+LemmaSet addition : "Addition lemmas" :=
+zero_add add_zero
 
 LemmaDoc not_not as not_not in "Logic"
 "`∀ (A : Prop), ¬¬A ↔ A`."
@@ -44,3 +44,6 @@ LemmaDoc even_square as even_square in "Nat"
 
 LemmaSet natural : "Natürliche Zahlen" :=
 even odd not_odd not_even
+
+LemmaSet logic : "Logik" :=
+not_not

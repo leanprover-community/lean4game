@@ -7,9 +7,11 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import { Paper, Box, Typography, Accordion, AccordionSummary, AccordionDetails, Tabs, Tab } from '@mui/material';
+import { Paper, Box, Typography, Accordion, AccordionSummary, AccordionDetails, Tabs, Tab, Divider, Button, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, faHammer } from '@fortawesome/free-solid-svg-icons'
 
 function TacticDoc(props) {
   return (
@@ -54,8 +56,7 @@ function LemmaDocs({ lemmas }) {
   }, [lemmas]);
 
   return (
-    <Paper sx={{ px: 2, py: 1, mt: 2 }}>
-      <Typography variant="h5">Inventory</Typography>
+    <div>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={curCategory}
@@ -64,20 +65,39 @@ function LemmaDocs({ lemmas }) {
         </Tabs>
       </Box>
       {curCategory && categories.get(curCategory).map((lemma) => <LemmaDoc lemma={lemma} key={lemma.name} />)}
-    </Paper>
-  )
+    </div>)
 }
 
-function LeftPanel({ spells, inventory }) {
+function LeftPanel({ spells, inventory, showSidePanel, setShowSidePanel }) {
+
   return (
-    <Box>
-      {spells && spells.length > 0 &&
-        <Paper sx={{ px: 2, py: 1 }}>
-          <Typography variant="h5" sx={{ mb: 2 }}>Spell book</Typography>
-          {spells.map((spell) => <TacticDoc key={spell.name} tactic={spell} />)}
-        </Paper>}
-      {inventory && inventory.length > 0 && <LemmaDocs lemmas={inventory} />}
-    </Box>)
+    <List className="side">
+      <ListItem key="tactics" disablePadding sx={{ display: 'block' }}>
+        <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5 }} onClick={() => setShowSidePanel(true)}>
+          <ListItemIcon sx={{minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
+            <FontAwesomeIcon icon={faHammer}></FontAwesomeIcon>
+          </ListItemIcon>
+          <ListItemText primary="Tactics" sx={{ display: showSidePanel ? null : "none" }} />
+        </ListItemButton>
+        {spells && spells.length > 0 &&
+          <Paper sx={{ px: 2, py: 1, display: showSidePanel ? null : "none" }} elevation={0} >
+            {spells.map((spell) => <TacticDoc key={spell.name} tactic={spell} />)}
+          </Paper>}
+      </ListItem>
+      <ListItem key="lemmas" disablePadding sx={{ display: 'block' }}>
+        <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5 }} >
+          <ListItemIcon sx={{minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
+            <FontAwesomeIcon icon={faBook}></FontAwesomeIcon>
+          </ListItemIcon>
+          <ListItemText primary="Lemmas" sx={{ display: showSidePanel ? null : "none" }} />
+        </ListItemButton>
+        {inventory && inventory.length > 0 &&
+          <Paper sx={{ px: 2, py: 1, mt: 2, display: showSidePanel ? null : "none" }} elevation={0} >
+            <LemmaDocs lemmas={inventory} />
+          </Paper>}
+      </ListItem>
+    </List>
+  )
 }
 
 export default LeftPanel;

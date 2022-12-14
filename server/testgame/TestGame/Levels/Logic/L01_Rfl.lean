@@ -31,5 +31,3 @@ Hint : 42 = 42 =>
 "Man schreibt eine Taktik pro Zeile, also gib 'rfl' ein gefolgt von ENTER."
 
 Conclusion "Bravo!"
-
-Tactics rfl

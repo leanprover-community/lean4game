@@ -26,3 +26,4 @@ deshalb musst du dieses häufig gar nicht mehr schreiben.
 "
 
 Tactics rfl
+Lemmas zero_add

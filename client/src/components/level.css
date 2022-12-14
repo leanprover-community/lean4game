@@ -4,7 +4,7 @@
   min-height: 0;
 }
 
-.main-panel, .info-panel, .doc-panel {
+.main-panel, .info-panel {
   height: 100%;
   overflow: auto;
 }
@@ -35,10 +35,18 @@
   margin-bottom: 0;
 }
 
+.doc-panel li {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12); /* This should be teh same colour as `divider` in LeftPanel.tsx */
+}
+
+.doc-panel li:first-of-type {
+  border-top: 1px solid rgb(0, 0, 0, 0.12); /* This should be teh same colour as `divider` in LeftPanel.tsx */
+}
+
 /***************************************/
 /* TODO: For development purposes only */
 /***************************************/
-.doc-panel {
+/* .doc-panel {
   border: 1px solid red;
 }
 
@@ -61,3 +69,8 @@
 .codeview {
   border: 1px solid rgb(98, 148, 255);
 }
+
+.main-grid {
+  border: 1px solid rgb(255, 0, 0);
+  margin: 1px;
+} */
