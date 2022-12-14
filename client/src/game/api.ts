@@ -4,7 +4,7 @@ import { Connection } from '../connection'
 interface GameInfo {
   title: null|string,
   introduction: null|string,
-  worlds: null|{nodes: string[], edges: string[][2]},
+  worlds: null|{nodes: string[], edges: string[][]},
   authors: null|string[],
   conclusion: null|string,
 }
