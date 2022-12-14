@@ -44,9 +44,6 @@ function Welcome() {
         </Typography>
       </Box>
       <Box textAlign='center' sx={{ m: 5 }}>
-        <Button component={RouterLink} to="/world/Logic/level/1" variant="contained">Start rescue mission</Button>
-      </Box>
-      <Box textAlign='center' sx={{ m: 5 }}>
         <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="30%"
             viewBox={bounds ? `${bounds.x1 - padding} ${bounds.y1 - padding} ${bounds.x2 - bounds.x1 + 2 * padding} ${bounds.y2 - bounds.y1 + 2 * padding}` : ''}>
           {gameInfo.data ? gameInfo.data.worlds.edges.map((edge) =>
