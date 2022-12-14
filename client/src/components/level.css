@@ -43,6 +43,11 @@
   border-top: 1px solid rgb(0, 0, 0, 0.12); /* This should be teh same colour as `divider` in LeftPanel.tsx */
 }
 
+/* fix as Mui seems to set this to `nowrap`. */
+.MuiAccordionDetails-root {
+  white-space: normal;
+}
+
 /***************************************/
 /* TODO: For development purposes only */
 /***************************************/
