@@ -15,17 +15,20 @@ structure GameLocalDecl where
   type : String
 deriving FromJson, ToJson
 
+structure GameMessage where
+  message : String
+  spoiler : Bool
+deriving FromJson, ToJson
+
 structure GameGoal where
   objects : List GameLocalDecl
   assumptions : List GameLocalDecl
   goal : String
-  messages : Array String
-  hints : Array String
+  messages : Array GameMessage
 deriving FromJson, ToJson
 
 
-def Lean.MVarId.toGameGoal (goal : MVarId)
-    (messages : Array String) (hints : Array String) : MetaM GameGoal := do
+def Lean.MVarId.toGameGoal (goal : MVarId) (messages : Array GameMessage) : MetaM GameGoal := do
 match (← getMCtx).findDecl? goal with
 | none          => throwError "unknown goal"
 | some mvarDecl => do
@@ -48,7 +51,7 @@ match (← getMCtx).findDecl? goal with
       return { userName := decl.userName, type := toString (← Meta.ppExpr decl.type) }
     let assumptions ← assumptions.mapM fun decl => do
       return { userName := decl.userName, type := toString (← Meta.ppExpr decl.type) }
-    return {objects := objects, assumptions := assumptions, goal := toString (← Meta.ppExpr mvarDecl.type), messages, hints }
+    return {objects := objects, assumptions := assumptions, goal := toString (← Meta.ppExpr mvarDecl.type), messages }
 
 namespace GameServer
 
@@ -97,46 +100,23 @@ def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool :=
 
 open Meta in
 /-- Find all messages whose trigger matches the current goal -/
-def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) (hLog : IO.FS.Stream) : MetaM (Array String) := do
+def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) (hLog : IO.FS.Stream) : MetaM (Array GameMessage) := do
   goal.withContext do
     let level ← getLevelByFileName doc.meta.mkInputContext.fileName
     let messages ← level.messages.filterMapM fun message => do
-      if message.spoiler then
-        return none
-      else
-        let (declMvars, binderInfo, messageGoal) ← forallMetaBoundedTelescope message.goal message.intros
-        -- TODO: Protext mvars in the type of `goal` to be instantiated?
-        if ← isDefEq messageGoal (← inferType $ mkMVar goal) -- TODO: also check assumptions
+      let (declMvars, binderInfo, messageGoal) ← forallMetaBoundedTelescope message.goal message.intros
+      -- TODO: Protext mvars in the type of `goal` to be instantiated?
+      if ← isDefEq messageGoal (← inferType $ mkMVar goal) -- TODO: also check assumptions
+      then
+        let lctx ← getLCtx -- Local context of the `goal`
+        hLog.putStr s!"{← declMvars.mapM inferType} =?= {← lctx.getFVars.mapM inferType}"
+        if ← matchDecls declMvars lctx.getFVars
         then
-          let lctx ← getLCtx -- Local context of the `goal`
-          hLog.putStr s!"{← declMvars.mapM inferType} =?= {← lctx.getFVars.mapM inferType}"
-          if ← matchDecls declMvars lctx.getFVars
-          then
-            return some message.message
-          else return none
-        else return none
-    return messages
-
-open Meta in
-/-- Find all hints whose trigger matches the current goal -/
-def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) (hLog : IO.FS.Stream) : MetaM (Array String) := do
-  goal.withContext do
-    let level ← getLevelByFileName doc.meta.mkInputContext.fileName
-    let hints ← level.messages.filterMapM fun message => do
-      if message.spoiler then
-        let (declMvars, binderInfo, messageGoal) ← forallMetaBoundedTelescope message.goal message.intros
-        -- TODO: Protext mvars in the type of `goal` to be instantiated?
-        if ← isDefEq messageGoal (← inferType $ mkMVar goal) -- TODO: also check assumptions
-        then
-          let lctx ← getLCtx -- Local context of the `goal`
-          hLog.putStr s!"{← declMvars.mapM inferType} =?= {← lctx.getFVars.mapM inferType}"
-          if ← matchDecls declMvars lctx.getFVars
-          then
-            return some message.message
-          else return none
+          return some { message := message.message, spoiler := message.spoiler }
         else return none
       else return none
-    return hints
+    return messages
+
 
 /-- Get goals and messages at a given position -/
 def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal)) := do
@@ -154,8 +134,7 @@ def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal
           let goals := List.toArray <| if useAfter then ti.goalsAfter else ti.goalsBefore
           let goals ← ci.runMetaM {} $ goals.mapM fun goal => do
             let messages ← findMessages goal doc hLog
-            let hints ← findHints goal doc hLog
-            return ← goal.toGameGoal messages hints
+            return ← goal.toGameGoal messages
           return goals
         return some { goals := goals.foldl (· ++ ·) ∅ }
       else

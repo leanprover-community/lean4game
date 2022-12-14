@@ -23,7 +23,9 @@ function Goal({ goal }) {
 
   const hasObject = typeof goal.objects === "object" && goal.objects.length > 0
   const hasAssumption = typeof goal.assumptions === "object" && goal.assumptions.length > 0
-  const hasHints = typeof goal.hints === "object" && goal.hints.length > 0
+  const openMessages = typeof goal.messages === "object" ? goal.messages.filter((msg) => ! msg.spoiler) : []
+  const hints = typeof goal.messages === "object" ? goal.messages.filter((msg) => msg.spoiler) : []
+  const hasHints = hints.length > 0
   return (
     <Box sx={{ pl: 2 }}>
       {hasObject && <Box><Typography>Objects</Typography>
@@ -41,13 +43,13 @@ function Goal({ goal }) {
         </List></Box>}
       <Typography>Prove:</Typography>
       <Typography color="primary" sx={{ ml: 2 }}>{goal.goal}</Typography>
-      {goal.messages.map((message) => <Alert severity="info" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message}</ReactMarkdown></MathJax></Alert>)}
+      {openMessages.map((message) => <Alert severity="info" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message.message}</ReactMarkdown></MathJax></Alert>)}
       {hasHints &&
         <FormControlLabel
           control={<Switch checked={showHints} onChange={handleHintsChange} />}
           label="Help"
         />}
-        {goal.hints.map((hint) => <Collapse in={showHints}><Alert severity="warning" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{hint}</ReactMarkdown></MathJax></Alert></Collapse>)}
+        {hints.map((hint) => <Collapse in={showHints}><Alert severity="warning" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{hint.message}</ReactMarkdown></MathJax></Alert></Collapse>)}
     </Box>)
 }
 
