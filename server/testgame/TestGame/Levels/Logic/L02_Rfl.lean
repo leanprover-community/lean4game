@@ -8,22 +8,20 @@ Title "Definitionally equal"
 
 Introduction
 "
-Achtung: `rfl` kann auch Gleichungen beweisen, wenn die beiden Terme Lean-intern gleich
-definiert sind, auch wenn diese unterschiedlich dargestellt werden.
-So sind `1 + 1` und `2` per Definition das Gleiche, da sie beide von Lean als `0.succ.succ`
-gelesen werden.
+**Vorsicht:** `rfl` kann auch Gleichungen beweisen, wenn die beiden Terme Lean-intern gleich
+definiert sind, auch wenn diese unterschiedlich dargestellt werden. Das kann anfänglich
+zu Verwirrung führen.
 
-Das kann anfänglich verwirrend sein und das Verhalten hängt von der Lean-Implementation ab.
+So sind `2` definiert als `1 + 1`, deshalb funktioniert `rfl` auch hier.
 "
 
-Statement "Zeige dass eins plus eins zwei ist." : 1 + 1 = 2 := by
+Statement "Zeige dass $1 + 1$ zwei ist." : 1 + 1 = 2 := by
   rfl
 
 Conclusion
 "
-Im weiteren führen die meisten anderen Taktiken `refl` automatisch am Ende aus,
-deshalb musst du dieses häufig gar nicht mehr schreiben.
+**Notiz:** Die meisten anderen Taktiken versuchen am Schluss automatisch `rfl`
+aufzurufen, deshalb brauchst du das nur noch selten.
 "
 
 Tactics rfl
-Lemmas zero_add
