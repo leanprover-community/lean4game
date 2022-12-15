@@ -23,7 +23,7 @@ export const progressSlice = createSlice({
 export function selectCode(world: string, level: number) {
   return (state) => {
     if (!state.progress.code[world]) { return undefined }
-    state.progress.code[world][level];
+    return state.progress.code[world][level];
   }
 }
 

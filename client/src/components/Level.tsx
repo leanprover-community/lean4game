@@ -214,7 +214,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
     setInfoProvider(infoProvider)
     setInfoviewApi(infoviewApi)
 
-    return () => { editor.setModel(null); infoProvider.dispose(); }
+    return () => { editor.setModel(null); infoProvider.dispose(); editor.dispose() }
   }, [])
 
   // Create model when level changes
