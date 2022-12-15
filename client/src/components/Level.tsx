@@ -32,6 +32,7 @@ import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Divider from '@mui/material/Divider';
 import Markdown from './Markdown';
+import { SetTitleContext } from '../App';
 
 
 
@@ -132,6 +133,16 @@ function Level() {
 
   const {editor, infoProvider} =
     useLevelEditor(worldId, levelId, codeviewRef, infoviewRef, initialCode, onDidChangeContent)
+
+  const {setTitle, setSubtitle} = React.useContext(SetTitleContext);
+
+  useEffect(() => {
+    setTitle(`World: ${worldId}`)
+  }, [worldId])
+
+  useEffect(() => {
+    setSubtitle(`Level ${levelId}: ${level?.data?.title}`)
+  }, [level?.data?.title])
 
   return <>
     <Box style={level.isLoading ? null : {display: "none"}} display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>

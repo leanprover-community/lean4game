@@ -11,18 +11,12 @@ import { AppBar, CssBaseline, Toolbar, Typography } from '@mui/material';
 
 import { useAppSelector } from './hooks';
 
+type SetTitleType = {setTitle: (string) => void, setSubtitle: (string) => void}
+export const SetTitleContext = React.createContext<SetTitleType>({setTitle: () => {}, setSubtitle: () => {}})
+
 function App() {
-  const [conclusion, setConclusion] = useState("")
-  const [levelTitle, setLevelTitle] = useState("")
-  const [nbLevels, setNbLevels] = useState(0)
-  const [curLevel, setCurLevel] = useState(0)
-  const [finished, setFinished] = useState(false)
-
-  function startGame() {
-    setCurLevel(1)
-  }
-
-  const title = ""//useAppSelector(state => state.gameApi.data.title)
+  const [title, setTitle] = useState("")
+  const [subtitle, setSubtitle] = useState("")
 
   return (
     <div className="App">
@@ -33,11 +27,13 @@ function App() {
           {title}
         </Typography>
         <Typography variant="h6" noWrap component="div">
-          {levelTitle}
+          {subtitle}
         </Typography>
         </Toolbar>
       </AppBar>
-      <Outlet />
+      <SetTitleContext.Provider value={{setTitle, setSubtitle}}>
+        <Outlet />
+      </SetTitleContext.Provider>
     </div>
   )
 }
