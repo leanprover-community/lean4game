@@ -4,8 +4,6 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import ReactMarkdown from 'react-markdown';
-import { MathJax } from "better-react-mathjax";
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
@@ -33,6 +31,7 @@ import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, fa
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Divider from '@mui/material/Divider';
+import Markdown from './Markdown';
 
 
 
@@ -149,11 +148,11 @@ function Level() {
       <Grid container columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ flexGrow: 1, p: 3 }} className="main-grid">
         <Grid xs={8} className="main-panel">
           <div ref={messagePanelRef} className="message-panel">
-            <MathJax><ReactMarkdown>{level?.data?.introduction}</ReactMarkdown></MathJax>
+            <Markdown>{level?.data?.introduction}</Markdown>
           </div>
           <div className="exercise">
             <h4>Aufgabe:</h4>
-            <MathJax><ReactMarkdown>{level?.data?.descrText}</ReactMarkdown></MathJax>
+            <Markdown>{level?.data?.descrText}</Markdown>
             <div className="statement"><code>{level?.data?.descrFormat}</code></div>
             <div ref={codeviewRef} className="codeview"></div>
           </div>

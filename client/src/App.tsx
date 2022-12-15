@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { MathJaxContext } from "better-react-mathjax";
 import { Outlet } from "react-router-dom";
 
 import '@fontsource/roboto/300.css';
@@ -19,18 +18,6 @@ function App() {
   const [curLevel, setCurLevel] = useState(0)
   const [finished, setFinished] = useState(false)
 
-  const mathJaxConfig = {
-    loader: {
-      load: ['input/tex-base', 'output/svg']
-      },
-        tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']]
-      },
-    svg: {
-      fontCache: 'global'
-    }
-    }
-
   function startGame() {
     setCurLevel(1)
   }
@@ -39,7 +26,6 @@ function App() {
 
   return (
     <div className="App">
-    <MathJaxContext config={mathJaxConfig}>
       <CssBaseline />
       <AppBar className="AppBar" position="sticky" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
@@ -52,7 +38,6 @@ function App() {
         </Toolbar>
       </AppBar>
       <Outlet />
-    </MathJaxContext>
     </div>
   )
 }

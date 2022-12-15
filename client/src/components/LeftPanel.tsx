@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { MathJax } from "better-react-mathjax";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -12,6 +11,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, faHammer } from '@fortawesome/free-solid-svg-icons'
+import Markdown from './Markdown';
 
 function TacticDoc(props) {
   return (
@@ -20,9 +20,7 @@ function TacticDoc(props) {
         <Typography>{props.tactic.name}</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <MathJax>
-          <ReactMarkdown>{props.tactic.content}</ReactMarkdown>
-        </MathJax>
+        <Markdown>{props.tactic.content}</Markdown>
       </AccordionDetails>
     </Accordion>)
 }
@@ -34,9 +32,7 @@ function LemmaDoc({ lemma }) {
         <Typography>{lemma.userName}</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <MathJax>
-          <ReactMarkdown>{lemma.content}</ReactMarkdown>
-        </MathJax>
+        <Markdown>{lemma.content}</Markdown>
       </AccordionDetails>
     </Accordion>)
 }

@@ -1,7 +1,5 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { MathJax } from "better-react-mathjax";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -16,6 +14,7 @@ cytoscape.use( klay );
 import { Box, Typography, Button, CircularProgress, Grid } from '@mui/material';
 import { useGetGameInfoQuery } from '../state/api';
 import { Link } from 'react-router-dom';
+import Markdown from './Markdown';
 
 
 function Welcome() {
@@ -38,9 +37,7 @@ function Welcome() {
     <div>
       <Box sx={{ m: 3 }}>
         <Typography variant="body1" component="div">
-          <MathJax>
-            <ReactMarkdown>{gameInfo.data.introduction}</ReactMarkdown>
-          </MathJax>
+          <Markdown>{gameInfo.data.introduction}</Markdown>
         </Typography>
       </Box>
       <Box textAlign='center' sx={{ m: 5 }}>

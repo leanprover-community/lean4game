@@ -3,8 +3,6 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import ReactMarkdown from 'react-markdown';
-import { MathJax } from "better-react-mathjax";
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -14,6 +12,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowPointer } from '@fortawesome/free-solid-svg-icons'
+import Markdown from './Markdown';
 
 // TODO: Dead variables (x✝) are not displayed correctly.
 
@@ -47,13 +46,13 @@ function Goal({ goal }) {
         </List></Box>}
       <Typography>Prove:</Typography>
       <Typography color="primary" sx={{ ml: 2 }}>{goal.goal}</Typography>
-      {openMessages.map((message) => <Alert severity="info" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{message.message}</ReactMarkdown></MathJax></Alert>)}
+      {openMessages.map((message) => <Alert severity="info" sx={{ mt: 1 }}><Markdown>{message.message}</Markdown></Alert>)}
       {hasHints &&
         <FormControlLabel
           control={<Switch checked={showHints} onChange={handleHintsChange} />}
           label="More Help?"
         />}
-        {hints.map((hint) => <Collapse in={showHints}><Alert severity="info" sx={{ mt: 1 }}><MathJax><ReactMarkdown>{hint.message}</ReactMarkdown></MathJax></Alert></Collapse>)}
+        {hints.map((hint) => <Collapse in={showHints}><Alert severity="info" sx={{ mt: 1 }}><Markdown>{hint.message}</Markdown></Alert></Collapse>)}
     </Box>)
 }
 
