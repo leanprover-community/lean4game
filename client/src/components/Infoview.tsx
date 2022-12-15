@@ -68,6 +68,7 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
   useEffect(() => {
     if (editor) {
       fetchInteractiveGoals()
+      checkCompleted()
       const t = editor.onDidChangeModel((ev) => {
         if (ev.newModelUrl) {
           setRpcSession(undefined)
