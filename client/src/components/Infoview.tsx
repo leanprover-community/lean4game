@@ -16,6 +16,14 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
   const [goals, setGoals] = useState<any[]>(null)
   const [completed, setCompleted] = useState<boolean>(false)
   const [diagnostics, setDiagnostics] = useState<any[]>(undefined)
+
+  /* `globalDiagnostics` is a work-around to show something when the proof is complete
+  but had previous subgoals with `sorry` or errors.
+
+  It is displayed whenever there are no goals and no (error)-messages present and the proof
+  isn't complete. */
+  const [globalDiagnostics, setGlobalDiagnostics] = useState<any[]>(undefined)
+
   const [uri, setUri] = useState<string>()
   console.log(rpcSession)
   const fetchInteractiveGoals = () => {
@@ -40,6 +48,10 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
         "textDocument":{uri},
         "position": pos
       }).then((res) => {
+
+        /* Workaround to not display the error `unsolved goals` */
+        if (res) {res = res.filter(x => x.message.trim() !== 'unsolved goals')}
+
         setDiagnostics(res ? res : undefined)
         console.log(res)
       }).catch((err) => {
@@ -60,6 +72,7 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
     }).then((res) => {
       // Check that there are no errors and no warnings
       setCompleted(!res.some(({severity}) => severity <= 2))
+      setGlobalDiagnostics(res)
     }).catch((err) => {
       console.error(err)
     })
@@ -100,7 +113,8 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
   }, [editor, leanClient, rpcSession])
 
   return (<div>
-    <TacticState goals={goals} diagnostics={diagnostics} completed={completed}></TacticState>
+    <TacticState goals={goals} diagnostics={diagnostics} completed={completed}
+      globalDiagnostics={globalDiagnostics}></TacticState>
   </div>)
 }
 

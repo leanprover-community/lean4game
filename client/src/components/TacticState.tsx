@@ -96,10 +96,16 @@ function OtherGoal({ goal }) {
     </Accordion>)
 }
 
-function TacticState({ goals, diagnostics, completed }) {
-  const hasError = typeof diagnostics === "object" && diagnostics.length > 0
+function TacticState({ goals, diagnostics, completed, globalDiagnostics }) {
   const hasGoal = goals !== null && goals.length > 0
   const hasManyGoal = hasGoal && goals.length > 1
+
+  if (!(hasGoal || completed) && globalDiagnostics) {
+  diagnostics = [{"severity" : 4, "message": "Showing global messages:"}, ...globalDiagnostics]
+  }
+
+  const hasError = typeof diagnostics === "object" && diagnostics.length > 0
+
   return (
     <Box sx={{ height: "100%" }}>
       {completed && <Typography variant="h6">Level completed ! 🎉</Typography>}
