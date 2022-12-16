@@ -102,6 +102,7 @@ function TacticState({ goals, diagnostics, completed }) {
   const hasManyGoal = hasGoal && goals.length > 1
   return (
     <Box sx={{ height: "100%" }}>
+      {completed && <Typography variant="h6">Level completed ! 🎉</Typography>}
       {hasGoal &&
         <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}>
           <Typography variant="h5">Main Goal
@@ -114,7 +115,6 @@ function TacticState({ goals, diagnostics, completed }) {
           No goals
           (at <FontAwesomeIcon icon={faArrowPointer}></FontAwesomeIcon>)
         </Typography>}
-      {completed && <Typography variant="h6">Level completed ! 🎉</Typography>}
       {hasError &&
         <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}>
           <Typography variant="h5" sx={{ mb: 2 }}>Lean says</Typography>

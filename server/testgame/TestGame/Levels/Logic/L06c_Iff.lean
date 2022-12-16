@@ -1,6 +1,4 @@
 import TestGame.Metadata
-import Std.Tactic.RCases
-import Mathlib.Tactic.Cases
 
 set_option tactic.hygienic false
 
@@ -12,52 +10,35 @@ Title "Genau dann wenn"
 
 Introduction
 "
-Umgekehrt, wenn man eine Annahme `(h : A ↔ B)` hat, kann man auf verschiedene
-Arten die Einzelteile `A → B` und `B → A` extrahieren.
+Wenn man eine Annahme `(h : A ↔ B)` hat, kann man auch davon die Einzelnen
+Implikationen $\\textrm{mp} : A \\Rightarrow B$ und $\\textrm{mpr} : B \\Rightarrow A$
+brauchen.
 
-- mit `rcases h` oder `rcases h with ⟨h₁, h₂⟩` teilt man die Annahme `h` auf. (Im zweiten Fall gibt
-man explizit an, wie die neuen Annahmen heissen sollen, die Klammern sind `\\<` und `\\>`).
+Dazu gibt es zwei Methoden:
 
+1.) `h.mp` (oder `h.1`) und `h.mpr` (oder `h.2`) sind direkt die einzelnen Richtungen.
+Man kann also z.B. mit `apply h.mp` die Implikation `A → B` auf ein Goal `B` anwenden.
+
+(PS: das `.mp` kommt von \"Modus Ponens\".)
 "
+
 Statement
-    ""
-    (A B : Prop) : (A ↔ B) → (A → B) := by
-  intro h
-  rcases h
-  exact mp
-
-Message (A : Prop) (B : Prop) : (A ↔ B) → A → B =>
-"Angefangen mit `intro h` kannst du annehmen, dass `(h : A ↔ B)` wahr ist."
-
-Conclusion
-"
-Anstatt
-```
-intro h
-rcases h with ⟨h₁, h₂⟩
-```
-kann man direkt `intro ⟨h₁, h₂⟩` schreiben.
-Wie du schon gesehen hast, sind diese Klammern `⟨⟩` Lean's Syntax für eine Struktur aus
-mehreren Teilen.
-
-"
-
-Tactics intro apply rcases assumption
-
-
-
-
-
-
-
--- TODO: The new `cases` works differntly. There is also `cases'`
-example (A B : Prop) : (A ↔ B) → (A → B) := by
-  intro h
-  cases h with
-  | intro a b =>
-    assumption
-
-example (A B : Prop) : (A ↔ B) → (A → B) := by
-  intro h
-  cases' h with a b
+    "Angenommen man hat $A \\iff B$ und $B \\Rightarrow C$, zeige $A \\Rightarrow C$."
+    (A B C : Prop) (h : A ↔ B) (g : B → C) : A → C := by
+  intro hA
+  apply g
+  apply h.mp
   assumption
+
+Message (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) : A → C =>
+"Zuerst kannst du wieder `intro` benützen um die Implikation anzugehen."
+
+Message (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : C =>
+"Der nächste Schritt kommt auch noch aus dem Implikationen-Level."
+
+Message (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : B =>
+"Mit `apply h.mp` kannst du nun die Implikation `A → B` anwenden."
+
+Conclusion "Im nächsten Level findest du die zweite Option."
+
+Tactics apply assumption

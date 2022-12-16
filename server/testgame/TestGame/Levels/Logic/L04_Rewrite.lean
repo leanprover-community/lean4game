@@ -13,14 +13,17 @@ Oft sind aber die Annahmen nicht genau das, was man zeigen will, sondern man bra
 mehrere Schritte im Beweis.
 
 Wenn man eine Annahme `(h : X = Y)` hat,
-kann die Taktik `rw [h]` im Goal `X` durch `Y` ersetzen.
+kann die Taktik `rw [h]` im Goal $X$ durch $Y$ ersetzen.
 (`rw` steht für *rewrite*)
-
 "
 
 Statement umschreiben
     "Angenommen man hat die Gleichheiten
-    $a = b$, $a = d$, $c = d$.
+    $$ \\begin{aligned}
+      a &= b \\\\\\\\
+      a &= d \\\\\\\\
+      c &= d
+    \\end{aligned} $$
     Zeige dass $b = c$."
     (a b c d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c := by
   rw [h₁]
@@ -42,14 +45,6 @@ Message (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h
 Hint (a : ℕ) (b : ℕ) (h : a = b) : a = b =>
 "Schau mal durch die Annahmen durch."
 
-
--- -- TODO: Muss ich das wirklich mehrmals auflisten?
--- Message (x : ℕ) : x = x =>
--- "Der Hauptunterschied zwischen `rw` und `rewrite` ist, dass das erste automatisch versucht,
--- anschliessend `rfl` anzuwenden. Bei `rewrite` musst du `rfl` explizit noch aufrufen."
-
-Conclusion "Übrigens, mit `rw [h₁] at h₂` kann man auch eine andere Annahme umschreiben
-anstatt dem Goal."
--- TODO: Das macht es doch unmöglich mit den Messages...
+Conclusion "Übrigens, mit `rw [h₁, ←h₂]` könnte man mehrere `rw` zusammenfassen."
 
 Tactics assumption rw

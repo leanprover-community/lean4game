@@ -8,12 +8,11 @@ Title "Genau dann wenn"
 
 Introduction
 "
-Als nächstes will man oft ein Iff-Statement `A ↔ B` wie zwei einzelne Implikationen
-`A → B` und `B → A` behandeln.
+Ein $A \\iff B$ besteht intern aus zwei Implikationen, $\\textrm{mp} : A \\Rightarrow B$
+und $\\textrm{mpr} : B \\Rightarrow A$.
 
-Wenn das Goal `A ↔ B` ist, kann man mit der `constructor` Taktik, dieses in die Einzelteile
-`A → B` und `B → A` zerlegen.
-
+Wenn man ein `A ↔ B` im Goal hat, kann man dieses mit `constructor` in die
+Einzelteile zerlegen.
 "
 
 Statement
@@ -23,6 +22,11 @@ Statement
   assumption
   assumption
 
+Message (A : Prop) (B : Prop) : A ↔ B =>
+"Eine Struktur wie `A ↔ B` kann man mit `constructor` zerlegen."
+
+Hint (A : Prop) (B : Prop) (h : A → B) : A → B =>
+"Such mal in den Annahmen."
 
 Conclusion
 "

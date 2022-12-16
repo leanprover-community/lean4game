@@ -48,6 +48,30 @@
   white-space: normal;
 }
 
+/* TODO: Adjust Mathjax styling. 1em vertical is excessive. */
+mjx-container[jax="CHTML"][display="true"] {
+  margin: 0.2em 0 !important;
+}
+
+
+/* Styling tables for Markdown */
+.message-panel table, .message-panel th, .message-panel td {
+  /* border: 1px solid rgb(0, 0, 0, 0.12); */
+  border-collapse: collapse;
+}
+
+.message-panel th, .message-panel td {
+  padding-left: .5em;
+  padding-right: .5em;
+}
+
+p, table {
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
 /***************************************/
 /* TODO: For development purposes only */
 /***************************************/

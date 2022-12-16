@@ -18,8 +18,16 @@ Wenn das Goal ein `∨` ist kann man mit `left` oder `right` entscheiden,
 welche Seite man beweisen möchte.
 "
 
-Statement "" (A B : Prop) (hA : A) : A ∨ (¬ B) := by
+Statement
+    "Angenommen $A$ ist wahr, zeige $A \\lor (\\neg B))$"
+    (A B : Prop) (hA : A) : A ∨ (¬ B) := by
   left
   assumption
+
+Hint (A : Prop) (B : Prop) (hA : A) : A ∨ (¬ B) =>
+"Entscheide dich, `right` oder `left`?"
+
+Message (A : Prop) (B : Prop) (hA : A) : ¬ B =>
+"Sackgasse. Probier's nochmals."
 
 Tactics left right assumption

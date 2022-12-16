@@ -10,9 +10,8 @@ Title "Implikation"
 
 Introduction
 "
-Wenn das Goal von der Form `A → B` ist, kann man mit `intro hA` annehmen, dass `A` wahr ist
-(i.e. erstellt eine Annahme `(hA : A)`)
-und das Goal wird zu `B`.
+Wenn das Goal eine Implikation $A \\Rightarrow B$ ist, kann man mit
+`intro hA` annehmen, dass $A$ wahr ist. Dann muss man $B$ beweisen.
 "
 
 Statement
@@ -22,5 +21,12 @@ Statement
   apply g
   apply f
   assumption
+
+Message (A : Prop) (B : Prop) (C : Prop) (f : A → B) (g : B → C) : A → C =>
+"mit `intro hA` kann man eine Implikation angehen."
+
+Message (A : Prop) (B : Prop) (C : Prop) (hA : A) (f : A → B) (g : B → C) : C =>
+"Jetzt ist es ein altbekanntes Spiel von `apply`-Anwendungen."
+
 
 Tactics intro apply assumption

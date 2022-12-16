@@ -1,4 +1,6 @@
 import TestGame.Metadata
+import Std.Tactic.RCases
+import Mathlib.Tactic.Cases
 
 Game "TestGame"
 World "Logic"
@@ -8,24 +10,44 @@ Title "Genau dann wenn"
 
 Introduction
 "
-Man kann auch die einzelnen Richtungen benützen, ohne `h` selber zu verändern:
+Als zweite Option, kann man eine Annahme `(h : A ↔ B)` in zwei neue Annahmen
+`(h₁ : A → B)` und `(h₂ : B → A)` aufteilen.
 
-- `h.1` und `h.2` sind direkt die einzelnen Richtungen. Man kann also z.B. mit `apply h.1` die
-Implikation `A → B` auf ein Goal `B` anwenden.
-- `h.mp` und `h.mpr` sind die bevorzugten Namen anstatt `.1` und `.2`. \"mp\" kommt von
-\"Modus Ponens\", aber das ist hier irrelevant.
+2.) Mit `rcases h` teilt man die Annahme `h` auf.
+
+(Mit `rcases h with ⟨h₁, h₂⟩` (`\\<`, `\\>`) kann man zudem die neuen Annahmen benennen.)
+
 "
-
 Statement
-    "Benütze nur `apply` und `assumption` um das gleiche Resultat zu zeigen."
-    (A B C : Prop) (h : A ↔ B) (g : B → C) : A → C := by
-  intro hA
-  apply g
-  apply h.mp
+    "Angenommen man hat $A \\iff B$ und $B \\Rightarrow C$, zeige $A \\Rightarrow C$."
+    (A B : Prop) : (A ↔ B) → (A → B) := by
+  intro h
+  rcases h
   assumption
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : B =>
-"Mit `apply h.mp` kannst du nun die Implikation `A → B` anwenden."
+Message (A : Prop) (B : Prop) : (A ↔ B) → A → B =>
+"Angefangen mit `intro h` kannst du annehmen, dass `(h : A ↔ B)` wahr ist."
 
-Tactics apply
-Tactics assumption
+Message (A : Prop) (B : Prop) (h : A ↔ B): A → B =>
+"Mit `rcases h with ⟨h₁, h₂⟩` kannst du jetzt die Annahme `(h : A ↔ B)` zerlegen."
+
+
+Conclusion
+"
+Note: In der Mathematik definieren wir oft Strukturen als Tupels, z.B. \"Sei (G, +) eine Gruppe\".
+In Lean brauchen wir dafür immer die Klammern von oben: `⟨_, _⟩`.
+"
+
+Tactics intro apply rcases assumption
+
+-- -- TODO: The new `cases` works differntly. There is also `cases'`
+-- example (A B : Prop) : (A ↔ B) → (A → B) := by
+--   intro h
+--   cases h with
+--   | intro a b =>
+--     assumption
+
+-- example (A B : Prop) : (A ↔ B) → (A → B) := by
+--   intro h
+--   cases' h with a b
+--   assumption

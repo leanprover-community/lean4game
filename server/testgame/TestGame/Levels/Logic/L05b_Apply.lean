@@ -8,18 +8,19 @@ Title "Implikation"
 
 Introduction
 "
-Angenommen man hat folgende Implikationen und weiss dass Aussage `A` wahr ist.
-```
-A → B ← C
-    ↓   ↓
-D → E → F
-```
-Beweise Aussage `F`.
+Angenommen man hat folgende Implikationen
+$$
+\\begin{CD}
+  A  @>{f}>> B       @<{g}<< C       \\\\
+  @. @V{h}VV @V{m}VV \\\\
+  D  @>{i}>> E       @>{k}>> F
+\\end{CD}
+$$
+und weiss, dass Aussage $A$ wahr ist.
 "
 
 Statement
-    "Seien `A`, `B` logische Aussagen, wobei `A` wahr ist und `A` impliziert `B`.
-    Zeige, dass `B` wahr ist."
+    "Beweise Aussage $F$."
     (A B C D E F : Prop) (hA : A) (f : A → B) (g : C → B) (h : B → E)
      (i : D → E) (k : E → F) (m : C → F) : F := by
   apply k
@@ -37,5 +38,6 @@ Message  (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (i : D → E) (k : E → F) (m : C → F) : D =>
 "Sackgasse. Probier doch einen anderen Weg."
 
-Tactics apply
-Tactics assumption
+Tactics apply assumption
+
+-- https://www.jmilne.org/not/Mamscd.pdf
