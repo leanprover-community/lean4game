@@ -18,14 +18,14 @@ kann die Taktik `rw [h]` im Goal $X$ durch $Y$ ersetzen.
 "
 
 Statement umschreiben
-    "Angenommen man hat die Gleichheiten
-    $$ \\begin{aligned}
-      a &= b \\\\\\\\
-      a &= d \\\\\\\\
-      c &= d
-    \\end{aligned} $$
-    Zeige dass $b = c$."
-    (a b c d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c := by
+"Angenommen man hat die Gleichheiten
+
+$$
+\\begin{aligned} a &= b \\\\ a &= d \\\\ c &= d \\end{aligned}
+$$
+
+Zeige dass $b = c$."
+(a b c d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c := by
   rw [h₁]
   rw [←h₂]
   assumption

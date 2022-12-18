@@ -4,7 +4,7 @@ set_option tactic.hygienic false
 
 Game "TestGame"
 World "Logic"
-Level 8
+Level 9
 
 Title "Implikation"
 
@@ -15,7 +15,7 @@ Wenn das Goal eine Implikation $A \\Rightarrow B$ ist, kann man mit
 "
 
 Statement
-    ""
+    "Angenommen man weiss $A \\Rightarrow B \\Rightarrow C$, zeige dass $A \\Rightarrow C$."
     (A B C : Prop) (f : A → B) (g : B → C) : A → C := by
   intro hA
   apply g
@@ -23,7 +23,7 @@ Statement
   assumption
 
 Message (A : Prop) (B : Prop) (C : Prop) (f : A → B) (g : B → C) : A → C =>
-"mit `intro hA` kann man eine Implikation angehen."
+"Mit `intro hA` kann man eine Implikation angehen."
 
 Message (A : Prop) (B : Prop) (C : Prop) (hA : A) (f : A → B) (g : B → C) : C =>
 "Jetzt ist es ein altbekanntes Spiel von `apply`-Anwendungen."

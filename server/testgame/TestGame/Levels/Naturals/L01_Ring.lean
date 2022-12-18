@@ -18,8 +18,13 @@ bereits mit `rfl` bewiesen werden können.
 Algemeinere Gleichungen mit Variablen kann man mit der Taktik `ring` lösen.
 "
 
-Statement "" (x y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
+Statement
+    "Zeige $(x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2$."
+    (x y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
   ring
+
+Message (x : ℕ) (y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 =>
+"`ring` übernimmt den ganzen Spaß."
 
 Conclusion
 "

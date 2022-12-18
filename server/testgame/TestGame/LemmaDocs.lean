@@ -16,9 +16,11 @@ zero_add add_zero
 LemmaDoc not_not as not_not in "Logic"
 "`∀ (A : Prop), ¬¬A ↔ A`."
 
+LemmaDoc not_forall as not_forall in "Logic"
+"`∀ (A : Prop), ¬(∀ x, A) ↔ ∃x, (¬A)`."
 
-
-
+LemmaDoc not_exists as not_exists in "Logic"
+"`∀ (A : Prop), ¬(∃ x, A) ↔ ∀x, (¬A)`."
 
 LemmaDoc even as even in "Nat"
 "
@@ -46,4 +48,4 @@ LemmaSet natural : "Natürliche Zahlen" :=
 even odd not_odd not_even
 
 LemmaSet logic : "Logik" :=
-not_not
+not_not not_forall not_exists

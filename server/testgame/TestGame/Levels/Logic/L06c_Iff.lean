@@ -4,7 +4,7 @@ set_option tactic.hygienic false
 
 Game "TestGame"
 World "Logic"
-Level 11
+Level 12
 
 Title "Genau dann wenn"
 

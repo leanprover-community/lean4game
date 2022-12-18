@@ -5,7 +5,7 @@ import Init.Data.ToString
 
 Game "TestGame"
 World "Logic"
-Level 9
+Level 10
 
 Title "Genau dann wenn"
 

@@ -65,6 +65,10 @@ mjx-container[jax="CHTML"][display="true"] {
   padding-right: .5em;
 }
 
+span.katex-display {
+  margin: 0;
+}
+
 p, table {
   margin-block-start: 1em;
   margin-block-end: 1em;

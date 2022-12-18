@@ -6,7 +6,7 @@ set_option tactic.hygienic false
 
 Game "TestGame"
 World "Logic"
-Level 16
+Level 17
 
 Title "Oder"
 

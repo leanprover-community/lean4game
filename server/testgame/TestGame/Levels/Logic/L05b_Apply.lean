@@ -2,7 +2,7 @@ import TestGame.Metadata
 
 Game "TestGame"
 World "Logic"
-Level 7
+Level 8
 
 Title "Implikation"
 
@@ -28,12 +28,17 @@ Statement
   apply f
   assumption
 
-Message  (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
+Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
+    (hA : A) (f : A → B) (g : C → B) (h : B → E)
+    (i : D → E) (k : E → F) (m : C → F) : F =>
+"Versuch mit `apply` den richtigen Weg zu finden."
+
+Message (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (hA : A) (f : A → B) (g : C → B) (h : B → E)
     (i : D → E) (k : E → F) (m : C → F) : C =>
 "Sackgasse. Probier doch einen anderen Weg."
 
-Message  (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
+Message (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (hA : A) (f : A → B) (g : C → B) (h : B → E)
     (i : D → E) (k : E → F) (m : C → F) : D =>
 "Sackgasse. Probier doch einen anderen Weg."

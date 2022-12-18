@@ -41,6 +41,10 @@ function LemmaDocs({ lemmas }) {
   const [categories, setCategories] = useState(new Map())
   const [curCategory, setCurCategory] = useState("")
 
+  const changeTab = (event: React.SyntheticEvent, newValue : string) => {
+    setCurCategory(newValue);
+  };
+
   useEffect(() => {
     const cats = new Map()
     lemmas.forEach(function (item) {
@@ -56,6 +60,7 @@ function LemmaDocs({ lemmas }) {
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={curCategory}
+          onChange={changeTab}
           aria-label="Categories" variant="scrollable" scrollButtons="auto">
           {(Array.from(categories)).map(([category, _]) => <Tab value={category} label={category} key={category} wrapped />)}
         </Tabs>
@@ -69,8 +74,8 @@ function LeftPanel({ spells, inventory, showSidePanel, setShowSidePanel }) {
   return (
     <List className="side">
       <ListItem key="tactics" disablePadding sx={{ display: 'block' }}>
-        <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5 }} onClick={() => setShowSidePanel(true)}>
-          <ListItemIcon sx={{minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
+        <ListItemButton sx={{ minHeight: 48, justifyContent: showSidePanel ? 'initial' : 'center', px: 2.5 }} onClick={() => setShowSidePanel(true)}>
+          <ListItemIcon sx={{minWidth: 0, mr: showSidePanel ? 3 : 'auto', justifyContent: 'center' }}>
             <FontAwesomeIcon icon={faHammer}></FontAwesomeIcon>
           </ListItemIcon>
           <ListItemText primary="Known Tactics" sx={{ display: showSidePanel ? null : "none" }} />
@@ -81,8 +86,8 @@ function LeftPanel({ spells, inventory, showSidePanel, setShowSidePanel }) {
           </Paper>}
       </ListItem>
       <ListItem key="lemmas" disablePadding sx={{ display: 'block' }}>
-        <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5 }} >
-          <ListItemIcon sx={{minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center' }}>
+        <ListItemButton sx={{ minHeight: 48, justifyContent: showSidePanel ? 'initial' : 'center', px: 2.5 }} >
+          <ListItemIcon sx={{minWidth: 0, mr: showSidePanel ? 3 : 'auto', justifyContent: 'center' }}>
             <FontAwesomeIcon icon={faBook}></FontAwesomeIcon>
           </ListItemIcon>
           <ListItemText primary="Known Lemmas" sx={{ display: showSidePanel ? null : "none" }} />

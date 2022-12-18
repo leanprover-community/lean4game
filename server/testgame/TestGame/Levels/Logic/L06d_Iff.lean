@@ -4,7 +4,7 @@ import Mathlib.Tactic.Cases
 
 Game "TestGame"
 World "Logic"
-Level 12
+Level 13
 
 Title "Genau dann wenn"
 

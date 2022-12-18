@@ -9,7 +9,7 @@ import Mathlib.Tactic.LeftRight
 
 Game "TestGame"
 World "Logic"
-Level 15
+Level 16
 
 Title "Oder - Bonus"
 

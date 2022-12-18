@@ -33,15 +33,15 @@ Hierzu gibt es 3 wichtige Taktiken:
    soll. Das macht man mit `use y`
 "
 
-Statement even_square "" (n : ℕ) (h : even n) : even (n ^ 2) := by
+Statement even_square
+      "Wenn $n$ gerade ist, dann ist $n^2$ gerade."
+      (n : ℕ) (h : even n) : even (n ^ 2) := by
   unfold even at *
   rcases h with ⟨x, hx⟩
   use 2 * x ^ 2
   rw [hx]
   ring
 
--- TODO: Server PANIC because of the `even`.
---
 Message (n : ℕ) (h : even n) : even (n ^ 2) =>
 "Wenn du die Definition von `even` nicht kennst, kannst du diese mit `unfold even` oder
 `unfold even at *` ersetzen.
@@ -68,3 +68,4 @@ Message (n : ℕ) (x : ℕ) (hx : n = x + x) : (x + x) ^ 2 = 2 * x ^ 2 + 2 * x ^
 "Die Taktik `ring` löst solche Gleichungen."
 
 Tactics unfold rcases use rw ring
+Lemmas even odd

@@ -16,9 +16,10 @@ Introduction
 also `(h : A)` und `(g : ¬ A)`. (`\\not`)
 "
 
-Statement
-    "Ein Widerspruch impliziert alles."
-    (n : ℕ) (h : even n) (g : ¬ (even n)) : n = 128 := by
+Statement absurd
+    "Sei $n$ eine natürliche Zahl die sowohl gerade wie auch nicht gerade ist.
+    Zeige, dass daraus $n = 42$ folgt. (oder, tatsächlich $n = x$ für jedes beliebige $x$)"
+    (n : ℕ) (h : even n) (g : ¬ (even n)) : n = 42 := by
   contradiction
 
 Conclusion
