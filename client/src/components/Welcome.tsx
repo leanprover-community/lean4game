@@ -37,7 +37,7 @@ function Welcome() {
     <div>
       <Box sx={{ m: 3 }}>
         <Typography variant="body1" component="div">
-          <Markdown>{gameInfo.data.introduction}</Markdown>
+          <Markdown>{gameInfo.data?.introduction}</Markdown>
         </Typography>
       </Box>
       <Box textAlign='center' sx={{ m: 5 }}>
