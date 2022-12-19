@@ -10,4 +10,6 @@ COPY testgame ./testgame
 WORKDIR /leanserver
 RUN rm -f ./build/bin/gameserver
 RUN lake build
-CMD ["./build/bin/gameserver", "TestGame", "../testgame"]
+
+WORKDIR /leanserver/build/bin/
+CMD ["./gameserver", "--server"]
