@@ -35,7 +35,7 @@ function Welcome() {
   if (gameInfo.data) {
     for (let edge of gameInfo.data.worlds.edges) {
       svgElements.push(
-        <line x1={nodes[edge[0]].x} y1={nodes[edge[0]].y} x2={nodes[edge[1]].x} y2={nodes[edge[1]].y} stroke="#1976d2" stroke-width="1"/>
+        <line x1={nodes[edge[0]].x} y1={nodes[edge[0]].y} x2={nodes[edge[1]].x} y2={nodes[edge[1]].y} stroke="#1976d2" strokeWidth="1"/>
       )
     }
     for (let id in nodes) {
@@ -44,7 +44,7 @@ function Welcome() {
       svgElements.push(
         <Link to={`/world/${id}/level/1`}>
           <circle fill="#61DAFB" cx={position.x} cy={position.y} r="8" />
-          <text style={{font: "italic 2px sans-serif",  "text-anchor": "middle", "dominant-baseline": "middle"} as any} x={position.x} y={position.y}>{id}</text>
+          <text style={{font: "italic 2px sans-serif",  textAnchor: "middle", dominantBaseline: "middle"} as any} x={position.x} y={position.y}>{id}</text>
         </Link>
       )
 
