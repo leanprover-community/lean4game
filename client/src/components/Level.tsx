@@ -20,7 +20,7 @@ import './level.css'
 import { ConnectionContext } from '../connection';
 import Infoview from './Infoview';
 import { useParams } from 'react-router-dom';
-import { useLoadLevelQuery } from '../state/api';
+import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { codeEdited, selectCode } from '../state/progress';
 import { useAppDispatch } from '../hooks';
 import { useSelector } from 'react-redux';
@@ -121,6 +121,8 @@ function Level() {
 
   const connection = React.useContext(ConnectionContext)
 
+  const gameInfo = useGetGameInfoQuery()
+
   const level = useLoadLevelQuery({world: worldId, level: levelId})
 
   const dispatch = useAppDispatch()
@@ -171,7 +173,7 @@ function Level() {
         <Grid xs={4} className="info-panel">
 
           <Button disabled={levelId <= 1} component={RouterLink} to={`/world/${worldId}/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
-          <Button disabled={false} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
+          <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
 
           <div style={{display: expertInfoview ? 'block' : 'none' }} ref={infoviewRef} className="infoview vscode-light"></div>
           <div style={{display: expertInfoview ? 'none' : 'block' }}>

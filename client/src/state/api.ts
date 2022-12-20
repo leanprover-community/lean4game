@@ -5,6 +5,7 @@ interface GameInfo {
   title: null|string,
   introduction: null|string,
   worlds: null|{nodes: string[], edges: string[][]},
+  worldSize: null|{[key: string]: number},
   authors: null|string[],
   conclusion: null|string,
 }
