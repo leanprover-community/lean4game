@@ -62,20 +62,22 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
   }
 
   const checkCompleted = () => {
-    const pos = toLanguageServerPosition(editor.getPosition())
-    // Get all diagnostics independent of cursor position
-    leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getDiagnostics",
-      "params":{"textDocument":{uri},},
-      "sessionId":rpcSession,
-      "textDocument":{uri},
-      "position": pos
-    }).then((res) => {
-      // Check that there are no errors and no warnings
-      setCompleted(!res.some(({severity}) => severity <= 2))
-      setGlobalDiagnostics(res)
-    }).catch((err) => {
-      console.error(err)
-    })
+    if (editor && rpcSession) {
+      const pos = toLanguageServerPosition(editor.getPosition())
+      // Get all diagnostics independent of cursor position
+      leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getDiagnostics",
+        "params":{"textDocument":{uri},},
+        "sessionId":rpcSession,
+        "textDocument":{uri},
+        "position": pos
+      }).then((res) => {
+        // Check that there are no errors and no warnings
+        setCompleted(!res.some(({severity}) => severity <= 2))
+        setGlobalDiagnostics(res)
+      }).catch((err) => {
+        console.error(err)
+      })
+    }
   }
 
   useEffect(() => {
