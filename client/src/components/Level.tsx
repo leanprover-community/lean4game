@@ -173,7 +173,7 @@ function Level() {
           <Button disabled={levelId <= 1} component={RouterLink} to={`/world/${worldId}/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
           <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
 
-          <Infoview leanClient={connection.getLeanClient()} editor={editor} editorApi={infoProvider?.getApi()} />
+          <Infoview key={worldId + "/Level" + levelId} leanClient={connection.getLeanClient()} editor={editor} editorApi={infoProvider?.getApi()} />
         </Grid>
       </Grid>
     </Box>
