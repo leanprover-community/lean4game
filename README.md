@@ -32,7 +32,7 @@ secured by [gVisor](https://gvisor.dev/).
 
 ### Node.js
 
-Developed using `node v18.12.1 (npm v8.19.2)`.
+Developed using `node v19.3.0 (npm v9.2.0)`.
 
 Install `nvm`
 ```
@@ -42,5 +42,5 @@ then reopen bash and test with `command -v nvm` if it is available (Should print
 
 Now install node:
 ```
-nvm install node --lts
+nvm install node
 ```
