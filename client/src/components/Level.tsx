@@ -230,6 +230,7 @@ console.log()
         model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
       }
       editor.setModel(model)
+      editor.setPosition(model.getFullModelRange().getEndPosition())
       const taskGutter = new LeanTaskGutter(infoProvider.client, editor)
       const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
