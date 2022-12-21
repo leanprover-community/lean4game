@@ -24,13 +24,16 @@ open Lsp
 open JsonRpc
 open IO
 
-def getGame (game : Name): GameServerM Game := do
+def getGame (game : Name): GameServerM Json := do
   let some game ← getGame? game
     | throwServerError "Game not found"
-  return game
+  let gameJson : Json := toJson game
+  -- Add world sizes to Json object
+  let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
+  let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
+  return gameJson
 
 /--
-
 Fields:
 - description: Lemma in mathematical language.
 - descriptionGoal: Lemma printed as Lean-Code.

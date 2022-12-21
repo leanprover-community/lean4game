@@ -63,8 +63,7 @@ aber eigenständig sein)
 
 ### Spieler-Führung
 
-- Keine Möglichkeit zurück zu gehen und nach dem letzten Level kann man trotzdem
-\"Next Level\" klicken
+- Keine Möglichkeit zurück zu gehen
 - Fehlermeldungen sind nicht besonders Benutzerfreundlich: Ganz unverständliche sammeln,
 damit wir diese später modifizieren können.
 - Kann man Taktiken blockieren?

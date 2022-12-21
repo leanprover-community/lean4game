@@ -17,10 +17,10 @@ import 'lean4web/client/src/editor/infoview.css'
 import { renderInfoview } from '@leanprover/infoview'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import './level.css'
-import { ConnectionContext } from '../connection';
+import { ConnectionContext, useLeanClient } from '../connection';
 import Infoview from './Infoview';
 import { useParams } from 'react-router-dom';
-import { useLoadLevelQuery } from '../state/api';
+import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { codeEdited, selectCode } from '../state/progress';
 import { useAppDispatch } from '../hooks';
 import { useSelector } from 'react-redux';
@@ -100,8 +100,6 @@ function Level() {
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
 
-  const [expertInfoview, setExpertInfoview] = useState(false)
-
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
   const messagePanelRef = useRef<HTMLDivElement>(null)
@@ -121,6 +119,8 @@ function Level() {
 
   const connection = React.useContext(ConnectionContext)
 
+  const gameInfo = useGetGameInfoQuery()
+
   const level = useLoadLevelQuery({world: worldId, level: levelId})
 
   const dispatch = useAppDispatch()
@@ -132,7 +132,7 @@ function Level() {
   const initialCode = useSelector(selectCode(worldId, levelId))
 
   const {editor, infoProvider} =
-    useLevelEditor(worldId, levelId, codeviewRef, infoviewRef, initialCode, onDidChangeContent)
+    useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
 
   const {setTitle, setSubtitle} = React.useContext(SetTitleContext);
 
@@ -171,15 +171,9 @@ function Level() {
         <Grid xs={4} className="info-panel">
 
           <Button disabled={levelId <= 1} component={RouterLink} to={`/world/${worldId}/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
-          <Button disabled={false} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
+          <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
 
-          <div style={{display: expertInfoview ? 'block' : 'none' }} ref={infoviewRef} className="infoview vscode-light"></div>
-          <div style={{display: expertInfoview ? 'none' : 'block' }}>
-            <Infoview leanClient={connection.getLeanClient()} editor={editor} editorApi={infoProvider?.getApi()} />
-          </div>
-          <FormGroup>
-            <FormControlLabel onChange={() => { setExpertInfoview(!expertInfoview) }} control={<Switch />} label="Expert mode" />
-          </FormGroup>
+          <Infoview leanClient={connection.getLeanClient()} editor={editor} editorApi={infoProvider?.getApi()} />
         </Grid>
       </Grid>
     </Box>
@@ -189,13 +183,12 @@ function Level() {
 export default Level
 
 
-function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewRef, initialCode, onDidChangeContent) {
+function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCode, onDidChangeContent) {
 
   const connection = React.useContext(ConnectionContext)
 
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
-  const [infoviewApi, setInfoviewApi] = useState(null)
 
   // Create Editor
   useEffect(() => {
@@ -217,38 +210,32 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
     })
 
     const infoProvider = new InfoProvider(connection.getLeanClient())
-    const div: HTMLElement = infoviewRef.current!
-    const infoviewApi = renderInfoview(infoProvider.getApi(), div)
-
+console.log()
     setEditor(editor)
     setInfoProvider(infoProvider)
-    setInfoviewApi(infoviewApi)
 
     return () => { editor.setModel(null); infoProvider.dispose(); editor.dispose() }
   }, [])
 
+  const {leanClient, leanClientStarted} = useLeanClient()
+
   // Create model when level changes
   useEffect(() => {
-    connection.startLeanClient().then((leanClient) => {
-      if (editor) {
+    if (editor && leanClientStarted) {
 
-        const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
-        let model = monaco.editor.getModel(uri)
-        if (!model) {
-          model = monaco.editor.createModel(initialCode, 'lean4', uri)
-          model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
-        }
-
-        editor.setModel(model)
-        infoviewApi.serverRestarted(leanClient.initializeResult)
-        infoProvider.openPreview(editor, infoviewApi)
-        new LeanTaskGutter(infoProvider.client, editor)
-
-        new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
+      const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
+      let model = monaco.editor.getModel(uri)
+      if (!model) {
+        model = monaco.editor.createModel(initialCode, 'lean4', uri)
+        model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
       }
-    })
-    // TODO: Properly close the file to stop send "keepAlive" calls to the server
-  }, [editor, levelId, connection])
+      editor.setModel(model)
+      const taskGutter = new LeanTaskGutter(infoProvider.client, editor)
+      const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
+
+      return () => { abbrevRewriter.dispose(); taskGutter.dispose(); model.dispose() }
+    }
+  }, [editor, levelId, connection, leanClientStarted])
 
   return {editor, infoProvider}
 }
