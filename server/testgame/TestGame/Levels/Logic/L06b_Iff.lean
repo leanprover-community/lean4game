@@ -11,7 +11,7 @@ Introduction
 Ein $A \\iff B$ besteht intern aus zwei Implikationen, $\\textrm{mp} : A \\Rightarrow B$
 und $\\textrm{mpr} : B \\Rightarrow A$.
 
-Wenn man ein `A ↔ B` im Goal hat, kann man dieses mit `constructor` in die
+Wenn man ein `A ↔ B` zeigen will (im Goal), kann man dieses mit `constructor` in die
 Einzelteile zerlegen.
 "
 

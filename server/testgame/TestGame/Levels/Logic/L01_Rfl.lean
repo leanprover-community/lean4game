@@ -11,7 +11,7 @@ Introduction
 Willkommen zum Lean-Crashkurs wo du lernst wie man mathematische Beweise vom Computer
 unterstützt und verifiziert schreiben kann.
 
-*Rechts* siehst den Status des Beweis. Unter **Main Goal** steht, was du im Moment am Beweisen
+*Rechts* siehst den Status des Beweis. Unter **Main Goal** steht, was du im Moment am beweisen
 bist. Falls es mehrere Subgoals gibt, werden alle weiteren darunter unter **Further Goals**
 aufgelistet, diese musst du dann später auch noch zeigen.
 
@@ -35,6 +35,6 @@ Message : 42 = 42 =>
 Hint : 42 = 42 =>
 "Man schreibt eine Taktik pro Zeile, also gib `rfl` ein und geh mit Enter ⏎ auf eine neue Zeile."
 
-Conclusion "Bravo!"
+Conclusion "Bravo! PS: `rfl` steht für \"reflexivity\"."
 
 Tactics rfl

@@ -23,10 +23,13 @@ Statement
   assumption
 
 Message (A : Prop) (B : Prop) (C : Prop) (f : A → B) (g : B → C) : A → C =>
-"Mit `intro hA` kann man eine Implikation angehen."
+"Mit `intro hA` kann man annehmen, dass $A$ wahr ist. danach muss man $B$ zeigen."
 
 Message (A : Prop) (B : Prop) (C : Prop) (hA : A) (f : A → B) (g : B → C) : C =>
 "Jetzt ist es ein altbekanntes Spiel von `apply`-Anwendungen."
 
+Hint (A : Prop) (B : Prop) (C : Prop) (hA : A) (f : A → B) (g : B → C) : C =>
+"Du willst $C$ beweisen. Suche also nach einer Implikation $\\ldots \\Rightarrow C$ und wende
+diese mit `apply` an."
 
 Tactics intro apply assumption

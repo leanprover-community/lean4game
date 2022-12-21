@@ -10,7 +10,7 @@ Title "Genau dann wenn"
 
 Introduction
 "
-Wenn man eine Annahme `(h : A ↔ B)` hat, kann man auch davon die Einzelnen
+Wenn man eine Annahme `(h : A ↔ B)` hat, kann man auch davon die beiden einzelnen
 Implikationen $\\textrm{mp} : A \\Rightarrow B$ und $\\textrm{mpr} : B \\Rightarrow A$
 brauchen.
 

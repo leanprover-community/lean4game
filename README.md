@@ -2,7 +2,7 @@
 
 This is a prototype for a Lean 4 game platform. It is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
 (NNG)](https://www.ma.imperial.ac.uk/~buzzard/xena/natural_number_game/)
-of Kevin Buzzard and Mohammad Pedramfar. 
+of Kevin Buzzard and Mohammad Pedramfar.
 The project is currently mostly copied from Patrick Massot's [NNG4](https://github.com/PatrickMassot/NNG4), but we plan to extend it significantly.
 
 Building this requires a [npm](https://www.npmjs.com/) toolchain. After cloning the repository you should run
@@ -26,3 +26,21 @@ On the server side, the command will set up a docker image containing the Lean s
 
 Providing the use access to a Lean instance running on the server is a severe security risk. That is why we start the Lean server in a Docker container
 secured by [gVisor](https://gvisor.dev/).
+
+
+## Detailed installation notes
+
+### Node.js
+
+Developed using `node v18.12.1 (npm v8.19.2)`.
+
+Install `nvm`
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+```
+then reopen bash and test with `command -v nvm` if it is available (Should print "nvm").
+
+Now install node:
+```
+nvm install node --lts
+```
