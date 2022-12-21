@@ -141,8 +141,12 @@ function Level() {
   }, [worldId])
 
   useEffect(() => {
-    setSubtitle(`Level ${levelId}: ${level?.data?.title}`)
-  }, [level?.data?.title])
+    if (level?.data?.title) {
+      setSubtitle(`Level ${levelId}: ${level?.data?.title}`)
+    } else {
+      setSubtitle(`Level ${levelId}`)
+    }
+  }, [levelId, level?.data?.title])
 
   return <>
     <Box style={level.isLoading ? null : {display: "none"}} display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
