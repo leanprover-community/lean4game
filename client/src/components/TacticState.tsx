@@ -6,7 +6,7 @@ import '@fontsource/roboto/700.css';
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import { Paper, Box, Typography, Alert, FormControlLabel, FormGroup, Switch, Collapse } from '@mui/material';
+import { Paper, Box, Typography, Alert, FormControlLabel, FormGroup, Switch, Collapse, CircularProgress } from '@mui/material';
 import { Accordion, AccordionSummary, AccordionDetails, Divider } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -97,6 +97,7 @@ function OtherGoal({ goal }) {
 }
 
 function TacticState({ goals, diagnostics, completed, globalDiagnostics }) {
+  const isLoading = goals === null
   const hasGoal = goals !== null && goals.length > 0
   const hasManyGoal = hasGoal && goals.length > 1
 
@@ -116,7 +117,8 @@ function TacticState({ goals, diagnostics, completed, globalDiagnostics }) {
           </Typography>
           <Goal goal={goals[0]} />
         </Paper>}
-      {!(hasGoal || completed) &&
+      {isLoading && <CircularProgress />}
+      {!(hasGoal || completed || isLoading) &&
         <Typography variant="h6">
           No goals
           (at <FontAwesomeIcon icon={faArrowPointer}></FontAwesomeIcon>)
