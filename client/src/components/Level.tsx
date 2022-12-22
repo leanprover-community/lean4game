@@ -14,7 +14,6 @@ import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/Ab
 import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
 import { InfoProvider } from 'lean4web/client/src/editor/infoview';
 import 'lean4web/client/src/editor/infoview.css'
-import { renderInfoview } from '@leanprover/infoview'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import './level.css'
 import { ConnectionContext, useLeanClient } from '../connection';
@@ -177,7 +176,7 @@ function Level() {
           <Button disabled={levelId <= 1} component={RouterLink} to={`/world/${worldId}/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
           <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
 
-          <Infoview key={worldId + "/Level" + levelId} leanClient={connection.getLeanClient()} editor={editor} editorApi={infoProvider?.getApi()} />
+          <Infoview key={worldId + "/Level" + levelId} editor={editor} editorApi={infoProvider?.getApi()} />
         </Grid>
       </Grid>
     </Box>
@@ -214,7 +213,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
     })
 
     const infoProvider = new InfoProvider(connection.getLeanClient())
-console.log()
+
     setEditor(editor)
     setInfoProvider(infoProvider)
 

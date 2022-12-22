@@ -19,3 +19,8 @@ code {
 .AppBar {
   flex: 0;
 }
+
+/* Hide monaco editor notifications */
+.monaco-workbench > .notifications-toasts.visible {
+  display: none !important;
+}

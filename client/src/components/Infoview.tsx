@@ -5,13 +5,14 @@ import { LeanClient } from 'lean4web/client/src/editor/leanclient';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import * as ls from 'vscode-languageserver-protocol'
 import TacticState from './TacticState';
+import { useLeanClient } from '../connection';
 
 // TODO: move into Lean 4 web
 function toLanguageServerPosition (pos: monaco.Position): ls.Position {
   return {line : pos.lineNumber - 1, character: pos.column - 1}
 }
 
-function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.IStandaloneCodeEditor, editorApi: EditorApi, leanClient: LeanClient}) {
+function Infoview({ editor, editorApi } : {editor: monaco.editor.IStandaloneCodeEditor, editorApi: EditorApi}) {
   const [rpcSession, setRpcSession] = useState<string>()
   const [goals, setGoals] = useState<any[]>(null)
   const [completed, setCompleted] = useState<boolean>(false)
@@ -24,10 +25,11 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
   isn't complete. */
   const [globalDiagnostics, setGlobalDiagnostics] = useState<any[]>(undefined)
 
-  const [uri, setUri] = useState<string>()
+  const {uri} = useEditorUri(editor)
+  const {leanClient, leanClientStarted} = useLeanClient()
 
   const fetchInteractiveGoals = () => {
-    if (editor && rpcSession) {
+    if (editor && rpcSession && editor.getPosition()) {
       const pos = toLanguageServerPosition(editor.getPosition())
 
       leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getGoals",
@@ -62,7 +64,7 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
   }
 
   const checkCompleted = () => {
-    if (editor && rpcSession) {
+    if (editor && rpcSession && editor.getPosition()) {
       const pos = toLanguageServerPosition(editor.getPosition())
       // Get all diagnostics independent of cursor position
       leanClient.sendRequest("$/lean/rpc/call", {"method":"Game.getDiagnostics",
@@ -84,19 +86,19 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
     if (editor) {
       fetchInteractiveGoals()
       checkCompleted()
-      const t = editor.onDidChangeModel((ev) => {
-        if (ev.newModelUrl) {
-          editorApi.closeRpcSession(rpcSession)
-          setRpcSession(undefined)
-          setUri(ev.newModelUrl.toString())
-          editorApi.createRpcSession(ev.newModelUrl.toString()).then((rpcSession) => {
-            setRpcSession(rpcSession)
-          })
-        }
-      })
-      return () => {t.dispose()}
     }
-  }, [editor, rpcSession]);
+  }, [editor, uri, rpcSession]);
+
+  useEffect(() => {
+    if (editorApi && leanClientStarted && uri) {
+      editorApi.closeRpcSession(rpcSession)
+      setRpcSession(undefined)
+      console.log(uri)
+      editorApi.createRpcSession(uri).then((rpcSession) => {
+        setRpcSession(rpcSession)
+      })
+    }
+  }, [editorApi, uri]);
 
   useEffect(() => {
     if (editor) {
@@ -122,3 +124,22 @@ function Infoview({ editor, editorApi, leanClient } : {editor: monaco.editor.ISt
 }
 
 export default Infoview
+
+const useEditorUri = (editor: monaco.editor.IStandaloneCodeEditor) => {
+  const [uri, setUri] = useState<string>(undefined)
+
+  useEffect(() => {
+    if (editor) {
+      const t = editor.onDidChangeModel((ev) => {
+        if (ev.newModelUrl) {
+          setUri(ev.newModelUrl.toString())
+        } else {
+          setUri(undefined)
+        }
+      })
+      return () => {t.dispose()}
+    }
+  }, [editor])
+
+  return {uri}
+}

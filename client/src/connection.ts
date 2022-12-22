@@ -44,7 +44,13 @@ export const ConnectionContext = React.createContext(null);
 export const useLeanClient = () => {
   const leanClient = connection.getLeanClient()
   const [leanClientStarted, setLeanClientStarted] = useState(leanClient.isStarted())
-  leanClient.restarted(() => { setLeanClientStarted(true) })
-  // TODO handle stopping lean client
+
+  React.useEffect(() => {
+    const t1 = leanClient.restarted(() => { console.log("START"); setLeanClientStarted(true) })
+    const t2 = leanClient.stopped(() => { console.log("STOP"); setLeanClientStarted(false) })
+
+    return () => {t1.dispose(); t2.dispose()}
+  }, [leanClient, setLeanClientStarted])
+
   return {leanClientStarted, leanClient}
 }
