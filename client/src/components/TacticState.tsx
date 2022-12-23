@@ -33,15 +33,15 @@ function Goal({ goal }) {
     <Box sx={{ pl: 2 }}>
       {hasObject && <Box><Typography>Objects</Typography>
         <List>
-          {goal.objects.map((item) =>
-            <ListItem key={item.userName}>
+          {goal.objects.map((item, index) =>
+            <ListItem key={index}>
               <Typography color="primary" sx={{ mr: 1 }}>{item.userName}</Typography> :
               <Typography color="secondary" sx={{ ml: 1 }}>{item.type}</Typography>
             </ListItem>)}
         </List></Box>}
       {hasAssumption && <Box><Typography>Assumptions</Typography>
         <List>
-          {goal.assumptions.map((item) => <ListItem key={item}><Typography color="primary" sx={{ mr: 1 }}>{item.userName}</Typography> :
+          {goal.assumptions.map((item, index) => <ListItem key={index}><Typography color="primary" sx={{ mr: 1 }}>{item.userName}</Typography> :
             <Typography color="secondary" sx={{ ml: 1 }}>{item.type}</Typography></ListItem>)}
         </List></Box>}
       <Typography>Prove:</Typography>
@@ -52,7 +52,7 @@ function Goal({ goal }) {
           control={<Switch checked={showHints} onChange={handleHintsChange} />}
           label="More Help?"
         />}
-        {hints.map((hint) => <Collapse in={showHints}><Alert severity="info" sx={{ mt: 1 }}><Markdown>{hint.message}</Markdown></Alert></Collapse>)}
+        {hints.map((hint, index) => <Collapse key={index} in={showHints}><Alert severity="info" sx={{ mt: 1 }}><Markdown>{hint.message}</Markdown></Alert></Collapse>)}
     </Box>)
 }
 
@@ -72,8 +72,8 @@ function OtherGoal({ goal }) {
           <Box>
             <Typography>Objects</Typography>
             <List>
-              {goal.objects.map((item) =>
-                <ListItem key={item.userName}>
+              {goal.objects.map((item, index) =>
+                <ListItem key={index}>
                   <Typography color="primary" sx={{ mr: 1 }}>{item.userName}</Typography> :
                   <Typography color="secondary" sx={{ ml: 1 }}>{item.type}</Typography>
                 </ListItem>)}
@@ -83,8 +83,8 @@ function OtherGoal({ goal }) {
           <Box>
             <Typography>Assumptions</Typography>
             <List>
-              {goal.assumptions.map((item) =>
-                <ListItem key={item}>
+              {goal.assumptions.map((item, index) =>
+                <ListItem key={index}>
                   <Typography color="primary" sx={{ mr: 1 }}>{item.userName}</Typography> :
                   <Typography color="secondary" sx={{ ml: 1 }}>{item.type}</Typography>
                 </ListItem>)}
@@ -126,8 +126,8 @@ function TacticState({ goals, diagnostics, completed, globalDiagnostics }) {
       {hasError &&
         <Paper sx={{ pt: 1, pl: 2, pr: 3, pb: 1, height: "100%" }}>
           <Typography variant="h5" sx={{ mb: 2 }}>Lean says</Typography>
-          {diagnostics.map(({severity, message}) =>
-            <Alert severity={{1: "error", 2:"warning", 3:"info", 4:"success"}[severity]} sx={{ mt: 1 }}>{message}</Alert>
+          {diagnostics.map(({severity, message}, index) =>
+            <Alert key={index} severity={{1: "error", 2:"warning", 3:"info", 4:"success"}[severity]} sx={{ mt: 1 }}>{message}</Alert>
             // TODO: When does Lean give severity=4? Had colour `gray` before. Make custom theme for that
           )}
         </Paper>}

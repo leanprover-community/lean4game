@@ -33,16 +33,17 @@ function Welcome() {
   const svgElements = []
 
   if (gameInfo.data) {
-    for (let edge of gameInfo.data.worlds.edges) {
+    for (let i in gameInfo.data.worlds.edges) {
+      const edge = gameInfo.data.worlds.edges[i]
       svgElements.push(
-        <line x1={nodes[edge[0]].x} y1={nodes[edge[0]].y} x2={nodes[edge[1]].x} y2={nodes[edge[1]].y} stroke="#1976d2" strokeWidth="1"/>
+        <line key={`pathway${i}`} x1={nodes[edge[0]].x} y1={nodes[edge[0]].y} x2={nodes[edge[1]].x} y2={nodes[edge[1]].y} stroke="#1976d2" strokeWidth="1"/>
       )
     }
     for (let id in nodes) {
       let position: cytoscape.Position = nodes[id]
 
       svgElements.push(
-        <Link to={`/world/${id}/level/1`}>
+        <Link key={`world${id}`} to={`/world/${id}/level/1`}>
           <circle fill="#61DAFB" cx={position.x} cy={position.y} r="8" />
           <text style={{font: "italic 2px sans-serif",  textAnchor: "middle", dominantBaseline: "middle"} as any} x={position.x} y={position.y}>{id}</text>
         </Link>
@@ -50,7 +51,7 @@ function Welcome() {
 
       for (let i = 1; i <= gameInfo.data.worldSize[id]; i++) {
         svgElements.push(
-          <Link to={`/world/${id}/level/${i}`}>
+          <Link to={`/world/${id}/level/${i}`} key={`/world/${id}/level/${i}`}>
             <circle fill="#aaa" cx={position.x + Math.sin(i/5) * 9} cy={position.y - Math.cos(i/5) * 9} r="0.8" />
           </Link>
         )
@@ -109,9 +110,7 @@ function computeWorldLayout(worlds) {
   let nodes = {}
   cy.nodes().forEach((node, id) => {
     nodes[node.id()] = node.position()
-    console.log(node.position())
   })
   const bounds = cy.nodes().boundingBox()
-  console.log(bounds)
   return { nodes, bounds }
 }
