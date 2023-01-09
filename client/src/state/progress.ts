@@ -2,29 +2,66 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 interface ProgressState {
-  code: {[world: string]: {[level: number]: string}}
+  level: {[world: string]: {[level: number]: LevelProgressState}}
 }
 
-const initialState = { code: {} } as ProgressState
+interface LevelProgressState {
+  code: string,
+  completed: boolean
+}
+
+const initialProgressState = { level: {} } as ProgressState
+const initalLevelProgressState = {code: "", completed: false} as LevelProgressState
+
+function addLevelProgress(state, action: PayloadAction<{world: string, level: number}>) {
+  if (!state.level[action.payload.world]) {
+    state.level[action.payload.world] = {}
+  }
+  if (!state.level[action.payload.world][action.payload.level]) {
+    state.level[action.payload.world][action.payload.level] = {...initalLevelProgressState}
+  }
+}
 
 export const progressSlice = createSlice({
   name: 'progress',
-  initialState,
+  initialState: initialProgressState,
   reducers: {
     codeEdited(state, action: PayloadAction<{world: string, level: number, code: string}>) {
-      if (!state.code[action.payload.world]) {
-        state.code[action.payload.world] = {}
-      }
-      state.code[action.payload.world][action.payload.level] = action.payload.code
+      addLevelProgress(state, action)
+      state.level[action.payload.world][action.payload.level].code = action.payload.code
+      state.level[action.payload.world][action.payload.level].completed = false
+    },
+    levelCompleted(state, action: PayloadAction<{world: string, level: number}>) {
+      addLevelProgress(state, action)
+      state.level[action.payload.world][action.payload.level].completed = true
     },
   }
 })
 
-export function selectCode(world: string, level: number) {
-  return (state) => {
-    if (!state.progress.code[world]) { return undefined }
-    return state.progress.code[world][level];
+export function selectLevel(world: string, level: number) {
+  return (state) =>{
+    if (!state.progress.level[world]) { return initalLevelProgressState }
+    if (!state.progress.level[world][level]) { return initalLevelProgressState }
+    return state.progress.level[world][level]
   }
 }
 
-export const { codeEdited } = progressSlice.actions
+export function selectCode(world: string, level: number) {
+  return (state) => {
+    return selectLevel(world, level)(state).code
+  }
+}
+
+export function selectCompleted(world: string, level: number) {
+  return (state) => {
+    return selectLevel(world, level)(state).completed
+  }
+}
+
+export function selectProgress() {
+  return (state) => {
+    return state.progress
+  }
+}
+
+export const { codeEdited, levelCompleted } = progressSlice.actions

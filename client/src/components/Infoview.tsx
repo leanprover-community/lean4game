@@ -6,13 +6,16 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import * as ls from 'vscode-languageserver-protocol'
 import TacticState from './TacticState';
 import { useLeanClient } from '../connection';
+import { useAppDispatch } from '../hooks';
+import { levelCompleted, selectCompleted } from '../state/progress';
 
 // TODO: move into Lean 4 web
 function toLanguageServerPosition (pos: monaco.Position): ls.Position {
   return {line : pos.lineNumber - 1, character: pos.column - 1}
 }
 
-function Infoview({ editor, editorApi } : {editor: monaco.editor.IStandaloneCodeEditor, editorApi: EditorApi}) {
+function Infoview({ worldId, levelId, editor, editorApi } : {worldId: string, levelId: number, editor: monaco.editor.IStandaloneCodeEditor, editorApi: EditorApi}) {
+  const dispatch = useAppDispatch()
   const [rpcSession, setRpcSession] = useState<string>()
   const [goals, setGoals] = useState<any[]>(null)
   const [completed, setCompleted] = useState<boolean>(false)
@@ -74,7 +77,11 @@ function Infoview({ editor, editorApi } : {editor: monaco.editor.IStandaloneCode
         "position": pos
       }).then((res) => {
         // Check that there are no errors and no warnings
-        setCompleted(!res.some(({severity}) => severity <= 2))
+        const completed = !res.some(({severity}) => severity <= 2)
+        if (completed) {
+          dispatch(levelCompleted({world: worldId, level: levelId}))
+        }
+        setCompleted(completed)
         setGlobalDiagnostics(res)
       }).catch((err) => {
         console.error(err)

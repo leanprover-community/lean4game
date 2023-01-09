@@ -7,15 +7,27 @@ import '@fontsource/roboto/700.css';
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 
 cytoscape.use( klay );
 
-import { Box, Typography, Button, CircularProgress, Grid } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Grid, selectClasses } from '@mui/material';
 import { useGetGameInfoQuery } from '../state/api';
 import { Link } from 'react-router-dom';
 import Markdown from './Markdown';
+import { selectCompleted } from '../state/progress';
 
+
+function LevelIcon({ worldId, levelId, position }) {
+  const completed = useSelector(selectCompleted(worldId,levelId))
+  // TODO: relative positioning?
+  return (
+    <Link to={`/world/${worldId}/level/${levelId}`} key={`/world/${worldId}/level/${levelId}`}>
+      <circle fill={completed ? "green" :"#aaa"} cx={position.x + Math.sin(levelId/5) * 9} cy={position.y - Math.cos(levelId/5) * 9} r="0.8" />
+    </Link>
+  )
+}
 
 function Welcome() {
   const navigate = useNavigate();
@@ -51,9 +63,7 @@ function Welcome() {
 
       for (let i = 1; i <= gameInfo.data.worldSize[id]; i++) {
         svgElements.push(
-          <Link to={`/world/${id}/level/${i}`} key={`/world/${id}/level/${i}`}>
-            <circle fill="#aaa" cx={position.x + Math.sin(i/5) * 9} cy={position.y - Math.cos(i/5) * 9} r="0.8" />
-          </Link>
+          <LevelIcon position={position} worldId={id} levelId={i} />
         )
       }
     }
