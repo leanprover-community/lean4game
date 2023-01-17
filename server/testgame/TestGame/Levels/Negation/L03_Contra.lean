@@ -8,8 +8,8 @@ import Mathlib.Tactic.Ring
 import TestGame.ToBePorted
 
 Game "TestGame"
-World "Contradiction"
-Level 3
+World "Proving"
+Level 1
 
 Title "Ad absurdum"
 

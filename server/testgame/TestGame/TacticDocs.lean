@@ -124,6 +124,13 @@ TacticDoc simp
 TODO
 "
 
+TacticDoc trivial
+"
+## Beschreibung
+
+TODO
+"
+
 TacticDoc contradiction
 "
 ## Beschreibung

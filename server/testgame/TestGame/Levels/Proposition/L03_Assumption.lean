@@ -2,10 +2,10 @@ import TestGame.Metadata
 import Mathlib.Data.Nat.Basic -- TODO
 
 Game "TestGame"
-World "Logic"
-Level 4
+World "Proposition"
+Level 3
 
-Title "Logische Aussagen: `Prop`"
+Title "Logische Aussagen"
 
 Introduction
 "
@@ -16,7 +16,7 @@ Mit einer Annahme `(hA : A)` nimmt man an, dass $A$ wahr ist:
 `hA` ist sozusagen ein Beweis von $A$.
 "
 
-Statement mehr_triviales
+Statement
     "Sei $A$ eine logische Aussage und sei `hA` ein Beweis für $A$.
     Zeige, dass $A$ wahr ist."
     (A : Prop) (hA : A) : A := by

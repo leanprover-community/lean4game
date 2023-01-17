@@ -1,7 +1,7 @@
 import TestGame.Metadata
 
 Game "TestGame"
-World "Logic"
+World "Proposition"
 Level 1
 
 Title "Aller Anfang ist... ein Einzeiler?"
@@ -20,7 +20,7 @@ man auf Papier argumentieren würde. Manche Taktiken können ganz konkret etwas 
 andere sind stark und lösen ganze Probleme automatisiert. Du findest die Taktiken *Links* an der
 Seite.
 
-Wenn der Beweis komplett ist, erscheint \"Level Completed! 🎉\".
+Wenn der Beweis komplett ist, erscheint \"Level completed! 🎉\".
 
 Deine erste Taktik ist `rfl`, welche dazu da ist, ein Goal der Form $X = X$ zu schliessen.
 Gib die Taktik ein gefolgt von Enter ⏎.

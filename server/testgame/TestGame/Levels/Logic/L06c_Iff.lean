@@ -3,8 +3,8 @@ import TestGame.Metadata
 set_option tactic.hygienic false
 
 Game "TestGame"
-World "Logic"
-Level 12
+World "Implication"
+Level 7
 
 Title "Genau dann wenn"
 
@@ -19,7 +19,7 @@ Dazu gibt es zwei Methoden:
 1.) `h.mp` (oder `h.1`) und `h.mpr` (oder `h.2`) sind direkt die einzelnen Richtungen.
 Man kann also z.B. mit `apply h.mp` die Implikation `A → B` auf ein Goal `B` anwenden.
 
-(PS: das `.mp` kommt von \"Modus Ponens\".)
+(PS: das `.mp` kommt von \"Modus Ponens\", ein Ausdruck as der Logik.)
 "
 
 Statement

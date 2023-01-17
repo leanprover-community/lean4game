@@ -4,7 +4,7 @@ import Mathlib.Tactic.Ring
 --set_option tactic.hygienic false
 
 Game "TestGame"
-World "Nat"
+World "Predicate"
 Level 1
 
 Title "Natürliche Zahlen"

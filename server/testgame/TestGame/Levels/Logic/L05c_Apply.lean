@@ -3,8 +3,8 @@ import TestGame.Metadata
 set_option tactic.hygienic false
 
 Game "TestGame"
-World "Logic"
-Level 9
+World "Implication"
+Level 1
 
 Title "Implikation"
 

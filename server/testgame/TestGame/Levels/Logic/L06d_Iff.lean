@@ -3,8 +3,8 @@ import Std.Tactic.RCases
 import Mathlib.Tactic.Cases
 
 Game "TestGame"
-World "Logic"
-Level 13
+World "Implication"
+Level 8
 
 Title "Genau dann wenn"
 

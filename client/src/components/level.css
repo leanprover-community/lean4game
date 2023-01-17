@@ -76,6 +76,11 @@ p, table {
   margin-inline-end: 0px;
 }
 
+/* Prevent white spaces break inside a table. */
+td code  {
+  white-space:nowrap;
+}
+
 /***************************************/
 /* TODO: For development purposes only */
 /***************************************/

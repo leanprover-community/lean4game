@@ -2,8 +2,8 @@ import TestGame.Metadata
 import Mathlib
 
 Game "TestGame"
-World "Logic"
-Level 5
+World "Predicate"
+Level 3
 
 Title "Rewrite"
 

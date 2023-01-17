@@ -5,7 +5,7 @@ import Mathlib
 import TestGame.ToBePorted
 
 Game "TestGame"
-World "Contradiction"
+World "Predicate"
 Level 9
 
 Title "PushNeg"

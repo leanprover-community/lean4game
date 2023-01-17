@@ -7,8 +7,8 @@ import Mathlib.Tactic.Ring
 import TestGame.ToBePorted
 
 Game "TestGame"
-World "Nat"
-Level 3
+World "Predicate"
+Level 7
 
 Title "Gerade/Ungerade"
 

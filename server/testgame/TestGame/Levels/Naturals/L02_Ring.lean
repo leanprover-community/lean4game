@@ -2,8 +2,8 @@ import TestGame.Metadata
 import Mathlib.Tactic.Ring
 
 Game "TestGame"
-World "Nat"
-Level 2
+World "Predicate"
+Level 5
 
 Title "Natürliche Zahlen"
 

@@ -1,11 +1,11 @@
 import TestGame.Metadata
 
 import Init.Data.ToString
-#check List UInt8
+-- #check List UInt8
 
 Game "TestGame"
-World "Logic"
-Level 10
+World "Implication"
+Level 6
 
 Title "Genau dann wenn"
 

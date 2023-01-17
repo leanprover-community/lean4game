@@ -3,10 +3,10 @@ import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 
 Game "TestGame"
-World "Contradiction"
-Level 4
+World "Predicate"
+Level 2
 
-Title "Ad absurdum"
+Title "Widerspruch"
 
 Introduction
 "

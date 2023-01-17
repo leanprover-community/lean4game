@@ -1,14 +1,15 @@
 import TestGame.Metadata
 
 Game "TestGame"
-World "Logic"
-Level 3
+World "Proposition"
+Level 2
 
 Title "Annahmen"
 
 Introduction
 "
-Um Aussagen zu formulieren brauchen wir Annahmen. Das sind zum einen Objekte, wie \"sei $n$ eine
+Um Aussagen zu formulieren brauchen wir *Annahmen* (Assumptions). Das sind
+zum einen Objekte, wie \"sei $n$ eine
 natürliche Zahl\", und Annahmen über diese Objekte, von denen wir wissen, dass sie wahr sind.
 Zum Beispiel
 \"und angenommen, dass $n$ strikt grösser als $1$ ist\".
@@ -20,7 +21,7 @@ zuerst eine natürliche Zahl $n$ und eine Annahme dass $1 < n$ gilt
 Wenn das Goal genau einer Annahme entspricht, kann man diese mit `assumption` beweisen.
 "
 
-Statement triviale_angelegenheit
+Statement
     "Angenommen $1 < n$. dann ist $1 < n$."
     (n : ℕ) (h : 1 < n) : 1 < n := by
   assumption

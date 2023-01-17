@@ -2,8 +2,8 @@ import TestGame.Metadata
 import Mathlib
 
 Game "TestGame"
-World "Contradiction"
-Level 5
+World "Implication"
+Level 20
 
 Title "Nicht-nicht"
 

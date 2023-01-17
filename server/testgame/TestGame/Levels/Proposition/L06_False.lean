@@ -3,22 +3,18 @@ import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 
 Game "TestGame"
-World "Contradiction"
-Level 1
+World "Proposition"
+Level 6
 
 Title "Widerspruch beweist alles."
 
 Introduction
 "
-Ein wichtiges Konzept ist die Verneinung und damit einhergehend die Kontraposition
-und der Widerspruch (Kontradiktion).
+Die Aussage `False` ist für uns wichtiger als `True`, da ein Beweis der falschen Aussage
+`False` einen Widerspruch repräsentiert.
+Hat man einen Widerspruch, kann man daraus mit der Taktik `contradiction` alles beweisen.
 
-Als allererstes der Widerspruch.
-
-Wenn man in den Annahmen einen Widerspruch hat, kann man mit `contradiction` den Beweis
-schliessen, denn ein Widerspruch beweist alles.
-
-Der einfachste Widerspruch ist wenn man einen Beweis von `False` hat:
+Der erste Widerspruch, den `contradiction` erkennt, ist ein Beweis von `False`.
 "
 
 Statement

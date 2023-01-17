@@ -7,8 +7,8 @@ import Mathlib.Tactic.Ring
 import TestGame.ToBePorted
 
 Game "TestGame"
-World "Contradiction"
-Level 8
+World "Implication"
+Level 2
 
 Title "Kontraposition"
 

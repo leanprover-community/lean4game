@@ -1,8 +1,8 @@
 import TestGame.Metadata
 
 Game "TestGame"
-World "Logic"
-Level 8
+World "Implication"
+Level 4
 
 Title "Implikation"
 

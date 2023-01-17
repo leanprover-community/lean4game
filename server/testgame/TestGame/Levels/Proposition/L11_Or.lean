@@ -5,8 +5,8 @@ import Mathlib.Tactic.LeftRight
 --set_option tactic.hygienic false
 
 Game "TestGame"
-World "Logic"
-Level 15
+World "Proposition"
+Level 11
 
 Title "Oder"
 
@@ -14,7 +14,7 @@ Introduction
 "
 Das logische ODER `A ∨ B` (`\\or`) funktioniert ein wenig anders als das UND.
 
-Wenn das Goal ein `∨` ist kann man mit `left` oder `right` entscheiden,
+Wenn das Goal ein `∨` ist kann man mit den Taktiken `left` oder `right` entscheiden,
 welche Seite man beweisen möchte.
 "
 

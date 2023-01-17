@@ -1,8 +1,8 @@
 import TestGame.Metadata
 
 Game "TestGame"
-World "Logic"
-Level 11
+World "Implication"
+Level 5
 
 Title "Genau dann wenn"
 

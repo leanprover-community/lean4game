@@ -5,8 +5,8 @@ import Mathlib.Tactic.LeftRight
 set_option tactic.hygienic false
 
 Game "TestGame"
-World "Logic"
-Level 17
+World "Implication"
+Level 9
 
 Title "Oder"
 
@@ -15,10 +15,10 @@ Introduction
 Übung macht den Meister... Benutze alle vier Methoden mit UND und ODER
 umzugehen um folgende Aussage zu beweisen.
 
-|         | Und           | Oder           |
-|---------|:--------------|:---------------|
-| Annahme | `rcases h`    | `rcases h`     |
-| Goal    | `constructor` | `left`/`right` |
+|         | Und                      | Oder                      |
+|---------|:-------------------------|:--------------------------|
+| Annahme | `rcases h with ⟨h₁, h₂⟩` | `rcases h with h₁ \\| h₂` |
+| Goal    | `constructor`            | `left`/`right`            |
 "
 
 Statement and_or_imp
