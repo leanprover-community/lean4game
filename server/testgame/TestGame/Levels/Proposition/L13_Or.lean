@@ -23,7 +23,7 @@ umzugehen um folgende Aussage zu beweisen.
 
 -- Note: The other direction would need arguing by cases.
 
-Statement or_and_left
+Statement
     "Angenommen $A \\lor (B \\land C)$ ist wahr, zeige dass
     $(A \\lor B) \\land (A \\lor C)$ wahr ist."
     (A B C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) := by
