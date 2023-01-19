@@ -4,14 +4,14 @@ set_option tactic.hygienic false
 
 Game "TestGame"
 World "Implication"
-Level 1
+Level 4
 
 Title "Implikation"
 
 Introduction
 "
-Wenn das Goal eine Implikation $A \\Rightarrow B$ ist, kann man mit
-`intro hA` annehmen, dass $A$ wahr ist. Dann muss man $B$ beweisen.
+Hier eine Übung zu Implikationen.
+Fast immer ist es der richtige Weg, wenn du mit `intro` anfängst.
 "
 
 Statement
@@ -22,7 +22,7 @@ Statement
   apply f
   assumption
 
-Message (A : Prop) (B : Prop) (C : Prop) (f : A → B) (g : B → C) : A → C =>
+Hint (A : Prop) (B : Prop) (C : Prop) (f : A → B) (g : B → C) : A → C =>
 "Mit `intro hA` kann man annehmen, dass $A$ wahr ist. danach muss man $B$ zeigen."
 
 Message (A : Prop) (B : Prop) (C : Prop) (hA : A) (f : A → B) (g : B → C) : C =>
@@ -32,4 +32,4 @@ Hint (A : Prop) (B : Prop) (C : Prop) (hA : A) (f : A → B) (g : B → C) : C =
 "Du willst $C$ beweisen. Suche also nach einer Implikation $\\ldots \\Rightarrow C$ und wende
 diese mit `apply` an."
 
-Tactics intro apply assumption
+Tactics intro apply assumption revert

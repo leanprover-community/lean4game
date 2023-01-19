@@ -8,7 +8,7 @@ import TestGame.ToBePorted
 
 Game "TestGame"
 World "Implication"
-Level 2
+Level 102
 
 Title "Kontraposition"
 

@@ -18,12 +18,12 @@ Der erste Widerspruch, den `contradiction` erkennt, ist ein Beweis von `False`.
 "
 
 Statement
-    "Sei $A$ eine Aussage und angenommen man hat einen Beweis für `False`.
-    Zeige, dass daraus $A$ folgt."
+"Sei $A$ eine Aussage und angenommen man hat einen Beweis für `False`.
+Zeige, dass daraus $A$ folgt."
     (A : Prop) (h : False) : A := by
   contradiction
 
-Message (A : Prop) (h : False) : A =>
+Hint (A : Prop) (h : False) : A =>
 "Wenn man einen Beweis von `False` hat, kann man mit `contradiction` das Goal beweisen,
 unabhängig davon, was das Goal ist."
 

@@ -1,32 +1,8 @@
 import TestGame.Metadata
-import TestGame.Levels.Logic.L02_Rfl
-import TestGame.Levels.Logic.L04_Rewrite
-import TestGame.Levels.Logic.L04b_Rewrite
-import TestGame.Levels.Logic.L05_Apply
-import TestGame.Levels.Logic.L05b_Apply
-import TestGame.Levels.Logic.L05c_Apply
-import TestGame.Levels.Logic.L06_Iff
-import TestGame.Levels.Logic.L06b_Iff
-import TestGame.Levels.Logic.L06c_Iff
-import TestGame.Levels.Logic.L06d_Iff
-import TestGame.Levels.Naturals.L01_Ring
-import TestGame.Levels.Naturals.L02_Ring
-import TestGame.Levels.Naturals.L03_Exists
-import TestGame.Levels.Naturals.L04_Forall
-import TestGame.Levels.Naturals.L31_Sum
-import TestGame.Levels.Naturals.L32_Induction
-import TestGame.Levels.Naturals.L33_Prime
-import TestGame.Levels.Naturals.L34_ExistsUnique
-import TestGame.Levels.Negation.L03_Contra
-import TestGame.Levels.Negation.L04_Contra
-import TestGame.Levels.Negation.L05_Not
-import TestGame.Levels.Negation.L06_ByContra
-import TestGame.Levels.Negation.L07_Contrapose
-import TestGame.Levels.Negation.L08_Contrapose
-import TestGame.Levels.Negation.L09_PushNeg
 
 import TestGame.Levels.Proposition
-
+import TestGame.Levels.Implication
+import TestGame.Levels.Predicate
 
 
 Game "TestGame"

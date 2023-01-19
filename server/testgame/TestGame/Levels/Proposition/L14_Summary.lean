@@ -37,34 +37,30 @@ eingeführt wurden.
 | `(ha : A)`    | Ein Beweis, dass die logische Aussage `(A : Prop)` wahr ist.             |
 | `(h : A ∧ B)` | Eine Annahme, die den Namen `h` bekommen hat.                            |
 | `⟨·,·⟩`       | Schreibweise für Struktur mit mehreren Feldern (kommt später im Detail). |
+| `h.1, h.2, …` | Die einzelnen Felder der Stuktur. Auch `h.[Name des Feldes]`             |
 
-Im weiteren haben wir gesehen, wie wir in Lean Aufgaben/Sätze formulieren :
+
+Im weiteren haben wir gesehen, wie wir in Lean Aufgaben formulieren :
 
 ```
 example [Annahmen] : [Aussage] := by
   [Beweis]
-
-lemma [Name] [Annahmen] : [Aussage] := by
-  [Beweis]
 ```
-
-Der Unterschied ist lediglich, dass Lemmas einen Namen haben und darum später
-wiederverwendet werden können (siehe spätere Kapitel). \"Examples\" kriegen keinen Namen.
 
 ## Taktiken
 
 Für die Beweise haben wir verschiedene Taktiken kennengelernt.
 
-|   | Taktik                    | Beispiel                                          |
-|:--|:--------------------------|:--------------------------------------------------|
-| 1 | `rfl`                     | Beweist `A = A`.                                  |
-| 2 | `assumption`              | Sucht das Goal in den Annahmen.                   |
-| 3 | `contradiction`           | Sucht einen Widerspruch.                          |
-| 4 | `trivial`                 | Kombiniert die obigen drei Taktiken (und mehr).   |
-| 5 | `constructor`             | Teilt ein UND im Goal auf.                        |
-| 6 | `left`/`right`            | Beweist eine Seite eines ODER im Goal.            |
-| 7ᵃ | `rcases h with ⟨h₁, h₂⟩` | Teilt ein UND in den Annahmen auf.                |
-| 7ᵇ | `rcases h with h \\| h`  | Teilt ein ODER in den Annahmen in zwei Fälle auf. |
+|    | Taktik                    | Beispiel                                          |
+|:---|:--------------------------|:--------------------------------------------------|
+| 1  | `rfl`                     | Beweist `A = A`.                                  |
+| 2  | `assumption`              | Sucht das Goal in den Annahmen.                   |
+| 3  | `contradiction`           | Sucht einen Widerspruch.                          |
+| 4  | `trivial`                 | Kombiniert die obigen drei Taktiken (und mehr).   |
+| 5  | `constructor`             | Teilt ein UND im Goal auf.                        |
+| 6  | `left`/`right`            | Beweist eine Seite eines ODER im Goal.            |
+| 7ᵃ | `rcases h with ⟨h₁, h₂⟩`  | Teilt ein UND in den Annahmen auf.                |
+| 7ᵇ | `rcases h with h \\| h`   | Teilt ein ODER in den Annahmen in zwei Fälle auf. |
 
 
 Zum Schluss gibt es noch eine kleine Übungsaufgabe:

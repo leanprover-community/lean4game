@@ -19,7 +19,7 @@ welche Seite man beweisen möchte.
 "
 
 Statement
-    "Angenommen $A$ ist wahr, zeige $A \\lor (\\neg B))$."
+"Angenommen $A$ ist wahr, zeige $A \\lor (\\neg B))$."
     (A B : Prop) (hA : A) : A ∨ (¬ B) := by
   left
   assumption

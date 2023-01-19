@@ -17,8 +17,8 @@ Mit einer Annahme `(hA : A)` nimmt man an, dass $A$ wahr ist:
 "
 
 Statement
-    "Sei $A$ eine logische Aussage und sei `hA` ein Beweis für $A$.
-    Zeige, dass $A$ wahr ist."
+"Sei $A$ eine logische Aussage und sei `hA` ein Beweis für $A$.
+Zeige, dass $A$ wahr ist."
     (A : Prop) (hA : A) : A := by
   assumption
 

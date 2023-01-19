@@ -26,7 +26,7 @@ Statement "" (A B : Prop) (hA : A) (hB : B) : A ∧ B := by
   assumption
   assumption
 
-Message (A : Prop) (B : Prop) (hA : A) (hB : B) : A ∧ B =>
+Hint (A : Prop) (B : Prop) (hA : A) (hB : B) : A ∧ B =>
   "`constructor` zerlegt die Struktur in Einzelteile."
 
 Hint (A : Prop) (hA : A) : A =>

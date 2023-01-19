@@ -1,5 +1,48 @@
 import GameServer.Commands
--- import TestGame.MyNat
+
+-- Wird im Level "Implication 11" ohne Beweis angenommen.
+LemmaDoc not_not as not_not in "Logic"
+"
+### Aussage
+
+`¬¬A ↔ A`
+
+### Annahmen
+
+`(A : Prop)`
+"
+
+-- Wird im Level "Implication 10" ohne Beweis angenommen.
+LemmaDoc not_or_of_imp as not_or_of_imp in "Logic"
+"
+### Aussage
+
+`¬A ∨ B`
+
+### Annahmen
+
+`(A B : Prop)`\\
+`(h : A → B)`
+"
+
+-- Wird im Level "Implication 12" bewiesen.
+LemmaDoc imp_iff_not_or as imp_iff_not_or in "Logic"
+"
+### Aussage
+
+`(A → B) ↔ ¬A ∨ B`
+
+### Annahmen
+
+`(A B : Prop)`
+"
+
+
+
+
+
+
+
 
 LemmaDoc zero_add as zero_add in "Addition"
 "This lemma says `∀ a : ℕ, 0 + a = a`."
@@ -12,9 +55,6 @@ LemmaDoc add_succ as add_succ in "Addition"
 
 LemmaSet addition : "Addition lemmas" :=
 zero_add add_zero
-
-LemmaDoc not_not as not_not in "Logic"
-"`∀ (A : Prop), ¬¬A ↔ A`."
 
 LemmaDoc not_forall as not_forall in "Logic"
 "`∀ (A : Prop), ¬(∀ x, A) ↔ ∃x, (¬A)`."

@@ -26,7 +26,9 @@ Wir können `True` aus dem nichts mit der Taktik `trivial` beweisen.
 aber manchmal ist sie nützlich.*
 "
 
-Statement "" : True := by
+Statement
+"Zeige, dass die logische Aussage `True` immer wahr ist." :
+True := by
   trivial
 
 Conclusion ""

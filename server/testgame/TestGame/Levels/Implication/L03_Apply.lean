@@ -5,21 +5,18 @@ Game "TestGame"
 World "Implication"
 Level 3
 
-Title "Implikation"
+Title "Apply"
 
 Introduction
-"Als nächstes widmen wir uns der Implikation $A \\Rightarrow B$.
-Mit zwei logischen Aussagen `(A : Prop) (B : Prop)` schreibt man eine Implikation
-als `A → B` (`\\to`).
+"
+`revert` ist aber nur selten der richtige Weg.
 
-Wenn man als Goal $B$ beweisen möchte und eine Impikation `(g : A → B)`
-hat, kann man mit `apply g` diese
-anwenden, worauf das zu beweisende Goal $A$ wird. Auf Papier würde man an der Stelle
-folgendes zu schreiben: \"Es genügt $A$ zu zeigen, denn $A \\Rightarrow B$\".
+Im vorigen Beispiel würde man besser die Implikation $A \\Rightarrow B$ *anwenden*, also
+sagen \"Es genügt $A$ zu zeigen, denn $A \\Rightarrow B$\" und danach $A$ beweisen.
 
-*Bemerke:* Das ist der selbe Pfeil, der später auch für Funktionen wie `ℕ → ℕ` gebraucht
-wird, deshalb heisst er `\\to`."
-
+Wenn man eine Implikation `(g : A → B)` in den Annahmen hat, bei welcher die Konsequenz
+(also $B$) mit dem Goal übereinstimmt, kann man `apply g` genau dies machen.
+"
 
 Statement
     "Seien $A, B$ logische Aussagen, wobei $A$ wahr ist und $A \\Rightarrow B$.

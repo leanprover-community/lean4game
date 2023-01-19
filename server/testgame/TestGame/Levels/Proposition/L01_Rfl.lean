@@ -22,15 +22,17 @@ Seite.
 
 Wenn der Beweis komplett ist, erscheint \"Level completed! 🎉\".
 
-Deine erste Taktik ist `rfl`, welche dazu da ist, ein Goal der Form $X = X$ zu schliessen.
+Deine erste Taktik ist `rfl` (für \"reflexivity\"), welche dazu da ist,
+ein Goal der Form $X = X$ zu schliessen.
 Gib die Taktik ein gefolgt von Enter ⏎.
 "
 
-Statement "Zeige $ 42 = 42 $." : 42 = 42 := by
+Statement
+"Zeige $ 42 = 42 $." : 42 = 42 := by
   rfl
 
-Message : 42 = 42 =>
-"Die Taktik `rfl` beweist ein Goal der Form `X = X`."
+-- Message : 42 = 42 =>
+-- "Die Taktik `rfl` beweist ein Goal der Form `X = X`."
 
 Hint : 42 = 42 =>
 "Man schreibt eine Taktik pro Zeile, also gib `rfl` ein und geh mit Enter ⏎ auf eine neue Zeile."

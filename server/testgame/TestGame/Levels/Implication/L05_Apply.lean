@@ -2,13 +2,13 @@ import TestGame.Metadata
 
 Game "TestGame"
 World "Implication"
-Level 4
+Level 5
 
 Title "Implikation"
 
 Introduction
 "
-Angenommen man hat folgende Implikationen
+Noch eine Übung: Angenommen man hat folgende Implikationen:
 $$
 \\begin{CD}
   A  @>{f}>> B       @<{g}<< C       \\\\
@@ -16,17 +16,22 @@ $$
   D  @>{i}>> E       @>{k}>> F
 \\end{CD}
 $$
-und weiss, dass Aussage $A$ wahr ist.
 "
 
 Statement
-    "Beweise Aussage $F$."
-    (A B C D E F : Prop) (hA : A) (f : A → B) (g : C → B) (h : B → E)
-     (i : D → E) (k : E → F) (m : C → F) : F := by
+    "Beweise $A \\Rightarrow F$."
+    (A B C D E F : Prop) (f : A → B) (g : C → B) (h : B → E)
+     (i : D → E) (k : E → F) (m : C → F) : A → F := by
+  intro ha
   apply k
   apply h
   apply f
   assumption
+
+Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
+    (f : A → B) (g : C → B) (h : B → E)
+    (i : D → E) (k : E → F) (m : C → F) : A → F =>
+"Wieder ist es schlau, mit `intro` anzufangen."
 
 Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (hA : A) (f : A → B) (g : C → B) (h : B → E)
@@ -43,6 +48,6 @@ Message (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (i : D → E) (k : E → F) (m : C → F) : D =>
 "Sackgasse. Probier doch einen anderen Weg."
 
-Tactics apply assumption
+Tactics apply assumption revert intro
 
 -- https://www.jmilne.org/not/Mamscd.pdf

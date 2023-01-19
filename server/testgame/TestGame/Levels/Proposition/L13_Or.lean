@@ -24,8 +24,8 @@ umzugehen um folgende Aussage zu beweisen.
 -- Note: The other direction would need arguing by cases.
 
 Statement
-    "Angenommen $A \\lor (B \\land C)$ ist wahr, zeige dass
-    $(A \\lor B) \\land (A \\lor C)$ wahr ist."
+"Angenommen $A \\lor (B \\land C)$ ist wahr, zeige dass
+$(A \\lor B) \\land (A \\lor C)$ wahr ist."
     (A B C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) := by
   constructor
   rcases h with h | h
@@ -41,26 +41,26 @@ Statement
   right
   assumption
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) ∧ (A ∨ C) =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) ∧ (A ∨ C) =>
 "Das `∧` in der Annahme kann mit `rcases h with ⟨h₁, h₂⟩` zerlegt werden."
 
-Message (A : Prop) (B : Prop) (C : Prop) : (A ∨ B) ∧ (A ∨ C) =>
+Hint (A : Prop) (B : Prop) (C : Prop) : (A ∨ B) ∧ (A ∨ C) =>
 "Das `∧` im Goal kann mit `constructor` zerlegt werden."
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) =>
 "Das `∨` in der Annahme kann mit `rcases h with h | h` zerlegt werden."
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) =>
 "Das `∨` in der Annahme kann mit `rcases h with h | h` zerlegt werden."
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ C) =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ C) =>
 "Das `∨` in der Annahme kann mit `rcases h with h | h` zerlegt werden."
 
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) =>
 "Das `∧` in der Annahme kann mit `rcases h with ⟨h₁, h₂⟩` zerlegt werden."
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ C) =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ C) =>
 "Das `∧` in der Annahme kann mit `rcases h with ⟨h₁, h₂⟩` zerlegt werden."
 
 -- TODO: Message nur Anhand der Annahmen?

@@ -14,7 +14,9 @@ geschrieben `¬A` (`\\not`), gegenteilig falsch oder wahr.
 Da die Aussage `False` nie wahr ist, ist die Aussage `¬False` immer wahr, genau wie `True`.
 "
 
-Statement "Zeige dass die Aussage `¬False` immer wahr ist." : ¬False := by
+Statement
+"Zeige dass die Aussage `¬False` immer wahr ist." :
+    ¬False := by
   trivial
 
 Conclusion ""

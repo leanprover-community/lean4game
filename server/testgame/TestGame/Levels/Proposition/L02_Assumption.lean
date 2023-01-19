@@ -22,12 +22,13 @@ Wenn das Goal genau einer Annahme entspricht, kann man diese mit `assumption` be
 "
 
 Statement
-    "Angenommen $1 < n$. dann ist $1 < n$."
+"Angenommen $1 < n$. dann ist $1 < n$."
     (n : ℕ) (h : 1 < n) : 1 < n := by
   assumption
 
-Message (n : ℕ) (h : 1 < n) : 1 < n =>
+Hint (n : ℕ) (h : 1 < n) : 1 < n =>
   "`assumption` sucht nach einer Annahme, die dem Goal entspricht."
+
 
 Conclusion ""
 

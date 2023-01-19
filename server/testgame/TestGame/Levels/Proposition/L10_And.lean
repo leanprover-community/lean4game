@@ -26,9 +26,9 @@ Statement "Benutze `rcases` um das UND in `(h : A ∧ (B ∧ C))` zu zerlegen un
   rcases h with ⟨_, ⟨g , _⟩⟩
   assumption
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∧ (B ∧ C)) : B =>
-  "Du kannst mit `rcases` auch verschachtelt mehrere Strukturen in einem Schritt zerlegen:
-  `rcases h with ⟨h₁, ⟨h₂ , h₃⟩⟩`."
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ (B ∧ C)) : B =>
+"Du kannst mit `rcases` auch verschachtelt mehrere Strukturen in einem Schritt zerlegen:
+`rcases h with ⟨h₁, ⟨h₂ , h₃⟩⟩`."
 
 Hint (A : Prop) (hA : A) : A =>
   "Du hast einen Beweis dafür in den *Annahmen*."

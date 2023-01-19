@@ -18,7 +18,7 @@ Zweitens kann `contradiction` auch aus Annahmen der Form `a ≠ a` einen Widersp
 "
 
 Statement
-    "Sei $n$ eine natürliche Zahl die ungleich sich selbst ist. Dann ist $n = 37$."
+"Sei $n$ eine natürliche Zahl die ungleich sich selbst ist. Dann ist $n = 37$."
     (n : ℕ) (h : n ≠ n) : n = 37 := by
   contradiction
 

@@ -11,11 +11,14 @@ Title "Natürliche Zahlen"
 
 Introduction
 "
-Wir sind den narürlichen Zahlen `ℕ` (`\\N`) schon begegnet. Dabei haben wir
-gesehen, dass explizite Gleichungen wie `2 + 3 * 5 = 17` implementationsbedingt
-bereits mit `rfl` bewiesen werden können.
+Wir sind den narürlichen Zahlen `ℕ` (`\\N`) schon kurz begegnet.
 
-Algemeinere Gleichungen mit Variablen kann man mit der Taktik `ring` lösen.
+Gleichungen, die nur die Operationen `+, -, *, ^` und Variablen enthalten, kann Lean mit der
+Taktik `ring` beweisen.
+
+Diese Taktik funktioniert nicht nur über den natürlichen Zahlen,
+sondern auch in (kommutativen) Gruppen, Ringen, und Körpern. Sie heisst `ring`, weil sie für Ringe
+entwickelt wurde.
 "
 
 Statement
@@ -23,7 +26,7 @@ Statement
     (x y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
   ring
 
-Message (x : ℕ) (y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 =>
+Hint (x : ℕ) (y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 =>
 "`ring` übernimmt den ganzen Spaß."
 
 Conclusion

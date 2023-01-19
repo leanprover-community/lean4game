@@ -2,17 +2,20 @@ import TestGame.Metadata
 
 Game "TestGame"
 World "Implication"
-Level 5
+Level 6
 
 Title "Genau dann wenn"
 
 Introduction
 "
-Ein $A \\iff B$ besteht intern aus zwei Implikationen, $\\textrm{mp} : A \\Rightarrow B$
-und $\\textrm{mpr} : B \\Rightarrow A$.
+Genau-dann-wenn, $A \\Leftrightarrow B$, wird als `A ↔ B` (`\\iff`) geschrieben.
+`A ↔ B` ist eine Struktur (ähnlich wie das logische UND), die aus zwei Teilen besteht:
 
-Wenn man ein `A ↔ B` zeigen will (im Goal), kann man dieses mit `constructor` in die
-Einzelteile zerlegen.
+- `mp`: die Implikation $A \\Rightarrow B$.
+- `mpr`: die Implikation $B \\Rightarrow A$.
+
+Hat man ein $\\Leftrightarrow$ im Goal, nimmt man dieses ebenfalls mit der Taktik
+`constructor` auseinander und zeigt dann beide Richtungen einzeln.
 "
 
 Statement
@@ -22,7 +25,7 @@ Statement
   assumption
   assumption
 
-Message (A : Prop) (B : Prop) : A ↔ B =>
+Hint (A : Prop) (B : Prop) : A ↔ B =>
 "Eine Struktur wie `A ↔ B` kann man mit `constructor` zerlegen."
 
 Hint (A : Prop) (B : Prop) (h : A → B) : A → B =>
