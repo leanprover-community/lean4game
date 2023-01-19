@@ -25,7 +25,7 @@ import { useAppDispatch } from '../hooks';
 import { useSelector } from 'react-redux';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, faDownload } from '@fortawesome/free-solid-svg-icons'
+import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, faHome } from '@fortawesome/free-solid-svg-icons'
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
@@ -173,8 +173,17 @@ function Level() {
         </Grid>
         <Grid xs={4} className="info-panel">
 
-          <Button disabled={levelId <= 1} component={RouterLink} to={`/world/${worldId}/level/${levelId - 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
-          <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`} sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
+          <Button
+            disabled={levelId <= 1} component={RouterLink}
+            to={`/world/${worldId}/level/${levelId - 1}`}
+            sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Previous Level</Button>
+          <Button
+            disabled={levelId >= gameInfo.data?.worldSize[worldId]}
+            component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`}
+            sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next Level</Button>
+          <Button
+            component={RouterLink} to={`/`}
+            sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple><FontAwesomeIcon icon={faHome}></FontAwesomeIcon></Button>
 
           <Infoview key={worldId + "/Level" + levelId} worldId={worldId} levelId={levelId} editor={editor} editorApi={infoProvider?.getApi()} />
         </Grid>
