@@ -17,7 +17,6 @@ import { monacoSetup } from 'lean4web/client/src/monacoSetup';
 
 monacoSetup()
 
-
 const router = createHashRouter([
   {
     path: "/",

@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
+import { loadState } from "./localStorage";
 
 interface ProgressState {
   level: {[world: string]: {[level: number]: LevelProgressState}}
@@ -10,7 +11,7 @@ interface LevelProgressState {
   completed: boolean
 }
 
-const initialProgressState = { level: {} } as ProgressState
+const initialProgressState = loadState() ?? { level: {} } as ProgressState
 const initalLevelProgressState = {code: "", completed: false} as LevelProgressState
 
 function addLevelProgress(state, action: PayloadAction<{world: string, level: number}>) {

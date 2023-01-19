@@ -15,6 +15,7 @@
     "@types/react-router-dom": "^5.3.3",
     "cytoscape": "^3.23.0",
     "cytoscape-klay": "^3.1.4",
+    "debounce": "^1.2.1",
     "express": "^4.18.2",
     "lean4web": "github:hhu-adam/lean4web",
     "path-browserify": "^1.0.1",
