@@ -10,5 +10,4 @@ import TestGame.Levels.Proposition.L09_And
 import TestGame.Levels.Proposition.L10_And
 import TestGame.Levels.Proposition.L11_Or
 import TestGame.Levels.Proposition.L12_Or
-import TestGame.Levels.Proposition.L13_Or
-import TestGame.Levels.Proposition.L14_Summary
+import TestGame.Levels.Proposition.L13_Summary

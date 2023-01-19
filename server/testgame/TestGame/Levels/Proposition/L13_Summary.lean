@@ -6,17 +6,17 @@ set_option tactic.hygienic false
 
 Game "TestGame"
 World "Proposition"
-Level 14
+Level 13
 
 Title "Zusammenfassung"
 
 Introduction
 "
-## Notationen / Begriffe
+Damit bist du am Ende der ersten Lektion angekommen. Hier ein Überblick über alle Begriffe,
+Notationen, und Taktiken, die in diesem Kapitel
+eingeführt wurden. Danach folgt eine Abschlussaufgabe.
 
-Damit bist du am Ende der ersten Lektion angekommen. Hier ein Überblick über alle Begriffe
-und Notationen, die in diesem Kapitel
-eingeführt wurden.
+## Notationen / Begriffe
 
 |               | Beschreibung                                                             |
 |:--------------|:-------------------------------------------------------------------------|
@@ -66,11 +66,60 @@ Für die Beweise haben wir verschiedene Taktiken kennengelernt.
 
 Zum Schluss gibt es noch eine kleine Übungsaufgabe:
 
+Benutze alle vier Methoden mit UND und ODER
+umzugehen um folgende Aussage zu beweisen.
+
+| (Übersicht) | Und (`∧`)                | Oder (`∨`)              |
+|-------------|:-------------------------|:------------------------|
+| Annahme     | `rcases h with ⟨h₁, h₂⟩` | `rcases h with h \\| h` |
+| Goal        | `constructor`            | `left`/`right`          |
 "
 
-Statement
-    "TODO"
-    : True := by
-  trivial
+-- Note: The other direction would need arguing by cases.
 
-Tactics rfl assumption trivial left right constructor rcases
+Statement
+"Angenommen $A \\lor (B \\land C)$ ist wahr, zeige dass
+$(A \\lor B) \\land (A \\lor C)$ wahr ist."
+    (A B C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) := by
+  constructor
+  rcases h with h | h
+  left
+  assumption
+  rcases h with ⟨h₁, h₂⟩
+  right
+  assumption
+  rcases h with h | h
+  left
+  assumption
+  rcases h with ⟨h₁, h₂⟩
+  right
+  assumption
+
+Hint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) ∧ (A ∨ C) =>
+"Das `∧` in der Annahme kann mit `rcases h with ⟨h₁, h₂⟩` zerlegt werden."
+
+Hint (A : Prop) (B : Prop) (C : Prop) : (A ∨ B) ∧ (A ∨ C) =>
+"Das `∧` im Goal kann mit `constructor` zerlegt werden."
+
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) =>
+"Das `∨` in der Annahme kann mit `rcases h with h | h` zerlegt werden."
+
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) =>
+"Das `∨` in der Annahme kann mit `rcases h with h | h` zerlegt werden."
+
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ C) =>
+"Das `∨` in der Annahme kann mit `rcases h with h | h` zerlegt werden."
+
+
+Hint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) =>
+"Das `∧` in der Annahme kann mit `rcases h with ⟨h₁, h₂⟩` zerlegt werden."
+
+Hint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ C) =>
+"Das `∧` in der Annahme kann mit `rcases h with ⟨h₁, h₂⟩` zerlegt werden."
+
+-- TODO: Message nur Anhand der Annahmen?
+
+Hint (A : Prop) (B : Prop) : A ∨ B =>
+"`left` oder `right`?"
+
+Tactics left right assumption constructor rcases rfl contradiction trivial
