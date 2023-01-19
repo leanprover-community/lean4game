@@ -31,7 +31,13 @@ export class Connection {
         if (!leanClient.isStarted()) {
           leanClient.start()
         }
-        leanClient.restarted(() => { resolve(leanClient) })
+        leanClient.restarted(() => {
+          // This keep alive message is not recognized by the server,
+          // but it makes sure that the websocket connection does not
+          // time out after 60 seconds.
+          setInterval(() => {leanClient.sendNotification('$/keepAlive', {}) }, 5000)
+          resolve(leanClient)
+        })
       }
     })
   }
