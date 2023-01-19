@@ -24,3 +24,8 @@ code {
 .monaco-workbench > .notifications-toasts.visible {
   display: none !important;
 }
+
+/* TODO: Do this the correct way. */
+.MuiButtonBase-root {
+  margin : 0 !important;
+}
