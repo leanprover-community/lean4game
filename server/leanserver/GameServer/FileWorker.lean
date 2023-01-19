@@ -4,6 +4,8 @@ import Lean
 import GameServer.EnvExtensions
 import GameServer.RpcHandlers
 
+import Lean.Server.FileWorker
+
 namespace MyModule
 open Lean
 open Elab
@@ -158,7 +160,7 @@ where
       : AsyncElabM (Option Snapshot) := do
     cancelTk.check
     let s ← get
-    let lastSnap := s.snaps.back
+    let .some lastSnap := s.snaps.back? | panic! "empty snapshots"
     if lastSnap.isAtEnd then
       publishDiagnostics m lastSnap.diagnostics.toArray ctx.hOut
       publishProgressDone m ctx.hOut
@@ -194,7 +196,7 @@ where
   def unfoldSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken)
       : ReaderT WorkerContext IO (AsyncList ElabTaskError Snapshot) := do
     let ctx ← read
-    let headerSnap := snaps[0]!
+    let some headerSnap := snaps[0]? | panic! "empty snapshots"
     if headerSnap.msgLog.hasErrors then
       -- Treat header processing errors as fatal so users aren't swamped with
       -- followup errors
@@ -211,29 +213,31 @@ end Elab
 
 section Updates
 
+/-- Given the new document, updates editable doc state. -/
   def updateDocument (newMeta : DocumentMeta) : WorkerM Unit := do
     let ctx ← read
     let oldDoc := (←get).doc
-    -- The watchdog only restarts the file worker when the semantic content of the header changes.
-    -- If e.g. a newline is deleted, it will not restart this file worker, but we still
-    -- need to reparse the header so that the offsets are correct.
+    oldDoc.cancelTk.set
+    let initHeaderStx := (← get).initHeaderStx
     let (newHeaderStx, newMpState, _) ← Parser.parseHeader newMeta.mkInputContext
     let cancelTk ← CancelToken.new
-    -- Wait for at least one snapshot from the old doc, we don't want to unnecessarily re-run `print-paths`
     let headSnapTask := oldDoc.cmdSnaps.waitHead?
-    let newSnaps ← EIO.mapTask (ε := ElabTaskError) (t := headSnapTask) fun headSnap?? => do
-      let headSnap? ← MonadExcept.ofExcept headSnap??
+    let newSnaps ← if initHeaderStx != newHeaderStx then
+      EIO.asTask (ε := ElabTaskError) (prio := .dedicated) do
+        IO.sleep ctx.initParams.editDelay.toUInt32
+        cancelTk.check
+        IO.Process.exit 2
+    else EIO.mapTask (ε := ElabTaskError) (t := headSnapTask) (prio := .dedicated) fun headSnap?? => do
       -- There is always at least one snapshot absent exceptions
-      let headSnap := headSnap?.get!
+      let some headSnap ← MonadExcept.ofExcept headSnap?? | panic! "empty snapshots"
       let newHeaderSnap := { headSnap with stx := newHeaderStx, mpState := newMpState }
-      oldDoc.cancelTk.set
       let changePos := oldDoc.meta.text.source.firstDiffPos newMeta.text.source
       -- Ignore exceptions, we are only interested in the successful snapshots
       let (cmdSnaps, _) ← oldDoc.cmdSnaps.getFinishedPrefix
       -- NOTE(WN): we invalidate eagerly as `endPos` consumes input greedily. To re-elaborate only
       -- when really necessary, we could do a whitespace-aware `Syntax` comparison instead.
-      let mut validSnaps := cmdSnaps.takeWhile (fun s => s.endPos < changePos)
-      if validSnaps.length ≤ 1 then
+      let mut validSnaps ← pure (cmdSnaps.takeWhile (fun s => s.endPos < changePos))
+      if h : validSnaps.length ≤ 1 then
         validSnaps := [newHeaderSnap]
       else
         /- When at least one valid non-header snap exists, it may happen that a change does not fall
@@ -241,15 +245,20 @@ section Updates
            We check for this here. We do not currently handle crazy grammars in which an appended
            token can merge two or more previous commands into one. To do so would require reparsing
            the entire file. -/
-        let mut lastSnap := validSnaps.getLast!
-        let preLastSnap := if validSnaps.length ≥ 2
-          then validSnaps.get! (validSnaps.length - 2)
-          else newHeaderSnap
+        have : validSnaps.length ≥ 2 := Nat.gt_of_not_le h
+        let mut lastSnap := validSnaps.getLast (by subst ·; simp at h)
+        let preLastSnap :=
+          have : 0 < validSnaps.length := Nat.lt_of_lt_of_le (by decide) this
+          have : validSnaps.length - 2 < validSnaps.length := Nat.sub_lt this (by decide)
+          validSnaps[validSnaps.length - 2]
         let newLastStx ← parseNextCmd newMeta.mkInputContext preLastSnap
         if newLastStx != lastSnap.stx then
           validSnaps := validSnaps.dropLast
-      unfoldSnaps newMeta validSnaps.toArray cancelTk ctx
-    modify fun st => { st with doc := ⟨newMeta, AsyncList.delayed newSnaps, cancelTk⟩ }
+      -- wait for a bit, giving the initial `cancelTk.check` in `nextCmdSnap` time to trigger
+      -- before kicking off any expensive elaboration (TODO: make expensive elaboration cancelable)
+      unfoldCmdSnaps newMeta validSnaps.toArray cancelTk ctx
+        (startAfterMs := ctx.initParams.editDelay.toUInt32)
+    modify fun st => { st with doc := { meta := newMeta, cmdSnaps := AsyncList.delayed newSnaps, cancelTk } }
 
 end Updates
 
