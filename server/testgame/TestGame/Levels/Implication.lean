@@ -10,3 +10,7 @@ import TestGame.Levels.Implication.L09_Iff
 import TestGame.Levels.Implication.L10_Apply
 import TestGame.Levels.Implication.L11_Rw
 import TestGame.Levels.Implication.L12_Summary
+
+Game "TestGame"
+World "Implication"
+Title "Meer der Implikationen"

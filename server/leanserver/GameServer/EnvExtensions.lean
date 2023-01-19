@@ -114,9 +114,9 @@ structure Graph (α β : Type) [inst : BEq α] [inst : Hashable α] where
   edges: Array (α × α) := {}
 deriving Inhabited
 
-instance [inst : BEq α] [inst : Hashable α] [ToJson α] : ToJson (Graph α β) := {
+instance [inst : BEq α] [inst : Hashable α] [ToJson α] [ToJson β] : ToJson (Graph α β) := {
   toJson := fun graph => Json.mkObj [
-    ("nodes", toJson (graph.nodes.toArray.map Prod.fst)),
+    ("nodes", toJson (graph.nodes.toArray.map Prod.snd)),
     ("edges", toJson graph.edges)
   ]
 }
@@ -215,6 +215,10 @@ structure World where
   conclusion : String := ""
   levels: HashMap Nat GameLevel := {}
 deriving Inhabited
+
+instance : ToJson World := ⟨
+  fun world => Json.mkObj [("name", toJson world.name), ("title", world.title)]
+⟩
 
 /-! ## Game -/
 

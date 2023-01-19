@@ -40,7 +40,7 @@ function Welcome() {
     if (gameInfo.data?.title) window.document.title = gameInfo.data.title
   }, [gameInfo.data?.title])
 
-  const padding = 10
+  const padding = 20
 
   const svgElements = []
 
@@ -48,16 +48,18 @@ function Welcome() {
     for (let i in gameInfo.data.worlds.edges) {
       const edge = gameInfo.data.worlds.edges[i]
       svgElements.push(
-        <line key={`pathway${i}`} x1={nodes[edge[0]].x} y1={nodes[edge[0]].y} x2={nodes[edge[1]].x} y2={nodes[edge[1]].y} stroke="#1976d2" strokeWidth="1"/>
+        <line key={`pathway${i}`} x1={nodes[edge[0]].position.x} y1={nodes[edge[0]].position.y}
+          x2={nodes[edge[1]].position.x} y2={nodes[edge[1]].position.y} stroke="#1976d2" strokeWidth="1"/>
       )
     }
     for (let id in nodes) {
-      let position: cytoscape.Position = nodes[id]
+      let position: cytoscape.Position = nodes[id].position
 
       svgElements.push(
         <Link key={`world${id}`} to={`/world/${id}/level/1`}>
           <circle fill="#61DAFB" cx={position.x} cy={position.y} r="8" />
-          <text style={{font: "italic 2px sans-serif",  textAnchor: "middle", dominantBaseline: "middle"} as any} x={position.x} y={position.y}>{id}</text>
+          <text style={{font: "italic 2px sans-serif",  textAnchor: "middle", dominantBaseline: "middle"} as any}
+            x={position.x} y={position.y}>{nodes[id].data.title ? nodes[id].data.title : id}</text>
         </Link>
       )
 
@@ -97,7 +99,7 @@ function computeWorldLayout(worlds) {
 
   let elements = []
   for (let node of worlds.nodes) {
-    elements.push({ data: { id: node } })
+    elements.push({ data: { id: node.name, title: node.title } })
   }
   for (let edge of worlds.edges) {
     elements.push({
@@ -119,7 +121,10 @@ function computeWorldLayout(worlds) {
   const layout = cy.layout({name: "klay", klay: {direction: "DOWN"}} as LayoutOptions).run()
   let nodes = {}
   cy.nodes().forEach((node, id) => {
-    nodes[node.id()] = node.position()
+    nodes[node.id()] = {
+      position: node.position(),
+      data: node.data()
+    }
   })
   const bounds = cy.nodes().boundingBox()
   return { nodes, bounds }

@@ -11,3 +11,7 @@ import TestGame.Levels.Proposition.L10_And
 import TestGame.Levels.Proposition.L11_Or
 import TestGame.Levels.Proposition.L12_Or
 import TestGame.Levels.Proposition.L13_Summary
+
+Game "TestGame"
+World "Proposition"
+Title "Land der Proposititionen"

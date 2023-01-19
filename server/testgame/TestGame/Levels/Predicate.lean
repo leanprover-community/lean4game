@@ -7,3 +7,7 @@ import TestGame.Levels.Predicate.L06_Exists
 import TestGame.Levels.Predicate.L07_Forall
 import TestGame.Levels.Predicate.L08_PushNeg
 import TestGame.Levels.Predicate.L09_Summary
+
+Game "TestGame"
+World "Predicate"
+Title "Reich der Prädikate"
