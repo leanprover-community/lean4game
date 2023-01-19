@@ -3,7 +3,9 @@ import TestGame.Metadata
 import TestGame.Levels.Proposition
 import TestGame.Levels.Implication
 import TestGame.Levels.Predicate
+import TestGame.Levels.Proving
 
+import TestGame.Levels.Naturals.L31_Sum
 
 Game "TestGame"
 

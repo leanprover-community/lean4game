@@ -14,10 +14,11 @@ Introduction
 "
 ## Notationen / Begriffe
 
-Damit bist du am Ende der ersten Lektion angekommen. Hier ein Überblick über alle Begriffe und Notationen, die in diesem Kapitel
+Damit bist du am Ende der ersten Lektion angekommen. Hier ein Überblick über alle Begriffe
+und Notationen, die in diesem Kapitel
 eingeführt wurden.
 
-|               | Beschreibung                                                                          |
+|               | Beschreibung                                                             |
 |:--------------|:-------------------------------------------------------------------------|
 | *Goal*        | Was aktuell zu beweisen ist.                                             |
 | *Annahme*     | Objekte & Resultate, die man zur Verfügung hat.                          |
