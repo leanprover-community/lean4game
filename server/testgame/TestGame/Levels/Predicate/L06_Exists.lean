@@ -8,7 +8,7 @@ import TestGame.ToBePorted
 
 Game "TestGame"
 World "Predicate"
-Level 7
+Level 6
 
 Title "Gerade/Ungerade"
 

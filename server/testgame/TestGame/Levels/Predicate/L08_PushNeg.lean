@@ -6,7 +6,7 @@ import TestGame.ToBePorted
 
 Game "TestGame"
 World "Predicate"
-Level 9
+Level 8
 
 Title "PushNeg"
 

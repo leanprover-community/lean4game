@@ -13,12 +13,15 @@ Introduction
 "
 Wir sind den narürlichen Zahlen `ℕ` (`\\N`) schon kurz begegnet.
 
-Gleichungen, die nur die Operationen `+, -, *, ^` und Variablen enthalten, kann Lean mit der
-Taktik `ring` beweisen.
+Gleichungen, die nur die Operationen `+, -, *, ^` (Addition, Subtraktion, Multiplikation, Potenz)
+und Variablen enthalten, kann Lean mit der Taktik `ring` beweisen.
 
 Diese Taktik funktioniert nicht nur über den natürlichen Zahlen,
 sondern auch in (kommutativen) Gruppen, Ringen, und Körpern. Sie heisst `ring`, weil sie für Ringe
 entwickelt wurde.
+
+(Note: Division `/` ignorieren wir hier erst einmal, weil diese auf `ℕ`
+nicht kanonisch definiert ist.)
 "
 
 Statement
@@ -37,3 +40,5 @@ Ring zu lösen, funktioniert aber auch auf `ℕ`, auch wenn dieses kein Ring ist
 "
 
 Tactics ring
+
+#eval 4 / 6

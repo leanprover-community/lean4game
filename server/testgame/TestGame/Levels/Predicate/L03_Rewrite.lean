@@ -3,13 +3,14 @@ import Mathlib
 
 Game "TestGame"
 World "Predicate"
-Level 4
+Level 3
 
 Title "Rewrite"
 
 Introduction
 "
-Mit `rw` kann man nicht nur das Goal sondern auch andere Annahmen umschreiben:
+Als Übung erinnern wir daran, dass man mit `rw [h] at g` auch in anderen Annahmen umschreiben
+kann:
 
 Wenn `(h : X = Y)` ist, dann ersetzt `rw [h] at g` in der Annahme
 `g` das `X` durch `Y`.

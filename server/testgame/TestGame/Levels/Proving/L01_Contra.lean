@@ -14,10 +14,24 @@ Level 1
 Title "Ad absurdum"
 
 Introduction
-"Aber, die Aussagen müssen wirklich exakte Gegenteile sein.
+"
+In diesem Kapitel lernen wir die wichtigsten Beweistechniken kennen.
 
-Hier musst du zuerst eines der Lemmas `(not_odd : ¬ odd n ↔ even n)` oder
-`(not_even : ¬ even n ↔ odd n)` benützen, um einer der Terme umzuschreiben."
+Zuerst repetieren wir, dass man vorhandene Lemmas mit `rw` und `apply` benützen kann.
+
+
+  Aber, die Aussagen müssen wirklich exakte Gegenteile sein.
+
+Hier musst du zuerst eines der folgenden Lemmas benützen, um einer der Terme umzuschreiben.
+
+```
+lemma not_odd (n : ℕ): ¬ odd n ↔ even n := by
+  ...
+
+lemma not_even (n : ℕ): ¬ even n ↔ odd n := by
+  ...
+```
+"
 
 Statement
     "Sei $n$ eine natürliche Zahl die sowohl gerade wie auch ungerade ist.

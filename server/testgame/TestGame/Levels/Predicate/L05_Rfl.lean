@@ -2,7 +2,7 @@ import TestGame.Metadata
 
 Game "TestGame"
 World "Predicate"
-Level 6
+Level 5
 
 Title "Definitionally equal"
 

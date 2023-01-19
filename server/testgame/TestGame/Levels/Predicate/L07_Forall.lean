@@ -8,7 +8,7 @@ import TestGame.ToBePorted
 
 Game "TestGame"
 World "Predicate"
-Level 8
+Level 7
 
 Title "Für alle"
 
@@ -16,7 +16,19 @@ Introduction
 "
 Zum `∃` gehört auch das \"für alle\" `∀` (`\\forall`).
 
+Der Syntax ist `∀ (n : ℕ), 0 ≤ n` also wie beim `∃` trennt ein Komma die Annahmen von der Aussage.
+
+Eine `∀`-Aussage in den Annahmen verhält sich so wie ein Lemma. Das heisst man kann
+auch diese mit `apply` und `rw` anwenden, je nachdem was die Aussage nach dem Komma ist.
+
+Also folgende Annahme und Lemma sind genau :
+- `(le_square : ∀ (n : ℕ), n ≤ n^2)`
+- `lemma le_square (n : ℕ) : n ≤ n^2`
+
 Ein `∀` im Goal kann man mit `intro` angehen, genau wie bei einer Implikation `→`.
+
+
+TODO: 1-2 Aufgaben mehr.
 "
 
 Statement

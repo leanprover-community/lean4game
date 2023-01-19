@@ -3,13 +3,16 @@ import Mathlib.Tactic.Ring
 
 Game "TestGame"
 World "Predicate"
-Level 5
+Level 4
 
 Title "Natürliche Zahlen"
 
 Introduction
 "
-Ring setzt aber nicht selbständig Annahmen ein, diese muss man zuerst manuell mit `rw` verwenden.
+Oft braucht man eine Kombination von `rw` und `ring` um Gleichungen zu lösen.
+
+Zuerst setzt man mit `rw` die vorhandenen Annahmen ein, und sobald die beiden Seiten
+einer Gleichung im Goal rechnerisch gleich sind, kan `ring` dies beweisen.
 "
 
 Statement
