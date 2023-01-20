@@ -8,10 +8,11 @@ import 'tachyons/css/tachyons.css';
 // import '@vscode/codicons/dist/codicon.ttf';
 import '@vscode/codicons/dist/codicon.css';
 import '../../../../node_modules/lean4-infoview/src/infoview/index.css';
+import './infoview.css'
 
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
 
-import { Infos } from '../../../../node_modules/lean4-infoview/src/infoview/infos';
+import { Infos } from './infos';
 import { AllMessages, WithLspDiagnosticsContext } from '../../../../node_modules/lean4-infoview/src/infoview/messages';
 import { useClientNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';

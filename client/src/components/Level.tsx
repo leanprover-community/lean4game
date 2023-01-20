@@ -13,6 +13,8 @@ import Grid from '@mui/material/Unstable_Grid2';
 import LeftPanel from './LeftPanel';
 import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter';
 import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
+import 'lean4web/client/src/editor/vscode.css';
+import 'lean4web/client/src/editor/infoview.css';
 import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
 import { InfoProvider } from 'lean4web/client/src/editor/infoview';
 import 'lean4web/client/src/editor/infoview.css'
