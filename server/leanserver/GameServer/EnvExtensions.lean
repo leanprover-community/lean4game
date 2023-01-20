@@ -114,9 +114,9 @@ structure Graph (α β : Type) [inst : BEq α] [inst : Hashable α] where
   edges: Array (α × α) := {}
 deriving Inhabited
 
-instance [inst : BEq α] [inst : Hashable α] [ToJson α] [ToJson β] : ToJson (Graph α β) := {
+instance [ToJson β] : ToJson (Graph Name β) := {
   toJson := fun graph => Json.mkObj [
-    ("nodes", toJson (graph.nodes.toArray.map Prod.snd)),
+    ("nodes", Json.mkObj (graph.nodes.toList.map fun (a,b) => (a.toString, toJson b))),
     ("edges", toJson graph.edges)
   ]
 }

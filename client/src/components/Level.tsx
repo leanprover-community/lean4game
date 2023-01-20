@@ -136,8 +136,8 @@ function Level() {
   const {setTitle, setSubtitle} = React.useContext(SetTitleContext);
 
   useEffect(() => {
-    setTitle(`World: ${worldId}`)
-  }, [worldId])
+    setTitle(`World: ${gameInfo.data?.worlds.nodes[worldId].title}`)
+  }, [gameInfo.data?.worlds.nodes[worldId].title])
 
   useEffect(() => {
     if (level?.data?.title) {
