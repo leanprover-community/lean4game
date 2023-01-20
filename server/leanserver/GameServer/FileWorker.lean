@@ -71,7 +71,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
   let pmctx := { env := cmdState.env, options := scope.opts, currNamespace := scope.currNamespace, openDecls := scope.openDecls }
   let (tacticStx, cmdParserState, msgLog, endOfWhitespace) :=
     MyModule.parseTactic inputCtx pmctx snap.mpState snap.msgLog couldBeEndSnap
-  let cmdPos := tacticStx.getPos?.get!
+  let cmdPos := tacticStx.getPos?.getD 0
   if Parser.isEOI tacticStx then
     let endSnap : Snapshot := {
       beginPos := cmdPos
