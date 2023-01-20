@@ -36,7 +36,7 @@ module.exports = env => {
             loader: 'ts-loader',
             options: { allowTsInNodeModules: true }
           }],
-          exclude: /node_modules(?!\/(lean4web|lean4))/,
+          exclude: /node_modules(?!\/(lean4web|lean4|lean4-infoview))/,
           // Allow .ts imports from node_modules/lean4web and node_modules/lean4
         },
         {
@@ -82,16 +82,11 @@ module.exports = env => {
         }
       }),
       isDevelopment && new ReactRefreshWebpackPlugin(),
-      new webpack.ContextReplacementPlugin(
-        /\/@leanprover\/infoview\//,
-        (data) => {
-          // Webpack is not happy about the dynamically loaded widget code in the function
-          // `dynamicallyLoadComponent` in `infoview/userWidget.tsx`. If we want to support
-          // dynamically loaded widget code, we need to make sure that the files are available.
-          delete data.dependencies[0].critical;
-          return data;
-        },
-      ),
     ].filter(Boolean),
+
+    // Webpack is not happy about the dynamically loaded widget code in the function
+    // `dynamicallyLoadComponent` in `infoview/userWidget.tsx`. If we want to support
+    // dynamically loaded widget code, we need to make sure that the files are available.
+    ignoreWarnings: [/Critical dependency: the request of a dependency is an expression/]
   };
 }

@@ -8,6 +8,7 @@
     "@emotion/styled": "^11.10.5",
     "@fontsource/roboto": "^4.5.8",
     "@fontsource/roboto-mono": "^4.5.8",
+    "lean4-infoview": "https://gitpkg.now.sh/leanprover/vscode-lean4/lean4-infoview?master",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.1",
     "@reduxjs/toolkit": "^1.9.1",

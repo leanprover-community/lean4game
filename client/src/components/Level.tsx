@@ -4,7 +4,8 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { InfoviewApi, renderInfoview } from '@leanprover/infoview'
+import { InfoviewApi } from '@leanprover/infoview'
+import { renderInfoview } from './infoview/main'
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
