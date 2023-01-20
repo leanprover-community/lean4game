@@ -23,28 +23,28 @@ Wenn das Goal eine Implikation ist, kann man `contrapose` anwenden.
 
 Statement
     "Ist n² ungerade, so ist auch n ungerade. Beweise durch Kontraposition."
-    (n : ℕ) : odd (n ^ 2) → odd n := by
+    (n : ℕ) : Odd (n ^ 2) → Odd n := by
   contrapose
   rw [not_odd]
   rw [not_odd]
   apply even_square
 
-Message (n : ℕ) (h : odd (n ^ 2)) : odd n =>
+Message (n : ℕ) (h : Odd (n ^ 2)) : Odd n =>
 "`intro` wär generell ein guter Ansatz! Aber hier wollen wir `contrapose` benützen, was eine
 Implikation benötigt, deshalb ist `intro` hier der falsche Weg!"
 
 
-Message (n : ℕ) : odd (n ^ 2) → odd n =>
+Message (n : ℕ) : Odd (n ^ 2) → Odd n =>
 "Mit `contrapose` kann man die Implikation zu
 `¬ (even n) → ¬ (even n^2)` umkehren."
 
-Hint (n : ℕ) : ¬odd n → ¬odd (n ^ 2) => "Du kennst bereits ein Lemma um `¬ odd ...` mit `rw`
+Hint (n : ℕ) : ¬Odd n → ¬Odd (n ^ 2) => "Du kennst bereits ein Lemma um `¬ odd ...` mit `rw`
 umzuschreiben"
 
-Message (n : ℕ) : even n → ¬odd (n ^ 2) => "rw [not_odd] muss hier zweimal angewendet werden,
+Message (n : ℕ) : Even n → ¬Odd (n ^ 2) => "rw [not_odd] muss hier zweimal angewendet werden,
 da rw das erste Mal `not_odd n` gebraucht hat und das zweite Mal `not_odd (n^2)` benützt."
 
-Message (n : ℕ) : even n → even (n ^ 2) => "Diese Aussage hast du bereits als Lemma bewiesen."
+Message (n : ℕ) : Even n → Even (n ^ 2) => "Diese Aussage hast du bereits als Lemma bewiesen."
 
 Tactics contrapose rw apply
-Lemmas even odd not_even not_odd even_square
+Lemmas Even Odd not_even not_odd even_square

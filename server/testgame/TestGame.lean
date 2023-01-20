@@ -4,6 +4,7 @@ import TestGame.Levels.Proposition
 import TestGame.Levels.Implication
 import TestGame.Levels.Predicate
 import TestGame.Levels.Proving
+import TestGame.Levels.Prime
 
 import TestGame.Levels.Naturals.L31_Sum
 
@@ -63,4 +64,6 @@ Conclusion
 
 
 Path Proposition → Implication → Predicate → Proving
+Path Predicate → Prime
+
 Path Predicate → Nat2

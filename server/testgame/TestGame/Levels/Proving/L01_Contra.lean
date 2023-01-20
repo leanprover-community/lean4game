@@ -36,11 +36,11 @@ lemma not_even (n : ℕ): ¬ even n ↔ odd n := by
 Statement
     "Sei $n$ eine natürliche Zahl die sowohl gerade wie auch ungerade ist.
     Zeige, dass daraus $n = 42$ folgt. (oder, tatsächlich $n = x$ für jedes beliebige $x$)."
-    (n : ℕ) (h_even : even n) (h_odd : odd n) : n = 42 := by
+    (n : ℕ) (h_even : Even n) (h_odd : Odd n) : n = 42 := by
   rw [← not_even] at h_odd
   contradiction
 
-Message (n : ℕ) (h_even : even n) (h_odd : odd n) : n = 42 =>
+Message (n : ℕ) (h_even : Even n) (h_odd : Odd n) : n = 42 =>
 "Schreibe zuerst eine der Aussagen mit `rw [←not_even] at h_odd` um, damit diese genaue
 Gegenteile werden."
 
@@ -48,4 +48,4 @@ Conclusion ""
 
 Tactics contradiction rw
 
-Lemmas even odd not_even not_odd
+Lemmas Even Odd not_even not_odd

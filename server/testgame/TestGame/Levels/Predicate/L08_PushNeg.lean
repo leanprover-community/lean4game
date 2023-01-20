@@ -2,6 +2,8 @@ import TestGame.Metadata
 import Mathlib.Tactic.PushNeg
 import Mathlib
 
+import Mathlib.Algebra.Parity
+
 import TestGame.ToBePorted
 
 Game "TestGame"
@@ -25,31 +27,30 @@ Das braucht intern die Lemmas
 
 Statement
     "Es existiert keine natürliche Zahl $n$, sodass $n + k$ immer ungerade ist.":
-    ¬ ∃ (n : ℕ), ∀ (k : ℕ) , odd (n + k) := by
+    ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) := by
   push_neg
   intro n
   use n
   rw [not_odd]
-  unfold even
+  unfold Even
   use n
-  ring
 
-Message : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , odd (n + k) =>
+Message : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) =>
 "`push_neg` schiebt die Negierung an den Quantoren vorbei."
 
 
-Message (n : ℕ) : (∃ k, ¬odd (n + k)) =>
+Message (n : ℕ) : (∃ k, ¬Odd (n + k)) =>
 "An dieser Stelle musst du nun ein `k` angeben, sodass `n + k` gerade ist... Benutze `use`
 mit der richtigen Zahl."
 
 
-Hint (n : ℕ) : ¬odd (n + n) =>
+Hint (n : ℕ) : ¬Odd (n + n) =>
 "Du kennst ein Lemma um mit `¬odd` umzugehen."
 
 -- Hint (n : ℕ) (k : ℕ) : ¬odd (n + k) =>
 -- "Du kennst ein Lemma um mit `¬odd` umzugehen."
 
-Hint (n : ℕ) : even (n + n) =>
+Hint (n : ℕ) : Even (n + n) =>
 "`unfold even` hilft, anzuschauen, was hinter `even` steckt.
 
 Danach musst du wieder mit `use r` ein `(r : ℕ)` angeben, dass du benützen möchtest."
@@ -63,4 +64,4 @@ Conclusion ""
 
 Tactics push_neg intro use rw unfold ring
 
-Lemmas even odd not_even not_odd not_exists not_forall
+Lemmas Even Odd not_even not_odd not_exists not_forall

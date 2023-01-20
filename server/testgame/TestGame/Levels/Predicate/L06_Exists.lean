@@ -4,7 +4,7 @@ import Mathlib.Tactic.Contrapose
 import Mathlib.Tactic.Use
 import Mathlib.Tactic.Ring
 
-import TestGame.ToBePorted
+import Mathlib.Algebra.Parity
 
 Game "TestGame"
 World "Predicate"
@@ -16,17 +16,17 @@ Introduction
 "
 Gerade/ungerade werden in Lean wie folgt definiert:
 ```
-def even (n : ℕ) : Prop := ∃ r, n = 2 * r
-def odd (n : ℕ) : Prop := ∃ r, n = 2 * r + 1
+def Even (n : ℕ) : Prop := ∃ r, n = r + r
+def Odd (n : ℕ) : Prop := ∃ r, n = r + r + 1
 ```
-Also dadurch, dass ein `(r : ℕ)` existiert sodass `n = 2 * r (+1)`.
+Also dadurch, dass ein `(r : ℕ)` existiert sodass `n = r + r (+1)`.
 Beachte das Komma `,` welches die Variablen des `∃` (`\\exists`) von der Aussage trennen.
 
 Hierzu gibt es 3 wichtige Taktiken:
 
-1) Definitionen wie `even` kann man mit `unfold even at *` im Infoview einsetzen.
+1) Definitionen wie `Even` kann man mit `unfold even at *` im Infoview einsetzen.
    Das ändert Lean-intern nichts und ist nur für den Benutzer. Man kann auch einen
-   Term `(h : even x)` einfach so behandeln als wäre es ein Term `(h : ∃ r, x = 2 * r)`.
+   Term `(h : Even x)` einfach so behandeln als wäre es ein Term `(h : ∃ r, x = 2 * r)`.
 2) Bei einer Annahme `(h : ∃ r, ...)` kann man mit `rcases h with ⟨y, hy⟩` ein solches `y`
    Auswählen, dass die Annahme `h` erfüllt.
 3) Bei einem `∃` im Goal muss man ein Element `y` angeben, welches diese Aussage erfüllen
@@ -35,14 +35,14 @@ Hierzu gibt es 3 wichtige Taktiken:
 
 Statement even_square
       "Wenn $n$ gerade ist, dann ist $n^2$ gerade."
-      (n : ℕ) (h : even n) : even (n ^ 2) := by
-  unfold even at *
+      (n : ℕ) (h : Even n) : Even (n ^ 2) := by
+  unfold Even at *
   rcases h with ⟨x, hx⟩
   use 2 * x ^ 2
   rw [hx]
   ring
 
-Message (n : ℕ) (h : even n) : even (n ^ 2) =>
+Message (n : ℕ) (h : Even n) : Even (n ^ 2) =>
 "Wenn du die Definition von `even` nicht kennst, kannst du diese mit `unfold even` oder
 `unfold even at *` ersetzen.
 Note: Der Befehl macht erst mal nichts in Lean sondern nur in der Anzeige. Der Beweis funktioniert
@@ -68,4 +68,4 @@ Message (n : ℕ) (x : ℕ) (hx : n = x + x) : (x + x) ^ 2 = 2 * x ^ 2 + 2 * x ^
 "Die Taktik `ring` löst solche Gleichungen."
 
 Tactics unfold rcases use rw ring
-Lemmas even odd
+Lemmas Even Odd

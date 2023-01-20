@@ -37,13 +37,6 @@ LemmaDoc imp_iff_not_or as imp_iff_not_or in "Logic"
 `(A B : Prop)`
 "
 
-
-
-
-
-
-
-
 LemmaDoc zero_add as zero_add in "Addition"
 "This lemma says `∀ a : ℕ, 0 + a = a`."
 
@@ -62,13 +55,13 @@ LemmaDoc not_forall as not_forall in "Logic"
 LemmaDoc not_exists as not_exists in "Logic"
 "`∀ (A : Prop), ¬(∃ x, A) ↔ ∀x, (¬A)`."
 
-LemmaDoc even as even in "Nat"
+LemmaDoc Even as Even in "Nat"
 "
 `even n` ist definiert als `∃ r, a = 2 * r`.
 Die Definition kann man mit `unfold even at *` einsetzen.
 "
 
-LemmaDoc odd as odd in "Nat"
+LemmaDoc Odd as Odd in "Nat"
 "
 `odd n` ist definiert als `∃ r, a = 2 * r + 1`.
 Die Definition kann man mit `unfold odd at *` einsetzen.
@@ -85,7 +78,7 @@ LemmaDoc even_square as even_square in "Nat"
 
 
 LemmaSet natural : "Natürliche Zahlen" :=
-even odd not_odd not_even
+Even Odd not_odd not_even
 
 LemmaSet logic : "Logik" :=
 not_not not_forall not_exists
