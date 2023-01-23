@@ -189,12 +189,19 @@ TacticDoc use
 TODO
 "
 
+TacticDoc sufficesₓ
+"
+## Beschreibung
 
+TODO
+"
 
+TacticDoc haveₓ
+"
+## Beschreibung
 
-
-
-
+TODO
+"
 
 
 TacticDoc induction_on
@@ -235,8 +242,6 @@ Prove:
   2 * succ n = succ n + succ n
 ```
 "
-
-
 
 TacticDoc intro
 "Useful to introduce stuff"

@@ -23,13 +23,8 @@ Abschlussaufgabe.
 | `ℕ`           | Die natürlichen Zahlen.     |
 | `∃`           | Existential-Quantifier      |
 | `∀`           | Forall-Quantifier           |
-| `even n`      | `n` ist gerade              |
-| `odd n`       | `n` ist ungerade            |
-|               |                             |
-|               |                             |
-|               |                             |
-|               |                             |
-|               |                             |
+| `Even n`      | `n` ist gerade              |
+| `Odd n`       | `n` ist ungerade            |
 
 
 ## Taktiken

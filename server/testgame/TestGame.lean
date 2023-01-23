@@ -3,7 +3,7 @@ import TestGame.Metadata
 import TestGame.Levels.Proposition
 import TestGame.Levels.Implication
 import TestGame.Levels.Predicate
-import TestGame.Levels.Proving
+import TestGame.Levels.Contradiction
 import TestGame.Levels.Prime
 
 import TestGame.Levels.Naturals.L31_Sum
@@ -63,7 +63,6 @@ Conclusion
 "There is nothing else so far. Thanks for rescuing natural numbers!"
 
 
-Path Proposition → Implication → Predicate → Proving
+Path Proposition → Implication → Predicate → Contradiction
 Path Predicate → Prime
-
 Path Predicate → Nat2
