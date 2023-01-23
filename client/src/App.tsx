@@ -7,9 +7,8 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import { AppBar, CssBaseline, Toolbar, Typography } from '@mui/material';
-
-import { useAppSelector } from './hooks';
+import './reset.css';
+import './app.css';
 
 type SetTitleType = {setTitle: (string) => void, setSubtitle: (string) => void}
 export const SetTitleContext = React.createContext<SetTitleType>({setTitle: () => {}, setSubtitle: () => {}})
@@ -19,18 +18,15 @@ function App() {
   const [subtitle, setSubtitle] = useState("")
 
   return (
-    <div className="App">
-      <CssBaseline />
-      <AppBar className="AppBar" position="sticky" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Typography variant="h6" noWrap component="div">
+    <div className="app">
+      <div className="app-bar">
+        <div className="app-bar-title">
           {title}
-        </Typography>
-        <Typography variant="h6" noWrap component="div">
+        </div>
+        <div className="app-bar-subtitle">
           {subtitle}
-        </Typography>
-        </Toolbar>
-      </AppBar>
+        </div>
+      </div>
       <SetTitleContext.Provider value={{setTitle, setSubtitle}}>
         <Outlet />
       </SetTitleContext.Provider>
