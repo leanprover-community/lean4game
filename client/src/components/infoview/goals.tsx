@@ -6,20 +6,21 @@ import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle, Interac
 import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
 import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
+import { GameInteractiveGoal, GameInteractiveGoals } from './rpcApi';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
     return h.indexOf('✝') >= 0;
 }
 
-function goalToString(g: InteractiveGoal): string {
+function goalToString(g: GameInteractiveGoal): string {
     let ret = ''
 
-    if (g.userName) {
-        ret += `case ${g.userName}\n`
+    if (g.goal.userName) {
+        ret += `case ${g.goal.userName}\n`
     }
 
-    for (const h of g.hyps) {
+    for (const h of g.goal.hyps) {
         const names = InteractiveHypothesisBundle_nonAnonymousNames(h).join(' ')
         ret += `${names} : ${TaggedText_stripTags(h.type)}`
         if (h.val) {
@@ -28,12 +29,12 @@ function goalToString(g: InteractiveGoal): string {
         ret += '\n'
     }
 
-    ret += `⊢ ${TaggedText_stripTags(g.type)}`
+    ret += `⊢ ${TaggedText_stripTags(g.goal.type)}`
 
     return ret
 }
 
-export function goalsToString(goals: InteractiveGoals): string {
+export function goalsToString(goals: GameInteractiveGoals): string {
     return goals.goals.map(goalToString).join('\n\n')
 }
 
@@ -111,7 +112,7 @@ function Hyp({ hyp: h, mvarId }: HypProps) {
 }
 
 interface GoalProps {
-    goal: InteractiveGoal
+    goal: GameInteractiveGoal
     filter: GoalFilterState
 }
 
@@ -121,44 +122,49 @@ interface GoalProps {
 export const Goal = React.memo((props: GoalProps) => {
     const { goal, filter } = props
 
-    const prefix = goal.goalPrefix ?? 'Prove: '
-    const filteredList = getFilteredHypotheses(goal.hyps, filter);
+    const prefix = goal.goal.goalPrefix ?? 'Prove: '
+    const filteredList = getFilteredHypotheses(goal.goal.hyps, filter);
     const hyps = filter.reverse ? filteredList.slice().reverse() : filteredList;
     const locs = React.useContext(LocationsContext)
     const goalLocs = React.useMemo(() =>
-        locs && goal.mvarId ?
-            { ...locs, subexprTemplate: { mvarId: goal.mvarId, loc: { target: '' }}} :
+        locs && goal.goal.mvarId ?
+            { ...locs, subexprTemplate: { mvarId: goal.goal.mvarId, loc: { target: '' }}} :
             undefined,
-        [locs, goal.mvarId])
+        [locs, goal.goal.mvarId])
     const goalLi = <div key={'goal'}>
         <strong className="goal-vdash">Prove: </strong>
         <LocationsContext.Provider value={goalLocs}>
-            <InteractiveCode fmt={goal.type} />
+            <InteractiveCode fmt={goal.goal.type} />
         </LocationsContext.Provider>
     </div>
 
     let cn = 'font-code tl pre-wrap bl bw1 pl1 b--transparent '
-    if (props.goal.isInserted) cn += 'b--inserted '
-    if (props.goal.isRemoved) cn += 'b--removed '
+    if (props.goal.goal.isInserted) cn += 'b--inserted '
+    if (props.goal.goal.isRemoved) cn += 'b--removed '
 
-    if (goal.userName) {
+    // TODO: make this prettier
+    const hints = goal.messages.map((m) => <div>{m.message}</div>)
+
+    if (goal.goal.userName) {
         return <details open className={cn}>
             <summary className='mv1 pointer'>
-                <strong className="goal-case">case </strong>{goal.userName}
+                <strong className="goal-case">case </strong>{goal.goal.userName}
             </summary>
             {filter.reverse && goalLi}
-            {hyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
+            {hyps.map((h, i) => <Hyp hyp={h} mvarId={goal.goal.mvarId} key={i} />)}
             {!filter.reverse && goalLi}
+            {hints}
         </details>
     } else return <div className={cn}>
         {filter.reverse && goalLi}
-        {hyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
+        {hyps.map((h, i) => <Hyp hyp={h} mvarId={goal.goal.mvarId} key={i} />)}
         {!filter.reverse && goalLi}
+        {hints}
     </div>
 })
 
 interface GoalsProps {
-    goals: InteractiveGoals
+    goals: GameInteractiveGoals
     filter: GoalFilterState
 }
 
@@ -179,7 +185,7 @@ interface FilteredGoalsProps {
      * When this is `undefined`, the component will not appear at all but will remember its state
      * by virtue of still being mounted in the React tree. When it does appear again, the filter
      * settings and collapsed state will be as before. */
-    goals?: InteractiveGoals
+    goals?: GameInteractiveGoals
 }
 
 /**

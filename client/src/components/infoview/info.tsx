@@ -11,6 +11,7 @@ import { lspDiagToInteractive, MessagesList } from './messages';
 import { getInteractiveGoals, getInteractiveTermGoal, InteractiveDiagnostic,
     InteractiveGoals, UserWidgetInstance, Widget_getWidgets, RpcSessionAtPos, isRpcError,
     RpcErrorCode, getInteractiveDiagnostics, InteractiveTermGoal } from '@leanprover/infoview-api';
+import { GameInteractiveGoal, GameInteractiveGoals } from './rpcApi';
 import { PanelWidgetDisplay } from '../../../../node_modules/lean4-infoview/src/infoview/userWidget'
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
@@ -76,7 +77,7 @@ const InfoStatusBar = React.memo((props: InfoStatusBarProps) => {
 interface InfoDisplayContentProps extends PausableProps {
     pos: DocumentPosition;
     messages: InteractiveDiagnostic[];
-    goals?: InteractiveGoals;
+    goals?: GameInteractiveGoals;
     termGoal?: InteractiveTermGoal;
     error?: string;
     userWidgets: UserWidgetInstance[];
@@ -120,22 +121,22 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
             {goals && <Goals filter={{ reverse: false, showType: true, showInstance: true, showHiddenAssumption: true, showLetValue: true }} key='goals' goals={goals} />}
         </LocationsContext.Provider>
         <FilteredGoals headerChildren='Expected type' key='term-goal'
-            goals={termGoal !== undefined ? {goals: [termGoal]} : undefined} />
+            goals={termGoal !== undefined ? {goals: [{goal:termGoal, messages: []}]} : undefined} />
         {userWidgets.map(widget =>
             <details key={`widget::${widget.id}::${widget.range?.toString()}`} open>
                 <summary className='mv2 pointer'>{widget.name}</summary>
-                <PanelWidgetDisplay pos={pos} goals={goals ? goals.goals : []} termGoal={termGoal}
+                <PanelWidgetDisplay pos={pos} goals={goals ? goals.goals.map (goal => goal.goal) : []} termGoal={termGoal}
                     selectedLocations={selectedLocs} widget={widget}/>
             </details>
         )}
-        <div style={{display: hasMessages ? 'block' : 'none'}} key='messages'>
-            {/* <details key='messages' open>
-                <summary className='mv2 pointer'>Messages ({messages.length})</summary> */}
+        {/* <div style={{display: hasMessages ? 'block' : 'none'}} key='messages'>
+            <details key='messages' open>
+                <summary className='mv2 pointer'>Messages ({messages.length})</summary>
                 <div className='ml1'>
                     <MessagesList uri={pos.uri} messages={messages} />
                 </div>
-            {/* </details> */}
-        </div>
+            </details>
+        </div> */}
         {nothingToShow && (
             isPaused ?
                 /* Adding {' '} to manage string literals properly: https://reactjs.org/docs/jsx-in-depth.html#string-literals-1 */
@@ -152,7 +153,7 @@ interface InfoDisplayProps {
     pos: DocumentPosition;
     status: InfoStatus;
     messages: InteractiveDiagnostic[];
-    goals?: InteractiveGoals;
+    goals?: GameInteractiveGoals;
     termGoal?: InteractiveTermGoal;
     error?: string;
     userWidgets: UserWidgetInstance[];
@@ -271,7 +272,7 @@ function InfoAux(props: InfoProps) {
     // with e.g. a new `pos`.
     type InfoRequestResult = Omit<InfoDisplayProps, 'triggerUpdate'>
     const [state, triggerUpdateCore] = useAsyncWithTrigger(() => new Promise<InfoRequestResult>((resolve, reject) => {
-        const goalsReq = getInteractiveGoals(rpcSess, DocumentPosition.toTdpp(pos));
+        const goalsReq = rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp(pos));
         const termGoalReq = getInteractiveTermGoal(rpcSess, DocumentPosition.toTdpp(pos))
         const widgetsReq = Widget_getWidgets(rpcSess, pos).catch(discardMethodNotFound)
         const messagesReq = getInteractiveDiagnostics(rpcSess, {start: pos.line, end: pos.line+1})
@@ -304,7 +305,7 @@ function InfoAux(props: InfoProps) {
                 pos,
                 status: 'ready',
                 messages,
-                goals,
+                goals: goals as any,
                 termGoal,
                 error: undefined,
                 userWidgets: userWidgets?.widgets ?? [],

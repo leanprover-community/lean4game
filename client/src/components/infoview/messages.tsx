@@ -130,7 +130,7 @@ export function AllMessages({uri: uri0}: { uri: DocumentUri }) {
 
     return (
     <RpcContext.Provider value={rs}>
-    <Details setOpenRef={setOpenRef as any} initiallyOpen={!config.autoOpenShowsGoal}>
+    {/* <Details setOpenRef={setOpenRef as any} initiallyOpen={!config.autoOpenShowsGoal}>
         <summary className="mv2 pointer">
             All Messages ({diags.length})
             <span className="fr">
@@ -139,9 +139,9 @@ export function AllMessages({uri: uri0}: { uri: DocumentUri }) {
                    title={isPaused ? 'continue updating' : 'pause updating'}>
                 </a>
             </span>
-        </summary>
+        </summary> */}
         <AllMessagesBody uri={uri} messages={iDiags} />
-    </Details>
+    {/* </Details> */}
     </RpcContext.Provider>
     )
 }

@@ -5,7 +5,6 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { InfoviewApi } from '@leanprover/infoview'
-import { renderInfoview } from './infoview/main'
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
@@ -27,6 +26,12 @@ import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { codeEdited, selectCode } from '../state/progress';
 import { useAppDispatch } from '../hooks';
 import { useSelector } from 'react-redux';
+
+import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts';
+import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection';
+import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
+import { Main } from './infoview/main'
+import type { Location } from 'vscode-languageserver-protocol';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, faHome, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
@@ -104,8 +109,7 @@ function Level() {
   const worldId = params.worldId
 
   const codeviewRef = useRef<HTMLDivElement>(null)
-  const infoviewRef = useRef<HTMLDivElement>(null)
-  const messagePanelRef = useRef<HTMLDivElement>(null)
+  const introductionPanelRef = useRef<HTMLDivElement>(null)
 
   const [showSidePanel, setShowSidePanel] = useState(true)
 
@@ -117,7 +121,7 @@ function Level() {
 
   useEffect(() => {
     // Scroll to top when loading a new level
-    messagePanelRef.current!.scrollTo(0,0)
+    introductionPanelRef.current!.scrollTo(0,0)
   }, [levelId])
 
   const connection = React.useContext(ConnectionContext)
@@ -134,8 +138,8 @@ function Level() {
 
   const initialCode = useSelector(selectCode(worldId, levelId))
 
-  const {editor, infoProvider} =
-    useLevelEditor(worldId, levelId, codeviewRef, infoviewRef, initialCode, onDidChangeContent)
+  const {editor, infoProvider, editorConnection} =
+    useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
 
   const {setTitle, setSubtitle} = React.useContext(SetTitleContext);
 
@@ -165,7 +169,7 @@ function Level() {
       </Drawer>
       <Grid container columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ flexGrow: 1, p: 3 }} className="main-grid">
         <Grid xs={8} className="main-panel">
-          <div ref={messagePanelRef} className="message-panel">
+          <div ref={introductionPanelRef} className="introduction-panel">
             <Markdown>{level?.data?.introduction}</Markdown>
           </div>
           <div className="exercise">
@@ -189,8 +193,10 @@ function Level() {
             component={RouterLink} to={`/`}
             sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple><FontAwesomeIcon icon={faHome}></FontAwesomeIcon></Button>
 
-          <div ref={infoviewRef} className="infoview vscode-light"></div>
-          {/* <Infoview key={worldId + "/Level" + levelId} worldId={worldId} levelId={levelId} editor={editor} editorApi={infoProvider?.getApi()} /> */}
+
+          <EditorContext.Provider value={editorConnection}>
+            {editorConnection ? <Main /> : null}
+          </EditorContext.Provider>
         </Grid>
       </Grid>
     </div>
@@ -200,13 +206,14 @@ function Level() {
 export default Level
 
 
-function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewRef, initialCode, onDidChangeContent) {
+function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCode, onDidChangeContent) {
 
   const connection = React.useContext(ConnectionContext)
 
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
   const [infoviewApi, setInfoviewApi] = useState<null|InfoviewApi>(null)
+  const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
 
   // Create Editor
   useEffect(() => {
@@ -228,8 +235,47 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
     })
 
     const infoProvider = new InfoProvider(connection.getLeanClient())
-    const div: HTMLElement = infoviewRef.current!
-    const infoviewApi = renderInfoview(infoProvider.getApi(), div)
+
+    const editorApi = infoProvider.getApi()
+
+    const editorEvents: EditorEvents = {
+        initialize: new EventEmitter(),
+        gotServerNotification: new EventEmitter(),
+        sentClientNotification: new EventEmitter(),
+        serverRestarted: new EventEmitter(),
+        serverStopped: new EventEmitter(),
+        changedCursorLocation: new EventEmitter(),
+        changedInfoviewConfig: new EventEmitter(),
+        runTestScript: new EventEmitter(),
+        requestedAction: new EventEmitter(),
+    };
+
+    // Challenge: write a type-correct fn from `Eventify<T>` to `T` without using `any`
+    const infoviewApi: InfoviewApi = {
+        initialize: async l => editorEvents.initialize.fire(l),
+        gotServerNotification: async (method, params) => {
+            editorEvents.gotServerNotification.fire([method, params]);
+        },
+        sentClientNotification: async (method, params) => {
+            editorEvents.sentClientNotification.fire([method, params]);
+        },
+        serverRestarted: async r => editorEvents.serverRestarted.fire(r),
+        serverStopped: async serverStoppedReason => {
+            editorEvents.serverStopped.fire(serverStoppedReason)
+        },
+        changedCursorLocation: async loc => editorEvents.changedCursorLocation.fire(loc),
+        changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
+        requestedAction: async action => editorEvents.requestedAction.fire(action),
+        // See https://rollupjs.org/guide/en/#avoiding-eval
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval
+        runTestScript: async script => new Function(script)(),
+        getInfoviewHtml: async () => document.body.innerHTML,
+    };
+
+    const ec = new EditorConnection(editorApi, editorEvents);
+    setEditorConnection(ec)
+
+    editorEvents.initialize.on((loc: Location) => ec.events.changedCursorLocation.fire(loc))
 
     setEditor(editor)
     setInfoProvider(infoProvider)
@@ -263,5 +309,5 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
     }
   }, [editor, levelId, connection, leanClientStarted])
 
-  return {editor, infoProvider}
+  return {editor, infoProvider, editorConnection}
 }

@@ -100,7 +100,7 @@ def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool :=
 
 open Meta in
 /-- Find all messages whose trigger matches the current goal -/
-def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) (hLog : IO.FS.Stream) : MetaM (Array GameMessage) := do
+def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array GameMessage) := do
   goal.withContext do
     let level ← getLevelByFileName doc.meta.mkInputContext.fileName
     let messages ← level.messages.filterMapM fun message => do
@@ -109,7 +109,6 @@ def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) (hLog : IO.
       if ← isDefEq messageGoal (← inferType $ mkMVar goal) -- TODO: also check assumptions
       then
         let lctx ← getLCtx -- Local context of the `goal`
-        hLog.putStr s!"{← declMvars.mapM inferType} =?= {← lctx.getFVars.mapM inferType}"
         if ← matchDecls declMvars lctx.getFVars
         then
           return some { message := message.message, spoiler := message.spoiler }
@@ -117,11 +116,23 @@ def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) (hLog : IO.
       else return none
     return messages
 
+structure GameInteractiveGoal where
+  goal : InteractiveGoal
+  messages: Array GameMessage
+  deriving RpcEncodable
 
-/-- Get goals and messages at a given position -/
-def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal)) := do
+structure GameInteractiveGoals where
+  goals : Array GameInteractiveGoal
+  deriving RpcEncodable
+
+def GameInteractiveGoals.append (l r : GameInteractiveGoals) : GameInteractiveGoals where
+  goals := l.goals ++ r.goals
+
+instance : Append GameInteractiveGoals := ⟨GameInteractiveGoals.append⟩
+
+open RequestM in
+def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option GameInteractiveGoals)) := do
   let doc ← readDoc
-  let hLog := (← read).hLog
   let text := doc.meta.text
   let hoverPos := text.lspPosToUtf8Pos p.position
   -- TODO: I couldn't find a good condition to find the correct snap. So we are looking
@@ -129,24 +140,35 @@ def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal
   withWaitFindSnap doc (fun s => ¬ (s.infoTree.goalsAt? doc.meta.text hoverPos).isEmpty)
     (notFoundX := return none) fun snap => do
       if let rs@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text hoverPos then
-        let goals ← rs.mapM fun { ctxInfo := ci, tacticInfo := ti, useAfter := useAfter, .. } => do
-          let ci := if useAfter then { ci with mctx := ti.mctxAfter } else { ci with mctx := ti.mctxBefore }
-          let goals := List.toArray <| if useAfter then ti.goalsAfter else ti.goalsBefore
-          let goals ← ci.runMetaM {} $ goals.mapM fun goal => do
-            let messages ← findMessages goal doc hLog
-            return ← goal.toGameGoal messages
-          return goals
-        return some { goals := goals.foldl (· ++ ·) ∅ }
+        let goals : List GameInteractiveGoals ← rs.mapM fun { ctxInfo := ci, tacticInfo := ti, useAfter := useAfter, .. } => do
+          let ciAfter := { ci with mctx := ti.mctxAfter }
+          let ci := if useAfter then ciAfter else { ci with mctx := ti.mctxBefore }
+          -- compute the interactive goals
+          let goals ← ci.runMetaM {} do
+            return List.toArray <| if useAfter then ti.goalsAfter else ti.goalsBefore
+          let goals ← ci.runMetaM {} do
+             goals.mapM fun goal => do
+              let messages ← findMessages goal doc
+              return {goal := ← Widget.goalToInteractive goal, messages}
+          -- compute the goal diff
+          -- let goals ← ciAfter.runMetaM {} (do
+          --     try
+          --       Widget.diffInteractiveGoals useAfter ti goals
+          --     catch _ =>
+          --       -- fail silently, since this is just a bonus feature
+          --       return goals
+          -- )
+          return {goals}
+        return some <| goals.foldl (· ++ ·) ⟨#[]⟩
       else
         return none
 
 builtin_initialize
   registerBuiltinRpcProcedure
-    `Game.getGoals
+    `Game.getInteractiveGoals
     Lsp.PlainGoalParams
-    (Option PlainGoal)
-    getGoals
-
+    (Option GameInteractiveGoals)
+    getInteractiveGoals
 
 structure Diagnostic where
   severity : Option Lean.Lsp.DiagnosticSeverity
