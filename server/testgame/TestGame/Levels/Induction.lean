@@ -4,5 +4,5 @@ import TestGame.Levels.Induction.L03_Induction
 import TestGame.Levels.Induction.L04_SumOdd
 
 Game "TestGame"
-World "Predicate"
+World "Induction"
 Title "Induktion"
