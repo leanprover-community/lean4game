@@ -117,11 +117,9 @@ def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) (hLog : IO.
       else return none
     return messages
 
-
-/-- Get goals and messages at a given position -/
-def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal)) := do
+open RequestM in
+def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Widget.InteractiveGoals)) := do
   let doc ← readDoc
-  let hLog := (← read).hLog
   let text := doc.meta.text
   let hoverPos := text.lspPosToUtf8Pos p.position
   -- TODO: I couldn't find a good condition to find the correct snap. So we are looking
@@ -129,24 +127,38 @@ def getGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option PlainGoal
   withWaitFindSnap doc (fun s => ¬ (s.infoTree.goalsAt? doc.meta.text hoverPos).isEmpty)
     (notFoundX := return none) fun snap => do
       if let rs@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text hoverPos then
-        let goals ← rs.mapM fun { ctxInfo := ci, tacticInfo := ti, useAfter := useAfter, .. } => do
-          let ci := if useAfter then { ci with mctx := ti.mctxAfter } else { ci with mctx := ti.mctxBefore }
-          let goals := List.toArray <| if useAfter then ti.goalsAfter else ti.goalsBefore
-          let goals ← ci.runMetaM {} $ goals.mapM fun goal => do
-            let messages ← findMessages goal doc hLog
-            return ← goal.toGameGoal messages
+        let goals : List Widget.InteractiveGoals ← rs.mapM fun { ctxInfo := ci, tacticInfo := ti, useAfter := useAfter, .. } => do
+          let ciAfter := { ci with mctx := ti.mctxAfter }
+          let ci := if useAfter then ciAfter else { ci with mctx := ti.mctxBefore }
+          -- compute the interactive goals
+          let goals ← ci.runMetaM {} (do
+            let goals := List.toArray <| if useAfter then ti.goalsAfter else ti.goalsBefore
+            let goals ← goals.mapM Widget.goalToInteractive
+            return {goals}
+          )
+          -- compute the goal diff
+          let goals ← ciAfter.runMetaM {} (do
+              try
+                Widget.diffInteractiveGoals useAfter ti goals
+              catch _ =>
+                -- fail silently, since this is just a bonus feature
+                return goals
+          )
+          -- TODO: add hints
+          -- let goals ← ci.runMetaM {} $ goals.mapM fun goal => do
+          --   let messages ← findMessages goal doc hLog
+          --   return ← goal.toGameGoal messages
           return goals
-        return some { goals := goals.foldl (· ++ ·) ∅ }
+        return some <| goals.foldl (· ++ ·) ∅
       else
         return none
 
 builtin_initialize
   registerBuiltinRpcProcedure
-    `Game.getGoals
+    `Game.getInteractiveGoals
     Lsp.PlainGoalParams
-    (Option PlainGoal)
-    getGoals
-
+    (Option InteractiveGoals)
+    getInteractiveGoals
 
 structure Diagnostic where
   severity : Option Lean.Lsp.DiagnosticSeverity
