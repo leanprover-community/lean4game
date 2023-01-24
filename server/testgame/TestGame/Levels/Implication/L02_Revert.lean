@@ -36,7 +36,7 @@ dass $B$ wahr ist."
   revert ha
   assumption
 
-Hint (A : Prop) (B : Prop) (ha : A) (h : A → B): B =>
+HiddenHint (A : Prop) (B : Prop) (ha : A) (h : A → B): B =>
 "Mit `revert ha` kann man die Annahme `ha` als Implikationsprämisse vorne ans Goal anhängen."
 
 Tactics revert assumption

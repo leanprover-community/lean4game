@@ -10,56 +10,12 @@ open Meta
 
 /-! ## GameGoal -/
 
-structure GameLocalDecl where
-  userName : Name
-  type : String
+structure GameHint where
+  text : String
+  hidden : Bool
 deriving FromJson, ToJson
-
-structure GameMessage where
-  message : String
-  spoiler : Bool
-deriving FromJson, ToJson
-
-structure GameGoal where
-  objects : List GameLocalDecl
-  assumptions : List GameLocalDecl
-  goal : String
-  messages : Array GameMessage
-deriving FromJson, ToJson
-
-
-def Lean.MVarId.toGameGoal (goal : MVarId) (messages : Array GameMessage) : MetaM GameGoal := do
-match (← getMCtx).findDecl? goal with
-| none          => throwError "unknown goal"
-| some mvarDecl => do
-  -- toGameGoalAux below will sort local declarations from the context of goal into data and assumptions,
-  -- discarding auxilliary declarations
-  let rec toGameGoalAux : List (Option LocalDecl) → MetaM (List LocalDecl × List LocalDecl)
-  | (some decl)::t => withLCtx mvarDecl.lctx mvarDecl.localInstances do
-    let (o, a) ← toGameGoalAux t
-    if decl.isAuxDecl then
-      return (o, a)
-    if (← inferType decl.type).isProp then
-      return (o, decl::a)
-    else
-      return (decl::o, a)
-  | none:: t => toGameGoalAux t
-  | [] => return ([], [])
-  withLCtx mvarDecl.lctx mvarDecl.localInstances do
-    let (objects, assumptions) ← toGameGoalAux mvarDecl.lctx.decls.toList
-    let objects ← objects.mapM fun decl => do
-      return { userName := decl.userName, type := toString (← Meta.ppExpr decl.type) }
-    let assumptions ← assumptions.mapM fun decl => do
-      return { userName := decl.userName, type := toString (← Meta.ppExpr decl.type) }
-    return {objects := objects, assumptions := assumptions, goal := toString (← Meta.ppExpr mvarDecl.type), messages }
 
 namespace GameServer
-
-/-- `Game.getGoals` client<-server reply. -/
-structure PlainGoal where
-  /-- The pretty-printed goals, empty if all accomplished. -/
-  goals : Array GameGoal
-  deriving FromJson, ToJson
 
 -- TODO: Find a better way to pass on the file name?
 def levelIdFromFileName [Monad m] [MonadError m] [MonadEnv m] (fileName : String) : m LevelId := do
@@ -99,26 +55,26 @@ def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool :=
   return true
 
 open Meta in
-/-- Find all messages whose trigger matches the current goal -/
-def findMessages (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array GameMessage) := do
+/-- Find all hints whose trigger matches the current goal -/
+def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array GameHint) := do
   goal.withContext do
     let level ← getLevelByFileName doc.meta.mkInputContext.fileName
-    let messages ← level.messages.filterMapM fun message => do
-      let (declMvars, binderInfo, messageGoal) ← forallMetaBoundedTelescope message.goal message.intros
+    let hints ← level.hints.filterMapM fun hint => do
+      let (declMvars, binderInfo, hintGoal) ← forallMetaBoundedTelescope hint.goal hint.intros
       -- TODO: Protext mvars in the type of `goal` to be instantiated?
-      if ← isDefEq messageGoal (← inferType $ mkMVar goal) -- TODO: also check assumptions
+      if ← isDefEq hintGoal (← inferType $ mkMVar goal) -- TODO: also check assumptions
       then
         let lctx ← getLCtx -- Local context of the `goal`
         if ← matchDecls declMvars lctx.getFVars
         then
-          return some { message := message.message, spoiler := message.spoiler }
+          return some { text := hint.text, hidden := hint.hidden }
         else return none
       else return none
-    return messages
+    return hints
 
 structure GameInteractiveGoal where
   goal : InteractiveGoal
-  messages: Array GameMessage
+  hints: Array GameHint
   deriving RpcEncodable
 
 structure GameInteractiveGoals where
@@ -148,8 +104,8 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
             return List.toArray <| if useAfter then ti.goalsAfter else ti.goalsBefore
           let goals ← ci.runMetaM {} do
              goals.mapM fun goal => do
-              let messages ← findMessages goal doc
-              return {goal := ← Widget.goalToInteractive goal, messages}
+              let hints ← findHints goal doc
+              return {goal := ← Widget.goalToInteractive goal, hints}
           -- compute the goal diff
           -- let goals ← ciAfter.runMetaM {} (do
           --     try

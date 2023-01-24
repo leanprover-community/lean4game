@@ -43,22 +43,22 @@ Statement
   rw [not_odd]
   apply even_square
 
-Hint (n : ℕ) (h : Odd (n ^ 2)) : Odd n =>
+HiddenHint (n : ℕ) (h : Odd (n ^ 2)) : Odd n =>
 "Um `contrapose` anzuwenden, brauchen wir eine Implikation `Odd (n ^ 2) → Odd n` im
 Goal. Benutze `revert h`!"
 
-Message (n : ℕ) : Odd (n ^ 2) → Odd n =>
+Hint (n : ℕ) : Odd (n ^ 2) → Odd n =>
 "Mit `contrapose` kann man die Implikation zu
 `¬ (Not n) → ¬ (Odd n^2)` umkehren."
 
-Message (n : ℕ) : ¬Odd n → ¬Odd (n ^ 2) => "Erinnere dich an das Lemma `not_odd`."
+Hint (n : ℕ) : ¬Odd n → ¬Odd (n ^ 2) => "Erinnere dich an das Lemma `not_odd`."
 
-Hint (n : ℕ) : ¬Odd n → ¬Odd (n ^ 2) => "Dieses kann mit `rw` gebraucht werden."
+HiddenHint (n : ℕ) : ¬Odd n → ¬Odd (n ^ 2) => "Dieses kann mit `rw` gebraucht werden."
 
-Message (n : ℕ) : Even n → ¬Odd (n ^ 2) =>
+Hint (n : ℕ) : Even n → ¬Odd (n ^ 2) =>
 "rw [not_odd] muss hier zweimal angewendet werden."
 
-Message (n : ℕ) : Even n → Even (n ^ 2) =>
+Hint (n : ℕ) : Even n → Even (n ^ 2) =>
 "Diese Aussage hast du bereits als Lemma bewiesen, schau mal in der Bibliothek."
 
 Tactics contrapose rw apply

@@ -1,13 +1,13 @@
 import { InteractiveGoals, InteractiveGoal } from '@leanprover/infoview-api';
 
-export interface GameMessage {
-  message: string;
-  spoiler: boolean;
+export interface GameHint {
+  text: string;
+  hidden: boolean;
 }
 
 export interface GameInteractiveGoal {
   goal: InteractiveGoal;
-  messages: GameMessage[];
+  hints: GameHint[];
 }
 
 export interface GameInteractiveGoals {

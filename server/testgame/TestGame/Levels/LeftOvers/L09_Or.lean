@@ -35,36 +35,36 @@ Statement and_or_imp
   assumption
   assumption
 
-Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B ∨ (A → C)) (hA : A) : B ∨ (C ∧ A) =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B ∨ (A → C)) (hA : A) : B ∨ (C ∧ A) =>
 "Ein ODER in den Annahmen teilt man mit `rcases h with h₁ | h₂`."
 
 -- If starting with `left`.
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B ∨ (A → C)) : B =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B ∨ (A → C)) : B =>
 "Da kommst du nicht mehr weiter..."
 
 -- If starting with `right`.
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B ∨ (A → C)) : (C ∧ A) =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B ∨ (A → C)) : (C ∧ A) =>
 "Da kommst du nicht mehr weiter..."
 
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) (hA : A) : B ∨ (C ∧ A) =>
+"`left` oder `right`?"
+
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B) (hA : A) : B ∨ (C ∧ A) =>
+"`left` oder `right`?"
+
 Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) (hA : A) : B ∨ (C ∧ A) =>
-"`left` oder `right`?"
-
-Hint (A : Prop) (B : Prop) (C : Prop) (h : B) (hA : A) : B ∨ (C ∧ A) =>
-"`left` oder `right`?"
-
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) (hA : A) : B ∨ (C ∧ A) =>
 "Ein UND in den Annahmen kann man mit `rcases h with ⟨h₁, h₂⟩` aufteilen."
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) (hA : A) : B =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) (hA : A) : B =>
 "Ein UND in den Annahmen kann man mit `rcases h with ⟨h₁, h₂⟩` aufteilen."
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) : C =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) : C =>
 "Sackgasse."
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) : C ∧ A =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) : C ∧ A =>
 "Hmmm..."
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A → C) : C ∧ A =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A → C) : C ∧ A =>
 "Ein UND im Goal kann mit `constructor` aufgeteilt werden."
 
 Tactics left right assumption constructor rcases

@@ -25,10 +25,10 @@ Statement
   assumption
   assumption
 
-Hint (A : Prop) (B : Prop) : A ↔ B =>
+HiddenHint (A : Prop) (B : Prop) : A ↔ B =>
 "Eine Struktur wie `A ↔ B` kann man mit `constructor` zerlegen."
 
-Hint (A : Prop) (B : Prop) (h : A → B) : A → B =>
+HiddenHint (A : Prop) (B : Prop) (h : A → B) : A → B =>
 "Such mal in den Annahmen."
 
 Conclusion

@@ -8,20 +8,20 @@ defined in this file.
 
 open Lean
 
-/-! ## Messages -/
+/-! ## Hints -/
 
 /--
-A message to be displayed to the user as instruction/hint.
+A hint to help the user with a specific goal state
 
 Fields
   (TODO)
-  spoiler: If true, then message should be hidden by default
+  hidden: If true, then hint should be hidden by default
 -/
-structure GoalMessageEntry where
+structure GoalHintEntry where
   goal : Expr
   intros : Nat
-  message : String
-  spoiler : Bool := false
+  text : String
+  hidden : Bool := false
   deriving Repr
 
 /-! ## Tactic documentation -/
@@ -200,7 +200,7 @@ structure GameLevel where
   conclusion: String := default
   tactics: Array TacticDocEntry := default
   lemmas: Array LemmaDocEntry := default
-  messages: Array GoalMessageEntry := default
+  hints: Array GoalHintEntry := default
   goal : TSyntax `Lean.Parser.Command.declSig := default
   descrText: String := default
   descrFormat : String := default

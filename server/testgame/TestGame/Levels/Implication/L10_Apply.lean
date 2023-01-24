@@ -40,10 +40,10 @@ Statement
   intro
   assumption
 
-Hint (A : Prop) :  ¬A ∨ A =>
+HiddenHint (A : Prop) :  ¬A ∨ A =>
 "Das Lemma wendest du mit `apply not_or_of_imp` an."
 
-Hint (A : Prop) : A → A =>
+HiddenHint (A : Prop) : A → A =>
 "Wie immer, `intro` ist dein Freund."
 
 Conclusion

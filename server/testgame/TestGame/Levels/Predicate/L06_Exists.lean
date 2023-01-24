@@ -42,29 +42,29 @@ Statement even_square
   rw [hx]
   ring
 
-Message (n : ℕ) (h : Even n) : Even (n ^ 2) =>
+Hint (n : ℕ) (h : Even n) : Even (n ^ 2) =>
 "Wenn du die Definition von `even` nicht kennst, kannst du diese mit `unfold even` oder
 `unfold even at *` ersetzen.
 Note: Der Befehl macht erst mal nichts in Lean sondern nur in der Anzeige. Der Beweis funktioniert
 genau gleich, wenn du das `unfold` rauslöscht."
 
-Message (n : ℕ) (h : ∃ r, n = 2 * r) : ∃ r, n ^ 2 = 2 * r =>
+Hint (n : ℕ) (h : ∃ r, n = 2 * r) : ∃ r, n ^ 2 = 2 * r =>
 "Ein `∃ x, ..` in den Annahmen kann man wieder mit `rcases h with ⟨x, hx⟩` aufteilen, und
 ein `x` erhalten, dass die Aussage erfüllt."
 
-Message (n : ℕ) (x : ℕ) (hx : n = x + x) : ∃ r, n ^ 2 = 2 * r =>
+Hint (n : ℕ) (x : ℕ) (hx : n = x + x) : ∃ r, n ^ 2 = 2 * r =>
 "Bei einem `∃ x, ..` im Goal hingegen, muss man mit `use y` das Element angeben, dass
 die Aussage erfüllen soll."
 
-Message (n : ℕ) (x : ℕ) (hx : n = x + x) : ∃ r, (x + x) ^ 2 = r + r =>
+Hint (n : ℕ) (x : ℕ) (hx : n = x + x) : ∃ r, (x + x) ^ 2 = r + r =>
 "Bei einem `∃ x, ..` im Goal hingegen, muss man mit `use y` das Element angeben, dass
 die Aussage erfüllen soll."
 
-Message (n : ℕ) (x : ℕ) (hx : n = x + x) : n ^ 2 = 2 * x ^ 2 + 2 * x ^ 2 =>
+Hint (n : ℕ) (x : ℕ) (hx : n = x + x) : n ^ 2 = 2 * x ^ 2 + 2 * x ^ 2 =>
 "Prinzipiell löst `ring` simple Gleichungen wie diese. Allerdings musst du zuerst `n` zu
 `x + x` umschreiben..."
 
-Message (n : ℕ) (x : ℕ) (hx : n = x + x) : (x + x) ^ 2 = 2 * x ^ 2 + 2 * x ^ 2 =>
+Hint (n : ℕ) (x : ℕ) (hx : n = x + x) : (x + x) ^ 2 = 2 * x ^ 2 + 2 * x ^ 2 =>
 "Die Taktik `ring` löst solche Gleichungen."
 
 Tactics unfold rcases use rw ring

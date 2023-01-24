@@ -28,10 +28,10 @@ Zeige dass $b + b ^ 2 = b + 1$."
   rw [h] at g
   assumption
 
-Message (a : ℕ) (b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : b + b ^ 2 = b + 1 =>
+Hint (a : ℕ) (b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : b + b ^ 2 = b + 1 =>
 "`rw [ ... ] at g` schreibt die Annahme `g` um."
 
-Message (a : ℕ) (b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : a + a ^ 2 = a + 1 =>
+Hint (a : ℕ) (b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : a + a ^ 2 = a + 1 =>
 "Sackgasse. probiers doch mit `rw [h] at g` stattdessen."
 
 Conclusion "Übrigens, mit `rw [h] at *` kann man im weiteren `h` in **allen** Annahmen und

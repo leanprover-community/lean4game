@@ -25,10 +25,10 @@ Statement
   apply g
   assumption
 
-Hint (A : Prop) (B : Prop) (hA : A) (g : A → B) : B =>
+HiddenHint (A : Prop) (B : Prop) (hA : A) (g : A → B) : B =>
 "Mit `apply g` kannst du die Implikation `g` anwenden."
 
-Hint (A : Prop) (B : Prop) (hA : A) (g : A → B) : A =>
+HiddenHint (A : Prop) (B : Prop) (hA : A) (g : A → B) : A =>
 "Nachdem du die Implikation `A → B` angewendet hast, musst du nur noch $A$ zeigen,
 dafür hast du bereits einen Beweis in den Annahmen."
 

@@ -29,7 +29,7 @@ Statement
     (x y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
   ring
 
-Hint (x : ℕ) (y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 =>
+HiddenHint (x : ℕ) (y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 =>
 "`ring` übernimmt den ganzen Spaß."
 
 Conclusion

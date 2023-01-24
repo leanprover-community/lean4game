@@ -43,7 +43,7 @@ Statement
   rw [hy]
   ring
 
-Message (n : ℕ) (hn : Odd n) (h : ∀ (x : ℕ), (Odd x) → Even (x + 1)) : Even (n + 1) =>
+Hint (n : ℕ) (hn : Odd n) (h : ∀ (x : ℕ), (Odd x) → Even (x + 1)) : Even (n + 1) =>
 "`∀ (x : ℕ), (odd x) → even (x + 1)` ist eigentlich das gleiche wie
 `(x : ℕ) → `"
 

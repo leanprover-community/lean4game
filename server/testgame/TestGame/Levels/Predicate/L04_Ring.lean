@@ -22,10 +22,10 @@ Statement
   rw [h]
   ring
 
-Message (x : ℕ) (y : ℕ) (h : x = 2 * y + 1) : x ^ 2 = 4 * y ^ 2 + 3 * y + 1 + y =>
+Hint (x : ℕ) (y : ℕ) (h : x = 2 * y + 1) : x ^ 2 = 4 * y ^ 2 + 3 * y + 1 + y =>
   "Die Annahme `h` kannst du mit `rw [h]` benützen."
 
-Message (y : ℕ) : (2 * y + 1) ^ 2 = 4 * y ^ 2 + 3 * y + 1 + y =>
+Hint (y : ℕ) : (2 * y + 1) ^ 2 = 4 * y ^ 2 + 3 * y + 1 + y =>
   "Jetzt kann `ring` übernehmen."
 
 Conclusion ""

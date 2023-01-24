@@ -36,38 +36,38 @@ Statement
   rw [←h₂]
   assumption
 
-Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : B ↔ C =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : B ↔ C =>
 "Im Goal kommt `C` vor und `h₁` sagt `C ↔ D`.
 Probiers doch mit `rw [h₁]`."
 
-Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : A ↔ C =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : A ↔ C =>
 "Im Goal kommt `C` vor und `h₁` sagt `C ↔ D`.
 Probiers doch mit `rw [h₁]`."
 
-Message (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : B ↔ D =>
+Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : B ↔ D =>
 "Man kann auch rückwärts umschreiben:
 `rw [←h₂]` ersetzt man im Goal `B` durch `a` (`\\l`, also ein kleines L)"
 
-Hint (A : Prop) (B : Prop) (h : A ↔ B) : A ↔ B =>
+HiddenHint (A : Prop) (B : Prop) (h : A ↔ B) : A ↔ B =>
 "Schau mal durch die Annahmen durch."
 
 
 -- These should not be necessary if they don't use `rw [] at`.
-Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ C) : B ↔ C =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ C) : B ↔ C =>
 "Auch eine Möglichkeit... Kannst du das Goal so umschreiben,
 dass es mit einer Annahme übereinstimmt?"
 
-Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : B ↔ D) : B ↔ C =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : B ↔ D) : B ↔ C =>
 "Auch eine Möglichkeit.. Kannst du das Goal so umschreiben, dass es mit einer Annahme übereinstimmt?"
 
-Message (A : Prop) (B : Prop) (h : B ↔ A) : A ↔ B =>
+Hint (A : Prop) (B : Prop) (h : B ↔ A) : A ↔ B =>
 "Naja auch Umwege führen ans Ziel... Wenn du das Goal zu `A ↔ A` umschreibst, kann man es mit
 `rfl` beweisen (rsp. das passiert automatisch.)"
 
-Message (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : D ↔ B) (h₃ : D ↔ A) : B ↔ C =>
+Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : D ↔ B) (h₃ : D ↔ A) : B ↔ C =>
 "Das ist nicht der optimale Weg..."
 
-Message (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : D ↔ B) (h₃ : A ↔ D) : B ↔ C =>
+Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : D ↔ B) (h₃ : A ↔ D) : B ↔ C =>
 "Das ist nicht der optimale Weg..."
 
 

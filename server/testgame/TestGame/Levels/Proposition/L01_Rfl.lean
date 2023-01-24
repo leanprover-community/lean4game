@@ -31,10 +31,10 @@ Statement
 "Zeige $ 42 = 42 $." : 42 = 42 := by
   rfl
 
--- Message : 42 = 42 =>
+-- Hint : 42 = 42 =>
 -- "Die Taktik `rfl` beweist ein Goal der Form `X = X`."
 
-Hint : 42 = 42 =>
+HiddenHint : 42 = 42 =>
 "Man schreibt eine Taktik pro Zeile, also gib `rfl` ein und geh mit Enter ⏎ auf eine neue Zeile."
 
 Conclusion "Bravo! PS: `rfl` steht für \"reflexivity\"."

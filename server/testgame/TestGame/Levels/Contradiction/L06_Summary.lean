@@ -40,10 +40,10 @@ Statement
   apply even_square
   assumption
 
-Hint (n : ℕ) (h : Odd (n^2)) : Odd n =>
+HiddenHint (n : ℕ) (h : Odd (n^2)) : Odd n =>
 "Schreibe `by_contra h₁` um einen Beweis durch Widerspruch zu starten."
 
-Message (n : ℕ) (g : ¬ Odd n) (h : Odd (n^2)) : False =>
+Hint (n : ℕ) (g : ¬ Odd n) (h : Odd (n^2)) : False =>
 "
 Am sinnvollsten ist es, hier einen Widerspruch zu `Odd (n^2)` zu suchen.
 Dafür kannst du
@@ -54,20 +54,20 @@ contradiction
 benützen.
 "
 
-Hint (n : ℕ) (g : ¬ Odd (n^2)) (h : Odd (n^2)) : False =>
+HiddenHint (n : ℕ) (g : ¬ Odd (n^2)) (h : Odd (n^2)) : False =>
 "Hier brauchst du nur `contradiction`."
 
-Message (n : ℕ) (g : ¬ Odd n) (h : Odd (n^2)) : ¬ Odd (n^2) =>
+Hint (n : ℕ) (g : ¬ Odd n) (h : Odd (n^2)) : ¬ Odd (n^2) =>
 "Das Zwischenresultat `¬Odd (n^2)` muss auch bewiesen werden.
 Hier ist wieder das Lemma `not_Odd` hilfreich."
 
-Hint (n : ℕ) (g : ¬ Odd n) (h : Odd (n^2)) : Even (n^2) =>
+HiddenHint (n : ℕ) (g : ¬ Odd n) (h : Odd (n^2)) : Even (n^2) =>
 "Mit `rw [not_Odd] at *` kannst du im Goal und allen Annahmen gleichzeitig umschreiben."
 
-Message (n: ℕ) (h : Odd (n ^ 2)) (g : Even n) : Even (n ^ 2) =>
+Hint (n: ℕ) (h : Odd (n ^ 2)) (g : Even n) : Even (n ^ 2) =>
 "Diese Aussage hast du bereits als Lemma bewiesen."
 
-Hint (n: ℕ) (h : Odd (n ^ 2)) (g : Even n) : Even (n ^ 2) =>
+HiddenHint (n: ℕ) (h : Odd (n ^ 2)) (g : Even n) : Even (n ^ 2) =>
 "Probiers mit `apply ...`"
 
 

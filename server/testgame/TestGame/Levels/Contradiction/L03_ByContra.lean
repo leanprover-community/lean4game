@@ -39,14 +39,14 @@ muss."
   assumption
 
 
-Hint (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) : ¬ A =>
+HiddenHint (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) : ¬ A =>
 "`by_contra h` nimmt das Gegenteil des Goal als Annahme `(h : A)` und setzt das
 Goal auf `False`."
 
-Message (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) (a : A) : False =>
+Hint (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) (a : A) : False =>
 "Jetzt kannst du mit `suffices` oder `have` Fortschritt machen."
 
-Hint (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) (a : A) : False =>
+HiddenHint (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) (a : A) : False =>
 "Zum Beispiel `suffices hb : B`."
 
 

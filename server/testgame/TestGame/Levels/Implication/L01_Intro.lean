@@ -31,10 +31,10 @@ Statement
   assumption
   assumption
 
-Hint (A : Prop) (B : Prop) (hb : B) : A → (A ∧ B) =>
+HiddenHint (A : Prop) (B : Prop) (hb : B) : A → (A ∧ B) =>
 "Mit `intro ha` kann man annehmen, dass $A$ wahr ist. danach muss man $A \\land B$ zeigen."
 
-Message (A : Prop) (B : Prop) (ha : A) (hb : B) : (A ∧ B) =>
+Hint (A : Prop) (B : Prop) (ha : A) (hb : B) : (A ∧ B) =>
 "Jetzt kannst du die Taktiken aus dem letzten Kapitel verwenden."
 
 Tactics intro constructor assumption

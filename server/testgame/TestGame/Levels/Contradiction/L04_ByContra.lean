@@ -40,7 +40,7 @@ Statement not_imp_not
 -- TODO: Forbidden Tactics: apply, rw
 -- TODO: forbidden Lemma: not_not
 
-Hint (A : Prop) (B : Prop) : A → B ↔ (¬ B → ¬ A) =>
+HiddenHint (A : Prop) (B : Prop) : A → B ↔ (¬ B → ¬ A) =>
 ""
 
 

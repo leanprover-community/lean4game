@@ -95,31 +95,31 @@ $(A \\lor B) \\land (A \\lor C)$ wahr ist."
   right
   assumption
 
-Hint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) ∧ (A ∨ C) =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) ∧ (A ∨ C) =>
 "Das `∧` in der Annahme kann mit `rcases h with ⟨h₁, h₂⟩` zerlegt werden."
 
-Hint (A : Prop) (B : Prop) (C : Prop) : (A ∨ B) ∧ (A ∨ C) =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) : (A ∨ B) ∧ (A ∨ C) =>
 "Das `∧` im Goal kann mit `constructor` zerlegt werden."
 
-Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) =>
 "Das `∨` in der Annahme kann mit `rcases h with h | h` zerlegt werden."
 
-Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) =>
 "Das `∨` in der Annahme kann mit `rcases h with h | h` zerlegt werden."
 
-Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ C) =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ C) =>
 "Das `∨` in der Annahme kann mit `rcases h with h | h` zerlegt werden."
 
 
-Hint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) =>
 "Das `∧` in der Annahme kann mit `rcases h with ⟨h₁, h₂⟩` zerlegt werden."
 
-Hint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ C) =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ C) =>
 "Das `∧` in der Annahme kann mit `rcases h with ⟨h₁, h₂⟩` zerlegt werden."
 
--- TODO: Message nur Anhand der Annahmen?
+-- TODO: Hint nur Anhand der Annahmen?
 
-Hint (A : Prop) (B : Prop) : A ∨ B =>
+HiddenHint (A : Prop) (B : Prop) : A ∨ B =>
 "`left` oder `right`?"
 
 Tactics left right assumption constructor rcases rfl contradiction trivial

@@ -52,28 +52,28 @@ Statement imp_iff_not_or
   contradiction
   assumption
 
-Hint (A : Prop) (B: Prop) : (A → B) ↔ ¬ A ∨ B =>
+HiddenHint (A : Prop) (B: Prop) : (A → B) ↔ ¬ A ∨ B =>
 "Eine Äquivalenz im Goal geht man immer mit `constructor` an."
 
-Hint (A : Prop) (B: Prop) : (A → B) → ¬ A ∨ B =>
+HiddenHint (A : Prop) (B: Prop) : (A → B) → ¬ A ∨ B =>
 "Diese Aussage hast du vorhin bereits als Lemma kennengelernt und angewendet."
 
-Hint (A : Prop) (B: Prop) (h : A → B) : ¬ A ∨ B =>
+HiddenHint (A : Prop) (B: Prop) (h : A → B) : ¬ A ∨ B =>
 "Diese Aussage hast du vorhin bereits als Lemma kennengelernt und angewendet."
 
-Hint (A : Prop) (B: Prop) : ¬ A ∨ B → (A → B) =>
+HiddenHint (A : Prop) (B: Prop) : ¬ A ∨ B → (A → B) =>
 "Eine Implikation geht man fast immer mit `intro h` an."
 
-Hint (A : Prop) (B: Prop) (h : ¬ A ∨ B) : (A → B) =>
+HiddenHint (A : Prop) (B: Prop) (h : ¬ A ∨ B) : (A → B) =>
 "Nochmals `intro`."
 
-Hint (A : Prop) (B: Prop) (h : ¬ A ∨ B) : (A → B) =>
+HiddenHint (A : Prop) (B: Prop) (h : ¬ A ∨ B) : (A → B) =>
 "Das ODER in den Annahmen kannst du mit `rcases h with h | h` aufteilen."
 
-Hint (A : Prop) (B: Prop) (h : ¬ A ∨ B) (ha : A) : B =>
+HiddenHint (A : Prop) (B: Prop) (h : ¬ A ∨ B) (ha : A) : B =>
 "Das ODER in den Annahmen kannst du mit `rcases h with h | h` aufteilen."
 
-Hint (A : Prop) (B: Prop) (ha : A) (ha' : ¬A) : B =>
+HiddenHint (A : Prop) (B: Prop) (ha : A) (ha' : ¬A) : B =>
 "Findest du einen Widerspruch?"
 
 Tactics rfl assumption trivial left right constructor rcases

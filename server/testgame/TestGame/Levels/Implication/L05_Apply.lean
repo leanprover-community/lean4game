@@ -28,22 +28,22 @@ Statement
   apply f
   assumption
 
-Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (f : A → B) (g : C → B) (h : B → E)
     (i : D → E) (k : E → F) (m : C → F) : A → F =>
 "Wieder ist es schlau, mit `intro` anzufangen."
 
-Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (hA : A) (f : A → B) (g : C → B) (h : B → E)
     (i : D → E) (k : E → F) (m : C → F) : F =>
 "Versuch mit `apply` den richtigen Weg zu finden."
 
-Message (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
+Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (hA : A) (f : A → B) (g : C → B) (h : B → E)
     (i : D → E) (k : E → F) (m : C → F) : C =>
 "Sackgasse. Probier doch einen anderen Weg."
 
-Message (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
+Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (hA : A) (f : A → B) (g : C → B) (h : B → E)
     (i : D → E) (k : E → F) (m : C → F) : D =>
 "Sackgasse. Probier doch einen anderen Weg."

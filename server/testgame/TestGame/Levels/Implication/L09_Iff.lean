@@ -25,10 +25,10 @@ Statement
   rcases h
   assumption
 
-Hint (A : Prop) (B : Prop) : (A ↔ B) → A → B =>
+HiddenHint (A : Prop) (B : Prop) : (A ↔ B) → A → B =>
 "Angefangen mit `intro h` kannst du annehmen, dass `(h : A ↔ B)` wahr ist."
 
-Hint (A : Prop) (B : Prop) (h : A ↔ B) : A → B =>
+HiddenHint (A : Prop) (B : Prop) (h : A ↔ B) : A → B =>
 "Mit `rcases h with ⟨h₁, h₂⟩` kannst du jetzt die Annahme `(h : A ↔ B)` zerlegen."
 
 

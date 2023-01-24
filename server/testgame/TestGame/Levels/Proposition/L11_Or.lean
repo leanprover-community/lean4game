@@ -24,10 +24,10 @@ Statement
   left
   assumption
 
-Hint (A : Prop) (B : Prop) (hA : A) : A ∨ (¬ B) =>
+HiddenHint (A : Prop) (B : Prop) (hA : A) : A ∨ (¬ B) =>
 "Entscheide dich, `right` oder `left`?"
 
-Message (A : Prop) (B : Prop) (hA : A) : ¬ B =>
+Hint (A : Prop) (B : Prop) (hA : A) : ¬ B =>
 "Sackgasse. Probier's nochmals."
 
 Tactics left right assumption

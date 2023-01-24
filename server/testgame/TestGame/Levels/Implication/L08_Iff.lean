@@ -30,13 +30,13 @@ Statement
   apply h.mp
   assumption
 
-Hint (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) : A → C =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) : A → C =>
 "Fange wie immer mit `intro` an."
 
-Hint (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : C =>
+HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : C =>
 "Wie im Implikationen-Level kannst du nun `apply` verwenden."
 
-Message (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : B =>
+Hint (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : B =>
 "Mit `apply h.mp` kannst du nun die Implikation `A → B` anwenden."
 
 Conclusion "Im nächsten Level findest du die zweite Option."

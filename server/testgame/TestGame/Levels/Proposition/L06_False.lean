@@ -23,7 +23,7 @@ Zeige, dass daraus $A$ folgt."
     (A : Prop) (h : False) : A := by
   contradiction
 
-Hint (A : Prop) (h : False) : A =>
+HiddenHint (A : Prop) (h : False) : A =>
 "Wenn man einen Beweis von `False` hat, kann man mit `contradiction` das Goal beweisen,
 unabhängig davon, was das Goal ist."
 

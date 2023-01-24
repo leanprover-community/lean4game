@@ -123,7 +123,7 @@ elab "Path" s:Parser.path : command => do
 
 end metadata
 
-/-! ## Messages -/
+/-! ## Hints -/
 
 open Lean Meta Elab Command Term
 
@@ -144,37 +144,36 @@ def mkGoalSyntax (s : Term) : List (Ident × Term) → MacroM Term
 | (n, t)::tail => do return (← `(∀ $n : $t, $(← mkGoalSyntax s tail)))
 | [] => return s
 
-/-- Declare a message. This version doesn't prevent the unused linter variable from running. -/
-local elab "Message'" decls:mydecl* ":" goal:term "=>" msg:str : command => do
-  let g ← liftMacroM $ mkGoalSyntax goal (decls.map (λ decl => (getIdent decl, getType decl))).toList
-  let g ← liftTermElabM do (return ← elabTermAndSynthesize g none)
-  modifyCurLevel fun level => pure {level with messages := level.messages.push {
-    goal := g,
-    intros := decls.size,
-    message := msg.getString }}
-
-/--
-Declare a hint. This version doesn't prevent the unused linter variable from running.
-The difference between hints/messages is that hints should be hidden by default, while
-messages are visible.
--/
+/-- Declare a hint. This version doesn't prevent the unused linter variable from running. -/
 local elab "Hint'" decls:mydecl* ":" goal:term "=>" msg:str : command => do
   let g ← liftMacroM $ mkGoalSyntax goal (decls.map (λ decl => (getIdent decl, getType decl))).toList
   let g ← liftTermElabM do (return ← elabTermAndSynthesize g none)
-  modifyCurLevel fun level => pure {level with messages := level.messages.push {
+  modifyCurLevel fun level => pure {level with hints := level.hints.push {
     goal := g,
     intros := decls.size,
-    spoiler := true,
-    message := msg.getString }}
+    text := msg.getString }}
 
+/--
+Declare a hint. This version doesn't prevent the unused linter variable from running.
+A hidden hint is only displayed if explicitly requested by the user.
+-/
+local elab "HiddenHint'" decls:mydecl* ":" goal:term "=>" msg:str : command => do
+  let g ← liftMacroM $ mkGoalSyntax goal (decls.map (λ decl => (getIdent decl, getType decl))).toList
+  let g ← liftTermElabM do (return ← elabTermAndSynthesize g none)
+  modifyCurLevel fun level => pure {level with hints := level.hints.push {
+    goal := g,
+    intros := decls.size,
+    hidden := true,
+    text := msg.getString }}
 
-/-- Declare a message in reaction to a given tactic state in the current level. -/
-macro "Message" decls:mydecl* ":" goal:term "=>" msg:str : command => do
-  `(set_option linter.unusedVariables false in Message' $decls* : $goal => $msg)
 
 /-- Declare a hint in reaction to a given tactic state in the current level. -/
 macro "Hint" decls:mydecl* ":" goal:term "=>" msg:str : command => do
   `(set_option linter.unusedVariables false in Hint' $decls* : $goal => $msg)
+
+/-- Declare a hidden hint in reaction to a given tactic state in the current level. -/
+macro "HiddenHint" decls:mydecl* ":" goal:term "=>" msg:str : command => do
+  `(set_option linter.unusedVariables false in HiddenHint' $decls* : $goal => $msg)
 
 /-! ## Tactics -/
 

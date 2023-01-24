@@ -54,7 +54,7 @@ Statement
 
 
 
-Message (n : ℕ) (hn : odd n) (h : ∀ (x : ℕ), (odd x) → even (x + 1)) : even (n + 1) =>
+Hint (n : ℕ) (hn : odd n) (h : ∀ (x : ℕ), (odd x) → even (x + 1)) : even (n + 1) =>
 "`∀ (x : ℕ), (odd x) → even (x + 1)` ist eigentlich das gleiche wie
 `(x : ℕ) → `"
 

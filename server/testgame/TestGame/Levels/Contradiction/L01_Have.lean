@@ -42,11 +42,11 @@ Statement
   assumption
   contradiction
 
-Message (A : Prop) (B : Prop) (h : A → ¬ B) (g : A ∧ B) : False =>
+Hint (A : Prop) (B : Prop) (h : A → ¬ B) (g : A ∧ B) : False =>
 " Fang mal damit an, das UND in den Annahmen mit `rcases` aufzuteilen.
 "
 
-Message (A : Prop) (B : Prop) (h : A → ¬ B) (g : A) (f : B) : False =>
+Hint (A : Prop) (B : Prop) (h : A → ¬ B) (g : A) (f : B) : False =>
 "
 Auf Deutsch: \"Als Zwischenresultat haben wir `¬ B`.\"
 

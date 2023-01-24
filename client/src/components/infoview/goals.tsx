@@ -143,7 +143,7 @@ export const Goal = React.memo((props: GoalProps) => {
     if (props.goal.goal.isRemoved) cn += 'b--removed '
 
     // TODO: make this prettier
-    const hints = goal.messages.map((m) => <div>{m.message}</div>)
+    const hints = goal.hints.map((m) => <div>{m.text}</div>)
 
     if (goal.goal.userName) {
         return <details open className={cn}>

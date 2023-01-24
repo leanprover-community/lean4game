@@ -26,10 +26,10 @@ Statement "" (A B : Prop) (hA : A) (hB : B) : A ∧ B := by
   assumption
   assumption
 
-Hint (A : Prop) (B : Prop) (hA : A) (hB : B) : A ∧ B =>
+HiddenHint (A : Prop) (B : Prop) (hA : A) (hB : B) : A ∧ B =>
   "`constructor` zerlegt die Struktur in Einzelteile."
 
-Hint (A : Prop) (hA : A) : A =>
+HiddenHint (A : Prop) (hA : A) : A =>
   "Du hast einen Beweis dafür in den *Annahmen*."
 
 Tactics constructor assumption
@@ -51,24 +51,24 @@ Tactics constructor assumption
 --   intro
 --   assumption
 
--- Message (A : Prop) (B : Prop) : A ∧ (A → B) ↔ A ∧ B =>
+-- Hint (A : Prop) (B : Prop) : A ∧ (A → B) ↔ A ∧ B =>
 -- "`↔` oder `∧` im Goal kann man mit `constructor` zerlegen."
 
--- Message (A : Prop) (B : Prop) : A ∧ (A → B) → A ∧ B =>
+-- Hint (A : Prop) (B : Prop) : A ∧ (A → B) → A ∧ B =>
 -- "Hier würdest du mit `intro` die Implikation angehen.
 
 -- (Experten können mit `intro ⟨h₁, h₂⟩` im gleichen Schritt noch ein `rcases` auf
 -- das UND in der Implikationsannahme)"
 
 -- -- if they don't use `intro ⟨_, _⟩`.
--- Message (A : Prop) (B : Prop) (h : A ∧ (A → B)) : A ∧ B =>
+-- Hint (A : Prop) (B : Prop) (h : A ∧ (A → B)) : A ∧ B =>
 -- "Jetzt erst mal noch schnell die Annahme `A ∧ (A → B)` mit `rcases` aufteilen."
 
--- Hint (A : Prop) (B : Prop) (hA : A) (h : A → B) : B =>
+-- HiddenHint (A : Prop) (B : Prop) (hA : A) (h : A → B) : B =>
 -- "Wie wär's mit `apply`? Hast du ne Implikation, die anwendbar ist?"
 
 -- -- Rückrichtung
--- Message (A : Prop) (B : Prop) : A ∧ B → A ∧ (A → B) =>
+-- Hint (A : Prop) (B : Prop) : A ∧ B → A ∧ (A → B) =>
 -- "Das Goal ist ne Implikation $\\ldots \\Rightarrow \\ldots$
 -- Da hilft `intro`.
 
@@ -78,16 +78,16 @@ Tactics constructor assumption
 
 
 -- -- if they don't use `intro ⟨_, _⟩`.
--- Message (A : Prop) (B : Prop) (h : A ∧ B) : A ∧ (A → B) =>
+-- Hint (A : Prop) (B : Prop) (h : A ∧ B) : A ∧ (A → B) =>
 -- "Jetzt erst mal noch schnell die Annahme `A ∧ B` mit `rcases` zerlegen."
 
--- Message (A : Prop) (B : Prop) (hA : A) (h : A → B) : A ∧ B =>
+-- Hint (A : Prop) (B : Prop) (hA : A) (h : A → B) : A ∧ B =>
 -- "Wieder in Einzelteile zerlegen..."
 
--- Message (A : Prop) (B : Prop) (ha : A) (hb : B) : A ∧ (A → B) =>
+-- Hint (A : Prop) (B : Prop) (ha : A) (hb : B) : A ∧ (A → B) =>
 -- "Immer das gleiche ... noch mehr zerlegen."
 
--- -- Message (A : Prop) (B : Prop) (h₁: A) (h₂: B) : A → B =>
+-- -- Hint (A : Prop) (B : Prop) (h₁: A) (h₂: B) : A → B =>
 -- -- "Das ist jetzt vielleicht etwas verwirrend: Wir wollen die Implikation `A → B` zeigen,
 -- -- wissen aber, dass `B` immer wahr ist (habe eine Annahme der Form `(hB : B)`).
 

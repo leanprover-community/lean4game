@@ -26,7 +26,7 @@ Statement
     (n : ℕ) (h : 1 < n) : 1 < n := by
   assumption
 
-Hint (n : ℕ) (h : 1 < n) : 1 < n =>
+HiddenHint (n : ℕ) (h : 1 < n) : 1 < n =>
   "`assumption` sucht nach einer Annahme, die dem Goal entspricht."
 
 

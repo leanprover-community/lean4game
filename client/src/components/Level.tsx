@@ -20,7 +20,6 @@ import 'lean4web/client/src/editor/infoview.css'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import './level.css'
 import { ConnectionContext, useLeanClient } from '../connection';
-import Infoview from './Infoview';
 import { useParams } from 'react-router-dom';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { codeEdited, selectCode } from '../state/progress';

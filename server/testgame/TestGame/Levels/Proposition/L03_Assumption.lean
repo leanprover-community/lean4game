@@ -22,7 +22,7 @@ Zeige, dass $A$ wahr ist."
     (A : Prop) (hA : A) : A := by
   assumption
 
-Hint (A : Prop) (hA : A) : A =>
+HiddenHint (A : Prop) (hA : A) : A =>
 "Auch hier kann `assumption` den Beweis von `A` finden."
 
 Conclusion ""

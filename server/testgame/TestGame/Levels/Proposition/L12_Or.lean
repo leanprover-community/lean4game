@@ -38,10 +38,10 @@ Statement
   rcases h with ⟨h₁, h₂⟩
   assumption
 
-Hint (A : Prop) (B : Prop) (h : A ∨ (A ∧ B)) : A =>
+HiddenHint (A : Prop) (B : Prop) (h : A ∨ (A ∧ B)) : A =>
 "Als erstes kannst du das ODER in den Annahmen mit `rcases h with h | h` zerlegen."
 
-Message (A : Prop) (B : Prop) (h : A ∧ B) : A =>
+Hint (A : Prop) (B : Prop) (h : A ∧ B) : A =>
 "Jetzt noch das UND in den Annahmen mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
 
 Tactics assumption rcases

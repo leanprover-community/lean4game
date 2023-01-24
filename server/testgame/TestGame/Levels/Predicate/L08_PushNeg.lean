@@ -35,30 +35,30 @@ Statement
   unfold Even
   use n
 
-Message : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) =>
+Hint : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) =>
 "`push_neg` schiebt die Negierung an den Quantoren vorbei."
 
 
-Message (n : ℕ) : (∃ k, ¬Odd (n + k)) =>
+Hint (n : ℕ) : (∃ k, ¬Odd (n + k)) =>
 "An dieser Stelle musst du nun ein `k` angeben, sodass `n + k` gerade ist... Benutze `use`
 mit der richtigen Zahl."
 
 
-Hint (n : ℕ) : ¬Odd (n + n) =>
+HiddenHint (n : ℕ) : ¬Odd (n + n) =>
 "Du kennst ein Lemma um mit `¬odd` umzugehen."
 
--- Hint (n : ℕ) (k : ℕ) : ¬odd (n + k) =>
+-- HiddenHint (n : ℕ) (k : ℕ) : ¬odd (n + k) =>
 -- "Du kennst ein Lemma um mit `¬odd` umzugehen."
 
-Hint (n : ℕ) : Even (n + n) =>
+HiddenHint (n : ℕ) : Even (n + n) =>
 "`unfold even` hilft, anzuschauen, was hinter `even` steckt.
 
 Danach musst du wieder mit `use r` ein `(r : ℕ)` angeben, dass du benützen möchtest."
 
--- Hint (n : ℕ) (k : ℕ) : even (n + k) =>
+-- HiddenHint (n : ℕ) (k : ℕ) : even (n + k) =>
 -- "`unfold even` hilft hier weiter."
 
-Message (n : ℕ) : n + n = 2 * n => "Recap: `ring` löst Gleichungen in `ℕ`."
+Hint (n : ℕ) : n + n = 2 * n => "Recap: `ring` löst Gleichungen in `ℕ`."
 
 Conclusion ""
 
