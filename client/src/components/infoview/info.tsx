@@ -128,14 +128,14 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                     selectedLocations={selectedLocs} widget={widget}/>
             </details>
         )}
-        <div style={{display: hasMessages ? 'block' : 'none'}} key='messages'>
-            {/* <details key='messages' open>
-                <summary className='mv2 pointer'>Messages ({messages.length})</summary> */}
+        {/* <div style={{display: hasMessages ? 'block' : 'none'}} key='messages'>
+            <details key='messages' open>
+                <summary className='mv2 pointer'>Messages ({messages.length})</summary>
                 <div className='ml1'>
                     <MessagesList uri={pos.uri} messages={messages} />
                 </div>
-            {/* </details> */}
-        </div>
+            </details>
+        </div> */}
         {nothingToShow && (
             isPaused ?
                 /* Adding {' '} to manage string literals properly: https://reactjs.org/docs/jsx-in-depth.html#string-literals-1 */

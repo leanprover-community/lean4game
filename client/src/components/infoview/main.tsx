@@ -13,7 +13,7 @@ import './infoview.css'
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
 
 import { Infos } from './infos';
-import { AllMessages, WithLspDiagnosticsContext } from '../../../../node_modules/lean4-infoview/src/infoview/messages';
+import { AllMessages, WithLspDiagnosticsContext } from './messages';
 import { useClientNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { WithRpcSessions } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
@@ -65,9 +65,9 @@ function Main(props: {}) {
     } else {
         ret = <div className="ma1">
             <Infos />
-            {/* {curUri && <div className="mv2">
+            {curUri && <div className="mv2">
                 <AllMessages uri={curUri} />
-            </div>} */}
+            </div>}
         </div>
     }
 
