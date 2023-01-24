@@ -6,5 +6,5 @@ import TestGame.Levels.Contradiction.L05_Contrapose
 import TestGame.Levels.Contradiction.L06_Summary
 
 Game "TestGame"
-World "Predicate"
+World "Contradiction"
 Title "Widerspruch"
