@@ -152,8 +152,8 @@ function Level() {
   }, [levelId, level?.data?.title])
 
   return <>
-    <Box style={level.isLoading ? null : {display: "none"}} display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
-    <Box style={level.isLoading ? {display: "none"} : null} display="flex" className="level" sx={{ mt: 0, ml: 0, mr: 0 }} >
+    <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
+    <div style={level.isLoading ? {display: "none"} : null} className="app-content level">
       <Drawer variant="permanent" open={showSidePanel} className="doc-panel">
         <DrawerHeader>
         </DrawerHeader>
@@ -193,7 +193,7 @@ function Level() {
           {/* <Infoview key={worldId + "/Level" + levelId} worldId={worldId} levelId={levelId} editor={editor} editorApi={infoProvider?.getApi()} /> */}
         </Grid>
       </Grid>
-    </Box>
+    </div>
     </>
 }
 

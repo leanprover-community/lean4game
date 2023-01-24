@@ -1,0 +1,61 @@
+/* variables */
+
+:root {
+  --clr-primary: #1976d2;
+  --clr-code: rgba(0, 32, 90, 0.87);
+}
+
+
+/* General styling */
+
+body {
+  font-family: Roboto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: Roboto Mono;
+  color: var(--clr-code);
+}
+
+
+/* Hide monaco editor notifications */
+.monaco-workbench > .notifications-toasts.visible {
+  display: none !important;
+}
+
+.loading {
+  margin: auto;
+  vertical-align: middle;
+}
+
+
+/* App Bar */
+
+.app {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-bar {
+  z-index: 1500;
+  flex: 0;
+  background: var(--clr-primary);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 1.1em;
+  filter: drop-shadow(0 0 5px rgba(0,0,0,0.5))
+}
+
+.app-bar-title, .app-bar-subtitle {
+  color: white;
+  font-weight: 500;
+  font-size: 1.3rem;
+}
+
+.app-content {
+  flex: 1;
+  min-height: 1fr;
+}

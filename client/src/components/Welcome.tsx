@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 
 cytoscape.use( klay );
 
-import { Box, Typography, Button, CircularProgress, Grid, selectClasses } from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
 import { useGetGameInfoQuery } from '../state/api';
 import { Link } from 'react-router-dom';
 import Markdown from './Markdown';
@@ -81,7 +81,7 @@ function Welcome() {
   { gameInfo.isLoading?
     <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}><CircularProgress /></Box>
     :
-    <div>
+    <div className="app-content">
       <Box sx={{ m: 3 }}>
         <Typography variant="body1" component="div">
           <Markdown>{gameInfo.data?.introduction}</Markdown>
