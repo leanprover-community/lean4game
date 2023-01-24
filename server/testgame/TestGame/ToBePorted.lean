@@ -1,8 +1,10 @@
 import Mathlib
 
-lemma not_odd {n : ℕ} : ¬ Odd n ↔ Even n := by sorry
+lemma not_odd {n : ℕ} : ¬ Odd n ↔ Even n := by
+  sorry
 
-lemma not_even {n : ℕ} : ¬ Even n ↔ Odd n := by sorry
+lemma not_even {n : ℕ} : ¬ Even n ↔ Odd n := by
+  sorry
 
 lemma even_square (n : ℕ) : Even n → Even (n ^ 2) := by
   intro ⟨x, hx⟩

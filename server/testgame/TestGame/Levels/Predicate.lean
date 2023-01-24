@@ -10,4 +10,4 @@ import TestGame.Levels.Predicate.L09_Summary
 
 Game "TestGame"
 World "Predicate"
-Title "Reich der Prädikate"
+Title "Prädikate"

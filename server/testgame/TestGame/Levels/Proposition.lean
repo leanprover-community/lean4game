@@ -14,4 +14,4 @@ import TestGame.Levels.Proposition.L13_Summary
 
 Game "TestGame"
 World "Proposition"
-Title "Land der Proposititionen"
+Title "Aussagenlogik 1"

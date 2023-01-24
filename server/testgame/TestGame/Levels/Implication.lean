@@ -13,4 +13,4 @@ import TestGame.Levels.Implication.L12_Summary
 
 Game "TestGame"
 World "Implication"
-Title "Meer der Implikationen"
+Title "Aussagenlogik 2"

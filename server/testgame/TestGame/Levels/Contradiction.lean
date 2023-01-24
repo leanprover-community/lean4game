@@ -4,3 +4,7 @@ import TestGame.Levels.Contradiction.L03_ByContra
 import TestGame.Levels.Contradiction.L04_ByContra
 import TestGame.Levels.Contradiction.L05_Contrapose
 import TestGame.Levels.Contradiction.L06_Summary
+
+Game "TestGame"
+World "Predicate"
+Title "Widerspruch"
