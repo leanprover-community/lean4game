@@ -5,8 +5,7 @@ import TestGame.Levels.Implication
 import TestGame.Levels.Predicate
 import TestGame.Levels.Contradiction
 import TestGame.Levels.Prime
-
-import TestGame.Levels.Naturals.L31_Sum
+import TestGame.Levels.Induction
 
 Game "TestGame"
 
@@ -65,4 +64,4 @@ Conclusion
 
 Path Proposition → Implication → Predicate → Contradiction
 Path Predicate → Prime
-Path Predicate → Nat2
+Path Predicate → Induction

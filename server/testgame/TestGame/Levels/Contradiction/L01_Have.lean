@@ -47,18 +47,19 @@ Message (A : Prop) (B : Prop) (h : A → ¬ B) (g : A ∧ B) : False =>
 "
 
 Message (A : Prop) (B : Prop) (h : A → ¬ B) (g : A) (f : B) : False =>
-" Auf Deutsch: \"Als Zwischenresultat haben wir `¬ B`.\"
+"
+Auf Deutsch: \"Als Zwischenresultat haben wir `¬ B`.\"
 
-  In Lean :
+In Lean :
 
-  ```
-  have k : ¬ B
-  [Beweis von k]
-  ```
+```
+have k : ¬ B
+[Beweis von k]
+```
 "
 
-example (n : ℕ) : n.succ + 2 = n + 3 := by
-ring_nf
+-- example (n : ℕ) : n.succ + 2 = n + 3 := by
+-- ring_nf
 
 Conclusion ""
 

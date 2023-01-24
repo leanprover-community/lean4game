@@ -7,7 +7,7 @@ import Mathlib.Tactic.Ring
 import TestGame.ToBePorted
 
 Game "TestGame"
-World "Proving"
+World "Contradiction"
 Level 6
 
 Title "Contradiction"
