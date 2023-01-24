@@ -17,8 +17,12 @@ Jetzt wollen wir ein paar Lemmas zu Summen kennenlernen, die `simp` nicht automa
 verwendet.
 
 Als erstes, kann man eine endliche Summe $\\sum_{i = 0}^n a_i + b_i$ mit
-`rw rw [Finset.sum_add_distrib]` als zwei Summen $\\sum_{i = 0}^n a_i + \\sum_{j = 0}^n b_j$
+`rw [Finset.sum_add_distrib]` als zwei Summen $\\sum_{i = 0}^n a_i + \\sum_{j = 0}^n b_j$
 auseinandernehmen.
+
+Insbesondere ist auch zu beachten, dass der Index `i` keine natürliche Zahl ist, sondern
+vom Typ `Fin n`, das heisst, man muss diesen eigentlich immer mit `(i : ℕ)`
+als natürliche Zahl verwenden.
 "
 
 Statement
