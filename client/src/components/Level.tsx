@@ -5,7 +5,6 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { InfoviewApi } from '@leanprover/infoview'
-import * as ReactDOM from 'react-dom/client';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
@@ -110,7 +109,6 @@ function Level() {
   const worldId = params.worldId
 
   const codeviewRef = useRef<HTMLDivElement>(null)
-  const infoviewRef = useRef<HTMLDivElement>(null)
   const introductionPanelRef = useRef<HTMLDivElement>(null)
 
   const [showSidePanel, setShowSidePanel] = useState(true)
@@ -140,8 +138,8 @@ function Level() {
 
   const initialCode = useSelector(selectCode(worldId, levelId))
 
-  const {editor, infoProvider} =
-    useLevelEditor(worldId, levelId, codeviewRef, infoviewRef, initialCode, onDidChangeContent)
+  const {editor, infoProvider, editorConnection} =
+    useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
 
   const {setTitle, setSubtitle} = React.useContext(SetTitleContext);
 
@@ -195,8 +193,10 @@ function Level() {
             component={RouterLink} to={`/`}
             sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple><FontAwesomeIcon icon={faHome}></FontAwesomeIcon></Button>
 
-          <div ref={infoviewRef} className="infoview vscode-light"></div>
-          {/* <Infoview key={worldId + "/Level" + levelId} worldId={worldId} levelId={levelId} editor={editor} editorApi={infoProvider?.getApi()} /> */}
+
+          <EditorContext.Provider value={editorConnection}>
+            {editorConnection ? <Main /> : null}
+          </EditorContext.Provider>
         </Grid>
       </Grid>
     </div>
@@ -206,13 +206,14 @@ function Level() {
 export default Level
 
 
-function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewRef, initialCode, onDidChangeContent) {
+function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCode, onDidChangeContent) {
 
   const connection = React.useContext(ConnectionContext)
 
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
   const [infoviewApi, setInfoviewApi] = useState<null|InfoviewApi>(null)
+  const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
 
   // Create Editor
   useEffect(() => {
@@ -234,7 +235,6 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
     })
 
     const infoProvider = new InfoProvider(connection.getLeanClient())
-    const uiElement: HTMLElement = infoviewRef.current!
 
     const editorApi = infoProvider.getApi()
 
@@ -273,15 +273,9 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
     };
 
     const ec = new EditorConnection(editorApi, editorEvents);
+    setEditorConnection(ec)
 
     editorEvents.initialize.on((loc: Location) => ec.events.changedCursorLocation.fire(loc))
-
-    const root = ReactDOM.createRoot(uiElement)
-    root.render(<React.StrictMode>
-        <EditorContext.Provider value={ec}>
-            <Main/>
-        </EditorContext.Provider>
-    </React.StrictMode>)
 
     setEditor(editor)
     setInfoProvider(infoProvider)
@@ -315,5 +309,5 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
     }
   }, [editor, levelId, connection, leanClientStarted])
 
-  return {editor, infoProvider}
+  return {editor, infoProvider, editorConnection}
 }

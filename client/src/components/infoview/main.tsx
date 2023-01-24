@@ -60,7 +60,7 @@ export function Main(props: {}) {
     } else if (serverStoppedResult){
         ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
     } else {
-        ret = <div className="ma1">
+        ret = <div className="ma1 infoview vscode-light">
             <Infos />
             {curUri && <div className="mv2">
                 <AllMessages uri={curUri} />
