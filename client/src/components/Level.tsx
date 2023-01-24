@@ -105,7 +105,7 @@ function Level() {
 
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
-  const messagePanelRef = useRef<HTMLDivElement>(null)
+  const introductionPanelRef = useRef<HTMLDivElement>(null)
 
   const [showSidePanel, setShowSidePanel] = useState(true)
 
@@ -117,7 +117,7 @@ function Level() {
 
   useEffect(() => {
     // Scroll to top when loading a new level
-    messagePanelRef.current!.scrollTo(0,0)
+    introductionPanelRef.current!.scrollTo(0,0)
   }, [levelId])
 
   const connection = React.useContext(ConnectionContext)
@@ -165,7 +165,7 @@ function Level() {
       </Drawer>
       <Grid container columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ flexGrow: 1, p: 3 }} className="main-grid">
         <Grid xs={8} className="main-panel">
-          <div ref={messagePanelRef} className="message-panel">
+          <div ref={introductionPanelRef} className="introduction-panel">
             <Markdown>{level?.data?.introduction}</Markdown>
           </div>
           <div className="exercise">
