@@ -10,3 +10,5 @@ lemma even_square (n : ℕ) : Even n → Even (n ^ 2) := by
   use 2 * x ^ 2
   rw [hx]
   ring
+
+theorem nat_succ (n : ℕ) : Nat.succ n = n + 1 := rfl

@@ -2,11 +2,13 @@ import TestGame.Metadata
 import Mathlib.Tactic.Ring
 import Mathlib
 
+import TestGame.ToBePorted
+
 Game "TestGame"
 World "Induction"
-Level 2
+Level 5
 
-Title "Induktion"
+Title "Bernoulli Ungleichung"
 
 Introduction
 "
@@ -15,12 +17,19 @@ TODO: Induktion (& induktion vs rcases)
 "
 
 
-theorem nat_succ (n : ℕ) : Nat.succ n = n + 1 := rfl
-
-lemma hh1 (n m : ℕ) (h : 2 * m = n) : m = n / 2 := by
-  rw [←h]
-  rw [Nat.mul_div_right]
+example (x : ℕ) (n : ℕ) : 1 + n * x ≤ (x + 1) ^ n := by
+  induction' n with n hn
   simp
+  rw [Nat.succ_mul]
+  rw [Nat.pow_succ]
+  sorry
+
+example (n : ℕ) : (∑ i : Fin (n + 1), ↑(2 * i - 1)) = n ^ 2 := by
+  induction' n with n hn
+  simp
+
+
+
 
 Statement
 "Zeige $\\sum_{i = 0}^n i = \\frac{n ⬝ (n + 1)}{2}$."
