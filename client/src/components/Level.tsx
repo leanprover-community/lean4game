@@ -5,7 +5,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { InfoviewApi } from '@leanprover/infoview'
-import { renderInfoview } from './infoview/main'
+import * as ReactDOM from 'react-dom/client';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
@@ -27,6 +27,12 @@ import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { codeEdited, selectCode } from '../state/progress';
 import { useAppDispatch } from '../hooks';
 import { useSelector } from 'react-redux';
+
+import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts';
+import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection';
+import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
+import { Main } from './infoview/main'
+import type { Location } from 'vscode-languageserver-protocol';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, faHome, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
@@ -228,8 +234,54 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, infoviewR
     })
 
     const infoProvider = new InfoProvider(connection.getLeanClient())
-    const div: HTMLElement = infoviewRef.current!
-    const infoviewApi = renderInfoview(infoProvider.getApi(), div)
+    const uiElement: HTMLElement = infoviewRef.current!
+
+    const editorApi = infoProvider.getApi()
+
+    const editorEvents: EditorEvents = {
+        initialize: new EventEmitter(),
+        gotServerNotification: new EventEmitter(),
+        sentClientNotification: new EventEmitter(),
+        serverRestarted: new EventEmitter(),
+        serverStopped: new EventEmitter(),
+        changedCursorLocation: new EventEmitter(),
+        changedInfoviewConfig: new EventEmitter(),
+        runTestScript: new EventEmitter(),
+        requestedAction: new EventEmitter(),
+    };
+
+    // Challenge: write a type-correct fn from `Eventify<T>` to `T` without using `any`
+    const infoviewApi: InfoviewApi = {
+        initialize: async l => editorEvents.initialize.fire(l),
+        gotServerNotification: async (method, params) => {
+            editorEvents.gotServerNotification.fire([method, params]);
+        },
+        sentClientNotification: async (method, params) => {
+            editorEvents.sentClientNotification.fire([method, params]);
+        },
+        serverRestarted: async r => editorEvents.serverRestarted.fire(r),
+        serverStopped: async serverStoppedReason => {
+            editorEvents.serverStopped.fire(serverStoppedReason)
+        },
+        changedCursorLocation: async loc => editorEvents.changedCursorLocation.fire(loc),
+        changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
+        requestedAction: async action => editorEvents.requestedAction.fire(action),
+        // See https://rollupjs.org/guide/en/#avoiding-eval
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval
+        runTestScript: async script => new Function(script)(),
+        getInfoviewHtml: async () => document.body.innerHTML,
+    };
+
+    const ec = new EditorConnection(editorApi, editorEvents);
+
+    editorEvents.initialize.on((loc: Location) => ec.events.changedCursorLocation.fire(loc))
+
+    const root = ReactDOM.createRoot(uiElement)
+    root.render(<React.StrictMode>
+        <EditorContext.Provider value={ec}>
+            <Main/>
+        </EditorContext.Provider>
+    </React.StrictMode>)
 
     setEditor(editor)
     setInfoProvider(infoProvider)
