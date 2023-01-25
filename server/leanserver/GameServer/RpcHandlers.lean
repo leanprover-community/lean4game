@@ -126,33 +126,4 @@ builtin_initialize
     (Option GameInteractiveGoals)
     getInteractiveGoals
 
-structure Diagnostic where
-  severity : Option Lean.Lsp.DiagnosticSeverity
-  message : String
-deriving FromJson, ToJson
-
-open RequestM in
-def getDiagnostics (params : GetInteractiveDiagnosticsParams) : RequestM (RequestTask (Array Diagnostic)) := do
-  let doc ← readDoc
-  let rangeEnd := params.lineRange?.map fun range =>
-    doc.meta.text.lspPosToUtf8Pos ⟨range.«end», 0⟩
-  let t := doc.cmdSnaps.waitAll fun snap => rangeEnd.all (snap.beginPos < ·)
-  pure <| t.map fun (snaps, _) =>
-    let diags? := snaps.getLast?.map fun snap =>
-      snap.interactiveDiags.toArray.filterMap fun diag =>
-        if params.lineRange?.all fun ⟨s, e⟩ =>
-          -- does [s,e) intersect [diag.fullRange.start.line,diag.fullRange.end.line)?
-          s ≤ diag.fullRange.start.line ∧ diag.fullRange.start.line < e ∨
-          diag.fullRange.start.line ≤ s ∧ s < diag.fullRange.end.line
-        then some {message := diag.message.stripTags, severity := diag.severity?}
-        else none
-    pure <| diags?.getD #[]
-
-builtin_initialize
-  registerBuiltinRpcProcedure
-    `Game.getDiagnostics
-    GetInteractiveDiagnosticsParams
-    (Array Diagnostic)
-    getDiagnostics
-
 end GameServer
