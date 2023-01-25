@@ -2,11 +2,11 @@
 
 import * as React from 'react'
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
-import { InteractiveHypothesisBundle, InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_stripTags } from '@leanprover/infoview-api'
+import { InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_stripTags } from '@leanprover/infoview-api'
 import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
 import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
-import { InteractiveGoal, InteractiveGoals } from './rpcApi';
+import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpcApi';
 import { Hints } from './hints';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
@@ -144,20 +144,16 @@ export const Goal = React.memo((props: GoalProps) => {
     if (props.goal.isRemoved) cn += 'b--removed '
 
     const hints = <Hints hints={goal.hints} />
+    const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
+    const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
 
-    if (goal.userName) {
-        return <details open className={cn}>
-            <summary className='mv1 pointer'>
-                <strong className="goal-case">case </strong>{goal.userName}
-            </summary>
-            {filter.reverse && goalLi}
-            {hyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
-            {!filter.reverse && goalLi}
-            {hints}
-        </details>
-    } else return <div className={cn}>
+    return <div className={cn}>
+        {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>}
         {filter.reverse && goalLi}
-        {hyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
+        <div>Objects:</div>
+        {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
+        <div>Assumptions:</div>
+        {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
         {!filter.reverse && goalLi}
         {hints}
     </div>

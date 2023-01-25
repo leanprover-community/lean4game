@@ -27,6 +27,8 @@ structure InteractiveHypothesisBundle where
   isInstance? : Option Bool := none
   /-- The hypothesis is a type. -/
   isType? : Option Bool := none
+  /-- The hypothesis's type is of type `Prop` -/
+  isAssumption? : Option Bool := none
   /-- If true, the hypothesis was not present on the previous tactic state.
   Only present in tactic-mode goals. -/
   isInserted? : Option Bool := none
@@ -123,10 +125,11 @@ def addInteractiveHypothesisBundle (hyps : Array InteractiveHypothesisBundle)
   return hyps.push {
     names
     fvarIds
-    type        := (← ppExprTagged type)
-    val?        := (← value?.mapM ppExprTagged)
-    isInstance? := if (← isClass? type).isSome then true else none
-    isType?     := if (← instantiateMVars type).isSort then true else none
+    type           := (← ppExprTagged type)
+    val?           := (← value?.mapM ppExprTagged)
+    isInstance?    := if (← isClass? type).isSome then true else none
+    isType?        := if (← instantiateMVars type).isSort then true else none
+    isAssumption?  := if (← inferType type).isProp then true else none
   }
 
 open Meta in
