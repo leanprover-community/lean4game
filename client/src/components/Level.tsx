@@ -280,7 +280,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
     setInfoProvider(infoProvider)
     setInfoviewApi(infoviewApi)
 
-    return () => { editor.setModel(null); editor.dispose() }
+    return () => { editor.setModel(null); infoProvider.dispose(); editor.dispose() }
   }, [])
 
   const {leanClient, leanClientStarted} = useLeanClient()
