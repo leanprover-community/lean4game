@@ -1,5 +1,6 @@
 import Lean
 import GameServer.EnvExtensions
+import GameServer.InteractiveGoal
 
 open Lean
 open Server
@@ -9,11 +10,6 @@ open Meta
 
 
 /-! ## GameGoal -/
-
-structure GameHint where
-  text : String
-  hidden : Bool
-deriving FromJson, ToJson
 
 namespace GameServer
 
@@ -72,22 +68,8 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array
       else return none
     return hints
 
-structure GameInteractiveGoal where
-  goal : InteractiveGoal
-  hints: Array GameHint
-  deriving RpcEncodable
-
-structure GameInteractiveGoals where
-  goals : Array GameInteractiveGoal
-  deriving RpcEncodable
-
-def GameInteractiveGoals.append (l r : GameInteractiveGoals) : GameInteractiveGoals where
-  goals := l.goals ++ r.goals
-
-instance : Append GameInteractiveGoals := ⟨GameInteractiveGoals.append⟩
-
 open RequestM in
-def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option GameInteractiveGoals)) := do
+def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option InteractiveGoals)) := do
   let doc ← readDoc
   let text := doc.meta.text
   let hoverPos := text.lspPosToUtf8Pos p.position
@@ -96,7 +78,7 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
   withWaitFindSnap doc (fun s => ¬ (s.infoTree.goalsAt? doc.meta.text hoverPos).isEmpty)
     (notFoundX := return none) fun snap => do
       if let rs@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text hoverPos then
-        let goals : List GameInteractiveGoals ← rs.mapM fun { ctxInfo := ci, tacticInfo := ti, useAfter := useAfter, .. } => do
+        let goals : List InteractiveGoals ← rs.mapM fun { ctxInfo := ci, tacticInfo := ti, useAfter := useAfter, .. } => do
           let ciAfter := { ci with mctx := ti.mctxAfter }
           let ci := if useAfter then ciAfter else { ci with mctx := ti.mctxBefore }
           -- compute the interactive goals
@@ -105,7 +87,7 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
           let goals ← ci.runMetaM {} do
              goals.mapM fun goal => do
               let hints ← findHints goal doc
-              return {goal := ← Widget.goalToInteractive goal, hints}
+              return ← goalToInteractive goal hints
           -- compute the goal diff
           -- let goals ← ciAfter.runMetaM {} (do
           --     try
@@ -123,7 +105,7 @@ builtin_initialize
   registerBuiltinRpcProcedure
     `Game.getInteractiveGoals
     Lsp.PlainGoalParams
-    (Option GameInteractiveGoals)
+    (Option InteractiveGoals)
     getInteractiveGoals
 
 end GameServer
