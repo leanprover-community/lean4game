@@ -121,10 +121,10 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate(); }}>{' '}Try again.</a>
             </div>}
         <LocationsContext.Provider value={locs}>
-            <div className="goals-section">
-                <div className="goals-section-title">Main Goal</div>
-                {goals && goals.goals.length > 0 && <Goal filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />}
-            </div>
+            {goals && goals.goals.length > 0 && <div className="goals-section">
+                    <div className="goals-section-title">Main Goal</div>
+                    <Goal filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />
+                </div>}
         </LocationsContext.Provider>
         {/* <FilteredGoals headerChildren='Expected type' key='term-goal'
             goals={termGoal !== undefined ? {goals: [{...termGoal, hints: []}]} : undefined} /> */}
@@ -154,12 +154,12 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 <div>Loading goal...</div>)}
         <AllMessages />
         <LocationsContext.Provider value={locs}>
-            <div className="goals-section">
-                <div className="goals-section-title">Other Goals</div>
+            {goals && goals.goals.length > 1 && <div className="goals-section">
+                    <div className="goals-section-title">Other Goals</div>
 
-                {goals && goals.goals.slice(1).map((goal, i) =>
-                  <details key={i}><summary><InteractiveCode fmt={goal.type} /></summary> <Goal filter={goalFilter} goal={goal} /></details>)}
-            </div>
+                    {goals.goals.slice(1).map((goal, i) =>
+                        <details key={i}><summary><InteractiveCode fmt={goal.type} /></summary> <Goal filter={goalFilter} goal={goal} /></details>)}
+                </div>}
         </LocationsContext.Provider>
     </>
 })
