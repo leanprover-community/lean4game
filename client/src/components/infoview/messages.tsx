@@ -4,7 +4,7 @@ import { Location, DocumentUri, Diagnostic, DiagnosticSeverity, PublishDiagnosti
 
 import { LeanDiagnostic, RpcErrorCode } from '@leanprover/infoview-api';
 
-import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { ConfigContext, EditorContext, LspDiagnosticsContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/collapsing';
 import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer';
@@ -89,13 +89,15 @@ function lazy<T>(f: () => T): () => T {
 }
 
 /** Displays all messages for the specified file. Can be paused. */
-export function AllMessages({uri: uri0}: { uri: DocumentUri }) {
+export function AllMessages() {
     const ec = React.useContext(EditorContext);
     const sv = React.useContext(VersionContext);
-    const rs0 = useRpcSessionAtPos({ uri: uri0, line: 0, character: 0 });
+    const curPos: DocumentPosition | undefined =
+        useEventResult(ec.events.changedCursorLocation, loc => loc ? { uri: loc.uri, ...loc.range.start } : undefined)
+    const rs0 = useRpcSessionAtPos({ uri: curPos.uri, line: 0, character: 0 });
     const dc = React.useContext(LspDiagnosticsContext);
     const config = React.useContext(ConfigContext);
-    const diags0 = dc.get(uri0) || [];
+    const diags0 = dc.get(curPos.uri) || [];
 
     const iDiags0 = React.useMemo(() => lazy(async () => {
         try {
@@ -114,8 +116,8 @@ export function AllMessages({uri: uri0}: { uri: DocumentUri }) {
             }
         }
         return diags0.map(d => ({ ...(d as LeanDiagnostic), message: { text: d.message } }));
-    }), [sv, rs0, uri0, diags0]);
-    const [{ isPaused, setPaused }, [uri, rs, diags, iDiags], _] = usePausableState(false, [uri0, rs0, diags0, iDiags0]);
+    }), [sv, rs0, curPos.uri, diags0]);
+    const [{ isPaused, setPaused }, [uri, rs, diags, iDiags], _] = usePausableState(false, [curPos.uri, rs0, diags0, iDiags0]);
 
     // Fetch interactive diagnostics when we're entering the paused state
     // (if they haven't already been fetched before)
@@ -140,7 +142,7 @@ export function AllMessages({uri: uri0}: { uri: DocumentUri }) {
                 </a>
             </span>
         </summary> */}
-        <AllMessagesBody uri={uri} key={uri} messages={iDiags} />
+        <AllMessagesBody uri={curPos.uri} key={curPos.uri} messages={iDiags0} />
     {/* </Details> */}
     </RpcContext.Provider>
     )

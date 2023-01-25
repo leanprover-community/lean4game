@@ -194,7 +194,7 @@ function Level() {
 
 
           <EditorContext.Provider value={editorConnection}>
-            {editorConnection ? <Main key={`${worldId}/${levelId}`}/> : null}
+            {editorConnection && <Main key={`${worldId}/${levelId}`}/>}
           </EditorContext.Provider>
         </Grid>
       </Grid>
@@ -280,7 +280,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
     setInfoProvider(infoProvider)
     setInfoviewApi(infoviewApi)
 
-    return () => { editor.setModel(null); infoProvider.dispose(); editor.dispose() }
+    return () => { infoProvider.dispose(); editor.dispose() }
   }, [])
 
   const {leanClient, leanClientStarted} = useLeanClient()

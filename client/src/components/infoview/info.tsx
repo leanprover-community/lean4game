@@ -152,7 +152,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                     {' '}to see information.
                 </span> :
                 <div>Loading goal...</div>)}
-        <AllMessages uri={pos.uri} />
+        <AllMessages />
         <LocationsContext.Provider value={locs}>
             <div className="goals-section">
                 <div className="goals-section-title">Other Goals</div>
