@@ -28,7 +28,14 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         [DiagnosticSeverity.Information]: 'information',
         [DiagnosticSeverity.Hint]: 'hint',
     }[diag.severity] : '';
-    const title = `${fname}:${line+1}:${character}`;
+    const title = `Line ${line+1}, Character ${character}`;
+
+    // Hide "unsolved goals" messages
+    if ("append" in diag.message && "text" in diag.message.append[0] &&
+      diag.message?.append[0].text === "unsolved goals") {
+        return <></>
+    }
+
     return (
     // <details open>
         // <summary className={severityClass + ' mv2 pointer'}>{title}
