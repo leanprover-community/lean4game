@@ -38,7 +38,7 @@ wss.addListener("connection", function(ws) {
     const socket = {
         onMessage: (cb) => { ws.on("message", cb) },
         onError: (cb) => { ws.on("error", cb) },
-        onClose: (cb) => { ws.on("onclose", cb) },
+        onClose: (cb) => { ws.on("close", cb) },
         send: (data, cb) => { ws.send(data,cb) }
     }
     const reader = new rpc.WebSocketMessageReader(socket);
