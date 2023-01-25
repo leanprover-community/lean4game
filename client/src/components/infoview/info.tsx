@@ -15,6 +15,7 @@ import { InteractiveGoal, InteractiveGoals } from './rpcApi';
 import { PanelWidgetDisplay } from '../../../../node_modules/lean4-infoview/src/infoview/userWidget'
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
+import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 
 type InfoStatus = 'updating' | 'error' | 'ready';
 type InfoKind = 'cursor' | 'pin';
@@ -120,7 +121,10 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate(); }}>{' '}Try again.</a>
             </div>}
         <LocationsContext.Provider value={locs}>
-            {goals && goals.goals.length > 0 && <Goal filter={goalFilter} key='mainGoal' goal={goals.goals[0]} />}
+            <div className="goals-section">
+                <div className="goals-section-title">Main Goal</div>
+                {goals && goals.goals.length > 0 && <Goal filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />}
+            </div>
         </LocationsContext.Provider>
         {/* <FilteredGoals headerChildren='Expected type' key='term-goal'
             goals={termGoal !== undefined ? {goals: [{...termGoal, hints: []}]} : undefined} /> */}
@@ -150,7 +154,12 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 <div>Loading goal...</div>)}
         <AllMessages uri={pos.uri} />
         <LocationsContext.Provider value={locs}>
-            {goals && goals.goals.slice(1).map((goal, i) => <Goal filter={goalFilter} key={i} goal={goal} />)}
+            <div className="goals-section">
+                <div className="goals-section-title">Other Goals</div>
+
+                {goals && goals.goals.slice(1).map((goal, i) =>
+                  <details key={i}><summary><InteractiveCode fmt={goal.type} /></summary> <Goal filter={goalFilter} goal={goal} /></details>)}
+            </div>
         </LocationsContext.Provider>
     </>
 })

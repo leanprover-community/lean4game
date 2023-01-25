@@ -115,13 +115,14 @@ function Hyp({ hyp: h, mvarId }: HypProps) {
 interface GoalProps {
     goal: InteractiveGoal
     filter: GoalFilterState
+    showHints?: boolean
 }
 
 /**
  * Displays the hypotheses, target type and optional case label of a goal according to the
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
-    const { goal, filter } = props
+    const { goal, filter, showHints } = props
 
     const filteredList = getFilteredHypotheses(goal.hyps, filter);
     const hyps = filter.reverse ? filteredList.slice().reverse() : filteredList;
@@ -156,7 +157,7 @@ export const Goal = React.memo((props: GoalProps) => {
             <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {!filter.reverse && goalLi}
-        {hints}
+        {showHints && hints}
     </div>
 })
 
