@@ -7,6 +7,7 @@ import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/
 import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { GameInteractiveGoal, GameInteractiveGoals } from './rpcApi';
+import { Hints } from './hints';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -142,8 +143,7 @@ export const Goal = React.memo((props: GoalProps) => {
     if (props.goal.goal.isInserted) cn += 'b--inserted '
     if (props.goal.goal.isRemoved) cn += 'b--removed '
 
-    // TODO: make this prettier
-    const hints = goal.hints.map((m) => <div>{m.text}</div>)
+    const hints = <Hints hints={goal.hints} />
 
     if (goal.goal.userName) {
         return <details open className={cn}>
