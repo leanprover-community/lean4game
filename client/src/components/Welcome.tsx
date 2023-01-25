@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+import './welcome.css'
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -63,8 +60,8 @@ function Welcome() {
 
       svgElements.push(
         <Link key={`world${id}`} to={`/world/${id}/level/1`}>
-          <circle fill="#61DAFB" cx={position.x} cy={position.y} r="8" />
-          <text style={{font: "italic 2px sans-serif",  textAnchor: "middle", dominantBaseline: "middle"} as any}
+          <circle className="world-circle" cx={position.x} cy={position.y} r="8" />
+          <text className="world-name"
             x={position.x} y={position.y}>{nodes[id].data.title ? nodes[id].data.title : id}</text>
         </Link>
       )

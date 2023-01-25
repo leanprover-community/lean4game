@@ -1,0 +1,12 @@
+
+svg .world-circle {
+  fill: var(--clr-primary)
+}
+
+svg .world-name {
+  fill: white;
+  font-size: 2px;
+  font-weight: 500;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
