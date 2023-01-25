@@ -121,7 +121,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
             {goals && <Goals filter={{ reverse: false, showType: true, showInstance: true, showHiddenAssumption: true, showLetValue: true }} key='goals' goals={goals} />}
         </LocationsContext.Provider>
         <FilteredGoals headerChildren='Expected type' key='term-goal'
-            goals={termGoal !== undefined ? {goals: [termGoal as any]} : undefined} />
+            goals={termGoal !== undefined ? {goals: [{...termGoal, hints: []}]} : undefined} />
         {userWidgets.map(widget =>
             <details key={`widget::${widget.id}::${widget.range?.toString()}`} open>
                 <summary className='mv2 pointer'>{widget.name}</summary>
