@@ -71,7 +71,7 @@ function mkMessageViewProps(uri: DocumentUri, messages: InteractiveDiagnostic[])
 /** Shows the given messages assuming they are for the given file. */
 export const MessagesList = React.memo(({uri, messages}: {uri: DocumentUri, messages: InteractiveDiagnostic[]}) => {
     const should_hide = messages.length === 0;
-    if (should_hide) { return <>No messages.</> }
+    if (should_hide) { return <></> }
 
     return (
     <div className="ml1">
@@ -140,7 +140,7 @@ export function AllMessages({uri: uri0}: { uri: DocumentUri }) {
                 </a>
             </span>
         </summary> */}
-        <AllMessagesBody uri={uri} messages={iDiags} />
+        <AllMessagesBody uri={uri} key={uri} messages={iDiags} />
     {/* </Details> */}
     </RpcContext.Provider>
     )

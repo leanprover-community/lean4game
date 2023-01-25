@@ -145,7 +145,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                     {' '}or <a className='link pointer dim' onClick={e => { e.preventDefault(); setPaused(false); }}>resume updating</a>
                     {' '}to see information.
                 </span> :
-                'No info found.')}
+                'Loading goal...')}
     </>
 })
 
