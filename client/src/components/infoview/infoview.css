@@ -16,3 +16,12 @@
   color: #D8000C;
   background-color: #FFBABA;
 }
+
+.hyp-group {
+  margin-bottom: 0.3em;
+}
+
+.hyp-group-title, .goal-title {
+  font-family: var(--ff-primary);
+  font-size: 1.2rem;
+}

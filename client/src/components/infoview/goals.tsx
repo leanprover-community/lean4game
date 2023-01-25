@@ -123,7 +123,6 @@ interface GoalProps {
 export const Goal = React.memo((props: GoalProps) => {
     const { goal, filter } = props
 
-    const prefix = goal.goalPrefix ?? 'Prove: '
     const filteredList = getFilteredHypotheses(goal.hyps, filter);
     const hyps = filter.reverse ? filteredList.slice().reverse() : filteredList;
     const locs = React.useContext(LocationsContext)
@@ -133,7 +132,7 @@ export const Goal = React.memo((props: GoalProps) => {
             undefined,
         [locs, goal.mvarId])
     const goalLi = <div key={'goal'}>
-        <strong className="goal-vdash">Prove: </strong>
+        <div className="goal-title">Goal: </div>
         <LocationsContext.Provider value={goalLocs}>
             <InteractiveCode fmt={goal.type} />
         </LocationsContext.Provider>
@@ -150,10 +149,12 @@ export const Goal = React.memo((props: GoalProps) => {
     return <div className={cn}>
         {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>}
         {filter.reverse && goalLi}
-        <div>Objects:</div>
-        {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
-        <div>Assumptions:</div>
-        {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
+        { objectHyps.length > 0 &&
+            <div className="hyp-group"><div className="hyp-group-title">Objects:</div>
+            {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
+        { assumptionHyps.length > 0 &&
+            <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
+            {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {!filter.reverse && goalLi}
         {hints}
     </div>

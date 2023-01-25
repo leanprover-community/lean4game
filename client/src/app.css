@@ -3,19 +3,21 @@
 :root {
   --clr-primary: #1976d2;
   --clr-code: rgba(0, 32, 90, 0.87);
+  --ff-primary: Roboto;
+  --ff-code: Roboto Mono;
 }
 
 
 /* General styling */
 
 body {
-  font-family: Roboto;
+  font-family: var(--ff-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: Roboto Mono;
+  font-family: var(--ff-code);
   color: var(--clr-code);
 }
 
