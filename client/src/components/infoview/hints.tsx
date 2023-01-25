@@ -11,15 +11,13 @@ export function Hints({hints} : {hints: GameHint[]}) {
 
 
   const [showHints, setShowHints] = React.useState(false);
-  const hasHints = hints.length > 0
-
 
   const openHints = hints.filter(hint => !hint.hidden)
   const hiddenHints = hints.filter(hint => hint.hidden)
 
   return <>
     {openHints.map(hint => <Hint hint={hint} />)}
-    {hasHints &&
+    {hiddenHints.length > 0 &&
         <FormControlLabel
           control={<Switch checked={showHints} onChange={() => setShowHints((prev) => !prev)} />}
           label="More Help?"

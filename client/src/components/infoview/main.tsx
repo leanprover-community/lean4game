@@ -62,9 +62,6 @@ export function Main(props: {}) {
     } else {
         ret = <div className="ma1 infoview vscode-light">
             <Infos />
-            {curUri && <div className="mv2">
-                <AllMessages uri={curUri} />
-            </div>}
         </div>
     }
 

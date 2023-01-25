@@ -150,7 +150,7 @@ export function AllMessages({uri: uri0}: { uri: DocumentUri }) {
 function AllMessagesBody({uri, messages}: {uri: DocumentUri, messages: () => Promise<InteractiveDiagnostic[]>}) {
     const [msgs, setMsgs] = React.useState<InteractiveDiagnostic[] | undefined>(undefined)
     React.useEffect(() => { void messages().then(setMsgs) }, [messages])
-    if (msgs === undefined) return <>Loading messages...</>
+    if (msgs === undefined) return <div>Loading messages...</div>
     else return <MessagesList uri={uri} messages={msgs}/>
 }
 

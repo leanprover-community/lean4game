@@ -147,7 +147,7 @@ export const Goal = React.memo((props: GoalProps) => {
     const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
 
     return <div className={cn}>
-        {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>}
+        {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
         {filter.reverse && goalLi}
         { objectHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Objects:</div>

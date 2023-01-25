@@ -3,11 +3,11 @@
 import * as React from 'react';
 import type { Location, Diagnostic } from 'vscode-languageserver-protocol';
 
-import { goalsToString, Goals, FilteredGoals } from './goals'
+import { goalsToString, Goal, FilteredGoals } from './goals'
 import { basename, DocumentPosition, RangeHelpers, useEvent, usePausableState, discardMethodNotFound,
     mapRpcError, useAsyncWithTrigger, PausableProps } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { ConfigContext, EditorContext, LspDiagnosticsContext, ProgressContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { lspDiagToInteractive, MessagesList } from './messages';
+import { AllMessages, lspDiagToInteractive, MessagesList } from './messages';
 import { getInteractiveTermGoal, InteractiveDiagnostic,
     UserWidgetInstance, Widget_getWidgets, RpcSessionAtPos, isRpcError,
     RpcErrorCode, getInteractiveDiagnostics, InteractiveTermGoal } from '@leanprover/infoview-api';
@@ -110,6 +110,8 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
         subexprTemplate: undefined
     }), [selectedLocs])
 
+    const goalFilter = { reverse: false, showType: true, showInstance: true, showHiddenAssumption: true, showLetValue: true }
+
     /* Adding {' '} to manage string literals properly: https://reactjs.org/docs/jsx-in-depth.html#string-literals-1 */
     return <>
         {hasError &&
@@ -118,10 +120,10 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate(); }}>{' '}Try again.</a>
             </div>}
         <LocationsContext.Provider value={locs}>
-            {goals && <Goals filter={{ reverse: false, showType: true, showInstance: true, showHiddenAssumption: true, showLetValue: true }} key='goals' goals={goals} />}
+            {goals && goals.goals.length > 0 && <Goal filter={goalFilter} key='mainGoal' goal={goals.goals[0]} />}
         </LocationsContext.Provider>
-        <FilteredGoals headerChildren='Expected type' key='term-goal'
-            goals={termGoal !== undefined ? {goals: [{...termGoal, hints: []}]} : undefined} />
+        {/* <FilteredGoals headerChildren='Expected type' key='term-goal'
+            goals={termGoal !== undefined ? {goals: [{...termGoal, hints: []}]} : undefined} /> */}
         {userWidgets.map(widget =>
             <details key={`widget::${widget.id}::${widget.range?.toString()}`} open>
                 <summary className='mv2 pointer'>{widget.name}</summary>
@@ -145,7 +147,11 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                     {' '}or <a className='link pointer dim' onClick={e => { e.preventDefault(); setPaused(false); }}>resume updating</a>
                     {' '}to see information.
                 </span> :
-                'Loading goal...')}
+                <div>Loading goal...</div>)}
+        <AllMessages uri={pos.uri} />
+        <LocationsContext.Provider value={locs}>
+            {goals && goals.goals.slice(1).map((goal, i) => <Goal filter={goalFilter} key={i} goal={goal} />)}
+        </LocationsContext.Provider>
     </>
 })
 
