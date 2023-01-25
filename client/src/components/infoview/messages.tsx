@@ -31,9 +31,12 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
     const title = `Line ${line+1}, Character ${character}`;
 
     // Hide "unsolved goals" messages
+    let message;
     if ("append" in diag.message && "text" in diag.message.append[0] &&
       diag.message?.append[0].text === "unsolved goals") {
-        return <></>
+        message = diag.message.append[0]
+    } else {
+        message = diag.message
     }
 
     return (
@@ -55,7 +58,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         <div className={severityClass + ' ml1 message'}>
             <p className="mv2">{title}</p>
             <pre className="font-code pre-wrap">
-                <InteractiveMessage fmt={diag.message} />
+                <InteractiveMessage fmt={message} />
             </pre>
         </div>
     // </details>
