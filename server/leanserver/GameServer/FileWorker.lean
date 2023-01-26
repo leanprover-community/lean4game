@@ -155,6 +155,19 @@ where
   private def publishIleanInfoFinal : DocumentMeta → FS.Stream → Array Snapshot → IO Unit :=
     publishIleanInfo "$/lean/ileanInfoFinal"
 
+  structure GameCompletedParams where
+    uri : String
+  deriving ToJson, FromJson
+
+  /-- Checks whether game level has been completed and sends a notification to the client -/
+  def publishGameCompleted (m : DocumentMeta) (hOut : FS.Stream) (snaps : Array Snapshot) : IO Unit := do
+    -- check if there is any error or warning
+    for snap in snaps do
+      if snap.diagnostics.any fun d => d.severity? == some .error ∨ d.severity? == some .warning
+      then return
+    let param := { uri := m.uri : GameCompletedParams}
+    hOut.writeLspNotification { method := "$/game/completed", param }
+
   /-- Elaborates the next command after `parentSnap` and emits diagnostics into `hOut`. -/
   private def nextSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken)
       : AsyncElabM (Option Snapshot) := do
@@ -162,6 +175,7 @@ where
     let s ← get
     let .some lastSnap := s.snaps.back? | panic! "empty snapshots"
     if lastSnap.isAtEnd then
+      publishGameCompleted m ctx.hOut s.snaps
       publishDiagnostics m lastSnap.diagnostics.toArray ctx.hOut
       publishProgressDone m ctx.hOut
       -- This will overwrite existing ilean info for the file, in case something

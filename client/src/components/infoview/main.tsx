@@ -1,7 +1,7 @@
 /* Partly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/main.tsx */
 
 import * as React from 'react';
-import type { DidCloseTextDocumentParams, Location, DocumentUri } from 'vscode-languageserver-protocol';
+import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location, DocumentUri } from 'vscode-languageserver-protocol';
 
 import 'tachyons/css/tachyons.css';
 // import '@vscode/codicons/dist/codicon.ttf';
@@ -13,14 +13,34 @@ import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoview
 
 import { Infos } from './infos';
 import { AllMessages, WithLspDiagnosticsContext } from './messages';
-import { useClientNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { WithRpcSessions } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infoview/serverVersion';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { codeEdited, levelCompleted, selectCompleted } from '../../state/progress';
 
 
-export function Main(props: {}) {
+export function Main(props: {world: string, level: number}) {
     const ec = React.useContext(EditorContext);
+
+    const dispatch = useAppDispatch()
+
+    // Mark level as completed when server gives notification
+    useServerNotificationEffect(
+        '$/game/completed',
+        (params: any) => {
+
+            if (ec.events.changedCursorLocation.current &&
+                ec.events.changedCursorLocation.current.uri === params.uri) {
+                dispatch(codeEdited)
+            }
+            dispatch(levelCompleted({world: props.world, level: props.level}))
+        },
+        []
+    );
+
+    const completed = useAppSelector(selectCompleted(props.world, props.level))
 
     /* Set up updates to the global infoview state on editor events. */
     const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
@@ -61,6 +81,7 @@ export function Main(props: {}) {
         ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
     } else {
         ret = <div className="ma1 infoview vscode-light">
+            {completed && <div className="level-completed">Level completed! 🎉</div>}
             <Infos />
         </div>
     }

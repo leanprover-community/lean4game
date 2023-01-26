@@ -194,7 +194,7 @@ function Level() {
 
 
           <EditorContext.Provider value={editorConnection}>
-            {editorConnection && <Main key={`${worldId}/${levelId}`}/>}
+            {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
           </EditorContext.Provider>
         </Grid>
       </Grid>
