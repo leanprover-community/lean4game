@@ -218,6 +218,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
   useEffect(() => {
     const editor = monaco.editor.create(codeviewRef.current!, {
       glyphMargin: true,
+      quickSuggestions: false,
       lightbulb: {
         enabled: true
       },
