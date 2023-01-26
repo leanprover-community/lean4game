@@ -104,7 +104,9 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           let done := Syntax.node (.synthetic cmdParserState.pos cmdParserState.pos) ``Lean.Parser.Tactic.done #[]
           let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
-          let cmdStx ← `(command| theorem my_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
+          let cmdStx ← `(command|
+            set_option tactic.hygienic false in
+            theorem my_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
         cmdCtx cmdStateRef
     let postNew := (← tacticCacheNew.get).post
