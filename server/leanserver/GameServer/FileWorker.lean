@@ -310,41 +310,104 @@ section Initialization
     let env ← importModules [{ module := `Init : Import }, { module := gameName : Import }] {} 0
     return (env, paths)
 
-  def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
-      : IO (Snapshot × SearchPath) := do
-    let mut (headerEnv, paths) ← createEnv
-    try
-      if let some path := System.Uri.fileUriToPath? m.uri then
-        headerEnv := headerEnv.setMainModule (← moduleNameOfFileName path none)
-    catch _ => pure ()
-    let cmdState := Elab.Command.mkState headerEnv {} opts
-    let cmdState := { cmdState with infoState := {
-      enabled := true
-      trees := #[Elab.InfoTree.context ({
-        env     := headerEnv
-        fileMap := m.text
-        ngen    := { namePrefix := `_worker }
-      }) (Elab.InfoTree.node
-          (Elab.Info.ofCommandInfo { elaborator := `header, stx := Syntax.missing })
-          #[].toPArray'
-      )].toPArray'
-    }}
-    let headerSnap := {
-      beginPos := 0
-      stx := Syntax.missing
-      mpState := {}
-      cmdState := cmdState
-      interactiveDiags := ← cmdState.messages.msgs.mapM (Widget.msgToInteractiveDiagnostic m.text · hasWidgets)
-      tacticCache := (← IO.mkRef {})
-    }
-    publishDiagnostics m headerSnap.diagnostics.toArray hOut
-    return (headerSnap, paths)
+  -- def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
+  --     : IO (Snapshot × SearchPath) := do
+  --   let mut (headerEnv, paths) ← createEnv
+  --   try
+  --     if let some path := System.Uri.fileUriToPath? m.uri then
+  --       headerEnv := headerEnv.setMainModule (← moduleNameOfFileName path none)
+  --   catch _ => pure ()
+  --   let cmdState := Elab.Command.mkState headerEnv {} opts
+  --   let cmdState := { cmdState with infoState := {
+  --     enabled := true
+  --     trees := #[Elab.InfoTree.context ({
+  --       env     := headerEnv
+  --       fileMap := m.text
+  --       ngen    := { namePrefix := `_worker }
+  --     }) (Elab.InfoTree.node
+  --         (Elab.Info.ofCommandInfo { elaborator := `header, stx := Syntax.missing })
+  --         #[].toPArray'
+  --     )].toPArray'
+  --   }}
+  --   let headerSnap := {
+  --     beginPos := 0
+  --     stx := Syntax.missing
+  --     mpState := {}
+  --     cmdState := cmdState
+  --     interactiveDiags := ← cmdState.messages.msgs.mapM (Widget.msgToInteractiveDiagnostic m.text · hasWidgets)
+  --     tacticCache := (← IO.mkRef {})
+  --   }
+  --   publishDiagnostics m headerSnap.diagnostics.toArray hOut
+  --   return (headerSnap, paths)
 
+
+  def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
+      : IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
+    let gameDir := "../../../testgame"
+
+    -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
+    let out ← IO.Process.output
+      { cwd := gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
+    if out.exitCode != 0 then
+      throwServerError s!"Error while running Lake: {out.stderr}"
+
+    -- Make the paths relative to the current directory
+    let paths : List System.FilePath := System.SearchPath.parse out.stdout.trim
+    let currentDir ← IO.currentDir
+    let paths := paths.map fun p => currentDir / (gameDir : System.FilePath) / p
+
+    -- Set the search path
+    Lean.searchPathRef.set paths
+
+    let gameName := `TestGame
+    let env ← importModules [{ module := `Init : Import }, { module := gameName : Import }] {} 0
+    -- return (env, paths)
+
+    -- use empty header
+    let (headerStx, headerParserState, msgLog) ← Parser.parseHeader
+      {m.mkInputContext with
+        input := ""
+        fileMap := FileMap.ofString ""}
+    (headerStx, ·) <$> EIO.asTask do
+      let mut srcSearchPath : SearchPath := paths --← initSrcSearchPath (← getBuildDir)
+      let headerEnv := env
+      let mut headerEnv := headerEnv
+      try
+        if let some path := System.Uri.fileUriToPath? m.uri then
+          headerEnv := headerEnv.setMainModule (← moduleNameOfFileName path none)
+      catch _ => pure ()
+      let cmdState := Elab.Command.mkState headerEnv {} opts
+      let cmdState := { cmdState with infoState := {
+        enabled := true
+        trees := #[Elab.InfoTree.context ({
+          env     := headerEnv
+          fileMap := m.text
+          ngen    := { namePrefix := `_worker }
+        }) (Elab.InfoTree.node
+            (Elab.Info.ofCommandInfo { elaborator := `header, stx := headerStx })
+            (headerStx[1].getArgs.toList.map (fun importStx =>
+              Elab.InfoTree.node (Elab.Info.ofCommandInfo {
+                elaborator := `import
+                stx := importStx
+              }) #[].toPArray'
+            )).toPArray'
+        )].toPArray'
+      }}
+      let headerSnap := {
+        beginPos := 0
+        stx := headerStx
+        mpState := {}
+        cmdState := cmdState
+        interactiveDiags := ← cmdState.messages.msgs.mapM (Widget.msgToInteractiveDiagnostic m.text · hasWidgets)
+        tacticCache := (← IO.mkRef {})
+      }
+      publishDiagnostics m headerSnap.diagnostics.toArray hOut
+      return (headerSnap, srcSearchPath)
 
   def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
       : IO (WorkerContext × WorkerState) := do
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
-    let headerTask ← EIO.asTask $ compileHeader meta o opts (hasWidgets := clientHasWidgets)
+    let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)
     let cancelTk ← CancelToken.new
     let ctx :=
       { hIn  := i
@@ -354,16 +417,16 @@ section Initialization
         initParams
         clientHasWidgets
       }
-    let snaps ← EIO.mapTask (t := headerTask) (match · with
+    let cmdSnaps ← EIO.mapTask (t := headerTask) (match · with
       | Except.ok (s, _) => unfoldSnaps meta #[s] cancelTk ctx (startAfterMs := 0)
       | Except.error e   => throw (e : ElabTaskError))
-    let doc : EditableDocument := ⟨meta, AsyncList.delayed snaps, cancelTk⟩
+    let doc : EditableDocument := { meta, cmdSnaps := AsyncList.delayed cmdSnaps, cancelTk }
     return (ctx,
-        { doc             := doc
-          initHeaderStx   := Syntax.missing
-          pendingRequests := RBMap.empty
-          rpcSessions     := RBMap.empty
-        })
+    { doc             := doc
+      initHeaderStx   := headerStx
+      pendingRequests := RBMap.empty
+      rpcSessions     := RBMap.empty
+    })
 
 end Initialization
 
