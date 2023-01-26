@@ -193,7 +193,7 @@ where
     return some snap
 
   /-- Elaborates all commands after the last snap (at least the header snap is assumed to exist), emitting the diagnostics into `hOut`. -/
-  def unfoldSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken)
+  def unfoldSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken) (startAfterMs : UInt32)
       : ReaderT WorkerContext IO (AsyncList ElabTaskError Snapshot) := do
     let ctx ← read
     let some headerSnap := snaps[0]? | panic! "empty snapshots"
@@ -207,7 +207,9 @@ where
       -- This will overwrite existing ilean info for the file since this has a
       -- higher version number.
       publishIleanInfoUpdate m ctx.hOut snaps
-      return AsyncList.ofList snaps.toList ++ (← AsyncList.unfoldAsync (nextSnap ctx m cancelTk) { snaps })
+      return AsyncList.ofList snaps.toList ++ AsyncList.delayed (← EIO.asTask (ε := ElabTaskError) (prio := .dedicated) do
+        IO.sleep startAfterMs
+        AsyncList.unfoldAsync (nextSnap ctx m cancelTk) { snaps })
 
 end Elab
 
@@ -256,7 +258,7 @@ section Updates
           validSnaps := validSnaps.dropLast
       -- wait for a bit, giving the initial `cancelTk.check` in `nextCmdSnap` time to trigger
       -- before kicking off any expensive elaboration (TODO: make expensive elaboration cancelable)
-      unfoldCmdSnaps newMeta validSnaps.toArray cancelTk ctx
+      unfoldSnaps newMeta validSnaps.toArray cancelTk ctx
         (startAfterMs := ctx.initParams.editDelay.toUInt32)
     modify fun st => { st with doc := { meta := newMeta, cmdSnaps := AsyncList.delayed newSnaps, cancelTk } }
 
@@ -337,7 +339,7 @@ section Initialization
         clientHasWidgets
       }
     let snaps ← EIO.mapTask (t := headerTask) (match · with
-      | Except.ok (s, _) => unfoldSnaps meta #[s] cancelTk ctx
+      | Except.ok (s, _) => unfoldSnaps meta #[s] cancelTk ctx (startAfterMs := 0)
       | Except.error e   => throw (e : ElabTaskError))
     let doc : EditableDocument := ⟨meta, AsyncList.delayed snaps, cancelTk⟩
     return (ctx,
