@@ -8,6 +8,7 @@ import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infov
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpcApi';
 import { Hints } from './hints';
+import { CommandLine } from './CommandLine';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -133,7 +134,7 @@ export const Goal = React.memo((props: GoalProps) => {
             undefined,
         [locs, goal.mvarId])
     const goalLi = <div key={'goal'}>
-        <div className="goal-title">Goal: </div>
+        <div className="goal-title">Target: </div>
         <LocationsContext.Provider value={goalLocs}>
             <InteractiveCode fmt={goal.type} />
         </LocationsContext.Provider>
@@ -156,6 +157,7 @@ export const Goal = React.memo((props: GoalProps) => {
         { assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
+        <CommandLine />
         {!filter.reverse && goalLi}
         {showHints && hints}
     </div>

@@ -35,3 +35,11 @@
   font-size: 1.8rem;
   font-weight: 500;
 }
+
+.command-line {
+  font-family: var(--ff-primary);
+}
+
+.command-line input[type="text"] {
+  font-family: var(--vscode-editor-font-family);
+}

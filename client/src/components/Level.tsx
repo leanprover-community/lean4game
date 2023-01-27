@@ -100,6 +100,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 /** End Drawer Test */
 
 
+export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
 
 function Level() {
 
@@ -194,7 +195,9 @@ function Level() {
 
 
           <EditorContext.Provider value={editorConnection}>
-            {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+            <MonacoEditorContext.Provider value={editor}>
+              {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+            </MonacoEditorContext.Provider>
           </EditorContext.Provider>
         </Grid>
       </Grid>
