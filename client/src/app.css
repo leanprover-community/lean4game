@@ -29,13 +29,19 @@ code {
 
 .loading {
   margin: auto;
-  vertical-align: middle;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
-
 
 /* App Bar */
 
+#root {
+  height: 100%;
+}
+
 .app {
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -59,5 +65,4 @@ code {
 
 .app-content {
   flex: 1;
-  min-height: 1fr;
 }
