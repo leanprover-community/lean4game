@@ -34,6 +34,21 @@ code {
   align-items: center;
 }
 
+.btn {
+  text-decoration: none;
+  color: var(--clr-primary);
+  background: white;
+  display: inline-block;
+  border-radius: 0.2em;
+  padding: 0.2em .6em;
+  font-size: 1rem;
+  margin: 0 .2em;
+}
+
+.btn-disabled {
+  color: #aaa;
+}
+
 /* App Bar */
 
 #root {
@@ -61,6 +76,8 @@ code {
   color: white;
   font-weight: 500;
   font-size: 1.3rem;
+  display: inline-block;
+  margin: 0 1em;
 }
 
 .app-content {

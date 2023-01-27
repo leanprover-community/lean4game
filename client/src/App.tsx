@@ -19,14 +19,6 @@ function App() {
 
   return (
     <div className="app">
-      <div className="app-bar">
-        <div className="app-bar-title">
-          {title}
-        </div>
-        <div className="app-bar-subtitle">
-          {subtitle}
-        </div>
-      </div>
       <SetTitleContext.Provider value={{setTitle, setSubtitle}}>
         <Outlet />
       </SetTitleContext.Provider>

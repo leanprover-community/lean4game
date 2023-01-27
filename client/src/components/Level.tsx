@@ -5,8 +5,8 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { InfoviewApi } from '@leanprover/infoview'
-import { Link as RouterLink } from 'react-router-dom';
-import { Box, Button, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
+import { Link, useParams } from 'react-router-dom';
+import { Box, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import Grid from '@mui/material/Unstable_Grid2';
 import LeftPanel from './LeftPanel';
@@ -19,8 +19,8 @@ import { InfoProvider } from 'lean4web/client/src/editor/infoview';
 import 'lean4web/client/src/editor/infoview.css'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import './level.css'
+import { Button } from './Button'
 import { ConnectionContext, useLeanClient } from '../connection';
-import { useParams } from 'react-router-dom';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { codeEdited, selectCode } from '../state/progress';
 import { useAppDispatch } from '../hooks';
@@ -144,12 +144,8 @@ function Level() {
   const {setTitle, setSubtitle} = React.useContext(SetTitleContext);
 
   useEffect(() => {
-    setTitle(`World: ${gameInfo.data?.worlds.nodes[worldId].title}`)
-  }, [gameInfo.data?.worlds.nodes[worldId].title])
-
-  useEffect(() => {
     if (level?.data?.title) {
-      setSubtitle(`Level ${levelId}: ${level?.data?.title}`)
+      setSubtitle(``)
     } else {
       setSubtitle(`Level ${levelId}`)
     }
@@ -157,6 +153,26 @@ function Level() {
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
+    <div style={level.isLoading ? {display: "none"} : null} className="app-bar">
+      <div>
+      <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button>
+        <span className="app-bar-title">
+          {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
+        </span>
+      </div>
+      <div>
+        <span className="app-bar-title">
+          {levelId && `Level ${levelId}`}{level?.data?.title && `: ${level?.data?.title}`}
+        </span>
+        <Button disabled={levelId <= 1}
+          to={`/world/${worldId}/level/${levelId - 1}`}
+          ><FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous</Button>
+        <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]}
+          to={`/world/${worldId}/level/${levelId + 1}`}
+          >Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>
+      </div>
+
+    </div>
     <div style={level.isLoading ? {display: "none"} : null} className="app-content level">
       <Drawer variant="permanent" open={showSidePanel} className="doc-panel">
         <DrawerHeader>
@@ -180,20 +196,6 @@ function Level() {
           </div>
         </Grid>
         <Grid xs={4} className="info-panel">
-
-          <Button
-            disabled={levelId <= 1} component={RouterLink}
-            to={`/world/${worldId}/level/${levelId - 1}`}
-            sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple><FontAwesomeIcon icon={faArrowLeft}></FontAwesomeIcon>&nbsp;Previous</Button>
-          <Button
-            disabled={levelId >= gameInfo.data?.worldSize[worldId]}
-            component={RouterLink} to={`/world/${worldId}/level/${levelId + 1}`}
-            sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple>Next&nbsp;<FontAwesomeIcon icon={faArrowRight}></FontAwesomeIcon></Button>
-          <Button
-            component={RouterLink} to={`/`}
-            sx={{ ml: 3, mt: 2, mb: 2 }} disableFocusRipple><FontAwesomeIcon icon={faHome}></FontAwesomeIcon></Button>
-
-
           <EditorContext.Provider value={editorConnection}>
             <MonacoEditorContext.Provider value={editor}>
               {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
