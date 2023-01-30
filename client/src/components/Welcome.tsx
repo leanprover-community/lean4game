@@ -14,7 +14,6 @@ import { useGetGameInfoQuery } from '../state/api';
 import { Link } from 'react-router-dom';
 import Markdown from './Markdown';
 import { selectCompleted } from '../state/progress';
-import { SetTitleContext } from '../App';
 
 
 function LevelIcon({ worldId, levelId, position }) {
@@ -34,12 +33,9 @@ function Welcome() {
 
   const { nodes, bounds }: any = gameInfo.data ? computeWorldLayout(gameInfo.data?.worlds) : {nodes: []}
 
-  const {setTitle, setSubtitle} = React.useContext(SetTitleContext);
-
   useEffect(() => {
     if (gameInfo.data?.title) {
       window.document.title = gameInfo.data.title
-      setTitle(gameInfo.data.title)
     }
   }, [gameInfo.data?.title])
 

@@ -112,7 +112,6 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
     }), [selectedLocs])
 
     const goalFilter = { reverse: false, showType: true, showInstance: true, showHiddenAssumption: true, showLetValue: true }
-
     /* Adding {' '} to manage string literals properly: https://reactjs.org/docs/jsx-in-depth.html#string-literals-1 */
     return <>
         {hasError &&
@@ -121,13 +120,13 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate(); }}>{' '}Try again.</a>
             </div>}
         <LocationsContext.Provider value={locs}>
-            {goals && goals.goals.length > 0 && <div className="goals-section">
-                    <div className="goals-section-title">Main Goal</div>
-                    <Goal filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />
-                </div>}
+            <div className="goals-section">
+                { goals && goals.goals.length > 0
+                  ? <><div className="goals-section-title">Main Goal</div>
+                    <Goal filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} /></>
+                  : <div className="goals-section-title">No Goals</div> }
+            </div>
         </LocationsContext.Provider>
-        {/* <FilteredGoals headerChildren='Expected type' key='term-goal'
-            goals={termGoal !== undefined ? {goals: [{...termGoal, hints: []}]} : undefined} /> */}
         {userWidgets.map(widget =>
             <details key={`widget::${widget.id}::${widget.range?.toString()}`} open>
                 <summary className='mv2 pointer'>{widget.name}</summary>
@@ -135,14 +134,6 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                     selectedLocations={selectedLocs} widget={widget}/>
             </details>
         )}
-        {/* <div style={{display: hasMessages ? 'block' : 'none'}} key='messages'>
-            <details key='messages' open>
-                <summary className='mv2 pointer'>Messages ({messages.length})</summary>
-                <div className='ml1'>
-                    <MessagesList uri={pos.uri} messages={messages} />
-                </div>
-            </details>
-        </div> */}
         {nothingToShow && (
             isPaused ?
                 /* Adding {' '} to manage string literals properly: https://reactjs.org/docs/jsx-in-depth.html#string-literals-1 */

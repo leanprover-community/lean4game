@@ -33,13 +33,10 @@ import { Main } from './infoview/main'
 import type { Location } from 'vscode-languageserver-protocol';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHome, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Divider from '@mui/material/Divider';
 import Markdown from './Markdown';
-import { SetTitleContext } from '../App';
 
 import Split from 'react-split'
 
@@ -73,6 +70,40 @@ function Level() {
     introductionPanelRef.current!.scrollTo(0,0)
   }, [levelId])
 
+  React.useEffect(() => {
+    if (!commandLineMode) {
+      // Delete last input attempt from command line
+      editor.executeEdits("command-line", [{
+        range: editor.getSelection(),
+        text: "",
+        forceMoveMarkers: false
+      }]);
+      editor.focus()
+    }
+  }, [commandLineMode])
+
+  const handleUndo = () => {
+    const endPos = editor.getModel().getFullModelRange().getEndPosition()
+    let range
+    console.log(endPos.column)
+    if (endPos.column === 1) {
+      range = monaco.Selection.fromPositions(
+        new monaco.Position(endPos.lineNumber - 1, 1),
+        endPos
+      )
+    } else {
+      range = monaco.Selection.fromPositions(
+        new monaco.Position(endPos.lineNumber, 1),
+        endPos
+      )
+    }
+    editor.executeEdits("undo-button", [{
+      range,
+      text: "",
+      forceMoveMarkers: false
+    }]);
+  }
+
   const connection = React.useContext(ConnectionContext)
 
   const gameInfo = useGetGameInfoQuery()
@@ -103,10 +134,10 @@ function Level() {
         <span className="app-bar-title">
           {levelId && `Level ${levelId}`}{level?.data?.title && `: ${level?.data?.title}`}
         </span>
-        <Button disabled={levelId <= 1}
+        <Button disabled={levelId <= 1} inverted={true}
           to={`/world/${worldId}/level/${levelId - 1}`}
           ><FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous</Button>
-        <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]}
+        <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted={true}
           to={`/world/${worldId}/level/${levelId + 1}`}
           >Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>
       </div>
@@ -125,9 +156,13 @@ function Level() {
         </div>
       </div>
       <div className="info-panel">
-        <FormGroup className="input-mode-switch">
-          <FormControlLabel control={<Switch onChange={(ev) => { setCommandLineMode(!commandLineMode) }} />} label="Editor mode" />
-        </FormGroup>
+        <div className="input-mode-switch">
+          {commandLineMode && <button className="btn" onClick={handleUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
+          <FormGroup>
+            <FormControlLabel control={<Switch onChange={(ev) => { setCommandLineMode(!commandLineMode) }} />} label="Editor mode" />
+          </FormGroup>
+        </div>
+
         <EditorContext.Provider value={editorConnection}>
           <MonacoEditorContext.Provider value={editor}>
             <InputModeContext.Provider value={{commandLineMode, setCommandLineMode}}>

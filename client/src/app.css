@@ -35,15 +35,22 @@ code {
 }
 
 .btn {
+  line-height: inherit;
   text-decoration: none;
-  color: var(--clr-primary);
-  background: white;
+  background: var(--clr-primary);
+  color: white;
   display: inline-block;
   border-radius: 0.2em;
-  padding: 0.2em .6em;
+  padding: 0.2rem .6em;
   font-size: 1rem;
   margin: 0 .2em;
   border: 0;
+  cursor: pointer;
+}
+
+.btn-inverted {
+  color: var(--clr-primary);
+  background: white;
 }
 
 .btn-disabled, .btn[disabled] {
@@ -63,7 +70,6 @@ code {
 }
 
 .app-bar {
-  z-index: 1500;
   flex: 0;
   background: var(--clr-primary);
   display: flex;

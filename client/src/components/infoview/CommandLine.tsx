@@ -4,11 +4,19 @@ import { LspDiagnosticsContext } from '../../../../node_modules/lean4-infoview/s
 import { useServerNotificationEffect } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol';
-import { MonacoEditorContext } from '../Level'
+import { InputModeContext, MonacoEditorContext } from '../Level'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 
+
+function hasErrorsOrWarnings(diags) {
+  return diags.some(
+    (d) =>
+      !d.message.startsWith("unsolved goals") &&
+      (d.severity == DiagnosticSeverity.Error || d.severity == DiagnosticSeverity.Warning)
+  )
+}
 
 export function CommandLine() {
 
@@ -16,31 +24,47 @@ export function CommandLine() {
   const commandInput = useRef<HTMLInputElement>()
   const [processing, setProcessing] = useState(false)
 
-  // const allDiags = React.useContext(LspDiagnosticsContext)
-  // const fileDiags = allDiags.get(editor.getModel().uri.toString())
+  const { commandLineMode } = React.useContext(InputModeContext)
+  const allDiags = React.useContext(LspDiagnosticsContext)
+  const diags = allDiags.get(editor.getModel().uri.toString())
 
+  React.useEffect(() => {
+    if (hasErrorsOrWarnings(diags)) {
+      // alert("err")
+    }
+  }, [])
+
+  React.useEffect(() => {
+    if (commandLineMode) {
+      const endPos = editor.getModel().getFullModelRange().getEndPosition()
+      if (editor.getModel().getLineContent(endPos.lineNumber).trim() !== "") {
+        editor.executeEdits("command-line", [{
+          range: monaco.Selection.fromPositions(endPos, endPos),
+          text: "\n",
+          forceMoveMarkers: false
+        }]);
+      }
+      editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
+    }
+  }, [commandLineMode])
 
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault()
-    var selection = monaco.Selection.fromPositions(
-      editor.getPosition(),
-      editor.getModel().getFullModelRange().getEndPosition()
-    );
-    var text = commandInput.current!.value + "\n";
-    var op = {range: selection, text: text, forceMoveMarkers: false};
-    editor.executeEdits("my-source", [op], editor.getSelections());
+    editor.executeEdits("command-line", [{
+      range: monaco.Selection.fromPositions(
+        editor.getPosition(),
+        editor.getModel().getFullModelRange().getEndPosition()
+      ),
+      text: commandInput.current!.value + "\n",
+      forceMoveMarkers: false
+    }]);
     setProcessing(true)
   }
 
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
     if (params.uri == editor.getModel().uri.toString()) {
       setProcessing(false)
-      const hasErrorsOrWarnings = params.diagnostics.some(
-        (d) =>
-          !d.message.startsWith("unsolved goals") &&
-          (d.severity == DiagnosticSeverity.Error || d.severity == DiagnosticSeverity.Warning)
-      )
-      if (!hasErrorsOrWarnings) {
+      if (!hasErrorsOrWarnings(params.diagnostics)) {
         commandInput.current!.value = "";
         editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
       }
@@ -50,7 +74,7 @@ export function CommandLine() {
   return <div className="command-line">
       <form onSubmit={handleSubmit}>
         <input type="text" ref={commandInput} disabled={processing} />
-        <button type="submit" disabled={processing} className="btn"><FontAwesomeIcon icon={faWandMagicSparkles} /> Run</button>
+        <button type="submit" disabled={processing} className="btn btn-inverted"><FontAwesomeIcon icon={faWandMagicSparkles} /> Run</button>
       </form>
     </div>
 }
