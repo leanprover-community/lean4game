@@ -58,6 +58,7 @@ function Level() {
 
   const [commandLineMode, setCommandLineMode] = useState(true)
   const [showSidePanel, setShowSidePanel] = useState(true)
+  const [canUndo, setCanUndo] = useState(true)
 
   const toggleSidePanel = () => {
     setShowSidePanel(!showSidePanel)
@@ -114,6 +115,8 @@ function Level() {
 
   const onDidChangeContent = (code) => {
     dispatch(codeEdited({world: worldId, level: levelId, code}))
+
+    setCanUndo(code.trim() !== "")
   }
 
   const initialCode = useSelector(selectCode(worldId, levelId))
@@ -157,7 +160,7 @@ function Level() {
       </div>
       <div className="info-panel">
         <div className="input-mode-switch">
-          {commandLineMode && <button className="btn" onClick={handleUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
+          {commandLineMode && <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
           <FormGroup>
             <FormControlLabel control={<Switch onChange={(ev) => { setCommandLineMode(!commandLineMode) }} />} label="Editor mode" />
           </FormGroup>
