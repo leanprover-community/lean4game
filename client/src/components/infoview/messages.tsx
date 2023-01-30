@@ -10,6 +10,7 @@ import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/co
 import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer';
 import { getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api';
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
+import { InputModeContext } from '../Level';
 
 interface MessageViewProps {
     uri: DocumentUri;
@@ -39,6 +40,8 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         message = diag.message
     }
 
+    const { commandLineMode } = React.useContext(InputModeContext)
+
     return (
     // <details open>
         // <summary className={severityClass + ' mv2 pointer'}>{title}
@@ -56,7 +59,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         //     </span>
         // </summary>
         <div className={severityClass + ' ml1 message'}>
-            <p className="mv2">{title}</p>
+            {!commandLineMode && <p className="mv2">{title}</p>}
             <pre className="font-code pre-wrap">
                 <InteractiveMessage fmt={message} />
             </pre>
