@@ -9,6 +9,7 @@ import { Locations, LocationsContext, SelectableLocation } from '../../../../nod
 import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpcApi';
 import { Hints } from './hints';
 import { CommandLine } from './CommandLine';
+import { InputModeContext } from '../Level';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -147,6 +148,7 @@ export const Goal = React.memo((props: GoalProps) => {
     const hints = <Hints hints={goal.hints} />
     const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
     const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
+    const {commandLineMode} = React.useContext(InputModeContext)
 
     return <div className={cn}>
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
@@ -157,7 +159,9 @@ export const Goal = React.memo((props: GoalProps) => {
         { assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        <CommandLine />
+        <div className={commandLineMode ? "" : "hidden"}>
+            <CommandLine />
+        </div>
         {!filter.reverse && goalLi}
         {showHints && hints}
     </div>

@@ -45,6 +45,11 @@ import Split from 'react-split'
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
 
+export const InputModeContext = React.createContext<{
+  commandLineMode: boolean,
+  setCommandLineMode: React.Dispatch<React.SetStateAction<boolean>>
+}>({commandLineMode: true, setCommandLineMode: () => {}});
+
 function Level() {
 
   const params = useParams();
@@ -54,6 +59,7 @@ function Level() {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const introductionPanelRef = useRef<HTMLDivElement>(null)
 
+  const [commandLineMode, setCommandLineMode] = useState(true)
   const [showSidePanel, setShowSidePanel] = useState(true)
 
   const toggleSidePanel = () => {
@@ -106,7 +112,7 @@ function Level() {
       </div>
 
     </div>
-    <Split minSize={200} className={`app-content level ${level.isLoading ? 'hidden' : ''}}`}>
+    <Split minSize={200} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
       <div className="main-panel">
         <div ref={introductionPanelRef} className="introduction-panel">
           <Markdown>{level?.data?.introduction}</Markdown>
@@ -114,14 +120,19 @@ function Level() {
         <div className="exercise">
           <h4>Aufgabe:</h4>
           <Markdown>{level?.data?.descrText}</Markdown>
-          <div className="statement"><code>{level?.data?.descrFormat}</code></div>
-          <div ref={codeviewRef} className="codeview"></div>
+          <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{level?.data?.descrFormat}</code></div>
+          <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div>
         </div>
       </div>
       <div className="info-panel">
+        <FormGroup className="input-mode-switch">
+          <FormControlLabel control={<Switch onChange={(ev) => { setCommandLineMode(!commandLineMode) }} />} label="Editor mode" />
+        </FormGroup>
         <EditorContext.Provider value={editorConnection}>
           <MonacoEditorContext.Provider value={editor}>
-            {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+            <InputModeContext.Provider value={{commandLineMode, setCommandLineMode}}>
+              {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+            </InputModeContext.Provider>
           </MonacoEditorContext.Provider>
         </EditorContext.Provider>
       </div>
