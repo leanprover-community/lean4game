@@ -6,6 +6,9 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol';
 import { MonacoEditorContext } from '../Level'
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
+
 
 export function CommandLine() {
 
@@ -47,7 +50,7 @@ export function CommandLine() {
   return <div className="command-line">
       <form onSubmit={handleSubmit}>
         <input type="text" ref={commandInput} disabled={processing} />
-        <input type="submit" value="Run" disabled={processing} />
+        <button type="submit" disabled={processing} className="btn"><FontAwesomeIcon icon={faWandMagicSparkles} /> Run</button>
       </form>
     </div>
 }

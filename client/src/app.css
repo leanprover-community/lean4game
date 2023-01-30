@@ -43,9 +43,10 @@ code {
   padding: 0.2em .6em;
   font-size: 1rem;
   margin: 0 .2em;
+  border: 0;
 }
 
-.btn-disabled {
+.btn-disabled, .btn[disabled] {
   color: #aaa;
 }
 

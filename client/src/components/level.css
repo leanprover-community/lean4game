@@ -34,7 +34,7 @@
   flex-flow: column;
 }
 
-.introduction-panel {
+.infoview {
   padding: 1em;
 }
 
@@ -59,7 +59,12 @@
   margin-bottom: 0;
 }
 
+.introduction-panel {
+  padding: 1em;
+}
+
 .input-mode-switch {
+  margin: .5em 0;
   float: right;
 }
 

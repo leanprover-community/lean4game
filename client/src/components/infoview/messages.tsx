@@ -84,7 +84,7 @@ export const MessagesList = React.memo(({uri, messages}: {uri: DocumentUri, mess
     if (should_hide) { return <></> }
 
     return (
-    <div className="ml1">
+    <div>
         {mkMessageViewProps(uri, messages).map(m => <MessageView {...m} />)}
     </div>
     );

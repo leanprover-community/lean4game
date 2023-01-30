@@ -33,7 +33,7 @@ import { Main } from './infoview/main'
 import type { Location } from 'vscode-languageserver-protocol';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, faHome, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';

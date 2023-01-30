@@ -141,16 +141,16 @@ export const Goal = React.memo((props: GoalProps) => {
         </LocationsContext.Provider>
     </div>
 
-    let cn = 'font-code tl pre-wrap bl bw1 pl1 b--transparent '
-    if (props.goal.isInserted) cn += 'b--inserted '
-    if (props.goal.isRemoved) cn += 'b--removed '
+    // let cn = 'font-code tl pre-wrap bl bw1 pl1 b--transparent '
+    // if (props.goal.isInserted) cn += 'b--inserted '
+    // if (props.goal.isRemoved) cn += 'b--removed '
 
     const hints = <Hints hints={goal.hints} />
     const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
     const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
     const {commandLineMode} = React.useContext(InputModeContext)
 
-    return <div className={cn}>
+    return <div>
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
         {filter.reverse && goalLi}
         { objectHyps.length > 0 &&

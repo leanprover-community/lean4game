@@ -80,7 +80,7 @@ export function Main(props: {world: string, level: number}) {
     } else if (serverStoppedResult){
         ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
     } else {
-        ret = <div className="ma1 infoview vscode-light">
+        ret = <div className="infoview vscode-light">
             {completed && <div className="level-completed">Level completed! 🎉</div>}
             <Infos />
         </div>

@@ -213,7 +213,7 @@ function InfoDisplay(props0: InfoDisplayProps & InfoPinnable) {
     <RpcContext.Provider value={rpcSess}>
     {/* <details open> */}
         {/* <InfoStatusBar {...props} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} /> */}
-        <div className='ml1'>
+        <div>
             <InfoDisplayContent {...props} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} />
         </div>
     {/* </details> */}

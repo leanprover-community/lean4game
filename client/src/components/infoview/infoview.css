@@ -37,9 +37,27 @@
 }
 
 .command-line {
+  background: var(--clr-primary);
+  padding: 0.5em;
   font-family: var(--ff-primary);
+  border-radius: 0.2em;
+  margin: 0.2em 0;
 }
 
 .command-line input[type="text"] {
   font-family: var(--vscode-editor-font-family);
+}
+
+.command-line form {
+  display: flex;
+}
+
+.command-line form>input{
+  display: block;
+}
+
+.command-line form>input[type="text"]{
+  flex: 1;
+  padding: 0.2em .6em;
+  font-size: 1rem;
 }
