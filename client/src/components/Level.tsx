@@ -41,64 +41,7 @@ import Divider from '@mui/material/Divider';
 import Markdown from './Markdown';
 import { SetTitleContext } from '../App';
 
-
-
-/** Drawer Test */
-const drawerWidth = 400; /* TODO: This width is hard-coded. Fix me. */
-
-const openedMixin = (theme: Theme): CSSObject => ({
-  width: drawerWidth,
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: 'hidden',
-});
-
-const closedMixin = (theme: Theme): CSSObject => ({
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: 'hidden',
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up('sm')]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
-});
-
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-}));
-
-interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
-}
-
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
-  }),
-);
-
-/** End Drawer Test */
-
+import Split from 'react-split'
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
 
@@ -141,16 +84,6 @@ function Level() {
   const {editor, infoProvider, editorConnection} =
     useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
 
-  const {setTitle, setSubtitle} = React.useContext(SetTitleContext);
-
-  useEffect(() => {
-    if (level?.data?.title) {
-      setSubtitle(``)
-    } else {
-      setSubtitle(`Level ${levelId}`)
-    }
-  }, [levelId, level?.data?.title])
-
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <div style={level.isLoading ? {display: "none"} : null} className="app-bar">
@@ -173,38 +106,31 @@ function Level() {
       </div>
 
     </div>
-    <div style={level.isLoading ? {display: "none"} : null} className="app-content level">
-      <Drawer variant="permanent" open={showSidePanel} className="doc-panel">
-        <DrawerHeader>
-        </DrawerHeader>
-        <Divider />
-        <IconButton onClick={toggleSidePanel}>
-          <FontAwesomeIcon icon={showSidePanel ? faChevronLeft : faChevronRight}></FontAwesomeIcon>
-        </IconButton>
-          <LeftPanel spells={level?.data?.tactics} inventory={level?.data?.lemmas} showSidePanel={showSidePanel} setShowSidePanel={setShowSidePanel} />
-      </Drawer>
-      <Grid container columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ flexGrow: 1, p: 3 }} className="main-grid">
-        <Grid xs={8} className="main-panel">
-          <div ref={introductionPanelRef} className="introduction-panel">
-            <Markdown>{level?.data?.introduction}</Markdown>
-          </div>
-          <div className="exercise">
-            <h4>Aufgabe:</h4>
-            <Markdown>{level?.data?.descrText}</Markdown>
-            <div className="statement"><code>{level?.data?.descrFormat}</code></div>
-            <div ref={codeviewRef} className="codeview"></div>
-          </div>
-        </Grid>
-        <Grid xs={4} className="info-panel">
-          <EditorContext.Provider value={editorConnection}>
-            <MonacoEditorContext.Provider value={editor}>
-              {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
-            </MonacoEditorContext.Provider>
-          </EditorContext.Provider>
-        </Grid>
-      </Grid>
-    </div>
-    </>
+    <Split minSize={200} className={`app-content level ${level.isLoading ? 'hidden' : ''}}`}>
+      <div className="main-panel">
+        <div ref={introductionPanelRef} className="introduction-panel">
+          <Markdown>{level?.data?.introduction}</Markdown>
+        </div>
+        <div className="exercise">
+          <h4>Aufgabe:</h4>
+          <Markdown>{level?.data?.descrText}</Markdown>
+          <div className="statement"><code>{level?.data?.descrFormat}</code></div>
+          <div ref={codeviewRef} className="codeview"></div>
+        </div>
+      </div>
+      <div className="info-panel">
+        <EditorContext.Provider value={editorConnection}>
+          <MonacoEditorContext.Provider value={editor}>
+            {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+          </MonacoEditorContext.Provider>
+        </EditorContext.Provider>
+      </div>
+      <div className="doc-panel">
+        <LeftPanel spells={level?.data?.tactics} inventory={level?.data?.lemmas}
+          showSidePanel={showSidePanel} setShowSidePanel={setShowSidePanel} />
+      </div>
+    </Split>
+  </>
 }
 
 export default Level

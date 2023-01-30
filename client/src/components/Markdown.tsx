@@ -12,7 +12,7 @@ function Markdown(props) {
         rehypePlugins: [...props.remarkPlugins ?? [], rehypeKatex],
       };
       return (
-        <ReactMarkdown {...newProps} />
+        <ReactMarkdown {...newProps} className="markdown" />
       );
 }
 

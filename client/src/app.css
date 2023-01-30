@@ -83,3 +83,11 @@ code {
 .app-content {
   flex: 1;
 }
+
+.markdown li ul, .markdown li ol {
+	margin:0 1.5em;
+}
+
+.markdown ul, .markdown ol {
+	margin:0 1.5em 1.5em 1.5em;
+}
