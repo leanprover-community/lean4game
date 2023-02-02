@@ -4,7 +4,7 @@ import Mathlib.Tactic.LeftRight
 
 Game "TestGame"
 World "Proposition"
-Level 6
+Level 7
 
 Title "Widerspruch beweist alles."
 

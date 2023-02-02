@@ -28,7 +28,7 @@
   {"git":
    {"url": "https://github.com/leanprover-community/mathlib4.git",
     "subDir?": null,
-    "rev": "8176e5d663db861cccf6fed6db2f9e5669fe6c5b",
+    "rev": "98bc5f26ea463d9583f601c84518c95643c0ea14",
     "name": "mathlib",
     "inputRev?": "master"}},
   {"git":
@@ -59,6 +59,12 @@
   {"git":
    {"url": "https://github.com/leanprover/std4",
     "subDir?": null,
-    "rev": "5770b609aeae209cb80ac74655ee8c750c12aabd",
+    "rev": "04b3c9831e0c141713a70e68af7e40973ec9a1ff",
     "name": "std",
+    "inputRev?": "main"}},
+  {"git":
+   {"url": "/home/jeugster/Documents/Lean/duper",
+    "subDir?": null,
+    "rev": "d0fb397d96483c90969c725ad5ea307cc02bdf7d",
+    "name": "duper",
     "inputRev?": "main"}}]}

@@ -81,6 +81,12 @@ mit Theoremen/Lemmas der Form `X = Y`
 TODO
 "
 
+TacticDoc simp_rw
+"
+## Beschreibung
+
+TODO
+"
 
 TacticDoc apply
 "
@@ -90,6 +96,13 @@ TODO
 "
 
 TacticDoc constructor
+"
+## Beschreibung
+
+TODO
+"
+
+TacticDoc tauto
 "
 ## Beschreibung
 

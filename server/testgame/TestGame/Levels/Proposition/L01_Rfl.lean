@@ -2,29 +2,17 @@ import TestGame.Metadata
 
 Game "TestGame"
 World "Proposition"
-Level 1
+Level 2
 
 Title "Aller Anfang ist... ein Einzeiler?"
 
 Introduction
 "
-Willkommen zum Lean-Crashkurs wo du lernst wie man mathematische Beweise vom Computer
-unterstützt und verifiziert schreiben kann.
-
-*Rechts* siehst den Status des Beweis. Unter **Main Goal** steht, was du im Moment am beweisen
-bist. Falls es mehrere Subgoals gibt, werden alle weiteren darunter unter **Further Goals**
-aufgelistet, diese musst du dann später auch noch zeigen.
-
-Ein Beweis besteht aus mehreren **Taktiken**. Das sind einzelne Beweisschritte, ähnlich wie
-man auf Papier argumentieren würde. Manche Taktiken können ganz konkret etwas kleines machen,
-andere sind stark und lösen ganze Probleme automatisiert. Du findest die Taktiken *Links* an der
-Seite.
-
-Wenn der Beweis komplett ist, erscheint \"Level completed! 🎉\".
+Jetzt gehen wir aber einen Schritt zurück und lernen, wie man konkret mit Lean arbeitet,
+damit du verstehst, was `tauto` hinter der Kulisse macht.
 
 Deine erste Taktik ist `rfl` (für \"reflexivity\"), welche dazu da ist,
-ein Goal der Form $X = X$ zu schliessen.
-Gib die Taktik ein gefolgt von Enter ⏎.
+ein Goal der Form $X = X$ zu schließen.
 "
 
 Statement

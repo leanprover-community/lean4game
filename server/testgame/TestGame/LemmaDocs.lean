@@ -77,6 +77,26 @@ LemmaDoc even_square as even_square in "Nat"
 "`∀ (n : ℕ), even n → even (n ^ 2)`"
 
 
+
+
+LemmaDoc mem_univ as mem_univ in "Set"
+"x ∈ @univ α"
+
+LemmaDoc not_mem_empty as not_mem_empty
+""
+
+LemmaDoc empty_subset as empty_subset in "Set"
+""
+
+LemmaDoc Subset.antisymm_iff as Subset.antisymm_iff in "Set"
+""
+
+
+
+
+
+
+
 LemmaSet natural : "Natürliche Zahlen" :=
 Even Odd not_odd not_even
 

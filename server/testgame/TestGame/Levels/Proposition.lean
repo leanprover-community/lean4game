@@ -1,3 +1,4 @@
+import TestGame.Levels.Proposition.L00_Tauto
 import TestGame.Levels.Proposition.L01_Rfl
 import TestGame.Levels.Proposition.L02_Assumption
 import TestGame.Levels.Proposition.L03_Assumption

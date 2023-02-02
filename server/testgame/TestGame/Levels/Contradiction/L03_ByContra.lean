@@ -31,11 +31,11 @@ steht:
 Statement
 "Angenommen $B$ ist falsch und es gilt $A \\Rightarrow B$. Zeige, dass $A$ falsch sein
 muss."
-    (A B : Prop) (h : A → B) (b : ¬ B) : ¬ A := by
+    (A B : Prop) (g : A → B) (b : ¬ B) : ¬ A := by
   by_contra a
   suffices b : B
   contradiction
-  apply h
+  apply g
   assumption
 
 

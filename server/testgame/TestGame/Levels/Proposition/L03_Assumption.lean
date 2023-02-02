@@ -3,7 +3,7 @@ import Mathlib.Data.Nat.Basic -- TODO
 
 Game "TestGame"
 World "Proposition"
-Level 3
+Level 4
 
 Title "Logische Aussagen"
 

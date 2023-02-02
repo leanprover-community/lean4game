@@ -6,7 +6,7 @@ import TestGame.ToBePorted
 
 Game "TestGame"
 World "Proposition"
-Level 7
+Level 8
 
 Title "Widerspruch"
 

@@ -2,7 +2,7 @@ import TestGame.Metadata
 
 Game "TestGame"
 World "Proposition"
-Level 5
+Level 6
 
 Title "Not"
 

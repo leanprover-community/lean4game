@@ -5,7 +5,7 @@ set_option tactic.hygienic false
 
 Game "TestGame"
 World "Proposition"
-Level 9
+Level 10
 
 Title "Und"
 

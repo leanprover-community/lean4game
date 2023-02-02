@@ -6,7 +6,7 @@ import Mathlib.Tactic.LeftRight
 
 Game "TestGame"
 World "Proposition"
-Level 11
+Level 12
 
 Title "Oder"
 

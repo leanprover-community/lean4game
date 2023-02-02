@@ -1,22 +1,5 @@
 import Mathlib
 
-lemma not_odd {n : ℕ} : ¬ Odd n ↔ Even n := by
-  sorry
-
-lemma not_even {n : ℕ} : ¬ Even n ↔ Odd n := by
-  sorry
-
-lemma even_square (n : ℕ) : Even n → Even (n ^ 2) := by
-  intro ⟨x, hx⟩
-  unfold Even at *
-  use 2 * x ^ 2
-  rw [hx]
-  ring
-
-theorem nat_succ (n : ℕ) : Nat.succ n = n + 1 := rfl
-
-section powerset
-
 open Set
 
 namespace Finset
@@ -83,4 +66,44 @@ lemma powerset_insert {U : Type _} (A : Set U) (x : U) :
 
 
 
-end powerset
+
+
+example : ({0} : Set ℕ) ∪ {1, 2} = {0, 2, 1} := by
+  rw [union_insert, singleton_union]
+  simp only [insert_comm, ←insert_emptyc_eq]
+
+example : powerset {0, 1} = {∅, {0}, {1}, {0, 1}} := by
+  simp_rw [powerset_insert, powerset_singleton]
+  simp only [image_insert_eq, union_insert, image_singleton, union_singleton]
+  simp only [insert_comm, ←insert_emptyc_eq]
+
+-- This one is much slower, but it still works
+example : powerset {0, 1, 2, 4} =
+    {∅, {0}, {1}, {0, 1}, {2}, {1, 2}, {0, 2}, {0, 1, 2},
+    {4}, {0, 4}, {1, 4}, {0, 1, 4}, {2, 4}, {1, 2, 4}, {0, 2, 4}, {0, 1, 2, 4}} := by
+  simp_rw [powerset_insert, powerset_singleton]
+  simp only [image_insert_eq, union_insert, image_singleton, union_singleton]
+  simp only [insert_comm, ←insert_emptyc_eq]
+
+example : ({∅, {0}, {1}, {0, 1}} : Finset (Finset ℕ)) = {∅, {1}, {0}, {0, 1}} := by
+  simp only []
+
+example : ({{0, 2}, {3, 5, 6}} : Set (Set ℕ)) = {{2, 0}, {5, 3, 6}} := by
+  rw [Subset.antisymm_iff]
+  constructor <;>
+  intro A hA <;>
+  simp_rw [mem_insert_iff, mem_singleton_iff] at *
+  · rw [pair_comm 2 0, insert_comm 5 3]
+    tauto
+  · rw [pair_comm 0 2, insert_comm 3 5]
+    tauto
+
+-- A trick to compare two concrete sets.
+example (A : Set ℕ) : ({{0, 2}, A, {3, 5, 6}} : Set (Set ℕ)) = {{2, 0}, {5, 3, 6}, A} := by
+  simp only [insert_comm, ←insert_emptyc_eq]
+
+example : ({{0, 2}, {3, 5, 6}} : Finset (Finset ℕ)) = {{2, 0}, {5, 3, 6}} := by
+  simp only
+
+-- Trick:
+-- attribute [default_instance] Set.instSingletonSet

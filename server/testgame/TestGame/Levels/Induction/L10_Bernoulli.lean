@@ -28,8 +28,7 @@ example (n : ℕ) : (∑ i : Fin (n + 1), ↑(2 * i - 1)) = n ^ 2 := by
   induction' n with n hn
   simp
 
-
-
+#check Finset.sum_comm
 
 Statement
 "Zeige $\\sum_{i = 0}^n i = \\frac{n ⬝ (n + 1)}{2}$."
