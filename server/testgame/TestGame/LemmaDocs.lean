@@ -82,7 +82,7 @@ LemmaDoc even_square as even_square in "Nat"
 LemmaDoc mem_univ as mem_univ in "Set"
 "x ∈ @univ α"
 
-LemmaDoc not_mem_empty as not_mem_empty
+LemmaDoc not_mem_empty as not_mem_empty in "Set"
 ""
 
 LemmaDoc empty_subset as empty_subset in "Set"
