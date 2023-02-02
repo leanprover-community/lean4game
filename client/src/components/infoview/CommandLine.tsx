@@ -29,12 +29,6 @@ export function CommandLine() {
   const diags = allDiags.get(editor.getModel().uri.toString())
 
   React.useEffect(() => {
-    if (hasErrorsOrWarnings(diags)) {
-      // alert("err")
-    }
-  }, [])
-
-  React.useEffect(() => {
     if (commandLineMode) {
       const endPos = editor.getModel().getFullModelRange().getEndPosition()
       if (editor.getModel().getLineContent(endPos.lineNumber).trim() !== "") {
@@ -50,14 +44,16 @@ export function CommandLine() {
 
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault()
+    const pos = editor.getPosition()
     editor.executeEdits("command-line", [{
       range: monaco.Selection.fromPositions(
-        editor.getPosition(),
+        pos,
         editor.getModel().getFullModelRange().getEndPosition()
       ),
       text: commandInput.current!.value + "\n",
       forceMoveMarkers: false
     }]);
+    editor.setPosition(pos)
     setProcessing(true)
   }
 
