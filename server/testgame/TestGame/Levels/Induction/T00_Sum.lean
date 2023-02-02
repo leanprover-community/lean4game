@@ -14,6 +14,7 @@ Introduction
 "
 "
 
+open BigOperators
 
 Statement
 "Zeige $\\sum_{i = 0}^n i^3 = (\\sum_{i = 0}^n i^3)^2$."

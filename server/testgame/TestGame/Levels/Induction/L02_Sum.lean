@@ -25,6 +25,8 @@ vom Typ `Fin n`, das heisst, man muss diesen eigentlich immer mit `(i : ℕ)`
 als natürliche Zahl verwenden.
 "
 
+open BigOperators
+
 Statement
 "Zeige dass $\\sum_{i=0}^{n-1} (i + 1) = n + \\sum_{i=0}^{n-1} i$."
     (n : ℕ) : ∑ i : Fin n, ((i : ℕ) + 1) = n + (∑ i : Fin n, (i : ℕ)) := by

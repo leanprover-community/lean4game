@@ -36,6 +36,8 @@ lemma sum_const_add (n : ℕ) : (∑ i in Fin n, 0) = 0 := by
 Mit `simp?` anstatt `simp` kannst du zudem schauen, welche Lemmas von `simp` benutzt wurde.
 "
 
+open BigOperators
+
 Statement
 "Zeige dass $\\sum_{i = 0} ^ {n-1} (0 + 0) = 0$."
     (n : ℕ) : (∑ i : Fin n, (0 + 0)) = 0 := by

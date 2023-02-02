@@ -15,6 +15,8 @@ Introduction
 Hier nochmals eine Übung zur Induktion.
 "
 
+open BigOperators
+
 Statement
 "Zeige folgende Gleichung zur Summe aller ungeraden Zahlen:
 

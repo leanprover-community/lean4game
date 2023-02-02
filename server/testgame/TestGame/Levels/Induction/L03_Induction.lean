@@ -29,6 +29,8 @@ Für den Induktionsschritt braucht man fast immer zwei technische Lemmas:
 
 -- Note: I don't want to deal with Nat-division, so I stated it as `2 * ... = ...` instead.
 
+open BigOperators
+
 Statement
 "Zeige $\\sum_{i = 0}^n i = \\frac{n \\cdot (n + 1)}{2}$."
   (n : ℕ) : 2 * (∑ i : Fin (n + 1), ↑i) = n * (n + 1) := by
