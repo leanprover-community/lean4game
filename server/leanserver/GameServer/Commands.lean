@@ -184,22 +184,6 @@ elab "TacticDoc" name:ident content:str : command =>
     name := name.getId,
     content := content.getString })
 
-/-- Declare a set of tactic documentation entries.
-Expect an identifier used as the set name then `:=` and a
-space separated list of identifiers.
--/
-elab "TacticSet" name:ident ":=" args:ident* : command => do
-  let docs := tacticDocExt.getState (← getEnv)
-  let mut entries : Array TacticDocEntry := #[]
-  for arg in args do
-    let name := arg.getId
-    match docs.find? (·.name = name) with
-    | some doc => entries := entries.push doc
-    | none => throwError "Documentation for tactic {name} wasn't found."
-  modifyEnv (tacticSetExt.addEntry · {
-    name := name.getId,
-    tactics := entries })
-
 instance : Quote TacticDocEntry `term :=
 ⟨λ entry => Syntax.mkCApp ``TacticDocEntry.mk #[quote entry.name, quote entry.content]⟩
 
@@ -209,15 +193,12 @@ entry or a tactic doc set. -/
 elab "Tactics" args:ident* : command => do
   let env ← getEnv
   let docs := tacticDocExt.getState env
-  let sets := tacticSetExt.getState env
   let mut tactics : Array TacticDocEntry := #[]
   for arg in args do
     let name := arg.getId
     match docs.find? (·.name = name) with
     | some entry => tactics := tactics.push entry
-    | none => match sets.find? (·.name = name) with
-              | some entry => tactics := tactics ++ entry.tactics
-              | none => throwError "Tactic doc or tactic set {name} wasn't found."
+    | none => throwError "Tactic doc {name} wasn't found."
   modifyCurLevel fun level => pure {level with tactics := tactics}
 
 /-! ## Lemmas -/

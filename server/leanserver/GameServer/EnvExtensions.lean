@@ -45,25 +45,6 @@ elab "#print_tactic_doc" : command => do
   for entry in tacticDocExt.getState (← getEnv) do
     dbg_trace "{entry.name} : {entry.content}"
 
-structure TacticSetEntry where
-  name : Name
-  tactics : Array TacticDocEntry
-  deriving ToJson, Repr
-
-/-- Environment extension for tactic sets. -/
-initialize tacticSetExt : SimplePersistentEnvExtension TacticSetEntry (Array TacticSetEntry) ←
-  registerSimplePersistentEnvExtension {
-    name := `tactic_set
-    addEntryFn := Array.push
-    addImportedFn := Array.concatMap id
-  }
-
-open Elab Command in
-/-- Print all registered tactic sets for debugging purposes. -/
-elab "#print_tactic_set" : command => do
-  for entry in tacticSetExt.getState (← getEnv) do
-    dbg_trace "{entry.name} : {entry.tactics.map TacticDocEntry.name}"
-
 /-! ## Lemma documentation -/
 
 structure LemmaDocEntry where
