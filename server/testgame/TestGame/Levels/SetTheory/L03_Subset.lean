@@ -39,7 +39,7 @@ Statement subset_empty_iff
   intro h hA
   apply mem_univ -- or `trivial`.
 
-Tactics intro trivial apply
+NewTactics intro trivial apply
 -- blocked: tauto simp
 
 end MySet

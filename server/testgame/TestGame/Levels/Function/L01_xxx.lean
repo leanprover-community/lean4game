@@ -23,4 +23,4 @@ Statement
     : True := by
   trivial
 
-Tactics rw
+NewTactics rw

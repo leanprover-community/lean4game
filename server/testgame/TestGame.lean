@@ -39,9 +39,12 @@ Conclusion
 
 
 Path Proposition → Implication → Predicate → Contradiction → LeanStuff
---Path Predicate → Prime
+-- Path Predicate → Prime
 Path Predicate → Induction → LeanStuff → Function → SetFunction
 
 Path LeanStuff → SetTheory → SetFunction
 
 Path SetTheory → SetTheory2
+
+
+MakeGame

@@ -30,4 +30,4 @@ Hint (y : ℕ) : (2 * y + 1) ^ 2 = 4 * y ^ 2 + 3 * y + 1 + y =>
 
 Conclusion ""
 
-Tactics ring rw
+NewTactics ring rw

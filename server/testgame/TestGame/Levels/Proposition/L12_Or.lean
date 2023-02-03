@@ -44,4 +44,4 @@ HiddenHint (A : Prop) (B : Prop) (h : A ∨ (A ∧ B)) : A =>
 Hint (A : Prop) (B : Prop) (h : A ∧ B) : A =>
 "Jetzt noch das UND in den Annahmen mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
 
-Tactics assumption rcases
+NewTactics assumption rcases

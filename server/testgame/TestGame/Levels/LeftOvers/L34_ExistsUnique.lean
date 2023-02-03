@@ -20,4 +20,4 @@ Conclusion
 "
 "
 
-Tactics ring
+NewTactics ring

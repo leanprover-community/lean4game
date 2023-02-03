@@ -190,16 +190,8 @@ instance : Quote TacticDocEntry `term :=
 /-- Declare the list of tactics that will be displayed in the current level.
 Expects a space separated list of identifiers that refer to either a tactic doc
 entry or a tactic doc set. -/
-elab "Tactics" args:ident* : command => do
-  let env ← getEnv
-  let docs := tacticDocExt.getState env
-  let mut tactics : Array TacticDocEntry := #[]
-  for arg in args do
-    let name := arg.getId
-    match docs.find? (·.name = name) with
-    | some entry => tactics := tactics.push entry
-    | none => throwError "Tactic doc {name} wasn't found."
-  modifyCurLevel fun level => pure {level with tactics := tactics}
+elab "NewTactics" args:ident* : command => do
+  modifyCurLevel fun level => pure {level with newTactics := args.map (·.getId)}
 
 /-! ## Lemmas -/
 
@@ -219,11 +211,11 @@ Expect an identifier used as the set name then `:=` and a
 space separated list of identifiers. -/
 elab "LemmaSet" name:ident ":" title:str ":=" args:ident* : command => do
   let docs := lemmaDocExt.getState (← getEnv)
-  let mut entries : Array LemmaDocEntry := #[]
+  let mut entries : Array Name := #[]
   for arg in args do
     let name := arg.getId
     match docs.find? (·.userName = name) with
-    | some doc => entries := entries.push doc
+    | some doc => entries := entries.push name
     | none => throwError "Lemma doc {name} wasn't found."
   modifyEnv (lemmaSetExt.addEntry · {
     name := name.getId,
@@ -236,16 +228,60 @@ instance : Quote LemmaDocEntry `term :=
 /-- Declare the list of lemmas that will be displayed in the current level.
 Expects a space separated list of identifiers that refer to either a lemma doc
 entry or a lemma doc set. -/
-elab "Lemmas" args:ident* : command => do
+elab "NewLemmas" args:ident* : command => do
   let env ← getEnv
   let docs := lemmaDocExt.getState env
   let sets := lemmaSetExt.getState env
-  let mut lemmas : Array LemmaDocEntry := #[]
+  let mut lemmas : Array Name := #[]
   for arg in args do
     let name := arg.getId
     match docs.find? (·.userName = name) with
-    | some entry => lemmas := lemmas.push entry
+    | some entry => lemmas := lemmas.push name
     | none => match sets.find? (·.name = name) with
               | some entry => lemmas := lemmas ++ entry.lemmas
               | none => throwError "Lemma doc or lemma set {name} wasn't found."
-  modifyCurLevel fun level => pure {level with lemmas := lemmas}
+  modifyCurLevel fun level => pure {level with newLemmas := lemmas}
+
+/-! ## Make Game -/
+
+def getTacticDoc! (tac : Name) : CommandElabM TacticDocEntry := do
+  match (tacticDocExt.getState (← getEnv)).find? (·.name = tac) with
+  | some doc => return doc
+  | none => throwError "Tactic documentation not found: {tac}"
+
+/-- Make the final Game. This command will precompute various things about the game, such as which
+tactics are available in each level etc. -/
+elab "MakeGame" : command => do
+  let game ← getCurGame
+
+  -- Check for loops in world graph
+  if game.worlds.hasLoops then
+    throwError "World graph has loops!"
+
+  -- Compute which tactics are available in which level:
+  let mut newTacticsInWorld : HashMap Name (HashSet Name) := {}
+  for (worldId, world) in game.worlds.nodes.toArray do
+    let mut newTactics : HashSet Name:= {}
+    for (_, level) in world.levels.toArray do
+      newTactics := newTactics.insertMany level.newTactics
+    newTacticsInWorld := newTacticsInWorld.insert worldId newTactics
+
+  let mut tacticsInWorld : HashMap Name (HashSet Name) := {}
+  for (worldId, _) in game.worlds.nodes.toArray do
+    let mut tactics : HashSet Name:= {}
+    let predecessors := game.worlds.predecessors worldId
+    for predWorldId in predecessors do
+      tactics := tactics.insertMany (newTacticsInWorld.find! predWorldId)
+    tacticsInWorld := tacticsInWorld.insert worldId tactics
+
+  for (worldId, world) in game.worlds.nodes.toArray do
+    let mut tactics := tacticsInWorld.find! worldId
+    logInfo m!"{tactics.toArray}"
+
+    let levels := world.levels.toArray.insertionSort fun a b => a.1 < b.1
+
+    for (levelId, level) in levels do
+      tactics := tactics.insertMany level.newTactics
+
+      modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
+        return {level with tactics := ← tactics.toArray.mapM getTacticDoc!}

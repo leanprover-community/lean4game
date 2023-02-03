@@ -50,4 +50,4 @@ Hint (n : ℕ) (hn : Odd n) (h : ∀ (x : ℕ), (Odd x) → Even (x + 1)) : Even
 Conclusion "Für-alle-Statements, Implikationen und Lemmas/Theoreme verhalten sich alle
 praktisch gleich. Mehr dazu später."
 
-Tactics ring intro unfold
+NewTactics ring intro unfold

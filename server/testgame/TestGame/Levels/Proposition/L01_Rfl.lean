@@ -27,4 +27,4 @@ HiddenHint : 42 = 42 =>
 
 Conclusion "Bravo! PS: `rfl` steht für \"reflexivity\"."
 
-Tactics rfl
+NewTactics rfl

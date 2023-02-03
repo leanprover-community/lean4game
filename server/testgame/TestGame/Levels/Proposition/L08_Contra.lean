@@ -29,4 +29,4 @@ Conclusion
 "
 "
 
-Tactics contradiction
+NewTactics contradiction

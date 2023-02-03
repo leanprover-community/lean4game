@@ -50,6 +50,6 @@ Statement
 
 Conclusion ""
 
-Tactics push_neg intro use rw unfold ring
+NewTactics push_neg intro use rw unfold ring
 
-Lemmas Even Odd not_even not_odd not_exists not_forall
+NewLemmas Even Odd not_even not_odd not_exists not_forall

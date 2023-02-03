@@ -32,4 +32,4 @@ HiddenHint (n : ℕ) (h : 1 < n) : 1 < n =>
 
 Conclusion ""
 
-Tactics assumption
+NewTactics assumption

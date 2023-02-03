@@ -27,4 +27,4 @@ HiddenHint (A : Prop) (h : False) : A =>
 "Wenn man einen Beweis von `False` hat, kann man mit `contradiction` das Goal beweisen,
 unabhängig davon, was das Goal ist."
 
-Tactics contradiction
+NewTactics contradiction

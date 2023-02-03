@@ -37,4 +37,4 @@ Hint (a : ℕ) (b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : a + a ^ 2 = a + 1
 Conclusion "Übrigens, mit `rw [h] at *` kann man im weiteren `h` in **allen** Annahmen und
 dem Goal umschreiben."
 
-Tactics assumption rw
+NewTactics assumption rw

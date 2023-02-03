@@ -30,4 +30,4 @@ $\\sum_{i = 0}^n (2n + 1) = n ^ 2$."
   --rw [hn]
   --ring
 
-Tactics ring
+NewTactics ring

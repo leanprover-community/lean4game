@@ -39,6 +39,6 @@ Ring zu lösen, funktioniert aber auch auf `ℕ`, auch wenn dieses kein Ring ist
 (erst `ℤ` ist ein Ring).
 "
 
-Tactics ring
+NewTactics ring
 
 #eval 4 / 6

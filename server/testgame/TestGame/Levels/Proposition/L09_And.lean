@@ -32,7 +32,7 @@ HiddenHint (A : Prop) (B : Prop) (hA : A) (hB : B) : A ∧ B =>
 HiddenHint (A : Prop) (hA : A) : A =>
   "Du hast einen Beweis dafür in den *Annahmen*."
 
-Tactics constructor assumption
+NewTactics constructor assumption
 
 -- Statement
 --     "Zeige $(A \\land (A \\Rightarrow B)) \\iff (A \\land B)$."

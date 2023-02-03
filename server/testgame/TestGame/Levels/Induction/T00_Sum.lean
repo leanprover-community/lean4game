@@ -23,4 +23,4 @@ Statement
   simp
   sorry
 
-Tactics ring
+NewTactics ring

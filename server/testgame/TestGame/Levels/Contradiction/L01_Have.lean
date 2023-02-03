@@ -63,6 +63,6 @@ have k : ¬ B
 
 Conclusion ""
 
-Tactics contradiction rcases haveₓ assumption apply
+NewTactics contradiction rcases haveₓ assumption apply
 
-Lemmas Even Odd not_even not_odd
+NewLemmas Even Odd not_even not_odd

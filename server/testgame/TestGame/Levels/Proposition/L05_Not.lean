@@ -21,4 +21,4 @@ Statement
 
 Conclusion ""
 
-Tactics trivial
+NewTactics trivial

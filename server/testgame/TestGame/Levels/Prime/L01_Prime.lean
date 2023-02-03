@@ -34,6 +34,6 @@ Statement
 
 Conclusion ""
 
-Tactics
+NewTactics
 
-Lemmas
+NewLemmas

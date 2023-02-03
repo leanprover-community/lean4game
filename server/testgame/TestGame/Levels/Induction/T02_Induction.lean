@@ -21,4 +21,4 @@ Statement
     (n : ℤ) : True := by
   sorry
 
-Tactics rw simp ring
+NewTactics rw simp ring

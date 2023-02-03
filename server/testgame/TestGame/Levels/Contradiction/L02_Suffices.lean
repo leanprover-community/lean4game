@@ -60,6 +60,6 @@ Hint (A : Prop) (B : Prop) (h : A → ¬ B) (g : A) (f : B) : False =>
 
 Conclusion ""
 
-Tactics contradiction apply assumption rcases sufficesₓ
+NewTactics contradiction apply assumption rcases sufficesₓ
 
-Lemmas Even Odd not_even not_odd
+NewLemmas Even Odd not_even not_odd
