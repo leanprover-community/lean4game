@@ -17,7 +17,7 @@ private def mkErrorMessage (c : InputContext) (pos : String.Pos) (errorMsg : Str
 
 private def mkEOI (pos : String.Pos) : Syntax :=
   let atom := mkAtom (SourceInfo.original "".toSubstring pos "".toSubstring pos) ""
-  mkNode `Lean.Parser.Module.eoi #[atom]
+  mkNode ``Command.eoi #[atom]
 
 partial def parseTactic (inputCtx : InputContext) (pmctx : ParserModuleContext)
   (mps : ModuleParserState) (messages : MessageLog) (couldBeEndSnap : Bool) :
@@ -105,8 +105,8 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
           let cmdStx ← `(command|
-            set_option tactic.hygienic false in
-            theorem my_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
+            -- set_option tactic.hygienic false in
+            theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
         cmdCtx cmdStateRef
     let postNew := (← tacticCacheNew.get).post
