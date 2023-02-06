@@ -187,14 +187,17 @@ elab "TacticDoc" name:ident content:str : command =>
 instance : Quote TacticDocEntry `term :=
 ⟨λ entry => Syntax.mkCApp ``TacticDocEntry.mk #[quote entry.name, quote entry.content]⟩
 
-/-- Declare the list of tactics that will be displayed in the current level.
-Expects a space separated list of identifiers that refer to either a tactic doc
-entry or a tactic doc set. -/
+/-- Declare tactics that are introduced by this level. -/
 elab "NewTactics" args:ident* : command => do
   modifyCurLevel fun level => pure {level with newTactics := args.map (·.getId)}
 
+/-- Declare tactics that are temporarily disabled in this level -/
 elab "DisabledTactics" args:ident* : command => do
   modifyCurLevel fun level => pure {level with disabledTactics := args.map (·.getId)}
+
+/-- Temporarily disable all tactics except the ones declared here -/
+elab "OnlyTactics" args:ident* : command => do
+  modifyCurLevel fun level => pure {level with onlyTactics := args.map (·.getId)}
 
 /-! ## Lemmas -/
 

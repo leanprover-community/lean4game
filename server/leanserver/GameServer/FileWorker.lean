@@ -79,7 +79,8 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (level : GameL
     if 0 < val.length ∧ val.data[0]!.isAlpha then
       if ¬ ((level.tactics.map (·.name.toString))).contains val then
         addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
-      else if level.disabledTactics.contains val then
+      else if level.disabledTactics.contains val
+        ∨ (¬ level.onlyTactics.isEmpty ∧ ¬ level.onlyTactics.contains val)then
         addErrorMessage info s!"The tactic '{val}' is disabled in this level!"
   | .ident info rawVal val preresolved => return ()
 where addErrorMessage (info : SourceInfo) (s : MessageData) :=
