@@ -64,6 +64,20 @@ open JsonRpc
 
 section Elab
 
+-- TODO: use HashSetf ro `allowed`?
+/-- Find all tactics in syntax object that are forbidden according to a
+set `allowed` of allowed tactics. -/
+partial def findForbiddenTactics (allowed: Array Name) (stx : Syntax)
+    (acc : Array (SourceInfo × String) := #[]) : Array (SourceInfo × String) :=
+  match stx with
+  | .missing => acc
+  | .node info kind args => args.foldl (fun acc s => findForbiddenTactics allowed s acc) acc
+  | .atom info val => if isForbidden val then acc.push (info, val) else acc
+  | .ident info rawVal val preresolved => acc
+where isForbidden (val : String) : Bool :=
+  0 < val.length ∧ val.data[0]!.isAlpha ∧ ¬ allowed.contains val
+
+
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool) (couldBeEndSnap : Bool) : IO Snapshot := do
   let cmdState := snap.cmdState
@@ -98,14 +112,28 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
       Elab.Command.catchExceptions
         (getResetInfoTrees *> do
           let level ← GameServer.getLevelByFileName inputCtx.fileName
+
+          -- Check for forbidden tactics
+          let forbiddenTacs := findForbiddenTactics (level.tactics.map (·.name)) tacticStx
+          for (info, forbiddenTac) in forbiddenTacs do
+            modify fun st => { st with
+              messages := st.messages.add {
+                fileName := inputCtx.fileName
+                severity := MessageSeverity.error
+                pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
+                data     := s!"You are not allowed to use the tactic '{forbiddenTac}'"
+              }
+            }
+
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
           -- Insert final `done` command to display unsolved goal error in the end
           let done := Syntax.node (.synthetic cmdParserState.pos cmdParserState.pos) ``Lean.Parser.Tactic.done #[]
           let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
+
           let cmdStx ← `(command|
-            -- set_option tactic.hygienic false in
+            set_option tactic.hygienic false in
             theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
         cmdCtx cmdStateRef
@@ -122,6 +150,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           data     := output
         }
       }
+
     let postCmdSnap : Snapshot := {
       beginPos := cmdPos
       stx := tacticStx
