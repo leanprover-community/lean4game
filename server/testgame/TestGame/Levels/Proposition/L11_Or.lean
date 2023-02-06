@@ -31,3 +31,4 @@ Hint (A : Prop) (B : Prop) (hA : A) : ¬ B =>
 "Sackgasse. Probier's nochmals."
 
 NewTactics left right assumption
+DisabledTactics tauto

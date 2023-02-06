@@ -64,19 +64,33 @@ open JsonRpc
 
 section Elab
 
--- TODO: use HashSetf ro `allowed`?
+-- TODO: use HashSet for allowed tactics?
 /-- Find all tactics in syntax object that are forbidden according to a
 set `allowed` of allowed tactics. -/
-partial def findForbiddenTactics (allowed: Array Name) (stx : Syntax)
-    (acc : Array (SourceInfo × String) := #[]) : Array (SourceInfo × String) :=
+partial def findForbiddenTactics (inputCtx : Parser.InputContext) (level : GameLevel) (stx : Syntax)
+  : Elab.Command.CommandElabM Unit := do
   match stx with
-  | .missing => acc
-  | .node info kind args => args.foldl (fun acc s => findForbiddenTactics allowed s acc) acc
-  | .atom info val => if isForbidden val then acc.push (info, val) else acc
-  | .ident info rawVal val preresolved => acc
-where isForbidden (val : String) : Bool :=
-  0 < val.length ∧ val.data[0]!.isAlpha ∧ ¬ allowed.contains val
-
+  | .missing => return ()
+  | .node info kind args =>
+    for arg in args do
+      findForbiddenTactics inputCtx level arg
+  | .atom info val =>
+    -- ignore syntax elements that do not start with a letter
+    if 0 < val.length ∧ val.data[0]!.isAlpha then
+      if ¬ ((level.tactics.map (·.name.toString))).contains val then
+        addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
+      else if level.disabledTactics.contains val then
+        addErrorMessage info s!"The tactic '{val}' is disabled in this level!"
+  | .ident info rawVal val preresolved => return ()
+where addErrorMessage (info : SourceInfo) (s : MessageData) :=
+  modify fun st => { st with
+    messages := st.messages.add {
+      fileName := inputCtx.fileName
+      severity := MessageSeverity.error
+      pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
+      data     := s
+    }
+  }
 
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool) (couldBeEndSnap : Bool) : IO Snapshot := do
@@ -114,16 +128,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           let level ← GameServer.getLevelByFileName inputCtx.fileName
 
           -- Check for forbidden tactics
-          let forbiddenTacs := findForbiddenTactics (level.tactics.map (·.name)) tacticStx
-          for (info, forbiddenTac) in forbiddenTacs do
-            modify fun st => { st with
-              messages := st.messages.add {
-                fileName := inputCtx.fileName
-                severity := MessageSeverity.error
-                pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
-                data     := s!"You are not allowed to use the tactic '{forbiddenTac}'"
-              }
-            }
+          findForbiddenTactics inputCtx level tacticStx
 
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]

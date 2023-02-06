@@ -30,3 +30,4 @@ Conclusion
 "
 
 NewTactics contradiction
+DisabledTactics tauto

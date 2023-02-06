@@ -193,6 +193,9 @@ entry or a tactic doc set. -/
 elab "NewTactics" args:ident* : command => do
   modifyCurLevel fun level => pure {level with newTactics := args.map (·.getId)}
 
+elab "DisabledTactics" args:ident* : command => do
+  modifyCurLevel fun level => pure {level with disabledTactics := args.map (·.getId)}
+
 /-! ## Lemmas -/
 
 /-- Declare a documentation entry for some lemma.

@@ -33,3 +33,4 @@ HiddenHint (n : ℕ) (h : 1 < n) : 1 < n =>
 Conclusion ""
 
 NewTactics assumption
+DisabledTactics tauto

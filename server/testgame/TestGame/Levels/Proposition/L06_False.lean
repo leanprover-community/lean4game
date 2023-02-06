@@ -28,3 +28,4 @@ HiddenHint (A : Prop) (h : False) : A =>
 unabhängig davon, was das Goal ist."
 
 NewTactics contradiction
+DisabledTactics tauto

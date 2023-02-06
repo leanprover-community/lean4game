@@ -45,3 +45,4 @@ Hint (A : Prop) (B : Prop) (h : A ∧ B) : A =>
 "Jetzt noch das UND in den Annahmen mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
 
 NewTactics assumption rcases
+DisabledTactics tauto
