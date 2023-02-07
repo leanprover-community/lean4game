@@ -44,8 +44,15 @@ export const MonacoEditorContext = React.createContext<monaco.editor.IStandalone
 
 export const InputModeContext = React.createContext<{
   commandLineMode: boolean,
-  setCommandLineMode: React.Dispatch<React.SetStateAction<boolean>>
-}>({commandLineMode: true, setCommandLineMode: () => {}});
+  setCommandLineMode: React.Dispatch<React.SetStateAction<boolean>>,
+  commandLineInput: string,
+  setCommandLineInput: React.Dispatch<React.SetStateAction<string>>
+}>({
+  commandLineMode: true,
+  setCommandLineMode: () => {},
+  commandLineInput: "",
+  setCommandLineInput: () => {},
+});
 
 function Level() {
 
@@ -56,9 +63,12 @@ function Level() {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const introductionPanelRef = useRef<HTMLDivElement>(null)
 
+  const initialCode = useSelector(selectCode(worldId, levelId))
+
   const [commandLineMode, setCommandLineMode] = useState(true)
+  const [commandLineInput, setCommandLineInput] = useState("")
   const [showSidePanel, setShowSidePanel] = useState(true)
-  const [canUndo, setCanUndo] = useState(true)
+  const [canUndo, setCanUndo] = useState(initialCode.trim() !== "")
 
   const toggleSidePanel = () => {
     setShowSidePanel(!showSidePanel)
@@ -119,7 +129,6 @@ function Level() {
     setCanUndo(code.trim() !== "")
   }
 
-  const initialCode = useSelector(selectCode(worldId, levelId))
 
   const {editor, infoProvider, editorConnection} =
     useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
@@ -168,7 +177,7 @@ function Level() {
 
         <EditorContext.Provider value={editorConnection}>
           <MonacoEditorContext.Provider value={editor}>
-            <InputModeContext.Provider value={{commandLineMode, setCommandLineMode}}>
+            <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
               {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
             </InputModeContext.Provider>
           </MonacoEditorContext.Provider>

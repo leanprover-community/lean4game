@@ -117,6 +117,27 @@ td code  {
   white-space:nowrap;
 }
 
+/* Styling in the editor while typing abbreviations such as "\alpha" */
+.abbreviation {
+  text-decoration: underline;
+}
+
+/* Styling in the left margin of the editor when processing */
+.processing {
+  background: linear-gradient(
+    to right,
+    rgba(255, 165, 0, 1) 0%,
+    rgba(255, 165, 0, 1) 30%,
+    transparent 30%,
+    transparent  100%
+  );
+}
+
+/* Styling in the left margin of the editor on error */
+.glyph-margin-error {
+  background: rgba(255, 0, 0, 1);
+}
+
 /***************************************/
 /* TODO: For development purposes only */
 /***************************************/
