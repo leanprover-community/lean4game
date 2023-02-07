@@ -118,13 +118,14 @@ interface GoalProps {
     goal: InteractiveGoal
     filter: GoalFilterState
     showHints?: boolean
+    commandLine: boolean
 }
 
 /**
  * Displays the hypotheses, target type and optional case label of a goal according to the
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
-    const { goal, filter, showHints } = props
+    const { goal, filter, showHints, commandLine } = props
 
     const filteredList = getFilteredHypotheses(goal.hyps, filter);
     const hyps = filter.reverse ? filteredList.slice().reverse() : filteredList;
@@ -159,7 +160,7 @@ export const Goal = React.memo((props: GoalProps) => {
         { assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        {commandLineMode && <CommandLine />}
+        {commandLine && commandLineMode && <CommandLine />}
         {!filter.reverse && goalLi}
         {showHints && hints}
     </div>
@@ -175,7 +176,7 @@ export function Goals({ goals, filter }: GoalsProps) {
         return <>No goals</>
     } else {
         return <>
-            {goals.goals.map((g, i) => <Goal key={i} goal={g} filter={filter} />)}
+            {goals.goals.map((g, i) => <Goal commandLine={false} key={i} goal={g} filter={filter} />)}
         </>
     }
 }

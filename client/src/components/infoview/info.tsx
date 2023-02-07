@@ -16,6 +16,7 @@ import { PanelWidgetDisplay } from '../../../../node_modules/lean4-infoview/src/
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
+import { Troubleshoot } from '@mui/icons-material';
 
 type InfoStatus = 'updating' | 'error' | 'ready';
 type InfoKind = 'cursor' | 'pin';
@@ -123,7 +124,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
             <div className="goals-section">
                 { goals && goals.goals.length > 0
                   ? <><div className="goals-section-title">Main Goal</div>
-                    <Goal filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} /></>
+                    <Goal commandLine={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} /></>
                   : <div className="goals-section-title">No Goals</div> }
             </div>
         </LocationsContext.Provider>
@@ -149,7 +150,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                     <div className="goals-section-title">Other Goals</div>
 
                     {goals.goals.slice(1).map((goal, i) =>
-                        <details key={i}><summary><InteractiveCode fmt={goal.type} /></summary> <Goal filter={goalFilter} goal={goal} /></details>)}
+                        <details key={i}><summary><InteractiveCode fmt={goal.type} /></summary> <Goal commandLine={false} filter={goalFilter} goal={goal} /></details>)}
                 </div>}
         </LocationsContext.Provider>
     </>
