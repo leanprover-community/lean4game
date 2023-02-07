@@ -1,16 +1,13 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+import './inventory.css'
 
 import { Paper, Box, Typography, Accordion, AccordionSummary, AccordionDetails, Tabs, Tab, Divider, Button, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUpload, faArrowRotateRight, faChevronLeft, faChevronRight, faBook, faHammer } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import Markdown from './Markdown';
 
 function TacticDoc(props) {
@@ -72,6 +69,16 @@ function LemmaDocs({ lemmas }) {
 function LeftPanel({ spells, inventory, showSidePanel, setShowSidePanel }) {
 
   return (
+    <>
+    <div className="tactic-inventory">
+      {  ["rfl", "tauto", "trivial", "simp", "left", "right", "assumption", "constructor"].map ((tac) => {
+        const locked = Math.random() > 0.5
+        const disabled = Math.random() > 0.5
+        const icon = locked ? faLock : disabled ? faBan : faLockOpen
+        const className = locked ? "locked" : disabled ? "disabled" : ""
+        return <div className={`tactic ${className}`}><FontAwesomeIcon icon={icon} />&nbsp;{tac}</div>
+    })}
+    </div>
     <List className="side">
       <ListItem key="tactics" disablePadding sx={{ display: 'block' }}>
         <ListItemButton sx={{ minHeight: 48, justifyContent: showSidePanel ? 'initial' : 'center', px: 2.5 }} onClick={() => setShowSidePanel(true)}>
@@ -98,6 +105,7 @@ function LeftPanel({ spells, inventory, showSidePanel, setShowSidePanel }) {
           </Paper>}
       </ListItem>
     </List>
+    </>
   )
 }
 

@@ -1,0 +1,15 @@
+.tactic-inventory {
+  display: flex;
+  gap: .5em;
+  flex-wrap : wrap;
+}
+
+.tactic-inventory .tactic {
+  border: solid 1px #aaa;
+  padding: .1em .5em;
+}
+
+.tactic-inventory .tactic.locked,
+.tactic-inventory .tactic.disabled {
+  color: #aaa;
+}
