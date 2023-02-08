@@ -155,19 +155,19 @@ function Level() {
       </div>
 
     </div>
-    <Split minSize={200} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+    <Split minSize={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
       <div className="main-panel">
         <div ref={introductionPanelRef} className="introduction-panel">
           <Markdown>{level?.data?.introduction}</Markdown>
         </div>
+      </div>
+      <div className="info-panel">
         <div className="exercise">
-          <h4>Aufgabe:</h4>
+          {/* <h4>Aufgabe:</h4> */}
           <Markdown>{level?.data?.descrText}</Markdown>
           <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{level?.data?.descrFormat}</code></div>
           <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div>
         </div>
-      </div>
-      <div className="info-panel">
         <div className="input-mode-switch">
           {commandLineMode && <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
           <FormGroup>
