@@ -14,7 +14,7 @@ interface LevelInfo {
   title: null|string,
   introduction: null|string,
   index: number,
-  tactics: any[],
+  tactics: {name: string, disabled: boolean, locked: boolean}[],
   lemmas: any[],
   descrText: null|string,
   descrFormat: null|string,

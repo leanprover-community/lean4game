@@ -266,28 +266,41 @@ elab "MakeGame" : command => do
 
   -- Compute which tactics are available in which level:
   let mut newTacticsInWorld : HashMap Name (HashSet Name) := {}
+  let mut allTactics : HashSet Name := {}
   for (worldId, world) in game.worlds.nodes.toArray do
     let mut newTactics : HashSet Name:= {}
     for (_, level) in world.levels.toArray do
       newTactics := newTactics.insertMany level.newTactics
+      allTactics := allTactics.insertMany level.newTactics
     newTacticsInWorld := newTacticsInWorld.insert worldId newTactics
 
-  let mut tacticsInWorld : HashMap Name (HashSet Name) := {}
+  let tacticAvailability₀ : HashMap Name TacticAvailability :=
+    HashMap.ofList $
+      allTactics.toList.map fun name =>
+        (name, {name, locked := true, disabled := false})
+
+  let mut tacticsInWorld : HashMap Name (HashMap Name TacticAvailability) := {}
   for (worldId, _) in game.worlds.nodes.toArray do
-    let mut tactics : HashSet Name:= {}
+    let mut tactics : HashMap Name TacticAvailability := tacticAvailability₀
     let predecessors := game.worlds.predecessors worldId
     for predWorldId in predecessors do
-      tactics := tactics.insertMany (newTacticsInWorld.find! predWorldId)
+      for tac in newTacticsInWorld.find! predWorldId do
+        tactics := tactics.insert tac {name := tac, locked := false, disabled := false}
     tacticsInWorld := tacticsInWorld.insert worldId tactics
 
   for (worldId, world) in game.worlds.nodes.toArray do
     let mut tactics := tacticsInWorld.find! worldId
-    logInfo m!"{tactics.toArray}"
 
     let levels := world.levels.toArray.insertionSort fun a b => a.1 < b.1
 
     for (levelId, level) in levels do
-      tactics := tactics.insertMany level.newTactics
+      for tac in level.newTactics do
+        tactics := tactics.insert tac {name := tac, locked := false, disabled := false}
+      for tac in level.disabledTactics do
+        tactics := tactics.insert tac {name := tac, locked := false, disabled := true}
 
+      let tacticArray := tactics.toArray
+        |>.insertionSort (fun a b => a.1.toString < b.1.toString)
+        |>.map (·.2)
       modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
-        return {level with tactics := ← tactics.toArray.mapM getTacticDoc!}
+        return {level with tactics := tacticArray}

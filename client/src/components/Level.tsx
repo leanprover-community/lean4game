@@ -184,8 +184,8 @@ function Level() {
         </EditorContext.Provider>
       </div>
       <div className="doc-panel">
-        <LeftPanel spells={level?.data?.tactics} inventory={level?.data?.lemmas}
-          showSidePanel={showSidePanel} setShowSidePanel={setShowSidePanel} />
+        {!level.isLoading && <LeftPanel tactics={level?.data?.tactics} inventory={level?.data?.lemmas}
+          showSidePanel={showSidePanel} setShowSidePanel={setShowSidePanel} />}
       </div>
     </Split>
   </>

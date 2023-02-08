@@ -144,6 +144,12 @@ structure LevelId where
   level : Nat
 deriving Inhabited
 
+structure TacticAvailability where
+  name : Name
+  locked : Bool
+  disabled : Bool
+deriving ToJson, FromJson, Repr
+
 def getCurLevelId [MonadError m] : m LevelId := do
   return { game := ← getCurGameId, world := ← getCurWorldId, level := ← getCurLevelIdx}
 
@@ -170,7 +176,7 @@ structure GameLevel where
   -- only these tactics are allowed in this level (ignore if empty):
   onlyTactics: Array Name := default
   -- tactics in this level (computed by `MakeGame`):
-  tactics: Array TacticDocEntry := default
+  tactics: Array TacticAvailability := default
   -- new lemmas introduces by this level:
   newLemmas: Array Name := default
   -- lemmas exceptionally forbidden in this level:
