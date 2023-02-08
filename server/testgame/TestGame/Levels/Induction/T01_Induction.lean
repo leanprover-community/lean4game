@@ -18,7 +18,15 @@ Introduction
 
 Statement
 "2^n > n^2   für   n ≥ 5"
-    (n : ℕ) : True := by
+    (n : ℕ) (h : 5 ≤ n) : n^2 < 2 ^ n := by
+  induction n with
+  | 0 | 1 | 2 | 3 | 4 => by contradiction
+  | n.succ  => by sorry
+
+
+example (n : ℕ) (h : 5 ≤ n) : n^2 < 2 ^ n
+| 0 | 1 | 2 | 3 | 4 => by
   sorry
+| n + 5  => by sorry
 
 Tactics rw simp ring

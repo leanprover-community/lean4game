@@ -57,7 +57,7 @@ lemma mem_powerset_insert_iff {U : Type _} (A S : Set U) (x : U) :
 
 lemma mem_powerset_insert_iff' {U : Type _} (A S : Set U) (x : U) :
     S ∈ 𝒫 (insert x A) ↔ S \ {x} ∈ 𝒫 A := by
-  rw [mem_powerset_iff, mem_powerset_iff, diff_singleton_subset_iff]
+  simp_rw [mem_powerset_iff, diff_singleton_subset_iff]
 
 lemma powerset_insert {U : Type _} (A : Set U) (x : U) :
     𝒫 (insert x A) = A.powerset ∪ A.powerset.image (insert x) := by

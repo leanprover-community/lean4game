@@ -2,7 +2,6 @@ import TestGame.Metadata
 import Mathlib.Tactic.Ring
 import Mathlib
 
-import TestGame.ToBePorted
 
 Game "TestGame"
 World "Induction"
@@ -31,16 +30,16 @@ Für den Induktionsschritt braucht man fast immer zwei technische Lemmas:
 
 open BigOperators
 
-Statement
+Statement arithmetic_sum
 "Zeige $\\sum_{i = 0}^n i = \\frac{n \\cdot (n + 1)}{2}$."
   (n : ℕ) : 2 * (∑ i : Fin (n + 1), ↑i) = n * (n + 1) := by
-  induction n
+  induction' n with n hn
   simp
-
-  sorry
-  -- rw [Fin.sum_univ_castSucc]
-  -- simp [nat_succ]
-  -- rw [mul_add, hn]
-  -- ring
+  rw [Fin.sum_univ_castSucc]
+  rw [mul_add]
+  simp
+  rw [mul_add, hn]
+  simp_rw [Nat.succ_eq_one_add]
+  ring
 
 Tactics ring

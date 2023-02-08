@@ -24,13 +24,15 @@ Statement
     (n : ℕ) : ∃! (n : ℕ), Nat.Prime n ∧ Even n := by
   use (2 : ℕ)
   constructor
-  simp only [true_and]
-  use 1
+  simp only []
   intro y
   rintro ⟨h₁, h₂⟩
   rw [← Nat.Prime.even_iff]
   assumption
   assumption
+
+example : True := by
+  by_cases h : 1 = 0
 
 Conclusion ""
 
