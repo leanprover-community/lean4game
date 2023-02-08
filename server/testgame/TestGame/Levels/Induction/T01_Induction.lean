@@ -5,11 +5,15 @@ import TestGame.Metadata
 
 set_option tactic.hygienic false
 
+open Nat
+
 Game "TestGame"
 World "Induction"
 Level 2
 
 Title "endliche Summe"
+
+-- TODO: Tactics `mono` and `omega` are not ported yet.
 
 Introduction
 "
@@ -18,10 +22,14 @@ Introduction
 
 Statement
 "2^n > n^2   für   n ≥ 5"
-    (n : ℕ) (h : 5 ≤ n) : n^2 < 2 ^ n := by
-  induction n with
-  | 0 | 1 | 2 | 3 | 4 => by contradiction
-  | n.succ  => by sorry
+    (n : ℕ) : (n + 5)^2 < 2 ^ (n + 5) := by
+induction' n with n ih
+simp
+rw [succ_eq_add_one]
+simp_rw [add_pow_two] at *
+ring_nf at ih ⊢
+sorry
+
 
 
 example (n : ℕ) (h : 5 ≤ n) : n^2 < 2 ^ n

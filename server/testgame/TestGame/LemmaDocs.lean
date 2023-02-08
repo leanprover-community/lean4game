@@ -93,6 +93,8 @@ LemmaDoc Subset.antisymm_iff as Subset.antisymm_iff in "Set"
 
 
 
+LemmaDoc Nat.prime_def_lt'' as Nat.prime_def_lt'' in "Nat"
+""
 
 
 

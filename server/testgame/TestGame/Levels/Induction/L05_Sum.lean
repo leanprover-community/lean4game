@@ -6,7 +6,7 @@ import TestGame.ToBePorted
 
 Game "TestGame"
 World "Induction"
-Level 3
+Level 5
 
 Title "Induktion"
 

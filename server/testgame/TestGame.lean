@@ -4,7 +4,7 @@ import TestGame.Levels.Proposition
 import TestGame.Levels.Implication
 import TestGame.Levels.Predicate
 import TestGame.Levels.Contradiction
---import TestGame.Levels.Prime
+import TestGame.Levels.Prime
 import TestGame.Levels.Induction
 
 import TestGame.Levels.LeanStuff
@@ -38,12 +38,9 @@ Conclusion
 "Fertig!"
 
 
-Path Proposition → Implication → Predicate → Contradiction → LeanStuff
--- Path Predicate → Prime
+Path Proposition → Implication → Predicate → Prime
+Path Predicate → Contradiction → LeanStuff → SetTheory → SetFunction
 Path Predicate → Induction → LeanStuff → Function → SetFunction
-
-Path LeanStuff → SetTheory → SetFunction
-
 Path SetTheory → SetTheory2
 
 

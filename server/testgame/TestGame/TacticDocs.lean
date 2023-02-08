@@ -61,6 +61,12 @@ TacticDoc rewrite
 Wie `rw` aber ruft `rfl` am Schluss nicht automatisch auf.
 "
 
+TacticDoc linarith
+"
+## Beschreibung
+
+"
+
 TacticDoc rw
 "
 ## Beschreibung
