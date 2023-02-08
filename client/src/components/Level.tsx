@@ -155,7 +155,7 @@ function Level() {
       </div>
 
     </div>
-    <Split minSize={200} sizes={[30, 45, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+    <Split minSize={0} snapOffset={200} sizes={[30, 45, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
       <div className="side-panel">
         <div ref={introductionPanelRef} className="introduction-panel">
           <Markdown>{level?.data?.introduction}</Markdown>
