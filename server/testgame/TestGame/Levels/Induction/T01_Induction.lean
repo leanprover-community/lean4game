@@ -29,4 +29,4 @@ example (n : ℕ) (h : 5 ≤ n) : n^2 < 2 ^ n
   sorry
 | n + 5  => by sorry
 
-Tactics rw simp ring
+NewTactics rw simp ring

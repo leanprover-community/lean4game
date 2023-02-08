@@ -29,4 +29,4 @@ Statement
     "TODO" : True := by
   trivial
 
-Tactics rw
+NewTactics rw

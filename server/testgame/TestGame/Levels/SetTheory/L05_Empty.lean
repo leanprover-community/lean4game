@@ -45,8 +45,8 @@ Statement eq_empty_iff_forall_not_mem
   rw [←subset_empty_iff]
   rfl -- This is quite a miracle :)
 
-Tactics constructor intro rw assumption rcases simp tauto trivial
+NewTactics constructor intro rw assumption rcases simp tauto trivial
 
-Lemmas Subset.antisymm_iff empty_subset
+NewLemmas Subset.antisymm_iff empty_subset
 
 end MySet

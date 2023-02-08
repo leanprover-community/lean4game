@@ -36,6 +36,6 @@ example : True := by
 
 Conclusion ""
 
-Tactics
+NewTactics
 
-Lemmas
+NewLemmas

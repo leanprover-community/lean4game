@@ -23,10 +23,4 @@ Statement
   sorry
   sorry
 
-Tactics rw simp ring
-
--- example (n : ℕ) : (n - 1) * (n + 1) = (n ^ 2 - 1) := by
---   induction' n with n hn
---   ring
---   rw [Nat.succ_eq_one_add]
---   rw []
+NewTactics rw simp ring

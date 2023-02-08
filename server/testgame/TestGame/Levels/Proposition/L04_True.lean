@@ -33,4 +33,5 @@ True := by
 
 Conclusion ""
 
-Tactics trivial
+NewTactics trivial
+DisabledTactics tauto

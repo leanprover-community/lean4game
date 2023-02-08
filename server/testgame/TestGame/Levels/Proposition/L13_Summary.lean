@@ -122,4 +122,5 @@ HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ C) =>
 HiddenHint (A : Prop) (B : Prop) : A ∨ B =>
 "`left` oder `right`?"
 
-Tactics left right assumption constructor rcases rfl contradiction trivial
+NewTactics left right assumption constructor rcases rfl contradiction trivial
+DisabledTactics tauto

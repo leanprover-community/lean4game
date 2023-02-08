@@ -30,4 +30,5 @@ HiddenHint (A : Prop) (B : Prop) (hA : A) : A ∨ (¬ B) =>
 Hint (A : Prop) (B : Prop) (hA : A) : ¬ B =>
 "Sackgasse. Probier's nochmals."
 
-Tactics left right assumption
+NewTactics left right assumption
+DisabledTactics tauto

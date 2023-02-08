@@ -39,4 +39,4 @@ Statement mem_univ
   trivial
   -- tauto
 
-Tactics tauto trivial
+NewTactics tauto trivial

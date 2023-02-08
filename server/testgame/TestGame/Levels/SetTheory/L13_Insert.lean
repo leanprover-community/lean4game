@@ -35,5 +35,5 @@ Statement
   simp_rw [mem_insert_iff, mem_singleton_iff] at *
   tauto
 
-Tactics simp_rw intro tauto rw
+NewTactics simp_rw intro tauto rw
 --Lemmas Subset.antisymm_iff empty_subset

@@ -32,6 +32,6 @@ Statement
   use 1
   ring
 
-Tactics constructor intro rw assumption rcases simp tauto trivial
+NewTactics constructor intro rw assumption rcases simp tauto trivial
 
-Lemmas Subset.antisymm_iff empty_subset
+NewLemmas Subset.antisymm_iff empty_subset

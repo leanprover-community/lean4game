@@ -29,4 +29,5 @@ Conclusion
 "
 "
 
-Tactics contradiction
+NewTactics contradiction
+DisabledTactics tauto

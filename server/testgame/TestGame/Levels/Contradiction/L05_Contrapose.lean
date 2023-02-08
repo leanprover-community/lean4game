@@ -61,5 +61,5 @@ Hint (n : ℕ) : Even n → ¬Odd (n ^ 2) =>
 Hint (n : ℕ) : Even n → Even (n ^ 2) =>
 "Diese Aussage hast du bereits als Lemma bewiesen, schau mal in der Bibliothek."
 
-Tactics contrapose rw apply
-Lemmas Even Odd not_even not_odd even_square
+NewTactics contrapose rw apply
+NewLemmas Even Odd not_even not_odd even_square

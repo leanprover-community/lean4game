@@ -42,4 +42,4 @@ Statement arithmetic_sum
   simp_rw [Nat.succ_eq_one_add]
   ring
 
-Tactics ring
+NewTactics ring

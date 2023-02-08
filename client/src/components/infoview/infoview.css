@@ -44,10 +44,6 @@
   margin: 0.2em 0;
 }
 
-.command-line input[type="text"] {
-  font-family: var(--vscode-editor-font-family);
-}
-
 .command-line form {
   display: flex;
 }
@@ -56,8 +52,21 @@
   display: block;
 }
 
-.command-line form>input[type="text"]{
+.command-line .command-line-input-wrapper{
   flex: 1;
-  padding: 0.2em .6em;
+  padding: 0.4em .6em 0;
   font-size: 1rem;
+  background: white;
+}
+
+.command-line .command-line-input{
+  height: 1.2em;
+}
+
+/* Turn off some monaco decorations: */
+.command-line-input .monaco-editor .view-overlays .current-line {
+  border: 0;
+}
+.command-line-input .monaco-editor .scroll-decoration {
+  box-shadow: none;
 }

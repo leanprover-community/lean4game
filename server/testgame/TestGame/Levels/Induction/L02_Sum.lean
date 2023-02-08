@@ -34,4 +34,4 @@ Statement
   simp
   ring
 
-Tactics rw simp ring
+NewTactics rw simp ring

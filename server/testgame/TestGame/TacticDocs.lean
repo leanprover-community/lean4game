@@ -258,5 +258,3 @@ Prove:
 
 TacticDoc intro
 "Useful to introduce stuff"
-
-TacticSet basics := rfl induction_on intro rewrite

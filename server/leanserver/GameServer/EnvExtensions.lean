@@ -1,4 +1,6 @@
 import Lean
+import GameServer.Graph
+
 /-! # Environment extensions
 
 The game framework stores almost all its game building data in environment extensions
@@ -45,25 +47,6 @@ elab "#print_tactic_doc" : command => do
   for entry in tacticDocExt.getState (← getEnv) do
     dbg_trace "{entry.name} : {entry.content}"
 
-structure TacticSetEntry where
-  name : Name
-  tactics : Array TacticDocEntry
-  deriving ToJson, Repr
-
-/-- Environment extension for tactic sets. -/
-initialize tacticSetExt : SimplePersistentEnvExtension TacticSetEntry (Array TacticSetEntry) ←
-  registerSimplePersistentEnvExtension {
-    name := `tactic_set
-    addEntryFn := Array.push
-    addImportedFn := Array.concatMap id
-  }
-
-open Elab Command in
-/-- Print all registered tactic sets for debugging purposes. -/
-elab "#print_tactic_set" : command => do
-  for entry in tacticSetExt.getState (← getEnv) do
-    dbg_trace "{entry.name} : {entry.tactics.map TacticDocEntry.name}"
-
 /-! ## Lemma documentation -/
 
 structure LemmaDocEntry where
@@ -90,7 +73,7 @@ elab "#print_lemma_doc" : command => do
 structure LemmaSetEntry where
   name : Name
   title : String
-  lemmas : Array LemmaDocEntry
+  lemmas : Array Name
   deriving ToJson, Repr
 
 /-- Environment extension for lemma sets. -/
@@ -105,26 +88,8 @@ open Elab Command in
 /-- Print all registered lemma sets for debugging purposes. -/
 elab "#print_lemma_set" : command => do
   for entry in lemmaSetExt.getState (← getEnv) do
-    dbg_trace "{entry.name} : {entry.lemmas.map LemmaDocEntry.name}"
+    dbg_trace "{entry.name} : {entry.lemmas}"
 
-/-! ## Graph -/
-
-structure Graph (α β : Type) [inst : BEq α] [inst : Hashable α] where
-  nodes: HashMap α β := {}
-  edges: Array (α × α) := {}
-deriving Inhabited
-
-instance [ToJson β] : ToJson (Graph Name β) := {
-  toJson := fun graph => Json.mkObj [
-    ("nodes", Json.mkObj (graph.nodes.toList.map fun (a,b) => (a.toString, toJson b))),
-    ("edges", toJson graph.edges)
-  ]
-}
-
-instance [inst : BEq α] [inst : Hashable α] : EmptyCollection (Graph α β) := ⟨default⟩
-
-def Graph.insertNode [inst : BEq α] [inst : Hashable α] (g : Graph α β) (a : α) (b : β) :=
-  {g with nodes := g.nodes.insert a b}
 
 /-! ## Environment extensions for game specification-/
 
@@ -198,7 +163,21 @@ structure GameLevel where
   introduction: String := default
   description: String := default
   conclusion: String := default
+  -- new tactics introduces by this level:
+  newTactics: Array Name := default
+  -- tactics exceptionally forbidden in this level:
+  disabledTactics: Array Name := default
+  -- only these tactics are allowed in this level (ignore if empty):
+  onlyTactics: Array Name := default
+  -- tactics in this level (computed by `MakeGame`):
   tactics: Array TacticDocEntry := default
+  -- new lemmas introduces by this level:
+  newLemmas: Array Name := default
+  -- lemmas exceptionally forbidden in this level:
+  disabledLemmas: Array Name := default
+  -- only these lemmas are allowed in this level (ignore if empty):
+  onlyLemmas: Array Name := default
+  -- lemmas in this level (computed by `MakeGame`):
   lemmas: Array LemmaDocEntry := default
   hints: Array GoalHintEntry := default
   goal : TSyntax `Lean.Parser.Command.declSig := default
@@ -329,3 +308,15 @@ def modifyCurLevel (fn : GameLevel → m GameLevel) [MonadError m] : m Unit := d
   modifyCurWorld fun world => do
     let level ← getCurLevel
     return {world with levels := world.levels.insert level.index (← fn level)}
+
+def modifyLevel (levelId : LevelId) (fn : GameLevel → m GameLevel) [MonadError m] : m Unit := do
+  let some game ← getGame? levelId.game
+    | throwError m!"Game {levelId.game} does not exist"
+  let some world := (← getCurGame).worlds.nodes.find? levelId.world
+    | throwError m!"World {levelId.world} does not exist"
+  let some level := world.levels.find? levelId.level
+    | throwError m!"Level {levelId.level} does not exist"
+  let level' ← fn level
+  let world' := {world with levels := world.levels.insert levelId.level level'}
+  let game' := {game with worlds := game.worlds.insertNode levelId.world world'}
+  insertGame levelId.game game'

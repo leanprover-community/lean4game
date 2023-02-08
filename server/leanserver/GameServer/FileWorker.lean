@@ -17,7 +17,7 @@ private def mkErrorMessage (c : InputContext) (pos : String.Pos) (errorMsg : Str
 
 private def mkEOI (pos : String.Pos) : Syntax :=
   let atom := mkAtom (SourceInfo.original "".toSubstring pos "".toSubstring pos) ""
-  mkNode `Lean.Parser.Module.eoi #[atom]
+  mkNode ``Command.eoi #[atom]
 
 partial def parseTactic (inputCtx : InputContext) (pmctx : ParserModuleContext)
   (mps : ModuleParserState) (messages : MessageLog) (couldBeEndSnap : Bool) :
@@ -64,6 +64,35 @@ open JsonRpc
 
 section Elab
 
+-- TODO: use HashSet for allowed tactics?
+/-- Find all tactics in syntax object that are forbidden according to a
+set `allowed` of allowed tactics. -/
+partial def findForbiddenTactics (inputCtx : Parser.InputContext) (level : GameLevel) (stx : Syntax)
+  : Elab.Command.CommandElabM Unit := do
+  match stx with
+  | .missing => return ()
+  | .node info kind args =>
+    for arg in args do
+      findForbiddenTactics inputCtx level arg
+  | .atom info val =>
+    -- ignore syntax elements that do not start with a letter
+    if 0 < val.length ∧ val.data[0]!.isAlpha then
+      if ¬ ((level.tactics.map (·.name.toString))).contains val then
+        addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
+      else if level.disabledTactics.contains val
+        ∨ (¬ level.onlyTactics.isEmpty ∧ ¬ level.onlyTactics.contains val)then
+        addErrorMessage info s!"The tactic '{val}' is disabled in this level!"
+  | .ident info rawVal val preresolved => return ()
+where addErrorMessage (info : SourceInfo) (s : MessageData) :=
+  modify fun st => { st with
+    messages := st.messages.add {
+      fileName := inputCtx.fileName
+      severity := MessageSeverity.error
+      pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
+      data     := s
+    }
+  }
+
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool) (couldBeEndSnap : Bool) : IO Snapshot := do
   let cmdState := snap.cmdState
@@ -98,15 +127,20 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
       Elab.Command.catchExceptions
         (getResetInfoTrees *> do
           let level ← GameServer.getLevelByFileName inputCtx.fileName
+
+          -- Check for forbidden tactics
+          findForbiddenTactics inputCtx level tacticStx
+
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
           -- Insert final `done` command to display unsolved goal error in the end
           let done := Syntax.node (.synthetic cmdParserState.pos cmdParserState.pos) ``Lean.Parser.Tactic.done #[]
           let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
+
           let cmdStx ← `(command|
             set_option tactic.hygienic false in
-            theorem my_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
+            theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
         cmdCtx cmdStateRef
     let postNew := (← tacticCacheNew.get).post
@@ -122,6 +156,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           data     := output
         }
       }
+
     let postCmdSnap : Snapshot := {
       beginPos := cmdPos
       stx := tacticStx

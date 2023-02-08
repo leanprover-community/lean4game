@@ -21,4 +21,5 @@ Statement
 
 Conclusion ""
 
-Tactics trivial
+NewTactics trivial
+DisabledTactics tauto

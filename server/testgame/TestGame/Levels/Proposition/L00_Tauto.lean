@@ -48,4 +48,4 @@ HiddenHint (A : Prop) (B : Prop) (C : Prop): ¬((¬B ∨ ¬ C) ∨ (A → B)) �
 
 Conclusion ""
 
-Tactics tauto
+NewTactics tauto

@@ -27,4 +27,5 @@ HiddenHint (A : Prop) (hA : A) : A =>
 
 Conclusion ""
 
-Tactics assumption
+NewTactics assumption
+DisabledTactics tauto

@@ -22,4 +22,4 @@ Statement : ∃ (f : ℕ → ℕ), ∀ (x : ℕ), f x = 0 := by
 
 Conclusion ""
 
-Tactics use simp
+NewTactics use simp

@@ -27,4 +27,4 @@ $\\sum_{i = 0}^n (2n + 1) = n ^ 2$."
   rw [hn, Nat.succ_eq_add_one]
   ring
 
-Tactics ring
+NewTactics ring

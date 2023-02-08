@@ -52,4 +52,4 @@ HiddenHint (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) (a : A) : False =>
 
 Conclusion ""
 
-Tactics by_contra sufficesₓ haveₓ contradiction apply assumption
+NewTactics by_contra sufficesₓ haveₓ contradiction apply assumption

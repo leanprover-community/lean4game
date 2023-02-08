@@ -21,7 +21,7 @@ Statement
     (n : ℕ) : True := by
   trivial
 
-Tactics simp
+NewTactics simp
 
 
 -- Σ_i Σ_j ... = Σ_j Σ_i ...
