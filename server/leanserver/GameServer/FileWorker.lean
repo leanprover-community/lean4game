@@ -76,7 +76,8 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (level : GameL
       findForbiddenTactics inputCtx level arg
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
-    if 0 < val.length ∧ val.data[0]!.isAlpha then
+    -- and ignore "with" keyword
+    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ val != "with" then
       if ¬ ((level.tactics.map (·.name.toString))).contains val then
         addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
       else if level.disabledTactics.contains val
