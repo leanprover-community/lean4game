@@ -24,14 +24,15 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
 }
 
-.main-panel, .info-panel, .doc-panel {
+.side-panel, .exercise-panel, .doc-panel {
   height: 100%;
   overflow: auto;
 }
 
-.main-panel {
+.side-panel {
   display: flex;
   flex-flow: column;
+  background-color: #e9f2fb;
 }
 
 .infoview {
