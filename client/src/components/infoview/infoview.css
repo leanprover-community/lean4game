@@ -51,9 +51,11 @@
 .command-line button {
   display: block;
   white-space: nowrap;
+  flex: 0;
 }
 
 .command-line .command-line-input-wrapper{
+  min-width: 0;
   flex: 1;
   padding: 0.4em .6em 0;
   font-size: 1rem;
