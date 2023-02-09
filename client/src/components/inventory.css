@@ -21,13 +21,15 @@
 }
 
 .inventory .item {
-  border: solid 1px #aaa;
+  background: #fff;
+  border: solid 1px #777;
   padding: .1em .5em;
 }
 
 .inventory .item.locked,
 .inventory .item.disabled {
-  color: #aaa;
+  border: solid 1px #ccc;
+  color: #ccc;
 }
 
 

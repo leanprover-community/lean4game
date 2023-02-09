@@ -72,6 +72,10 @@
   gap: 1em;
 }
 
+.doc-panel {
+  background: #fafafa;
+}
+
 .doc-panel li {
   border-bottom: 1px solid rgba(0, 0, 0, 0.12); /* This should be teh same colour as `divider` in Inventory.tsx */
 }
