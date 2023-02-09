@@ -195,7 +195,7 @@ export function CommandLine() {
         <div className="command-line-input-wrapper">
           <div ref={inputRef} className="command-line-input" />
         </div>
-        <button type="submit" disabled={processing} className="btn btn-inverted"><FontAwesomeIcon icon={faWandMagicSparkles} /> Run</button>
+        <button type="submit" disabled={processing} className="btn btn-inverted"><FontAwesomeIcon icon={faWandMagicSparkles} /> Execute</button>
       </form>
     </div>
 }
