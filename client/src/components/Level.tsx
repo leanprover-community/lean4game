@@ -9,7 +9,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Box, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import Grid from '@mui/material/Unstable_Grid2';
-import LeftPanel from './LeftPanel';
+import Inventory from './Inventory';
 import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter';
 import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
 import 'lean4web/client/src/editor/vscode.css';
@@ -179,7 +179,7 @@ function Level() {
         </EditorContext.Provider>
       </div>
       <div className="doc-panel">
-        {!level.isLoading && <LeftPanel tactics={level?.data?.tactics} lemmas={level?.data?.lemmas} />}
+        {!level.isLoading && <Inventory tactics={level?.data?.tactics} lemmas={level?.data?.lemmas} />}
       </div>
     </Split>
   </>

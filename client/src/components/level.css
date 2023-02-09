@@ -73,11 +73,11 @@
 }
 
 .doc-panel li {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12); /* This should be teh same colour as `divider` in LeftPanel.tsx */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12); /* This should be teh same colour as `divider` in Inventory.tsx */
 }
 
 .doc-panel li:first-of-type {
-  border-top: 1px solid rgb(0, 0, 0, 0.12); /* This should be teh same colour as `divider` in LeftPanel.tsx */
+  border-top: 1px solid rgb(0, 0, 0, 0.12); /* This should be teh same colour as `divider` in Inventory.tsx */
 }
 
 /* fix as Mui seems to set this to `nowrap`. */

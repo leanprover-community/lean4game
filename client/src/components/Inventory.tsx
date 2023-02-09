@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import Markdown from './Markdown';
 
-function LeftPanel({ tactics, lemmas } :
+function Inventory({ tactics, lemmas } :
   {lemmas: {name: string, locked: boolean, disabled: boolean}[],
    tactics: {name: string, locked: boolean, disabled: boolean}[]}) {
 
@@ -31,4 +31,4 @@ function InventoryItem({name, locked, disabled}) {
   return <div className={`item ${className}`}>{icon} {name}</div>
 }
 
-export default LeftPanel;
+export default Inventory;
