@@ -41,6 +41,10 @@ initialize tacticDocExt : SimplePersistentEnvExtension TacticDocEntry (Array Tac
     addImportedFn := Array.concatMap id
   }
 
+def getTacticDoc? {m : Type → Type} [Monad m] [MonadEnv m] (tac : Name) :
+    m (Option TacticDocEntry) := do
+  return (tacticDocExt.getState (← getEnv)).find? (·.name = tac)
+
 open Elab Command in
 /-- Print a registered tactic doc for debugging purposes. -/
 elab "#print_tactic_doc" : command => do
@@ -63,6 +67,10 @@ initialize lemmaDocExt : SimplePersistentEnvExtension LemmaDocEntry (Array Lemma
     addEntryFn := Array.push
     addImportedFn := Array.concatMap id
   }
+
+def getLemmaDoc? {m : Type → Type} [Monad m] [MonadEnv m] (tac : Name) :
+    m (Option LemmaDocEntry) := do
+  return (lemmaDocExt.getState (← getEnv)).find? (·.name = tac)
 
 open Elab Command in
 /-- Print a lemma doc for debugging purposes. -/

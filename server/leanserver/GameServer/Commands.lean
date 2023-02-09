@@ -250,11 +250,6 @@ elab "NewLemmas" args:ident* : command => do
 
 /-! ## Make Game -/
 
-def getTacticDoc! (tac : Name) : CommandElabM TacticDocEntry := do
-  match (tacticDocExt.getState (← getEnv)).find? (·.name = tac) with
-  | some doc => return doc
-  | none => throwError "Tactic documentation not found: {tac}"
-
 /-- Make the final Game. This command will precompute various things about the game, such as which
 tactics are available in each level etc. -/
 elab "MakeGame" : command => do

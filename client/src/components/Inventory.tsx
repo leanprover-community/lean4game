@@ -4,31 +4,61 @@ import './inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import Markdown from './Markdown';
+import { useLoadDocQuery } from '../state/api';
 
 function Inventory({ tactics, lemmas } :
   {lemmas: {name: string, locked: boolean, disabled: boolean}[],
    tactics: {name: string, locked: boolean, disabled: boolean}[]}) {
 
-  return (
-    <>
-    <div className="inventory">
-      { tactics.map(tac => <InventoryItem name={tac.name} locked={tac.locked} disabled={tac.disabled} />) }
-    {/* TODO: Click on Tactic: show info
-      TODO: click on paste icon -> paste into command line */}
-    </div>
+  const [docName, setDocName] = useState(null)
+  const [docType, setDocType] = useState(null)
 
+
+  return (
     <div className="inventory">
-      { lemmas.map(lem => <InventoryItem name={lem.name} locked={lem.locked} disabled={lem.disabled} />) }
+      <h2>Tactics</h2>
+      <div className="inventory-list">
+        { tactics.map(tac =>
+           <InventoryItem key={tac.name} showDoc={() => {setDocName(tac.name); setDocType("tactic")}}
+             name={tac.name} locked={tac.locked} disabled={tac.disabled} />) }
+      {/* TODO: Click on Tactic: show info
+        TODO: click on paste icon -> paste into command line */}
+      </div>
+
+      <h2>Lemmas</h2>
+      <div className="inventory-list">
+        { lemmas.map(lem =>
+            <InventoryItem key={lem.name} showDoc={() => {setDocName(lem.name); setDocType("lemma")}}
+              name={lem.name} locked={lem.locked} disabled={lem.disabled} />) }
+      </div>
+
+      {docName && <Documentation name={docName} type={docType} />}
     </div>
-    </>
   )
 }
 
-function InventoryItem({name, locked, disabled}) {
+function InventoryItem({name, locked, disabled, showDoc}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : ""
   const className = locked ? "locked" : disabled ? "disabled" : ""
-  return <div className={`item ${className}`}>{icon} {name}</div>
+
+  const handleClick = () => {
+    if (!locked && !disabled) {
+      showDoc()
+    }
+  }
+
+  return <div className={`item ${className}`} onClick={handleClick}>{icon} {name}</div>
+}
+
+function Documentation({name, type}) {
+
+  const doc = useLoadDocQuery({type: type, name: name})
+
+  return <>
+    <h2 className="doc">{doc.data?.name}</h2>
+    <Markdown>{doc.data?.text}</Markdown>
+  </>
 }
 
 export default Inventory;
