@@ -67,12 +67,7 @@ function Level() {
 
   const [commandLineMode, setCommandLineMode] = useState(true)
   const [commandLineInput, setCommandLineInput] = useState("")
-  const [showSidePanel, setShowSidePanel] = useState(true)
   const [canUndo, setCanUndo] = useState(initialCode.trim() !== "")
-
-  const toggleSidePanel = () => {
-    setShowSidePanel(!showSidePanel)
-  }
 
   const theme = useTheme();
 
@@ -184,8 +179,7 @@ function Level() {
         </EditorContext.Provider>
       </div>
       <div className="doc-panel">
-        {!level.isLoading && <LeftPanel tactics={level?.data?.tactics} inventory={level?.data?.lemmas}
-          showSidePanel={showSidePanel} setShowSidePanel={setShowSidePanel} />}
+        {!level.isLoading && <LeftPanel tactics={level?.data?.tactics} lemmas={level?.data?.lemmas} />}
       </div>
     </Split>
   </>

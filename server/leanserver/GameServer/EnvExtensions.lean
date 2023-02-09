@@ -144,7 +144,7 @@ structure LevelId where
   level : Nat
 deriving Inhabited
 
-structure TacticAvailability where
+structure Availability where
   name : Name
   locked : Bool
   disabled : Bool
@@ -176,7 +176,7 @@ structure GameLevel where
   -- only these tactics are allowed in this level (ignore if empty):
   onlyTactics: Array Name := default
   -- tactics in this level (computed by `MakeGame`):
-  tactics: Array TacticAvailability := default
+  tactics: Array Availability := default
   -- new lemmas introduces by this level:
   newLemmas: Array Name := default
   -- lemmas exceptionally forbidden in this level:
@@ -184,7 +184,7 @@ structure GameLevel where
   -- only these lemmas are allowed in this level (ignore if empty):
   onlyLemmas: Array Name := default
   -- lemmas in this level (computed by `MakeGame`):
-  lemmas: Array LemmaDocEntry := default
+  lemmas: Array Availability := default
   hints: Array GoalHintEntry := default
   goal : TSyntax `Lean.Parser.Command.declSig := default
   descrText: String := default

@@ -41,8 +41,8 @@ Fields:
 structure LevelInfo where
   index : Nat
   title : String
-  tactics: Array TacticAvailability
-  lemmas: Array LemmaDocEntry
+  tactics: Array Availability
+  lemmas: Array Availability
   introduction : String
   descrText : String := ""
   descrFormat : String := ""
