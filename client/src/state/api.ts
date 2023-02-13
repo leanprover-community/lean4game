@@ -14,11 +14,17 @@ interface LevelInfo {
   title: null|string,
   introduction: null|string,
   index: number,
-  tactics: any[],
-  lemmas: any[],
+  tactics: {name: string, disabled: boolean, locked: boolean}[],
+  lemmas: {name: string, disabled: boolean, locked: boolean}[],
   descrText: null|string,
   descrFormat: null|string,
 }
+
+interface Doc {
+  name: string,
+  text: string
+}
+
 
 const customBaseQuery = async (
   args : {method: string, params?: any},
@@ -48,9 +54,12 @@ export const apiSlice = createApi({
     loadLevel: builder.query<LevelInfo, {world: string, level: number}>({
       query: ({world, level}) => {return {method: "loadLevel", params: {world, level}}},
     }),
+    loadDoc: builder.query<Doc, {name: string, type: "lemma"|"tactic"}>({
+      query: ({name, type}) => {return {method: "loadDoc", params: {name, type}}},
+    }),
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetGameInfoQuery, useLoadLevelQuery } = apiSlice
+export const { useGetGameInfoQuery, useLoadLevelQuery, useLoadDocQuery } = apiSlice

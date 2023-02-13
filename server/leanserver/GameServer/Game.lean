@@ -41,8 +41,8 @@ Fields:
 structure LevelInfo where
   index : Nat
   title : String
-  tactics: Array TacticDocEntry
-  lemmas: Array LemmaDocEntry
+  tactics: Array Availability
+  lemmas: Array Availability
   introduction : String
   descrText : String := ""
   descrFormat : String := ""
@@ -52,6 +52,32 @@ structure LoadLevelParams where
   world : Name
   level : Nat
   deriving ToJson, FromJson
+
+structure Doc where
+  name: String
+  text: String
+deriving ToJson
+
+inductive TacOrLem := | tactic | «lemma»
+deriving ToJson, FromJson
+
+structure LoadDocParams where
+  name : Name
+  type : TacOrLem
+deriving ToJson, FromJson
+
+def mkDoc (name : Name) (type : TacOrLem) : GameServerM (Option Doc) := do
+  match type with
+  | .tactic => do
+    let doc ← getTacticDoc? name
+    return doc.map fun doc =>
+      { name := doc.name.toString
+        text := doc.content }
+  | .lemma => do
+    let doc ← getLemmaDoc? name
+    return doc.map fun doc =>
+      { name := doc.name.toString
+        text := doc.content }
 
 partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
   match ev with
@@ -68,8 +94,9 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let c ← read
       let some lvl ← getLevel? {game := s.game, world := p.world, level := p.level}
         | do
-            c.hOut.writeLspResponseError ⟨id, .invalidParams, s!"Level not found: world {p.world}, level {p.level}", none⟩
-            return true
+          c.hOut.writeLspResponseError ⟨id, .invalidParams, s!"Level not found: world {p.world}, level {p.level}", none⟩
+          return true
+
       let levelInfo : LevelInfo :=
           { index := lvl.index,
             title := lvl.title,
@@ -79,6 +106,16 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson levelInfo⟩
+      return true
+    | Message.request id "loadDoc" params =>
+      let p ← parseParams LoadDocParams (toJson params)
+      let s ← get
+      let c ← read
+      let some doc ← mkDoc p.name p.type
+        | do
+            c.hOut.writeLspResponseError ⟨id, .invalidParams, s!"Documentation not found: {p.name}", none⟩
+            return true
+      c.hOut.writeLspResponse ⟨id, ToJson.toJson doc⟩
       return true
     | _ => return false
   | _ => return false

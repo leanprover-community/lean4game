@@ -41,6 +41,10 @@ initialize tacticDocExt : SimplePersistentEnvExtension TacticDocEntry (Array Tac
     addImportedFn := Array.concatMap id
   }
 
+def getTacticDoc? {m : Type → Type} [Monad m] [MonadEnv m] (tac : Name) :
+    m (Option TacticDocEntry) := do
+  return (tacticDocExt.getState (← getEnv)).find? (·.name = tac)
+
 open Elab Command in
 /-- Print a registered tactic doc for debugging purposes. -/
 elab "#print_tactic_doc" : command => do
@@ -63,6 +67,10 @@ initialize lemmaDocExt : SimplePersistentEnvExtension LemmaDocEntry (Array Lemma
     addEntryFn := Array.push
     addImportedFn := Array.concatMap id
   }
+
+def getLemmaDoc? {m : Type → Type} [Monad m] [MonadEnv m] (tac : Name) :
+    m (Option LemmaDocEntry) := do
+  return (lemmaDocExt.getState (← getEnv)).find? (·.name = tac)
 
 open Elab Command in
 /-- Print a lemma doc for debugging purposes. -/
@@ -144,6 +152,12 @@ structure LevelId where
   level : Nat
 deriving Inhabited
 
+structure Availability where
+  name : Name
+  locked : Bool
+  disabled : Bool
+deriving ToJson, FromJson, Repr
+
 def getCurLevelId [MonadError m] : m LevelId := do
   return { game := ← getCurGameId, world := ← getCurWorldId, level := ← getCurLevelIdx}
 
@@ -170,7 +184,7 @@ structure GameLevel where
   -- only these tactics are allowed in this level (ignore if empty):
   onlyTactics: Array Name := default
   -- tactics in this level (computed by `MakeGame`):
-  tactics: Array TacticDocEntry := default
+  tactics: Array Availability := default
   -- new lemmas introduces by this level:
   newLemmas: Array Name := default
   -- lemmas exceptionally forbidden in this level:
@@ -178,7 +192,7 @@ structure GameLevel where
   -- only these lemmas are allowed in this level (ignore if empty):
   onlyLemmas: Array Name := default
   -- lemmas in this level (computed by `MakeGame`):
-  lemmas: Array LemmaDocEntry := default
+  lemmas: Array Availability := default
   hints: Array GoalHintEntry := default
   goal : TSyntax `Lean.Parser.Command.declSig := default
   descrText: String := default

@@ -1,0 +1,38 @@
+.inventory {
+  padding: 0 1em;
+}
+
+.inventory h2 {
+  font-size: 1.5em;
+  margin-top: 1em;
+  margin-bottom: .2em;
+}
+
+
+.inventory h2.doc {
+  margin-top: 1.5em;
+  font-weight: 900;
+}
+
+.inventory-list {
+  display: flex;
+  gap: .5em;
+  flex-wrap : wrap;
+}
+
+.inventory .item {
+  background: #fff;
+  border: solid 1px #777;
+  padding: .1em .5em;
+}
+
+.inventory .item.locked,
+.inventory .item.disabled {
+  border: solid 1px #ccc;
+  color: #ccc;
+}
+
+
+.inventory .item:not(.locked):not(.disabled) {
+  cursor: pointer;
+}

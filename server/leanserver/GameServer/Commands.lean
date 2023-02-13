@@ -250,11 +250,6 @@ elab "NewLemmas" args:ident* : command => do
 
 /-! ## Make Game -/
 
-def getTacticDoc! (tac : Name) : CommandElabM TacticDocEntry := do
-  match (tacticDocExt.getState (← getEnv)).find? (·.name = tac) with
-  | some doc => return doc
-  | none => throwError "Tactic documentation not found: {tac}"
-
 /-- Make the final Game. This command will precompute various things about the game, such as which
 tactics are available in each level etc. -/
 elab "MakeGame" : command => do
@@ -264,30 +259,72 @@ elab "MakeGame" : command => do
   if game.worlds.hasLoops then
     throwError "World graph has loops!"
 
-  -- Compute which tactics are available in which level:
+  -- Compute which tactics/lemmas are available in which level:
   let mut newTacticsInWorld : HashMap Name (HashSet Name) := {}
+  let mut allTactics : HashSet Name := {}
+  let mut newLemmasInWorld : HashMap Name (HashSet Name) := {}
+  let mut allLemmas : HashSet Name := {}
   for (worldId, world) in game.worlds.nodes.toArray do
     let mut newTactics : HashSet Name:= {}
+    let mut newLemmas : HashSet Name:= {}
     for (_, level) in world.levels.toArray do
       newTactics := newTactics.insertMany level.newTactics
+      allTactics := allTactics.insertMany level.newTactics
+      newLemmas := newLemmas.insertMany level.newLemmas
+      allLemmas := allLemmas.insertMany level.newLemmas
     newTacticsInWorld := newTacticsInWorld.insert worldId newTactics
+    newLemmasInWorld := newLemmasInWorld.insert worldId newLemmas
 
-  let mut tacticsInWorld : HashMap Name (HashSet Name) := {}
+  -- Basic tactic/lemma availability: all locked, none disabled.
+  let Availability₀ : HashMap Name Availability :=
+    HashMap.ofList $
+      allTactics.toList.map fun name =>
+        (name, {name, locked := true, disabled := false})
+  let lemmaAvailability₀ : HashMap Name Availability :=
+    HashMap.ofList $
+      allLemmas.toList.map fun name =>
+        (name, {name, locked := true, disabled := false})
+
+  -- Availability after a given world
+  let mut tacticsInWorld : HashMap Name (HashMap Name Availability) := {}
+  let mut lemmasInWorld : HashMap Name (HashMap Name Availability) := {}
   for (worldId, _) in game.worlds.nodes.toArray do
-    let mut tactics : HashSet Name:= {}
+    let mut tactics := Availability₀
+    let mut lemmas := lemmaAvailability₀
     let predecessors := game.worlds.predecessors worldId
     for predWorldId in predecessors do
-      tactics := tactics.insertMany (newTacticsInWorld.find! predWorldId)
+      for tac in newTacticsInWorld.find! predWorldId do
+        tactics := tactics.insert tac {name := tac, locked := false, disabled := false}
+      for lem in newLemmasInWorld.find! predWorldId do
+        lemmas := lemmas.insert lem {name := lem, locked := false, disabled := false}
     tacticsInWorld := tacticsInWorld.insert worldId tactics
+    lemmasInWorld := lemmasInWorld.insert worldId lemmas
 
   for (worldId, world) in game.worlds.nodes.toArray do
     let mut tactics := tacticsInWorld.find! worldId
-    logInfo m!"{tactics.toArray}"
+    let mut lemmas := lemmasInWorld.find! worldId
 
     let levels := world.levels.toArray.insertionSort fun a b => a.1 < b.1
 
     for (levelId, level) in levels do
-      tactics := tactics.insertMany level.newTactics
+      for tac in level.newTactics do
+        tactics := tactics.insert tac {name := tac, locked := false, disabled := false}
+      for tac in level.disabledTactics do
+        tactics := tactics.insert tac {name := tac, locked := false, disabled := true}
+      for lem in level.newLemmas do
+        lemmas := lemmas.insert lem {name := lem, locked := false, disabled := false}
+      for lem in level.disabledLemmas do
+        lemmas := lemmas.insert lem {name := lem, locked := false, disabled := true}
+
+      let tacticArray := tactics.toArray
+        |>.insertionSort (fun a b => a.1.toString < b.1.toString)
+        |>.map (·.2)
+
+      let lemmaArray := lemmas.toArray
+        |>.insertionSort (fun a b => a.1.toString < b.1.toString)
+        |>.map (·.2)
 
       modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
-        return {level with tactics := ← tactics.toArray.mapM getTacticDoc!}
+        return {level with
+          tactics := tacticArray
+          lemmas := lemmaArray}
