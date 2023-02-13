@@ -35,18 +35,18 @@ bevor du dann mit dem Beweis forfährst.
 Statement
     "Angenommen, man hat eine Implikation $A \\Rightarrow \\neg B$ und weiss, dass
     $A \\land B$ wahr ist. Zeige, dass dies zu einem Widerspruch führt."
-    (A B : Prop) (h : A → ¬ B) (g : A ∧ B) : False := by
-  rcases g with ⟨h₁, h₂⟩
+    (A B : Prop) (h : A → ¬ B) (k : A ∧ B) : False := by
+  rcases k with ⟨h₁, h₂⟩
   have h₃ : ¬ B
   apply h
   assumption
   contradiction
 
-Hint (A : Prop) (B : Prop) (h : A → ¬ B) (g : A ∧ B) : False =>
+Hint (A : Prop) (B : Prop) (h : A → ¬ B) (k : A ∧ B) : False =>
 " Fang mal damit an, das UND in den Annahmen mit `rcases` aufzuteilen.
 "
 
-Hint (A : Prop) (B : Prop) (h : A → ¬ B) (g : A) (f : B) : False =>
+Hint (A : Prop) (B : Prop) (h : A → ¬ B) (k : A) (f : B) : False =>
 "
 Auf Deutsch: \"Als Zwischenresultat haben wir `¬ B`.\"
 
@@ -63,6 +63,7 @@ have k : ¬ B
 
 Conclusion ""
 
-NewTactics contradiction rcases haveₓ assumption apply
+NewTactics «have»
+DisabledTactics «suffices»
 
 NewLemmas Even Odd not_even not_odd

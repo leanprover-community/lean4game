@@ -46,4 +46,4 @@ HiddenHint (A : Prop) (B : Prop) : A → B ↔ (¬ B → ¬ A) =>
 
 Conclusion ""
 
-NewTactics contradiction constructor intro by_contra sufficesₓ haveₓ apply assumption
+NewTactics contradiction constructor intro by_contra apply assumption

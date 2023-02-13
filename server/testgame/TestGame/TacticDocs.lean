@@ -208,14 +208,14 @@ TacticDoc use
 TODO
 "
 
-TacticDoc sufficesₓ
+TacticDoc «suffices»
 "
 ## Beschreibung
 
 TODO
 "
 
-TacticDoc haveₓ
+TacticDoc «have»
 "
 ## Beschreibung
 

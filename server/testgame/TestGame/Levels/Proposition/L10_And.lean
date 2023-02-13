@@ -33,7 +33,7 @@ HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ (B ∧ C)) : B =>
 HiddenHint (A : Prop) (hA : A) : A =>
   "Du hast einen Beweis dafür in den *Annahmen*."
 
-NewTactics constructor assumption
+NewTactics rcases
 DisabledTactics tauto
 
 -- Statement

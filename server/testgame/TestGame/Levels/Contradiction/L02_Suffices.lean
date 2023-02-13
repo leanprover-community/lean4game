@@ -23,7 +23,7 @@ suffices h : [Aussage]
 [Beweis des Goals (mithilfe von h)]
 [Beweis der Aussage h]
 ```
-Auf Deutsch entspricht `suffices h : [Aussage]` dem Ausdruck
+Auf Deutsch entspricht `suffices g : [Aussage]` dem Ausdruck
 \"Es genügt zu zeigen, dass `[Aussage]` wahr ist.\"
 
 Man kann `have` und `suffices` nach belieben vertauschen. Bevorzugt, wählt man es so,
@@ -35,18 +35,18 @@ dass der erste Beweisblock der kürzere ist. Zum Beispiel wäre bei der vorigen 
 Statement
     "Angenommen, man hat eine Implikation $A \\Rightarrow \\neg B$ und weiss, dass
     $A \\land B$ wahr ist. Zeige, dass dies zu einem Widerspruch führt."
-    (A B : Prop) (h : A → ¬ B) (g : A ∧ B) : False := by
-  rcases g with ⟨h₁, h₂⟩
+    (A B : Prop) (h : A → ¬ B) (k : A ∧ B) : False := by
+  rcases k with ⟨h₁, h₂⟩
   suffices k : ¬ B
   contradiction
   apply h
   assumption
 
-Hint (A : Prop) (B : Prop) (h : A → ¬ B) (g : A ∧ B) : False =>
+Hint (A : Prop) (B : Prop) (h : A → ¬ B) (k : A ∧ B) : False =>
 " Fang mal damit an, das UND in den Annahmen mit `rcases` aufzuteilen.
 "
 
-Hint (A : Prop) (B : Prop) (h : A → ¬ B) (g : A) (f : B) : False =>
+Hint (A : Prop) (B : Prop) (h : A → ¬ B) (k : A) (f : B) : False =>
 " Auf Deutsch: \"Es genügt `¬ B` zu zeigen, da dies zu einem direkten Widerspruch führt.\"
 
   In Lean :
@@ -60,6 +60,7 @@ Hint (A : Prop) (B : Prop) (h : A → ¬ B) (g : A) (f : B) : False =>
 
 Conclusion ""
 
-NewTactics contradiction apply assumption rcases sufficesₓ
+NewTactics «suffices»
+DisabledTactics «have»
 
 NewLemmas Even Odd not_even not_odd
