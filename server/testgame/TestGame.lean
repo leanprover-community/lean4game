@@ -13,6 +13,7 @@ import TestGame.Levels.LeanStuff
 import TestGame.Levels.SetTheory
 import TestGame.Levels.Function
 import TestGame.Levels.SetFunction
+import TestGame.Levels.LinearAlgebra
 
 
 
@@ -45,5 +46,6 @@ Path Predicate → Contradiction → LeanStuff → SetTheory → SetTheory2 → 
 Path Predicate → Induction → LeanStuff → Function → SetFunction
 Path SetTheory2 → Numbers
 
+Path Module → Basis → Module2
 
 MakeGame

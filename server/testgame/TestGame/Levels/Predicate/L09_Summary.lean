@@ -45,7 +45,7 @@ Als Abschlussübung kannst du folgende Äquivalenz zeigen:
 
 Statement
     "TODO":
-    True := by
+  True := by
   trivial
 
 Conclusion ""
