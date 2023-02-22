@@ -150,9 +150,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
 
-          let cmdStx ← `(command|
-            set_option tactic.hygienic false in
-            theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
+          let cmdStx ← `(command| theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
 
           Elab.Command.withScope (fun _ => level.scope) do -- use open namespaces and options as in the file
             Elab.Command.elabCommandTopLevel cmdStx)
