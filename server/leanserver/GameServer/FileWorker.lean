@@ -77,13 +77,24 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (level : GameL
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore "with" keyword
-    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ val != "with" then
+    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ val != "with" ∧ val != "at" then
       if ¬ ((level.tactics.map (·.name.toString))).contains val then
         addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
       else if level.disabledTactics.contains val
         ∨ (¬ level.onlyTactics.isEmpty ∧ ¬ level.onlyTactics.contains val)then
         addErrorMessage info s!"The tactic '{val}' is disabled in this level!"
-  | .ident info rawVal val preresolved => return ()
+  | .ident info rawVal val preresolved =>
+      let ns ←
+        try resolveGlobalConst (mkIdent val)
+        catch | _ => pure [] -- catch "unknown constant" error
+      for n in ns do
+        let some (.thmInfo ..) := (← getEnv).find? n
+          | return () -- not a theroem -> ignore
+        if ¬ ((level.lemmas.map (·.name))).contains n then
+          addErrorMessage info s!"You have not unlocked the lemma '{n}' yet!"
+        else if level.disabledLemmas.contains n
+          ∨ (¬ level.onlyLemmas.isEmpty ∧ ¬ level.onlyLemmas.contains n)then
+          addErrorMessage info s!"The lemma '{n}' is disabled in this level!"
 where addErrorMessage (info : SourceInfo) (s : MessageData) :=
   modify fun st => { st with
     messages := st.messages.add {
