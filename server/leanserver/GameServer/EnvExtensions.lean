@@ -161,9 +161,10 @@ deriving ToJson, FromJson, Repr
 def getCurLevelId [MonadError m] : m LevelId := do
   return { game := ← getCurGameId, world := ← getCurWorldId, level := ← getCurLevelIdx}
 
+/-- Instance to make GameLevel Repr work -/
+instance : Repr Elab.Command.Scope := ⟨fun s _ => repr s.currNamespace⟩
+
 /--
-
-
 Fields:
 - TODO
 - introduction: Theory block shown all the time.
@@ -195,6 +196,7 @@ structure GameLevel where
   lemmas: Array Availability := default
   hints: Array GoalHintEntry := default
   goal : TSyntax `Lean.Parser.Command.declSig := default
+  scope : Elab.Command.Scope := default
   descrText: String := default
   descrFormat : String := default
   deriving Inhabited, Repr

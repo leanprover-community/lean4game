@@ -153,7 +153,9 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           let cmdStx ← `(command|
             set_option tactic.hygienic false in
             theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
-          Elab.Command.elabCommandTopLevel cmdStx)
+
+          Elab.Command.withScope (fun _ => level.scope) do -- use open namespaces and options as in the file
+            Elab.Command.elabCommandTopLevel cmdStx)
         cmdCtx cmdStateRef
     let postNew := (← tacticCacheNew.get).post
     snap.tacticCache.modify fun _ => { pre := postNew, post := {} }

@@ -79,9 +79,12 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
   -- | none => `(lemma $(mkIdent "XX") $sig $val) -- TODO: Make it into an `example`
   -- | some name => `(lemma $name $sig $val)
 
+  let scope ← getScope
+
   elabCommand thmStatement
   modifyCurLevel fun level => pure {level with
     goal := sig,
+    scope := scope,
     descrText := descr.getString,
     descrFormat := match statementName with
     | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
