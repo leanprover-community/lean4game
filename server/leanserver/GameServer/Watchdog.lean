@@ -102,6 +102,7 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
   let i ← maybeTee "wdIn.txt" false i
   let o ← maybeTee "wdOut.txt" true o
   let e ← maybeTee "wdErr.txt" true e
+  let state := {env := ← createEnv, game := `TestGame}
   let initRequest ← i.readLspRequestAs "initialize" InitializeParams
   o.writeLspResponse {
     id     := initRequest.id
@@ -114,7 +115,6 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
       : InitializeResult
     }
   }
-  let state := {env := ← createEnv, game := `TestGame}
   let context : ServerContext := {
     hIn            := i
     hOut           := o

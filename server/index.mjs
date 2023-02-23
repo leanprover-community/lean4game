@@ -1,7 +1,7 @@
 import { WebSocketServer } from 'ws';
 import express from 'express'
 import path from 'path'
-import { spawn } from 'child_process';
+import * as cp from 'child_process';
 import * as url from 'url';
 import * as rpc from 'vscode-ws-jsonrpc';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
@@ -34,7 +34,34 @@ if (isDevelopment) {
     cwd = "."
 }
 
+/** We keep a queue of started Lean Server processes to be ready when a user arrives */
+const queue = []
+const queueLength = 5
+
+/** start Lean Server processes to refill the queue */
+function fillQueue() {
+    while (queue.length < queueLength) {
+        const serverProcess = cp.spawn(cmd, cmdArgs, { cwd })
+        serverProcess.on('error', error =>
+            console.error(`Launching Lean Server failed: ${error}`)
+        );
+        if (serverProcess.stderr !== null) {
+            serverProcess.stderr.on('data', data =>
+                console.error(`Lean Server: ${data}`)
+            );
+        }
+
+        queue.push(serverProcess)
+    }
+}
+
+fillQueue()
+
 wss.addListener("connection", function(ws) {
+
+    const ps = queue.shift() // Pick the first Lean process; it's likely to be ready immediately
+    fillQueue()
+
     const socket = {
         onMessage: (cb) => { ws.on("message", cb) },
         onError: (cb) => { ws.on("error", cb) },
@@ -44,7 +71,7 @@ wss.addListener("connection", function(ws) {
     const reader = new rpc.WebSocketMessageReader(socket);
     const writer = new rpc.WebSocketMessageWriter(socket);
     const socketConnection = jsonrpcserver.createConnection(reader, writer, () => ws.close())
-    const serverConnection = jsonrpcserver.createServerProcess('Lean Server', cmd, cmdArgs, { cwd });
+    const serverConnection = jsonrpcserver.createProcessStreamConnection(ps);
     socketConnection.forward(serverConnection, message => {
         console.log(`CLIENT: ${JSON.stringify(message)}`)
         return message;
