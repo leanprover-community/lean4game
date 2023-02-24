@@ -79,9 +79,12 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
   -- | none => `(lemma $(mkIdent "XX") $sig $val) -- TODO: Make it into an `example`
   -- | some name => `(lemma $name $sig $val)
 
+  let scope ← getScope
+
   elabCommand thmStatement
   modifyCurLevel fun level => pure {level with
     goal := sig,
+    scope := scope,
     descrText := descr.getString,
     descrFormat := match statementName with
     | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
@@ -187,17 +190,28 @@ elab "TacticDoc" name:ident content:str : command =>
 instance : Quote TacticDocEntry `term :=
 ⟨λ entry => Syntax.mkCApp ``TacticDocEntry.mk #[quote entry.name, quote entry.content]⟩
 
+/-- Throw an error if tactic doc does not exist -/
+def checkTacticDoc (name : Name) : CommandElabM Unit := do
+  let some _ := (tacticDocExt.getState (← getEnv)).find? (·.name = name)
+    | throwError "Missing Tactic Documentation: {name}"
+
 /-- Declare tactics that are introduced by this level. -/
 elab "NewTactics" args:ident* : command => do
-  modifyCurLevel fun level => pure {level with newTactics := args.map (·.getId)}
+  let names := args.map (·.getId)
+  for name in names do checkTacticDoc name
+  modifyCurLevel fun level => pure {level with newTactics := names}
 
 /-- Declare tactics that are temporarily disabled in this level -/
 elab "DisabledTactics" args:ident* : command => do
-  modifyCurLevel fun level => pure {level with disabledTactics := args.map (·.getId)}
+  let names := args.map (·.getId)
+  for name in names do checkTacticDoc name
+  modifyCurLevel fun level => pure {level with disabledTactics := names}
 
 /-- Temporarily disable all tactics except the ones declared here -/
 elab "OnlyTactics" args:ident* : command => do
-  modifyCurLevel fun level => pure {level with onlyTactics := args.map (·.getId)}
+  let names := args.map (·.getId)
+  for name in names do checkTacticDoc name
+  modifyCurLevel fun level => pure {level with onlyTactics := names}
 
 /-! ## Lemmas -/
 

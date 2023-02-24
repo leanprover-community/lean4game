@@ -77,13 +77,24 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (level : GameL
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore "with" keyword
-    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ val != "with" then
+    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ val != "with" ∧ val != "at" then
       if ¬ ((level.tactics.map (·.name.toString))).contains val then
         addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
       else if level.disabledTactics.contains val
         ∨ (¬ level.onlyTactics.isEmpty ∧ ¬ level.onlyTactics.contains val)then
         addErrorMessage info s!"The tactic '{val}' is disabled in this level!"
-  | .ident info rawVal val preresolved => return ()
+  | .ident info rawVal val preresolved =>
+      let ns ←
+        try resolveGlobalConst (mkIdent val)
+        catch | _ => pure [] -- catch "unknown constant" error
+      for n in ns do
+        let some (.thmInfo ..) := (← getEnv).find? n
+          | return () -- not a theroem -> ignore
+        if ¬ ((level.lemmas.map (·.name))).contains n then
+          addErrorMessage info s!"You have not unlocked the lemma '{n}' yet!"
+        else if level.disabledLemmas.contains n
+          ∨ (¬ level.onlyLemmas.isEmpty ∧ ¬ level.onlyLemmas.contains n)then
+          addErrorMessage info s!"The lemma '{n}' is disabled in this level!"
 where addErrorMessage (info : SourceInfo) (s : MessageData) :=
   modify fun st => { st with
     messages := st.messages.add {
@@ -139,10 +150,10 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
 
-          let cmdStx ← `(command|
-            set_option tactic.hygienic false in
-            theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
-          Elab.Command.elabCommandTopLevel cmdStx)
+          let cmdStx ← `(command| theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
+
+          Elab.Command.withScope (fun _ => level.scope) do -- use open namespaces and options as in the file
+            Elab.Command.elabCommandTopLevel cmdStx)
         cmdCtx cmdStateRef
     let postNew := (← tacticCacheNew.get).post
     snap.tacticCache.modify fun _ => { pre := postNew, post := {} }

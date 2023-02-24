@@ -22,9 +22,9 @@ import './level.css'
 import { Button } from './Button'
 import { ConnectionContext, useLeanClient } from '../connection';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
-import { codeEdited, selectCode } from '../state/progress';
-import { useAppDispatch } from '../hooks';
-import { useSelector } from 'react-redux';
+import { codeEdited, selectCode, progressSlice } from '../state/progress';
+import { useAppDispatch, useAppSelector } from '../hooks';
+import { useStore } from 'react-redux';
 
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection';
@@ -63,7 +63,7 @@ function Level() {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const introductionPanelRef = useRef<HTMLDivElement>(null)
 
-  const initialCode = useSelector(selectCode(worldId, levelId))
+  const initialCode = useAppSelector(selectCode(worldId, levelId))
 
   const [commandLineMode, setCommandLineMode] = useState(true)
   const [commandLineInput, setCommandLineInput] = useState("")
@@ -113,6 +113,8 @@ function Level() {
   const connection = React.useContext(ConnectionContext)
 
   const gameInfo = useGetGameInfoQuery()
+
+  useLoadWorldFiles(worldId)
 
   const level = useLoadLevelQuery({world: worldId, level: levelId})
 
@@ -277,8 +279,8 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
       let model = monaco.editor.getModel(uri)
       if (!model) {
         model = monaco.editor.createModel(initialCode, 'lean4', uri)
-        model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
       }
+      model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
       editor.setModel(model)
       editor.setPosition(model.getFullModelRange().getEndPosition())
 
@@ -288,9 +290,32 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
       const taskGutter = new LeanTaskGutter(infoProvider.client, editor)
       const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
-      return () => { abbrevRewriter.dispose(); taskGutter.dispose(); model.dispose() }
+      return () => { abbrevRewriter.dispose(); taskGutter.dispose(); }
     }
   }, [editor, levelId, connection, leanClientStarted])
 
   return {editor, infoProvider, editorConnection}
+}
+
+/** Open all files in this world on the server so that they will load faster when accessed */
+function useLoadWorldFiles(worldId) {
+  const gameInfo = useGetGameInfoQuery()
+  const store = useStore()
+
+  useEffect(() => {
+    if (gameInfo.data) {
+      const models = []
+      for (let levelId = 1; levelId <= gameInfo.data.worldSize[worldId]; levelId++) {
+        const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
+        let model = monaco.editor.getModel(uri)
+        if (model) {
+          models.push(model)
+        } else {
+          const code = selectCode(worldId, levelId)(store.getState())
+          models.push(monaco.editor.createModel(code, 'lean4', uri))
+        }
+      }
+      return () => { for (let model of models) { model.dispose() } }
+    }
+  }, [gameInfo.data, worldId])
 }

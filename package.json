@@ -17,7 +17,7 @@
     "cytoscape-klay": "^3.1.4",
     "debounce": "^1.2.1",
     "express": "^4.18.2",
-    "lean4-infoview": "https://gitpkg.now.sh/leanprover/vscode-lean4/lean4-infoview?master",
+    "lean4-infoview": "https://gitpkg.now.sh/leanprover/vscode-lean4/lean4-infoview?de0062c",
     "lean4web": "github:hhu-adam/lean4web",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",

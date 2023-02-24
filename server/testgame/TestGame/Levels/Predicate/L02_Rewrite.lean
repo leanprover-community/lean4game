@@ -54,7 +54,7 @@ HiddenHint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b)
 "Auch eine Möglichkeit.. Kannst du das Goal so umschreiben, dass es mit einer Annahme übereinstimmt?"
 
 Hint (a : ℕ) (b : ℕ) (h : b = a) : a = b =>
-"Naja auch Umwege führen ans Ziel... Wenn du das Goal zu `a = A` umschreibst, kann man es mit
+"Naja auch Umwege führen ans Ziel... Wenn du das Goal zu `a = a` umschreibst, kann man es mit
 `rfl` beweisen (rsp. das passiert automatisch.)"
 
 Hint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : d = b) (h₃ : d = a) : b = c =>
