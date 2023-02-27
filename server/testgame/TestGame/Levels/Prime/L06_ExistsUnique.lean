@@ -11,7 +11,7 @@ import TestGame.ToBePorted
 
 Game "TestGame"
 World "Prime"
-Level 6
+Level 4
 
 Title "Existiert eindeutig"
 

@@ -8,6 +8,7 @@ import TestGame.Levels.Prime
 import TestGame.Levels.Induction
 
 import TestGame.Levels.Numbers
+import TestGame.Levels.Inequality
 
 import TestGame.Levels.LeanStuff
 import TestGame.Levels.SetTheory
@@ -43,9 +44,10 @@ Conclusion
 
 Path Proposition → Implication → Predicate → Prime
 Path Predicate → Contradiction → LeanStuff → SetTheory → SetTheory2 → SetFunction
-Path Predicate → Induction → LeanStuff → Function → SetFunction
 Path SetTheory2 → Numbers
 
 Path Module → Basis → Module2
+
+Path Contradiction → Inequality → Induction → LeanStuff → Function → SetFunction
 
 MakeGame

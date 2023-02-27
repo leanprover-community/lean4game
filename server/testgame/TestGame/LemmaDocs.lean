@@ -37,6 +37,15 @@ LemmaDoc imp_iff_not_or as imp_iff_not_or in "Logic"
 `(A B : Prop)`
 "
 
+
+LemmaDoc Nat.succ_pos as Nat.succ_pos in "Nat"
+"
+"
+
+LemmaDoc zero_lt_iff as zero_lt_iff in "Nat"
+"
+"
+
 LemmaDoc zero_add as zero_add in "Addition"
 "This lemma says `∀ a : ℕ, 0 + a = a`."
 

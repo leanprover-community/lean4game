@@ -11,7 +11,7 @@ import TestGame.ToBePorted
 
 Game "TestGame"
 World "Prime"
-Level 5
+Level 3
 
 Title "Primzahlen"
 

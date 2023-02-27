@@ -32,8 +32,6 @@ Zum Beispiel kennt es ein Lemma das ungefähr so aussieht:
 lemma sum_const_add (n : ℕ) : (∑ i in Fin n, 0) = 0 := by
   sorry
 ```
-
-Mit `simp?` anstatt `simp` kannst du zudem schauen, welche Lemmas von `simp` benutzt wurde.
 "
 
 open BigOperators

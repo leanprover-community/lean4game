@@ -61,11 +61,32 @@ TacticDoc rewrite
 Wie `rw` aber ruft `rfl` am Schluss nicht automatisch auf.
 "
 
+TacticDoc induction
+"
+## Beschreibung
+
+Wie `rw` aber ruft `rfl` am Schluss nicht automatisch auf.
+"
+
+
 TacticDoc linarith
 "
 ## Beschreibung
 
 "
+
+TacticDoc fin_cases
+"
+## Beschreibung
+
+"
+
+TacticDoc funext
+"
+## Beschreibung
+
+"
+
 
 TacticDoc rw
 "

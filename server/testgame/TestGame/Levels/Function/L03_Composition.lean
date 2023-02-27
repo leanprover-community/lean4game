@@ -17,4 +17,4 @@ TODO
 Statement
 "TODO: Find an exercise."
     (U S T V : Type _) (f : U → V) (g : V → T) (x : U) : (g ∘ f) x = g (f x)  := by
-  trivial
+  simp only [Function.comp_apply]

@@ -11,20 +11,21 @@ import TestGame.ToBePorted
 
 Game "TestGame"
 World "Prime"
-Level 4
+Level 2
 
 Title "Primzahlen"
 
 Introduction
 "
-Um zu sagen, dass eine natürliche Zahl $n$ eine Primzahl ist, braucht man
-eine Aussage `Nat.Prime n`, ähnlich wie `Even n`.
+Eine Primzahl wird mit `(n : ℕ) (h : Nat.Prime n)` dargestellt.
 
-Primzahlen sind ein Objekt in Lean, das genug abstrakt definiert ist, dass es sich
-aus mathematischer Sicht nicht lohnt mit der Definition zu arbeiten.
+Wichtige Lemmas über Primzhalen werden mit
 
-Alle wichtigen Lemmas um mit Primzahlen zu arbeiten sind in
-[`import Data.Nat.Prime`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Prime.html)
+```
+import Data.Nat.Prime
+```
+importiert (siehe
+[Docs](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Prime.html))
 
 Insbesondere `Nat.prime_def_lt''` welches die aus der Schule bekannte Definition einer
 Primzahl `Prime p ↔ 2 ≤ p ∧ (∀ m, m ∣ p → m = 1 ∨ m = p)` gibt.
