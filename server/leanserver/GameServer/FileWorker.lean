@@ -26,9 +26,6 @@ partial def parseTactic (inputCtx : InputContext) (pmctx : ParserModuleContext)
   let mut recovering := mps.recovering
   let mut messages := messages
   let mut stx := Syntax.missing  -- will always be assigned below
-  if inputCtx.input.atEnd pos ∧ couldBeEndSnap then
-    stx := mkEOI pos
-    return (stx, { pos, recovering }, messages, 0)
 
   let tokens := getTokenTable pmctx.env
 
@@ -107,38 +104,55 @@ where addErrorMessage (info : SourceInfo) (s : MessageData) :=
 
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool) (couldBeEndSnap : Bool) : IO Snapshot := do
-  let cmdState := snap.cmdState
-  let scope := cmdState.scopes.head!
-  let pmctx := { env := cmdState.env, options := scope.opts, currNamespace := scope.currNamespace, openDecls := scope.openDecls }
-  let (tacticStx, cmdParserState, msgLog, endOfWhitespace) :=
-    MyModule.parseTactic inputCtx pmctx snap.mpState snap.msgLog couldBeEndSnap
-  let cmdPos := tacticStx.getPos?.getD 0
-  if Parser.isTerminalCommand tacticStx then
+  -- Recognize end snap
+  if inputCtx.input.atEnd snap.mpState.pos ∧ couldBeEndSnap then
     let endSnap : Snapshot := {
-      beginPos := cmdPos
-      stx := tacticStx
-      mpState := cmdParserState
+      beginPos := snap.mpState.pos
+      stx := MyModule.mkEOI snap.mpState.pos
+      mpState := snap.mpState
       cmdState := snap.cmdState
-      interactiveDiags := ← withNewInteractiveDiags msgLog
+      interactiveDiags := ← withNewInteractiveDiags snap.msgLog
       tacticCache := snap.tacticCache
     }
     return endSnap
-  else
-    let cmdStateRef ← IO.mkRef { snap.cmdState with messages := msgLog }
-    /- The same snapshot may be executed by different tasks. So, to make sure `elabCommandTopLevel` has exclusive
-       access to the cache, we create a fresh reference here. Before this change, the
-       following `snap.tacticCache.modify` would reset the tactic post cache while another snapshot was still using it. -/
-    let tacticCacheNew ← IO.mkRef (← snap.tacticCache.get)
-    let cmdCtx : Elab.Command.Context := {
-      cmdPos       := snap.endPos
-      fileName     := inputCtx.fileName
-      fileMap      := inputCtx.fileMap
-      tacticCache? := some tacticCacheNew
-    }
-    let (output, _) ← IO.FS.withIsolatedStreams (isolateStderr := server.stderrAsMessages.get scope.opts) <| liftM (m := BaseIO) do
-      Elab.Command.catchExceptions
-        (getResetInfoTrees *> do
-          let level ← GameServer.getLevelByFileName inputCtx.fileName
+
+  let parseResultRef ← IO.mkRef (Syntax.missing, snap.mpState)
+
+  let cmdStateRef ← IO.mkRef snap.cmdState
+  /- The same snapshot may be executed by different tasks. So, to make sure `elabCommandTopLevel` has exclusive
+      access to the cache, we create a fresh reference here. Before this change, the
+      following `snap.tacticCache.modify` would reset the tactic post cache while another snapshot was still using it. -/
+  let tacticCacheNew ← IO.mkRef (← snap.tacticCache.get)
+  let cmdCtx : Elab.Command.Context := {
+    cmdPos       := snap.endPos
+    fileName     := inputCtx.fileName
+    fileMap      := inputCtx.fileMap
+    tacticCache? := some tacticCacheNew
+  }
+  let (output, _) ← IO.FS.withIsolatedStreams (isolateStderr := server.stderrAsMessages.get snap.cmdState.scopes.head!.opts) <| liftM (m := BaseIO) do
+    Elab.Command.catchExceptions
+      (getResetInfoTrees *> do
+        let level ← GameServer.getLevelByFileName inputCtx.fileName
+        let scope := level.scope
+
+        -- use open namespaces and options as in the level file
+        Elab.Command.withScope (fun _ => scope) do
+          for od in scope.openDecls do
+            let .simple ns _ := od
+              | pure ()
+            activateScoped ns
+          activateScoped scope.currNamespace
+
+          -- parse tactics
+          let pmctx := {
+            env := ← getEnv,
+            options := scope.opts,
+            currNamespace := scope.currNamespace,
+            openDecls := scope.openDecls }
+          let (tacticStx, cmdParserState, msgLog, endOfWhitespace) :=
+            MyModule.parseTactic inputCtx pmctx snap.mpState snap.msgLog couldBeEndSnap
+          modify (fun s => { s with messages := msgLog })
+          parseResultRef.set (tacticStx, cmdParserState)
 
           -- Check for forbidden tactics
           findForbiddenTactics inputCtx level tacticStx
@@ -150,34 +164,35 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
 
-          let cmdStx ← `(command| theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
-
-          Elab.Command.withScope (fun _ => level.scope) do -- use open namespaces and options as in the file
-            Elab.Command.elabCommandTopLevel cmdStx)
-        cmdCtx cmdStateRef
-    let postNew := (← tacticCacheNew.get).post
-    snap.tacticCache.modify fun _ => { pre := postNew, post := {} }
-    let mut postCmdState ← cmdStateRef.get
-    if !output.isEmpty then
-      postCmdState := {
-        postCmdState with
-        messages := postCmdState.messages.add {
-          fileName := inputCtx.fileName
-          severity := MessageSeverity.information
-          pos      := inputCtx.fileMap.toPosition snap.endPos
-          data     := output
-        }
+          let cmdStx ← `(command|
+            theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
+          Elab.Command.elabCommandTopLevel cmdStx)
+      cmdCtx cmdStateRef
+  let postNew := (← tacticCacheNew.get).post
+  snap.tacticCache.modify fun _ => { pre := postNew, post := {} }
+  let mut postCmdState ← cmdStateRef.get
+  if !output.isEmpty then
+    postCmdState := {
+      postCmdState with
+      messages := postCmdState.messages.add {
+        fileName := inputCtx.fileName
+        severity := MessageSeverity.information
+        pos      := inputCtx.fileMap.toPosition snap.endPos
+        data     := output
       }
-
-    let postCmdSnap : Snapshot := {
-      beginPos := cmdPos
-      stx := tacticStx
-      mpState := cmdParserState
-      cmdState := postCmdState
-      interactiveDiags := ← withNewInteractiveDiags postCmdState.messages
-      tacticCache := (← IO.mkRef {})
     }
-    return postCmdSnap
+
+  let (tacticStx, cmdParserState) ← parseResultRef.get
+
+  let postCmdSnap : Snapshot := {
+    beginPos := tacticStx.getPos?.getD 0
+    stx := tacticStx
+    mpState := cmdParserState
+    cmdState := postCmdState
+    interactiveDiags := ← withNewInteractiveDiags postCmdState.messages
+    tacticCache := (← IO.mkRef {})
+  }
+  return postCmdSnap
 
 where
   /-- Compute the current interactive diagnostics log by finding a "diff" relative to the parent
