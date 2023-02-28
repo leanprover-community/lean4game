@@ -16,7 +16,7 @@ import { PanelWidgetDisplay } from '../../../../node_modules/lean4-infoview/src/
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
-import { Troubleshoot } from '@mui/icons-material';
+import { CircularProgress } from '@mui/material';
 
 type InfoStatus = 'updating' | 'error' | 'ready';
 type InfoKind = 'cursor' | 'pin';
@@ -122,10 +122,12 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
             </div>}
         <LocationsContext.Provider value={locs}>
             <div className="goals-section">
-                { goals && goals.goals.length > 0
+                { goals && (
+                    goals.goals.length > 0
                   ? <><div className="goals-section-title">Main Goal</div>
                     <Goal commandLine={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} /></>
-                  : <div className="goals-section-title">No Goals</div> }
+                  : <div className="goals-section-title">No Goals</div>
+                ) }
             </div>
         </LocationsContext.Provider>
         {userWidgets.map(widget =>
@@ -143,7 +145,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                     {' '}or <a className='link pointer dim' onClick={e => { e.preventDefault(); setPaused(false); }}>resume updating</a>
                     {' '}to see information.
                 </span> :
-                <div>Loading goal...</div>)}
+                <><CircularProgress /><div>Loading goal...</div></>)}
         <AllMessages />
         <LocationsContext.Provider value={locs}>
             {goals && goals.goals.length > 1 && <div className="goals-section">
