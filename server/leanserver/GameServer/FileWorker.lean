@@ -3,6 +3,7 @@
 import Lean
 import GameServer.EnvExtensions
 import GameServer.RpcHandlers
+import GameServer.Game
 
 import Lean.Server.FileWorker
 
@@ -132,7 +133,8 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
   let (output, _) ← IO.FS.withIsolatedStreams (isolateStderr := server.stderrAsMessages.get snap.cmdState.scopes.head!.opts) <| liftM (m := BaseIO) do
     Elab.Command.catchExceptions
       (getResetInfoTrees *> do
-        let level ← GameServer.getLevelByFileName inputCtx.fileName
+        let some level ← GameServer.getLevelByFileName? inputCtx.fileName
+          | throwError "Level not found: {inputCtx.fileName}"
         let scope := level.scope
 
         -- use open namespaces and options as in the level file
@@ -344,67 +346,13 @@ end Updates
 
 section Initialization
 
-
   def DocumentMeta.mkInputContext (doc : DocumentMeta) : Parser.InputContext where
     input    := "" -- No header!
     fileName := (System.Uri.fileUriToPath? doc.uri).getD doc.uri |>.toString
     fileMap  := default
 
-  -- TODO: Duplicate in Watchdog?
-  def createEnv : IO (Environment × SearchPath) := do
-    let gameDir := "../../../testgame"
-
-    -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
-    let out ← IO.Process.output
-      { cwd := gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
-    if out.exitCode != 0 then
-      throwServerError s!"Error while running Lake: {out.stderr}"
-
-    -- Make the paths relative to the current directory
-    let paths : List System.FilePath := System.SearchPath.parse out.stdout.trim
-    let currentDir ← IO.currentDir
-    let paths := paths.map fun p => currentDir / (gameDir : System.FilePath) / p
-
-    -- Set the search path
-    Lean.searchPathRef.set paths
-
-    let gameName := `TestGame
-    let env ← importModules [{ module := `Init : Import }, { module := gameName : Import }] {} 0
-    return (env, paths)
-
-  -- def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
-  --     : IO (Snapshot × SearchPath) := do
-  --   let mut (headerEnv, paths) ← createEnv
-  --   try
-  --     if let some path := System.Uri.fileUriToPath? m.uri then
-  --       headerEnv := headerEnv.setMainModule (← moduleNameOfFileName path none)
-  --   catch _ => pure ()
-  --   let cmdState := Elab.Command.mkState headerEnv {} opts
-  --   let cmdState := { cmdState with infoState := {
-  --     enabled := true
-  --     trees := #[Elab.InfoTree.context ({
-  --       env     := headerEnv
-  --       fileMap := m.text
-  --       ngen    := { namePrefix := `_worker }
-  --     }) (Elab.InfoTree.node
-  --         (Elab.Info.ofCommandInfo { elaborator := `header, stx := Syntax.missing })
-  --         #[].toPArray'
-  --     )].toPArray'
-  --   }}
-  --   let headerSnap := {
-  --     beginPos := 0
-  --     stx := Syntax.missing
-  --     mpState := {}
-  --     cmdState := cmdState
-  --     interactiveDiags := ← cmdState.messages.msgs.mapM (Widget.msgToInteractiveDiagnostic m.text · hasWidgets)
-  --     tacticCache := (← IO.mkRef {})
-  --   }
-  --   publishDiagnostics m headerSnap.diagnostics.toArray hOut
-  --   return (headerSnap, paths)
-
-
   def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
-      : IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
+    (levelModule : Name) : IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
     let gameDir := "../../../testgame"
 
     -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
@@ -421,8 +369,7 @@ section Initialization
     -- Set the search path
     Lean.searchPathRef.set paths
 
-    let gameName := `TestGame
-    let env ← importModules [{ module := `Init : Import }, { module := gameName : Import }] {} 0
+    let env ← importModules [{ module := `Init : Import }, { module := levelModule : Import }] {} 0
     -- return (env, paths)
 
     -- use empty header
@@ -467,9 +414,9 @@ section Initialization
       return (headerSnap, srcSearchPath)
 
   def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
-      : IO (WorkerContext × WorkerState) := do
+      (levelModule : Name) : IO (WorkerContext × WorkerState) := do
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
-    let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)
+    let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets) levelModule
     let cancelTk ← CancelToken.new
     let ctx :=
       { hIn  := i
@@ -566,6 +513,8 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do
   let o ← maybeTee "fwOut.txt" true o
   let initParams ← i.readLspRequestAs "initialize" InitializeParams
   let ⟨_, param⟩ ← i.readLspNotificationAs "textDocument/didOpen" DidOpenTextDocumentParams
+  let ⟨_, levelParam⟩ ← i.readLspNotificationAs "$/game/didOpenLevel" Game.DidOpenLevelParams
+
   let doc := param.textDocument
   /- NOTE(WN): `toFileMap` marks line beginnings as immediately following
     "\n", which should be enough to handle both LF and CRLF correctly.
@@ -576,7 +525,7 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do
   let e := e.withPrefix s!"[{param.textDocument.uri}] "
   let _ ← IO.setStderr e
   try
-    let (ctx, st) ← initializeWorker meta i o e initParams.param opts
+    let (ctx, st) ← initializeWorker meta i o e initParams.param opts levelParam.levelModule
     let _ ← StateRefT'.run (s := st) <| ReaderT.run (r := ctx) mainLoop
     return (0 : UInt32)
   catch e =>

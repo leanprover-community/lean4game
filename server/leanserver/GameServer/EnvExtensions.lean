@@ -199,6 +199,8 @@ structure GameLevel where
   scope : Elab.Command.Scope := default
   descrText: String := default
   descrFormat : String := default
+  -- The module to be imported when playing this level:
+  module : Name := default
   deriving Inhabited, Repr
 
 /-! ## World -/

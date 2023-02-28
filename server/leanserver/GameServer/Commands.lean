@@ -80,9 +80,11 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
   -- | some name => `(lemma $name $sig $val)
 
   let scope ← getScope
+  let env ← getEnv
 
   elabCommand thmStatement
   modifyCurLevel fun level => pure {level with
+    module := env.header.mainModule
     goal := sig,
     scope := scope,
     descrText := descr.getString,

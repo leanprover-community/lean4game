@@ -1,5 +1,6 @@
 import Lean
 import GameServer.EnvExtensions
+import GameServer.RpcHandlers
 
 
 open Lean
@@ -46,11 +47,16 @@ structure LevelInfo where
   introduction : String
   descrText : String := ""
   descrFormat : String := ""
-deriving ToJson
+deriving ToJson, FromJson
 
 structure LoadLevelParams where
   world : Name
   level : Nat
+  deriving ToJson, FromJson
+
+structure DidOpenLevelParams where
+  uri : String
+  levelModule : Name
   deriving ToJson, FromJson
 
 structure Doc where
@@ -78,6 +84,29 @@ def mkDoc (name : Name) (type : TacOrLem) : GameServerM (Option Doc) := do
     return doc.map fun doc =>
       { name := doc.name.toString
         text := doc.content }
+
+def handleDidOpenLevel (params : Json) : GameServerM Unit := do
+  let p ← parseParams _ params
+  let m := p.textDocument
+  -- Execute the regular handling of the `didOpen` event
+  handleDidOpen p
+  let fw ← findFileWorker! m.uri
+  let s ← get
+  let c ← read
+  let some lvl ← GameServer.getLevelByFileName? ((System.Uri.fileUriToPath? m.uri).getD m.uri |>.toString)
+    | do
+      c.hLog.putStr s!"Level not found: {m.uri}"
+      c.hLog.flush
+  -- Send an extra notification to the file worker to inform it about the level data
+  fw.stdin.writeLspNotification {
+    method := "$/game/didOpenLevel"
+    param  := {
+      uri       := m.uri
+      levelModule := lvl.module
+      : DidOpenLevelParams
+    }
+  }
+
 
 partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
   match ev with

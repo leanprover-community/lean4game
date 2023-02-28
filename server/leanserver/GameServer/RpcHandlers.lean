@@ -13,20 +13,17 @@ open Meta
 
 namespace GameServer
 
--- TODO: Find a better way to pass on the file name?
-def levelIdFromFileName [Monad m] [MonadError m] [MonadEnv m] (fileName : String) : m LevelId := do
+def levelIdFromFileName? (fileName : String) : Option LevelId := Id.run do
   let fileParts := fileName.splitOn "/"
   if fileParts.length == 3 then
     if let some level := fileParts[2]!.toNat? then
-      return {game := `TestGame, world := fileParts[1]!, level := level}
-  throwError s!"Could not find level ID in file name: {fileName}"
+      return some {game := `TestGame, world := fileParts[1]!, level := level}
+  return none
 
-def getLevelByFileName [Monad m] [MonadError m] [MonadEnv m] (fileName : String) : m GameLevel := do
-  let levelId ← levelIdFromFileName fileName
-  -- TODO: make world and game configurable
-  let some level ← getLevel? levelId
-    | throwError "Level not found"
-  return level
+def getLevelByFileName? [Monad m] [MonadEnv m] (fileName : String) : m (Option GameLevel) := do
+  let some levelId := levelIdFromFileName? fileName
+    | return none
+  return ← getLevel? levelId
 
 /-- Check if each meta variable in `declMvars` has a matching fvar in `declFvars` -/
 def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool := do
@@ -54,7 +51,8 @@ open Meta in
 /-- Find all hints whose trigger matches the current goal -/
 def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array GameHint) := do
   goal.withContext do
-    let level ← getLevelByFileName doc.meta.mkInputContext.fileName
+    let some level ← getLevelByFileName? doc.meta.mkInputContext.fileName
+      | throwError "Level not found: {doc.meta.mkInputContext.fileName}"
     let hints ← level.hints.filterMapM fun hint => do
       let (declMvars, binderInfo, hintGoal) ← forallMetaBoundedTelescope hint.goal hint.intros
       -- TODO: Protext mvars in the type of `goal` to be instantiated?
