@@ -126,3 +126,6 @@ LemmaDoc arithmetic_sum as arithmetic_sum in "Sum"
 
 LemmaDoc add_pow_two as add_pow_two in "Nat"
 ""
+
+LemmaDoc Finset.sum_comm as Finset.sum_comm in "Sum"
+""

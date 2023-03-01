@@ -24,7 +24,7 @@ Beachte das Komma `,` welches die Variablen des `∃` (`\\exists`) von der Aussa
 
 Hierzu gibt es 3 wichtige Taktiken:
 
-1) Definitionen wie `Even` kann man mit `unfold even at *` im Infoview einsetzen.
+1) Definitionen wie `Even` kann man mit `unfold Even at *` im Infoview einsetzen.
    Das ändert Lean-intern nichts und ist nur für den Benutzer. Man kann auch einen
    Term `(h : Even x)` einfach so behandeln als wäre es ein Term `(h : ∃ r, x = 2 * r)`.
 2) Bei einer Annahme `(h : ∃ r, ...)` kann man mit `rcases h with ⟨y, hy⟩` ein solches `y`
@@ -43,16 +43,16 @@ Statement even_square
   ring
 
 Hint (n : ℕ) (h : Even n) : Even (n ^ 2) =>
-"Wenn du die Definition von `even` nicht kennst, kannst du diese mit `unfold even` oder
-`unfold even at *` ersetzen.
+"Wenn du die Definition von `Even` nicht kennst, kannst du diese mit `unfold Even` oder
+`unfold Even at *` ersetzen.
 Note: Der Befehl macht erst mal nichts in Lean sondern nur in der Anzeige. Der Beweis funktioniert
 genau gleich, wenn du das `unfold` rauslöscht."
 
-Hint (n : ℕ) (h : ∃ r, n = 2 * r) : ∃ r, n ^ 2 = 2 * r =>
+Hint (n : ℕ) (h : ∃ r, n = r + r) : ∃ r, n ^ 2 = r + r =>
 "Ein `∃ x, ..` in den Annahmen kann man wieder mit `rcases h with ⟨x, hx⟩` aufteilen, und
 ein `x` erhalten, dass die Aussage erfüllt."
 
-Hint (n : ℕ) (x : ℕ) (hx : n = x + x) : ∃ r, n ^ 2 = 2 * r =>
+Hint (n : ℕ) (x : ℕ) (hx : n = x + x) : ∃ r, n ^ 2 = r + r =>
 "Bei einem `∃ x, ..` im Goal hingegen, muss man mit `use y` das Element angeben, dass
 die Aussage erfüllen soll."
 

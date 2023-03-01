@@ -5,17 +5,34 @@ import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
 
 import TestGame.ToBePorted
+import TestGame.Options.ArithSum
 
 Game "TestGame"
 World "Sum"
-Level 5
+Level 6
 
 set_option tactic.hygienic false
 
-Title "Quadrat der Arithmetischen Summe"
+Title "Zusammenfassung"
 
 Introduction
 "
+Zusammenfassung aus diesem Kapitel
+
+## Notationen / Begriffe
+
+|                      | Beschreibung                              |
+|:---------------------|:------------------------------------------|
+| `Fin n`              | Ist ein Typ mit Zahlen $0, \\ldots, n-1$. |
+| `∑ (i : Fin n), a i` | $\\sum_{i=0}^{n-1} a_i$                   |
+
+## Taktiken
+
+|    | Taktik                    | Beispiel                             |
+|:---|:--------------------------|:-------------------------------------|
+| 20 | `simp`                    | Simplifikation.                      |
+| 21 | `induction n`             | Induktion über $n$                   |
+
 Und hier noch eine etwas schwierigere Übung.
 
 Das Resultat aus Level 3 kannst du als `arithmetic_sum` wiederverwenden:
@@ -25,16 +42,6 @@ $$
 "
 
 open BigOperators
-
-lemma arithmetic_sum (n : ℕ) : 2 * (∑ i : Fin (n + 1), ↑i) = n * (n + 1) := by
-  induction' n with n hn
-  simp
-  rw [Fin.sum_univ_castSucc]
-  rw [mul_add]
-  simp
-  rw [mul_add, hn]
-  simp_rw [Nat.succ_eq_one_add]
-  ring
 
 Statement
 "Zeige $\\sum_{i = 0}^n i^3 = (\\sum_{i = 0}^n i)^2$."

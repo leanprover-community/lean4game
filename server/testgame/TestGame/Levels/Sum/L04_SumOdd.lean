@@ -18,7 +18,7 @@ set_option tactic.hygienic false
 
 open BigOperators
 
-Statement
+Statement odd_arithmetic_sum
 "Zeige folgende Gleichung zur Summe aller ungeraden Zahlen:
 
 $\\sum_{i = 0}^n (2n + 1) = n ^ 2$."
