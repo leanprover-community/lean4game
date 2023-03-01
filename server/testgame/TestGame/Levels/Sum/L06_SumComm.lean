@@ -1,15 +1,14 @@
-
-import Mathlib.Algebra.BigOperators.Basic
-import Mathlib
-
 import TestGame.Metadata
+
+import TestGame.Options.BigOperators
+import Mathlib.Algebra.BigOperators.Fin
 
 set_option tactic.hygienic false
 
 open BigOperators
 
 Game "TestGame"
-World "Induction"
+World "Sum"
 Level 6
 
 Title "Summe vertauschen"

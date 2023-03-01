@@ -5,7 +5,7 @@ import TestGame.Levels.Implication
 import TestGame.Levels.Predicate
 import TestGame.Levels.Contradiction
 import TestGame.Levels.Prime
-import TestGame.Levels.Induction
+import TestGame.Levels.Sum
 
 import TestGame.Levels.Numbers
 import TestGame.Levels.Inequality
@@ -48,6 +48,6 @@ Path SetTheory2 → Numbers
 
 Path Module → Basis → Module2
 
-Path Contradiction → Inequality → Induction → LeanStuff → Function → SetFunction
+Path Contradiction → Inequality → Sum → LeanStuff → Function → SetFunction
 
 MakeGame

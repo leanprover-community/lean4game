@@ -25,7 +25,7 @@ Wichtige Lemmas über Primzhalen werden mit
 import Data.Nat.Prime
 ```
 importiert (siehe
-[Docs](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Prime.html))
+[Docs](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Prime.html)).
 
 Insbesondere `Nat.prime_def_lt''` welches die aus der Schule bekannte Definition einer
 Primzahl `Prime p ↔ 2 ≤ p ∧ (∀ m, m ∣ p → m = 1 ∨ m = p)` gibt.

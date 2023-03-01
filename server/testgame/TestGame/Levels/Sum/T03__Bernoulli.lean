@@ -1,11 +1,13 @@
 import TestGame.Metadata
+
+import TestGame.Options.BigOperators
+import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
-import Mathlib
 
 import TestGame.ToBePorted
 
 Game "TestGame"
-World "Induction"
+World "Sum"
 Level 5
 
 Title "Bernoulli Ungleichung"

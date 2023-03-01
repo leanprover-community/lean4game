@@ -27,11 +27,10 @@ dann gilt $P(n)$ für alle $n \\in \\mathbb{N}.$"
   apply h_step
   assumption
 
--- TODO: Why are these not shown.
-HiddenHint (n : ℕ) (P : ℕ → Prop) : P n =>
-"Benutze `induction n`."
+-- HiddenHint (n : ℕ) (P : ℕ → Prop) : P n =>
+-- "Benutze `induction n`."
 
-Hint (P : ℕ → Prop) : P 0 =>
+Hint (P : ℕ → Prop) : P Nat.zero =>
 "Das ist die Induktionsverankerung, hier musst du $P(0)$ zeigen."
 
 Hint (P : ℕ → Prop) (m : ℕ) (hi : P m) : P (Nat.succ m) =>

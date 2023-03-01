@@ -113,3 +113,27 @@ Even Odd not_odd not_even
 
 LemmaSet logic : "Logik" :=
 not_not not_forall not_exists
+
+LemmaDoc Finset.sum_add_distrib as Finset.sum_add_distrib in "Sum"
+""
+
+LemmaDoc Fin.sum_univ_castSucc as Fin.sum_univ_castSucc in "Sum"
+""
+
+LemmaDoc Nat.succ_eq_add_one as Nat.succ_eq_add_one in "Sum"
+""
+
+LemmaDoc add_comm as add_comm in "Nat"
+""
+
+LemmaDoc mul_add as mul_add in "Nat"
+""
+
+LemmaDoc add_mul as add_mul in "Nat"
+""
+
+LemmaDoc arithmetic_sum as arithmetic_sum in "Sum"
+""
+
+LemmaDoc add_pow_two as add_pow_two in "Nat"
+""
