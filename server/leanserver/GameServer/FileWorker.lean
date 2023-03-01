@@ -65,22 +65,24 @@ section Elab
 -- TODO: use HashSet for allowed tactics?
 /-- Find all tactics in syntax object that are forbidden according to a
 set `allowed` of allowed tactics. -/
-partial def findForbiddenTactics (inputCtx : Parser.InputContext) (level : GameLevel) (stx : Syntax)
+partial def findForbiddenTactics (inputCtx : Parser.InputContext) (levelParams : Game.DidOpenLevelParams) (stx : Syntax)
   : Elab.Command.CommandElabM Unit := do
   match stx with
   | .missing => return ()
   | .node info kind args =>
     for arg in args do
-      findForbiddenTactics inputCtx level arg
+      findForbiddenTactics inputCtx levelParams arg
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore "with" keyword
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ val != "with" ∧ val != "at" then
-      if ¬ ((level.tactics.map (·.name.toString))).contains val then
-        addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
-      else if level.disabledTactics.contains val
-        ∨ (¬ level.onlyTactics.isEmpty ∧ ¬ level.onlyTactics.contains val)then
-        addErrorMessage info s!"The tactic '{val}' is disabled in this level!"
+      match levelParams.tactics.find? (fun t => t.name.toString == val) with
+      | none => addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
+      | some tac =>
+        if tac.locked then
+          addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
+        else if tac.disabled then
+          addErrorMessage info s!"The tactic '{val}' is disabled in this level!"
   | .ident info rawVal val preresolved =>
       let ns ←
         try resolveGlobalConst (mkIdent val)
@@ -88,11 +90,13 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (level : GameL
       for n in ns do
         let some (.thmInfo ..) := (← getEnv).find? n
           | return () -- not a theroem -> ignore
-        if ¬ ((level.lemmas.map (·.name))).contains n then
-          addErrorMessage info s!"You have not unlocked the lemma '{n}' yet!"
-        else if level.disabledLemmas.contains n
-          ∨ (¬ level.onlyLemmas.isEmpty ∧ ¬ level.onlyLemmas.contains n)then
-          addErrorMessage info s!"The lemma '{n}' is disabled in this level!"
+        match levelParams.lemmas.find? (fun l => l.name.toString == n) with
+        | none => addErrorMessage info s!"You have not unlocked the lemma '{n}' yet!"
+        | some lem =>
+          if lem.locked then
+            addErrorMessage info s!"You have not unlocked the lemma '{n}' yet!"
+          else if lem.disabled then
+            addErrorMessage info s!"The lemma '{n}' is disabled in this level!"
 where addErrorMessage (info : SourceInfo) (s : MessageData) :=
   modify fun st => { st with
     messages := st.messages.add {
@@ -104,7 +108,8 @@ where addErrorMessage (info : SourceInfo) (s : MessageData) :=
   }
 
 open Elab Meta Expr in
-def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool) (couldBeEndSnap : Bool) : IO Snapshot := do
+def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool)
+    (couldBeEndSnap : Bool) (levelParams : Game.DidOpenLevelParams) : IO Snapshot := do
   -- Recognize end snap
   if inputCtx.input.atEnd snap.mpState.pos ∧ couldBeEndSnap then
     let endSnap : Snapshot := {
@@ -157,7 +162,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           parseResultRef.set (tacticStx, cmdParserState)
 
           -- Check for forbidden tactics
-          findForbiddenTactics inputCtx level tacticStx
+          findForbiddenTactics inputCtx levelParams tacticStx
 
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
@@ -235,7 +240,7 @@ where
     hOut.writeLspNotification { method := "$/game/completed", param }
 
   /-- Elaborates the next command after `parentSnap` and emits diagnostics into `hOut`. -/
-  private def nextSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken)
+  private def nextSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken) (levelParams : Game.DidOpenLevelParams)
       : AsyncElabM (Option Snapshot) := do
     cancelTk.check
     let s ← get
@@ -252,7 +257,7 @@ where
     -- Make sure that there is at least one snap after the head snap, so that
     -- we can see the current goal even on an empty document
     let couldBeEndSnap := s.snaps.size > 1
-    let snap ← compileProof m.mkInputContext lastSnap ctx.clientHasWidgets couldBeEndSnap
+    let snap ← compileProof m.mkInputContext lastSnap ctx.clientHasWidgets couldBeEndSnap levelParams
     set { s with snaps := s.snaps.push snap }
     -- TODO(MH): check for interrupt with increased precision
     cancelTk.check
@@ -273,7 +278,8 @@ where
     return some snap
 
   /-- Elaborates all commands after the last snap (at least the header snap is assumed to exist), emitting the diagnostics into `hOut`. -/
-  def unfoldSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken) (startAfterMs : UInt32)
+  def unfoldSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken)
+      (startAfterMs : UInt32) (levelParams : Game.DidOpenLevelParams)
       : ReaderT WorkerContext IO (AsyncList ElabTaskError Snapshot) := do
     let ctx ← read
     let some headerSnap := snaps[0]? | panic! "empty snapshots"
@@ -289,14 +295,14 @@ where
       publishIleanInfoUpdate m ctx.hOut snaps
       return AsyncList.ofList snaps.toList ++ AsyncList.delayed (← EIO.asTask (ε := ElabTaskError) (prio := .dedicated) do
         IO.sleep startAfterMs
-        AsyncList.unfoldAsync (nextSnap ctx m cancelTk) { snaps })
+        AsyncList.unfoldAsync (nextSnap ctx m cancelTk levelParams) { snaps })
 
 end Elab
 
 section Updates
 
 /-- Given the new document, updates editable doc state. -/
-  def updateDocument (newMeta : DocumentMeta) : WorkerM Unit := do
+  def updateDocument (newMeta : DocumentMeta) (levelParams : Game.DidOpenLevelParams) : WorkerM Unit := do
     let ctx ← read
     let oldDoc := (←get).doc
     oldDoc.cancelTk.set
@@ -338,7 +344,7 @@ section Updates
           validSnaps := validSnaps.dropLast
       -- wait for a bit, giving the initial `cancelTk.check` in `nextCmdSnap` time to trigger
       -- before kicking off any expensive elaboration (TODO: make expensive elaboration cancelable)
-      unfoldSnaps newMeta validSnaps.toArray cancelTk ctx
+      unfoldSnaps newMeta validSnaps.toArray cancelTk levelParams ctx
         (startAfterMs := ctx.initParams.editDelay.toUInt32)
     modify fun st => { st with doc := { meta := newMeta, cmdSnaps := AsyncList.delayed newSnaps, cancelTk } }
 
@@ -414,9 +420,9 @@ section Initialization
       return (headerSnap, srcSearchPath)
 
   def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
-      (levelModule : Name) : IO (WorkerContext × WorkerState) := do
+       (levelParams : Game.DidOpenLevelParams) : IO (WorkerContext × WorkerState) := do
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
-    let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets) levelModule
+    let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets) levelParams.levelModule
     let cancelTk ← CancelToken.new
     let ctx :=
       { hIn  := i
@@ -427,7 +433,7 @@ section Initialization
         clientHasWidgets
       }
     let cmdSnaps ← EIO.mapTask (t := headerTask) (match · with
-      | Except.ok (s, _) => unfoldSnaps meta #[s] cancelTk ctx (startAfterMs := 0)
+      | Except.ok (s, _) => unfoldSnaps meta #[s] cancelTk levelParams ctx (startAfterMs := 0)
       | Except.error e   => throw (e : ElabTaskError))
     let doc : EditableDocument := { meta, cmdSnaps := AsyncList.delayed cmdSnaps, cancelTk }
     return (ctx,
@@ -441,7 +447,7 @@ end Initialization
 
 section NotificationHandling
 
-  def handleDidChange (p : DidChangeTextDocumentParams) : WorkerM Unit := do
+  def handleDidChange (levelParams : Game.DidOpenLevelParams) (p : DidChangeTextDocumentParams) : WorkerM Unit := do
     let docId := p.textDocument
     let changes := p.contentChanges
     let oldDoc := (←get).doc
@@ -452,17 +458,17 @@ section NotificationHandling
       IO.eprintln s!"Got outdated version number: {newVersion} ≤ {oldDoc.meta.version}"
     else if ¬ changes.isEmpty then
       let newDocText := foldDocumentChanges changes oldDoc.meta.text
-      updateDocument ⟨docId.uri, newVersion, newDocText⟩
+      updateDocument ⟨docId.uri, newVersion, newDocText⟩ levelParams
 
 end NotificationHandling
 
 section MessageHandling
 
-  def handleNotification (method : String) (params : Json) : WorkerM Unit := do
+  def handleNotification (method : String) (params : Json) (levelParams : Game.DidOpenLevelParams) : WorkerM Unit := do
     let handle := fun paramType [FromJson paramType] (handler : paramType → WorkerM Unit) =>
       parseParams paramType params >>= handler
     match method with
-    | "textDocument/didChange" => handle DidChangeTextDocumentParams handleDidChange
+    | "textDocument/didChange" => handle DidChangeTextDocumentParams (handleDidChange levelParams)
     | "$/cancelRequest"        => handle CancelParams handleCancelRequest
     | "$/lean/rpc/release"     => handle RpcReleaseParams handleRpcRelease
     | "$/lean/rpc/keepAlive"   => handle RpcKeepAliveParams handleRpcKeepAlive
@@ -471,7 +477,7 @@ section MessageHandling
 end MessageHandling
 
 section MainLoop
-  partial def mainLoop : WorkerM Unit := do
+  partial def mainLoop (levelParams : Game.DidOpenLevelParams) : WorkerM Unit := do
     let ctx ← read
     let mut st ← get
     let msg ← ctx.hIn.readLspMessage
@@ -497,14 +503,14 @@ section MainLoop
     match msg with
     | Message.request id method (some params) =>
       handleRequest id method (toJson params)
-      mainLoop
+      mainLoop levelParams
     | Message.notification "exit" none =>
       let doc := st.doc
       doc.cancelTk.set
       return ()
     | Message.notification method (some params) =>
-      handleNotification method (toJson params)
-      mainLoop
+      handleNotification method (toJson params) levelParams
+      mainLoop levelParams
     | _ => throwServerError "Got invalid JSON-RPC message"
 end MainLoop
 
@@ -513,7 +519,7 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do
   let o ← maybeTee "fwOut.txt" true o
   let initParams ← i.readLspRequestAs "initialize" InitializeParams
   let ⟨_, param⟩ ← i.readLspNotificationAs "textDocument/didOpen" DidOpenTextDocumentParams
-  let ⟨_, levelParam⟩ ← i.readLspNotificationAs "$/game/didOpenLevel" Game.DidOpenLevelParams
+  let ⟨_, levelParams⟩ ← i.readLspNotificationAs "$/game/didOpenLevel" Game.DidOpenLevelParams
 
   let doc := param.textDocument
   /- NOTE(WN): `toFileMap` marks line beginnings as immediately following
@@ -525,8 +531,8 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do
   let e := e.withPrefix s!"[{param.textDocument.uri}] "
   let _ ← IO.setStderr e
   try
-    let (ctx, st) ← initializeWorker meta i o e initParams.param opts levelParam.levelModule
-    let _ ← StateRefT'.run (s := st) <| ReaderT.run (r := ctx) mainLoop
+    let (ctx, st) ← initializeWorker meta i o e initParams.param opts levelParams
+    let _ ← StateRefT'.run (s := st) <| ReaderT.run (r := ctx) (mainLoop levelParams)
     return (0 : UInt32)
   catch e =>
     IO.eprintln e

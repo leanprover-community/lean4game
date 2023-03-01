@@ -57,6 +57,8 @@ structure LoadLevelParams where
 structure DidOpenLevelParams where
   uri : String
   levelModule : Name
+  tactics: Array Availability
+  lemmas: Array Availability
   deriving ToJson, FromJson
 
 structure Doc where
@@ -103,6 +105,8 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
     param  := {
       uri       := m.uri
       levelModule := lvl.module
+      tactics := lvl.tactics
+      lemmas := lvl.lemmas
       : DidOpenLevelParams
     }
   }
