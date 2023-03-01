@@ -180,91 +180,118 @@ macro "Hint" decls:mydecl* ":" goal:term "=>" msg:str : command => do
 macro "HiddenHint" decls:mydecl* ":" goal:term "=>" msg:str : command => do
   `(set_option linter.unusedVariables false in HiddenHint' $decls* : $goal => $msg)
 
-/-! ## Tactics -/
+/-! ## Inventory -/
+
+/-- Throw an error if inventory doc does not exist -/
+def checkInventoryDoc (type : InventoryType) (name : Name) : CommandElabM Unit := do
+  let some _ := (inventoryDocExt.getState (← getEnv)).find?
+      (fun x => x.name == name && x.type == type)
+    | throwError "Missing {type} Documentation: {name}"
+
+/-! ### Tactics -/
 
 /-- Declare a documentation entry for some tactic.
 Expect an identifier and then a string literal. -/
 elab "TacticDoc" name:ident content:str : command =>
-  modifyEnv (tacticDocExt.addEntry · {
+  modifyEnv (inventoryDocExt.addEntry · {
+    category := default
+    type := .Tactic
     name := name.getId,
+    userName := name.getId,
     content := content.getString })
-
-instance : Quote TacticDocEntry `term :=
-⟨λ entry => Syntax.mkCApp ``TacticDocEntry.mk #[quote entry.name, quote entry.content]⟩
-
-/-- Throw an error if tactic doc does not exist -/
-def checkTacticDoc (name : Name) : CommandElabM Unit := do
-  let some _ := (tacticDocExt.getState (← getEnv)).find? (·.name = name)
-    | throwError "Missing Tactic Documentation: {name}"
 
 /-- Declare tactics that are introduced by this level. -/
 elab "NewTactics" args:ident* : command => do
   let names := args.map (·.getId)
-  for name in names do checkTacticDoc name
-  modifyCurLevel fun level => pure {level with newTactics := names}
+  for name in names do checkInventoryDoc .Tactic name
+  modifyCurLevel fun level => pure {level with tactics := {level.tactics with new := names}}
 
 /-- Declare tactics that are temporarily disabled in this level -/
 elab "DisabledTactics" args:ident* : command => do
   let names := args.map (·.getId)
-  for name in names do checkTacticDoc name
-  modifyCurLevel fun level => pure {level with disabledTactics := names}
+  for name in names do checkInventoryDoc .Tactic name
+  modifyCurLevel fun level => pure {level with tactics := {level.tactics with disabled := names}}
 
 /-- Temporarily disable all tactics except the ones declared here -/
 elab "OnlyTactics" args:ident* : command => do
   let names := args.map (·.getId)
-  for name in names do checkTacticDoc name
-  modifyCurLevel fun level => pure {level with onlyTactics := names}
+  for name in names do checkInventoryDoc .Tactic name
+  modifyCurLevel fun level => pure {level with tactics := {level.tactics with only := names}}
 
-/-! ## Lemmas -/
+/-! ### Definitions -/
+
+/-- Declare a documentation entry for some definition.
+Expect an identifier and then a string literal. -/
+elab "DefinitionDoc" name:ident content:str : command =>
+  modifyEnv (inventoryDocExt.addEntry · {
+    category := default
+    type := .Definition
+    name := name.getId,
+    userName := name.getId,
+    content := content.getString })
+
+/-- Declare definitions that are introduced by this level. -/
+elab "NewDefinitions" args:ident* : command => do
+  let names := args.map (·.getId)
+  for name in names do checkInventoryDoc .Definition name
+  modifyCurLevel fun level => pure {level with definitions := {level.definitions with new := names}}
+
+/-- Declare definitions that are temporarily disabled in this level -/
+elab "DisabledDefinitions" args:ident* : command => do
+  let names := args.map (·.getId)
+  for name in names do checkInventoryDoc .Definition name
+  modifyCurLevel fun level => pure {level with definitions := {level.definitions with disabled := names}}
+
+/-- Temporarily disable all definitions except the ones declared here -/
+elab "OnlyDefinitions" args:ident* : command => do
+  let names := args.map (·.getId)
+  for name in names do checkInventoryDoc .Definition name
+  modifyCurLevel fun level => pure {level with definitions := {level.definitions with only := names}}
+
+
+/-! ### Lemmas -/
 
 /-- Declare a documentation entry for some lemma.
 Expect two identifiers and then a string literal. The first identifier is meant
 as the real name of the lemma while the second is the displayed name. Currently
 the real name isn't used. -/
 elab "LemmaDoc" name:ident "as" userName:ident "in" category:str content:str : command =>
-  modifyEnv (lemmaDocExt.addEntry · {
+  modifyEnv (inventoryDocExt.addEntry · {
     name := name.getId,
+    type := .Lemma
     userName := userName.getId,
     category := category.getString,
     content := content.getString })
 
-/-- Declare a set of lemma documentation entries.
-Expect an identifier used as the set name then `:=` and a
-space separated list of identifiers. -/
-elab "LemmaSet" name:ident ":" title:str ":=" args:ident* : command => do
-  let docs := lemmaDocExt.getState (← getEnv)
-  let mut entries : Array Name := #[]
-  for arg in args do
-    let name := arg.getId
-    match docs.find? (·.userName = name) with
-    | some doc => entries := entries.push name
-    | none => throwError "Lemma doc {name} wasn't found."
-  modifyEnv (lemmaSetExt.addEntry · {
-    name := name.getId,
-    title := title.getString,
-    lemmas := entries })
-
-instance : Quote LemmaDocEntry `term :=
-⟨λ entry => Syntax.mkCApp ``LemmaDocEntry.mk #[quote entry.name, quote entry.userName, quote entry.category, quote entry.content]⟩
-
-/-- Declare the list of lemmas that will be displayed in the current level.
-Expects a space separated list of identifiers that refer to either a lemma doc
-entry or a lemma doc set. -/
+/-- Declare lemmas that are introduced by this level. -/
 elab "NewLemmas" args:ident* : command => do
-  let env ← getEnv
-  let docs := lemmaDocExt.getState env
-  let sets := lemmaSetExt.getState env
-  let mut lemmas : Array Name := #[]
-  for arg in args do
-    let name := arg.getId
-    match docs.find? (·.userName = name) with
-    | some entry => lemmas := lemmas.push name
-    | none => match sets.find? (·.name = name) with
-              | some entry => lemmas := lemmas ++ entry.lemmas
-              | none => throwError "Lemma doc or lemma set {name} wasn't found."
-  modifyCurLevel fun level => pure {level with newLemmas := lemmas}
+  let names := args.map (·.getId)
+  for name in names do checkInventoryDoc .Lemma name
+  modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with new := names}}
+
+/-- Declare lemmas that are temporarily disabled in this level -/
+elab "DisabledLemmas" args:ident* : command => do
+  let names := args.map (·.getId)
+  for name in names do checkInventoryDoc .Lemma name
+  modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with disabled := names}}
+
+/-- Temporarily disable all lemmas except the ones declared here -/
+elab "OnlyLemmas" args:ident* : command => do
+  let names := args.map (·.getId)
+  for name in names do checkInventoryDoc .Lemma name
+  modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with only := names}}
 
 /-! ## Make Game -/
+
+def GameLevel.getInventory (level : GameLevel) : InventoryType → InventoryInfo
+| .Tactic => level.tactics
+| .Definition => level.definitions
+| .Lemma => level.lemmas
+
+def GameLevel.setComputedInventory (level : GameLevel) : InventoryType → Array Availability → GameLevel
+| .Tactic, v =>     {level with tactics     := {level.tactics     with computed := v}}
+| .Definition, v => {level with definitions := {level.definitions with computed := v}}
+| .Lemma, v =>      {level with lemmas      := {level.lemmas      with computed := v}}
 
 /-- Make the final Game. This command will precompute various things about the game, such as which
 tactics are available in each level etc. -/
@@ -275,72 +302,47 @@ elab "MakeGame" : command => do
   if game.worlds.hasLoops then
     throwError "World graph has loops!"
 
-  -- Compute which tactics/lemmas are available in which level:
-  let mut newTacticsInWorld : HashMap Name (HashSet Name) := {}
-  let mut allTactics : HashSet Name := {}
-  let mut newLemmasInWorld : HashMap Name (HashSet Name) := {}
-  let mut allLemmas : HashSet Name := {}
-  for (worldId, world) in game.worlds.nodes.toArray do
-    let mut newTactics : HashSet Name:= {}
-    let mut newLemmas : HashSet Name:= {}
-    for (_, level) in world.levels.toArray do
-      newTactics := newTactics.insertMany level.newTactics
-      allTactics := allTactics.insertMany level.newTactics
-      newLemmas := newLemmas.insertMany level.newLemmas
-      allLemmas := allLemmas.insertMany level.newLemmas
-    newTacticsInWorld := newTacticsInWorld.insert worldId newTactics
-    newLemmasInWorld := newLemmasInWorld.insert worldId newLemmas
+  -- Compute which inventory items are available in which level:
+  for inventoryType in open InventoryType in #[Tactic, Definition, Lemma] do
+    let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
+    let mut allItems : HashSet Name := {}
+    for (worldId, world) in game.worlds.nodes.toArray do
+      let mut newItems : HashSet Name := {}
+      for (_, level) in world.levels.toArray do
+        newItems := newItems.insertMany (level.getInventory inventoryType).new
+        allItems := allItems.insertMany (level.getInventory inventoryType).new
+      newItemsInWorld := newItemsInWorld.insert worldId newItems
 
-  -- Basic tactic/lemma availability: all locked, none disabled.
-  let Availability₀ : HashMap Name Availability :=
-    HashMap.ofList $
-      allTactics.toList.map fun name =>
-        (name, {name, locked := true, disabled := false})
-  let lemmaAvailability₀ : HashMap Name Availability :=
-    HashMap.ofList $
-      allLemmas.toList.map fun name =>
-        (name, {name, locked := true, disabled := false})
+    -- Basic inventory item availability: all locked, none disabled.
+    let Availability₀ : HashMap Name Availability :=
+      HashMap.ofList $
+        allItems.toList.map fun name =>
+          (name, {name, locked := true, disabled := false})
 
-  -- Availability after a given world
-  let mut tacticsInWorld : HashMap Name (HashMap Name Availability) := {}
-  let mut lemmasInWorld : HashMap Name (HashMap Name Availability) := {}
-  for (worldId, _) in game.worlds.nodes.toArray do
-    let mut tactics := Availability₀
-    let mut lemmas := lemmaAvailability₀
-    let predecessors := game.worlds.predecessors worldId
-    for predWorldId in predecessors do
-      for tac in newTacticsInWorld.find! predWorldId do
-        tactics := tactics.insert tac {name := tac, locked := false, disabled := false}
-      for lem in newLemmasInWorld.find! predWorldId do
-        lemmas := lemmas.insert lem {name := lem, locked := false, disabled := false}
-    tacticsInWorld := tacticsInWorld.insert worldId tactics
-    lemmasInWorld := lemmasInWorld.insert worldId lemmas
+    -- Availability after a given world
+    let mut itemsInWorld : HashMap Name (HashMap Name Availability) := {}
+    for (worldId, _) in game.worlds.nodes.toArray do
+      let mut items := Availability₀
+      let predecessors := game.worlds.predecessors worldId
+      for predWorldId in predecessors do
+        for item in newItemsInWorld.find! predWorldId do
+          items := items.insert item {name := item, locked := false, disabled := false}
+      itemsInWorld := itemsInWorld.insert worldId items
 
-  for (worldId, world) in game.worlds.nodes.toArray do
-    let mut tactics := tacticsInWorld.find! worldId
-    let mut lemmas := lemmasInWorld.find! worldId
+    for (worldId, world) in game.worlds.nodes.toArray do
+      let mut items := itemsInWorld.find! worldId
 
-    let levels := world.levels.toArray.insertionSort fun a b => a.1 < b.1
+      let levels := world.levels.toArray.insertionSort fun a b => a.1 < b.1
 
-    for (levelId, level) in levels do
-      for tac in level.newTactics do
-        tactics := tactics.insert tac {name := tac, locked := false, disabled := false}
-      for tac in level.disabledTactics do
-        tactics := tactics.insert tac {name := tac, locked := false, disabled := true}
-      for lem in level.newLemmas do
-        lemmas := lemmas.insert lem {name := lem, locked := false, disabled := false}
-      for lem in level.disabledLemmas do
-        lemmas := lemmas.insert lem {name := lem, locked := false, disabled := true}
+      for (levelId, level) in levels do
+        for item in (level.getInventory inventoryType).new do
+          items := items.insert item {name := item, locked := false, disabled := false}
+        for item in (level.getInventory inventoryType).disabled do
+          items := items.insert item {name := item, locked := false, disabled := true}
 
-      let tacticArray := tactics.toArray
-        |>.insertionSort (fun a b => a.1.toString < b.1.toString)
-        |>.map (·.2)
+        let itemsArray := items.toArray
+          |>.insertionSort (fun a b => a.1.toString < b.1.toString)
+          |>.map (·.2)
 
-      let lemmaArray := lemmas.toArray
-        |>.insertionSort (fun a b => a.1.toString < b.1.toString)
-        |>.map (·.2)
-
-      modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
-        return {level with
-          tactics := tacticArray
-          lemmas := lemmaArray}
+        modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
+          return level.setComputedInventory inventoryType itemsArray

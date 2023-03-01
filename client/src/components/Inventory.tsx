@@ -19,7 +19,7 @@ function Inventory({ tactics, lemmas } :
       <h2>Tactics</h2>
       <div className="inventory-list">
         { tactics.map(tac =>
-           <InventoryItem key={tac.name} showDoc={() => {setDocName(tac.name); setDocType("tactic")}}
+           <InventoryItem key={tac.name} showDoc={() => {setDocName(tac.name); setDocType("Tactic")}}
              name={tac.name} locked={tac.locked} disabled={tac.disabled} />) }
       {/* TODO: Click on Tactic: show info
         TODO: click on paste icon -> paste into command line */}
@@ -28,7 +28,7 @@ function Inventory({ tactics, lemmas } :
       <h2>Lemmas</h2>
       <div className="inventory-list">
         { lemmas.map(lem =>
-            <InventoryItem key={lem.name} showDoc={() => {setDocName(lem.name); setDocType("lemma")}}
+            <InventoryItem key={lem.name} showDoc={() => {setDocName(lem.name); setDocType("Lemma")}}
               name={lem.name} locked={lem.locked} disabled={lem.disabled} />) }
       </div>
 

@@ -66,26 +66,10 @@ structure Doc where
   text: String
 deriving ToJson
 
-inductive TacOrLem := | tactic | «lemma»
-deriving ToJson, FromJson
-
 structure LoadDocParams where
   name : Name
-  type : TacOrLem
+  type : InventoryType
 deriving ToJson, FromJson
-
-def mkDoc (name : Name) (type : TacOrLem) : GameServerM (Option Doc) := do
-  match type with
-  | .tactic => do
-    let doc ← getTacticDoc? name
-    return doc.map fun doc =>
-      { name := doc.name.toString
-        text := doc.content }
-  | .lemma => do
-    let doc ← getLemmaDoc? name
-    return doc.map fun doc =>
-      { name := doc.name.toString
-        text := doc.content }
 
 def handleDidOpenLevel (params : Json) : GameServerM Unit := do
   let p ← parseParams _ params
@@ -105,8 +89,8 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
     param  := {
       uri       := m.uri
       levelModule := lvl.module
-      tactics := lvl.tactics
-      lemmas := lvl.lemmas
+      tactics := lvl.tactics.computed
+      lemmas := lvl.lemmas.computed
       : DidOpenLevelParams
     }
   }
@@ -133,8 +117,8 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let levelInfo : LevelInfo :=
           { index := lvl.index,
             title := lvl.title,
-            tactics := lvl.tactics,
-            lemmas := lvl.lemmas,
+            tactics := lvl.tactics.computed,
+            lemmas := lvl.lemmas.computed,
             descrText := lvl.descrText,
             descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction }
@@ -144,10 +128,13 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let p ← parseParams LoadDocParams (toJson params)
       let s ← get
       let c ← read
-      let some doc ← mkDoc p.name p.type
+      let some doc ← getInventoryDoc? p.name p.type
         | do
             c.hOut.writeLspResponseError ⟨id, .invalidParams, s!"Documentation not found: {p.name}", none⟩
             return true
+      let doc : Doc :=
+          { name := doc.name.toString
+            text := doc.content }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson doc⟩
       return true
     | _ => return false
