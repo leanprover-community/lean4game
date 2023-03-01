@@ -55,9 +55,6 @@ LemmaDoc add_zero as add_zero in "Addition"
 LemmaDoc add_succ as add_succ in "Addition"
 "This lemma says `∀ a b : ℕ, a + succ b = succ (a + b)`."
 
-LemmaSet addition : "Addition lemmas" :=
-zero_add add_zero
-
 LemmaDoc not_forall as not_forall in "Logic"
 "`∀ (A : Prop), ¬(∀ x, A) ↔ ∃x, (¬A)`."
 
@@ -105,14 +102,6 @@ LemmaDoc Subset.antisymm_iff as Subset.antisymm_iff in "Set"
 LemmaDoc Nat.prime_def_lt'' as Nat.prime_def_lt'' in "Nat"
 ""
 
-
-
-
-LemmaSet natural : "Natürliche Zahlen" :=
-Even Odd not_odd not_even
-
-LemmaSet logic : "Logik" :=
-not_not not_forall not_exists
 
 LemmaDoc Finset.sum_add_distrib as Finset.sum_add_distrib in "Sum"
 ""

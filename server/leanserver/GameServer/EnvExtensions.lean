@@ -26,77 +26,43 @@ structure GoalHintEntry where
   hidden : Bool := false
   deriving Repr
 
-/-! ## Tactic documentation -/
 
-structure TacticDocEntry where
+/-! ## Tactic/Definition/Lemma documentation -/
+
+inductive InventoryType := | Tactic | Lemma | Definition
+deriving ToJson, FromJson, Repr, BEq, Hashable
+
+instance : ToString InventoryType := ⟨fun t => match t with
+| .Tactic => "Tactic"
+| .Lemma => "Lemma"
+| .Definition => "Definition"
+⟩
+
+structure InventoryDocEntry where
   name : Name
-  content : String
-  deriving ToJson, Repr
-
-/-- Environment extension for tactic documentation. -/
-initialize tacticDocExt : SimplePersistentEnvExtension TacticDocEntry (Array TacticDocEntry) ←
-  registerSimplePersistentEnvExtension {
-    name := `tactic_doc
-    addEntryFn := Array.push
-    addImportedFn := Array.concatMap id
-  }
-
-def getTacticDoc? {m : Type → Type} [Monad m] [MonadEnv m] (tac : Name) :
-    m (Option TacticDocEntry) := do
-  return (tacticDocExt.getState (← getEnv)).find? (·.name = tac)
-
-open Elab Command in
-/-- Print a registered tactic doc for debugging purposes. -/
-elab "#print_tactic_doc" : command => do
-  for entry in tacticDocExt.getState (← getEnv) do
-    dbg_trace "{entry.name} : {entry.content}"
-
-/-! ## Lemma documentation -/
-
-structure LemmaDocEntry where
-  name : Name
+  type : InventoryType
   userName : Name
   category : String
   content : String
   deriving ToJson, Repr
 
-/-- Environment extension for lemma documentation. -/
-initialize lemmaDocExt : SimplePersistentEnvExtension LemmaDocEntry (Array LemmaDocEntry) ←
+/-- Environment extension for inventory documentation. -/
+initialize inventoryDocExt : SimplePersistentEnvExtension InventoryDocEntry (Array InventoryDocEntry) ←
   registerSimplePersistentEnvExtension {
-    name := `lemma_doc
+    name := `inventory_doc
     addEntryFn := Array.push
     addImportedFn := Array.concatMap id
   }
 
-def getLemmaDoc? {m : Type → Type} [Monad m] [MonadEnv m] (tac : Name) :
-    m (Option LemmaDocEntry) := do
-  return (lemmaDocExt.getState (← getEnv)).find? (·.name = tac)
+def getInventoryDoc? {m : Type → Type} [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
+    m (Option InventoryDocEntry) := do
+  return (inventoryDocExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
 
 open Elab Command in
-/-- Print a lemma doc for debugging purposes. -/
-elab "#print_lemma_doc" : command => do
-  for entry in lemmaDocExt.getState (← getEnv) do
-    dbg_trace "{entry.userName} ({entry.name}) in {entry.category}: {entry.content}"
-
-structure LemmaSetEntry where
-  name : Name
-  title : String
-  lemmas : Array Name
-  deriving ToJson, Repr
-
-/-- Environment extension for lemma sets. -/
-initialize lemmaSetExt : SimplePersistentEnvExtension LemmaSetEntry (Array LemmaSetEntry) ←
-  registerSimplePersistentEnvExtension {
-    name := `lemma_set
-    addEntryFn := Array.push
-    addImportedFn := Array.concatMap id
-  }
-
-open Elab Command in
-/-- Print all registered lemma sets for debugging purposes. -/
-elab "#print_lemma_set" : command => do
-  for entry in lemmaSetExt.getState (← getEnv) do
-    dbg_trace "{entry.name} : {entry.lemmas}"
+/-- Print a registered tactic doc for debugging purposes. -/
+elab "#print_doc" : command => do
+  for entry in inventoryDocExt.getState (← getEnv) do
+    dbg_trace "[{entry.type}] {entry.name} : {entry.content}"
 
 
 /-! ## Environment extensions for game specification-/
@@ -156,7 +122,18 @@ structure Availability where
   name : Name
   locked : Bool
   disabled : Bool
-deriving ToJson, FromJson, Repr
+deriving ToJson, FromJson, Repr, Inhabited
+
+structure InventoryInfo where
+  -- new inventory items introduced by this level:
+  new : Array Name
+  -- inventory items exceptionally forbidden in this level:
+  disabled : Array Name
+  -- only these inventory items are allowed in this level (ignored if empty):
+  only : Array Name
+  -- inventory items in this level (computed by `MakeGame`):
+  computed : Array Availability
+deriving ToJson, FromJson, Repr, Inhabited
 
 def getCurLevelId [MonadError m] : m LevelId := do
   return { game := ← getCurGameId, world := ← getCurWorldId, level := ← getCurLevelIdx}
@@ -164,37 +141,20 @@ def getCurLevelId [MonadError m] : m LevelId := do
 /-- Instance to make GameLevel Repr work -/
 instance : Repr Elab.Command.Scope := ⟨fun s _ => repr s.currNamespace⟩
 
-/--
-Fields:
-- TODO
-- introduction: Theory block shown all the time.
-- description:  The mathematical statemtent in mathematician-readable form.
-- goal:         The statement in Lean.
-- conclusion:   Displayed when level is completed.
--/
 structure GameLevel where
   index: Nat
   title: String := default
+  /-- introduction: Theory block shown all the time -/
   introduction: String := default
+  /-- The mathematical statemtent in mathematician-readable form -/
   description: String := default
+  /-- conclusion displayed when level is completed. -/
   conclusion: String := default
-  -- new tactics introduces by this level:
-  newTactics: Array Name := default
-  -- tactics exceptionally forbidden in this level:
-  disabledTactics: Array Name := default
-  -- only these tactics are allowed in this level (ignore if empty):
-  onlyTactics: Array Name := default
-  -- tactics in this level (computed by `MakeGame`):
-  tactics: Array Availability := default
-  -- new lemmas introduces by this level:
-  newLemmas: Array Name := default
-  -- lemmas exceptionally forbidden in this level:
-  disabledLemmas: Array Name := default
-  -- only these lemmas are allowed in this level (ignore if empty):
-  onlyLemmas: Array Name := default
-  -- lemmas in this level (computed by `MakeGame`):
-  lemmas: Array Availability := default
+  tactics: InventoryInfo := default
+  definitions: InventoryInfo := default
+  lemmas: InventoryInfo := default
   hints: Array GoalHintEntry := default
+  /-- The statement in Lean. -/
   goal : TSyntax `Lean.Parser.Command.declSig := default
   scope : Elab.Command.Scope := default
   descrText: String := default
