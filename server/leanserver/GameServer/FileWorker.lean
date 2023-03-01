@@ -91,13 +91,14 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (levelParams :
       for n in ns do
         let some (.thmInfo ..) := (← getEnv).find? n
           | return () -- not a theroem -> ignore
-        match levelParams.lemmas.find? (fun l => l.name.toString == n) with
-        | none => addErrorMessage info s!"You have not unlocked the lemma '{n}' yet!"
+        let lemmasAndDefs := levelParams.lemmas ++ levelParams.definitions
+        match lemmasAndDefs.find? (fun l => l.name.toString == n) with
+        | none => addErrorMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
         | some lem =>
           if lem.locked then
-            addErrorMessage info s!"You have not unlocked the lemma '{n}' yet!"
+            addErrorMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
           else if lem.disabled then
-            addErrorMessage info s!"The lemma '{n}' is disabled in this level!"
+            addErrorMessage info s!"The lemma/definition '{n}' is disabled in this level!"
 where addErrorMessage (info : SourceInfo) (s : MessageData) :=
   modify fun st => { st with
     messages := st.messages.add {

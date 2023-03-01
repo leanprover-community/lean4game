@@ -6,9 +6,10 @@ import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-s
 import Markdown from './Markdown';
 import { useLoadDocQuery } from '../state/api';
 
-function Inventory({ tactics, lemmas } :
+function Inventory({ tactics, lemmas, definitions } :
   {lemmas: {name: string, locked: boolean, disabled: boolean}[],
-   tactics: {name: string, locked: boolean, disabled: boolean}[]}) {
+  tactics: {name: string, locked: boolean, disabled: boolean}[],
+  definitions: {name: string, locked: boolean, disabled: boolean}[]}) {
 
   const [docName, setDocName] = useState(null)
   const [docType, setDocType] = useState(null)
@@ -23,6 +24,13 @@ function Inventory({ tactics, lemmas } :
              name={tac.name} locked={tac.locked} disabled={tac.disabled} />) }
       {/* TODO: Click on Tactic: show info
         TODO: click on paste icon -> paste into command line */}
+      </div>
+
+      <h2>Definitions</h2>
+      <div className="inventory-list">
+        { definitions.map(def =>
+            <InventoryItem key={def.name} showDoc={() => {setDocName(def.name); setDocType("Definition")}}
+              name={def.name} locked={def.locked} disabled={def.disabled} />) }
       </div>
 
       <h2>Lemmas</h2>

@@ -42,8 +42,9 @@ Fields:
 structure LevelInfo where
   index : Nat
   title : String
-  tactics: Array Availability
-  lemmas: Array Availability
+  tactics : Array Availability
+  lemmas : Array Availability
+  definitions : Array Availability
   introduction : String
   descrText : String := ""
   descrFormat : String := ""
@@ -57,8 +58,9 @@ structure LoadLevelParams where
 structure DidOpenLevelParams where
   uri : String
   levelModule : Name
-  tactics: Array Availability
-  lemmas: Array Availability
+  tactics : Array Availability
+  lemmas : Array Availability
+  definitions : Array Availability
   deriving ToJson, FromJson
 
 structure Doc where
@@ -91,6 +93,7 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
       levelModule := lvl.module
       tactics := lvl.tactics.computed
       lemmas := lvl.lemmas.computed
+      definitions := lvl.definitions.computed
       : DidOpenLevelParams
     }
   }
@@ -119,6 +122,7 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             title := lvl.title,
             tactics := lvl.tactics.computed,
             lemmas := lvl.lemmas.computed,
+            definitions := lvl.definitions.computed,
             descrText := lvl.descrText,
             descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction }

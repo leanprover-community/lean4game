@@ -66,4 +66,5 @@ Conclusion ""
 NewTactics «have»
 DisabledTactics «suffices»
 
-NewLemmas Even Odd not_even not_odd
+NewDefinitions Even Odd
+NewLemmas not_even not_odd

@@ -61,13 +61,13 @@ LemmaDoc not_forall as not_forall in "Logic"
 LemmaDoc not_exists as not_exists in "Logic"
 "`∀ (A : Prop), ¬(∃ x, A) ↔ ∀x, (¬A)`."
 
-LemmaDoc Even as Even in "Nat"
+DefinitionDoc Even
 "
 `even n` ist definiert als `∃ r, a = 2 * r`.
 Die Definition kann man mit `unfold even at *` einsetzen.
 "
 
-LemmaDoc Odd as Odd in "Nat"
+DefinitionDoc Odd
 "
 `odd n` ist definiert als `∃ r, a = 2 * r + 1`.
 Die Definition kann man mit `unfold odd at *` einsetzen.

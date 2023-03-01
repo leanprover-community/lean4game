@@ -72,5 +72,5 @@ HiddenHint (n: ℕ) (h : Odd (n ^ 2)) (g : Even n) : Even (n ^ 2) =>
 
 
 NewTactics contradiction by_contra rw apply assumption -- TODO: suffices, have
-
-NewLemmas Odd Even not_odd not_even even_square
+NewDefinitions Even Odd
+NewLemmas not_odd not_even even_square

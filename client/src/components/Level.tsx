@@ -181,7 +181,7 @@ function Level() {
         </EditorContext.Provider>
       </div>
       <div className="doc-panel">
-        {!level.isLoading && <Inventory tactics={level?.data?.tactics} lemmas={level?.data?.lemmas} />}
+        {!level.isLoading && <Inventory tactics={level?.data?.tactics} lemmas={level?.data?.lemmas} definitions={level?.data?.definitions} />}
       </div>
     </Split>
   </>
