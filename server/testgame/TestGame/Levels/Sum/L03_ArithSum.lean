@@ -3,6 +3,8 @@ import TestGame.Metadata
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
 
+set_option tactic.hygienic false
+
 Game "TestGame"
 World "Sum"
 Level 3
@@ -13,13 +15,19 @@ Introduction
 "
 Oft beweist man Aussagen über Summen am besten per Induktion.
 
-Eines der wichtigsten Lemmas für den Induktionsschritt ist
-`Fin.sum_univ_castSucc`, welches
-$\\sum_{i=0}^{n} a_i = \\sum_{i=0}^{n-1} a_i + a_n$ umschreibt.
+Mit `induction n` startet man einen Induktionsbeweis. Dies erstellt 2 neue Goals:
+
+* **Induktionsanfang**: `n = 0`. Dieser kann ganz oft direkt mit `simp` bewiesen werden.
+* **Induktionsschritt**: Man kriegt eine Annahme `(n_ih : P n)` und muss `P (n + 1)`
+  beweisen. Für endliche Summen will man normalerweise danach zuerst
+  `rw [Fin.sum_univ_castSucc]` brauchen, welches
+  $$\\sum_{i=0}^{n} a_i = \\sum_{i=0}^{n-1} a_i + a_n$$
+  umschreibt.
 
 **Bemerkung:**
 
-Eine technische Sonderheit ist der kleine Pfeil `↑` in `∑ i : Fin (n + 1), ↑i`.
+Eine technische Sonderheit bezüglich endlichen Summen
+ist der kleine Pfeil `↑` in `∑ i : Fin (n + 1), ↑i`.
 Da `i : Fin n` technisch keine natürliche Zahl ist (sondern vom Typ `Fin n`), muss man
 dieses zuerst mit `↑i` oder `(i : ℕ)` in eine natürliche Zahl umwandeln. Diese nennt man
 *Coersion*.
@@ -28,25 +36,21 @@ Gleichermassen, kommen hier im Induktionsschritt die Terme `↑(↑Fin.castSucc.
 und `↑(Fin.last (n + 1))` vor. Diese Terme können mit `simp` vereinfacht werden.
 "
 
--- Note: I don't want to deal with Nat-division, so I stated it as `2 * ... = ...` instead.
-
-set_option tactic.hygienic false
-
 open BigOperators
 
 Statement arithmetic_sum
 "Zeige $2 \\cdot \\sum_{i = 0}^n i = n \\cdot (n + 1)$."
     (n : ℕ) : 2 * (∑ i : Fin (n + 1), ↑i) = n * (n + 1) := by
-  induction' n with n hn
+  induction n
   simp
   rw [Fin.sum_univ_castSucc]
   rw [mul_add]
   simp
-  rw [hn]
+  rw [n_ih]
   rw [Nat.succ_eq_add_one]
   ring
 
-NewTactics ring
+NewTactics induction
 NewLemmas Fin.sum_univ_castSucc Nat.succ_eq_add_one mul_add add_mul
 
 Hint (n : ℕ) : 2 * (∑ i : Fin (n + 1), ↑i) = n * (n + 1) =>

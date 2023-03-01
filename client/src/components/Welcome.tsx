@@ -116,6 +116,7 @@ function computeWorldLayout(worlds) {
     headless: true,
     styleEnabled: false
   })
+// TODO: Jon play around with graph layout
 
   const layout = cy.layout({name: "klay", klay: {direction: "DOWN"}} as LayoutOptions).run()
   let nodes = {}

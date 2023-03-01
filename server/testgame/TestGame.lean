@@ -6,6 +6,7 @@ import TestGame.Levels.Predicate
 import TestGame.Levels.Contradiction
 import TestGame.Levels.Prime
 import TestGame.Levels.Sum
+import TestGame.Levels.Induction
 
 import TestGame.Levels.Numbers
 import TestGame.Levels.Inequality
@@ -42,12 +43,15 @@ Conclusion
 "Fertig!"
 
 
-Path Proposition → Implication → Predicate → Prime
-Path Predicate → Contradiction → LeanStuff → SetTheory → SetTheory2 → SetFunction
+Path Proposition → Implication → Predicate
+Path Predicate → Contradiction → Sum → LeanStuff
+Path LeanStuff → SetTheory → SetTheory2 → SetFunction
+
+Path Predicate → Prime → Induction
+Path Sum → Inequality → Induction
+
 Path SetTheory2 → Numbers
-
 Path Module → Basis → Module2
-
-Path Contradiction → Inequality → Sum → LeanStuff → Function → SetFunction
+Path LeanStuff → Function → SetFunction
 
 MakeGame

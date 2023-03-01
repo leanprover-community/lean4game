@@ -34,7 +34,6 @@ Statement
   simp
   ring
 
-NewTactics rw simp ring
 NewLemmas Finset.sum_add_distrib add_comm
 
 Hint (n : ℕ) : ∑ x : Fin n, ↑x + ∑ x : Fin n, 1 = n + ∑ i : Fin n, ↑i =>

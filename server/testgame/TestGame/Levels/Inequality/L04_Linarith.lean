@@ -9,15 +9,20 @@ Title "Linarith"
 
 Introduction
 "
-Die Taktik `linarith` kann alle Systeme von linearen (Un-)gleichungen über `ℤ`, `ℚ`, etc. lösen.
-Über `ℕ` ist sie etwas schwächer, aber einfache Aussagen kann sie trotzdem beweisen.
+Sobald man mit einem Ring arbeitet, der eine lineare Order hat (also z.B. `ℤ` oder `ℚ`),
+ist `linarith` stärker und kann Systeme von Gleichungen und Ungleichungen angehen.
+
+`linarith` kann aber nur mit linearen Ungleichungen umgehen, mit Termen der Form `x ^ 2`
+kann es nicht umgehen.
 "
 
 Statement
-"Wenn $n \\ge 2$, zeige, dass $n$ nich Null sein kann."
-    (n : ℕ) (h : 2 ≤ n) : n ≠ 0 := by
+"
+Angenommen man hat für zwei Ganzzahlen $x, y$ folgende Ungleichungen.
+$$
+\\begin{aligned} 5 * y &\\le 35 - 2 * x \\\\ 2 * y &\\le x + 3 \\end{aligned}
+$$
+Zeige, dass $y \\le 5$.
+"
+    (x y : ℤ) (h₂ : 5 * y ≤ 35 - 2 * x) (h₃ : 2 * y ≤ x + 3) : y ≤ 5 := by
   linarith
-
-NewTactics linarith
-
-NewLemmas zero_lt_iff

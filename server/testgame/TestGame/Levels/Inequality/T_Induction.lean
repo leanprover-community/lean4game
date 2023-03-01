@@ -1,5 +1,7 @@
 import TestGame.Metadata
 
+import Mathlib
+
 Game "TestGame"
 World "Inequality"
 Level 1
@@ -7,6 +9,7 @@ Level 1
 Title "Induktion"
 
 set_option tactic.hygienic false
+
 
 Introduction
 "
@@ -26,9 +29,6 @@ dann gilt $P(n)$ für alle $n \\in \\mathbb{N}.$"
   assumption
   apply h_step
   assumption
-
--- HiddenHint (n : ℕ) (P : ℕ → Prop) : P n =>
--- "Benutze `induction n`."
 
 Hint (P : ℕ → Prop) : P Nat.zero =>
 "Das ist die Induktionsverankerung, hier musst du $P(0)$ zeigen."

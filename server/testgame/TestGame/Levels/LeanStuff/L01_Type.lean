@@ -27,9 +27,10 @@ Zum Beispiel ist `ℕ` der Typ der natürlichen Zahlen, `Prop` der Typ der logis
 Aussagen, und ein Ring ist ein Typ `(R : Type)` zusammen mit einer Instanz `[Ring R]`,
 die sagt, dass auf diesem Typ eine Ringstruktur besteht.
 
-**Achtung**: Wie du aber gleich sehen wirst sind Typen und Mengen in Lean komplett
-unterschiedliche Sachen! (Und Mengen nehmen in Lean nicht die fundamentale Funktion
-ein, die sie in der Mathe innehaben.)
+**Achtung**: Wie du aber gleich sehen wirst sind Typen und Mengen in Lean unterschiedliche
+Sachen.
+
+Hier ein kleines Beispiel zu Typen und Instanzen:
 "
 
 Statement
@@ -38,5 +39,11 @@ Statement
   ring
 
 Hint (R : Type) (h : CommRing R) (a : R) (b : R) : a + b = b + a =>
-"Die Taktik `ring` funktioniert in jedem Typen,
-der mindestens eine Instanz `[Ring R]` hat."
+"
+Die Taktik `ring` funktioniert in jedem Typen,
+ist aber stärker, je nach Instanz auf dem Typen.
+
+In Mathlib sind Instanzen `[CommSemiring ℕ]`, [CommRing ℤ]`, `[Field ℚ]`, etc. definiert.
+Die Taktik `ring` muss eine dieser Instanzen finden, die sagen, dass die Addition kommutative ist,
+damit das Lemma `add_comm` angewendet und die Aussage bewiesen werden kann.
+"

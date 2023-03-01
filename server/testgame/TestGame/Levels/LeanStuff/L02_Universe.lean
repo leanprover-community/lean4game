@@ -12,26 +12,40 @@ Title "Universen"
 
 Introduction
 "
-In der Mathematik stösst man manchmal an Mengentheoretische Grenzen, und so auch in Lean.
+Ein weitere Syntax, den man in Lean abundzu sieht sind Universen.
 
-Klassisch ist bekannt dass die \"Menge aller Mengen\" nicht existieren kann.
+Diese sind für Mathematiker erst einmal nicht so wichtig, und es reicht zu wissen,
+dass diese existieren.
 
-Falls man an diese Grenzen stösst (z.B. in der Mengenlehre oder Kategorientheorie) hat Lean
-Universen bereit: `Type` ist eigentlich `Type 0` und es gibt auch `Type 1, Type 2, ...`
+Da alle Objekte in Lean einen Typ haben, kann man sich fragen, welchen Typ hat eigentlich `Type`
+selber? Die Anwort darauf ist dass `Type` vom Typ `Type 1` ist und dieses wiederum vom Typ `Type 2`
+usw.
 
-Deshalb sieht man oft in Lean-Code `(R : Type _)` wenn es keine mengentheoretischen
-Probleme gibt (`_` ist ein Platzhalter) oder `universe u` am Anfang und dann `(R : Type u)`
-falls man diese mengentheoretischen Probleme kontrollieren muss.
+Da Lemmas in Lean gerne so algemein wie möglich formuliert werden, sieht man oft `(R : Type _)`
+anstatt `(R : Type)`, wobei `_` einfach ein Platzhalter für eine Zahl ist.
 
-In der Praxis kommt man aber relativ weit, wenn man sich erst mal nicht mit Universen
-beschäftigt, und lediglich weiss, dass es sowas gibt.
+Alternativ kann man auch explizit Universum-Levels definieren, so sind die folgenden beiden
+Aussdrücke äquivalent:
+
+```
+variable (R : Type _)
+
+universe u
+variable (R : Type u)
+```
+
+In der Praxis kann man immer ohne bedenken `Type _` verwendenen und wenn man auf
+(mengentheoretische)
+Probleme stösst, muss man dan eventuell die Universen spezifizieren.
+
+*Die Normalform ist eigentlich `(R : Type _)` zu schreiben solange man kein Grund hat
+das Universum einzuschränken.*
 "
 
 Statement
-"TODO"
-    (R S : Type _) [CommRing R] (a b : R) : a + b = b + a := by
+""
+    (R : Type _) [CommRing R] (a b : R) : a + b = b + a := by
   ring
 
-Hint (R : Type _) (h : CommRing R) (a : R) (b : R) : a + b = b + a =>
-"Die Taktik `ring` funktioniert in jedem Typen,
-der mindestens eine Instanz `[Ring R]` hat."
+-- Hint (R : Type) (h : CommRing R) (a : R) (b : R) : a + b = b + a =>
+-- ""

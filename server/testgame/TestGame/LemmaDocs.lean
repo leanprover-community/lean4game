@@ -42,7 +42,7 @@ LemmaDoc Nat.succ_pos as Nat.succ_pos in "Nat"
 "
 "
 
-LemmaDoc zero_lt_iff as zero_lt_iff in "Nat"
+LemmaDoc Nat.pos_iff_ne_zero as Nat.pos_iff_ne_zero in "Nat"
 "
 "
 
