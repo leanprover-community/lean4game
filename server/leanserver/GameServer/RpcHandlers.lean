@@ -25,45 +25,6 @@ def getLevelByFileName? [Monad m] [MonadEnv m] (fileName : String) : m (Option G
     | return none
   return ← getLevel? levelId
 
-/-- Checks if `pattern` and `e` are equal up to mvars in `pattern` that may be assigned to fvars in `e`. -/
-partial def matchExprAux (pattern : Expr) (e : Expr) : MetaM Bool := do
-    match pattern, e with
-    | .bvar i1, .bvar i2 => return i1 == i2
-    | .fvar i1, .fvar i2 => return i1 == i2
-    | .mvar _, .mvar _ => return true
-    | .sort u1, .sort u2 => Meta.isLevelDefEq u1 u2
-    | .const n1 ls1, .const n2 ls2 =>
-      return n1 == n2 && (← (ls1.zip ls2).allM fun (l1, l2) => Meta.isLevelDefEq l1 l2)
-    | .app f1 a1, .app f2 a2 =>
-      return (← matchExprAux f1 f2) && (← matchExprAux a1 a2)
-    | .lam _ t1 b1 _, .lam _ t2 b2 _ =>
-      return (← matchExprAux t1 t2) && (← matchExprAux b1 b2)
-    | .forallE _ t1 b1 _, .forallE _ t2 b2 _ =>
-      return (← matchExprAux t1 t2) && (← matchExprAux b1 b2)
-    | .letE _ t1 v1 b1 _, .letE _ t2 v2 b2 _ =>
-      return (← matchExprAux t1 t2) && (← matchExprAux v1 v2)  && (← matchExprAux b1 b2)
-    | .lit l1, .lit l2 =>
-      return l1 == l2
-    | .proj i1 n1 e1, .proj i2 n2 e2 =>
-      return i1 == i2 && n1 == n2 && (← matchExprAux e1 e2)
-    -- ignore mdata:
-    | .mdata _ pattern', _ =>
-      return ← matchExprAux pattern' e
-    | _, .mdata _ e' =>
-      return ← matchExprAux pattern e'
-    -- assign fvars to mvars:
-    | .mvar i1, .fvar _ =>
-      match ← getExprMVarAssignment? i1 with
-      | some pattern' => matchExprAux pattern' e
-      | none =>
-        i1.assign e
-        return true
-    | _, _ => return false
-
-def matchExpr (pattern : Expr) (e : Expr) : MetaM Bool := do
-  checkpointDefEq (mayPostpone := true) do
-    matchExprAux pattern e
-
 /-- Check if each meta variable in `declMvars` has a matching fvar in `declFvars` -/
 def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool := do
   -- We iterate through the array backwards hoping that this will find us faster results
@@ -77,7 +38,7 @@ def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool :=
       let declFvar := declFvars[declFvars.size - j - 1]!
       let usedFvar := usedFvars[declFvars.size - j - 1]!
       if ¬ usedFvar then
-        if ← matchExpr declMvar declFvar then
+        if ← isDefEq declMvar declFvar then
           usedFvars := usedFvars.set! (declFvars.size - j - 1) true
           found := true
           break
@@ -95,7 +56,7 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array
     let hints ← level.hints.filterMapM fun hint => do
       let (declMvars, binderInfo, hintGoal) ← forallMetaBoundedTelescope hint.goal hint.intros
       -- TODO: Protect mvars in the type of `goal` to be instantiated?
-      if ← matchExpr hintGoal (← inferType $ mkMVar goal)
+      if ← isDefEq hintGoal (← inferType $ mkMVar goal)
       then
         let lctx ← getLCtx -- Local context of the `goal`
         if ← matchDecls declMvars lctx.getFVars
