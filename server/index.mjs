@@ -38,19 +38,23 @@ if (isDevelopment) {
 const queue = []
 const queueLength = 5
 
+function startServerProcess() {
+    const serverProcess = cp.spawn(cmd, cmdArgs, { cwd })
+    serverProcess.on('error', error =>
+        console.error(`Launching Lean Server failed: ${error}`)
+    );
+    if (serverProcess.stderr !== null) {
+        serverProcess.stderr.on('data', data =>
+            console.error(`Lean Server: ${data}`)
+        );
+    }
+    return serverProcess
+}
+
 /** start Lean Server processes to refill the queue */
 function fillQueue() {
     while (queue.length < queueLength) {
-        const serverProcess = cp.spawn(cmd, cmdArgs, { cwd })
-        serverProcess.on('error', error =>
-            console.error(`Launching Lean Server failed: ${error}`)
-        );
-        if (serverProcess.stderr !== null) {
-            serverProcess.stderr.on('data', data =>
-                console.error(`Lean Server: ${data}`)
-            );
-        }
-
+        const serverProcess = startServerProcess()
         queue.push(serverProcess)
     }
 }
@@ -58,9 +62,13 @@ function fillQueue() {
 fillQueue()
 
 wss.addListener("connection", function(ws) {
-
-    const ps = queue.shift() // Pick the first Lean process; it's likely to be ready immediately
-    fillQueue()
+    let ps;
+    if (isDevelopment) { // Don't use queue in development
+        ps = startServerProcess()
+    } else {
+        ps = queue.shift() // Pick the first Lean process; it's likely to be ready immediately
+        fillQueue()
+    }
 
     const socket = {
         onMessage: (cb) => { ws.on("message", cb) },
