@@ -10,13 +10,20 @@ interface GameInfo {
   conclusion: null|string,
 }
 
+export interface ComputedInventoryItem {
+  name: string,
+  category: string,
+  disabled: boolean,
+  locked: boolean
+}
+
 interface LevelInfo {
   title: null|string,
   introduction: null|string,
   index: number,
-  tactics: {name: string, disabled: boolean, locked: boolean}[],
-  lemmas: {name: string, disabled: boolean, locked: boolean}[],
-  definitions: {name: string, disabled: boolean, locked: boolean}[],
+  tactics: ComputedInventoryItem[],
+  lemmas: ComputedInventoryItem[],
+  definitions: ComputedInventoryItem[],
   descrText: null|string,
   descrFormat: null|string,
 }

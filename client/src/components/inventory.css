@@ -36,3 +36,25 @@
 .inventory .item:not(.locked):not(.disabled) {
   cursor: pointer;
 }
+
+.tab-bar {
+  border-bottom: 0.1em solid var(--clr-dark-gray);
+  margin-bottom: 0.5em;
+}
+
+.tab {
+  color: var(--clr-darker-gray);
+  line-height: inherit;
+  text-decoration: none;
+  padding: 0.2rem .6em;
+  font-size: 1rem;
+  margin: 0 .1em;
+  border: 0;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.tab.active {
+  color: black;
+  border-bottom: 0.3em solid var(--clr-primary);
+}

@@ -30,7 +30,7 @@ structure GoalHintEntry where
 /-! ## Tactic/Definition/Lemma documentation -/
 
 inductive InventoryType := | Tactic | Lemma | Definition
-deriving ToJson, FromJson, Repr, BEq, Hashable
+deriving ToJson, FromJson, Repr, BEq, Hashable, Inhabited
 
 instance : ToString InventoryType := ⟨fun t => match t with
 | .Tactic => "Tactic"
@@ -44,7 +44,7 @@ structure InventoryDocEntry where
   userName : Name
   category : String
   content : String
-  deriving ToJson, Repr
+  deriving ToJson, Repr, Inhabited
 
 /-- Environment extension for inventory documentation. -/
 initialize inventoryDocExt : SimplePersistentEnvExtension InventoryDocEntry (Array InventoryDocEntry) ←
@@ -118,8 +118,9 @@ structure LevelId where
   level : Nat
 deriving Inhabited
 
-structure Availability where
+structure ComputedInventoryItem where
   name : Name
+  category : String
   locked : Bool
   disabled : Bool
 deriving ToJson, FromJson, Repr, Inhabited
@@ -132,7 +133,7 @@ structure InventoryInfo where
   -- only these inventory items are allowed in this level (ignored if empty):
   only : Array Name
   -- inventory items in this level (computed by `MakeGame`):
-  computed : Array Availability
+  computed : Array ComputedInventoryItem
 deriving ToJson, FromJson, Repr, Inhabited
 
 def getCurLevelId [MonadError m] : m LevelId := do

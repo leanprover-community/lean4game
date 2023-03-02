@@ -288,7 +288,7 @@ def GameLevel.getInventory (level : GameLevel) : InventoryType → InventoryInfo
 | .Definition => level.definitions
 | .Lemma => level.lemmas
 
-def GameLevel.setComputedInventory (level : GameLevel) : InventoryType → Array Availability → GameLevel
+def GameLevel.setComputedInventory (level : GameLevel) : InventoryType → Array ComputedInventoryItem → GameLevel
 | .Tactic, v =>     {level with tactics     := {level.tactics     with computed := v}}
 | .Definition, v => {level with definitions := {level.definitions with computed := v}}
 | .Lemma, v =>      {level with lemmas      := {level.lemmas      with computed := v}}
@@ -314,19 +314,28 @@ elab "MakeGame" : command => do
       newItemsInWorld := newItemsInWorld.insert worldId newItems
 
     -- Basic inventory item availability: all locked, none disabled.
-    let Availability₀ : HashMap Name Availability :=
+    let Availability₀ : HashMap Name ComputedInventoryItem :=
       HashMap.ofList $
-        allItems.toList.map fun name =>
-          (name, {name, locked := true, disabled := false})
+        ← allItems.toList.mapM fun name => do
+          return (name, {
+            name
+            category := (← getInventoryDoc? name inventoryType).get!.category
+            locked := true
+            disabled := false})
 
     -- Availability after a given world
-    let mut itemsInWorld : HashMap Name (HashMap Name Availability) := {}
+    let mut itemsInWorld : HashMap Name (HashMap Name ComputedInventoryItem) := {}
     for (worldId, _) in game.worlds.nodes.toArray do
       let mut items := Availability₀
       let predecessors := game.worlds.predecessors worldId
       for predWorldId in predecessors do
         for item in newItemsInWorld.find! predWorldId do
-          items := items.insert item {name := item, locked := false, disabled := false}
+          items := items.insert item {
+            name := item
+            category := (← getInventoryDoc? item inventoryType).get!.category
+            locked := false
+            disabled := false
+          }
       itemsInWorld := itemsInWorld.insert worldId items
 
     for (worldId, world) in game.worlds.nodes.toArray do
@@ -336,9 +345,11 @@ elab "MakeGame" : command => do
 
       for (levelId, level) in levels do
         for item in (level.getInventory inventoryType).new do
-          items := items.insert item {name := item, locked := false, disabled := false}
+          let category := (← getInventoryDoc? item inventoryType).get!.category
+          items := items.insert item {name := item, category, locked := false, disabled := false}
         for item in (level.getInventory inventoryType).disabled do
-          items := items.insert item {name := item, locked := false, disabled := true}
+          let category := (← getInventoryDoc? item inventoryType).get!.category
+          items := items.insert item {name := item, category, locked := false, disabled := true}
 
         let itemsArray := items.toArray
           |>.insertionSort (fun a b => a.1.toString < b.1.toString)

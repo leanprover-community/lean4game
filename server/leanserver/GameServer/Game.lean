@@ -42,9 +42,9 @@ Fields:
 structure LevelInfo where
   index : Nat
   title : String
-  tactics : Array Availability
-  lemmas : Array Availability
-  definitions : Array Availability
+  tactics : Array ComputedInventoryItem
+  lemmas : Array ComputedInventoryItem
+  definitions : Array ComputedInventoryItem
   introduction : String
   descrText : String := ""
   descrFormat : String := ""
@@ -58,9 +58,9 @@ structure LoadLevelParams where
 structure DidOpenLevelParams where
   uri : String
   levelModule : Name
-  tactics : Array Availability
-  lemmas : Array Availability
-  definitions : Array Availability
+  tactics : Array ComputedInventoryItem
+  lemmas : Array ComputedInventoryItem
+  definitions : Array ComputedInventoryItem
   deriving ToJson, FromJson
 
 structure Doc where

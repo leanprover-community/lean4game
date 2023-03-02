@@ -4,45 +4,64 @@ import './inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import Markdown from './Markdown';
-import { useLoadDocQuery } from '../state/api';
+import { useLoadDocQuery, ComputedInventoryItem } from '../state/api';
 
 function Inventory({ tactics, lemmas, definitions } :
-  {lemmas: {name: string, locked: boolean, disabled: boolean}[],
-  tactics: {name: string, locked: boolean, disabled: boolean}[],
-  definitions: {name: string, locked: boolean, disabled: boolean}[]}) {
+  {lemmas: ComputedInventoryItem[],
+  tactics: ComputedInventoryItem[],
+  definitions: ComputedInventoryItem[]}) {
 
   const [docName, setDocName] = useState(null)
   const [docType, setDocType] = useState(null)
 
+  function openDoc(name, type) {
+    setDocName(name)
+    setDocType(type)
+  }
 
   return (
     <div className="inventory">
+    {/* TODO: Click on Tactic: show info
+      TODO: click on paste icon -> paste into command line */}
       <h2>Tactics</h2>
-      <div className="inventory-list">
-        { tactics.map(tac =>
-           <InventoryItem key={tac.name} showDoc={() => {setDocName(tac.name); setDocType("Tactic")}}
-             name={tac.name} locked={tac.locked} disabled={tac.disabled} />) }
-      {/* TODO: Click on Tactic: show info
-        TODO: click on paste icon -> paste into command line */}
-      </div>
+      <InventoryList items={tactics} docType="Tactic" openDoc={openDoc} />
 
       <h2>Definitions</h2>
-      <div className="inventory-list">
-        { definitions.map(def =>
-            <InventoryItem key={def.name} showDoc={() => {setDocName(def.name); setDocType("Definition")}}
-              name={def.name} locked={def.locked} disabled={def.disabled} />) }
-      </div>
+      <InventoryList items={definitions} docType="Definition" openDoc={openDoc} />
 
       <h2>Lemmas</h2>
-      <div className="inventory-list">
-        { lemmas.map(lem =>
-            <InventoryItem key={lem.name} showDoc={() => {setDocName(lem.name); setDocType("Lemma")}}
-              name={lem.name} locked={lem.locked} disabled={lem.disabled} />) }
-      </div>
+      <InventoryList items={lemmas} docType="Lemma" openDoc={openDoc} />
 
       {docName && <Documentation name={docName} type={docType} />}
     </div>
   )
+}
+
+function InventoryList({items, docType, openDoc} : {items: ComputedInventoryItem[], docType: string, openDoc(name: string, type: string): void}) {
+
+  const categorySet = new Set<string>()
+  for (let item of items) {
+    categorySet.add(item.category)
+  }
+  const categories = Array.from(categorySet).sort()
+
+  const [tab, setTab] = useState(categories[0]);
+
+  return <>
+    {categories.length > 1 &&
+      <div className="tab-bar">
+        {categories.map((cat) =>
+          <div className={`tab ${cat == tab ? "active": ""}`} onClick={() => { setTab(cat) }}>{cat}</div>)}
+      </div>}
+    <div className="inventory-list">
+    { items.map(item => {
+        if (tab == item.category) {
+          return <InventoryItem key={item.name} showDoc={() => {openDoc(item.name, docType)}}
+            name={item.name} locked={item.locked} disabled={item.disabled} />
+        }
+      }) }
+    </div>
+    </>
 }
 
 function InventoryItem({name, locked, disabled, showDoc}) {
