@@ -92,7 +92,7 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (levelParams :
         let some (.thmInfo ..) := (← getEnv).find? n
           | return () -- not a theroem -> ignore
         let lemmasAndDefs := levelParams.lemmas ++ levelParams.definitions
-        match lemmasAndDefs.find? (fun l => l.name.toString == n) with
+        match lemmasAndDefs.find? (fun l => l.name == n) with
         | none => addErrorMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
         | some lem =>
           if lem.locked then
