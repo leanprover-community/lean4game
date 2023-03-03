@@ -33,7 +33,7 @@ $\\sum_{i = 0}^n (2n + 1) = n ^ 2$."
 
 HiddenHint (n : ℕ) : (∑ i : Fin n, (2 * (i : ℕ) + 1)) = n ^ 2 =>
 "
-Fange wieder mit `induction n` an.
+Fange wieder mit `induction {n}` an.
 "
 
 HiddenHint : ∑ i : Fin Nat.zero, ((2 : ℕ) * i + 1) = Nat.zero ^ 2 =>
@@ -49,7 +49,7 @@ Den Induktionsschritt startest du mit `rw [Fin.sum_univ_castSucc]`.
 HiddenHint (n : ℕ) (hn : ∑ i : Fin n, (2 * (i : ℕ) + 1) = n ^ 2) :
   ∑ x : Fin n, (2 * (x : ℕ) + 1) + (2 * n + 1) = Nat.succ n ^ 2 =>
 "
-Hier kommt die Induktionshypothese ins Spiel.
+Hier kommt die Induktionshypothese {hn} ins Spiel.
 "
 
 HiddenHint (n : ℕ) : n ^ 2 + (2 * n + 1) = Nat.succ n ^ 2 =>
