@@ -43,7 +43,7 @@ $$
     ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) := by
   tauto
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop): ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) =>
+Hint (A B C : Prop): ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) =>
 "Man schreibt eine Taktik pro Zeile, also gib `tauto` ein und geh mit Enter ⏎ auf eine neue Zeile."
 
 Conclusion ""

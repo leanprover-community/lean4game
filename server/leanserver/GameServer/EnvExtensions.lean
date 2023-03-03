@@ -14,15 +14,14 @@ open Lean
 
 /--
 A hint to help the user with a specific goal state
-
-Fields
-  (TODO)
-  hidden: If true, then hint should be hidden by default
 -/
 structure GoalHintEntry where
   goal : Expr
+  /-- Number of variables to intro in the beginning of goal -/
   intros : Nat
-  text : String
+  /-- Text of the hint as an expression of type `Array Expr → MessageData` -/
+  text : Expr
+  /--  If true, then hint should be hidden by default -/
   hidden : Bool := false
   deriving Repr
 

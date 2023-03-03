@@ -47,6 +47,14 @@ def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool :=
     if ¬ found then return false
   return true
 
+unsafe def evalHintMessageUnsafe : Expr → MetaM (Array Expr → MessageData) :=
+  evalExpr (Array Expr → MessageData)
+    (.forallE default (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr))
+      (mkConst ``MessageData) .default)
+
+@[implemented_by evalHintMessageUnsafe]
+def evalHintMessage : Expr → MetaM (Array Expr → MessageData) := fun _ => pure (fun _ => "")
+
 open Meta in
 /-- Find all hints whose trigger matches the current goal -/
 def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array GameHint) := do
@@ -61,7 +69,10 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array
         let lctx ← getLCtx -- Local context of the `goal`
         if ← matchDecls declMvars lctx.getFVars
         then
-          return some { text := hint.text, hidden := hint.hidden }
+          let text := (← evalHintMessage hint.text) declMvars
+          let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
+          let text ← (MessageData.withContext ctx text).toString
+          return some { text := text, hidden := hint.hidden }
         else return none
       else return none
     return hints

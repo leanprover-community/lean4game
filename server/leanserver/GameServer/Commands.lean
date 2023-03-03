@@ -132,53 +132,49 @@ end metadata
 
 open Lean Meta Elab Command Term
 
-declare_syntax_cat mydecl
-syntax "(" ident ":" term ")" : mydecl
-
-def getIdent : TSyntax `mydecl → Ident
-| `(mydecl| ($n:ident : $_t:term)) => n
-| _ => default
-
-def getType : TSyntax `mydecl → Term
-| `(mydecl| ($_n:ident : $t:term)) => t
-| _ => default
-
 /-- From a term `s` and a list of pairs `(i, t) ; Ident × Term`, create the syntax
 where `s` is preceded with universal quantifiers `∀ i : t`. -/
 def mkGoalSyntax (s : Term) : List (Ident × Term) → MacroM Term
 | (n, t)::tail => do return (← `(∀ $n : $t, $(← mkGoalSyntax s tail)))
 | [] => return s
 
-/-- Declare a hint. This version doesn't prevent the unused linter variable from running. -/
-local elab "Hint'" decls:mydecl* ":" goal:term "=>" msg:str : command => do
-  let g ← liftMacroM $ mkGoalSyntax goal (decls.map (λ decl => (getIdent decl, getType decl))).toList
-  let g ← liftTermElabM do (return ← elabTermAndSynthesize g none)
+def elabHint (hidden : Bool) (binders : TSyntaxArray `Lean.Parser.Term.bracketedBinder)
+  (goal : TSyntax `term) (msg : TSyntax `interpolatedStrKind) :=
+liftTermElabM do withOptions (fun options => options.setBool `linter.unusedVariables false) do
+  let (g, decls) ← elabBinders binders fun xs => do
+    let g ← mkForallFVars xs $ ← elabTermAndSynthesize goal none
+    return (g, ← xs.mapM (fun x => x.fvarId!.getDecl))
+  let varsName := `vars
+  let msg ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
+    let mut msg ← `(m! $msg)
+    for i in [:decls.size] do
+      msg ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $msg)
+    return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize msg none
   modifyCurLevel fun level => pure {level with hints := level.hints.push {
     goal := g,
     intros := decls.size,
-    text := msg.getString }}
+    hidden := hidden,
+    text := msg }}
+
+/-- Declare a hint. This version doesn't prevent the unused linter variable from running. -/
+local elab "Hint'" binders:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command =>
+  elabHint false binders goal msg
 
 /--
 Declare a hint. This version doesn't prevent the unused linter variable from running.
 A hidden hint is only displayed if explicitly requested by the user.
 -/
-local elab "HiddenHint'" decls:mydecl* ":" goal:term "=>" msg:str : command => do
-  let g ← liftMacroM $ mkGoalSyntax goal (decls.map (λ decl => (getIdent decl, getType decl))).toList
-  let g ← liftTermElabM do (return ← elabTermAndSynthesize g none)
-  modifyCurLevel fun level => pure {level with hints := level.hints.push {
-    goal := g,
-    intros := decls.size,
-    hidden := true,
-    text := msg.getString }}
-
+local elab "HiddenHint'" binders:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command => do
+  elabHint true binders goal msg
 
 /-- Declare a hint in reaction to a given tactic state in the current level. -/
-macro "Hint" decls:mydecl* ":" goal:term "=>" msg:str : command => do
+macro "Hint" decls:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command => do
   `(set_option linter.unusedVariables false in Hint' $decls* : $goal => $msg)
 
 /-- Declare a hidden hint in reaction to a given tactic state in the current level. -/
-macro "HiddenHint" decls:mydecl* ":" goal:term "=>" msg:str : command => do
+macro "HiddenHint" decls:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command => do
   `(set_option linter.unusedVariables false in HiddenHint' $decls* : $goal => $msg)
+
 
 /-! ## Inventory -/
 
