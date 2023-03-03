@@ -44,7 +44,7 @@ $$
 open BigOperators
 
 Statement
-"Zeige $\\sum_{i = 0}^n i^3 = (\\sum_{i = 0}^n i)^2$."
+"Zeige $\\sum_{i = 0}^m i^3 = (\\sum_{i = 0}^m i)^2$."
   (m : ℕ) : (∑ i : Fin (m + 1), (i : ℕ)^3) = (∑ i : Fin (m + 1), (i : ℕ))^2 := by
   induction' m with m hm
   simp
@@ -59,26 +59,35 @@ Statement
 
 NewLemmas arithmetic_sum add_pow_two
 
-HiddenHint (m : ℕ) : ∑ i : Fin (Nat.zero + 1), ↑i ^ 3 = (∑ i : Fin (Nat.zero + 1), ↑i) ^ 2 =>
+HiddenHint (m : ℕ) : ∑ i : Fin (m + 1), (i : ℕ) ^ 3 = (∑ i : Fin (m + 1), ↑i) ^ 2 =>
+"Führe auch hier einen Induktionsbeweis."
+
+HiddenHint : ∑ i : Fin (Nat.zero + 1), (i : ℕ) ^ 3 = (∑ i : Fin (Nat.zero + 1), ↑i) ^ 2 =>
 "`simp` kann den Induktionsanfang beweisen."
 
-Hint (m : ℕ) : ∑ i : Fin (Nat.succ m + 1), ↑i ^ 3 = (∑ i : Fin (Nat.succ m + 1), ↑i) ^ 2 =>
-"Im Induktionsschritt musst du versuchen, das Goal so umzuformen, dass du
-`∑ i : Fin (m + 1), ↑i ^ 3` (Induktionshypothese) oder
-`2 * (∑ i : Fin (m + 1), ↑i)` (arithmetische Summe) erhälst.
+Hint (m : ℕ) : ∑ i : Fin (Nat.succ m + 1), (i : ℕ) ^ 3 = (∑ i : Fin (Nat.succ m + 1), ↑i) ^ 2 =>
+"Im Induktionsschritt willst du das Goal so umformen, dass du folgende Therme
+ersetzen kannst:
 
+* `∑ i : Fin (m + 1), ↑i ^ 3` (Induktionshypothese)
+* `2 * (∑ i : Fin (m + 1), ↑i)` (arithmetische Summe)
+"
+
+HiddenHint (m : ℕ) : ∑ i :
+    Fin (Nat.succ m + 1), (i : ℕ) ^ 3 = (∑ i : Fin (Nat.succ m + 1), ↑i) ^ 2 =>
+"
 Als erstes kannst du mal mit dem bekannten `rw [Fin.sum_univ_castSucc]` anfangen.
 "
 
-HiddenHint (m : ℕ) : ∑ i : Fin (m + 1), ↑(Fin.castSucc.toEmbedding i) ^ 3 +
+HiddenHint (m : ℕ) : ∑ i : Fin (m + 1), (Fin.castSucc.toEmbedding i : ℕ) ^ 3 +
     ↑(Fin.last (m + 1)) ^ 3 = (∑ i : Fin (Nat.succ m + 1), ↑i) ^ 2 =>
 "Mit `simp` kriegst du das `↑(Fin.castSucc.toEmbedding i)` weg"
 
 Hint (m : ℕ) : ∑ x : Fin (m + 1), (x : ℕ) ^ 3 + (m + 1) ^ 3 =
     (∑ i : Fin (Nat.succ m + 1), ↑i) ^ 2 =>
-"Jetzt kannst du die Induktionshypothese mit `rw` einsetzen."
+"Jetzt kannst du die Induktionshypothese benützen."
 
-Hint (m : ℕ) : (∑ i : Fin (m + 1), ↑i) ^ 2 + (m + 1) ^ 3 = (∑ i : Fin (Nat.succ m + 1), ↑i) ^ 2 =>
+Hint (m : ℕ) : (∑ i : Fin (m + 1), (i : ℕ)) ^ 2 + (m + 1) ^ 3 = (∑ i : Fin (Nat.succ m + 1), ↑i) ^ 2 =>
 "Die linke Seite ist jetzt erst mal gut. Um auf der rechten Seite `Fin.sum_univ_castSucc`
 anzuwenden, haben wir ein Problem: Lean schreibt immer die erste Instanz um, also würde gerne
 auf der linken Seite `(∑ i : Fin (m + 1), ↑i) ^ 2` umschreiben.
@@ -94,11 +103,17 @@ rw [Fin.sum_univ_castSucc (n := m + 1)]
 
 HiddenHint (m : ℕ) : (∑ i : Fin (m + 1), ↑i) ^ 2 + (m + 1) ^ 3 =
     (∑ i : Fin (m + 1), ↑(Fin.castSucc.toEmbedding i) + ↑(Fin.last (m + 1))) ^ 2 =>
-"wieder `simp`"
+"Wenn du noch einen AUsdruck `↑(Fin.castSucc.toEmbedding i)` hast, solltest du mal
+`simp` aufrufen."
 
 Hint (m : ℕ) : (∑ i : Fin (m + 1), ↑i) ^ 2 + (m + 1) ^ 3 = (∑ i : Fin (m + 1), ↑i + (m + 1)) ^ 2 =>
 "Die rechte Seite hat die Form $(a + b)^2$ welche mit `add_pow_two` zu $a^2 + 2ab + b^2$
 umgeschrieben werden kann."
+
+HiddenHint (m : ℕ) : (∑ i : Fin (m + 1), ↑i) ^ 2 + (m + 1) ^ 3 =
+    (∑ i : Fin (m + 1), ↑i) ^ 2 + (2 * ∑ i : Fin (m + 1), ↑i) * (m + 1) + (m + 1) ^ 2 =>
+"Wenn du noch einen AUsdruck `↑(Fin.castSucc.toEmbedding i)` hast, solltest du mal
+`simp` aufrufen."
 
 Hint (m : ℕ) : (∑ i : Fin (m + 1), ↑i) ^ 2 + (m + 1) ^ 3 =
     (∑ i : Fin (m + 1), ↑i) ^ 2 + (2 * ∑ i : Fin (m + 1), ↑i) * (m + 1) + (m + 1) ^ 2 =>

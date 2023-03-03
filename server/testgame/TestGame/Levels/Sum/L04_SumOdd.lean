@@ -36,7 +36,7 @@ HiddenHint (n : ℕ) : (∑ i : Fin n, (2 * (i : ℕ) + 1)) = n ^ 2 =>
 Fange wieder mit `induction n` an.
 "
 
-HiddenHint (n : ℕ) : ∑ i : Fin Nat.zero, ((2 : ℕ) * i + 1) = Nat.zero ^ 2 =>
+HiddenHint : ∑ i : Fin Nat.zero, ((2 : ℕ) * i + 1) = Nat.zero ^ 2 =>
 "
 Den Induktionsanfang kannst du wieder mit `simp` beweisen.
 "
@@ -54,5 +54,5 @@ Hier kommt die Induktionshypothese ins Spiel.
 
 HiddenHint (n : ℕ) : n ^ 2 + (2 * n + 1) = Nat.succ n ^ 2 =>
 "
-Mit `rw [Fin.sum_univ_castSucc]` und `ring` kannst du hier abschliessen.
+Mit `rw [Nat.succ_eq_add_one]` und `ring` kannst du hier abschliessen.
 "
