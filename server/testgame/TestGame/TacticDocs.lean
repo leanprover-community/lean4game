@@ -243,6 +243,12 @@ TacticDoc «have»
 TODO
 "
 
+TacticDoc «let»
+"
+## Beschreibung
+
+TODO
+"
 
 TacticDoc induction_on
 "

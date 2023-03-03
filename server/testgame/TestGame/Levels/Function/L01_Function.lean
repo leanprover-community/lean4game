@@ -27,3 +27,9 @@ Statement
     : ∃ f : ℕ → ℤ, ∀ x, f x < x := by
   use (fun x ↦ x - 1)
   simp
+
+Hint : ∃ f : ℕ → ℤ, ∀ x, f x < x =>
+"
+Benütze eine anonyme Funktion `use (fun n ↦ _)` wobei `_` durch einen Ausdruck ersetzt
+werden muss, so dass die Aussage erfüllt wird.
+"

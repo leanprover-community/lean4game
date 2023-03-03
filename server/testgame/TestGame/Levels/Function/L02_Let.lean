@@ -20,21 +20,26 @@ def f : ℚ → ℚ := fun x ↦ 1 / (1 + x^2)
 
 (die beiden Varianten sind äquivalent.)
 
-Um eine anonyme Funktion `fun x ↦ 1 / (1 + x^2)` innerhalb eines Beweis einem Namen
+Um eine anonyme Funktion `fun x ↦ 1 / (1 + x^2)` **innerhalb** eines Beweis einem Namen
 zuzuordnen, benützt man `let`:
 
 ```
 let f : ℕ → ℕ := fun (n : ℕ) ↦ n ^ 2
 ```
 
-Die Taktiken `let` und `have` sind fast gleich, mit einem wichtigen Unterschied. Mit
+`def` und `let` funktionieren also fast gleich wie `lemma`/`example`/`theorem` und `have` mit
+einem wichtigen Unterschied:
 
 ```
 have f : ℕ → ℕ := fun (n : ℕ) ↦ n ^ 2
+let f₂ : ℕ → ℕ := fun (n : ℕ) ↦ n ^ 2
 ```
 
-vergisst Lean sofort wie `f` konstruiert wurde, und weiss nur noch dass es eine Funktion
-`(f : ℕ → ℕ)` gibt. Mit `let` kann Lean jederzeit auf die Definition von `f` zugreifen.
+`have` vergisst sofort den \"Beweis\", das heisst, Lean weiss dann nur, dass es eine
+Funktion `(f : ℕ → ℕ)` gibt, aber nicht, wie diese definiert ist. `let` hingegen speichert
+die Definition der Funktion.
+
+Manchmal muss man Definitionen (von einem `def` oder `let` Statement) mit `unfold` einsetzen.
 "
 
 def f (x : ℤ) : ℤ := (x + 1) ^ 2
@@ -53,7 +58,19 @@ show that $f(x) = x^2 + 2x + 1$.
   unfold f
   ring
 
+NewTactics «let»
+OnlyTactics «let» intro unfold ring
+
+HiddenHint : ∀ x, f x = x ^ 2 + 2 * x + 1 =>
+"Fang zuerst wie immer mit `intro x` an."
+
 Hint (x : ℤ) : f x = x ^ 2 + 2 * x + 1 =>
-"If your function has been defined with a `def` then usually you need to use `unfold f` to
-help Lean replacing it with it's definition (alternatively `sim [f]`
-oder `rw [f]` funktionieren auch)."
+"
+Definitionen muss man anundzu manuell einsetzen um den Taktiken zu helfen.
+
+Das macht man mit `unfold f` (oder alternativ mit `rw [f]`).
+"
+
+HiddenHint (x : ℤ) : f x = x ^ 2 + 2 * x + 1 =>
+"
+Nachdem die Definition von `f` eingesetzt ist, übernimmt `ring` den Rest"

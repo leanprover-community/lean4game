@@ -8,17 +8,30 @@ Title "Annahmen"
 
 Introduction
 "
-Um Aussagen zu formulieren brauchen wir *Annahmen* (Assumptions). Das sind
-zum einen Objekte, wie \"sei $n$ eine
-natürliche Zahl\", und Annahmen über diese Objekte, von denen wir wissen, dass sie wahr sind.
-Zum Beispiel
-\"und angenommen, dass $n$ strikt grösser als $1$ ist\".
+Um spannendere Aussagen zu formulieren brauchen wir Objekte und Annahmen über diese
+Objekte.
 
-In Lean schreibt man beides mit dem gleichen Syntax: `(n : ℕ) (h : 1 < n)` definiert
-zuerst eine natürliche Zahl $n$ und eine Annahme dass $1 < n$ gilt
-(welche den Namen `h` kriegt).
+Hier zum Beispiel haben wir eine natürliche Zahl $n$ und eine Annahme $1 < n$, die
+wir $h$ nennen.
 
 Wenn das Goal genau einer Annahme entspricht, kann man diese mit `assumption` beweisen.
+
+
+**Note:**
+Wenn du den \"Editor mode\" umstellst, kannst du sehen, wie die Aufgabe in vollständigem
+Lean-Code geschrieben wird. Hier sieht das wie folgt aus:
+
+```
+example (n : ℕ) (h : 1 < n) : 1 < n := by
+  sorry
+```
+
+Also
+
+```
+example [Objekte/Annahmen] : [Aussage] := by
+  [Beweis]
+```
 "
 
 Statement
