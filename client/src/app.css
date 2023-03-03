@@ -66,6 +66,10 @@ code {
   background: white;
 }
 
+em {
+  font-style: italic;
+}
+
 /* App Bar */
 
 #root {

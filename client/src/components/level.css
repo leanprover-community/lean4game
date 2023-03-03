@@ -65,10 +65,10 @@
 }
 
 .input-mode-switch {
-  margin: .5em 0;
-  float: right;
+  margin: 0;
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   gap: 1em;
 }
 
