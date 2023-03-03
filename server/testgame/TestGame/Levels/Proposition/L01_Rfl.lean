@@ -11,7 +11,7 @@ Introduction
 Jetzt gehen wir aber einen Schritt zurück und lernen, wie man konkret mit Lean arbeitet,
 damit du verstehst, was `tauto` hinter der Kulisse macht.
 
-Deine erste Taktik ist `rfl` (für \"reflexivity\"), welche dazu da ist,
+Eine der grundlegendsten Taktiken ist `rfl` (für \"reflexivity\"), welche dazu da ist,
 ein Goal der Form $X = X$ zu schließen.
 "
 
@@ -23,7 +23,7 @@ Statement
 -- "Die Taktik `rfl` beweist ein Goal der Form `X = X`."
 
 HiddenHint : 42 = 42 =>
-"Man schreibt eine Taktik pro Zeile, also gib `rfl` ein und geh mit Enter ⏎ auf eine neue Zeile."
+"Die beiden Seiten dieser Gleichung sind identisch, also gib `rfl` ein und drücke Enter ⏎"
 
 Conclusion "Bravo! PS: `rfl` steht für \"reflexivity\"."
 

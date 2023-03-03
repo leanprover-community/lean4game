@@ -22,7 +22,7 @@ Wenn das Goal genau einer Annahme entspricht, kann man diese mit `assumption` be
 "
 
 Statement
-"Angenommen $1 < n$. dann ist $1 < n$."
+"Angenommen $1 < n$. Dann ist $1 < n$."
     (n : ℕ) (h : 1 < n) : 1 < n := by
   assumption
 

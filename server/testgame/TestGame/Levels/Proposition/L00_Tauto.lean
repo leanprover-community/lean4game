@@ -12,18 +12,17 @@ Introduction
 Willkommen zum Lean-Crashkurs wo du lernst wie man mathematische Beweise vom Computer
 unterstützt und verifiziert schreiben kann.
 
-*Rechts* siehst den Status des Beweis. Unter **Main Goal** steht, was du im Moment am beweisen
-bist. Falls es mehrere Subgoals gibt, werden alle weiteren darunter unter **Further Goals**
+In der *mittleren Spalte* siehst den Status des Beweis. Unter **Main Goal** steht, was du im Moment
+beweisen musst. Falls es mehrere Dinge zu beweisen gibt, werden alle weiteren darunter unter **Further Goals**
 aufgelistet, diese musst du dann später auch noch zeigen.
 
 Ein Beweis besteht aus mehreren **Taktiken**. Das sind einzelne Beweisschritte, ähnlich wie
 man auf Papier argumentieren würde. Manche Taktiken können ganz konkret etwas kleines machen,
-andere sind stark und lösen ganze Probleme automatisiert. Du findest die Taktiken *Links* an der
-Seite.
+andere sind stark und lösen ganze Probleme automatisiert. Du findest die Taktiken in der *rechten Spalte*.
 
 Wenn der Beweis komplett ist, erscheint \"Level completed! 🎉\".
 
-Als erstes ein kleiner Preview, dass Lean auch vieles automatisch kann. So gibt es eine
+Als erste kleine Vorschau, dass Lean auch vieles automatisch kann, gibt es eine
 Taktik `tauto`, die alle wahren Aussagen der Prädikaten-Logik beweisen kann.
 
 Dieses Beispiel würde von Hand etwas Zeit in Anspruch nehmen. Lean ist da viel schneller.
@@ -44,7 +43,7 @@ $$
   tauto
 
 Hint (A B C : Prop): ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) =>
-"Man schreibt eine Taktik pro Zeile, also gib `tauto` ein und geh mit Enter ⏎ auf eine neue Zeile."
+"Gib `tauto` ein und drücke Enter ⏎."
 
 Conclusion ""
 
