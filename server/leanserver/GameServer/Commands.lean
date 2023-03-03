@@ -143,13 +143,17 @@ def elabHint (hidden : Bool) (binders : TSyntaxArray `Lean.Parser.Term.bracketed
 liftTermElabM do withOptions (fun options => options.setBool `linter.unusedVariables false) do
   let (g, decls) ← elabBinders binders fun xs => do
     let g ← mkForallFVars xs $ ← elabTermAndSynthesize goal none
-    return (g, ← xs.mapM (fun x => x.fvarId!.getDecl))
+    synthesizeSyntheticMVarsNoPostponing false
+    return (← instantiateMVars g, ← xs.mapM (fun x => x.fvarId!.getDecl))
   let varsName := `vars
   let msg ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
     let mut msg ← `(m! $msg)
     for i in [:decls.size] do
       msg ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $msg)
     return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize msg none
+
+  if g.hasMVar then throwError m!"Goal contains metavariables: {g}"
+
   modifyCurLevel fun level => pure {level with hints := level.hints.push {
     goal := g,
     intros := decls.size,
