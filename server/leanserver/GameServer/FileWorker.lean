@@ -65,8 +65,9 @@ section Elab
 -- TODO: use HashSet for allowed tactics?
 /-- Find all tactics in syntax object that are forbidden according to a
 set `allowed` of allowed tactics. -/
-partial def findForbiddenTactics (inputCtx : Parser.InputContext) (levelParams : Game.DidOpenLevelParams) (stx : Syntax)
-  : Elab.Command.CommandElabM Unit := do
+partial def findForbiddenTactics (inputCtx : Parser.InputContext)
+    (levelParams : Game.DidOpenLevelParams) (stx : Syntax) :
+    Elab.Command.CommandElabM Unit := do
   match stx with
   | .missing => return ()
   | .node info kind args =>
@@ -75,7 +76,8 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (levelParams :
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore "with" keyword
-    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ val != "with" ∧ val != "at" ^ val != "only" then
+    let allowed := ["with", "fun", "at", "only"]
+    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
       match levelParams.tactics.find? (fun t => t.name.toString == val) with
       | none => addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
