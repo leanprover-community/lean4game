@@ -75,7 +75,7 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (levelParams :
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore "with" keyword
-    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ val != "with" ∧ val != "at" then
+    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ val != "with" ∧ val != "at" ^ val != "only" then
       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
       match levelParams.tactics.find? (fun t => t.name.toString == val) with
       | none => addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
