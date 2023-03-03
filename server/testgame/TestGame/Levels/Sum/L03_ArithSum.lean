@@ -73,7 +73,7 @@ Hint (n : ℕ) (hn : 2 * ∑ i : Fin (n + 1), ↑i = n * (n + 1)) :
 Hint (n : ℕ) (hn : 2 * ∑ i : Fin (n + 1), ↑i = n * (n + 1)) :
   2 * (∑ x : Fin (n + 1), ↑x + (n + 1)) = Nat.succ n * (Nat.succ n + 1) =>
 "Um Die Induktionshypothese anzuwenden muss man noch
-$$2 \\cdot ((\\sum_{x=0}^n x) + (n + 1)) = 2 \\cdot \\sum_{x=0}^n x + 2 \\cdot (n + 1))$$
+$$2 \\cdot ((\\sum_\{x=0}^n x) + (n + 1)) = 2 \\cdot \\sum_\{x=0}^n x + 2 \\cdot (n + 1))$$
 umschreiben. Dazu kannst du `mul_add` benützen.
 "
 
