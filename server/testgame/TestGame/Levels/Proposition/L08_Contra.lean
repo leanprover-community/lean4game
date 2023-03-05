@@ -12,21 +12,21 @@ Title "Widerspruch"
 
 Introduction
 "
-Drittens kann die Taktik `contradiction` auch einen Widerspruch finden,
-wenn zwei Annahmen genaue Gegenteile voneinander sind.
-Also z.B. `(h : A)` und `(g : ¬ A)`.
-
-Da `≠` als `¬(· = ·)` gelesen wird, gilt dasselbe für Annahmen `(h : a = b)` und `(g : a ≠ b)`.
+Auftritt dritter Querulant.
 "
 
 Statement
-"Sei $n$ eine natürliche Zahl die sowohl gleich als auch ungleich `10` ist.
-Zeige, dass daraus $n = 42$ folgt. (oder, tatsächlich $n = x$ für jedes beliebige $x$)"
-    (n : ℕ) (h : n = 10) (g : (n ≠ 10)) : n = 42 := by
+  (n : ℕ) (h : n = 10) (g : (n ≠ 10)) : n = 42 := by
   contradiction
+
+Hint
+"
+**Du** Wieder ein Widerspruch in den Annahmen?
+"
 
 Conclusion
 "
+**Robo** Gut gemacht.  Bei dieser Frage ist auch ein bisschen offensichtlicher, worin der Widerspruch besteht:  Die Annahme `n ≠ 10` ist genau die Negation von `n = 10`.   Man muss `≠` immer als `¬(· = ·)` lesen.
 "
 
 NewTactics contradiction

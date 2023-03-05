@@ -10,11 +10,7 @@ Title "Widerspruch beweist alles."
 
 Introduction
 "
-Die Aussage `False` ist für uns wichtiger als `True`, da ein Beweis der falschen Aussage
-`False` einen Widerspruch repräsentiert.
-Hat man einen Widerspruch, kann man daraus mit der Taktik `contradiction` alles beweisen.
-
-Der erste Widerspruch, den `contradiction` erkennt, ist ein Beweis von `False`.
+Als nächstes kommen drei Querulanten.  Der erste hat folgendes Problem:
 "
 
 Statement
@@ -23,9 +19,28 @@ Zeige, dass daraus $A$ folgt."
     (A : Prop) (h : False) : A := by
   contradiction
 
-HiddenHint (A : Prop) (h : False) : A =>
-"Wenn man einen Beweis von `False` hat, kann man mit `contradiction` das Goal beweisen,
-unabhängig davon, was das Goal ist."
+Hint
+"
+**Du** Wenn ich das jetzt richtig lese, ist `A` eine Aussage, und wir haben außerdem eine Annahme names `h`, die besagt … 
+
+**Robo** … die besagt, dass `False` gilt. 
+
+**Du** Ich dachte, `False` gilt nie?
+
+**Robo** Ja, genau.  Die Annahme ist `False`, also falsch.  Und aus einer falschen Annahme kann man bekanntlich alles beweisen!  Insbesondere die gesuchte Aussage `A`.
+
+**Du** Und wie erkläre ich das jetzt diesem Formalosophen?
+
+**Robo** Ich glaube, Du musst ihn darauf hinweisen, dass zwischen der allgemeingültigen Annahme `True` und seiner Annahme `False` ein Widerspruch besteht.  Probier mal `contradiction`.
+"
+
+Conlusion
+"Der erste Querulant ist offenbar zufrieden.
+
+**Du** War das jetzt ein Widerspruchsbeweis?
+
+**Robo** Nein, nein, ein Widerspruchsbeweis sieht anders aus.  Das Argument hier war:  wir haben eine `contradiction` in unserem Annahmen, also folgt jede beliebige Aussage.
+"
 
 NewTactics contradiction
 DisabledTactics tauto
