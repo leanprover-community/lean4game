@@ -66,7 +66,7 @@ HiddenHint : ∀ x, f x = x ^ 2 + 2 * x + 1 =>
 
 Hint (x : ℤ) : f x = x ^ 2 + 2 * x + 1 =>
 "
-Definitionen muss man anundzu manuell einsetzen um den Taktiken zu helfen.
+Definitionen muss man manchmal manuell einsetzen um den Taktiken zu helfen.
 
 Das macht man mit `unfold f` (oder alternativ mit `rw [f]`).
 "

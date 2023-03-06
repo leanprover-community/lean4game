@@ -129,3 +129,6 @@ LemmaDoc add_pow_two as add_pow_two in "Nat"
 
 LemmaDoc Finset.sum_comm as Finset.sum_comm in "Sum"
 ""
+
+LemmaDoc Function.comp_apply as Function.comp_apply in "Function"
+""
