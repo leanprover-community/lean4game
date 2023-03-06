@@ -12,10 +12,7 @@ Title "Oder"
 
 Introduction
 "
-Das logische ODER `A ∨ B` (`\\or`) funktioniert ein wenig anders als das UND.
-
-Wenn das Goal ein `∨` ist kann man mit den Taktiken `left` oder `right` entscheiden,
-welche Seite man beweisen möchte.
+Der nächste bitte …
 "
 
 Statement
@@ -24,11 +21,26 @@ Statement
   left
   assumption
 
-HiddenHint (A : Prop) (B : Prop) (hA : A) : A ∨ (¬ B) =>
-"Entscheide dich, `right` oder `left`?"
+Hint (A B : Prop) (hA : A) : A ∨ (¬ B) =>
+"
+**Du** Muss ich jetzt wieder das Beweisziel de-konstruieren?
+
+**Robo** Nein, viel einfacher.  Wenn Du eine Oder-Aussage beweisen sollst, musst Du Dich einfach entscheiden, ob Du die linke oder rechte Seite beweisen willst.
+
+**Du** Und wie erkläre ich meinem Formalosophen, welche Seite ich gern beweisen würde?  Ich will natürlich `A` beweisen!
+
+**Robo** Mit `left` bzw. `right'. Ist doch logisch, oder?
+"
 
 Hint (A : Prop) (B : Prop) (hA : A) : ¬ B =>
-"Sackgasse. Probier's nochmals."
+"
+**Robo** Wusst gar nicht, dass Du eine Links-Rechts-Schwäche hast.  Probier's nochmal.
+"
+
+Conclusion
+"
+Auch dieser Formalosoph zieht zufrieden von dannen.
+"
 
 NewTactics left right assumption
 DisabledTactics tauto

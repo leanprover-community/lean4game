@@ -8,24 +8,26 @@ Title "Aller Anfang ist... ein Einzeiler?"
 
 Introduction
 "
-Jetzt gehen wir aber einen Schritt zurück und lernen, wie man konkret mit Lean arbeitet,
-damit du verstehst, was `tauto` hinter der Kulisse macht.
+In der Zwischenzeit hat bereits sich eine lange Schlange Untertanen gebildet, die gern ihren Fragen stellen würden.  Logisinde winkt den ersten nach vorn.  Er räuspert sich.
 
-Eine der grundlegendsten Taktiken ist `rfl` (für \"reflexivity\"), welche dazu da ist,
-ein Goal der Form $X = X$ zu schließen.
+**Untertan** Warum ist $42 = 42$?
+
+Du schaust ihn fassungslos an.
+Er schreibt es Dir wieder auf.
 "
 
-Statement
-"Zeige $ 42 = 42 $." : 42 = 42 := by
+Statement "" :
+  42 = 42 := by
   rfl
 
--- Hint : 42 = 42 =>
--- "Die Taktik `rfl` beweist ein Goal der Form `X = X`."
+Hint : 42 = 42 => "
+**Robo** Ist doch klar.  Du musst ihn einfach daran erinnern, dass Gleichheit *reflexiv* ist.  Probier mal `rfl`.
+"
 
-HiddenHint : 42 = 42 =>
-"Die beiden Seiten dieser Gleichung sind identisch, also gib `rfl` ein und drücke Enter ⏎"
-
-Conclusion "Bravo! PS: `rfl` steht für \"reflexivity\"."
+Conclusion
+"
+**Untertan** Ah, richtig. Ja, Sie haben ja so recht.  Das vergesse ich immer.  Rfl, rfl, rfl …
+"
 
 NewTactics rfl
 DisabledTactics tauto

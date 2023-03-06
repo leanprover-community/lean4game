@@ -5,46 +5,61 @@ Game "TestGame"
 World "Proposition"
 Level 1
 
-Title "Atomatisierung"
+Title "Automatisierung"
 
 Introduction
 "
-Willkommen zum Lean-Crashkurs wo du lernst wie man mathematische Beweise vom Computer
-unterstützt und verifiziert schreiben kann.
+Durch eine unvorhergesehene und nicht-kanonische Singularität in der Raumzeit
+bist Du ausversehen in ein Paralleluniversum gestolpert. Wie es aussieht, gibt es kein zurück.
+Richte Dich besser darauf ein, hier bleiben und Dich zurechtzufinden zu müssen.
 
-In der *mittleren Spalte* siehst den Status des Beweis. Unter **Main Goal** steht, was du im Moment
-beweisen musst. Falls es mehrere Dinge zu beweisen gibt, werden alle weiteren darunter unter **Further Goals**
-aufgelistet, diese musst du dann später auch noch zeigen.
+Wie es aussieht, gibt es hier viele nette kleine Planeten. Alle bewohnbar, und bis zu
+sieben Sonnenuntergänge täglich inklusive. Nur werden sie allesamt von Formalosophen bewohnt,
+seltsamen Wesen mit ausgefallenen mathematischen Obsessionen. Und dummerweise hat sich
+herumgesprochen, dass Du in Deinem früheren Universum Mathematiker warst. Du wirst hier
+keine Ruhe finden, solange Du nicht lernst, ihren unablässigen Wissensdurst zu stillen.
 
-Ein Beweis besteht aus mehreren **Taktiken**. Das sind einzelne Beweisschritte, ähnlich wie
-man auf Papier argumentieren würde. Manche Taktiken können ganz konkret etwas kleines machen,
-andere sind stark und lösen ganze Probleme automatisiert. Du findest die Taktiken in der *rechten Spalte*.
+Es gibt nur zwei Schwierigkeiten: Erstens haben die Formalosophen allem Anschein nach
+überhaupt kein tieferes mathematisches Verständnis, und zweitens kommunizieren Sie über Mathematik
+exklusiv in einem Dir fremden Dialekt, den sie Leanish [liːnɪʃ] nennen.
 
-Wenn der Beweis komplett ist, erscheint \"Level completed! 🎉\".
+Zum Glück hat Robo mit Dir das Universum gewechselt.
+Robo, das ist Dein kleiner SmartElf. Robo ist war auch nicht die mathematische Leuchte, die Du Dir in dieser Situation gewünscht hättest, aber es scheint, er hat irgendwo Leanish gelernt.  Und das ist Gold wert.
 
-Als erste kleine Vorschau, dass Lean auch vieles automatisch kann, gibt es eine
-Taktik `tauto`, die alle wahren Aussagen der Prädikaten-Logik beweisen kann.
+----
 
-Dieses Beispiel würde von Hand etwas Zeit in Anspruch nehmen. Lean ist da viel schneller.
+Gerade seid Ihr auf Königin Logisindes Planeten. Sie kommt ohne Umschweife zum Punkt:
 
-Gib also `tauto` gefolgt von Enter ⏎ ein um deinen ersten automatisierten Beweis zu führen!
+**Logisinde**  Werte Wesen aus fremden Welten, gestatten Sie eine Frage.  Warum gilt …
+
+Und er kritzelt etwas auf ein Stück Papier:  oben ein paar Annahmen, unten eine Schlussfolgerung.
+Dazwischen sollst Du offenbar einen Beweis eintragen.
+Du siehst Robo hilflos an.
 "
 
-Statement
-"Zeige dass folgende Aussage wahr ist:
-
-$$
-  \\neg ((\\neg B\\textrm{ oder }\\neg C) \\textrm{ oder } (A \\Rightarrow B)) \\Rightarrow
-  (\\neg A \\textrm{ oder } B) \\textrm{ und } \\neg (B \\textrm{ und } C)
-$$
-"
+Statement ""
     (A B C : Prop) :
     ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) := by
   tauto
 
-Hint (A B C : Prop): ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) =>
-"Gib `tauto` ein und drücke Enter ⏎."
+Hint  (A B C : Prop) :
+    ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) =>
+ "**Robo**  Das ist ganz einfach.  Mit `A B C : Prop` meint er:  `A`, `B` und `C` sind irgendwelche Aussagen (*propositions*).  Und mit `→` meint er ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
 
-Conclusion ""
+**Du** Ehhm, ja.  Aber da muss ich jetzt trotzdem erst einmal überlegen.
+
+**Robo** (flüsternd) Behaupte doch einfach, dass sei eine Tautologie.
+
+**Du** Ernsthaft?
+
+**Robo** Ja.  Schreib einfach `tauto`.
+
+**Robo** Mach schon …
+"
+
+Conclusion
+"
+**Logisinde** (etwas konsterniert)  Ja, das ist streng genommen richtig.  Aber glaubt bloß nicht, dass Ihr damit auf *diesem* Planeten viel weiterkommt!  Meine Untertanen verstehen `tauto` nicht.  Da müsst Ihr Euch schon etwas mehr anstrengen.
+"
 
 NewTactics tauto

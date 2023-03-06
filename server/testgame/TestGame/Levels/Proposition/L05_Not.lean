@@ -8,18 +8,29 @@ Title "Not"
 
 Introduction
 "
-Wenn eine Aussage `(A : Prop)` wahr oder falsch ist, dann ist die Umkehrung \"nicht $A$\",
-geschrieben `¬A` (`\\not`), gegenteilig falsch oder wahr.
-
-Da die Aussage `False` nie wahr ist, ist die Aussage `¬False` immer wahr, genau wie `True`.
+Der Schelm hat noch eine Schwester dabei.
 "
 
-Statement
-"Zeige dass die Aussage `¬False` immer wahr ist." :
-    ¬False := by
+Statement "" :
+  ¬False := by
   trivial
 
-Conclusion ""
+Hint : ¬False => "
+  **Robo** Dieses Zeichen `¬` bedeutet Negation. Also wenn eine Aussage `(A : Prop)` wahr ist, dann ist  `¬A` falsch, und umgekehrt.
+
+  **Du** Und `False` ist wahrscheinlich die Aussage, die immer falsch ist?
+
+  **Robo** Ja, richtig.
+
+  **Du** Ist das jetzt nicht doch wieder trivial?
+
+  **Robo** Probier mal!
+"
+
+Conclusion
+"
+Die Schwester lacht und eilt ihrem Bruder hinterher.
+"
 
 NewTactics trivial
 DisabledTactics tauto

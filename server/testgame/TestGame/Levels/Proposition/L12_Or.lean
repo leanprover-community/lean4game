@@ -15,19 +15,7 @@ Title "Oder"
 
 Introduction
 "
-Wenn man hingegen ein ODER `(h : A ∨ B)` in den Annahmen hat, kann man dieses
-ähnlich wie beim UND mit `rcases h` aufteilen.
-
-**Wichtig:** der Syntax dafür ist `rcases h with h | h`. Das \"`h | h`\" bedeutet, dass
-wir in beiden Fälle (linke oder rechte Seite wahr) diese Seite wieder `h` nennen wollen.
-
-Der Unterschied ist, dass man beim UND eine Annahme in zwei Einzelteile zerlegt (mit `⟨h₁, h₂⟩`).
-Beim ODER hingegen, kriegt man stattdessen zwei *Goals*, nämlich eines wo man annimmt,
-die linke Seite sei wahr und eines wo man annimmt, rechts sei wahr.
-
-*Notiz:* UND hat stärkere Bindung als ODER, und beide binden rechts, d.h.
-`A ∨ B ∧ C` wird als `A ∨ (B ∧ C)` gelesen. Zudem binden beide nach rechts,
-also `A ∨ B ∨ C` ist `A ∨ (B ∨ C)`.
+Der nächste bitte …
 "
 
 Statement
@@ -38,11 +26,78 @@ Statement
   rcases h with ⟨h₁, h₂⟩
   assumption
 
-HiddenHint (A : Prop) (B : Prop) (h : A ∨ (A ∧ B)) : A =>
-"Als erstes kannst du das ODER in den Annahmen mit `rcases h with h | h` zerlegen."
+Hint (A B : Prop) (h : A ∨ (A ∧ B)) : A =>
+"
+**Du** Ja klar, erst ein Und im Ziel, dann ein Und in der Annahme, dann ein Oder im Ziel, und jetzt noch ein Oder in der Annahme.  Ich glaube den ganzen Circus hier langsam nicht mehr.  Die haben sich doch abgesprochen!
+
+**Robo** Lass ihnen doch ihren Spaß.  Wir sind ja gleich hier fertig, und können zu einem interessanteren Planeten weiterfliegen.
+
+**Du** Also, wieder `rcases …`?
+
+**Robo** Ja, aber diesmal nicht `rcases h with ⟨h₁, h₂⟩`, sondern `rcases h with h | h`.
+"
 
 Hint (A : Prop) (B : Prop) (h : A ∧ B) : A =>
-"Jetzt noch das UND in den Annahmen mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
+"
+**Robo** Jetzt musst Du Dein Ziel zweimal beweisen:  Einmal unter der Annahme `A`, und einmal unter der Annahme `A ∨ B`.
+"
+HiddenHint  (A : Prop) (B : Prop) (h : A ∧ B) : A =>
+"
+**Robo** Wie man mit einem Und in den Annahmen umgeht, weißt Du doch schon:  `rcases h with ⟨h₁, h₂⟩`.  Zur Erinnerung: Für die Klammern schreibst Du `\\<>`.
+"
+
+Conclusion
+"**Du**  Ok, das scheint ihn zufriedenzustellen.  One to go … Kannst Du mir vorher noch einmal kurz alles Leanish zusammenfassen, das Du mir bis hierher beigebracht hast?
+
+Robo straht überglücklich.  Noch *nie* warst Du so auf ihn angewiesen.
+
+**Robo** Na klar, schau her!
+
+## Notationen / Begriffe
+
+|               | Beschreibung                                                             |
+|:--------------|:-------------------------------------------------------------------------|
+| *Goal*        | Was aktuell zu beweisen ist.                                             |
+| *Annahme*     | Objekte & Resultate, die man zur Verfügung hat.                          |
+| *Taktik*      | Befehl im Beweis. Entspricht einem Beweisschritt.                        |
+| `ℕ`           | Typ aller natürlichen Zahlen.                                            |
+| `0, 1, 2, …`  | Explizite natürliche Zahlen.                                             |
+| `=`           | Gleichheit.                                                              |
+| `≠`           | Ungleichheit. Abkürzung für `¬(·=·)`.                                    |
+| `Prop`        | Typ aller logischen Aussagen.                                            |
+| `True`        | Die logische Aussage `(True : Prop)` ist bedingungslos wahr.             |
+| `False`       | Die logische Aussage `(False : Prop)` ist bedingungslos falsch.          |
+| `¬`           | Logische Negierung.                                                      |
+| `∧`           | Logisch UND.                                                             |
+| `∨`           | Logisch ODER.                                                            |
+| `(n : ℕ)`     | Eine natürliche Zahl.                                                    |
+| `(A : Prop)`  | Eine logische Aussage.                                                   |
+| `(ha : A)`    | Ein Beweis, dass die logische Aussage `(A : Prop)` wahr ist.             |
+| `(h : A ∧ B)` | Eine Annahme, die den Namen `h` bekommen hat.                            |
+| `⟨·,·⟩`       | Schreibweise für Struktur mit mehreren Feldern (kommt später im Detail). |
+| `h.1, h.2, …` | Die einzelnen Felder der Stuktur. Auch `h.[Name des Feldes]`             |
+
+
+## Taktiken
+
+Die Worte, die Du aktiv gebrauchen musst, heißen zusammengefasst `Taktiken`.  Hier sind alle Taktiken, die wir auf diesem Planeten gebraucht haben:
+
+|    | Taktik                    | Beispiel                                          |
+|:---|:--------------------------|:--------------------------------------------------|
+| 1  | `rfl`                     | Beweist `A = A`.                                  |
+| 2  | `assumption`              | Sucht das Goal in den Annahmen.                   |
+| 3  | `contradiction`           | Sucht einen Widerspruch.                          |
+| 4  | `trivial`                 | Kombiniert die obigen drei Taktiken (und mehr).   |
+| 5  | `constructor`             | Teilt ein UND im Goal auf.                        |
+| 6  | `left`/`right`            | Beweist eine Seite eines ODER im Goal.            |
+| 7ᵃ | `rcases h with ⟨h₁, h₂⟩`  | Teilt ein UND in den Annahmen auf.                |
+| 7ᵇ | `rcases h with h \\| h`   | Teilt ein ODER in den Annahmen in zwei Fälle auf. |
+
+**Du** Woher weißt Du das eigentlich alles?
+
+**Robo** Keine Ahnung.  War, glaube ich, vorinstalliert.
+"
+
 
 NewTactics assumption rcases
 DisabledTactics tauto

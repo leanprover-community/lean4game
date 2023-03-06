@@ -8,42 +8,35 @@ Title "Annahmen"
 
 Introduction
 "
-Um spannendere Aussagen zu formulieren brauchen wir Objekte und Annahmen über diese
-Objekte.
-
-Hier zum Beispiel haben wir eine natürliche Zahl $n$ und eine Annahme $1 < n$, die
-wir $h$ nennen.
-
-Wenn das Goal genau einer Annahme entspricht, kann man diese mit `assumption` beweisen.
-
-
-**Note:**
-Wenn du den \"Editor mode\" umstellst, kannst du sehen, wie die Aufgabe in vollständigem
-Lean-Code geschrieben wird. Hier sieht das wie folgt aus:
-
-```
-example (n : ℕ) (h : 1 < n) : 1 < n := by
-  sorry
-```
-
-Also
-
-```
-example [Objekte/Annahmen] : [Aussage] := by
-  [Beweis]
-```
+Während der erste Untertan noch rfl, rfl, rfl murmelt, tritt schon der nächste nach vorne. Es ist schüchtern und schreibt bloß.
 "
 
-Statement
-"Angenommen $1 < n$. Dann ist $1 < n$."
-    (n : ℕ) (h : 1 < n) : 1 < n := by
+Statement ""
+    (n : ℕ) (h₁ : 10 > n) (h₂ : 1 < n) (h₃ : n ≠ 5) : 1 < n := by
   assumption
 
-HiddenHint (n : ℕ) (h : 1 < n) : 1 < n =>
-  "`assumption` sucht nach einer Annahme, die dem Goal entspricht."
+Hint (n : ℕ) (h₁ : 10 > n) (h₂ : 1 < n) (h₃ : n ≠ 5) : 1 < n => "
+**Robo** `n : ℕ` bedeutet, `n` ist eine natürliche Zahl.
 
+**Du** Warum schreibt er dann nicht `n ∈ ℕ`??
 
-Conclusion ""
+**Robo** Weil das hier alles komische Typen sind …  Ich kann Dir das später mal in Ruhe erklären.  Jetzt will ich erst einmal die Frage entschlüsseln.
+
+**Robo** Also, `h₁`, `h₂`, `h₃` sind einfach nur Namen für verschiedene Annahmen, und zwar für die Annahme `n < 10`, `1 < n` und `n ≠ 5`. Beweisen sollen wir:  `1 < n`.
+
+**Du** Aber das war doch gerade eine der Annahmen.
+
+**Robo** Ja, stimmt.
+
+**Du** ???
+
+**Robo** Du musst ihm das halt explizit sagen.  Probiers mal mit `assumption`.
+"
+
+Conclusion
+"
+**Untertan** Ja richtig! Wenn Ihr nur wüsstet, was ich mir an dieser Frage schon den Kopf zerbrochen habe!
+"
 
 NewTactics assumption
 DisabledTactics tauto
