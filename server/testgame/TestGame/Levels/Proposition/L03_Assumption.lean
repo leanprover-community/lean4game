@@ -12,7 +12,11 @@ Introduction
 Ein dritter Untertan kommt mit folgendem Problem.
 "
 
-Statement "
+Statement ""
+  (A : Prop) (hA : A) : A := by
+  assumption
+
+Hint (A : Prop) (hA : A) : A => "
 **Robo** Hier bedeutet `A : Prop` wieder, dass `A` irgendeine Aussage ist.
    Und `hA` ist eine Name für die Annahme, dass `A` wahr ist.
 
@@ -20,9 +24,6 @@ Statement "
 
 **Robo** Ja.  Da kommst Du jetzt selbst drauf, wie das geht, oder?
 "
-  (A : Prop) (hA : A) : A := by
-  assumption
-
 
 HiddenHint (A : Prop) (hA : A) : A =>
 "Ist doch genau wie eben:  die Aussage, die zu beweisen ist, gehört selbst zu den Annahmen. Also wird `asumption` auch wieder funktionieren."

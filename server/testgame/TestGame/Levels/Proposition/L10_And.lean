@@ -14,7 +14,12 @@ Introduction
 Langsam wird die Schlange kürzer. Die nächste Formalosophin hat folgendes Anliegen:
 "
 
-Statement "
+Statement ""
+  (A B C : Prop) (h : A ∧ (B ∧ C)) : B := by
+  rcases h with ⟨_, ⟨g , _⟩⟩
+  assumption
+
+Hint (A B C : Prop) (h : A ∧ (B ∧ C)) : B => "
 **Du**  Jetzt müssen wir wohl die Annahme de-konstruieren.
 
 **Robo** Ja, genau.  Das geht am einfachsten mit `rcases h with ⟨h₁, h₂⟩`.
@@ -24,9 +29,6 @@ Statement "
 **Robo** Die bleiden Klammern schreibst Du als `\\<` und `\\>`, oder gleichzeitig als `\\<>`.
          Und h₁ schreibst Du einfach als `h\\1`.  Aber Du kannst Dir auch einfach andere Namen für `h₁` und `h₂`, zum Beispiel `rcases h with ⟨hA, hBC⟩`
 "
-  (A B C : Prop) (h : A ∧ (B ∧ C)) : B := by
-  rcases h with ⟨_, ⟨g , _⟩⟩
-  assumption
 
 Hint  (A B C : Prop) (hA : A) (hAB : B ∧ C) : B =>
 "

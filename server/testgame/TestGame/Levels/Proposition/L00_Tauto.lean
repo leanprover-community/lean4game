@@ -37,7 +37,14 @@ Dazwischen sollst Du offenbar einen Beweis eintragen.
 Du siehst Robo hilflos an.
 "
 
-Statement "**Robo**  Das ist ganz einfach.  Mit `A B C : Prop` meint er:  `A`, `B` und `C` sind irgendwelche Aussagen (*propositions*).  Und mit `→` meint er ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
+Statement ""
+    (A B C : Prop) :
+    ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) := by
+  tauto
+
+Hint  (A B C : Prop) :
+    ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) =>
+ "**Robo**  Das ist ganz einfach.  Mit `A B C : Prop` meint er:  `A`, `B` und `C` sind irgendwelche Aussagen (*propositions*).  Und mit `→` meint er ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
 
 **Du** Ehhm, ja.  Aber da muss ich jetzt trotzdem erst einmal überlegen.
 
@@ -49,9 +56,6 @@ Statement "**Robo**  Das ist ganz einfach.  Mit `A B C : Prop` meint er:  `A`, `
 
 **Robo** Mach schon …
 "
-    (A B C : Prop) :
-    ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) := by
-  tauto
 
 Conclusion
 "
