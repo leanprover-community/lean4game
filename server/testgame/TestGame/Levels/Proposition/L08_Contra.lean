@@ -15,11 +15,11 @@ Introduction
 Auftritt dritter Querulant.
 "
 
-Statement
+Statement ""
   (n : ℕ) (h : n = 10) (g : (n ≠ 10)) : n = 42 := by
   contradiction
 
-Hint
+Hint (n : ℕ) (h : n = 10) (g : (n ≠ 10)) : n = 42 =>
 "
 **Du** Wieder ein Widerspruch in den Annahmen?
 "

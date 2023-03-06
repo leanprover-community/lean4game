@@ -17,7 +17,7 @@ Der letzte Untertan tritt vor.  Ihr Anliegen ist etwas komplizierter als die vor
 
 -- Note: The other direction would need arguing by cases.
 
-Statement
+Statement ""
   (A B C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) := by
   constructor
   rcases h with h | h
@@ -33,7 +33,7 @@ Statement
   right
   assumption
 
-Hint
+Hint (A B C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) =>
 "
 **Robo** Wirf einfach alles drauf, was Du gelernt hast.  Hier, ich bin sogar so nett und zeig Dir noch einmal die beiden vier wichtigsten Taktiken für diese Situation an.
 
@@ -72,9 +72,9 @@ HiddenHint (A : Prop) (B : Prop) : A ∨ B =>
 
 Conclusion
 "
-**Robo** Bravo!  Jetzt aber nichts wie weg hier, bevor sich eine neue Schlange bildet!  
+**Robo** Bravo!  Jetzt aber nichts wie weg hier, bevor sich eine neue Schlange bildet!
 
-Logisinde ist in der Zwischenzeit eingeschlafen, und ihr stehlt euch heimlich davon. 
+Logisinde ist in der Zwischenzeit eingeschlafen, und ihr stehlt euch heimlich davon.
 "
 
 NewTactics left right assumption constructor rcases rfl contradiction trivial

@@ -21,13 +21,13 @@ Statement
   left
   assumption
 
-Hint
-" 
-**Du** Muss ich jetzt wieder das Beweisziel de-konstruieren? 
+Hint (A B : Prop) (hA : A) : A ∨ (¬ B) =>
+"
+**Du** Muss ich jetzt wieder das Beweisziel de-konstruieren?
 
 **Robo** Nein, viel einfacher.  Wenn Du eine Oder-Aussage beweisen sollst, musst Du Dich einfach entscheiden, ob Du die linke oder rechte Seite beweisen willst.
 
-**Du** Und wie erkläre ich meinem Formalosophen, welche Seite ich gern beweisen würde?  Ich will natürlich `A` beweisen!  
+**Du** Und wie erkläre ich meinem Formalosophen, welche Seite ich gern beweisen würde?  Ich will natürlich `A` beweisen!
 
 **Robo** Mit `left` bzw. `right'. Ist doch logisch, oder?
 "

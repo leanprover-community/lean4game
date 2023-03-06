@@ -16,16 +16,13 @@ Du schaust ihn fassungslos an.
 Er schreibt es Dir wieder auf.
 "
 
-Statement
+Statement "
+**Robo** Ist doch klar.  Du musst ihn einfach daran erinnern, dass Gleichheit *reflexiv* ist.  Probier mal `rfl`.
+" :
   42 = 42 := by
   rfl
 
-Hint 
-"
-**Robo** Ist doch klar.  Du musst ihn einfach daran erinnern, dass Gleichheit *reflexiv* ist.  Probier mal `rfl`.
-"
-
-Conclusion 
+Conclusion
 "
 **Untertan** Ah, richtig. Ja, Sie haben ja so recht.  Das vergesse ich immer.  Rfl, rfl, rfl …
 "

@@ -8,23 +8,20 @@ Title "True/False"
 
 Introduction
 "
-Der nächste Untertan in der Reihe ist ein Schelm. 
+Der nächste Untertan in der Reihe ist ein Schelm.
 "
 
-Statement
-True := by
-  trivial
-
-Hint
-"
-**Robo**  Dieses `True` ist eine spezielle Aussage, nämlich die Aussage, die immer und bedingungslos wahr ist.  
+Statement "
+**Robo**  Dieses `True` ist eine spezielle Aussage, nämlich die Aussage, die immer und bedingungslos wahr ist.
 
 **Du** Und was genau ist dann zu beweisen?
 
 **Robo** Ich glaube, nichts. Ich glaube, Du kannst einfach `trivial` schreiben.
-"
+" :
+True := by
+  trivial
 
-Conclusion 
+Conclusion
 "
 **Schelm**  Wollte nur mal sehen, dass Ihr nicht auf den Kopf gefallen seid …
 

@@ -21,7 +21,7 @@ keine Ruhe finden, solange Du nicht lernst, ihren unablässigen Wissensdurst zu 
 
 Es gibt nur zwei Schwierigkeiten: Erstens haben die Formalosophen allem Anschein nach
 überhaupt kein tieferes mathematisches Verständnis, und zweitens kommunizieren Sie über Mathematik
-exklusiv in einem Dir fremden Dialekt, den sie Leanish [liːnɪʃ] nennen. 
+exklusiv in einem Dir fremden Dialekt, den sie Leanish [liːnɪʃ] nennen.
 
 Zum Glück hat Robo mit Dir das Universum gewechselt.
 Robo, das ist Dein kleiner SmartElf. Robo ist war auch nicht die mathematische Leuchte, die Du Dir in dieser Situation gewünscht hättest, aber es scheint, er hat irgendwo Leanish gelernt.  Und das ist Gold wert.
@@ -30,32 +30,28 @@ Robo, das ist Dein kleiner SmartElf. Robo ist war auch nicht die mathematische L
 
 Gerade seid Ihr auf Königin Logisindes Planeten. Sie kommt ohne Umschweife zum Punkt:
 
-**Logisinde**  Werte Wesen aus fremden Welten, gestatten Sie eine Frage.  Warum gilt …  
+**Logisinde**  Werte Wesen aus fremden Welten, gestatten Sie eine Frage.  Warum gilt …
 
-Und er kritzelt etwas auf ein Stück Papier:  oben ein paar Annahmen, unten eine Schlussfolgerung.  
-Dazwischen sollst Du offenbar einen Beweis eintragen.  
-Du siehst Robo hilflos an.  
+Und er kritzelt etwas auf ein Stück Papier:  oben ein paar Annahmen, unten eine Schlussfolgerung.
+Dazwischen sollst Du offenbar einen Beweis eintragen.
+Du siehst Robo hilflos an.
 "
 
-Statement
-    (A B C : Prop) :
-    ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) := by
-  tauto
-
-
-Hint
-"**Robo**  Das ist ganz einfach.  Mit `A B C : Prop` meint er:  `A`, `B` und `C` sind irgendwelche Aussagen (*propositions*).  Und mit `→` meint er ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?  
+Statement "**Robo**  Das ist ganz einfach.  Mit `A B C : Prop` meint er:  `A`, `B` und `C` sind irgendwelche Aussagen (*propositions*).  Und mit `→` meint er ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
 
 **Du** Ehhm, ja.  Aber da muss ich jetzt trotzdem erst einmal überlegen.
 
-**Robo** (flüsternd) Behaupte doch einfach, dass sei eine Tautologie.  
+**Robo** (flüsternd) Behaupte doch einfach, dass sei eine Tautologie.
 
-**Du** Ernsthaft? 
+**Du** Ernsthaft?
 
 **Robo** Ja.  Schreib einfach `tauto`.
 
 **Robo** Mach schon …
 "
+    (A B C : Prop) :
+    ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) := by
+  tauto
 
 Conclusion
 "

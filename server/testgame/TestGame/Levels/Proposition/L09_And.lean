@@ -18,7 +18,7 @@ Statement "" (A B : Prop) (hA : A) (hB : B) : A ∧ B := by
   assumption
   assumption
 
-Hint
+Hint (A B : Prop) (hA : A) (hB : B) : A ∧ B =>
 "
 **Du**:  Also, wir haben zwei Annahmen: `A` gilt, und `B` gilt.  Auch.  Und beweisen sollen wir … `A und B` gilt.  Ich glaube, diese Formalospinner treiben mich noch zur Verzweiflung.  Kann ich nicht wieder `trivial` sagen?
 
@@ -34,7 +34,7 @@ HiddenHint (A : Prop) (hA : A) : A =>
 **Robo**   Schau mal, das ist Zauberpapier.  Jetzt haben wir auf einmal zwei Beweisziele: `A` und `B`.  Ich glaube, Du weißt schon, wie man die jeweils erreicht.  Die Ziele stehen ja jeweils in den *Annahmen*.
 "
 
-Conclusion 
+Conclusion
 "
 **Robo** Super!
 

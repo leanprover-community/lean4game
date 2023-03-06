@@ -15,7 +15,7 @@ Title "Oder"
 
 Introduction
 "
-Der nächste bitte … 
+Der nächste bitte …
 "
 
 Statement
@@ -26,13 +26,13 @@ Statement
   rcases h with ⟨h₁, h₂⟩
   assumption
 
-Hint
+Hint (A B : Prop) (h : A ∨ (A ∧ B)) : A =>
 "
 **Du** Ja klar, erst ein Und im Ziel, dann ein Und in der Annahme, dann ein Oder im Ziel, und jetzt noch ein Oder in der Annahme.  Ich glaube den ganzen Circus hier langsam nicht mehr.  Die haben sich doch abgesprochen!
 
 **Robo** Lass ihnen doch ihren Spaß.  Wir sind ja gleich hier fertig, und können zu einem interessanteren Planeten weiterfliegen.
 
-**Du** Also, wieder `rcases …`? 
+**Du** Also, wieder `rcases …`?
 
 **Robo** Ja, aber diesmal nicht `rcases h with ⟨h₁, h₂⟩`, sondern `rcases h with h | h`.
 "
@@ -42,14 +42,14 @@ Hint (A : Prop) (B : Prop) (h : A ∧ B) : A =>
 **Robo** Jetzt musst Du Dein Ziel zweimal beweisen:  Einmal unter der Annahme `A`, und einmal unter der Annahme `A ∨ B`.
 "
 HiddenHint  (A : Prop) (B : Prop) (h : A ∧ B) : A =>
-" 
+"
 **Robo** Wie man mit einem Und in den Annahmen umgeht, weißt Du doch schon:  `rcases h with ⟨h₁, h₂⟩`.  Zur Erinnerung: Für die Klammern schreibst Du `\\<>`.
 "
 
 Conclusion
 "**Du**  Ok, das scheint ihn zufriedenzustellen.  One to go … Kannst Du mir vorher noch einmal kurz alles Leanish zusammenfassen, das Du mir bis hierher beigebracht hast?
 
-Robo straht überglücklich.  Noch *nie* warst Du so auf ihn angewiesen.  
+Robo straht überglücklich.  Noch *nie* warst Du so auf ihn angewiesen.
 
 **Robo** Na klar, schau her!
 

@@ -19,11 +19,11 @@ Zeige, dass daraus $A$ folgt."
     (A : Prop) (h : False) : A := by
   contradiction
 
-Hint
+Hint (A : Prop) (h : False) : A =>
 "
-**Du** Wenn ich das jetzt richtig lese, ist `A` eine Aussage, und wir haben außerdem eine Annahme names `h`, die besagt … 
+**Du** Wenn ich das jetzt richtig lese, ist `A` eine Aussage, und wir haben außerdem eine Annahme names `h`, die besagt …
 
-**Robo** … die besagt, dass `False` gilt. 
+**Robo** … die besagt, dass `False` gilt.
 
 **Du** Ich dachte, `False` gilt nie?
 
@@ -34,7 +34,7 @@ Hint
 **Robo** Ich glaube, Du musst ihn darauf hinweisen, dass zwischen der allgemeingültigen Annahme `True` und seiner Annahme `False` ein Widerspruch besteht.  Probier mal `contradiction`.
 "
 
-Conlusion
+Conclusion
 "Der erste Querulant ist offenbar zufrieden.
 
 **Du** War das jetzt ein Widerspruchsbeweis?
