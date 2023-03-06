@@ -13,6 +13,13 @@ Title "Zusammenfassung"
 Introduction
 "
 Der letzte Untertan tritt vor.  Ihr Anliegen ist etwas komplizierter als die vorherigen.
+
+**Robo** Wirf einfach alles drauf, was Du gelernt hast.  Hier, ich bin sogar so nett und zeig Dir noch einmal die vier wichtigsten Taktiken für diese Situation an.
+
+| (Übersicht) | Und (`∧`)                | Oder (`∨`)              |
+|-------------|:-------------------------|:------------------------|
+| Annahme     | `rcases h with ⟨h₁, h₂⟩` | `rcases h with h \\| h` |
+| Goal        | `constructor`            | `left`/`right`          |
 "
 
 -- Note: The other direction would need arguing by cases.
@@ -32,16 +39,6 @@ Statement ""
   rcases h with ⟨h₁, h₂⟩
   right
   assumption
-
-Hint (A B C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) =>
-"
-**Robo** Wirf einfach alles drauf, was Du gelernt hast.  Hier, ich bin sogar so nett und zeig Dir noch einmal die beiden vier wichtigsten Taktiken für diese Situation an.
-
-| (Übersicht) | Und (`∧`)                | Oder (`∨`)              |
-|-------------|:-------------------------|:------------------------|
-| Annahme     | `rcases h with ⟨h₁, h₂⟩` | `rcases h with h \\| h` |
-| Goal        | `constructor`            | `left`/`right`          |
-"
 
 HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) ∧ (A ∨ C) =>
 "**Robo** Das `∧` in der Annahme kannst Du mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
