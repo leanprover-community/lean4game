@@ -20,6 +20,7 @@ export interface ComputedInventoryItem {
 interface LevelInfo {
   title: null|string,
   introduction: null|string,
+  conclusion: null|string,
   index: number,
   tactics: ComputedInventoryItem[],
   lemmas: ComputedInventoryItem[],

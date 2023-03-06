@@ -46,6 +46,7 @@ structure LevelInfo where
   lemmas : Array ComputedInventoryItem
   definitions : Array ComputedInventoryItem
   introduction : String
+  conclusion : String
   descrText : String := ""
   descrFormat : String := ""
 deriving ToJson, FromJson
@@ -125,7 +126,8 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             definitions := lvl.definitions.computed,
             descrText := lvl.descrText,
             descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
-            introduction := lvl.introduction }
+            introduction := lvl.introduction
+            conclusion := lvl.conclusion }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson levelInfo⟩
       return true
     | Message.request id "loadDoc" params =>

@@ -43,6 +43,10 @@
   padding: 1em;
 }
 
+.conclusion {
+  padding: 1em;
+}
+
 .exercise {
   flex: 1 1 auto;
   display: flex;
