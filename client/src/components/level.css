@@ -35,16 +35,15 @@
   background-color: #e9f2fb;
 }
 
+.introduction-panel, .infoview, .exercise, .conclusion {
+  padding-top: 1em;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 0;
+}
+
 .infoview {
-  padding: 1em;
-}
-
-.exercise {
-  padding: 1em;
-}
-
-.conclusion {
-  padding: 1em;
+  padding-top: 0em;
 }
 
 .exercise {
@@ -62,10 +61,6 @@
 .exercise h4 {
   margin-top: 0;
   margin-bottom: 0;
-}
-
-.introduction-panel {
-  padding: 1em;
 }
 
 .input-mode-switch {

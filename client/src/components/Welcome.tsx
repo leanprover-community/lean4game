@@ -55,7 +55,7 @@ function Welcome() {
       let position: cytoscape.Position = nodes[id].position
 
       svgElements.push(
-        <Link key={`world${id}`} to={`/world/${id}/level/1`}>
+        <Link key={`world${id}`} to={`/world/${id}/level/0`}>
           <circle className="world-circle" cx={position.x} cy={position.y} r="8" />
           <text className="world-name"
             x={position.x} y={position.y}>{nodes[id].data.title ? nodes[id].data.title : id}</text>

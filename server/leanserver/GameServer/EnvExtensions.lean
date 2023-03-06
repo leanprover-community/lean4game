@@ -174,7 +174,10 @@ structure World where
 deriving Inhabited
 
 instance : ToJson World := ⟨
-  fun world => Json.mkObj [("name", toJson world.name), ("title", world.title)]
+  fun world => Json.mkObj [
+    ("name", toJson world.name),
+    ("title", world.title),
+    ("introduction", world.introduction)]
 ⟩
 
 /-! ## Game -/

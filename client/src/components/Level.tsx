@@ -39,6 +39,7 @@ import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import Markdown from './Markdown';
 
 import Split from 'react-split'
+import { Alert } from '@mui/material';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
 
@@ -129,7 +130,50 @@ function Level() {
   const completed = useAppSelector(selectCompleted(worldId, levelId))
 
   const {editor, infoProvider, editorConnection} =
-    useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
+  useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
+
+  // TODO: This is a hack for having an introduction (i.e. level 0)
+  // for each world.
+  if (levelId == 0) {
+    return <>
+      <div className="app-bar">
+        <div>
+        <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button>
+          <span className="app-bar-title">
+          {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
+          </span>
+        </div>
+        <div>
+          <span className="app-bar-title">
+            {`Einführung`}
+          </span>
+          <Button disabled={levelId <= 1} inverted={true}
+            to={`/world/${worldId}/level/0`}
+            ><FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous</Button>
+          <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted={true}
+            to={`/world/${worldId}/level/1`}
+            >Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>
+        </div>
+      </div>
+        <div className="exercise-panel">
+          <div ref={introductionPanelRef} className="introduction-panel">
+            <Alert severity="info" sx={{ mt: 1 }}>
+              <Markdown>
+                {gameInfo.data?.worlds.nodes[worldId].introduction}
+              </Markdown>
+            </Alert>
+          <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div>
+        </div>
+        <div className="conclusion">
+          {levelId >= gameInfo.data?.worldSize[worldId] ?
+          <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button> :
+          <Button to={`/world/${worldId}/level/1`}>
+            Start&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+          </Button>}
+        </div>
+      </div>
+    </>
+  }
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
@@ -144,7 +188,7 @@ function Level() {
         <span className="app-bar-title">
           {levelId && `Level ${levelId}`}{level?.data?.title && `: ${level?.data?.title}`}
         </span>
-        <Button disabled={levelId <= 1} inverted={true}
+        <Button disabled={levelId <= 0} inverted={true}
           to={`/world/${worldId}/level/${levelId - 1}`}
           ><FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous</Button>
         <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted={true}
@@ -153,13 +197,20 @@ function Level() {
       </div>
 
     </div>
-    <Split minSize={0} snapOffset={200} sizes={[30, 45, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+    <Split minSize={0} snapOffset={200} sizes={[0, 50, 25, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
       <div className="side-panel">
+        {/*
         <div ref={introductionPanelRef} className="introduction-panel">
           <Markdown>{level?.data?.introduction}</Markdown>
         </div>
+        */}
       </div>
       <div className="exercise-panel">
+        <div ref={introductionPanelRef} className="introduction-panel">
+          <Alert severity="info" sx={{ mt: 1 }}>
+            <Markdown>{level?.data?.introduction}</Markdown>
+          </Alert>
+        </div>
         <div className="exercise">
           {/* <h4>Aufgabe:</h4> */}
           <Markdown>{level?.data?.descrText}</Markdown>
@@ -192,6 +243,9 @@ function Level() {
       </div>
       <div className="doc-panel">
         {!level.isLoading && <Inventory tactics={level?.data?.tactics} lemmas={level?.data?.lemmas} definitions={level?.data?.definitions} />}
+      </div>
+      <div className="side-panel">
+        <p>Display Tactic documentation here?</p>
       </div>
     </Split>
   </>
