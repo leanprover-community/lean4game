@@ -8,7 +8,8 @@ Title "Aller Anfang ist... ein Einzeiler?"
 
 Introduction
 "
-In der Zwischenzeit hat bereits sich eine lange Schlange Untertanen gebildet, die gern ihren Fragen stellen würden.  Logisinde winkt den ersten nach vorn.  Er räuspert sich.
+In der Zwischenzeit hat bereits sich eine lange Schlange Untertanen gebildet, die gern ihren
+Fragen stellen würden. Logisinde winkt den ersten nach vorn. Er räuspert sich.
 
 **Untertan** Warum ist $42 = 42$?
 
@@ -21,7 +22,8 @@ Statement "" :
   rfl
 
 Hint : 42 = 42 => "
-**Robo** Ist doch klar.  Du musst ihn einfach daran erinnern, dass Gleichheit *reflexiv* ist.  Probier mal `rfl`.
+**Robo** Ist doch klar.  Du musst ihn einfach daran erinnern, dass Gleichheit *reflexiv* ist.
+Probier mal `rfl`.
 "
 
 Conclusion

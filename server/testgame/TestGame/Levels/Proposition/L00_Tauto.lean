@@ -21,16 +21,18 @@ keine Ruhe finden, solange Du nicht lernst, ihren unablässigen Wissensdurst zu 
 
 Es gibt nur zwei Schwierigkeiten: Erstens haben die Formalosophen allem Anschein nach
 überhaupt kein tieferes mathematisches Verständnis, und zweitens kommunizieren Sie über Mathematik
-exklusiv in einem Dir fremden Dialekt, den sie Leanish [liːnɪʃ] nennen.
+exklusiv in einem Dir fremden Dialekt, den sie Leansch [liːnʃ] nennen.
 
 Zum Glück hat Robo mit Dir das Universum gewechselt.
-Robo, das ist Dein kleiner SmartElf. Robo ist war auch nicht die mathematische Leuchte, die Du Dir in dieser Situation gewünscht hättest, aber es scheint, er hat irgendwo Leanish gelernt.  Und das ist Gold wert.
+Robo, das ist Dein kleiner SmartElf. Robo ist war auch nicht die mathematische Leuchte, die Du Dir
+in dieser Situation gewünscht hättest, aber es scheint, er hat irgendwo Leansch gelernt.
+Und das ist Gold wert.
 
 ----
 
-Gerade seid Ihr auf Königin Logisindes Planeten. Sie kommt ohne Umschweife zum Punkt:
+Gerade seid Ihr auf Königin *Logisindes* Planeten. Sie kommt ohne Umschweife zum Punkt:
 
-**Logisinde**  Werte Wesen aus fremden Welten, gestatten Sie eine Frage.  Warum gilt …
+**Logisinde**  Werte Wesen aus fremden Welten, gestatten Sie eine Frage. Warum gilt …
 
 Und er kritzelt etwas auf ein Stück Papier:  oben ein paar Annahmen, unten eine Schlussfolgerung.
 Dazwischen sollst Du offenbar einen Beweis eintragen.
@@ -44,7 +46,9 @@ Statement ""
 
 Hint  (A B C : Prop) :
     ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) =>
- "**Robo**  Das ist ganz einfach.  Mit `A B C : Prop` meint er:  `A`, `B` und `C` sind irgendwelche Aussagen (*propositions*).  Und mit `→` meint er ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
+ "**Robo**  Das ist ganz einfach.  Mit `{A} {B} {C} : Prop` meint er:
+ `{A}`, `{B}` und `{C}` sind irgendwelche Aussagen (*propositions*).
+ Und mit `→` meint er ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
 
 **Du** Ehhm, ja.  Aber da muss ich jetzt trotzdem erst einmal überlegen.
 
@@ -59,7 +63,9 @@ Hint  (A B C : Prop) :
 
 Conclusion
 "
-**Logisinde** (etwas konsterniert)  Ja, das ist streng genommen richtig.  Aber glaubt bloß nicht, dass Ihr damit auf *diesem* Planeten viel weiterkommt!  Meine Untertanen verstehen `tauto` nicht.  Da müsst Ihr Euch schon etwas mehr anstrengen.
+**Logisinde** (etwas konsterniert)  Ja, das ist streng genommen richtig.
+Aber glaubt bloß nicht, dass Ihr damit auf *diesem* Planeten viel weiterkommt!
+Meine Untertanen verstehen `tauto` nicht.  Da müsst Ihr Euch schon etwas mehr anstrengen.
 "
 
 NewTactics tauto

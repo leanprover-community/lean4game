@@ -16,17 +16,21 @@ Auftritt dritter Querulant.
 "
 
 Statement ""
-  (n : ℕ) (h : n = 10) (g : (n ≠ 10)) : n = 42 := by
+  (n : ℕ) (h : n = 10) (g : n ≠ 10) : n = 42 := by
   contradiction
 
-Hint (n : ℕ) (h : n = 10) (g : (n ≠ 10)) : n = 42 =>
+Hint (n : ℕ) (h : n = 10) (g : n ≠ 10) : n = 42 =>
 "
 **Du** Wieder ein Widerspruch in den Annahmen?
+
+**Robo** Ich sehe, du hast langsam den Dreh raus.
 "
 
 Conclusion
 "
-**Robo** Gut gemacht.  Bei dieser Frage ist auch ein bisschen offensichtlicher, worin der Widerspruch besteht:  Die Annahme `n ≠ 10` ist genau die Negation von `n = 10`.   Man muss `≠` immer als `¬(· = ·)` lesen.
+**Robo** Gut gemacht.  Bei dieser Frage ist auch ein bisschen offensichtlicher,
+worin der Widerspruch besteht:  Die Annahme `n ≠ 10` ist genau die Negation von `n = 10`.
+Man muss `≠` immer als `¬(· = ·)` lesen.
 "
 
 NewTactics contradiction

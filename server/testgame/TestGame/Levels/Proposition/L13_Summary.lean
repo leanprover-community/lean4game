@@ -71,7 +71,7 @@ Conclusion
 "
 **Robo** Bravo!  Jetzt aber nichts wie weg hier, bevor sich eine neue Schlange bildet!
 
-Logisinde ist in der Zwischenzeit eingeschlafen, und ihr stehlt euch heimlich davon.
+Königin *Logisinde* ist in der Zwischenzeit eingeschlafen, und ihr stehlt euch heimlich davon.
 "
 
 NewTactics left right assumption constructor rcases rfl contradiction trivial

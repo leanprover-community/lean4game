@@ -27,7 +27,7 @@ Conclusion
 "
 **Schelm**  Wollte nur mal sehen, dass Ihr nicht auf den Kopf gefallen seid …
 
-**Du** (zu Robo)**  Können wir nicht einfach immer dieses `trivial` verwenden?  Wie in einer Mathe-Vorlesung?
+**Du** *(zu Robo)*  Können wir nicht einfach immer dieses `trivial` verwenden?  Wie in einer Mathe-Vorlesung?
 
 **Robo** Nein, das `trivial` hier hat eine ziemlich spezielle Bedeutung.  Das funktioniert nur in einer Handvoll Situationen.
 "

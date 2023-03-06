@@ -22,12 +22,13 @@ Statement ""
 Hint (A B C : Prop) (h : A ∧ (B ∧ C)) : B => "
 **Du**  Jetzt müssen wir wohl die Annahme de-konstruieren.
 
-**Robo** Ja, genau.  Das geht am einfachsten mit `rcases h with ⟨h₁, h₂⟩`.
+**Robo** Ja, genau.  Das geht am einfachsten mit `rcases {h} with ⟨h₁, h₂⟩`.
 
 **Du** Moment, wie schreib ich *das* denn hier auf?
 
 **Robo** Die bleiden Klammern schreibst Du als `\\<` und `\\>`, oder gleichzeitig als `\\<>`.
-         Und h₁ schreibst Du einfach als `h\\1`.  Aber Du kannst Dir auch einfach andere Namen für `h₁` und `h₂`, zum Beispiel `rcases h with ⟨hA, hBC⟩`
+Und h₁ schreibst Du einfach als `h\\1`.  Aber Du kannst Dir auch einfach andere Namen
+für `h₁` und `h₂`, zum Beispiel `rcases {h} with ⟨hA, hBC⟩`
 "
 
 Hint  (A B C : Prop) (hA : A) (hAB : B ∧ C) : B =>
@@ -42,7 +43,8 @@ HiddenHint (A : Prop) (hA : A) : A =>
 
 Conclusion
 "
-**Robo** Du hättest übrigens auch direkt schreiben können `rcases h with ⟨h₁, ⟨h₂ , h₃⟩⟩`.
+**Robo** Du hättest das übrigens auch direkt verschachtelt schreiben können:
+`rcases h with ⟨h₁, ⟨h₂ , h₃⟩⟩`.
 "
 
 NewTactics rcases
