@@ -22,7 +22,7 @@ import './level.css'
 import { Button } from './Button'
 import { ConnectionContext, useLeanClient } from '../connection';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
-import { codeEdited, selectCode, progressSlice } from '../state/progress';
+import { codeEdited, selectCode, progressSlice, selectCompleted } from '../state/progress';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { useStore } from 'react-redux';
 
@@ -126,6 +126,7 @@ function Level() {
     setCanUndo(code.trim() !== "")
   }
 
+  const completed = useAppSelector(selectCompleted(worldId, levelId))
 
   const {editor, infoProvider, editorConnection} =
     useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
@@ -179,6 +180,8 @@ function Level() {
             </InputModeContext.Provider>
           </MonacoEditorContext.Provider>
         </EditorContext.Provider>
+
+        {completed && <div className="conclusion"><Markdown>{level?.data?.conclusion}</Markdown></div>}
       </div>
       <div className="doc-panel">
         {!level.isLoading && <Inventory tactics={level?.data?.tactics} lemmas={level?.data?.lemmas} definitions={level?.data?.definitions} />}
