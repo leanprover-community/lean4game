@@ -181,7 +181,14 @@ function Level() {
           </MonacoEditorContext.Provider>
         </EditorContext.Provider>
 
-        {completed && <div className="conclusion"><Markdown>{level?.data?.conclusion}</Markdown></div>}
+        {completed && <div className="conclusion">
+          <Markdown>{level?.data?.conclusion}</Markdown>
+          {levelId >= gameInfo.data?.worldSize[worldId] ?
+          <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button> :
+          <Button to={`/world/${worldId}/level/${levelId + 1}`}>
+            Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
+
+        </div>}
       </div>
       <div className="doc-panel">
         {!level.isLoading && <Inventory tactics={level?.data?.tactics} lemmas={level?.data?.lemmas} definitions={level?.data?.definitions} />}
