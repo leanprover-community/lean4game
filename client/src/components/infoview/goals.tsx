@@ -146,7 +146,7 @@ export const Goal = React.memo((props: GoalProps) => {
     // if (props.goal.isInserted) cn += 'b--inserted '
     // if (props.goal.isRemoved) cn += 'b--removed '
 
-    const hints = <Hints hints={goal.hints} />
+    const hints = <Hints hints={goal.hints} key={goal.mvarId} />
     const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
     const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
     const {commandLineMode} = React.useContext(InputModeContext)
