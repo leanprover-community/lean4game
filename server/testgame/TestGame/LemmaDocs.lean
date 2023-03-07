@@ -132,3 +132,12 @@ LemmaDoc Finset.sum_comm as Finset.sum_comm in "Sum"
 
 LemmaDoc Function.comp_apply as Function.comp_apply in "Function"
 ""
+
+LemmaDoc not_le as not_le in "Logic"
+""
+
+LemmaDoc if_pos as if_pos in "Logic"
+""
+
+LemmaDoc if_neg as if_neg in "Logic"
+""
