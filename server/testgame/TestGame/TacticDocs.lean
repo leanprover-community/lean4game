@@ -115,6 +115,13 @@ TacticDoc simp_rw
 TODO
 "
 
+TacticDoc by_cases
+"
+## Beschreibung
+
+TODO
+"
+
 TacticDoc apply
 "
 ## Beschreibung

@@ -33,9 +33,8 @@ export function Main(props: {world: string, level: number}) {
 
             if (ec.events.changedCursorLocation.current &&
                 ec.events.changedCursorLocation.current.uri === params.uri) {
-                dispatch(codeEdited)
+                dispatch(levelCompleted({world: props.world, level: props.level}))
             }
-            dispatch(levelCompleted({world: props.world, level: props.level}))
         },
         []
     );

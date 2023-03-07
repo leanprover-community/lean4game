@@ -124,7 +124,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
             <div className="goals-section">
                 { goals && (
                     goals.goals.length > 0
-                  ? <><div className="goals-section-title">Main Goal</div>
+                  ? <><div className="goals-section-title">Aktuelles Goal</div>
                     <Goal commandLine={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} /></>
                   : <div className="goals-section-title">No Goals</div>
                 ) }
@@ -148,8 +148,8 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 <><CircularProgress /><div>Loading goal...</div></>)}
         <AllMessages />
         <LocationsContext.Provider value={locs}>
-            {goals && goals.goals.length > 1 && <div className="goals-section">
-                    <div className="goals-section-title">Other Goals</div>
+            {goals && goals.goals.length > 1 && <div className="goals-section other-goals">
+                    <div className="goals-section-title">Weitere Goals</div>
 
                     {goals.goals.slice(1).map((goal, i) =>
                         <details key={i}><summary><InteractiveCode fmt={goal.type} /></summary> <Goal commandLine={false} filter={goalFilter} goal={goal} /></details>)}

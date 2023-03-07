@@ -2,7 +2,7 @@ import TestGame.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 
---set_option tactic.hygienic false
+set_option tactic.hygienic false
 
 --set_option autoImplicit false
 
@@ -18,38 +18,64 @@ Introduction
 Der nächste bitte …
 "
 
-Statement
-"Angenommen \"$A$ oder ($A$ und $B$)\" wahr ist, zeige, dass $A$ wahr ist."
-    (A B : Prop) (h : A ∨ (A ∧ B)) : A := by
+Statement ""
+    (A B : Prop) (h : (A ∧ B) ∨ A) : A := by
   rcases h with h | h
-  assumption
   rcases h with ⟨h₁, h₂⟩
   assumption
+  assumption
 
-Hint (A B : Prop) (h : A ∨ (A ∧ B)) : A =>
+Hint (A B : Prop) (h :(A ∧ B) ∨ A) : A =>
 "
-**Du** Ja klar, erst ein Und im Ziel, dann ein Und in der Annahme, dann ein Oder im Ziel, und jetzt noch ein Oder in der Annahme.  Ich glaube den ganzen Circus hier langsam nicht mehr.  Die haben sich doch abgesprochen!
+**Robo** Schau mal, wenn du mit dem Finger eine Annahme berührst, zeigt es dir,
+wie die Klammern gesetzt sind. Irre…
 
-**Robo** Lass ihnen doch ihren Spaß.  Wir sind ja gleich hier fertig, und können zu einem interessanteren Planeten weiterfliegen.
+**Du** Ah ich sehe, also `({A} ∧ {B}) ∨ {A}`!
+
+**Du** Ich glaube den ganzen Zircus hier langsam nicht mehr:
+Zuerst ein \"Und\" im Ziel, dann \"Und\" in der Annahme, dann \"Oder\" im Ziel und jetzt
+\"Oder\" in der Annahme, die haben sich doch abgesprochen!
+
+**Robo** Lass ihnen doch ihren Spaß.
+Wir sind ja gleich hier fertig, und können zu einem interessanteren Planeten weiterfliegen.
 
 **Du** Also, wieder `rcases …`?
 
-**Robo** Ja, aber diesmal nicht `rcases h with ⟨h₁, h₂⟩`, sondern `rcases h with h | h`.
+**Robo** Ja, aber diesmal nicht `rcases {h} with ⟨h₁, h₂⟩`, sondern `rcases {h} with h | h`.
 "
+
+-- -- TODO: This also triggers later under the assumptions
+-- -- `(A : Prop) (B : Prop) (h₁ : A) (h₂ : B) : A`
+-- -- Could we do something about that?
+-- Hint (A : Prop) (B : Prop) (h : A) : A =>
+-- "
+-- **Robo** Jetzt musst Du Dein Ziel zweimal beweisen:
+-- Einmal unter Annahme der linken Seite `{A}`,
+-- und einmal unter Annahme der rechten Seite `{A} ∨ {B}`. Hier haben nehmen wir an, die linke Seite
+-- sei wahr.
+-- "
 
 Hint (A : Prop) (B : Prop) (h : A ∧ B) : A =>
 "
-**Robo** Jetzt musst Du Dein Ziel zweimal beweisen:  Einmal unter der Annahme `A`, und einmal unter der Annahme `A ∨ B`.
+**Robo**
+Jetzt musst Du Dein Ziel zweimal beweisen:
+Einmal unter Annahme der linken Seite `{A} ∨ {B}`,
+und einmal unter Annahme der rechten Seite `{A}`.
+Hier haben nehmen wir an, die linke Seite
+sei wahr.
 "
 HiddenHint  (A : Prop) (B : Prop) (h : A ∧ B) : A =>
 "
-**Robo** Wie man mit einem Und in den Annahmen umgeht, weißt Du doch schon:  `rcases h with ⟨h₁, h₂⟩`.  Zur Erinnerung: Für die Klammern schreibst Du `\\<>`.
+**Robo** Wie man mit einem Und in den Annahmen umgeht, weißt Du doch schon:
+`rcases h with ⟨h₁, h₂⟩`.  Zur Erinnerung: Für die Klammern schreibst Du `\\<>`.
 "
 
 Conclusion
-"**Du**  Ok, das scheint ihn zufriedenzustellen.  One to go … Kannst Du mir vorher noch einmal kurz alles Leanish zusammenfassen, das Du mir bis hierher beigebracht hast?
+"**Du**  Ok, das scheint ihn zufriedenzustellen. Nur noch eine Seele…
+Kannst Du mir vorher noch einmal kurz alles Leansch zusammenfassen,
+das Du mir bis hierher beigebracht hast?
 
-Robo straht überglücklich.  Noch *nie* warst Du so auf ihn angewiesen.
+Robo strahlt überglücklich.  Noch *nie* warst Du so auf ihn angewiesen.
 
 **Robo** Na klar, schau her!
 

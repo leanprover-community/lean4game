@@ -20,7 +20,7 @@ export function Hints({hints} : {hints: GameHint[]}) {
     {hiddenHints.length > 0 &&
         <FormControlLabel
           control={<Switch checked={showHints} onChange={() => setShowHints((prev) => !prev)} />}
-          label="More Help?"
+          label="Robo, hast du einen Tipp?"
         />}
     {showHints && hiddenHints.map(hint => <Hint hint={hint} />)}
   </>

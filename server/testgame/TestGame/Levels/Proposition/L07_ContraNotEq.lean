@@ -21,7 +21,7 @@ Statement ""
 
 Hint (n : ℕ) (h : n ≠ n) : n = 37 =>
 "
-**Du** Ist `n ≠ n` nicht auch ein Widerspruch?
+**Du** Ist `{n} ≠ {n}` nicht auch ein Widerspruch?
 
 **Robo** Probiers mal!
 "
@@ -30,9 +30,11 @@ Conclusion
 "
 **Du** Ja, scheint funktioniert zu haben.
 
-**Du** Aber irgendwie kommt mir das immer noch ein wenig suspekt vor.  Jetzt habe ich bewiesen, dass eine beliebige natürliche Zahl gleich 37 ist?
+**Du** Aber irgendwie kommt mir das immer noch ein wenig suspekt vor.
+Jetzt habe ich bewiesen, dass eine beliebige natürliche Zahl gleich 37 ist?
 
-**Robo** Nein, nicht doch.  Nur eine beliebige Zahl, die ungleich sich selbst ist, ist gleich 37.  Und gleich 38, und gleich 39, …
+**Robo** Nein, nicht doch.  Nur eine beliebige Zahl, die ungleich sich selbst ist, ist gleich 37.
+Und gleich 38, und gleich 39, …
 
 **Du** Ok, ok, verstehe.
 "

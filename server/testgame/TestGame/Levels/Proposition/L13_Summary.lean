@@ -41,7 +41,7 @@ Statement ""
   assumption
 
 HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) ∧ (A ∨ C) =>
-"**Robo** Das `∧` in der Annahme kannst Du mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
+"**Robo** Das `∧` in der Annahme kannst Du mit `rcases {h} with ⟨h₁, h₂⟩` zerlegen."
 
 HiddenHint (A : Prop) (B : Prop) (C : Prop) : (A ∨ B) ∧ (A ∨ C) =>
 "**Robo** Das `∧` im Goal kannst Du mit `constructor` zerlegen."
@@ -60,7 +60,7 @@ HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) =>
 "**Robo** Das `∧` in der Annahme kannst Du mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
 
 HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ C) =>
-"**Robo** Das `∧` in der Annahme kannst Du mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
+"**Robo** Das `∧` in der Annahme kannst Du mit `rcases {h} with ⟨h₁, h₂⟩` zerlegen."
 
 -- TODO: Hint nur Anhand der Annahmen?
 
@@ -71,7 +71,7 @@ Conclusion
 "
 **Robo** Bravo!  Jetzt aber nichts wie weg hier, bevor sich eine neue Schlange bildet!
 
-Logisinde ist in der Zwischenzeit eingeschlafen, und ihr stehlt euch heimlich davon.
+Königin *Logisinde* ist in der Zwischenzeit eingeschlafen, und ihr stehlt euch heimlich davon.
 "
 
 NewTactics left right assumption constructor rcases rfl contradiction trivial

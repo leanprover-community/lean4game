@@ -14,3 +14,17 @@ import TestGame.Levels.Implication.L12_Summary
 Game "TestGame"
 World "Implication"
 Title "Aussagenlogik 2"
+
+Introduction
+"
+Zurück im Raumschiff macht ihr euch auf den Weg zum einem der beiden Monde, die ebenfalls
+beide bewohnt zu sein scheinen.
+
+**Du**: Sag mal Robo, Königin *Logisindes* hat under anderem von Implikationen gesprochen,
+aber niemand von den Einwohnern...
+
+**Robo**: Auf dem Mond *Implis* den wir gerade ansteuern können sie uns vielleicht mehr
+erzählen…
+
+Und damit leitet Robo den Landeanflug ein.
+"

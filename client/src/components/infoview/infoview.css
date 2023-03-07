@@ -75,3 +75,7 @@
 .command-line-input .monaco-editor .scroll-decoration {
   box-shadow: none;
 }
+
+.other-goals .goals-section-title, .other-goals summary, .other-goals summary .font-code {
+  color: #5191d1;
+}

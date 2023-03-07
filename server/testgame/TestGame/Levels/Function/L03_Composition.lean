@@ -16,5 +16,7 @@ TODO
 
 Statement
 "TODO: Find an exercise."
-    (U S T V : Type _) (f : U → V) (g : V → T) (x : U) : (g ∘ f) x = g (f x)  := by
+    (U T V : Type _) (f : U → V) (g : V → T) (x : U) : (g ∘ f) x = g (f x)  := by
   simp only [Function.comp_apply]
+
+NewLemmas Function.comp_apply
