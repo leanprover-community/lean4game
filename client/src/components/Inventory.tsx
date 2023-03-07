@@ -54,7 +54,10 @@ function InventoryList({items, docType, openDoc} : {items: ComputedInventoryItem
           <div className={`tab ${cat == tab ? "active": ""}`} onClick={() => { setTab(cat) }}>{cat}</div>)}
       </div>}
     <div className="inventory-list">
-    { items.map(item => {
+    { [...items].sort(
+      // sort unavailable tactics/lemmas/def to the back.
+      (x, y) => +x.locked - +y.locked || +x.disabled - +y.disabled
+    ).map(item => {
         if (tab == item.category) {
           return <InventoryItem key={item.name} showDoc={() => {openDoc(item.name, docType)}}
             name={item.name} locked={item.locked} disabled={item.disabled} />
