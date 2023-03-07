@@ -73,6 +73,34 @@ DefinitionDoc Odd
 Die Definition kann man mit `unfold odd at *` einsetzen.
 "
 
+DefinitionDoc Injective
+"
+`Injective f` ist als
+
+```
+∀ {a b : U}, a < b → f a < f b
+```
+definiert.
+"
+
+DefinitionDoc Surjective
+"
+"
+
+DefinitionDoc Bijective
+"
+"
+
+DefinitionDoc StrictMono
+"
+`StrictMono`
+
+```
+∀ {a b : U}, f a  f b → a = b
+```
+
+"
+
 LemmaDoc not_odd as not_odd in "Nat"
 "`¬ (odd n) ↔ even n`"
 
@@ -140,4 +168,13 @@ LemmaDoc if_pos as if_pos in "Logic"
 ""
 
 LemmaDoc if_neg as if_neg in "Logic"
+""
+
+LemmaDoc StrictMono.injective as StrictMono.injective in "Function"
+""
+
+LemmaDoc StrictMono.add as StrictMono.add in "Function"
+""
+
+LemmaDoc Odd.strictMono_pow as Odd.strictMono_pow in "Function"
 ""

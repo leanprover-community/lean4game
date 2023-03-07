@@ -9,16 +9,30 @@ Title ""
 
 Introduction
 "
+Ihr läuft durch verschiedenste Leere Gänge des Funktionentempels.
+
+**Du**: Wenn wir wüssten, dass nur ein möglicher Weg hierhin führt, könnten wir
+ausschliessen, dass wir im Kreis laufen.
+
+Plötzlich begegnet ihr einem älteren Wesen mit Fakel. Auf die Frage antwortet es mit
 "
 open Set Function
 
-def f3 : ℕ → ℕ := fun n ↦ if Even n then n^2 else n+1
-
-#eval (f3 + f3) 2
-
-example : ¬ f3.Injective := by
-  unfold Injective
-  push_neg
-  use 2
-  use 3
+Statement "" : Injective (fun (n : ℤ) ↦ n + 3) := by
+  intro a b
   simp
+
+NewDefinitions Injective
+
+Hint : Injective (fun (n : ℤ) ↦ n + 3) =>
+"**Robo**: `Injective` ist als `∀ \{a b : U}, f a = f b → a = b`
+definiert, also kannst du mit `intro` anfangen.
+"
+
+Hint (a b : ℤ) : (fun n => n + 3) a = (fun n => n + 3) b → a = b =>
+"**Du**: Kann man das wohl vereinfachen?"
+
+Hint (a b : ℤ) (hab : (fun n => n + 3) a = (fun n => n + 3) b) : a = b =>
+"**Robot**: Jetzt musst du wohl `{hab}` vereinfachen."
+
+Conclusion "**Du** Woa das war ja einfach!"

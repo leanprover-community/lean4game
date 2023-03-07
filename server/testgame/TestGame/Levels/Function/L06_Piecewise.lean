@@ -171,6 +171,9 @@ geschrieben hast."
 Hint (x : ℚ) (h : ¬ 0 ≤ f x) : ¬ 0 ≤ f x =>
 "**Robo**: Dieses Goal ist entstanden, als du `rw [if_neg]` anstatt `rw [if_neg {h}]`
 geschrieben hast."
-#check Set.piecewise
+
+Conclusion
+"Zufrieden tauschen die beiden Wächter ihren Platz und geben so dabei den
+Durchgang frei."
 
 end LevelFunction4
