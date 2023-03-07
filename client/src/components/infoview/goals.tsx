@@ -136,7 +136,7 @@ export const Goal = React.memo((props: GoalProps) => {
             undefined,
         [locs, goal.mvarId])
     const goalLi = <div key={'goal'}>
-        <div className="goal-title">Target: </div>
+        <div className="goal-title">Goal: </div>
         <LocationsContext.Provider value={goalLocs}>
             <InteractiveCode fmt={goal.type} />
         </LocationsContext.Provider>
@@ -155,10 +155,10 @@ export const Goal = React.memo((props: GoalProps) => {
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
         {filter.reverse && goalLi}
         { objectHyps.length > 0 &&
-            <div className="hyp-group"><div className="hyp-group-title">Objects:</div>
+            <div className="hyp-group"><div className="hyp-group-title">Objekte:</div>
             {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         { assumptionHyps.length > 0 &&
-            <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
+            <div className="hyp-group"><div className="hyp-group-title">Annahmen:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {commandLine && commandLineMode && <CommandLine />}
         {!filter.reverse && goalLi}

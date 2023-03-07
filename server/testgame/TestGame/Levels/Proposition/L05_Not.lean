@@ -16,7 +16,8 @@ Statement "" :
   trivial
 
 Hint : ¬False => "
-  **Robo** Dieses Zeichen `¬` bedeutet Negation. Also wenn eine Aussage `(A : Prop)` wahr ist, dann ist  `¬A` falsch, und umgekehrt.
+  **Robo** Dieses Zeichen `¬` bedeutet Negation. Also wenn eine Aussage `(A : Prop)`
+  wahr ist, dann ist  `¬A` falsch, und umgekehrt.
 
   **Du** Und `False` ist wahrscheinlich die Aussage, die immer falsch ist?
 
