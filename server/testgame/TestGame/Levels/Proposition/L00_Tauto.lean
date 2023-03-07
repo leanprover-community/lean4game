@@ -32,7 +32,7 @@ Gerade seid Ihr auf Königin Logisindes Planeten. Sie kommt ohne Umschweife zum 
 
 **Logisinde**  Werte Wesen aus fremden Welten, gestatten Sie eine Frage.  Warum gilt …
 
-Und er kritzelt etwas auf ein Stück Papier:  oben ein paar Annahmen, unten eine Schlussfolgerung.
+Und sie kritzelt etwas auf ein Stück Papier:  oben ein paar Annahmen, unten eine Schlussfolgerung.
 Dazwischen sollst Du offenbar einen Beweis eintragen.
 Du siehst Robo hilflos an.
 "
@@ -44,7 +44,7 @@ Statement ""
 
 Hint  (A B C : Prop) :
     ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) =>
- "**Robo**  Das ist ganz einfach.  Mit `A B C : Prop` meint er:  `A`, `B` und `C` sind irgendwelche Aussagen (*propositions*).  Und mit `→` meint er ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
+ "**Robo**  Das ist ganz einfach.  Mit `A B C : Prop` meint sie:  `A`, `B` und `C` sind irgendwelche Aussagen (*propositions*).  Und mit `→` meint sie ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
 
 **Du** Ehhm, ja.  Aber da muss ich jetzt trotzdem erst einmal überlegen.
 

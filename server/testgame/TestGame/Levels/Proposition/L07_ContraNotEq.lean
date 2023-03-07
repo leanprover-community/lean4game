@@ -8,7 +8,7 @@ Game "TestGame"
 World "Proposition"
 Level 8
 
-Title "Widerspruch"
+Title "Aus Falschem folgt vieles."
 
 Introduction
 "

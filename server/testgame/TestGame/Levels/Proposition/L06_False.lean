@@ -6,7 +6,7 @@ Game "TestGame"
 World "Proposition"
 Level 7
 
-Title "Widerspruch beweist alles."
+Title "Aus Falschem folgt vieles."
 
 Introduction
 "
