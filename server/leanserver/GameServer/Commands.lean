@@ -209,7 +209,7 @@ elab "NewTactic" args:ident* : command => do
 /-- Declare tactics that are temporarily disabled in this level -/
 elab "DisabledTactic" args:ident* : command => do
   let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Tactic name
+  -- for name in names do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with tactics := {level.tactics with disabled := names}}
 
 /-- Temporarily disable all tactics except the ones declared here -/
@@ -239,7 +239,7 @@ elab "NewDefinition" args:ident* : command => do
 /-- Declare definitions that are temporarily disabled in this level -/
 elab "DisabledDefinition" args:ident* : command => do
   let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Definition name
+  -- for name in names do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with definitions := {level.definitions with disabled := names}}
 
 /-- Temporarily disable all definitions except the ones declared here -/
@@ -272,7 +272,7 @@ elab "NewLemma" args:ident* : command => do
 /-- Declare lemmas that are temporarily disabled in this level -/
 elab "DisabledLemma" args:ident* : command => do
   let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Lemma name
+  -- for name in names do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with disabled := names}}
 
 /-- Temporarily disable all lemmas except the ones declared here -/
