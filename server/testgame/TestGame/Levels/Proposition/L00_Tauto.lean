@@ -13,7 +13,7 @@ Gerade seid Ihr auf Königin *Logisindes* Planeten. Sie kommt ohne Umschweife zu
 
 **Logisinde**  Werte Wesen aus fremden Welten, gestatten Sie eine Frage. Warum gilt …
 
-Und er kritzelt etwas auf ein Stück Papier:  oben ein paar Annahmen, unten eine Schlussfolgerung.
+Und sie kritzelt etwas auf ein Stück Papier:  oben ein paar Annahmen, unten eine Schlussfolgerung.
 Dazwischen sollst Du offenbar einen Beweis eintragen.
 Du siehst Robo hilflos an.
 "

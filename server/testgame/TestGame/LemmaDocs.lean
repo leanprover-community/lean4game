@@ -75,28 +75,41 @@ Die Definition kann man mit `unfold odd at *` einsetzen.
 
 DefinitionDoc Injective
 "
-`Injective f` ist als
+`Injective f` ist definiert als
 
 ```
-∀ {a b : U}, a < b → f a < f b
+∀ a b, f a = f b → a = b
 ```
 definiert.
 "
 
 DefinitionDoc Surjective
 "
+`Surjective f` ist definiert als
+
+```
+∀ a, (∃ b, f a = b)
+```
 "
 
 DefinitionDoc Bijective
 "
 "
 
+DefinitionDoc LeftInverse
+"
+"
+
+DefinitionDoc RightInverse
+"
+"
+
 DefinitionDoc StrictMono
 "
-`StrictMono`
+`StrictMono f` ist definiert als
 
 ```
-∀ {a b : U}, f a  f b → a = b
+∀ a b, a < b → f a < f b
 ```
 
 "
@@ -177,4 +190,14 @@ LemmaDoc StrictMono.add as StrictMono.add in "Function"
 ""
 
 LemmaDoc Odd.strictMono_pow as Odd.strictMono_pow in "Function"
+""
+
+LemmaDoc Exists.choose as Exists.choose in "Function"
+""
+
+LemmaDoc Exists.choose_spec as Exists.choose_spec in "Function"
+""
+LemmaDoc congrArg as congrArg in "Function"
+""
+LemmaDoc congrFun as congrFun in "Function"
 ""
