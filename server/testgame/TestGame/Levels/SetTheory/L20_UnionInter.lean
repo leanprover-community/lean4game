@@ -22,6 +22,6 @@ open Set
 Statement
 "" : True := sorry
 
-NewTactics constructor intro rw assumption rcases simp tauto trivial
+NewTactic constructor intro rw assumption rcases simp tauto trivial
 
-NewLemmas Subset.antisymm_iff empty_subset
+NewLemma Subset.antisymm_iff empty_subset

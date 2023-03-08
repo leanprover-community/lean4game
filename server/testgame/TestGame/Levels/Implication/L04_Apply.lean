@@ -32,4 +32,4 @@ HiddenHint (A : Prop) (B : Prop) (C : Prop) (hA : A) (f : A → B) (g : B → C)
 "Du willst $C$ beweisen. Suche also nach einer Implikation $\\ldots \\Rightarrow C$ und wende
 diese mit `apply` an."
 
-NewTactics intro apply assumption revert
+NewTactic intro apply assumption revert

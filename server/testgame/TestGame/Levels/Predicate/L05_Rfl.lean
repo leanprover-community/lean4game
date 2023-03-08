@@ -28,4 +28,4 @@ Conclusion
 aufzurufen, deshalb brauchst du das nur noch selten.
 "
 
-NewTactics rfl
+NewTactic rfl

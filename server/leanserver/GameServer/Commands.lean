@@ -201,19 +201,19 @@ elab "TacticDoc" name:ident content:str : command =>
     content := content.getString })
 
 /-- Declare tactics that are introduced by this level. -/
-elab "NewTactics" args:ident* : command => do
+elab "NewTactic" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with tactics := {level.tactics with new := names}}
 
 /-- Declare tactics that are temporarily disabled in this level -/
-elab "DisabledTactics" args:ident* : command => do
+elab "DisabledTactic" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with tactics := {level.tactics with disabled := names}}
 
 /-- Temporarily disable all tactics except the ones declared here -/
-elab "OnlyTactics" args:ident* : command => do
+elab "OnlyTactic" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with tactics := {level.tactics with only := names}}
@@ -231,19 +231,19 @@ elab "DefinitionDoc" name:ident content:str : command =>
     content := content.getString })
 
 /-- Declare definitions that are introduced by this level. -/
-elab "NewDefinitions" args:ident* : command => do
+elab "NewDefinition" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with definitions := {level.definitions with new := names}}
 
 /-- Declare definitions that are temporarily disabled in this level -/
-elab "DisabledDefinitions" args:ident* : command => do
+elab "DisabledDefinition" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with definitions := {level.definitions with disabled := names}}
 
 /-- Temporarily disable all definitions except the ones declared here -/
-elab "OnlyDefinitions" args:ident* : command => do
+elab "OnlyDefinition" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with definitions := {level.definitions with only := names}}
@@ -264,19 +264,19 @@ elab "LemmaDoc" name:ident "as" userName:ident "in" category:str content:str : c
     content := content.getString })
 
 /-- Declare lemmas that are introduced by this level. -/
-elab "NewLemmas" args:ident* : command => do
+elab "NewLemma" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with new := names}}
 
 /-- Declare lemmas that are temporarily disabled in this level -/
-elab "DisabledLemmas" args:ident* : command => do
+elab "DisabledLemma" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with disabled := names}}
 
 /-- Temporarily disable all lemmas except the ones declared here -/
-elab "OnlyLemmas" args:ident* : command => do
+elab "OnlyLemma" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with only := names}}

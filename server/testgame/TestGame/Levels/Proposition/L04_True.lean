@@ -35,5 +35,5 @@ Wie in einer Mathe-Vorlesung?
 Das funktioniert nur in einer Handvoll Situationen.
 "
 
-NewTactics trivial
-DisabledTactics tauto
+NewTactic trivial
+DisabledTactic tauto

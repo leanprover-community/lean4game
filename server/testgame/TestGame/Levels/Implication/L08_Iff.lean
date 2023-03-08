@@ -41,4 +41,4 @@ Hint (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : B =
 
 Conclusion "Im nächsten Level findest du die zweite Option."
 
-NewTactics apply assumption
+NewTactic apply assumption

@@ -45,5 +45,5 @@ Conclusion
  wir haben eine `contradiction` in unserem Annahmen, also folgt jede beliebige Aussage.
 "
 
-NewTactics contradiction
-DisabledTactics tauto
+NewTactic contradiction
+DisabledTactic tauto

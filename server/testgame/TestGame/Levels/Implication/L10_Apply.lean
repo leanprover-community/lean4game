@@ -50,6 +50,6 @@ Conclusion
 "
 "
 
-NewTactics apply left right assumption
+NewTactic apply left right assumption
 
-NewLemmas not_or_of_imp
+NewLemma not_or_of_imp

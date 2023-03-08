@@ -48,6 +48,6 @@ Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
     (i : D → E) (k : E → F) (m : C → F) : D =>
 "Sackgasse. Probier doch einen anderen Weg."
 
-NewTactics apply assumption revert intro
+NewTactic apply assumption revert intro
 
 -- https://www.jmilne.org/not/Mamscd.pdf

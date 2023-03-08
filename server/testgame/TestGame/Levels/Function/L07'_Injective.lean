@@ -29,8 +29,8 @@ Statement "" : Injective (fun (n : ℤ) ↦ n^3 + (n + 3)) := by
   intro a b
   simp
 
-NewDefinitions Injective
-NewLemmas StrictMono.injective StrictMono.add Odd.strictMono_pow
+NewDefinition Injective
+NewLemma StrictMono.injective StrictMono.add Odd.strictMono_pow
 
 
 Hint : Injective fun (n : ℤ) => n ^ 3 + (n + 3) =>

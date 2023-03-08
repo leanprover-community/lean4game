@@ -47,5 +47,5 @@ Conclusion
 `rcases h with ⟨h₁, ⟨h₂ , h₃⟩⟩`.
 "
 
-NewTactics rcases
-DisabledTactics tauto
+NewTactic rcases
+DisabledTactic tauto

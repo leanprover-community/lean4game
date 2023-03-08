@@ -54,5 +54,5 @@ Ihm scheinen diese Fragen inzwischen Spaß zu machen.
 Oder ist der nur gemalt?  Probier mal!
 "
 
-NewTactics constructor
-DisabledTactics tauto
+NewTactic constructor
+DisabledTactic tauto

@@ -57,9 +57,9 @@ Statement ""
   unfold f
   ring
 
-NewTactics funext by_cases simp_rw linarith
+NewTactic funext by_cases simp_rw linarith
 
-NewLemmas not_le if_pos if_neg
+NewLemma not_le if_pos if_neg
 
 
 Hint : f ∘ g = g ∘ f =>

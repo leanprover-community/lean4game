@@ -67,5 +67,5 @@ Hint (n : ℕ) (x : ℕ) (hx : n = x + x) : n ^ 2 = 2 * x ^ 2 + 2 * x ^ 2 =>
 Hint (n : ℕ) (x : ℕ) (hx : n = x + x) : (x + x) ^ 2 = 2 * x ^ 2 + 2 * x ^ 2 =>
 "Die Taktik `ring` löst solche Gleichungen."
 
-NewTactics unfold rcases use rw ring
-NewDefinitions Even Odd
+NewTactic unfold rcases use rw ring
+NewDefinition Even Odd

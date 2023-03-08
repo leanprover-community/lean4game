@@ -58,8 +58,8 @@ show that $f(x) = x^2 + 2x + 1$.
   unfold f
   ring
 
-NewTactics «let»
-OnlyTactics «let» intro unfold ring
+NewTactic «let»
+OnlyTactic «let» intro unfold ring
 
 HiddenHint : ∀ x, f x = x ^ 2 + 2 * x + 1 =>
 "Fang zuerst wie immer mit `intro x` an."

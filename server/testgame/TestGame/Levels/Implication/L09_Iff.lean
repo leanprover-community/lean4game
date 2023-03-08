@@ -36,7 +36,7 @@ Conclusion
 "
 "
 
-NewTactics intro apply rcases assumption
+NewTactic intro apply rcases assumption
 
 -- -- TODO: The new `cases` works differntly. There is also `cases'`
 -- example (A B : Prop) : (A ↔ B) → (A → B) := by

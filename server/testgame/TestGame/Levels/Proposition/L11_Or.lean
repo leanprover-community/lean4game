@@ -44,5 +44,5 @@ Conclusion
 Auch dieser Formalosoph zieht zufrieden von dannen.
 "
 
-NewTactics left right assumption
-DisabledTactics tauto
+NewTactic left right assumption
+DisabledTactic tauto

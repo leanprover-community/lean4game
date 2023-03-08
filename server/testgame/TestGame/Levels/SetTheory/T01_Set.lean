@@ -54,7 +54,7 @@ Statement
   rw [←Set.union_diff_distrib]
   rw [Set.univ_union]
 
-NewTactics rw
+NewTactic rw
 
 example : 4 ∈ (univ : Set ℕ) := by
   trivial

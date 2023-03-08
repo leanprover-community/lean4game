@@ -34,6 +34,6 @@ Conclusion
 `rw` hat automatisch `rfl` ausgeführt und dadurch den Beweis beendet.
 "
 
-NewTactics rw
+NewTactic rw
 
-NewLemmas not_not not_or_of_imp
+NewLemma not_not not_or_of_imp

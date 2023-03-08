@@ -46,4 +46,4 @@ Statement
   -- rw [mul_add, hn]
   -- ring
 
-NewTactics ring
+NewTactic ring

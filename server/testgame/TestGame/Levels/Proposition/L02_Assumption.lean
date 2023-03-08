@@ -41,5 +41,5 @@ Conclusion
 zerbrochen habe!
 "
 
-NewTactics assumption
-DisabledTactics tauto
+NewTactic assumption
+DisabledTactic tauto

@@ -67,4 +67,4 @@ Hint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : d = b) (h₃
 
 Conclusion "Übrigens, mit `rw [h₁, ←h₂]` könnte man mehrere `rw` zusammenfassen."
 
-NewTactics assumption rw
+NewTactic assumption rw

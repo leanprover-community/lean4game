@@ -39,5 +39,5 @@ Und gleich 38, und gleich 39, …
 **Du** Ok, ok, verstehe.
 "
 
-NewTactics contradiction
-DisabledTactics tauto
+NewTactic contradiction
+DisabledTactic tauto

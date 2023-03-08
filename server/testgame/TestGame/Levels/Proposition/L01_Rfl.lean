@@ -31,5 +31,5 @@ Conclusion
 **Untertan** Ah, richtig. Ja, Sie haben ja so recht.  Das vergesse ich immer.  Rfl, rfl, rfl …
 "
 
-NewTactics rfl
-DisabledTactics tauto
+NewTactic rfl
+DisabledTactic tauto

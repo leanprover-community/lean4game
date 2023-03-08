@@ -60,7 +60,7 @@ Hint (A : Prop) (B : Prop) (h : A → ¬ B) (k : A) (f : B) : False =>
 
 Conclusion ""
 
-NewTactics «suffices»
-DisabledTactics «have»
-NewDefinitions Even Odd
-NewLemmas not_even not_odd
+NewTactic «suffices»
+DisabledTactic «have»
+NewDefinition Even Odd
+NewLemma not_even not_odd

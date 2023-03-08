@@ -37,4 +37,4 @@ HiddenHint (A : Prop) (B : Prop) (hb : B) : A → (A ∧ B) =>
 Hint (A : Prop) (B : Prop) (ha : A) (hb : B) : (A ∧ B) =>
 "Jetzt kannst du die Taktiken aus dem letzten Kapitel verwenden."
 
-NewTactics intro constructor assumption
+NewTactic intro constructor assumption

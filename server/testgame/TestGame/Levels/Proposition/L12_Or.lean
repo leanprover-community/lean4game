@@ -125,5 +125,5 @@ Die Worte, die Du aktiv gebrauchen musst, heißen zusammengefasst `Taktiken`.  H
 "
 
 
-NewTactics assumption rcases
-DisabledTactics tauto
+NewTactic assumption rcases
+DisabledTactic tauto

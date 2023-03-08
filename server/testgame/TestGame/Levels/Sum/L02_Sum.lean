@@ -34,7 +34,7 @@ Statement
   simp
   ring
 
-NewLemmas Finset.sum_add_distrib add_comm
+NewLemma Finset.sum_add_distrib add_comm
 
 Hint (n : ℕ) : ∑ x : Fin n, ↑x + ∑ x : Fin n, 1 = n + ∑ i : Fin n, ↑i =>
 "Die zweite Summe `∑ x : Fin n, 1` kann `simp` zu `n` vereinfacht werden."

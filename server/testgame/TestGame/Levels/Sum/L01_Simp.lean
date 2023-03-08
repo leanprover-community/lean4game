@@ -44,4 +44,4 @@ Statement
     (n : ℕ) : (∑ i : Fin n, (0 + 0)) = 0 := by
   simp
 
-NewTactics simp
+NewTactic simp

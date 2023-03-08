@@ -33,5 +33,5 @@ Conclusion
 Die Schwester lacht und eilt ihrem Bruder hinterher.
 "
 
-NewTactics trivial
-DisabledTactics tauto
+NewTactic trivial
+DisabledTactic tauto

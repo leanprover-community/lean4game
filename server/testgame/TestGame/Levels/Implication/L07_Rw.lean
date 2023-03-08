@@ -71,4 +71,4 @@ Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (h₁ : C ↔ D) (h₂ : D ↔ 
 "Das ist nicht der optimale Weg..."
 
 
-NewTactics rw assumption
+NewTactic rw assumption

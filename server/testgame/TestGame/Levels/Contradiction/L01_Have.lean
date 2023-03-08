@@ -63,8 +63,8 @@ have k : ¬ B
 
 Conclusion ""
 
-NewTactics «have»
-DisabledTactics «suffices»
+NewTactic «have»
+DisabledTactic «suffices»
 
-NewDefinitions Even Odd
-NewLemmas not_even not_odd
+NewDefinition Even Odd
+NewLemma not_even not_odd

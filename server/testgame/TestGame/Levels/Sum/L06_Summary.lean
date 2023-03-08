@@ -57,7 +57,7 @@ Statement
   rw [arithmetic_sum]
   ring
 
-NewLemmas arithmetic_sum add_pow_two
+NewLemma arithmetic_sum add_pow_two
 
 HiddenHint (m : ℕ) : ∑ i : Fin (m + 1), (i : ℕ) ^ 3 = (∑ i : Fin (m + 1), ↑i) ^ 2 =>
 "Führe auch hier einen Induktionsbeweis."

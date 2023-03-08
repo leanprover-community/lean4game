@@ -52,8 +52,8 @@ Statement arithmetic_sum
   rw [Nat.succ_eq_add_one]
   ring
 
-NewTactics induction
-NewLemmas Fin.sum_univ_castSucc Nat.succ_eq_add_one mul_add add_mul
+NewTactic induction
+NewLemma Fin.sum_univ_castSucc Nat.succ_eq_add_one mul_add add_mul
 
 Hint (n : ℕ) : 2 * (∑ i : Fin (n + 1), ↑i) = n * (n + 1) =>
 "Als Erinnerung, einen Induktionsbeweis startet man mit `induction n`."

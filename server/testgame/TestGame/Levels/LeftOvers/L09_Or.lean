@@ -67,4 +67,4 @@ Hint (A : Prop) (B : Prop) (C : Prop) (h : A ∧ B) : C ∧ A =>
 Hint (A : Prop) (B : Prop) (C : Prop) (h : A → C) : C ∧ A =>
 "Ein UND im Goal kann mit `constructor` aufgeteilt werden."
 
-NewTactics left right assumption constructor rcases
+NewTactic left right assumption constructor rcases

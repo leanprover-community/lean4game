@@ -22,7 +22,7 @@ Statement "" : Injective (fun (n : ℤ) ↦ n + 3) := by
   intro a b
   simp
 
-NewDefinitions Injective
+NewDefinition Injective
 
 Hint : Injective (fun (n : ℤ) ↦ n + 3) =>
 "**Robo**: `Injective` ist als `∀ \{a b : U}, f a = f b → a = b`

@@ -19,4 +19,4 @@ Statement
     (U T V : Type _) (f : U → V) (g : V → T) (x : U) : (g ∘ f) x = g (f x)  := by
   simp only [Function.comp_apply]
 
-NewLemmas Function.comp_apply
+NewLemma Function.comp_apply

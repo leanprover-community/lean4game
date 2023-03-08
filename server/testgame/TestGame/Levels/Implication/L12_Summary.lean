@@ -76,6 +76,6 @@ HiddenHint (A : Prop) (B: Prop) (h : ¬ A ∨ B) (ha : A) : B =>
 HiddenHint (A : Prop) (B: Prop) (ha : A) (ha' : ¬A) : B =>
 "Findest du einen Widerspruch?"
 
-NewTactics rfl assumption trivial left right constructor rcases
+NewTactic rfl assumption trivial left right constructor rcases
 
-NewLemmas not_not not_or_of_imp
+NewLemma not_not not_or_of_imp
