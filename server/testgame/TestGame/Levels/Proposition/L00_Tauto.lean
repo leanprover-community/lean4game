@@ -21,6 +21,7 @@ Du siehst Robo hilflos an.
 Statement ""
     (A B C : Prop) :
     ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) := by
+  Hint "Hello? {A}"
   tauto
 
 Hint  (A B C : Prop) :

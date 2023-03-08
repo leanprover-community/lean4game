@@ -63,6 +63,20 @@ def reprint (stx : Syntax) : Format :=
 
 -- macro mods:declModifiers "lemma" n:declId sig:declSig val:declVal : command => `($mods:declModifiers theorem $n $sig $val)
 
+elab "Hint" msg:interpolatedStr(term) : tactic => do
+  let goal ← Tactic.getMainGoal
+  let varsName := `vars
+  let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
+    let mut text ← `(m! $msg)
+    let goalDecl ← goal.getDecl
+    let decls := goalDecl.lctx.decls.toArray.filterMap id
+    for i in [:decls.size] do
+      text ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $text)
+    return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize text none
+  let mvar ← mkFreshExprMVar none
+  guard $ ← isDefEq mvar text
+  logInfo (.compose (.ofGoal mvar.mvarId!) (.ofGoal goal))
+
 /-- Define the statement of the current level.
 
 Arguments:
@@ -74,15 +88,40 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
   let lvlIdx ← getCurLevelIdx
   let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
+
+  let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
+
   let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
   -- let thmStatement' ← match statementName with
   -- | none => `(lemma $(mkIdent "XX") $sig $val) -- TODO: Make it into an `example`
   -- | some name => `(lemma $name $sig $val)
+  elabCommand thmStatement
+
+  let msgs := (← get).messages
+
+  let mut hints := #[]
+  for msg in msgs.msgs do
+    -- TODO: mark the hints in a unique way to recognize them here
+    if let (MessageData.withNamingContext nctx (MessageData.withContext ctx
+        (.compose (.ofGoal text) (.ofGoal goal)))) := msg.data then
+      let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
+        let goalDecl ← goal.getDecl
+        let fvars := goalDecl.lctx.decls.toArray.filterMap id |> Array.map (mkFVar ·.fvarId)
+        let goal ← mkForallFVars fvars goalDecl.type
+        return {
+          goal := goal
+          intros := fvars.size
+          text := ← instantiateMVars (mkMVar text)
+        }
+      hints := hints.push hint
+
+  modify fun st => { st with
+    messages := initMsgs ++ msgs
+  }
 
   let scope ← getScope
   let env ← getEnv
 
-  elabCommand thmStatement
   modifyCurLevel fun level => pure {level with
     module := env.header.mainModule
     goal := sig,
@@ -91,6 +130,7 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
     descrFormat := match statementName with
     | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
     | some name => (Format.join ["lemma ", reprint name.raw, " ", reprint sig.raw, " := by"]).pretty 10  -- "lemma "  ++ (toString <| reprint name.raw) ++ " " ++ (Format.pretty (reprint sig.raw) 40) ++ " := by"
+    hints := hints
   } -- Format.pretty <| format thmStatement.raw }
 
 /-- Define the conclusion of the current game or current level if some
