@@ -5,7 +5,7 @@ set_option tactic.hygienic false
 
 Game "TestGame"
 World "Function"
-Level 6
+Level 5
 
 Title ""
 
@@ -76,4 +76,4 @@ Hint (a b : ℤ) (h : a ^ 3 + (a + 3) = b ^ 3 + (b + 3)) : a = b =>
 
 Conclusion "**Du**: Danke vielmals!
 
-Und ihr läst das Wesen mit im Gang stehen weiter über Injectivität nachdenkend."
+Und damit lässt das Wesen mitten im Gang stehen, wo es weiter über Injektivität nachdenkt."

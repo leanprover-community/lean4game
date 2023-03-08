@@ -5,72 +5,78 @@ Game "TestGame"
 World "Function"
 Level 2
 
-Title ""
+Title "let"
 
 Introduction
 "
-Ausserhalb eines Beweises kann man Funktionen mit `def`
-(anstatt `lemma`/`example`/`theorem`) definieren:
+Ihr macht euch auf Richtung Bibliothek entlang kleiner Pfade zwischen verschiedenster Behausungen.
+
+**Du**: Sag mal, ich weiss jetzt dass ich eine Funktion als `fun x ↦ x - 1` definieren kann,
+aber wie kann ich der einen Namen geben?
+
+**Robo**: Wenn jemand hier eine Funktion definiert, werden die dir
+`def f (x : ℤ) : ℤ := x - 1` oder `def f : ℤ → ℤ := (fun x ↦ x - 1)` geben.
+
+**Du**: Und das bedeutet beides das gleiche?
+
+**Robo**: Praktisch, ja. Aber! Wenn du eine Funktion in einer Aufgabe benennen willst,
+schreibst du `let f := fun (x : ℤ) ↦ x - 1`!
+
+**Du**: Und was ist der Unterschied?
+
+**Robo**: Deines mit `let` ist für innerhalb von einem Beweis, das andere mit `def`
+ist für ausserhalb von einem Beweis. Hier, ich geb dir mal eine Aufgabe:
 
 ```
-def f (x : ℚ) : ℚ := 1 / (1 + x^2)
-
-def f : ℚ → ℚ := fun x ↦ 1 / (1 + x^2)
+def f (x : ℤ) : ℤ := (x + 4)
 ```
-
-(die beiden Varianten sind äquivalent.)
-
-Um eine anonyme Funktion `fun x ↦ 1 / (1 + x^2)` **innerhalb** eines Beweis einem Namen
-zuzuordnen, benützt man `let`:
-
-```
-let f : ℕ → ℕ := fun (n : ℕ) ↦ n ^ 2
-```
-
-`def` und `let` funktionieren also fast gleich wie `lemma`/`example`/`theorem` und `have` mit
-einem wichtigen Unterschied:
-
-```
-have f : ℕ → ℕ := fun (n : ℕ) ↦ n ^ 2
-let f₂ : ℕ → ℕ := fun (n : ℕ) ↦ n ^ 2
-```
-
-`have` vergisst sofort den \"Beweis\", das heisst, Lean weiss dann nur, dass es eine
-Funktion `(f : ℕ → ℕ)` gibt, aber nicht, wie diese definiert ist. `let` hingegen speichert
-die Definition der Funktion.
-
-Manchmal muss man Definitionen (von einem `def` oder `let` Statement) mit `unfold` einsetzen.
+und:
 "
 
-def f (x : ℤ) : ℤ := (x + 1) ^ 2
+def f (x : ℤ) : ℤ := (x + 4)
 
-Statement
-"
-Given the function
-```
-def f (x : ℤ) : ℤ := (x + 1) ^ 2
-```
-show that $f(x) = x^2 + 2x + 1$.
-
-"
-    : ∀ x, f x = x ^ 2 + 2 * x + 1 := by
-  intro x
+Statement "" (x : ℤ) : ∃ (g : ℤ → ℤ), (g ∘ f) x = x + 1 := by
+  let g := fun (x : ℤ) ↦ x - 3
+  use g
+  simp
   unfold f
   ring
 
 NewTactic «let»
-OnlyTactic «let» intro unfold ring
+NewLemma Function.comp_apply
 
-HiddenHint : ∀ x, f x = x ^ 2 + 2 * x + 1 =>
-"Fang zuerst wie immer mit `intro x` an."
+Hint (x : ℤ) : ∃ g, (g ∘ f) x = x + 1 =>
+"**Du**: Ist `g ∘ f` Komposition von Funktionen?
 
-Hint (x : ℤ) : f x = x ^ 2 + 2 * x + 1 =>
+**Robo**: Richtig! Das schreibt man mit `\\comp`.
+
+  **Du** Und hier könnte ich also zuerst
+`let g := fun (x : ℤ) ↦ _` definieren, anstatt direkt
+`use fun (x : ℤ) ↦ _`?
+
+**Robo**: Genau! Das ist zwar praktisch das gleiche, aber kann manchmal nützlich sein.
 "
-Definitionen muss man manchmal manuell einsetzen um den Taktiken zu helfen.
 
-Das macht man mit `unfold f` (oder alternativ mit `rw [f]`).
-"
+-- TODO: Make some hints work here
+Hint (x : ℤ) : ((fun (x : ℤ) ↦ x - 3) ∘ f) x = x + 1 =>
+"**Robo**: Manchmal must du nachhelfen und Funktionen mit `unfold f` öffnen, manchmal nicht.
+Um erlich zu sein, sagt mein Programm nicht genau wann man das machen muss…"
 
-HiddenHint (x : ℤ) : f x = x ^ 2 + 2 * x + 1 =>
-"
-Nachdem die Definition von `f` eingesetzt ist, übernimmt `ring` den Rest"
+-- TODO : Make this work
+Hint (x : ℤ) (g := (fun (x : ℤ) ↦ x - 3)) : (g ∘ f) x = x + 1 =>
+"**Robo**: `(g ∘ f) x` ist per Definition `g (f x)`, aber mit
+`rw [Function.comp_apply]` kann man das explizit umschreiben, aber `simp` kennt das
+Lemma auch."
+
+Hint (x : ℤ) : f x - 3 = x + 1 =>
+"**Robo**: Manchmal must du nachhelfen und Definitionen mit `unfold f` öffnen, mamchmal klappts
+ohne.
+Um erlich zu sein, sagt mein Programm nicht genau wann man das machen muss…"
+
+-- TODO: Block simp-Lemma
+
+Conclusion "**Du**: Dann verstehst du etwas Mathe?
+
+**Robo**: Ich hatte ja keine Ahnung ob die generierte Aufgabe beweisbar ist…
+
+Und damit erreicht ihr den Hügel mit der Bibliothek."

@@ -36,6 +36,7 @@ Path LeanStuff → SetTheory → SetTheory2 → SetFunction
 
 Path Predicate → Prime → Induction
 Path Sum → Inequality → Induction
+Path Inequality → LeanStuff
 
 Path SetTheory2 → Numbers
 Path Module → Basis → Module2

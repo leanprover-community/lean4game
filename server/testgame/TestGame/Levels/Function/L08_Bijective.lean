@@ -3,7 +3,7 @@ import Mathlib
 
 Game "TestGame"
 World "Function"
-Level 9
+Level 8
 
 Title ""
 
@@ -26,7 +26,7 @@ Statement "" : Bijective (fun (n : ℤ) ↦ n + 1) := by
   simp
 
 Hint : Bijective (fun (n : ℤ) ↦ n + 1) =>
-"**Robo** *(flüsternd)**: `Bijectve f` ist als `Injective f ∧ Surjective f` definiert.
+"**Robo** *(flüsternd)*: `Bijectve f` ist als `Injective f ∧ Surjective f` definiert.
 
 **Du**: Dann ist das ja ganz simpel!
 "

@@ -3,13 +3,14 @@ import Mathlib
 
 Game "TestGame"
 World "Function"
-Level 4
+Level 3
 
-Title ""
+Title "Komposition"
 
 Introduction
 "
-Du kommst an eine Tür mit zwei Wächtern. Der eine hat ein Schild
+Endlich kommt ihr zur Bibliothek. Komischerweise stehen an der Tür
+zwei Wächtern. Der eine zeigt euch ein Blatt mit
 
 ```
 def f : ℚ → ℚ := fun x ↦ 5 * x
@@ -21,10 +22,8 @@ der andere eines mit
 def g : ℚ → ℚ := fun x ↦ if 0 ≤ x then 2*x else 0
 ```
 
-Auf der Tür steht groß:
+und gibt Dir ein Blatt mit einer einzelnen Zeile am oberen Ende.
 "
-
-example (P : Prop) [Decidable P] (a b : ℕ) (h : P) : ite P a b = a := if_pos h
 
 open Set
 
@@ -32,11 +31,6 @@ namespace LevelFunction4
 
 def f : ℚ → ℚ := fun x ↦ 5 * x
 def g : ℚ → ℚ := fun x ↦ if 0 ≤ x then 2*x else 0
-
-
--- #eval (f2 + f2) 2
-
--- #check range f2
 
 Statement ""
     : f ∘ g = g ∘ f := by
@@ -72,6 +66,7 @@ Hint : f ∘ g = g ∘ f =>
 dann für dieses.
 "
 
+-- TODO : This does not trigger.
 -- TODO: These 5 hints should be mutually exclusive. i.e. they should not trigger
 -- if a assumption is missing.
 Hint (x : ℚ) : (f ∘ g) x = (g ∘ f) x =>
@@ -92,12 +87,15 @@ könnte mit dem Lemma `not_le` zwischen `¬(0 ≤ {x})` und `0 < {x}` wechseln.
 Hint (x : ℚ) (h : 0 ≤ x) : f (g x) = g (f x) =>
 "
 **Robo**: Um das ausrechnen zu können, brauchst du nicht nur `0 ≤ x` sondern auch noch
-eine Annahme `0 ≤ f x`.
+eine neue Annahme `0 ≤ f x`.
+
+**Du**: Also `have h₂ : _`?
 "
 
 Hint (x : ℚ) (h : 0 ≤ x) (h₂ : 0 ≤ f x) : f (g x) = g (f x) =>
 "
-**Du**: Mit den beiden Annahmen habe ich ja jetzt `(if 0 ≤ x then _)` wobei `0 ≤ x` wahr ist,
+**Du**: Mit den beiden Annahmen sagt die Definition von `g` ja z.B.
+`(if 0 ≤ x then _)` wobei ich weiss dass `0 ≤ x` wahr ist,
 kann ich das dann einfach vereinfachen?
 
 **Robo**: Dafür must du zuerst die Definition von `g` öffnen, also `unfold`. Und dann mit

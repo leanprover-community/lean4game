@@ -3,7 +3,7 @@ import Mathlib
 
 Game "TestGame"
 World "Function"
-Level 10
+Level 9
 
 Title "Inverse"
 
@@ -19,6 +19,7 @@ aber er möchte, dass Du ihm das hier und jetzt nochmals von Grund auf zeigst.
 
 open Function
 
+--TODO: This is a really hard proof
 Statement bijective_iff_has_inverse "" {A B : Type} (f : A → B) :
     Bijective f ↔ ∃ g, LeftInverse g f ∧ RightInverse g f := by
   constructor
@@ -53,7 +54,7 @@ Hint {A B : Type} (f : A → B) : Bijective f ↔ ∃ g, LeftInverse g f ∧ Rig
 ich ja schon."
 
 Conclusion
-"Endlich entkommt ihr dem Tempel.
+"Endlich entkommt ihr der Bibliothek.
 
 **Robo**: Da würden mich keine zehn Pferde nochmals hineinbringen!
 
