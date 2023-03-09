@@ -61,9 +61,24 @@ partial def reprintCore : Syntax → Option Format
 def reprint (stx : Syntax) : Format :=
   reprintCore stx |>.getD ""
 
+
+syntax hintArg := " (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")"
+
 /-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
-see hints. -/
-elab "Hint" msg:interpolatedStr(term) : tactic => do
+see hints. The tactic does not affect the goal state. -/
+elab "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
+
+  let mut strict := false
+  let mut hidden := false
+
+  for arg in args do
+    match arg with
+    | `(hintArg| (strict := true)) => strict := true
+    | `(hintArg| (strict := false)) => strict := false
+    | `(hintArg| (hidden := true)) => hidden := true
+    | `(hintArg| (hidden := false)) => hidden := false
+    | _ => throwUnsupportedSyntax
+
   let goal ← Tactic.getMainGoal
   goal.withContext do
     -- We construct an expression that can produce the hint text. The difficulty is that we
@@ -77,11 +92,15 @@ elab "Hint" msg:interpolatedStr(term) : tactic => do
       for i in [:decls.size] do
         text ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $text)
       return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize text none
-    let mvar ← mkFreshExprMVar none
-    guard $ ← isDefEq mvar text -- Store the text in a mvar.
+    let textmvar ← mkFreshExprMVar none
+    guard $ ← isDefEq textmvar text -- Store the text in a mvar.
     -- The information about the hint is logged as a message using `logInfo` to transfer it to the
     -- `Statement` command defined below:
-    logInfo (.tagged `Hint (.compose (.ofGoal mvar.mvarId!) (.ofGoal goal)))
+    logInfo $
+      .tagged `Hint $
+      .nest (if strict then 1 else 0) $
+      .nest (if hidden then 1 else 0) $
+      .compose (.ofGoal textmvar.mvarId!) (.ofGoal goal)
 
 /-- Define the statement of the current level.
 
@@ -109,12 +128,19 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
   let mut hints := #[]
   let mut nonHintMsgs := #[]
   for msg in msgs.msgs do
-    if let (MessageData.withNamingContext _ (MessageData.withContext ctx
-        (.tagged `Hint (.compose (.ofGoal text) (.ofGoal goal))))) := msg.data then
+    -- Look for messages produced by the `Hint` tactic. They are used to pass information about the
+    -- intermediate goal state
+    if let MessageData.withNamingContext _ $ MessageData.withContext ctx $
+        .tagged `Hint $
+        .nest strict $
+        .nest hidden $
+        .compose (.ofGoal text) (.ofGoal goal) := msg.data then
       let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
         return {
           goal := ← abstractCtx goal
           text := ← instantiateMVars (mkMVar text)
+          strict := strict == 1
+          hidden := hidden == 1
         }
       hints := hints.push hint
     else

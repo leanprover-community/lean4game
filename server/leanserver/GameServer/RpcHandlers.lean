@@ -123,7 +123,7 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array
         if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
         then
           let lctx := (← goal.getDecl).lctx
-          if ← matchDecls hintFVars lctx.getFVars (strict := true) (initBij := fvarBij)
+          if ← matchDecls hintFVars lctx.getFVars (strict := hint.strict) (initBij := fvarBij)
           then
             let text := (← evalHintMessage hint.text) hintFVars
             let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}

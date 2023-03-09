@@ -20,8 +20,10 @@ structure GoalHintEntry where
   goal : AbstractCtxResult
   /-- Text of the hint as an expression of type `Array Expr → MessageData` -/
   text : Expr
-  /--  If true, then hint should be hidden by default -/
+  /--  If true, then hint should be hidden and only be shown on player's request -/
   hidden : Bool := false
+  /--  If true, then the goal must contain only the assumptions specified in `goal` and no others -/
+  strict : Bool := false
 
 instance : Repr GoalHintEntry := {
   reprPrec := fun a n => reprPrec a.text n

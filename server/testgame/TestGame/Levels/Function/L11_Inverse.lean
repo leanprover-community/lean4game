@@ -21,13 +21,13 @@ open Function
 
 Statement bijective_iff_has_inverse "" {A B : Type} (f : A → B) :
     Bijective f ↔ ∃ g, LeftInverse g f ∧ RightInverse g f := by
-  Hint "constructor"
+  Hint (hidden := true) "constructor"
   constructor
   Hint "intro h" -- does not show
   intro h
   Hint "rcases h with ⟨h₁, h₂⟩" -- shows too late: 1, 2 after
   rcases h with ⟨h₁, h₂⟩
-  Hint "let g := fun x => (h₂ x).choose" -- shows correct + 1 after
+  Hint (strict := true) "let g := fun x => (h₂ x).choose" -- shows correct + 1 after
   let g := fun x => (h₂ x).choose
   Hint "use g"
   use g
@@ -53,7 +53,7 @@ Statement bijective_iff_has_inverse "" {A B : Type} (f : A → B) :
   constructor
   Hint "intro a b hab"
   intro a b hab
-  Hint "have h : g (f a) = g (f b)"
+  Hint (strict := true) "have h : g (f a) = g (f b)"
   have h : g (f a) = g (f b)
   Hint "apply congrArg"
   apply congrArg
