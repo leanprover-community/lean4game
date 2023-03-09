@@ -21,6 +21,9 @@ open Function
 
 Statement bijective_iff_has_inverse "" {A B : Type} (f : A → B) :
     Bijective f ↔ ∃ g, LeftInverse g f ∧ RightInverse g f := by
+  Branch
+    exfalso
+    Hint "Das war eine blöde Idee"
   Hint (hidden := true) "constructor"
   constructor
   Hint "intro h" -- does not show

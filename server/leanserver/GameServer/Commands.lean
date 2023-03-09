@@ -102,6 +102,15 @@ elab "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
       .nest (if hidden then 1 else 0) $
       .compose (.ofGoal textmvar.mvarId!) (.ofGoal goal)
 
+/-- This tactic allows us to execute an alternative sequence of tactics, but without affecting the
+proof state. We use it to define Hints for alternative proof methods or dead ends. -/
+elab "Branch" t:tacticSeq : tactic => do
+  let b ← saveState
+  Tactic.evalTactic t
+  let msgs ← Core.getMessageLog
+  b.restore
+  Core.setMessageLog msgs
+
 /-- Define the statement of the current level.
 
 Arguments:
