@@ -1,5 +1,6 @@
 import Lean
 import GameServer.Graph
+import GameServer.AbstractCtx
 
 /-! # Environment extensions
 
@@ -16,15 +17,15 @@ open Lean
 A hint to help the user with a specific goal state
 -/
 structure GoalHintEntry where
-  goal : Expr
-  /-- Number of variables to intro in the beginning of goal -/
-  intros : Nat
+  goal : AbstractCtxResult
   /-- Text of the hint as an expression of type `Array Expr → MessageData` -/
   text : Expr
   /--  If true, then hint should be hidden by default -/
   hidden : Bool := false
-  deriving Repr
 
+instance : Repr GoalHintEntry := {
+  reprPrec := fun a n => reprPrec a.text n
+}
 
 /-! ## Tactic/Definition/Lemma documentation -/
 

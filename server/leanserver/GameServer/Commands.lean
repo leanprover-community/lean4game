@@ -65,17 +65,18 @@ def reprint (stx : Syntax) : Format :=
 
 elab "Hint" msg:interpolatedStr(term) : tactic => do
   let goal ← Tactic.getMainGoal
-  let varsName := `vars
-  let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
-    let mut text ← `(m! $msg)
-    let goalDecl ← goal.getDecl
-    let decls := goalDecl.lctx.decls.toArray.filterMap id
-    for i in [:decls.size] do
-      text ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $text)
-    return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize text none
-  let mvar ← mkFreshExprMVar none
-  guard $ ← isDefEq mvar text
-  logInfo (.compose (.ofGoal mvar.mvarId!) (.ofGoal goal))
+  goal.withContext do
+    let varsName := `vars
+    let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
+      let mut text ← `(m! $msg)
+      let goalDecl ← goal.getDecl
+      let decls := goalDecl.lctx.decls.toArray.filterMap id
+      for i in [:decls.size] do
+        text ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $text)
+      return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize text none
+    let mvar ← mkFreshExprMVar none
+    guard $ ← isDefEq mvar text
+    logInfo (.compose (.ofGoal mvar.mvarId!) (.ofGoal goal))
 
 /-- Define the statement of the current level.
 
@@ -105,12 +106,8 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
     if let (MessageData.withNamingContext nctx (MessageData.withContext ctx
         (.compose (.ofGoal text) (.ofGoal goal)))) := msg.data then
       let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
-        let goalDecl ← goal.getDecl
-        let fvars := goalDecl.lctx.decls.toArray.filterMap id |> Array.map (mkFVar ·.fvarId)
-        let goal ← mkForallFVars fvars goalDecl.type
         return {
-          goal := goal
-          intros := fvars.size
+          goal := ← abstractCtx goal
           text := ← instantiateMVars (mkMVar text)
         }
       hints := hints.push hint
@@ -178,38 +175,40 @@ def mkGoalSyntax (s : Term) : List (Ident × Term) → MacroM Term
 | (n, t)::tail => do return (← `(∀ $n : $t, $(← mkGoalSyntax s tail)))
 | [] => return s
 
-def elabHint (hidden : Bool) (binders : TSyntaxArray `Lean.Parser.Term.bracketedBinder)
-  (goal : TSyntax `term) (msg : TSyntax `interpolatedStrKind) :=
-liftTermElabM do withOptions (fun options => options.setBool `linter.unusedVariables false) do
-  let (g, decls) ← elabBinders binders fun xs => do
-    let g ← mkForallFVars xs $ ← elabTermAndSynthesize goal none
-    synthesizeSyntheticMVarsNoPostponing false
-    return (← instantiateMVars g, ← xs.mapM (fun x => x.fvarId!.getDecl))
-  let varsName := `vars
-  let msg ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
-    let mut msg ← `(m! $msg)
-    for i in [:decls.size] do
-      msg ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $msg)
-    return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize msg none
+-- def elabHint (hidden : Bool) (binders : TSyntaxArray `Lean.Parser.Term.bracketedBinder)
+--   (goal : TSyntax `term) (msg : TSyntax `interpolatedStrKind) :=
+-- liftTermElabM do withOptions (fun options => options.setBool `linter.unusedVariables false) do
+--   let (g, decls) ← elabBinders binders fun xs => do
+--     let g ← mkForallFVars xs $ ← elabTermAndSynthesize goal none
+--     synthesizeSyntheticMVarsNoPostponing false
+--     return (← instantiateMVars g, ← xs.mapM (fun x => x.fvarId!.getDecl))
+--   let varsName := `vars
+--   let msg ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
+--     let mut msg ← `(m! $msg)
+--     for i in [:decls.size] do
+--       msg ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $msg)
+--     return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize msg none
 
-  if g.hasMVar then throwError m!"Goal contains metavariables: {g}"
+--   if g.hasMVar then throwError m!"Goal contains metavariables: {g}"
 
-  modifyCurLevel fun level => pure {level with hints := level.hints.push {
-    goal := g,
-    intros := decls.size,
-    hidden := hidden,
-    text := msg }}
+  -- modifyCurLevel fun level => pure {level with hints := level.hints.push {
+  --   goal := g,
+  --   intros := decls.size,
+  --   hidden := hidden,
+  --   text := msg }}
 
 /-- Declare a hint. This version doesn't prevent the unused linter variable from running. -/
 local elab "Hint'" binders:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command =>
-  elabHint false binders goal msg
+  -- elabHint false binders goal msg
+  pure ()
 
 /--
 Declare a hint. This version doesn't prevent the unused linter variable from running.
 A hidden hint is only displayed if explicitly requested by the user.
 -/
 local elab "HiddenHint'" binders:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command => do
-  elabHint true binders goal msg
+  -- elabHint true binders goal msg
+  pure ()
 
 /-- Declare a hint in reaction to a given tactic state in the current level. -/
 macro "Hint" decls:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command => do

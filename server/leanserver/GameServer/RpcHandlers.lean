@@ -25,67 +25,82 @@ def getLevelByFileName? [Monad m] [MonadEnv m] (fileName : String) : m (Option G
     | return none
   return ← getLevel? levelId
 
+structure FVarBijection :=
+  (forward : HashMap FVarId FVarId)
+  (backward : HashMap FVarId FVarId)
 
-/-- Checks if `pattern` and `e` are equal up to mvars in `pattern` that may be assigned to fvars in `e`. -/
-partial def matchExprAux (pattern : Expr) (e : Expr) : MetaM Bool := do
+instance : EmptyCollection FVarBijection := ⟨{},{}⟩
+
+def FVarBijection.insert (bij : FVarBijection) (a b : FVarId) : FVarBijection :=
+  ⟨bij.forward.insert a b, bij.backward.insert b a⟩
+
+def FVarBijection.insert? (bij : FVarBijection) (a b : FVarId) : Option FVarBijection :=
+  let a' := bij.forward.find? a
+  let b' := bij.forward.find? b
+  if (a' == none || a' == some b) && (b' == none || b' == some a)
+  then some $ bij.insert a b
+  else none
+
+/-- Checks if `pattern` and `e` are equal up to FVar identities. -/
+partial def matchExpr (pattern : Expr) (e : Expr) (bij : FVarBijection := {}) : Option FVarBijection :=
   match pattern, e with
-  | .bvar i1, .bvar i2 => return i1 == i2
-  | .fvar i1, .fvar i2 => return i1 == i2
-  | .mvar _, .mvar _ => return true
-  | .sort u1, .sort u2 => Meta.isLevelDefEq u1 u2
+  | .bvar i1, .bvar i2 => if i1 == i2 then bij else none
+  | .fvar i1, .fvar i2 => bij.insert? i1 i2
+  | .mvar _, .mvar _ => bij
+  | .sort u1, .sort u2 => bij -- TODO?
   | .const n1 ls1, .const n2 ls2 =>
-    return n1 == n2 && (← (ls1.zip ls2).allM fun (l1, l2) => Meta.isLevelDefEq l1 l2)
+    if n1 == n2 then bij else none -- && (← (ls1.zip ls2).allM fun (l1, l2) => Meta.isLevelDefEq l1 l2)
   | .app f1 a1, .app f2 a2 =>
-    return (← matchExprAux f1 f2) && (← matchExprAux a1 a2)
+    some bij
+      |> (Option.bind · (fun bij => matchExpr f1 f2 bij))
+      |> (Option.bind · (fun bij => matchExpr a1 a2 bij))
   | .lam _ t1 b1 _, .lam _ t2 b2 _ =>
-    return (← matchExprAux t1 t2) && (← matchExprAux b1 b2)
+    some bij
+      |> (Option.bind · (fun bij => matchExpr t1 t2 bij))
+      |> (Option.bind · (fun bij => matchExpr b1 b2 bij))
   | .forallE _ t1 b1 _, .forallE _ t2 b2 _ =>
-    return (← matchExprAux t1 t2) && (← matchExprAux b1 b2)
+    some bij
+      |> (Option.bind · (fun bij => matchExpr t1 t2 bij))
+      |> (Option.bind · (fun bij => matchExpr b1 b2 bij))
   | .letE _ t1 v1 b1 _, .letE _ t2 v2 b2 _ =>
-    return (← matchExprAux t1 t2) && (← matchExprAux v1 v2)  && (← matchExprAux b1 b2)
+    some bij
+      |> (Option.bind · (fun bij => matchExpr t1 t2 bij))
+      |> (Option.bind · (fun bij => matchExpr v1 v2 bij))
+      |> (Option.bind · (fun bij => matchExpr b1 b2 bij))
   | .lit l1, .lit l2 =>
-    return l1 == l2
+    if l1 == l2 then bij else none
   | .proj i1 n1 e1, .proj i2 n2 e2 =>
-    return i1 == i2 && n1 == n2 && (← matchExprAux e1 e2)
+    if i1 == i2 && n1 == n2 then matchExpr e1 e2 bij else none
   -- ignore mdata:
   | .mdata _ pattern', _ =>
-    return ← matchExprAux pattern' e
+    matchExpr pattern' e bij
   | _, .mdata _ e' =>
-    return ← matchExprAux pattern e'
-  -- assign fvars to mvars:
-  | .mvar i1, .fvar _ =>
-    match ← getExprMVarAssignment? i1 with
-    | some pattern' => matchExprAux pattern' e
-    | none =>
-      i1.assign e
-      return true
-  | _, _ => return false
+    matchExpr pattern e' bij
+  | _, _ => none
 
-def matchExpr (pattern : Expr) (e : Expr) : MetaM Bool := do
-  checkpointDefEq (mayPostpone := true) do
-    matchExprAux pattern e
-
-/-- Check if each meta variable in `declMvars` has a matching fvar in `declFvars` -/
-def matchDecls (declMvars : Array Expr) (declFvars : Array Expr) : MetaM Bool := do
+/-- Check if each fvar in `patterns` has a matching fvar in `fvars` -/
+def matchDecls (patterns : Array Expr) (fvars : Array Expr) : Bool :=
   -- We iterate through the array backwards hoping that this will find us faster results
   -- TODO: implement backtracking
-  let mut usedFvars := (List.replicate declFvars.size false).toArray
-  -- `usedFvars` keeps track of the fvars that were already used to match an mvar.
-  for i in [:declMvars.size] do
-    let declMvar := declMvars[declMvars.size - i - 1]!
-    let mut found := false
-    for j in [:declFvars.size] do
-      let declFvar := declFvars[declFvars.size - j - 1]!
-      let usedFvar := usedFvars[declFvars.size - j - 1]!
-      if ¬ usedFvar then
-        if ← matchExpr declMvar declFvar then
-          usedFvars := usedFvars.set! (declFvars.size - j - 1) true
-          found := true
-          break
-      else
-        continue
-    if ¬ found then return false
-  return true
+  -- TODO: reimplement this
+  patterns.size = fvars.size
+  -- let mut usedFvars := (List.replicate declFvars.size false).toArray
+  -- -- `usedFvars` keeps track of the fvars that were already used to match an mvar.
+  -- for i in [:declMvars.size] do
+  --   let declMvar := declMvars[declMvars.size - i - 1]!
+  --   let mut found := false
+  --   for j in [:declFvars.size] do
+  --     let declFvar := declFvars[declFvars.size - j - 1]!
+  --     let usedFvar := usedFvars[declFvars.size - j - 1]!
+  --     if ¬ usedFvar then
+  --       if let some _ := matchExpr declMvar declFvar then
+  --         usedFvars := usedFvars.set! (declFvars.size - j - 1) true
+  --         found := true
+  --         break
+  --     else
+  --       continue
+  --   if ¬ found then return false
+  -- return true
 
 unsafe def evalHintMessageUnsafe : Expr → MetaM (Array Expr → MessageData) :=
   evalExpr (Array Expr → MessageData)
@@ -102,19 +117,19 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array
     let some level ← getLevelByFileName? doc.meta.mkInputContext.fileName
       | throwError "Level not found: {doc.meta.mkInputContext.fileName}"
     let hints ← level.hints.filterMapM fun hint => do
-      let (declMvars, binderInfo, hintGoal) ← forallMetaBoundedTelescope hint.goal hint.intros
-      -- TODO: Protect mvars in the type of `goal` to be instantiated?
-      if ← matchExpr hintGoal (← inferType $ mkMVar goal)
-      then
-        let lctx ← getLCtx -- Local context of the `goal`
-        if ← matchDecls declMvars lctx.getFVars
+      openAbstractCtxResult hint.goal fun hintFVars hintGoal => do
+        if let some _ := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
         then
-          let text := (← evalHintMessage hint.text) declMvars
-          let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
-          let text ← (MessageData.withContext ctx text).toString
-          return some { text := text, hidden := hint.hidden }
-        else return none
-      else return none
+          let lctx := (← goal.getDecl).lctx
+          if matchDecls hintFVars lctx.getFVars
+          then
+            let text := (← evalHintMessage hint.text) hintFVars
+            let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
+            let text ← (MessageData.withContext ctx text).toString
+            return some { text := text, hidden := hint.hidden }
+          else return none
+        else
+          return none
     return hints
 
 open RequestM in
