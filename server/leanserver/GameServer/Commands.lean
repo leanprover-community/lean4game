@@ -61,11 +61,14 @@ partial def reprintCore : Syntax → Option Format
 def reprint (stx : Syntax) : Format :=
   reprintCore stx |>.getD ""
 
--- macro mods:declModifiers "lemma" n:declId sig:declSig val:declVal : command => `($mods:declModifiers theorem $n $sig $val)
-
+/-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
+see hints. -/
 elab "Hint" msg:interpolatedStr(term) : tactic => do
   let goal ← Tactic.getMainGoal
   goal.withContext do
+    -- We construct an expression that can produce the hint text. The difficulty is that we
+    -- want the text to possibly contain quotation of the local variables which might have been
+    -- named differently by the player.
     let varsName := `vars
     let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
       let mut text ← `(m! $msg)
@@ -75,8 +78,10 @@ elab "Hint" msg:interpolatedStr(term) : tactic => do
         text ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $text)
       return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize text none
     let mvar ← mkFreshExprMVar none
-    guard $ ← isDefEq mvar text
-    logInfo (.compose (.ofGoal mvar.mvarId!) (.ofGoal goal))
+    guard $ ← isDefEq mvar text -- Store the text in a mvar.
+    -- The information about the hint is logged as a message using `logInfo` to transfer it to the
+    -- `Statement` command defined below:
+    logInfo (.tagged `Hint (.compose (.ofGoal mvar.mvarId!) (.ofGoal goal)))
 
 /-- Define the statement of the current level.
 
@@ -90,6 +95,7 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
   let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
 
+  -- save the messages before evaluation of the proof
   let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
 
   let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
@@ -101,19 +107,22 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
   let msgs := (← get).messages
 
   let mut hints := #[]
+  let mut nonHintMsgs := #[]
   for msg in msgs.msgs do
-    -- TODO: mark the hints in a unique way to recognize them here
-    if let (MessageData.withNamingContext nctx (MessageData.withContext ctx
-        (.compose (.ofGoal text) (.ofGoal goal)))) := msg.data then
+    if let (MessageData.withNamingContext _ (MessageData.withContext ctx
+        (.tagged `Hint (.compose (.ofGoal text) (.ofGoal goal))))) := msg.data then
       let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
         return {
           goal := ← abstractCtx goal
           text := ← instantiateMVars (mkMVar text)
         }
       hints := hints.push hint
+    else
+      nonHintMsgs := nonHintMsgs.push msg
 
+  -- restore saved messages and non-hint messages
   modify fun st => { st with
-    messages := initMsgs ++ msgs
+    messages := initMsgs ++ ⟨nonHintMsgs.toPArray'⟩
   }
 
   let scope ← getScope
