@@ -79,28 +79,30 @@ partial def matchExpr (pattern : Expr) (e : Expr) (bij : FVarBijection := {}) : 
   | _, _ => none
 
 /-- Check if each fvar in `patterns` has a matching fvar in `fvars` -/
-def matchDecls (patterns : Array Expr) (fvars : Array Expr) : Bool :=
+def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true) (initBij : FVarBijection := {}) : MetaM Bool := do
   -- We iterate through the array backwards hoping that this will find us faster results
   -- TODO: implement backtracking
-  -- TODO: reimplement this
-  patterns.size = fvars.size
-  -- let mut usedFvars := (List.replicate declFvars.size false).toArray
-  -- -- `usedFvars` keeps track of the fvars that were already used to match an mvar.
-  -- for i in [:declMvars.size] do
-  --   let declMvar := declMvars[declMvars.size - i - 1]!
-  --   let mut found := false
-  --   for j in [:declFvars.size] do
-  --     let declFvar := declFvars[declFvars.size - j - 1]!
-  --     let usedFvar := usedFvars[declFvars.size - j - 1]!
-  --     if ¬ usedFvar then
-  --       if let some _ := matchExpr declMvar declFvar then
-  --         usedFvars := usedFvars.set! (declFvars.size - j - 1) true
-  --         found := true
-  --         break
-  --     else
-  --       continue
-  --   if ¬ found then return false
-  -- return true
+  let mut bij := initBij
+  for i in [:patterns.size] do
+    let pattern := patterns[patterns.size - i - 1]!
+    if bij.forward.contains pattern.fvarId! then
+      continue
+    for j in [:fvars.size] do
+      let fvar := fvars[fvars.size - j - 1]!
+      if bij.backward.contains fvar.fvarId! then
+        continue
+
+      if let some bij' := matchExpr
+          (← instantiateMVars $ ← inferType pattern)
+          (← instantiateMVars $ ← inferType fvar) bij then
+        -- usedFvars := usedFvars.set! (fvars.size - j - 1) true
+        bij := bij'.insert pattern.fvarId! fvar.fvarId!
+        break
+    if ! bij.forward.contains pattern.fvarId! then return false
+
+  if strict then
+    return fvars.all (fun fvar => bij.backward.contains fvar.fvarId!)
+  return true
 
 unsafe def evalHintMessageUnsafe : Expr → MetaM (Array Expr → MessageData) :=
   evalExpr (Array Expr → MessageData)
@@ -118,10 +120,10 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array
       | throwError "Level not found: {doc.meta.mkInputContext.fileName}"
     let hints ← level.hints.filterMapM fun hint => do
       openAbstractCtxResult hint.goal fun hintFVars hintGoal => do
-        if let some _ := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
+        if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
         then
           let lctx := (← goal.getDecl).lctx
-          if matchDecls hintFVars lctx.getFVars
+          if ← matchDecls hintFVars lctx.getFVars (strict := true) (initBij := fvarBij)
           then
             let text := (← evalHintMessage hint.text) hintFVars
             let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}

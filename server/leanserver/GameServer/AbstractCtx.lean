@@ -20,5 +20,7 @@ def abstractCtx (goal : MVarId) : MetaM AbstractCtxResult := do
 def openAbstractCtxResult (res : AbstractCtxResult) (k : Array Expr → Expr → MetaM α) : MetaM α := do
   let (mvars, binderInfo, expr) ← openAbstractMVarsResult res.abstractMVarsResult
   lambdaLetTelescope (← instantiateMVars expr) k
+  -- TODO: Unfornately, lambdaLetTelescope does not allow us to provide the number of arguments.
+  -- If the goal is a function, this will not work.
 
 end AbstractCtx
