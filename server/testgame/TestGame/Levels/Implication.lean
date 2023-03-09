@@ -26,5 +26,8 @@ aber niemand von den Einwohnern wusste was davon...
 **Robo**: Auf dem Mond *Implis* den wir gerade ansteuern können sie uns vielleicht mehr
 erzählen…
 
-Und damit leitet Robo den Landeanflug ein.
+Und damit leitet Robo den Landeanflug ein. Implis scheint ein riesiger Tagbau zu sein auf
+dem nach allem möglichen gegraben wird. Überall seht ihr Förderbänder kreuz und queer.
+
+Das Operationsteam begrüsst euch freundlich und lädt zum Essen im Kommandoturm.
 "

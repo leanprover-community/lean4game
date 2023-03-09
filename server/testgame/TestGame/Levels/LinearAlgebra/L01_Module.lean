@@ -62,28 +62,30 @@ Im nachfolgenden beweisen wir die Eigenschaften einzeln.
 
 Statement
 "Zeige, dass $\\mathbb{R}$ ein $\\mathbb{Q}$-Modul ist."
-    : Module ℚ ℝ :=
-  { smul := fun a r ↦ ↑a * r,
-    smul_zero := by
-      intro a
-      rw [smul_zero]
-    zero_smul := by
-      intro a
-      change (0 : ℚ) * a = 0
-      simp
-    one_smul := by
-      intro b
-      change (1 : ℚ) * b = b
-      rw [Rat.cast_one, one_mul]
-    smul_add := by
-      intro a x y
-      change a * (x + y) = a * x + a * y
-      rw [mul_add]
-    add_smul := by
-      intro r s x
-      change (r + s : ℚ) * x = r * x + s * x
-      rw [Rat.cast_add, add_mul]
-    mul_smul := by
-      intro x y b
-      change (x * y : ℚ) * b = x * (y * b)
-      rw [Rat.cast_mul, mul_assoc]}
+    : Module ℚ ℝ := by
+  refine {
+    smul := fun a r => ↑a * r
+    smul_zero := ?smul_zero
+    zero_smul := ?zero_smul
+    one_smul := ?one_smul
+    smul_add := ?smul_add
+    add_smul := ?add_smul
+    mul_smul := ?mul_smul }
+
+  · intro b
+    change (1 : ℚ) * b = b
+    rw [Rat.cast_one, one_mul]
+  · intro x y b
+    change (x * y : ℚ) * b = x * (y * b)
+    rw [Rat.cast_mul, mul_assoc]
+  · intro a
+    rw [smul_zero]
+  · intro a x y
+    change a * (x + y) = a * x + a * y
+    rw [mul_add]
+  · intro r s x
+    change (r + s : ℚ) * x = r * x + s * x
+    rw [Rat.cast_add, add_mul]
+  · intro a
+    change (0 : ℚ) * a = 0
+    simp
