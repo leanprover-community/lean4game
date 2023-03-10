@@ -20,24 +20,20 @@ Wenn man eine Implikation `(g : A → B)` in den Annahmen hat, bei welcher die K
 (also $B$) mit dem Goal übereinstimmt, kann man `apply g` genau dies machen.
 "
 
-Statement "" (A B : Prop) (hA : A) (h : A → B) : B := by
+Statement (A B : Prop) (hA : A) (h : A → B) : B := by
+  Hint "**Robo**: Du hast natürlich recht, normalerweise ist es viel schöner mit
+  `apply {h}` die Implikation anzuwenden."
   apply h
+  Hint "**Du**: Und jetzt genügt es also `A` zu zeigen."
   assumption
-
-NewTactic apply
-DisabledTactic revert tauto
-
-Hint (A : Prop) (B : Prop) (hA : A) (h : A → B) : B =>
-"**Robo**: Du hast natürlich recht, normalerweise ist es viel schöner mit
-`apply {h}` die Implikation anzuwenden."
-
-Hint (A : Prop) (B : Prop) (hA : A) (g : A → B) : A =>
-"**Du**: Und jetzt genügt es also `A` zu zeigen."
 
 Conclusion "**Robo** Übrigens mit `apply LEMMA` kannst auch jedes Lemma anwenden, dessen
 Aussage mit dem Goal übereinstimmt.
 
 Die beiden Fragenden schauen das Blatt an und murmeln zustimmend."
+
+NewTactic apply
+DisabledTactic revert tauto
 
 -- Katex notes
 -- `\\(    \\)` or `$   $` for inline

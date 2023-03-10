@@ -8,8 +8,9 @@ import TestGame.Levels.Implication.L07_Rw
 import TestGame.Levels.Implication.L08_Iff
 import TestGame.Levels.Implication.L09_Iff
 import TestGame.Levels.Implication.L10_Apply
-import TestGame.Levels.Implication.L11_Rw
-import TestGame.Levels.Implication.L12_Summary
+import TestGame.Levels.Implication.L11_ByCases
+import TestGame.Levels.Implication.L12_Rw
+import TestGame.Levels.Implication.L13_Summary
 
 Game "TestGame"
 World "Implication"

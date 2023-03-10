@@ -10,35 +10,35 @@ Title "Genau dann wenn"
 
 Introduction
 "
-Nun schauen wir uns Option 1) an, die du schon von UND kennst:
+Der Koch kommt erfreut hinter einem grossen Topf hervor.
 
-1. Mit `h.mp` und `h.mpr` (oder `h.1` und `h.2`) kann man die einzelnen Implikationen
-   direkt auswählen.
-
-`h.mp` und `h.mpr` (oder `h.1` und `h.2`) sind die einzelnen Implikationen, und du kannst
-mit denen ensprechend arbeiten. Insbesondere kannst du mit `apply h.mp` die Implikation
-$A \\Rightarrow B$ anwenden, wenn das Goal $B$ ist.
-
-*(PS: das `.mp` kommt von \"Modus Ponens\", ein Ausdruck as der Logik.)*
+**Koch**: Sagt mal, gestern hat mir jemand was erzählt und es will einfach nicht aus
+meinem Kopf…
 "
 
-Statement
-"Angenommen man hat $A \\iff B$ und $B \\Rightarrow C$, zeige $A \\Rightarrow C$."
-    (A B C : Prop) (h : A ↔ B) (g : B → C) : A → C := by
+Statement (A B C : Prop) (h : A ↔ B) (g : B → C) : A → C := by
+  Hint "**Du**: Naja ich kann wohl immerhin mal mit `intro` anfangen und annehmen,
+  dass `{A}` wahr sei…
+
+  **Robo**: und dann schauen wir weiter!"
   intro hA
+  Hint "**Robo**: Also eine Implikation wendet man mit apply an…
+
+  **Du**: Weiss ich ja!"
   apply g
+  Hint "**Robo**: …und du kannst die Implikation `{A} → {B}` genau gleich mit
+  `apply {h}.mp` anwenden.
+
+  **Du**: Aber ich könnte hier auch `rw [← h]` sagen, oder?
+
+  **Robo**: Klar, aber offenbar versteht der Koch das `rw` nicht.
+  "
   apply h.mp
   assumption
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) : A → C =>
-"Fange wie immer mit `intro` an."
+Conclusion "**Koch**: Danke vielmals! Jetzt muss ich aber schauen dass die Suppe nicht verkocht!
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : C =>
-"Wie im Implikationen-Level kannst du nun `apply` verwenden."
-
-Hint (A : Prop) (B : Prop) (C : Prop) (h : A ↔ B) (g : B → C) (hA : A) : B =>
-"Mit `apply h.mp` kannst du nun die Implikation `A → B` anwenden."
-
-Conclusion "Im nächsten Level findest du die zweite Option."
+Und er eilt davon."
 
 NewTactic apply assumption
+DisabledTactic tauto rw

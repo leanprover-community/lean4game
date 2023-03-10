@@ -27,7 +27,7 @@ Statement (A B : Prop) (hb : B) : A → (A ∧ B) := by
   assumption
   assumption
 
+Conclusion "Der Operationsleiter nickt bedacht."
+
 NewTactic intro
 DisabledTactic tauto
-
-Conclusion "Der Operationsleiter nickt bedacht."

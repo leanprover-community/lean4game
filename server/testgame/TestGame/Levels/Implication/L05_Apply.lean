@@ -22,43 +22,32 @@ $$
 "
 
 Statement
-    "Beweise $A \\Rightarrow F$."
     (A B C D E F G H I : Prop)
     (f : A → B) (g : C → B) (h : B → E) (i : D → E) (k : E → F) (m : G → D)
     (n : H → E) (p : F → I) (q : H → G) (r : H → I) : A → I := by
+  Hint "**Du**: Also ich muss einen Pfad von Implikationen $A \\Rightarrow I$ finden.
+
+  **Robo**: Und dann fängst du am besten wieder mit `intro` an."
   intro ha
+  Branch
+    apply r
+    Hint "**Robo**: Das sieht nach einer Sackgasse aus…"
+  Hint (hidden := true) "**Robo**: Na wieder `apply`, was sonst."
   apply p
   apply k
   apply h
+  Branch
+    apply g
+    Hint "**Robo**: Nah, da stimmt doch was nicht…"
   apply f
   assumption
 
-Hint (A B C D E F G H I : Prop)
-    (f : A → B) (g : C → B) (h : B → E) (i : D → E) (k : E → F) (m : G → D)
-    (n : H → E) (p : F → I) (q : H → G) (r : H → I)  : A → I =>
-"**Du**: Also ich muss einen Pfad von Implikationen $A \\Rightarrow I$ finden.
+Conclusion
+"Mit einem lauten Ratteln springen die Förderbänder wieder an.
 
-**Robo**: Und dann fängst du am besten wieder mit `intro` an."
-
-HiddenHint (A B C D E F G H I : Prop)
-    (f : A → B) (g : C → B) (h : B → E) (i : D → E) (k : E → F) (m : G → D)
-    (n : H → E) (p : F → I) (q : H → G) (r : H → I) (a : A) : I =>
-"**Robo**: Na wieder `apply`, was sonst."
-
--- TODO: Dieser wird falscherweise bei `F` angezeigt
-Hint (A B C D E F G H I : Prop)
-    (f : A → B) (g : C → B) (h : B → E) (i : D → E) (k : E → F) (m : G → D)
-    (n : H → E) (p : F → I) (q : H → G) (r : H → I) (a : A) : H =>
-"**Robo**: Das sieht nach einer Sackgasse aus…"
-
-Hint (A B C D E F G H I : Prop)
-    (f : A → B) (g : C → B) (h : B → E) (i : D → E) (k : E → F) (m : G → D)
-    (n : H → E) (p : F → I) (q : H → G) (r : H → I) (a : A) : C =>
-"**Robo**: Nah, da stimmt doch was nicht…"
+**Operationsleiter**: Vielen Dank euch! Kommt ich geb euch eine Führung und stell euch den
+Technikern hier vor."
 
 DisabledTactic tauto
-
-Conclusion
-"Mit einem lauten Ratteln springen die Förderbänder wieder an."
 
 -- https://www.jmilne.org/not/Mamscd.pdf
