@@ -114,9 +114,9 @@ elab "Branch" t:tacticSeq : tactic => do
 
 Arguments:
 - ident: (Optional) The name of the statemtent.
-- descr: The human-readable version of the lemma as string. Accepts Markdown and Mathjax.
+- descr: (Optional) The human-readable version of the lemma as string. Accepts Markdown and Mathjax.
 -/
-elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : command => do
+elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
 
   let lvlIdx ← getCurLevelIdx
   let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
@@ -166,7 +166,9 @@ elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : comma
     module := env.header.mainModule
     goal := sig,
     scope := scope,
-    descrText := descr.getString,
+    descrText := match descr with
+    | none => ""
+    | some s => s.getString
     descrFormat := match statementName with
     | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
     | some name => (Format.join ["lemma ", reprint name.raw, " ", reprint sig.raw, " := by"]).pretty 10  -- "lemma "  ++ (toString <| reprint name.raw) ++ " " ++ (Format.pretty (reprint sig.raw) 40) ++ " := by"
