@@ -6,17 +6,14 @@ import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-s
 import Markdown from './Markdown';
 import { useLoadDocQuery, ComputedInventoryItem } from '../state/api';
 
-function Inventory({ tactics, lemmas, definitions } :
+export function Inventory({ tactics, lemmas, definitions, setInventoryDoc } :
   {lemmas: ComputedInventoryItem[],
   tactics: ComputedInventoryItem[],
-  definitions: ComputedInventoryItem[]}) {
-
-  const [docName, setDocName] = useState(null)
-  const [docType, setDocType] = useState(null)
+  definitions: ComputedInventoryItem[],
+  setInventoryDoc: (inventoryDoc: {name: string, type: string}) => void}) {
 
   function openDoc(name, type) {
-    setDocName(name)
-    setDocType(type)
+    setInventoryDoc({name, type})
   }
 
   return (
@@ -31,8 +28,6 @@ function Inventory({ tactics, lemmas, definitions } :
 
       <h2>Lemmas</h2>
       <InventoryList items={lemmas} docType="Lemma" openDoc={openDoc} />
-
-      {docName && <Documentation name={docName} type={docType} />}
     </div>
   )
 }
@@ -81,7 +76,7 @@ function InventoryItem({name, locked, disabled, showDoc}) {
   return <div className={`item ${className}`} onClick={handleClick}>{icon} {name}</div>
 }
 
-function Documentation({name, type}) {
+export function Documentation({name, type}) {
 
   const doc = useLoadDocQuery({type: type, name: name})
 
@@ -90,5 +85,3 @@ function Documentation({name, type}) {
     <Markdown>{doc.data?.text}</Markdown>
   </>
 }
-
-export default Inventory;

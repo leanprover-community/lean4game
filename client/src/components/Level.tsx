@@ -9,7 +9,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Box, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import Grid from '@mui/material/Unstable_Grid2';
-import Inventory from './Inventory';
+import {Inventory, Documentation} from './Inventory';
 import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter';
 import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
 import 'lean4web/client/src/editor/vscode.css';
@@ -132,6 +132,8 @@ function Level() {
   const {editor, infoProvider, editorConnection} =
   useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
 
+  const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
+
   // TODO: This is a hack for having an introduction (i.e. level 0)
   // for each world.
   if (levelId == 0) {
@@ -241,11 +243,13 @@ function Level() {
 
         </div>}
       </div>
-      <div className="doc-panel">
-        {!level.isLoading && <Inventory tactics={level?.data?.tactics} lemmas={level?.data?.lemmas} definitions={level?.data?.definitions} />}
+      <div className="inventory-panel">
+        {!level.isLoading &&
+          <Inventory tactics={level?.data?.tactics} lemmas={level?.data?.lemmas}
+            definitions={level?.data?.definitions} setInventoryDoc={setInventoryDoc} />}
       </div>
-      <div className="side-panel">
-        <p>Display Tactic documentation here?</p>
+      <div className="doc-panel">
+        {inventoryDoc && <Documentation name={inventoryDoc.name} type={inventoryDoc.type} />}
       </div>
     </Split>
   </>
