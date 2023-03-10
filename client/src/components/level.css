@@ -24,15 +24,9 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
 }
 
-.side-panel, .exercise-panel, .doc-panel {
+.inventory-panel, .exercise-panel, .doc-panel {
   height: 100%;
   overflow: auto;
-}
-
-.side-panel {
-  display: flex;
-  flex-flow: column;
-  background-color: #e9f2fb;
 }
 
 .introduction-panel, .infoview, .exercise, .conclusion {
