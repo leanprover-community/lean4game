@@ -38,4 +38,4 @@ Statement
     Alternativ kann man auch mit `rw [add_comm]` dies explizit umordnen."
   ring
 
-NewLemmas Finset.sum_add_distrib add_comm
+NewLemma Finset.sum_add_distrib add_comm
