@@ -13,9 +13,7 @@ Während der erste Untertan noch rfl, rfl, rfl murmelt, tritt schon der nächste
 
 Statement ""
     (n : ℕ) (h₁ : 10 > n) (h₂ : 1 < n) (h₃ : n ≠ 5) : 1 < n := by
-  assumption
-
-Hint (n : ℕ) (h₁ : 10 > n) (h₂ : 1 < n) (h₃ : n ≠ 5) : 1 < n => "
+  Hint "
 **Robo** `{n} : ℕ` bedeutet, `{n}` ist eine natürliche Zahl.
 
 **Du** Warum schreibt er dann nicht `{n} ∈ ℕ`??
@@ -32,8 +30,8 @@ für die Annahme `n < 10`, `1 < n` und `n ≠ 5`. Beweisen sollen wir: `1 < n`.
 
 **Du** ???
 
-**Robo** Du musst ihm das halt explizit sagen.  Probiers mal mit `assumption`.
-"
+**Robo** Du musst ihm das halt explizit sagen.  Probiers mal mit `assumption`."
+  assumption
 
 Conclusion
 "

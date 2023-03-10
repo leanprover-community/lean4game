@@ -18,12 +18,7 @@ Der nächste bitte …
 Statement
 ""
     (A B : Prop) (hA : A) : A ∨ (¬ B) := by
-  left
-  assumption
-
-Hint (A B : Prop) (hA : A) : A ∨ (¬ B) =>
-"
-**Du** Muss ich jetzt wieder das Beweisziel de-konstruieren?
+  Hint "**Du** Muss ich jetzt wieder das Beweisziel de-konstruieren?
 
 **Robo** Nein, viel einfacher.  Wenn Du eine Oder-Aussage beweisen sollst, musst Du Dich
 einfach entscheiden, ob Du die linke oder rechte Seite beweisen willst.
@@ -31,13 +26,12 @@ einfach entscheiden, ob Du die linke oder rechte Seite beweisen willst.
 **Du** Und wie erkläre ich meinem Formalosophen, welche Seite ich gern beweisen würde?
 Ich will natürlich `{A}` beweisen!
 
-**Robo** Mit `left` bzw. `right`. Ist doch logisch, oder?
-"
-
-Hint (A B : Prop) (hA : A) : ¬ B =>
-"
-**Robo** Wusste gar nicht, dass Du eine Links-Rechts-Schwäche hast.  Probier's nochmal.
-"
+**Robo** Mit `left` bzw. `right`. Ist doch logisch, oder?"
+  Branch
+    right
+    Hint "**Robo** Wusste gar nicht, dass Du eine Links-Rechts-Schwäche hast.  Probier's nochmal."
+  left
+  assumption
 
 Conclusion
 "

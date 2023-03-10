@@ -21,25 +21,20 @@ Du siehst Robo hilflos an.
 Statement ""
     (A B C : Prop) :
     ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) := by
-  Hint "Hello? {A}"
+  Hint "**Robo**  Das ist ganz einfach.  Mit `{A} {B} {C} : Prop` meint er:
+  `{A}`, `{B}` und `{C}` sind irgendwelche Aussagen (*propositions*).
+  Und mit `→` meint sie ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
+
+  **Du** Ehhm, ja.  Aber da muss ich jetzt trotzdem erst einmal überlegen.
+
+  **Robo** (flüsternd) Behaupte doch einfach, dass sei eine Tautologie.
+
+  **Du** Ernsthaft?
+
+  **Robo** Ja.  Schreib einfach `tauto`.
+
+  **Robo** Mach schon …"
   tauto
-
-Hint  (A B C : Prop) :
-    ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) =>
- "**Robo**  Das ist ganz einfach.  Mit `{A} {B} {C} : Prop` meint er:
- `{A}`, `{B}` und `{C}` sind irgendwelche Aussagen (*propositions*).
- Und mit `→` meint sie ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
-
-**Du** Ehhm, ja.  Aber da muss ich jetzt trotzdem erst einmal überlegen.
-
-**Robo** (flüsternd) Behaupte doch einfach, dass sei eine Tautologie.
-
-**Du** Ernsthaft?
-
-**Robo** Ja.  Schreib einfach `tauto`.
-
-**Robo** Mach schon …
-"
 
 Conclusion
 "

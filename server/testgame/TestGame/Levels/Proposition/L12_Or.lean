@@ -20,14 +20,7 @@ Der nächste bitte …
 
 Statement ""
     (A B : Prop) (h : (A ∧ B) ∨ A) : A := by
-  rcases h with h | h
-  rcases h with ⟨h₁, h₂⟩
-  assumption
-  assumption
-
-Hint (A B : Prop) (h :(A ∧ B) ∨ A) : A =>
-"
-**Robo** Schau mal, wenn du mit dem Finger eine Annahme berührst, zeigt es dir,
+  Hint "**Robo** Schau mal, wenn du mit dem Finger eine Annahme berührst, zeigt es dir,
 wie die Klammern gesetzt sind. Irre…
 
 **Du** Ah ich sehe, also `({A} ∧ {B}) ∨ {A}`!
@@ -41,34 +34,24 @@ Wir sind ja gleich hier fertig, und können zu einem interessanteren Planeten we
 
 **Du** Also, wieder `rcases …`?
 
-**Robo** Ja, aber diesmal nicht `rcases {h} with ⟨h₁, h₂⟩`, sondern `rcases {h} with h | h`.
-"
-
--- -- TODO: This also triggers later under the assumptions
--- -- `(A : Prop) (B : Prop) (h₁ : A) (h₂ : B) : A`
--- -- Could we do something about that?
--- Hint (A : Prop) (B : Prop) (h : A) : A =>
--- "
--- **Robo** Jetzt musst Du Dein Ziel zweimal beweisen:
--- Einmal unter Annahme der linken Seite `{A}`,
--- und einmal unter Annahme der rechten Seite `{A} ∨ {B}`. Hier haben nehmen wir an, die linke Seite
--- sei wahr.
--- "
-
-Hint (A : Prop) (B : Prop) (h : A ∧ B) : A =>
-"
-**Robo**
+**Robo** Ja, aber diesmal nicht `rcases {h} with ⟨h₁, h₂⟩`, sondern `rcases {h} with h | h`."
+  rcases h with h | h
+  Hint "**Robo**
 Jetzt musst Du Dein Ziel zweimal beweisen:
 Einmal unter Annahme der linken Seite `{A} ∨ {B}`,
 und einmal unter Annahme der rechten Seite `{A}`.
 Hier haben nehmen wir an, die linke Seite
-sei wahr.
-"
-HiddenHint  (A : Prop) (B : Prop) (h : A ∧ B) : A =>
-"
-**Robo** Wie man mit einem Und in den Annahmen umgeht, weißt Du doch schon:
-`rcases h with ⟨h₁, h₂⟩`.  Zur Erinnerung: Für die Klammern schreibst Du `\\<>`.
-"
+sei wahr."
+  Hint (hidden := true) " **Robo** Wie man mit einem Und in den Annahmen umgeht,
+weißt Du doch schon:
+`rcases h with ⟨h₁, h₂⟩`.  Zur Erinnerung: Für die Klammern schreibst Du `\\<>`."
+  rcases h with ⟨h₁, h₂⟩
+  Hint "**Robo** Jetzt musst Du Dein Ziel zweimal beweisen:
+Einmal unter Annahme der linken Seite `{A}`,
+und einmal unter Annahme der rechten Seite `{A} ∨ {B}`. Hier haben nehmen wir an, die linke Seite
+sei wahr."
+  assumption
+  assumption
 
 Conclusion
 "**Du**  Ok, das scheint ihn zufriedenzustellen. Nur noch eine Seele…
