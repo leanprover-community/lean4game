@@ -61,6 +61,17 @@ function Level() {
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
 
+  useLoadWorldFiles(worldId)
+
+  if (levelId == 0) {
+    return <Introduction worldId={worldId} />
+  } else {
+    return <PlayableLevel worldId={worldId} levelId={levelId} />
+  }
+}
+
+
+function PlayableLevel({worldId, levelId}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const introductionPanelRef = useRef<HTMLDivElement>(null)
 
@@ -115,8 +126,6 @@ function Level() {
 
   const gameInfo = useGetGameInfoQuery()
 
-  useLoadWorldFiles(worldId)
-
   const level = useLoadLevelQuery({world: worldId, level: levelId})
 
   const dispatch = useAppDispatch()
@@ -134,33 +143,8 @@ function Level() {
 
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
 
-  // TODO: This is a hack for having an introduction (i.e. level 0)
-  // for each world.
-  if (levelId == 0) {
-    return <>
-      <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-      <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Einführung" worldId={worldId} levelId={levelId} />
-      <div style={gameInfo.isLoading ? {display: "none"} : null} className="exercise-panel">
-        <div ref={introductionPanelRef} className="introduction-panel">
-          <Alert severity="info" sx={{ mt: 1 }}>
-            <Markdown>
-              {gameInfo.data?.worlds.nodes[worldId].introduction}
-            </Markdown>
-          </Alert>
-          <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div>
-        </div>
-        <div className="conclusion">
-          {levelId >= gameInfo.data?.worldSize[worldId] ?
-          <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button> :
-          <Button to={`/world/${worldId}/level/1`}>
-            Start&nbsp;<FontAwesomeIcon icon={faArrowRight} />
-          </Button>}
-        </div>
-      </div>
-    </>
-  }
-
   const levelTitle = <>{levelId && `Level ${levelId}`}{level?.data?.title && `: ${level?.data?.title}`}</>
+
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
@@ -215,8 +199,32 @@ function Level() {
 
 export default Level
 
+function Introduction({worldId}) {
+  const gameInfo = useGetGameInfoQuery()
 
-function LevelAppBar ({isLoading, levelId, worldId, levelTitle}) {
+  return <>
+    <div style={gameInfo.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Einführung" worldId={worldId} levelId={0} />
+    <div style={gameInfo.isLoading ? {display: "none"} : null} className="exercise-panel">
+      <div className="introduction-panel">
+        <Alert severity="info" sx={{ mt: 1 }}>
+          <Markdown>
+            {gameInfo.data?.worlds.nodes[worldId].introduction}
+          </Markdown>
+        </Alert>
+      </div>
+      <div className="conclusion">
+        {0 == gameInfo.data?.worldSize[worldId] ?
+        <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button> :
+        <Button to={`/world/${worldId}/level/1`}>
+          Start&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+        </Button>}
+      </div>
+    </div>
+  </>
+}
+
+function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
   const gameInfo = useGetGameInfoQuery()
 
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
