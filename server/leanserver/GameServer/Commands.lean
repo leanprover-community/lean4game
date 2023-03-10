@@ -1,6 +1,7 @@
 import Lean
 
 import GameServer.EnvExtensions
+import GameServer.StrInterpolation
 
 open Lean Meta
 
@@ -61,13 +62,11 @@ partial def reprintCore : Syntax → Option Format
 def reprint (stx : Syntax) : Format :=
   reprintCore stx |>.getD ""
 
-
 syntax hintArg := " (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")"
 
 /-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
 see hints. The tactic does not affect the goal state. -/
-elab "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
-
+elab "Hint" args:hintArg* msg:Lean.Parser.interpolatedStrNoIndent : tactic => do
   let mut strict := false
   let mut hidden := false
 
@@ -86,7 +85,7 @@ elab "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
     -- named differently by the player.
     let varsName := `vars
     let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
-      let mut text ← `(m! $msg)
+      let mut text ← expandInterpolatedStr ⟨msg.raw⟩ (← `(MessageData)) (← `(toMessageData))
       let goalDecl ← goal.getDecl
       let decls := goalDecl.lctx.decls.toArray.filterMap id
       for i in [:decls.size] do
