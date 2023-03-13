@@ -431,13 +431,18 @@ elab "MakeGame" : command => do
         for item in (level.getInventory inventoryType).new do
           let category := (← getInventoryDoc? item inventoryType).get!.category
           items := items.insert item {name := item, category, locked := false, disabled := false}
+
+        let mut disabled : HashSet Name := {}
         for item in (level.getInventory inventoryType).disabled do
           let category := (← getInventoryDoc? item inventoryType).get!.category
-          items := items.insert item {name := item, category, locked := false, disabled := true}
+          items := items.insert item {name := item, category, locked := false, disabled := false}
+          -- (we set disabled to false at first because it applies only to the current level)
+          disabled := disabled.insert item
 
         let itemsArray := items.toArray
           |>.insertionSort (fun a b => a.1.toString < b.1.toString)
           |>.map (·.2)
+          |>.map (fun item => {item with disabled := disabled.contains item.name})
 
         modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
           return level.setComputedInventory inventoryType itemsArray
