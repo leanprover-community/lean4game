@@ -7,6 +7,19 @@ as quotes.
 import Lean
 namespace Lean.Parser
 
+/-- Push `(Syntax.node tk <new-atom>)` onto syntax stack if parse was successful. -/
+def mkNodeTokenNoWs (n : SyntaxNodeKind) (startPos : String.Pos) : ParserFn := fun c s => Id.run do
+  if s.hasError then
+    return s
+  let input     := c.input
+  let stopPos   := s.pos
+  let leading   := mkEmptySubstringAt input startPos
+  let val       := input.extract startPos stopPos
+  let wsStopPos := s.pos
+  let trailing  := { str := input, startPos := stopPos, stopPos := wsStopPos : Substring }
+  let info      := SourceInfo.original leading startPos trailing stopPos
+  s.pushSyntax (Syntax.mkLit n val info)
+
 partial def interpolatedStrNoIndentFn (p : ParserFn) : ParserFn := fun c s =>
   let input     := c.input
   let stackSize := s.stackSize
@@ -24,7 +37,7 @@ partial def interpolatedStrNoIndentFn (p : ParserFn) : ParserFn := fun c s =>
         s.mkNode interpolatedStrKind stackSize
       else if curr == '\n' then
         -- Ignore initial spaces on a new line
-        let s := mkNodeToken interpolatedStrLitKind startPos c s
+        let s := mkNodeTokenNoWs interpolatedStrLitKind startPos c s
         let s := takeWhileFn (fun curr => curr == ' ') c s
         parse s.pos c s
       else if curr == '\\' then
@@ -98,7 +111,7 @@ private partial def decodeInterpStrLit (s : String) : Option String :=
     else if c == '\n' then
       pure (acc.push c)
     else if s.atEnd i then
-      none
+      pure acc
     else if c == '\\' then do
       let (c, i) ← decodeInterpStrQuotedChar s i
       loop i (acc.push c)
