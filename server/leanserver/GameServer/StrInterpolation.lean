@@ -23,9 +23,10 @@ partial def interpolatedStrNoIndentFn (p : ParserFn) : ParserFn := fun c s =>
         let s := mkNodeToken interpolatedStrLitKind startPos c s
         s.mkNode interpolatedStrKind stackSize
       else if curr == '\n' then
+        -- Ignore initial spaces on a new line
         let s := mkNodeToken interpolatedStrLitKind startPos c s
         let s := takeWhileFn (fun curr => curr == ' ') c s
-        parse (input.prev s.pos) c s
+        parse s.pos c s
       else if curr == '\\' then
         andthenFn (quotedCharCoreFn isQuotableCharForStrInterpolant) (parse startPos) c s
       else if curr == '{' then
@@ -103,8 +104,11 @@ private partial def decodeInterpStrLit (s : String) : Option String :=
       loop i (acc.push c)
     else
       loop i (acc.push c)
-  loop ⟨1⟩ ""
-
+  let c := s.get 0
+  if c == '\"' || c == '{' then
+    loop ⟨1⟩ ""
+  else
+    loop ⟨0⟩ ""
 partial def isInterpolatedStrLit? (stx : Syntax) : Option String :=
   match Syntax.isLit? interpolatedStrLitKind stx with
   | none     => none
