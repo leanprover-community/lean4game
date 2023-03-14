@@ -34,8 +34,10 @@ hier bei `(h : A ↔ B)` heissen sie `h.mp` und `h.mpr`.
 
 **Du**: Also `h.mp` ist `A → B`? Wieso `mp`?
 
-**Operationsleiter**: Das steht Modulo Ponens, aber das ist doch nicht wichtig. Und das \"r\"
-  steht für \"reverse\" weils die Gegenrichtung ist.
+**Operationsleiter**: \"Modulo Ponens\" ist ein lokaler Begriff hier,
+aber das ist doch nicht wichtig.
+
+**Robo**: Und das \"r\" in `mpr` stünde für \"reverse\" weils die Rückrichtung ist.
 "
 
 NewTactic constructor

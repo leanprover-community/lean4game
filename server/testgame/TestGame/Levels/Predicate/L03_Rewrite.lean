@@ -9,32 +9,28 @@ Title "Rewrite"
 
 Introduction
 "
-Als Übung erinnern wir daran, dass man mit `rw [h] at g` auch in anderen Annahmen umschreiben
-kann:
-
-Wenn `(h : X = Y)` ist, dann ersetzt `rw [h] at g` in der Annahme
-`g` das `X` durch `Y`.
+**Evenine**: Mit diesem neuen Wissen, könnt ihr mir bei folgendem helfen:
 "
 
-Statement umschreiben
-"Angenommen man hat die Gleichheiten
-
+Statement
+"
 $$
-\\begin{aligned} a &= b \\\\ a + a ^ 2 &= b + 1 \\end{aligned}
+\\begin{aligned}
+  a &= b \\\\
+  a + a ^ 2 &= b + 1 \\\\
+  \\vdash b + b ^ 2 = b + 1
+\\end{aligned}
 $$
-
-Zeige dass $b + b ^ 2 = b + 1$."
+"
 (a b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : b + b ^ 2 = b + 1 := by
+  Hint "**Du**: Ah da ersetzt man ja einfach `{a}` durch `{b}` in der anderen Annahme!
+
+  **Robo**: Genau! Das machst du mit `rw [{h}] at {g}`."
   rw [h] at g
+  Hint (hidden := true) "**Robo**: Schau mal durch die Annahmen."
   assumption
 
-Hint (a : ℕ) (b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : b + b ^ 2 = b + 1 =>
-"`rw [ ... ] at g` schreibt die Annahme `g` um."
-
-Hint (a : ℕ) (b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : a + a ^ 2 = a + 1 =>
-"Sackgasse. probiers doch mit `rw [h] at g` stattdessen."
-
-Conclusion "Übrigens, mit `rw [h] at *` kann man im weiteren `h` in **allen** Annahmen und
-dem Goal umschreiben."
-
-NewTactic assumption rw
+Conclusion "
+**Robo**: Noch ein Trick: Mit `rw [h] at *` kann man im weiteren `h` in **allen** Annahmen und
+dem Goal umschreiben.
+"

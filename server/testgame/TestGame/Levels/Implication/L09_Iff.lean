@@ -24,6 +24,11 @@ Statement (A B : Prop) : (A ↔ B) → (A → B) := by
 
   **Robo**: Was du machen könntest ist mit `rcases h with ⟨mp, mpr⟩` die Annahme in zwei
   Teile aufteilen."
+  Branch
+    intro a
+    Hint "**Robo**: Hier müsstest du jetzt `rw [←h]` oder `apply h.mp` benützen, aber der
+    Gehilfe will, dass du zwingend eine dritte Variante benützt. Geh doch einen
+    Schritt zurück so dass das Goal `A → B` ist."
   rcases h with ⟨mp, mpr⟩
   Hint (hidden := true) "**Du**: Ah und jetzt ist das Resultat in den Annahmen."
   assumption
@@ -32,7 +37,7 @@ Conclusion
 "
 **Gehilfe**: Ah danke! Und jetzt versteh ich auch die Zusammenhänge!
 "
-
+OnlyTactic intro rcases assumption
 DisabledTactic rw apply tauto
 
 -- -- TODO: The new `cases` works differntly. There is also `cases'`

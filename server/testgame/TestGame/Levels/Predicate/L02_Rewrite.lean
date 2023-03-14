@@ -9,62 +9,31 @@ Title "Rewrite"
 
 Introduction
 "
-Wir haben gesehen, dass man mit `rw` Äquivalenzen wie `A ↔ B` brauchen kann, um im Goal
-$A$ durch $B$ zu ersetzen.
+Robo spuckt den Brief aus, den er dabei hatte, und gibt ihn *Evenine*.
 
-Genau gleich kann man auch Gleichungen `a = b` mit `rw` verwenden.
+**Evenine**: Das verstehe ich nicht, wisst ihr was damit gemeint ist?
+
+Und sie händigt Dir den Brief:
 "
 
-Statement umschreiben
-"Angenommen man hat die Gleichheiten
+Statement (a b c d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c := by
+  Hint "**Du**: Schau mal, das ist ja fast genau, was wir auf *Implis* gemacht haben,
+  nur jetzt mit Gleichheiten von Zahlen anstatt Genau-Dann-Wenn-Aussagen!
 
-$$
-\\begin{aligned} a &= b \\\\ a &= d \\\\ c &= d \\end{aligned}
-$$
+  **Robo**: `=` und `↔` kannst du praktisch gleich behandeln wenns um `rw` geht."
+  Hint (hidden := true) "**Du**: Also auch `rw [hₓ]` und `rw [← hₓ]`?
 
-Zeige dass $b = c$."
-(a b c d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c := by
+  **Robo**: Probiers doch einfach."
   rw [h₁]
+  Hint (hidden := true) "**Du**: Wie war das nochmals mit rückwärts umschreiben?
+
+  **Robo**: `←` ist `\\l`. Und dann `rw [← hₓ]`"
   rw [←h₂]
   assumption
 
-HiddenHint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c =>
-"Im Goal kommt `c` vor und `h₁` sagt `c = d`.
-Probiers doch mit `rw [h₁]`."
-
-HiddenHint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : a = c =>
-"Im Goal kommt `C` vor und `h₁` sagt `C ↔ D`.
-Probiers doch mit `rw [h₁]`."
-
-HiddenHint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = d =>
-" Man kann auch rückwärts umschreiben: `h₂` sagt `a = b` mit
-`rw [←h₂]` ersetzt man im Goal `b` durch `a` (`\\l`, also ein kleines L)"
-
-HiddenHint (a : ℕ) (b : ℕ) (h : a = b) : a = b =>
-"Schau mal durch die Annahmen durch."
-
-
-
--- These should not be necessary if they don't use `rw [] at`.
-HiddenHint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = c) : b = c =>
-"Auch eine Möglichkeit... Kannst du das Goal so umschreiben,
-dass es mit einer Annahme übereinstimmt?"
-
-HiddenHint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : b = d) : b = c =>
-"Auch eine Möglichkeit.. Kannst du das Goal so umschreiben, dass es mit einer Annahme übereinstimmt?"
-
-Hint (a : ℕ) (b : ℕ) (h : b = a) : a = b =>
-"Naja auch Umwege führen ans Ziel... Wenn du das Goal zu `a = a` umschreibst, kann man es mit
-`rfl` beweisen (rsp. das passiert automatisch.)"
-
-Hint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : d = b) (h₃ : d = a) : b = c =>
-"das ist nicht der optimale Weg..."
-
-Hint (a : ℕ) (b : ℕ) (c : ℕ) (d : ℕ) (h₁ : c = d) (h₂ : d = b) (h₃ : a = d) : b = c =>
-"das ist nicht der optimale Weg..."
-
-
-
-Conclusion "Übrigens, mit `rw [h₁, ←h₂]` könnte man mehrere `rw` zusammenfassen."
+Conclusion
+"
+**Evenine**: Danke viemals, das hilft uns vermutlich, jetzt Frage ich mich aber…
+"
 
 NewTactic assumption rw

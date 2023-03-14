@@ -18,7 +18,7 @@ habe ich noch ein Problem, an dem ich mir die Zähne ausbeisse. Wir haben die
 Herleitung eines unserer Programme `imp_iff_not_or` verloren, und wissen nicht mehr
 ob es einwandfrei funktioniert.
 
-**Du**: Nah gut, al sehen. Robo, was hab ich denn alles hier gelernt?
+**Du**: Nah gut, mal sehen. Robo, was hab ich denn alles hier gelernt?
 
 **Robo**: Hier ist die Übersicht:
 
@@ -61,3 +61,17 @@ Statement imp_iff_not_or (A B : Prop) : (A → B) ↔ ¬ A ∨ B := by
   assumption
 
 DisabledTactic tauto
+
+Conclusion "**Operationsleiter**: Damit gehen unsere Wege auseinander. Da fällt mir ein, seit
+ihr auf dem Weg zu unserem Schwestermond?
+
+**Du**: Könnten wir sein…
+
+**Operationsleiter**: Ich hab hier einen Brief für *Evenine*, könntet ihr diesen mit euch führen?
+
+**Du**: Klar! Robo, halt den mal.
+
+Robo nimmt den Brief und lässt ihn irgendwo in seinem Innern verschwinden. Dabei bemerkt er
+den besorgten Blick des Operationsleiters.
+
+**Robo**: Keine Angst, ich verdaue nichts!"

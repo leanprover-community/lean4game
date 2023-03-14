@@ -8,24 +8,29 @@ Title "Definitionally equal"
 
 Introduction
 "
-Als kleine Nebenbemerkung:
+Müde ruht ihr euch in eurer Bleibe aus. Du schaust doch eine Lücke in den Blättern vielen
+kleinen Vögeln bei der Nahrungssuche zu.
 
-Auf Grund der Implementation in Lean brauchst du die Taktik `ring` gar nicht, wenn
-du Gleichungen über `ℕ` hast, die keine Variablen enthalten:
-
-So ist zum Beispiel `2` als `1 + 1` definiert, deshalb kannst du $1 + 1 = 2$ einfach mit
-`rfl` beweisen.
+**Du**: Sag mal Robo, ich hab vorhin ein Kind überhört, dass seinem Spielgefährten erklärt hat,
+folgendes sei mit `rfl` zu beweisen:
 "
 
-Statement
-"Zeige dass $1 + 1$ zwei ist." :
-    1 + 1 = 2 := by
+Statement : 1 + 1 = 2 := by
+  Hint "**Du**: Wieso nicht `ring`?
+
+  **Robo**: Klar, `ring` geht auch und ist intuitiver.
+  Für `rfl` kommt es darauf an, wie die Sachen genau definiert sind: `1 + 1` ist als
+  `(0.succ).succ` definiert und `2` halt ebenfalls.
+  "
   rfl
+
+OnlyTactic rfl
 
 Conclusion
 "
-**Notiz:** Die meisten anderen Taktiken versuchen am Schluss automatisch `rfl`
-aufzurufen, deshalb brauchst du das nur noch selten.
-"
+**Du**: Dann war das mehr Glück?
 
-NewTactic rfl
+**Robo**: Das ist eine Art die Welt zu sehen…
+
+Damit fällst du in einen ruhigen Schlaf.
+"
