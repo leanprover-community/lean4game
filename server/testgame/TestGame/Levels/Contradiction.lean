@@ -8,3 +8,9 @@ import TestGame.Levels.Contradiction.L06_Summary
 Game "TestGame"
 World "Contradiction"
 Title "Widerspruch"
+
+Introduction "
+Ihr begebt euch auf die Suche nach *Oddeus*. Nach etwas rumfragen, kommt ihr tatsächlich an
+eine Dornenfestung und nachdem ihr erklärt habt, wer ihr seit, werdet ihr auf eine Audienz
+gebeten.
+"

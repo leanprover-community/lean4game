@@ -15,56 +15,46 @@ Title "Have"
 
 Introduction
 "
-Manchmal, wollen wir nicht am aktuellen Goal arbeiten, sondern zuerst ein
-Zwischenresultat beweisen, welches wir dann benützen können.
-
-Mit `have [Name] : [Aussage]` kann man ein Zwischenresultat erstellen,
-dass man anschliessen beweisen muss.
-
-Wenn du zum Beispiel die Annahmen `(h : A → ¬ B)` und `(ha : A)` hast, kannst
-du mit
-```
-have g : ¬ B
-apply h
-assumption
-```
-eine neue Annahme `(g : ¬ B)` erstellen. Danach beweist du zuerst diese Annahme,
-bevor du dann mit dem Beweis forfährst.
+**Oddeus**: Willkommen Reisende! Ich muss eingestehen ich bin in Gedanken noch
+an etwas, könnt ihr mir bei diesem widersprüchlichen Problem helfen?
 "
 
-Statement
-    "Angenommen, man hat eine Implikation $A \\Rightarrow \\neg B$ und weiss, dass
-    $A \\land B$ wahr ist. Zeige, dass dies zu einem Widerspruch führt."
-    (A B : Prop) (h : A → ¬ B) (k : A ∧ B) : False := by
+-- Manchmal, wollen wir nicht am aktuellen Goal arbeiten, sondern zuerst ein
+-- Zwischenresultat beweisen, welches wir dann benützen können.
+
+-- Mit `have [Name] : [Aussage]` kann man ein Zwischenresultat erstellen,
+-- dass man anschliessen beweisen muss.
+
+-- Wenn du zum Beispiel die Annahmen `(h : A → ¬ B)` und `(ha : A)` hast, kannst
+-- du mit
+-- ```
+-- have g : ¬ B
+-- apply h
+-- assumption
+-- ```
+-- eine neue Annahme `(g : ¬ B)` erstellen. Danach beweist du zuerst diese Annahme,
+-- bevor du dann mit dem Beweis forfährst.
+
+Statement (A B : Prop) (h : A → ¬ B) (k : A ∧ B) : False := by
+  Hint "**Du**: Also als erstes Teile ich wohl mal das Und (`∧`) auf."
   rcases k with ⟨h₁, h₂⟩
-  have h₃ : ¬ B
-  apply h
-  assumption
-  contradiction
+  Hint "**Du**: Aber jetzt…
 
-Hint (A : Prop) (B : Prop) (h : A → ¬ B) (k : A ∧ B) : False =>
-" Fang mal damit an, das UND in den Annahmen mit `rcases` aufzuteilen.
-"
+  **Robo**: Du könntest dir ein passendes Zwischenresultat zurechtlegen, das dir hilft:
+  Mach mal `have g : ¬ B`!"
+  have g : ¬ B
+  · Hint "**Du**: Was und jetzt hab ich einfach angenommen das sei richtig?
 
-Hint (A : Prop) (B : Prop) (h : A → ¬ B) (k : A) (f : B) : False =>
-"
-Auf Deutsch: \"Als Zwischenresultat haben wir `¬ B`.\"
+    **Robo**: Ne, jetzt musst du das zuerst beweisen bevor du es dann benützen kannst."
+    Hint (hidden := true) "**Robo**: `apply` scheint passend zu sein."
+    apply h
+    assumption
+  · Hint (hidden := true) "**Du**: Und wie war das nochmals wenn zwei Annahmen sich widersprechen?
 
-In Lean :
-
-```
-have k : ¬ B
-[Beweis von k]
-```
-"
-
--- example (n : ℕ) : n.succ + 2 = n + 3 := by
--- ring_nf
-
-Conclusion ""
+    **Robo**: `contradiction`."
+    contradiction
 
 NewTactic «have»
 DisabledTactic «suffices»
 
-NewDefinition Even Odd
-NewLemma not_even not_odd
+Conclusion "*Oddeus*: Das stimmt wohl."
