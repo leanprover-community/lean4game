@@ -4,25 +4,25 @@
  [{"git":
    {"url": "https://github.com/leanprover-community/mathlib4.git",
     "subDir?": null,
-    "rev": "c8bff08cf815e8881e95967259910524100adfb0",
+    "rev": "fc4a489c2af75f687338fe85c8901335360f8541",
     "name": "mathlib",
     "inputRev?": "master"}},
   {"git":
    {"url": "https://github.com/gebner/quote4",
     "subDir?": null,
-    "rev": "7ac99aa3fac487bec1d5860e751b99c7418298cf",
+    "rev": "cc915afc9526e904a7b61f660d330170f9d60dd7",
     "name": "Qq",
     "inputRev?": "master"}},
   {"git":
    {"url": "https://github.com/JLimperg/aesop",
     "subDir?": null,
-    "rev": "ba61f7fec6174d8c7d2796457da5a8d0b0da44c6",
+    "rev": "071464ac36e339afb7a87640aa1f8121f707a59a",
     "name": "aesop",
     "inputRev?": "master"}},
   {"path": {"name": "GameServer", "dir": "./../leanserver"}},
   {"git":
    {"url": "https://github.com/leanprover/std4",
     "subDir?": null,
-    "rev": "de7e2a79905a3f87cad1ad5bf57045206f9738c7",
+    "rev": "44a92d84c31a88b9af9329a441890ad449d8cd5f",
     "name": "std",
     "inputRev?": "main"}}]}

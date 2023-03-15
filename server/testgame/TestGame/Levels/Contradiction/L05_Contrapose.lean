@@ -42,6 +42,7 @@ Endeckungen zeigen. Schaut, darunter ist eine Aufgabe.
 -- logisch equivalent sind.
 
 -- Wenn das Goal eine Implikation ist, kann man `contrapose` anwenden.
+open Nat
 
 Statement (n : ℕ) (h : Odd (n ^ 2)): Odd n := by
   Hint "**Oddeus**: Wie soll das den gehen?
@@ -56,9 +57,9 @@ Statement (n : ℕ) (h : Odd (n ^ 2)): Odd n := by
   revert h
   Hint "*Oddeus*: Ob man jetzt wohl dieses `contrapose` benutzen kann?"
   contrapose
-  Hint (hidden := true) "**Du**: Warte mal, jetzt kann man wohl `not_odd` verwenden…"
-  rw [not_odd]
-  rw [not_odd]
+  Hint (hidden := true) "**Du**: Warte mal, jetzt kann man wohl `even_iff_not_odd` verwenden…"
+  rw [← even_iff_not_odd]
+  rw [← even_iff_not_odd]
   Hint "**Robo**: Und den Rest hast du bei *Evenine* als Lemma gezeigt!"
   apply even_square
 

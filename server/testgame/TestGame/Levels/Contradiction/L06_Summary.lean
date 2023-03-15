@@ -27,6 +27,8 @@ und \"per Kontraposition\", beweise die Gleiche Aufgabe indem
 du mit `by_contra` einen Widerspruch suchst.
 "
 
+open Nat
+
 Statement (n : ℕ) (h : Odd (n ^ 2)) : Odd n := by
   Hint "**Robo**: Fang diesmal mit `by_contra g` an!"
   by_contra g
@@ -34,7 +36,7 @@ Statement (n : ℕ) (h : Odd (n ^ 2)) : Odd n := by
   Hint "**Robo**: Also `suffices g : ¬ Odd (n ^ 2)`."
   suffices d : ¬ Odd (n ^ 2)
   contradiction
-  rw [not_odd] at *
+  rw [←even_iff_not_odd] at *
   apply even_square
   assumption
 

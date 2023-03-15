@@ -29,6 +29,7 @@ and eine Wand aus Dornenranken. Beim Eingang steht eine Wache, die auch zuruft:
 
 -- (welche man auch mit `rw` explizit benutzen könnte.)
 
+open Nat
 
 Statement : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) := by
   Hint "**Du**: Also ich kann mal das `¬` durch die Quantifier hindurchschieben.
@@ -46,29 +47,31 @@ Statement : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) := by
     unfold Odd
     push_neg
     Hint "**Robo**: Der Weg ist etwas schwieriger. Ich würde nochmals zurück und schauen,
-    dass du irgendwann `¬Odd` kriegst, was du dann mit `rw [not_odd]` zu `Even` umwandeln
+    dass du irgendwann `¬Odd` kriegst, was du dann mit `rw [←even_iff_not_odd]`
+    zu `Even` umwandeln.
     kannst."
   push_neg
   intro n
   Hint "**Robo**: Welche Zahl du jetzt mit `use` brauchst, danach wirst du vermutlich das
-  Lemma `not_odd` brauchen.
+  Lemma `←even_iff_not_odd` brauchen.
 
-  **Du**: Könnte ich jetzt schon `rw [not_odd]` machen?
+  **Du**: Könnte ich jetzt schon `rw [←even_iff_not_odd]` machen?
 
   **Robo**: Ne, `rw` kann nicht innerhalb von Quantifiern umschreiben.
 
   **Du**: Aber wie würde ich das machen?
 
-  **Robo**: Zeig ich dir später, die Wache wird schon ganz ungeduldig!"
+  **Robo**: Zeig ich dir später, die Wache wird schon ganz ungeduldig!
+  Im Moment würde ich zuerst mit `use` eine richtige Zahl angeben, und danach umschreiben."
   Branch
     use n + 2
-    Hint "**Robo**: Gute Wahl! Jetzt kannst du `not_odd` verwenden."
+    Hint "**Robo**: Gute Wahl! Jetzt kannst du `←even_iff_not_odd` verwenden."
   Branch
     use n + 4
-    Hint "**Robo**: Gute Wahl! Jetzt kannst du `not_odd` verwenden."
+    Hint "**Robo**: Gute Wahl! Jetzt kannst du `←even_iff_not_odd` verwenden."
   use n
-  Hint "**Robo**: Gute Wahl! Jetzt kannst du `not_odd` verwenden."
-  rw [not_odd]
+  Hint "**Robo**: Gute Wahl! Jetzt kannst du `←even_iff_not_odd` verwenden."
+  rw [←even_iff_not_odd]
   unfold Even
   use n
   --ring
@@ -103,4 +106,4 @@ ist deine!
 "
 
 NewTactic push_neg
-NewLemma not_even not_odd not_exists not_forall
+NewLemma even_iff_not_odd odd_iff_not_even not_exists not_forall
