@@ -62,7 +62,7 @@ partial def reprintCore : Syntax → Option Format
 def reprint (stx : Syntax) : Format :=
   reprintCore stx |>.getD ""
 
-syntax hintArg := " (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")"
+syntax hintArg := atomic(" (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")")
 
 /-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
 see hints. The tactic does not affect the goal state. -/
