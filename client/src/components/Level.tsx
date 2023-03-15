@@ -22,7 +22,7 @@ import './level.css'
 import { Button } from './Button'
 import { ConnectionContext, useLeanClient } from '../connection';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
-import { codeEdited, selectCode, progressSlice, selectCompleted } from '../state/progress';
+import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { useStore } from 'react-redux';
 
@@ -76,6 +76,7 @@ function PlayableLevel({worldId, levelId}) {
   const introductionPanelRef = useRef<HTMLDivElement>(null)
 
   const initialCode = useAppSelector(selectCode(worldId, levelId))
+  const initialSelections = useAppSelector(selectSelections(worldId, levelId))
 
   const [commandLineMode, setCommandLineMode] = useState(true)
   const [commandLineInput, setCommandLineInput] = useState("")
@@ -86,6 +87,8 @@ function PlayableLevel({worldId, levelId}) {
   useEffect(() => {
     // Scroll to top when loading a new level
     introductionPanelRef.current!.scrollTo(0,0)
+    // Reset command line input when loading a new level
+    setCommandLineInput("")
   }, [levelId])
 
   React.useEffect(() => {
@@ -122,8 +125,6 @@ function PlayableLevel({worldId, levelId}) {
     }]);
   }
 
-  const connection = React.useContext(ConnectionContext)
-
   const gameInfo = useGetGameInfoQuery()
 
   const level = useLoadLevelQuery({world: worldId, level: levelId})
@@ -136,10 +137,37 @@ function PlayableLevel({worldId, levelId}) {
     setCanUndo(code.trim() !== "")
   }
 
+  const onDidChangeSelection = (monacoSelections) => {
+    const selections = monacoSelections.map(
+      ({selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}) =>
+      {return {selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}})
+    dispatch(changedSelection({world: worldId, level: levelId, selections}))
+  }
+
   const completed = useAppSelector(selectCompleted(worldId, levelId))
 
   const {editor, infoProvider, editorConnection} =
-  useLevelEditor(worldId, levelId, codeviewRef, initialCode, onDidChangeContent)
+    useLevelEditor(worldId, levelId, codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
+
+  // Effect when command line mode gets enabled
+  useEffect(() => {
+    if (editor && commandLineMode) {
+      let endPos = editor.getModel().getFullModelRange().getEndPosition()
+      if (editor.getModel().getLineContent(endPos.lineNumber).trim() !== "") {
+        editor.executeEdits("command-line", [{
+          range: monaco.Selection.fromPositions(endPos, endPos),
+          text: "\n",
+          forceMoveMarkers: true
+        }]);
+      }
+      endPos = editor.getModel().getFullModelRange().getEndPosition()
+      let currPos = editor.getPosition()
+      if (currPos.column != 1 || (currPos.lineNumber != endPos.lineNumber && currPos.lineNumber != endPos.lineNumber - 1)) {
+        // This is not a position that would naturally occur from CommandLine, reset:
+        editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
+      }
+    }
+  }, [editor, commandLineMode])
 
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
 
@@ -249,7 +277,7 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
   </div>
 }
 
-function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCode, onDidChangeContent) {
+function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
 
   const connection = React.useContext(ConnectionContext)
 
@@ -340,8 +368,11 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
         model = monaco.editor.createModel(initialCode, 'lean4', uri)
       }
       model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
+      editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
       editor.setModel(model)
-      editor.setPosition(model.getFullModelRange().getEndPosition())
+      if (initialSelections) {
+        editor.setSelections(initialSelections)
+      }
 
       infoviewApi.serverRestarted(leanClient.initializeResult)
       infoProvider.openPreview(editor, infoviewApi)

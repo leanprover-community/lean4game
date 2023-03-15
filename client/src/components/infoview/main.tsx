@@ -18,7 +18,7 @@ import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '.
 import { WithRpcSessions } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infoview/serverVersion';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { codeEdited, levelCompleted, selectCompleted } from '../../state/progress';
+import { levelCompleted, selectCompleted } from '../../state/progress';
 
 
 export function Main(props: {world: string, level: number}) {

@@ -5,9 +5,15 @@ import { loadState } from "./localStorage";
 interface ProgressState {
   level: {[world: string]: {[level: number]: LevelProgressState}}
 }
-
+interface Selection {
+  selectionStartLineNumber: number,
+  selectionStartColumn: number,
+  positionLineNumber: number
+  positionColumn: number
+}
 interface LevelProgressState {
   code: string,
+  selections: Selection[],
   completed: boolean
 }
 
@@ -32,6 +38,10 @@ export const progressSlice = createSlice({
       state.level[action.payload.world][action.payload.level].code = action.payload.code
       state.level[action.payload.world][action.payload.level].completed = false
     },
+    changedSelection(state, action: PayloadAction<{world: string, level: number, selections: Selection[]}>) {
+      addLevelProgress(state, action)
+      state.level[action.payload.world][action.payload.level].selections = action.payload.selections
+    },
     levelCompleted(state, action: PayloadAction<{world: string, level: number}>) {
       addLevelProgress(state, action)
       state.level[action.payload.world][action.payload.level].completed = true
@@ -53,6 +63,12 @@ export function selectCode(world: string, level: number) {
   }
 }
 
+export function selectSelections(world: string, level: number) {
+  return (state) => {
+    return selectLevel(world, level)(state).selections
+  }
+}
+
 export function selectCompleted(world: string, level: number) {
   return (state) => {
     return selectLevel(world, level)(state).completed
@@ -65,4 +81,4 @@ export function selectProgress() {
   }
 }
 
-export const { codeEdited, levelCompleted } = progressSlice.actions
+export const { changedSelection, codeEdited, levelCompleted } = progressSlice.actions
