@@ -38,4 +38,4 @@ Hint (P : ℕ → Prop) (m : ℕ) (hi : P m) : P (Nat.succ m) =>
 
 In diesem Beispiel kannst du `apply` benützen."
 
-NewTactics induction
+NewTactic induction

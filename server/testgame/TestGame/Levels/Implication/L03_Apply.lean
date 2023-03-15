@@ -9,6 +9,8 @@ Title "Apply"
 
 Introduction
 "
+Sein Kollege zieht eine Linie unter deinen Beweis, schreibt ein durchgestrichenes ~`revert`~
+hin und gibt dir das Blatt wieder.
 `revert` ist aber nur selten der richtige Weg.
 
 Im vorigen Beispiel würde man besser die Implikation $A \\Rightarrow B$ *anwenden*, also
@@ -18,21 +20,20 @@ Wenn man eine Implikation `(g : A → B)` in den Annahmen hat, bei welcher die K
 (also $B$) mit dem Goal übereinstimmt, kann man `apply g` genau dies machen.
 "
 
-Statement
-    "Seien $A, B$ logische Aussagen, wobei $A$ wahr ist und $A \\Rightarrow B$.
-    Zeige, dass $B$ wahr ist."
-    (A B : Prop) (hA : A) (g : A → B) : B := by
-  apply g
+Statement (A B : Prop) (hA : A) (h : A → B) : B := by
+  Hint "**Robo**: Du hast natürlich recht, normalerweise ist es viel schöner mit
+  `apply {h}` die Implikation anzuwenden."
+  apply h
+  Hint "**Du**: Und jetzt genügt es also `A` zu zeigen."
   assumption
 
-HiddenHint (A : Prop) (B : Prop) (hA : A) (g : A → B) : B =>
-"Mit `apply g` kannst du die Implikation `g` anwenden."
+Conclusion "**Robo** Übrigens mit `apply LEMMA` kannst auch jedes Lemma anwenden, dessen
+Aussage mit dem Goal übereinstimmt.
 
-HiddenHint (A : Prop) (B : Prop) (hA : A) (g : A → B) : A =>
-"Nachdem du die Implikation `A → B` angewendet hast, musst du nur noch $A$ zeigen,
-dafür hast du bereits einen Beweis in den Annahmen."
+Die beiden Fragenden schauen das Blatt an und murmeln zustimmend."
 
-NewTactics apply assumption
+NewTactic apply
+DisabledTactic revert tauto
 
 -- Katex notes
 -- `\\(    \\)` or `$   $` for inline

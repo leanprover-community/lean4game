@@ -30,6 +30,6 @@ Statement nonempty_iff_ne_empty
   push_neg
   rfl
 
-NewTactics constructor intro rw assumption rcases simp tauto trivial
+NewTactic constructor intro rw assumption rcases simp tauto trivial
 
-NewLemmas Subset.antisymm_iff empty_subset
+NewLemma Subset.antisymm_iff empty_subset

@@ -16,10 +16,7 @@ Langsam wird die Schlange kürzer. Die nächste Formalosophin, ebenfalls häkeln
 
 Statement ""
   (A B C : Prop) (h : A ∧ (B ∧ C)) : B := by
-  rcases h with ⟨_, ⟨g , _⟩⟩
-  assumption
-
-Hint (A B C : Prop) (h : A ∧ (B ∧ C)) : B => "
+  Hint "
 **Du**  Jetzt müssen wir wohl die Annahme de-konstruieren.
 
 **Robo** Ja, genau.  Das geht am einfachsten mit `rcases {h} with ⟨h₁, h₂⟩`.
@@ -30,16 +27,12 @@ Hint (A B C : Prop) (h : A ∧ (B ∧ C)) : B => "
 Und h₁ schreibst Du einfach als `h\\1`.  Aber Du kannst Dir auch einfach andere Namen
 für `h₁` und `h₂`, zum Beispiel `rcases {h} with ⟨hA, hBC⟩`
 "
-
-Hint  (A B C : Prop) (hA : A) (hAB : B ∧ C) : B =>
-"
-**Robo** Das sieht doch schon besser aus!  Gleich nochmal!
-"
-
-HiddenHint (A : Prop) (hA : A) : A =>
-"
-**Robo** Du hast einen Beweis dafür in den *Annahmen*.
-"
+  Branch
+    rcases h with ⟨h₁, h₂⟩
+    Hint "**Robo** Das sieht doch schon besser aus!  Gleich nochmal!"
+  rcases h with ⟨_, ⟨g , _⟩⟩
+  Hint (hidden := true) "**Robo** Du hast einen Beweis dafür in den *Annahmen*."
+  assumption
 
 Conclusion
 "
@@ -47,5 +40,5 @@ Conclusion
 `rcases h with ⟨h₁, ⟨h₂ , h₃⟩⟩`.
 "
 
-NewTactics rcases
-DisabledTactics tauto
+NewTactic rcases
+DisabledTactic tauto

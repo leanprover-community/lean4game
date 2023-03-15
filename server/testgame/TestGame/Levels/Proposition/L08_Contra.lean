@@ -17,14 +17,12 @@ Auftritt dritter Querulant.
 
 Statement ""
   (n : ℕ) (h : n = 10) (g : n ≠ 10) : n = 42 := by
+  Hint "**Du** Wieder ein Widerspruch in den Annahmen?
+
+**Robo** Ich sehe, du hast langsam den Dreh raus."
   contradiction
 
-Hint (n : ℕ) (h : n = 10) (g : n ≠ 10) : n = 42 =>
-"
-**Du** Wieder ein Widerspruch in den Annahmen?
 
-**Robo** Ich sehe, du hast langsam den Dreh raus.
-"
 
 Conclusion
 "
@@ -33,5 +31,5 @@ worin der Widerspruch besteht:  Die Annahme `n ≠ 10` ist genau die Negation vo
 Man muss `≠` immer als `¬(· = ·)` lesen.
 "
 
-NewTactics contradiction
-DisabledTactics tauto
+NewTactic contradiction
+DisabledTactic tauto

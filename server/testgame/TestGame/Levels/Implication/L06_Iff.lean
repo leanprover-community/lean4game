@@ -8,36 +8,39 @@ Title "Genau dann wenn"
 
 Introduction
 "
-Genau-dann-wenn, $A \\Leftrightarrow B$, wird als `A ↔ B` (`\\iff`) geschrieben.
-`A ↔ B` ist eine Struktur (ähnlich wie das logische UND), die aus zwei Teilen besteht:
+Als erstes kommt ihr in einen kleinen Raum mit ganz vielen Bildschirmen.
 
-- `mp`: die Implikation $A \\Rightarrow B$.
-- `mpr`: die Implikation $B \\Rightarrow A$.
+Ein junges Wesen dreht sich auf dem Stuhl um, und sagt:
 
-Hat man ein $\\Leftrightarrow$ im Goal, nimmt man dieses ebenfalls mit der Taktik
-`constructor` auseinander und zeigt dann beide Richtungen einzeln.
+**Mitarbeiter**: Oh hallo! Schaut euch mal das hier an!
 "
 
-Statement
-    "Zeige dass `B ↔ C`."
-    (A B : Prop) (mp : A → B) (mpr : B → A) : A ↔ B := by
+Statement (A B : Prop) (mp : A → B) (mpr : B → A) : A ↔ B := by
+  Hint "**Robo**: Das ist ein genau-dann-wenn Pfeil: `\\iff`. Er besteht aus zwei Teilen:
+  `A ↔ B` ist als `⟨A → B, B → A⟩` definiert.
+
+  **Du**: Also ganz ähnlich wie das UND, `A ∧ B`?
+
+  **Robo**: Genau. Entsprechend kannst du hier auch mit `constructor` anfangen."
   constructor
+  Hint "**Du**: Ah und die beiden hab ich schon in den Annahmen."
   assumption
   assumption
-
-HiddenHint (A : Prop) (B : Prop) : A ↔ B =>
-"Eine Struktur wie `A ↔ B` kann man mit `constructor` zerlegen."
-
-HiddenHint (A : Prop) (B : Prop) (h : A → B) : A → B =>
-"Such mal in den Annahmen."
 
 Conclusion
 "
-Die Taktik `constructor` heisst so, weil `↔` als \"Struktur\" definiert ist, die
-aus mehreren Einzelteilen besteht: `⟨A → B, B → A⟩`. Man sagt also Lean, es soll versuchen,
-ob das Goal aus solchen Einzelteilen \"konstruiert\" werden kann.
+**Robo**: Übrigens, bei `(h : A ∧ B)` haben die beiden Teile `h.left` und `h.right` geheissen,
+hier bei `(h : A ↔ B)` heissen sie `h.mp` und `h.mpr`.
+
+**Du**: Also `h.mp` ist `A → B`? Wieso `mp`?
+
+**Operationsleiter**: \"Modulo Ponens\" ist ein lokaler Begriff hier,
+aber das ist doch nicht wichtig.
+
+**Robo**: Und das \"r\" in `mpr` stünde für \"reverse\" weils die Rückrichtung ist.
 "
 
-NewTactics constructor assumption
+NewTactic constructor
+DisabledTactic tauto rw
 
 -- TODO : `case mpr =>` ist mathematisch noch sinnvoll.

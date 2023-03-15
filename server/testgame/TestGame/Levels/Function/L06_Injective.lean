@@ -3,7 +3,7 @@ import Mathlib
 
 Game "TestGame"
 World "Function"
-Level 7
+Level 6
 
 Title "Injektive"
 
@@ -13,13 +13,13 @@ Weiterirrend kommt ihr an eine Verzweigung.
 
 **Robo**: Sieht beides gleich aus.
 
-Ein paar Schritte in den linken Korridor hinein seht ihr gekritzel an der Wand:
+Ein paar Schritte in den linken Korridor hinein seht ihr auf dem Boden ein Blatt mit Gekritzel:
 
 ```
 def f : ℕ → ℕ := fun n ↦ if Even n then n^2 else n+1
 ```
 
-**Du**: Hier haben wir eine stückweis definierte Funktion
+**Du**: Hier haben wir wieder eine stückweise Funktion
 
 $$
 f(n) = \\begin{cases}

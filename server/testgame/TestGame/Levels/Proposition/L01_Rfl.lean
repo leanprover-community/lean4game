@@ -19,17 +19,14 @@ Er schreibt es Dir wieder auf.
 
 Statement "" :
   42 = 42 := by
+  Hint " **Robo** Ist doch klar.  Du musst ihn einfach daran erinnern,
+    dass Gleichheit *reflexiv* ist. Probier mal `rfl`."
   rfl
-
-Hint : 42 = 42 => "
-**Robo** Ist doch klar.  Du musst ihn einfach daran erinnern, dass Gleichheit *reflexiv* ist.
-Probier mal `rfl`.
-"
 
 Conclusion
 "
 **Untertan** Ah, richtig. Ja, Sie haben ja so recht.  Das vergesse ich immer.  Rfl, rfl, rfl …
 "
 
-NewTactics rfl
-DisabledTactics tauto
+NewTactic rfl
+DisabledTactic tauto

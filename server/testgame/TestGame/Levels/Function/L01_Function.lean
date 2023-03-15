@@ -5,31 +5,59 @@ Game "TestGame"
 World "Function"
 Level 1
 
-Title ""
+Title "Anonyme Funktionen"
 
 Introduction
 "
-Funktionen werden in Lean mit `ℕ → ℕ` geschrieben (`\\to`), also dem gleichen
-Pfeil wie Implikationen.
-
-Eine abstrakte Funktion ist ein entsprechendes Element `(f : ℕ → ℕ)` oder `(g : ℕ → ℝ)`.
-Dies sagt aber gar nichts darüber, wie `f` tatsächlich definiert ist.
-
-Hat man eine Funktion `(f : A → B)` und ein Element `(x : A)` dann ist `f x` der
-Bildpunkt in `B`. In Lean braucht man also keine Klammern um $f(x)$ zu schreiben.
-
-Eplizite, anonyme Funktionen kann man mit dem Syntax `fun (n : ℕ) ↦ n ^ 2` definieren
-(entweder `↦` (`\\map`) oder `=>` als Pfeil in der Mitte).
+Auf die Frage hin, ob sie von einem Bibliothek wisse, erzählt euch das kleine Mädchen,
+dass es auf der Insel nur einen gäbe, aber sie bedrängt euch so mit einer Frage,
+dass sie euch gar nicht sagt, wo dieser zu finden sei.
 "
 
-Statement
-"Zeige, dass es eine Funktion $\\mathbb{N} \\to \\mathbb{Z}$ gibt, für die $f(x) < x$ gilt."
-    : ∃ f : ℕ → ℤ, ∀ x, f x < x := by
+Statement "" : ∃ f : ℤ → ℤ, ∀ x, f x < x := by
   use (fun x ↦ x - 1)
   simp
 
-Hint : ∃ f : ℕ → ℤ, ∀ x, f x < x =>
+Hint : ∃ f : ℤ → ℤ, ∀ x, f x < x =>
 "
-Benütze eine anonyme Funktion `use (fun n ↦ _)` wobei `_` durch einen Ausdruck ersetzt
-werden muss, so dass die Aussage erfüllt wird.
+**Robo**: `f : ℤ → ℤ` ist die Notation für eine Funktion und `f x` ist diese Funktion
+angewendet auf ein Element `(x : ℤ)`.
+
+**Du**: War `→` nicht eben noch eine Implikation?
+
+**Robo**: Doch, die brauchen das gleiche Zeichen für beides.
+
+**Du**: Dann ist `f : ℤ → ℤ` also einfach abstrakt irgendeine Funktion,
+wie definier ich aber jetzt konkret eine Abbildungsvorschrift?
+
+**Robo**: Man kennt hier eine Notation für eine anonyme Funktion:
+`fun (x : ℤ) ↦ x ^ 2` ist
+
+$$
+\\begin\{aligned}
+  f : \\mathbb\{ℤ} &\\to \\mathbb\{ℤ} \\\\
+  x &\\mapsto x ^ 2
+\\end\{aligned}
+$$
+
+**Robo**: PS, `↦` ist `\\mapsto`. Aber man kann auch stattdessen `=>` benützen.
+"
+
+HiddenHint : ∃ f : ℕ → ℤ, ∀ x, f x < x =>
+"
+**Du**: Ja aber was mach ich damit?
+
+**Robo**: Wie immer gehst du ein `∃` mit `use …` an.
+"
+
+-- TODO: Why does this not show?
+HiddenHint : ∀ (x : ℤ), (fun (y : ℤ) => y - 1) x < x =>
+"**Du**: Zu was sich das wohl vereinfacht?"
+
+HiddenHint (x : ℤ) : (fun y => y - 1) x < x =>
+"**Du**: Zu was sich das wohl vereinfacht?"
+
+Conclusion "Das Mädchen wird kurz ruhig, dann beginnt es zu lächeln und zeigt strahlend
+in eine Richtung. Ihr folgt ihrem Finger und euch fällt in weiter ferne eine pompöse Struktur
+auf einem flachen Hügel auf.
 "

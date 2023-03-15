@@ -14,7 +14,9 @@ Introduction
 "
 Der letzte Untertan tritt vor.  Ihr Anliegen ist etwas komplizierter als die vorherigen.
 
-**Robo** Wirf einfach alles drauf, was Du gelernt hast.  Hier, ich bin sogar so nett und zeig Dir noch einmal die vier wichtigsten Taktiken für diese Situation an.
+**Robo** Wirf einfach alles drauf, was Du gelernt hast.
+Hier, ich bin sogar so nett und zeig Dir noch einmal die vier
+wichtigsten Taktiken für diese Situation an.
 
 | (Übersicht) | Und (`∧`)                | Oder (`∨`)              |
 |-------------|:-------------------------|:------------------------|
@@ -26,46 +28,83 @@ Der letzte Untertan tritt vor.  Ihr Anliegen ist etwas komplizierter als die vor
 
 Statement ""
   (A B C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) := by
-  constructor
-  rcases h with h | h
-  left
-  assumption
-  rcases h with ⟨h₁, h₂⟩
-  right
-  assumption
-  rcases h with h | h
-  left
-  assumption
-  rcases h with ⟨h₁, h₂⟩
-  right
-  assumption
+  Hint (hidden := true)
+  "**Robo**: Ich würd zuerst die Annahme {h} mit `rcases {h}` aufteilen."
+  Branch
+    constructor
+    · rcases h with h' | h'
+      · left
+        assumption
+      · rcases h' with ⟨h₁, h₂⟩
+        right
+        assumption
+    · rcases h with h' | h'
+      · left
+        assumption
+      · rcases h' with ⟨h₁, h₂⟩
+        right
+        assumption
+  rcases h
+  Hint (hidden := true) "**Robo**: Jetzt kannst Du das `∧` im Goal mit `constructor` angehen."
+  · constructor
+    · left
+      assumption
+    · left
+      assumption
+  · Hint (hidden := true)
+    "**Robo**: Hier würde ich die Annahme {h} nochmals mit `rcases` aufteilen."
+    Branch
+      constructor
+      · Hint "**Robo**: Der Nachteil an der Reihenfolge ist, dass du jetzt in jedem Untergoal
+`rcases h` aufrufen musst."
+        Branch
+          right
+          rcases h with ⟨h₁, h₂⟩
+          assumption
+        rcases h with ⟨h₁, h₂⟩
+        right
+        assumption
+      · Branch
+          right
+          rcases h with ⟨h₁, h₂⟩
+          assumption
+        rcases h with ⟨h₁, h₂⟩
+        right
+        assumption
+    rcases h with ⟨h₁, h₂⟩
+    constructor
+    · right
+      assumption
+    · right
+      assumption
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) ∧ (A ∨ C) =>
-"**Robo** Das `∧` in der Annahme kannst Du mit `rcases {h} with ⟨h₁, h₂⟩` zerlegen."
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) : (A ∨ B) ∧ (A ∨ C) =>
-"**Robo** Das `∧` im Goal kannst Du mit `constructor` zerlegen."
+-- HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) ∧ (A ∨ C) =>
+-- "**Robo** Das `∧` in der Annahme kannst Du mit `rcases {h} with ⟨h₁, h₂⟩` zerlegen."
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) =>
-"**Robo** Das `∨` in der Annahme kannst Du mit `rcases h with h | h` zerlegen."
+-- HiddenHint (A : Prop) (B : Prop) (C : Prop) : (A ∨ B) ∧ (A ∨ C) =>
+-- "**Robo** Das `∧` im Goal kannst Du mit `constructor` zerlegen."
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) =>
-"**Robo** Das `∨` in der Annahme kannst Du mit `rcases h with h | h` zerlegen."
+-- HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) ∧ (A ∨ C) =>
+-- "**Robo** Das `∨` in der Annahme kannst Du mit `rcases h with h | h` zerlegen."
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ C) =>
-"**Robo** Das `∨` in der Annahme kannst Du mit `rcases h with h | h` zerlegen."
+-- HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ B) =>
+-- "**Robo** Das `∨` in der Annahme kannst Du mit `rcases h with h | h` zerlegen."
+
+-- HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : A ∨ (B ∧ C)) : (A ∨ C) =>
+-- "**Robo** Das `∨` in der Annahme kannst Du mit `rcases h with h | h` zerlegen."
 
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) =>
-"**Robo** Das `∧` in der Annahme kannst Du mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
+-- HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ B) =>
+-- "**Robo** Das `∧` in der Annahme kannst Du mit `rcases h with ⟨h₁, h₂⟩` zerlegen."
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ C) =>
-"**Robo** Das `∧` in der Annahme kannst Du mit `rcases {h} with ⟨h₁, h₂⟩` zerlegen."
+-- HiddenHint (A : Prop) (B : Prop) (C : Prop) (h : B ∧ C) : (A ∨ C) =>
+-- "**Robo** Das `∧` in der Annahme kannst Du mit `rcases {h} with ⟨h₁, h₂⟩` zerlegen."
 
--- TODO: Hint nur Anhand der Annahmen?
+-- -- TODO: Hint nur Anhand der Annahmen?
 
-HiddenHint (A : Prop) (B : Prop) : A ∨ B =>
-"**Robo** `left` oder `right`?"
+-- HiddenHint (A : Prop) (B : Prop) : A ∨ B =>
+-- "**Robo** `left` oder `right`?"
 
 Conclusion
 "
@@ -74,5 +113,5 @@ Conclusion
 Königin *Logisinde* ist in der Zwischenzeit eingeschlafen, und ihr stehlt euch heimlich davon.
 "
 
-NewTactics left right assumption constructor rcases rfl contradiction trivial
-DisabledTactics tauto
+NewTactic left right assumption constructor rcases rfl contradiction trivial
+DisabledTactic tauto

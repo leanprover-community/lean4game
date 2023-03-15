@@ -3,13 +3,13 @@ import Mathlib
 
 Game "TestGame"
 World "Function"
-Level 5
+Level 4
 
 Title ""
 
 Introduction
 "
-Ihr läuft durch verschiedenste Leere Gänge des Funktionentempels.
+Ihr läuft durch verschiedenste Gänge der Bibliothek, allesamt mit Büchern entlang der Wände.
 
 **Du**: Wenn wir wüssten, dass nur ein möglicher Weg hierhin führt, könnten wir
 ausschliessen, dass wir im Kreis laufen.
@@ -22,7 +22,7 @@ Statement "" : Injective (fun (n : ℤ) ↦ n + 3) := by
   intro a b
   simp
 
-NewDefinitions Injective
+NewDefinition Injective
 
 Hint : Injective (fun (n : ℤ) ↦ n + 3) =>
 "**Robo**: `Injective` ist als `∀ \{a b : U}, f a = f b → a = b`

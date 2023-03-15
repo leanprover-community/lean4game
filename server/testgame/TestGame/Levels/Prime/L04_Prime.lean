@@ -43,4 +43,4 @@ Statement
   rcases h with ⟨_, h₂⟩
   assumption
 
-NewLemmas Nat.prime_def_lt''
+NewLemma Nat.prime_def_lt''

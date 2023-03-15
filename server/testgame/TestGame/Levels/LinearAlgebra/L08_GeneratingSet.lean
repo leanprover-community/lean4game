@@ -40,4 +40,4 @@ Statement
   --   fin_cases i;
   --   simp,
 
---NewLemmas top_le_span_range_iff_forall_exists_fun le_top
+--NewLemma top_le_span_range_iff_forall_exists_fun le_top

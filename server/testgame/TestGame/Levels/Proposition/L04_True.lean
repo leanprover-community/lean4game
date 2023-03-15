@@ -11,11 +11,8 @@ Introduction
 Der nächste Untertan in der Reihe ist ein Schelm.
 "
 
-Statement "" :
-True := by
-  trivial
-
-Hint : True => "
+Statement "" : True := by
+  Hint "
 **Robo**  Dieses `True` ist eine spezielle Aussage, nämlich die Aussage, die immer und
 bedingungslos wahr ist.
 
@@ -23,6 +20,7 @@ bedingungslos wahr ist.
 
 **Robo** Ich glaube, nichts. Ich glaube, Du kannst einfach `trivial` schreiben.
 "
+  trivial
 
 Conclusion
 "
@@ -35,5 +33,5 @@ Wie in einer Mathe-Vorlesung?
 Das funktioniert nur in einer Handvoll Situationen.
 "
 
-NewTactics trivial
-DisabledTactics tauto
+NewTactic trivial
+DisabledTactic tauto

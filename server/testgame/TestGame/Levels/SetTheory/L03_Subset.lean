@@ -28,18 +28,18 @@ namespace MySet
 
 open Set
 
-theorem mem_univ {A : Type _} (x : A) : x ∈ (univ : Set A) := by
-  trivial
+-- theorem mem_univ {A : Type _} (x : A) : x ∈ (univ : Set A) := by
+--   trivial
 
-theorem not_mem_empty {A : Type _} (x : A) : x ∉ (∅ : Set A) := by
-  tauto
+-- theorem not_mem_empty {A : Type _} (x : A) : x ∉ (∅ : Set A) := by
+--   tauto
 
 Statement subset_empty_iff
 "." (A : Set ℕ) : A ⊆ univ := by
   intro h hA
-  apply mem_univ -- or `trivial`.
+  trivial --apply mem_univ -- or `trivial`.
 
-NewTactics intro trivial apply
+NewTactic intro trivial apply
 -- blocked: tauto simp
 
 end MySet

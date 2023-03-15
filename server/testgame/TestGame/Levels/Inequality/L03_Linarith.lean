@@ -18,6 +18,6 @@ Statement
     (n : ℕ) (h : 2 ≤ n) : n ≠ 0 := by
   linarith
 
-NewTactics linarith
+NewTactic linarith
 
-NewLemmas Nat.pos_iff_ne_zero
+NewLemma Nat.pos_iff_ne_zero

@@ -8,46 +8,46 @@ Title "Implikation"
 
 Introduction
 "
-Noch eine Übung: Angenommen man hat folgende Implikationen:
+Selbstsicher folgt ihr den Anweisungen und geht nach draussen zum
+defekten Kontrollelement. Dieses zeigt ein kompliziertes Diagram:
 $$
 \\begin{CD}
   A  @>{f}>> B       @<{g}<< C       \\\\
   @. @V{h}VV @V{m}VV \\\\
-  D  @>{i}>> E       @>{k}>> F
+  D  @>{i}>> E       @>{k}>> F       \\\\
+  @A{m}AA @A{n}AA @V{p}VV \\\\
+  G  @<{q}<< H       @>{r}>> I
 \\end{CD}
 $$
 "
 
 Statement
-    "Beweise $A \\Rightarrow F$."
-    (A B C D E F : Prop) (f : A → B) (g : C → B) (h : B → E)
-     (i : D → E) (k : E → F) (m : C → F) : A → F := by
+    (A B C D E F G H I : Prop)
+    (f : A → B) (g : C → B) (h : B → E) (i : D → E) (k : E → F) (m : G → D)
+    (n : H → E) (p : F → I) (q : H → G) (r : H → I) : A → I := by
+  Hint "**Du**: Also ich muss einen Pfad von Implikationen $A \\Rightarrow I$ finden.
+
+  **Robo**: Und dann fängst du am besten wieder mit `intro` an."
   intro ha
+  Branch
+    apply r
+    Hint "**Robo**: Das sieht nach einer Sackgasse aus…"
+  Hint (hidden := true) "**Robo**: Na wieder `apply`, was sonst."
+  apply p
   apply k
   apply h
+  Branch
+    apply g
+    Hint "**Robo**: Nah, da stimmt doch was nicht…"
   apply f
   assumption
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
-    (f : A → B) (g : C → B) (h : B → E)
-    (i : D → E) (k : E → F) (m : C → F) : A → F =>
-"Wieder ist es schlau, mit `intro` anzufangen."
+Conclusion
+"Mit einem lauten Ratteln springen die Förderbänder wieder an.
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
-    (hA : A) (f : A → B) (g : C → B) (h : B → E)
-    (i : D → E) (k : E → F) (m : C → F) : F =>
-"Versuch mit `apply` den richtigen Weg zu finden."
+**Operationsleiter**: Vielen Dank euch! Kommt ich geb euch eine Führung und stell euch den
+Technikern hier vor."
 
-Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
-    (hA : A) (f : A → B) (g : C → B) (h : B → E)
-    (i : D → E) (k : E → F) (m : C → F) : C =>
-"Sackgasse. Probier doch einen anderen Weg."
-
-Hint (A : Prop) (B : Prop) (C : Prop) (D : Prop) (E : Prop) (F : Prop)
-    (hA : A) (f : A → B) (g : C → B) (h : B → E)
-    (i : D → E) (k : E → F) (m : C → F) : D =>
-"Sackgasse. Probier doch einen anderen Weg."
-
-NewTactics apply assumption revert intro
+DisabledTactic tauto
 
 -- https://www.jmilne.org/not/Mamscd.pdf

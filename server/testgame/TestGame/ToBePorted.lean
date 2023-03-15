@@ -1,10 +1,10 @@
 import Mathlib
 
-lemma not_odd {n : ℕ} : ¬ Odd n ↔ Even n := by
-  sorry
+-- lemma not_odd {n : ℕ} : ¬ Odd n ↔ Even n := by
+--   sorry
 
-lemma not_even {n : ℕ} : ¬ Even n ↔ Odd n := by
-  sorry
+-- lemma not_even {n : ℕ} : ¬ Even n ↔ Odd n := by
+--   sorry
 
 lemma even_square (n : ℕ) : Even n → Even (n ^ 2) := by
   intro ⟨x, hx⟩
@@ -13,72 +13,58 @@ lemma even_square (n : ℕ) : Even n → Even (n ^ 2) := by
   rw [hx]
   ring
 
-section powerset
+-- section powerset
 
-open Set
+-- open Set
 
-namespace Finset
+-- namespace Finset
 
-theorem powerset_singleton {U : Type _} [DecidableEq U] (x : U) :
-    Finset.powerset {x} = {∅, {x}} := by
-  ext y
-  rw [mem_powerset, subset_singleton_iff, mem_insert, mem_singleton]
+-- theorem powerset_singleton {U : Type _} [DecidableEq U] (x : U) :
+--     Finset.powerset {x} = {∅, {x}} := by
+--   ext y
+--   rw [mem_powerset, subset_singleton_iff, mem_insert, mem_singleton]
 
-end Finset
+-- end Finset
 
-/- The powerset of a singleton contains only `∅` and the singleton. -/
-theorem powerset_singleton {U : Type _} (x : U) :
-    𝒫 ({x} : Set U) = {∅, {x}} := by
-  ext y
-  rw [mem_powerset_iff, subset_singleton_iff_eq, mem_insert_iff, mem_singleton_iff]
+-- /- The powerset of a singleton contains only `∅` and the singleton. -/
+-- theorem powerset_singleton {U : Type _} (x : U) :
+--     𝒫 ({x} : Set U) = {∅, {x}} := by
+--   ext y
+--   rw [mem_powerset_iff, subset_singleton_iff_eq, mem_insert_iff, mem_singleton_iff]
 
-theorem subset_insert_iff_of_not_mem {U : Type _ } {s t : Set U} {a : U} (h : a ∉ s)
-    : s ⊆ insert a t ↔ s ⊆ t := by
-  constructor
-  · intro g y hy
-    specialize g hy
-    rw [mem_insert_iff] at g
-    rcases g with g | g
-    · rw [g] at hy
-      contradiction
-    · assumption
-  · intro g y hy
-    specialize g hy
-    exact mem_insert_of_mem _ g
+-- theorem subset_insert_iff_of_not_mem' {U : Type _ } {s t : Set U} {a : U} (h : a ∉ s)
+--     (g : s ⊆ t) : s ⊆ insert a t := by
+--   intro y hy
+--   specialize g hy
+--   exact mem_insert_of_mem _ g
 
-theorem subset_insert_iff_of_not_mem' {U : Type _ } {s t : Set U} {a : U} (h : a ∉ s)
-    (g : s ⊆ t) : s ⊆ insert a t := by
-  intro y hy
-  specialize g hy
-  exact mem_insert_of_mem _ g
+-- lemma mem_powerset_insert_iff {U : Type _} (A S : Set U) (x : U) :
+--     S ∈ 𝒫 (insert x A) ↔ S ∈ 𝒫 A ∨ ∃ B ∈ 𝒫 A , insert x B = S := by
+--   simp_rw [mem_powerset_iff]
+--   constructor
+--   · intro h
+--     by_cases hs : x ∈ S
+--     · right
+--       use S \ {x}
+--       rw [insert_diff_singleton, insert_eq_of_mem hs, diff_singleton_subset_iff]
+--       exact ⟨h, rfl⟩
+--     · left
+--       exact (subset_insert_iff_of_not_mem hs).mp h
+--   · intro h
+--     rcases h with h | ⟨B, h₁, h₂⟩
+--     · exact le_trans h (subset_insert x A)
+--     · rw [←h₂]
+--       exact insert_subset_insert h₁
 
-lemma mem_powerset_insert_iff {U : Type _} (A S : Set U) (x : U) :
-    S ∈ 𝒫 (insert x A) ↔ S ∈ 𝒫 A ∨ ∃ B ∈ 𝒫 A , insert x B = S := by
-  simp_rw [mem_powerset_iff]
-  constructor
-  · intro h
-    by_cases hs : x ∈ S
-    · right
-      use S \ {x}
-      rw [insert_diff_singleton, insert_eq_of_mem hs, diff_singleton_subset_iff]
-      exact ⟨h, rfl⟩
-    · left
-      exact (subset_insert_iff_of_not_mem hs).mp h
-  · intro h
-    rcases h with h | ⟨B, h₁, h₂⟩
-    · exact le_trans h (subset_insert x A)
-    · rw [←h₂]
-      exact insert_subset_insert h₁
+-- lemma mem_powerset_insert_iff' {U : Type _} (A S : Set U) (x : U) :
+--     S ∈ 𝒫 (insert x A) ↔ S \ {x} ∈ 𝒫 A := by
+--   rw [mem_powerset_iff, mem_powerset_iff, diff_singleton_subset_iff]
 
-lemma mem_powerset_insert_iff' {U : Type _} (A S : Set U) (x : U) :
-    S ∈ 𝒫 (insert x A) ↔ S \ {x} ∈ 𝒫 A := by
-  rw [mem_powerset_iff, mem_powerset_iff, diff_singleton_subset_iff]
-
-lemma powerset_insert {U : Type _} (A : Set U) (x : U) :
-    𝒫 (insert x A) = A.powerset ∪ A.powerset.image (insert x) := by
-  ext y
-  rw [mem_powerset_insert_iff, mem_union, mem_image]
+-- lemma powerset_insert {U : Type _} (A : Set U) (x : U) :
+--     𝒫 (insert x A) = A.powerset ∪ A.powerset.image (insert x) := by
+--   ext y
+--   rw [mem_powerset_insert_iff, mem_union, mem_image]
 
 
 
-end powerset
+-- end powerset

@@ -35,4 +35,4 @@ lemma asdf (a b c d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c 
 
 Conclusion ""
 
-NewTactics assumption
+NewTactic assumption

@@ -14,63 +14,43 @@ Title "Contradiction"
 
 Introduction
 "
+**Du**: Sag mal Robo, das hätte ich aber auch als Widerspruch anstatt Kontraposition
+beweisen können?
+
+**Robo**: Klar. `contrapose` ist eine Kontraposition, `by_contra` ein Widerspruchsbeweis.
+Probiers doch einfach!
 In diesem Kapitel hast du also folgende Taktiken kennengelernt:
 
-|       | Taktik          | Beispiel                                               |
-|:------|:----------------|:-------------------------------------------------------|
-| 16    | `have`          | Zwischenresultat annehmen.                             |
-| 17    | `suffices`      | Zwischenresultat annehmen.                             |
-| 18    | `by_contra`     | Widerspruch. (startet einen Widerspruch)               |
-| *3*   | `contradiction` | *(Schliesst einen Widerspruchsbeweis)*                 |
-| 19    | `contrapose`    | Contraposition.                                        |
-| *9*   | `revert`        | Nützlich um danach `contrapose` anzuwenden.            |
 
 Als Vergleich zwischen Beweisen \"per Widerspruch\"
 und \"per Kontraposition\", beweise die Gleiche Aufgabe indem
 du mit `by_contra` einen Widerspruch suchst.
 "
 
-Statement
-    "Ist n² ungerade, so ist auch n ungerade. Beweise durch Widerspruch."
-    (n : ℕ) (h : Odd (n ^ 2)) : Odd n := by
+open Nat
+
+Statement (n : ℕ) (h : Odd (n ^ 2)) : Odd n := by
+  Hint "**Robo**: Fang diesmal mit `by_contra g` an!"
   by_contra g
+  Hint "**Robo**: Jetzt würde ich einen Widerspruch zu `Odd (n ^ 2)` führen."
+  Hint "**Robo**: Also `suffices g : ¬ Odd (n ^ 2)`."
   suffices d : ¬ Odd (n ^ 2)
   contradiction
-  rw [not_odd] at *
+  rw [←even_iff_not_odd] at *
   apply even_square
   assumption
 
-HiddenHint (n : ℕ) (h : Odd (n^2)) : Odd n =>
-"Schreibe `by_contra h₁` um einen Beweis durch Widerspruch zu starten."
+DisabledTactic contrapose revert
 
-Hint (n : ℕ) (g : ¬ Odd n) (h : Odd (n^2)) : False =>
+Conclusion "**Robo**: Bravo! Hier nochmals ein Überblick, was wir jetzt alles auf diesem
+Mond gelernt haben:
+
+|       | Taktik          | Beispiel                                               |
+|:------|:----------------|:-------------------------------------------------------|
+| 177   | `have`          | Zwischenresultat annehmen.                             |
+| 18    | `suffices`      | Zwischenresultat annehmen.                             |
+| 19    | `by_contra`     | Widerspruch. (startet einen Widerspruch)               |
+| *3*   | `contradiction` | *(Schliesst einen Widerspruchsbeweis)*                 |
+| 20    | `contrapose`    | Kontraposition.                                        |
+| *9*   | `revert`        | Nützlich um danach `contrapose` anzuwenden.            |
 "
-Am sinnvollsten ist es, hier einen Widerspruch zu `Odd (n^2)` zu suchen.
-Dafür kannst du
-```
-suffices k : ¬ Odd (n ^ 2)
-contradiction
-```
-benützen.
-"
-
-HiddenHint (n : ℕ) (g : ¬ Odd (n^2)) (h : Odd (n^2)) : False =>
-"Hier brauchst du nur `contradiction`."
-
-Hint (n : ℕ) (g : ¬ Odd n) (h : Odd (n^2)) : ¬ Odd (n^2) =>
-"Das Zwischenresultat `¬Odd (n^2)` muss auch bewiesen werden.
-Hier ist wieder das Lemma `not_Odd` hilfreich."
-
-HiddenHint (n : ℕ) (g : ¬ Odd n) (h : Odd (n^2)) : Even (n^2) =>
-"Mit `rw [not_Odd] at *` kannst du im Goal und allen Annahmen gleichzeitig umschreiben."
-
-Hint (n: ℕ) (h : Odd (n ^ 2)) (g : Even n) : Even (n ^ 2) =>
-"Diese Aussage hast du bereits als Lemma bewiesen."
-
-HiddenHint (n: ℕ) (h : Odd (n ^ 2)) (g : Even n) : Even (n ^ 2) =>
-"Probiers mit `apply ...`"
-
-
-NewTactics contradiction by_contra rw apply assumption -- TODO: suffices, have
-NewDefinitions Even Odd
-NewLemmas not_odd not_even even_square

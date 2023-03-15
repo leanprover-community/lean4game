@@ -33,4 +33,4 @@ $\\sum_{i=0}^n\\sum_{j=0}^m  2^i (1 + j) = \\sum_{j=0}^m\\sum_{i=0}^n  2^i (1 + 
     ∑ j : Fin m, ∑ i : Fin n, ( 2^i * (1 + j) : ℕ) := by
   rw [Finset.sum_comm]
 
-NewLemmas Finset.sum_comm
+NewLemma Finset.sum_comm

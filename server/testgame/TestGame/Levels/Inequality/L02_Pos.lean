@@ -34,8 +34,8 @@ Statement Nat.pos_iff_ne_zero
   intro
   apply Nat.succ_pos
 
-NewTactics simp
-NewLemmas Nat.succ_pos
+NewTactic simp
+NewLemma Nat.succ_pos
 
 Hint : 0 < Nat.zero ↔ Nat.zero ≠ 0 =>
 "Den Induktionsanfang kannst du oft mit `simp` lösen."

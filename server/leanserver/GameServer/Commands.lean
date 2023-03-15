@@ -1,6 +1,7 @@
 import Lean
 
 import GameServer.EnvExtensions
+import GameServer.StrInterpolation
 
 open Lean Meta
 
@@ -61,36 +62,117 @@ partial def reprintCore : Syntax → Option Format
 def reprint (stx : Syntax) : Format :=
   reprintCore stx |>.getD ""
 
--- macro mods:declModifiers "lemma" n:declId sig:declSig val:declVal : command => `($mods:declModifiers theorem $n $sig $val)
+syntax hintArg := " (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")"
+
+/-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
+see hints. The tactic does not affect the goal state. -/
+elab "Hint" args:hintArg* msg:Lean.Parser.interpolatedStrNoIndent : tactic => do
+  let mut strict := false
+  let mut hidden := false
+
+  for arg in args do
+    match arg with
+    | `(hintArg| (strict := true)) => strict := true
+    | `(hintArg| (strict := false)) => strict := false
+    | `(hintArg| (hidden := true)) => hidden := true
+    | `(hintArg| (hidden := false)) => hidden := false
+    | _ => throwUnsupportedSyntax
+
+  let goal ← Tactic.getMainGoal
+  goal.withContext do
+    -- We construct an expression that can produce the hint text. The difficulty is that we
+    -- want the text to possibly contain quotation of the local variables which might have been
+    -- named differently by the player.
+    let varsName := `vars
+    let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
+      let mut text ← expandInterpolatedStr ⟨msg.raw⟩ (← `(MessageData)) (← `(toMessageData))
+      let goalDecl ← goal.getDecl
+      let decls := goalDecl.lctx.decls.toArray.filterMap id
+      for i in [:decls.size] do
+        text ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $text)
+      return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize text none
+    let textmvar ← mkFreshExprMVar none
+    guard $ ← isDefEq textmvar text -- Store the text in a mvar.
+    -- The information about the hint is logged as a message using `logInfo` to transfer it to the
+    -- `Statement` command defined below:
+    logInfo $
+      .tagged `Hint $
+      .nest (if strict then 1 else 0) $
+      .nest (if hidden then 1 else 0) $
+      .compose (.ofGoal textmvar.mvarId!) (.ofGoal goal)
+
+/-- This tactic allows us to execute an alternative sequence of tactics, but without affecting the
+proof state. We use it to define Hints for alternative proof methods or dead ends. -/
+elab "Branch" t:tacticSeq : tactic => do
+  let b ← saveState
+  Tactic.evalTactic t
+  let msgs ← Core.getMessageLog
+  b.restore
+  Core.setMessageLog msgs
 
 /-- Define the statement of the current level.
 
 Arguments:
 - ident: (Optional) The name of the statemtent.
-- descr: The human-readable version of the lemma as string. Accepts Markdown and Mathjax.
+- descr: (Optional) The human-readable version of the lemma as string. Accepts Markdown and Mathjax.
 -/
-elab "Statement" statementName:ident ? descr:str sig:declSig val:declVal : command => do
+elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
 
   let lvlIdx ← getCurLevelIdx
   let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
+
+  -- save the messages before evaluation of the proof
+  let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
+
   let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
   -- let thmStatement' ← match statementName with
   -- | none => `(lemma $(mkIdent "XX") $sig $val) -- TODO: Make it into an `example`
   -- | some name => `(lemma $name $sig $val)
+  elabCommand thmStatement
+
+  let msgs := (← get).messages
+
+  let mut hints := #[]
+  let mut nonHintMsgs := #[]
+  for msg in msgs.msgs do
+    -- Look for messages produced by the `Hint` tactic. They are used to pass information about the
+    -- intermediate goal state
+    if let MessageData.withNamingContext _ $ MessageData.withContext ctx $
+        .tagged `Hint $
+        .nest strict $
+        .nest hidden $
+        .compose (.ofGoal text) (.ofGoal goal) := msg.data then
+      let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
+        return {
+          goal := ← abstractCtx goal
+          text := ← instantiateMVars (mkMVar text)
+          strict := strict == 1
+          hidden := hidden == 1
+        }
+      hints := hints.push hint
+    else
+      nonHintMsgs := nonHintMsgs.push msg
+
+  -- restore saved messages and non-hint messages
+  modify fun st => { st with
+    messages := initMsgs ++ ⟨nonHintMsgs.toPArray'⟩
+  }
 
   let scope ← getScope
   let env ← getEnv
 
-  elabCommand thmStatement
   modifyCurLevel fun level => pure {level with
     module := env.header.mainModule
     goal := sig,
     scope := scope,
-    descrText := descr.getString,
+    descrText := match descr with
+    | none => ""
+    | some s => s.getString
     descrFormat := match statementName with
     | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
     | some name => (Format.join ["lemma ", reprint name.raw, " ", reprint sig.raw, " := by"]).pretty 10  -- "lemma "  ++ (toString <| reprint name.raw) ++ " " ++ (Format.pretty (reprint sig.raw) 40) ++ " := by"
+    hints := hints
   } -- Format.pretty <| format thmStatement.raw }
 
 /-- Define the conclusion of the current game or current level if some
@@ -138,38 +220,40 @@ def mkGoalSyntax (s : Term) : List (Ident × Term) → MacroM Term
 | (n, t)::tail => do return (← `(∀ $n : $t, $(← mkGoalSyntax s tail)))
 | [] => return s
 
-def elabHint (hidden : Bool) (binders : TSyntaxArray `Lean.Parser.Term.bracketedBinder)
-  (goal : TSyntax `term) (msg : TSyntax `interpolatedStrKind) :=
-liftTermElabM do withOptions (fun options => options.setBool `linter.unusedVariables false) do
-  let (g, decls) ← elabBinders binders fun xs => do
-    let g ← mkForallFVars xs $ ← elabTermAndSynthesize goal none
-    synthesizeSyntheticMVarsNoPostponing false
-    return (← instantiateMVars g, ← xs.mapM (fun x => x.fvarId!.getDecl))
-  let varsName := `vars
-  let msg ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
-    let mut msg ← `(m! $msg)
-    for i in [:decls.size] do
-      msg ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $msg)
-    return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize msg none
+-- def elabHint (hidden : Bool) (binders : TSyntaxArray `Lean.Parser.Term.bracketedBinder)
+--   (goal : TSyntax `term) (msg : TSyntax `interpolatedStrKind) :=
+-- liftTermElabM do withOptions (fun options => options.setBool `linter.unusedVariables false) do
+--   let (g, decls) ← elabBinders binders fun xs => do
+--     let g ← mkForallFVars xs $ ← elabTermAndSynthesize goal none
+--     synthesizeSyntheticMVarsNoPostponing false
+--     return (← instantiateMVars g, ← xs.mapM (fun x => x.fvarId!.getDecl))
+--   let varsName := `vars
+--   let msg ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
+--     let mut msg ← `(m! $msg)
+--     for i in [:decls.size] do
+--       msg ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $msg)
+--     return ← mkLambdaFVars #[vars] $ ← elabTermAndSynthesize msg none
 
-  if g.hasMVar then throwError m!"Goal contains metavariables: {g}"
+--   if g.hasMVar then throwError m!"Goal contains metavariables: {g}"
 
-  modifyCurLevel fun level => pure {level with hints := level.hints.push {
-    goal := g,
-    intros := decls.size,
-    hidden := hidden,
-    text := msg }}
+  -- modifyCurLevel fun level => pure {level with hints := level.hints.push {
+  --   goal := g,
+  --   intros := decls.size,
+  --   hidden := hidden,
+  --   text := msg }}
 
 /-- Declare a hint. This version doesn't prevent the unused linter variable from running. -/
 local elab "Hint'" binders:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command =>
-  elabHint false binders goal msg
+  -- elabHint false binders goal msg
+  pure ()
 
 /--
 Declare a hint. This version doesn't prevent the unused linter variable from running.
 A hidden hint is only displayed if explicitly requested by the user.
 -/
 local elab "HiddenHint'" binders:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command => do
-  elabHint true binders goal msg
+  -- elabHint true binders goal msg
+  pure ()
 
 /-- Declare a hint in reaction to a given tactic state in the current level. -/
 macro "Hint" decls:bracketedBinder* ":" goal:term "=>" msg:interpolatedStr(term) : command => do
@@ -201,19 +285,19 @@ elab "TacticDoc" name:ident content:str : command =>
     content := content.getString })
 
 /-- Declare tactics that are introduced by this level. -/
-elab "NewTactics" args:ident* : command => do
+elab "NewTactic" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with tactics := {level.tactics with new := names}}
 
 /-- Declare tactics that are temporarily disabled in this level -/
-elab "DisabledTactics" args:ident* : command => do
+elab "DisabledTactic" args:ident* : command => do
   let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Tactic name
+  -- for name in names do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with tactics := {level.tactics with disabled := names}}
 
 /-- Temporarily disable all tactics except the ones declared here -/
-elab "OnlyTactics" args:ident* : command => do
+elab "OnlyTactic" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with tactics := {level.tactics with only := names}}
@@ -231,19 +315,19 @@ elab "DefinitionDoc" name:ident content:str : command =>
     content := content.getString })
 
 /-- Declare definitions that are introduced by this level. -/
-elab "NewDefinitions" args:ident* : command => do
+elab "NewDefinition" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with definitions := {level.definitions with new := names}}
 
 /-- Declare definitions that are temporarily disabled in this level -/
-elab "DisabledDefinitions" args:ident* : command => do
+elab "DisabledDefinition" args:ident* : command => do
   let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Definition name
+  -- for name in names do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with definitions := {level.definitions with disabled := names}}
 
 /-- Temporarily disable all definitions except the ones declared here -/
-elab "OnlyDefinitions" args:ident* : command => do
+elab "OnlyDefinition" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with definitions := {level.definitions with only := names}}
@@ -264,19 +348,19 @@ elab "LemmaDoc" name:ident "as" userName:ident "in" category:str content:str : c
     content := content.getString })
 
 /-- Declare lemmas that are introduced by this level. -/
-elab "NewLemmas" args:ident* : command => do
+elab "NewLemma" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with new := names}}
 
 /-- Declare lemmas that are temporarily disabled in this level -/
-elab "DisabledLemmas" args:ident* : command => do
+elab "DisabledLemma" args:ident* : command => do
   let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Lemma name
+  -- for name in names do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with disabled := names}}
 
 /-- Temporarily disable all lemmas except the ones declared here -/
-elab "OnlyLemmas" args:ident* : command => do
+elab "OnlyLemma" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with only := names}}
@@ -347,13 +431,18 @@ elab "MakeGame" : command => do
         for item in (level.getInventory inventoryType).new do
           let category := (← getInventoryDoc? item inventoryType).get!.category
           items := items.insert item {name := item, category, locked := false, disabled := false}
+
+        let mut disabled : HashSet Name := {}
         for item in (level.getInventory inventoryType).disabled do
           let category := (← getInventoryDoc? item inventoryType).get!.category
-          items := items.insert item {name := item, category, locked := false, disabled := true}
+          items := items.insert item {name := item, category, locked := false, disabled := false}
+          -- (we set disabled to false at first because it applies only to the current level)
+          disabled := disabled.insert item
 
         let itemsArray := items.toArray
           |>.insertionSort (fun a b => a.1.toString < b.1.toString)
           |>.map (·.2)
+          |>.map (fun item => {item with disabled := disabled.contains item.name})
 
         modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
           return level.setComputedInventory inventoryType itemsArray

@@ -13,17 +13,22 @@ Title "leere Menge"
 
 Introduction
 "
-Gleich wie bei `univ` gibt es leere Mengen `∅` von verschiedenen Typen.
-So ist `(∅ : Set ℕ)` in Lean nicht das gleiche wie `(∅ : Set ℤ)`. (`\\empty`)
-
-Zudem hat die Verneinung `¬ (x ∈ A)` die Notation `x ∉ A` (`\\nin`), gleich wie bei `=` and `≠`.
-
-Um zu zeigen, dass etwas nicht in der leeren Menge ist, kannst du wieder `tauto` verwenden.
+Ihr zieht also durch die Gegend und redet mit den Leuten. Ein Junge rennt zu euch und fragt:
 "
 
 open Set
 
-Statement not_mem_empty
-    "Kein Element ist in der leeren Menge enthalten." {A : Type _} (x : A) :
+Statement not_mem_empty "" {A : Type} (x : A) :
     x ∉ (∅ : Set A) := by
   tauto
+
+NewLemma mem_univ
+
+Hint (A : Type) (x : A) : x ∉ (∅ : Set A) =>
+"**Du**: Kein Element ist in der leeren Menge enthalten? Das ist ja alles tautologisches Zeugs...
+
+**Robo**: Dann behaupte das doch. (`\\empty`)"
+
+Conclusion "Der Junge rennt weiter.
+
+**Du**: So wird das ganze schon angenehmer."

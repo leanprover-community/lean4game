@@ -5,7 +5,7 @@ set_option tactic.hygienic false
 
 Game "TestGame"
 World "Function"
-Level 6
+Level 5
 
 Title ""
 
@@ -29,8 +29,8 @@ Statement "" : Injective (fun (n : ℤ) ↦ n^3 + (n + 3)) := by
   intro a b
   simp
 
-NewDefinitions Injective
-NewLemmas StrictMono.injective StrictMono.add Odd.strictMono_pow
+NewDefinition Injective
+NewLemma StrictMono.injective StrictMono.add Odd.strictMono_pow
 
 
 Hint : Injective fun (n : ℤ) => n ^ 3 + (n + 3) =>
@@ -76,4 +76,4 @@ Hint (a b : ℤ) (h : a ^ 3 + (a + 3) = b ^ 3 + (b + 3)) : a = b =>
 
 Conclusion "**Du**: Danke vielmals!
 
-Und ihr läst das Wesen mit im Gang stehen weiter über Injectivität nachdenkend."
+Und damit lässt das Wesen mitten im Gang stehen, wo es weiter über Injektivität nachdenkt."

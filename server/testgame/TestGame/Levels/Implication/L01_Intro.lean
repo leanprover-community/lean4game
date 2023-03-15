@@ -1,4 +1,5 @@
 import TestGame.Metadata
+import Mathlib.Tactic.Tauto
 
 set_option tactic.hygienic false
 
@@ -10,31 +11,23 @@ Title "Intro"
 
 Introduction
 "
-## Implikationen
-
-In diesem Kapitel lernst du Implikation ($\\Rightarrow$) und Genau-dann-wenn
-($\\Leftrightarrow$) kennen.
-Dazu lernst du, wie man bereits bewiesene Sätze verwendet.
-
-Seien `(A B : Prop)` zwei logische Aussagen. Eine Implikation $A \\Rightarrow B$ schreibt
-man in Lean als `A → B` (`\\to`).
-
-Wenn das Goal eine Implikation $A \\Rightarrow B$ ist, kann man mit
-`intro ha` annehmen, dass $A$ wahr ist. Dann muss man $B$ beweisen.
+**Operationsleiter**: Sagt mal, könnt ihr mir hier weiterhelfen?
 "
 
-Statement
-    "Wenn $B$ wahr ist, dann ist die Implikation $A \\Rightarrow (A ∧ B)$ wahr."
-    (A B : Prop) (hb : B) : A → (A ∧ B) := by
+Statement (A B : Prop) (hb : B) : A → (A ∧ B) := by
+  Hint "**Du**: Einen Moment, das ist eine Implikation (`\\to`),
+  also `A` impliziert `A und B`, soweit so gut, also eine Tautologie.
+
+  **Robo**: Die scheinen hier `tauto` auch nicht zu verstehen.
+  Implikationen kannst du aber mit `intro h` angehen."
   intro hA
+  Hint "**Du**: Jetzt habe ich also angenommen, dass `A` wahr ist und muss `A ∧ B` zeigen,
+  das kennen wir ja schon."
   constructor
   assumption
   assumption
 
-HiddenHint (A : Prop) (B : Prop) (hb : B) : A → (A ∧ B) =>
-"Mit `intro ha` kann man annehmen, dass $A$ wahr ist. danach muss man $A \\land B$ zeigen."
+Conclusion "Der Operationsleiter nickt bedacht."
 
-Hint (A : Prop) (B : Prop) (ha : A) (hb : B) : (A ∧ B) =>
-"Jetzt kannst du die Taktiken aus dem letzten Kapitel verwenden."
-
-NewTactics intro constructor assumption
+NewTactic intro
+DisabledTactic tauto

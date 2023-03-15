@@ -72,4 +72,4 @@ Statement
   simp <;>
   ring
 
-NewTactics fin_cases funext
+NewTactic fin_cases funext

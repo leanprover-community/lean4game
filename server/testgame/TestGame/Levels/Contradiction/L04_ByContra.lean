@@ -16,34 +16,36 @@ Title "Per Widerspruch"
 
 Introduction
 "
-Als Übung zu `by_contra` und dem bisher gelernten, zeige folgendes Lemma welches
-wir für die Kontraposition brauchen werden:
+*Oddeus* Geht zu einem Regal mit vielen Dokumenten und beginnt zu suchen.
+
+**Oddeus**: Ich hab's gleich. Hier ist eine Notiz meiner Gelehrter, die mir
+mit solchen kryptischen Nachrichten helfen wollten.
+
+Auf dem Pergament steht das ein Lemma mit dem Namen `not_imp_not`:
 "
 
-Statement not_imp_not
-"$A \\Rightarrow B$ ist äquivalent zu $\\neg B \\Rightarrow \\neg A$."
-    (A B : Prop) : A → B ↔ (¬ B → ¬ A) := by
+Statement not_imp_not (A B : Prop) : A → B ↔ (¬ B → ¬ A) := by
+  Hint "**Du**: Ich glaube, dafür kenn ich das meiste schon."
+  Hint (hidden := true) "**Robo**: Fang doch mal mit `constructor` an."
   constructor
   intro h b
   by_contra a
+  Hint "**Robo**: Zur Erinnerung, hier würde ich mit `suffices g : B` einen Widerspruch
+  herbeiführen."
   suffices b : B
   contradiction
   apply h
   assumption
   intro h a
+  Hint "**Robo**: Hier würde ich ebenfalls einen Widerspruch anfangen."
   by_contra b
+  Hint (hidden := true) "**Robo**: `suffices g : ¬ A` sieht nach einer guten Option aus."
   suffices g : ¬ A
   contradiction
   apply h
   assumption
 
--- TODO: Forbidden Tactics: apply, rw
--- TODO: forbidden Lemma: not_not
+DisabledTactic rw
+DisabledLemma not_not
 
-HiddenHint (A : Prop) (B : Prop) : A → B ↔ (¬ B → ¬ A) =>
-""
-
-
-Conclusion ""
-
-NewTactics contradiction constructor intro by_contra apply assumption
+Conclusion "**Du**: Und wie hilft uns das jetzt, was steht denn in dem Brief?"

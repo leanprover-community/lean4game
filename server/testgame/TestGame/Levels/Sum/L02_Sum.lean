@@ -31,15 +31,11 @@ Statement
 "Zeige dass $\\sum_{i=0}^{n-1} (i + 1) = n + \\sum_{i=0}^{n-1} i$."
     (n : ℕ) : ∑ i : Fin n, ((i : ℕ) + 1) = n + (∑ i : Fin n, (i : ℕ)) := by
   rw [Finset.sum_add_distrib]
+  Hint "Die zweite Summe `∑ x : Fin n, 1` kann `simp` zu `n` vereinfacht werden."
   simp
+  Hint "Bis auf Umordnung sind jetzt beide Seiten gleich, darum kann `ring` das Goal schließen.
+
+    Alternativ kann man auch mit `rw [add_comm]` dies explizit umordnen."
   ring
 
-NewLemmas Finset.sum_add_distrib add_comm
-
-Hint (n : ℕ) : ∑ x : Fin n, ↑x + ∑ x : Fin n, 1 = n + ∑ i : Fin n, ↑i =>
-"Die zweite Summe `∑ x : Fin n, 1` kann `simp` zu `n` vereinfacht werden."
-
-Hint (n : ℕ) : ∑ x : Fin n, ↑x + n = n + ∑ x : Fin n, ↑x =>
-"Bis auf Umordnung sind jetzt beide Seiten gleich, darum kann `ring` das Goal schließen.
-
-Alternativ kann man auch mit `rw [add_comm]` dies explizit umordnen."
+NewLemma Finset.sum_add_distrib add_comm

@@ -30,6 +30,6 @@ Statement
   rw [←union_diff_distrib]
   rw [univ_union]
 
-NewTactics constructor intro rw assumption rcases simp tauto trivial
+NewTactic constructor intro rw assumption rcases simp tauto trivial
 
-NewLemmas Subset.antisymm_iff empty_subset
+NewLemma Subset.antisymm_iff empty_subset

@@ -15,41 +15,51 @@ Level 3
 Title "Per Widerspruch"
 
 Introduction
-"
-Eine sehr nützliche Beweismethode ist per Widerspruch.
+"**Oddeus**: Ich verstehe *Evenine* einfach nicht. Ich will euch auch gleich zeigen,
+was sie mir letzthin geschrieben hat, aber zuerst schaut einmal unseren
+wunderschönen Absurda-Tempel an!
 
-Wir habe schon gesehen, dass `contradiction` einen Widerspruch in den Annahmen
-sucht, und damit jegliches beweisen kann.
+Damit kommt ihr vor einen sehr hohen Turm, der ausschliesslich aus Dornenranken gewachsen
+scheint.
 
-Um dorthin zu kommen, können wir `by_contra h` brauchen, welches das aktuelle
-Goal auf `False` setzt und die Negierung des Goals als Annahme hinzufügt.
-
-Insbesondere braucht man `by_contra h` meistens, wenn im Goal eine Negierung
-steht:
+**Oddeus**: Versteht ihr, was hier über dem Eingang steht?
 "
 
-Statement
-"Angenommen $B$ ist falsch und es gilt $A \\Rightarrow B$. Zeige, dass $A$ falsch sein
-muss."
-    (A B : Prop) (g : A → B) (b : ¬ B) : ¬ A := by
-  by_contra a
-  suffices b : B
+--   Eine sehr nützliche Beweismethode ist per Widerspruch.
+
+-- Wir habe schon gesehen, dass `contradiction` einen Widerspruch in den Annahmen
+-- sucht, und damit jegliches beweisen kann.
+
+-- Um dorthin zu kommen, können wir `by_contra h` brauchen, welches das aktuelle
+-- Goal auf `False` setzt und die Negierung des Goals als Annahme hinzufügt.
+
+-- Insbesondere braucht man `by_contra h` meistens, wenn im Goal eine Negierung
+-- steht:
+
+Statement (A B : Prop) (g : A → B) (b : ¬ B) : ¬ A := by
+  Hint "**Robo**: Ein `¬` im Goal heisst häufig, dass du einen Widerspruchsbeweis führen
+  möchtest.
+
+  **Du**: Und wie mach ich das? Mit `contradiction`?
+
+  **Robo**: Mit `by_contra h` fängst du einen an. Mit `contradiction` schliesst du ihn dann
+  später ab."
+  by_contra h
+  Hint "**Robo**: Jetzt hast du also eine Annahme `{h} : ¬ {A}`, und damit musst du einen
+  Widerspruch herbeileiten.
+
+  Ein Methode ist, dass du jetzt mit `suffices` sagts, zu was du denn gerne den Widerspruch
+  haben möchtest, zum Beispiel `suffices k : B`
+  "
+  suffices k : B
+  Hint "**Du**: Ah und jetzt kann ich einfach sagen dass sich die Anahmen `{B}` und `¬{B}`
+  widersprechen."
   contradiction
+  Hint "**Robo**: Und jetzt kannst du noch das Ergebnis zeigen, das zu einem Widerspruch
+  geführt hat."
   apply g
   assumption
 
+NewTactic by_contra
 
-HiddenHint (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) : ¬ A =>
-"`by_contra h` nimmt das Gegenteil des Goal als Annahme `(h : A)` und setzt das
-Goal auf `False`."
-
-Hint (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) (a : A) : False =>
-"Jetzt kannst du mit `suffices` oder `have` Fortschritt machen."
-
-HiddenHint (A : Prop) (B : Prop) (h : A → B) (b : ¬ B) (a : A) : False =>
-"Zum Beispiel `suffices hb : B`."
-
-
-Conclusion ""
-
-NewTactics by_contra contradiction apply assumption
+Conclusion "**Oddeus**: Sehr gut, kommt mit hinein!"

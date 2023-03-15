@@ -17,14 +17,10 @@ Auftritt zweiter Querulant.
 
 Statement ""
   (n : ℕ) (h : n ≠ n) : n = 37 := by
+  Hint "**Du** Ist `{n} ≠ {n}` nicht auch ein Widerspruch?
+
+**Robo** Probiers mal!"
   contradiction
-
-Hint (n : ℕ) (h : n ≠ n) : n = 37 =>
-"
-**Du** Ist `{n} ≠ {n}` nicht auch ein Widerspruch?
-
-**Robo** Probiers mal!
-"
 
 Conclusion
 "
@@ -39,5 +35,5 @@ Und gleich 38, und gleich 39, …
 **Du** Ok, ok, verstehe.
 "
 
-NewTactics contradiction
-DisabledTactics tauto
+NewTactic contradiction
+DisabledTactic tauto

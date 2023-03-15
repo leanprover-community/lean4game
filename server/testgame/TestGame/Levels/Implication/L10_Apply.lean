@@ -11,45 +11,39 @@ Title "Lemmas"
 
 Introduction
 "
-Bewiesene Resultate möchte man in späteren Aufgaben als Sätze wieder verwenden.
+Ihr setzt euch hin und der Gehilfe bringt euch allen Suppe. Neben euch sitzt eine Mechanikerin
+über ihre Suppe geneigt.
 
-In Lean sind das Lemmas und Theoreme (wobei es keinen Unterschied zwischen `lemma` und `theorem`
-gibt).
-
-Links in der Bibliothek findest du bekannte Lemmas. Wenn das Goal mit der Aussage des Lemmas
-übereinstimmt, kannst du es mit `apply [Lemma-Name]` anwenden, wie du das mit Implikationen auch
-machst.
-
-Zum Beispiel gibt es ein Lemma, das sagt, dass wenn
-$A \\Rightarrow B$ dann $(\\neg A \\lor B)$:
-
-```
-lemma not_or_of_imp : (A B : Prop) (h : A → B) :
-    ¬A ∨ B := by
-  ...
-```
-
-Wenn also dein Goal `¬A ∨ B` ist, kannst du mit `apply not_or_of_imp` dieses
-Lemma anwenden. Danach musst du noch alle Annahmen zeigen.
+**Mechanikerin**: Sagt mal, ich hab unten über folgendes tiefgründiges Problem nachgedacht:
 "
 
-Statement
-"Benutze `not_or_of_imp` um zu zeigen, dass $\\neg A \\lor A$ wahr ist."
-    (A : Prop) : ¬A ∨ A := by
+Statement (A : Prop) : ¬A ∨ A := by
+  Hint "**Du**: Das scheint ziemlich offensichtlich.
+
+  **Robo**: Ich glaube, sie will eine detailierte Antwort. Ich kenne ein Lemma
+  `not_or_of_imp`, was sagt `(A → B) → ¬ A ∨ B`. Da das Resultat des Lemmas mit
+  deinem Goal übreinstimmt, kannst du es mit `apply not_or_of_imp` anwenden."
+  Branch
+    right
+    Hint "**Du**: Und jetzt?
+
+    **Robo**: `right/left` funktioniert hier nicht, da du nicht weisst ob `A` wahr oder falsch
+    ist."
+  Branch
+    left
+    Hint "**Du**: Und jetzt?
+
+    **Robo**: `right/left` funktioniert hier nicht, da du nicht weisst ob `A` wahr oder falsch
+    ist."
   apply not_or_of_imp
+  Hint (hidden := true) "**Robo**: Ich würd wieder mit `intro` weitermachen."
   intro
   assumption
 
-HiddenHint (A : Prop) :  ¬A ∨ A =>
-"Das Lemma wendest du mit `apply not_or_of_imp` an."
-
-HiddenHint (A : Prop) : A → A =>
-"Wie immer, `intro` ist dein Freund."
-
 Conclusion
 "
+**Mechanikerin**: Danke vielmals, jetzt bin ich schon viel ruhiger.
 "
 
-NewTactics apply left right assumption
-
-NewLemmas not_or_of_imp
+NewLemma not_or_of_imp
+DisabledTactic tauto

@@ -15,52 +15,49 @@ Title "Suffices"
 
 Introduction
 "
-Die Taktik `suffices` funktioniert genau gleich wie `have`,
-vertauscht aber die beiden Beweisblöcke:
+*Oddeus*' Partner meldet sich.
 
-```
-suffices h : [Aussage]
-[Beweis des Goals (mithilfe von h)]
-[Beweis der Aussage h]
-```
-Auf Deutsch entspricht `suffices g : [Aussage]` dem Ausdruck
-\"Es genügt zu zeigen, dass `[Aussage]` wahr ist.\"
-
-Man kann `have` und `suffices` nach belieben vertauschen. Bevorzugt, wählt man es so,
-dass der erste Beweisblock der kürzere ist. Zum Beispiel wäre bei der vorigen Aufgabe
-`suffices` schöner gewesen:
-
+**Partner**: Ich habe letzthin was änliches gesehen, aber irgendwie verdreht.
 "
+
+-- Die Taktik `suffices` funktioniert genau gleich wie `have`,
+-- vertauscht aber die beiden Beweisblöcke:
+
+-- ```
+-- suffices h : [Aussage]
+-- [Beweis des Goals (mithilfe von h)]
+-- [Beweis der Aussage h]
+-- ```
+-- Auf Deutsch entspricht `suffices g : [Aussage]` dem Ausdruck
+-- \"Es genügt zu zeigen, dass `[Aussage]` wahr ist.\"
+
+-- Man kann `have` und `suffices` nach belieben vertauschen. Bevorzugt, wählt man es so,
+-- dass der erste Beweisblock der kürzere ist. Zum Beispiel wäre bei der vorigen Aufgabe
+-- `suffices` schöner gewesen:
 
 Statement
     "Angenommen, man hat eine Implikation $A \\Rightarrow \\neg B$ und weiss, dass
     $A \\land B$ wahr ist. Zeige, dass dies zu einem Widerspruch führt."
-    (A B : Prop) (h : A → ¬ B) (k : A ∧ B) : False := by
-  rcases k with ⟨h₁, h₂⟩
-  suffices k : ¬ B
+    (A B : Prop) (h : A → ¬ B) (k₁ : A) (k₂ : B) : False := by
+  Hint "**Robo**: Ich weiss was er meint! Anstatt `have` kannst du auch `suffices`
+  brauchen. Das funktioniert genau gleich, aussert dass dann die beiden Goals vertauscht sind.
+
+  **Du**: Also nach `suffices g : ¬B` muss ich dann zuerst zeigen, wie man mit `g` den Beweis
+  abschliesst bevor ich `g` beweise?
+
+  **Robo**: Genau! Verwendende `have` und `suffices` einfach nach gutdünken."
+  suffices g : ¬ B
+  Hint "**Robo**: Also hier beendest du den Beweis angenommen {g} sei wahr."
   contradiction
+  Hint "**Robo**: Und hier beweist du das Zwischenresultat."
   apply h
   assumption
 
-Hint (A : Prop) (B : Prop) (h : A → ¬ B) (k : A ∧ B) : False =>
-" Fang mal damit an, das UND in den Annahmen mit `rcases` aufzuteilen.
-"
+NewTactic «suffices»
+DisabledTactic «have»
 
-Hint (A : Prop) (B : Prop) (h : A → ¬ B) (k : A) (f : B) : False =>
-" Auf Deutsch: \"Es genügt `¬ B` zu zeigen, da dies zu einem direkten Widerspruch führt.\"
+Conclusion "*Oddeus* nimmt den Brief, schaut ihn an und, rollt ihn zusammen.
 
-  In Lean :
+**Oddeus**: Ich verstehe meine Schwester nie. Kommt, vielleicht könnt ihr mir helfen.
 
-  ```
-  suffices k : ¬ B
-  contradiction
-  [...]
-  ```
-"
-
-Conclusion ""
-
-NewTactics «suffices»
-DisabledTactics «have»
-NewDefinitions Even Odd
-NewLemmas not_even not_odd
+Und er führt euch durch seinen Rosengarten."

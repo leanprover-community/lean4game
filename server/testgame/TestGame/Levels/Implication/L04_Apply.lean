@@ -10,26 +10,29 @@ Title "Implikation"
 
 Introduction
 "
-Hier eine Übung zu Implikationen.
-Fast immer ist es der richtige Weg, wenn du mit `intro` anfängst.
+**Du** *(zu Robo)*: Testen die uns eigentlich hier?
+
+Ein älteres Gruppenmitglied schiebt ein Tablet über den Tisch und beginnt in leiser
+Stimme zu erklären.
+
+**Mitarbeiterin**: Eines unserer Kontrollelemente ist kaputt und ist verwirrt, wo Sachen hinkommen.
+Gesteuert werden diese über Panels, und hier hab ich das Übungspanel, mit dem wir neue
+Ingeneure ausbilden:
 "
 
-Statement
-    "Angenommen man weiss $A \\Rightarrow B \\Rightarrow C$, zeige dass $A \\Rightarrow C$."
-    (A B C : Prop) (f : A → B) (g : B → C) : A → C := by
+Statement (A B C : Prop) (f : A → B) (g : B → C) : A → C := by
+  Hint "**Du**: Ich soll Implikationen $A \\Rightarrow B \\Rightarrow C$ zu $A \\Rightarrow C$
+  kombinieren?
+
+  **Robo**: Am besten fängst du mit `intro` an und arbeitest dich dann rückwärts durch."
   intro hA
+  Hint (hidden := true) "**Robo**: Das ist wieder eine Anwendung von `apply`."
   apply g
   apply f
   assumption
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (f : A → B) (g : B → C) : A → C =>
-"Mit `intro hA` kann man annehmen, dass $A$ wahr ist. danach muss man $B$ zeigen."
+Conclusion "**Du**: Ich hab das Konzept verstanden.
 
-Hint (A : Prop) (B : Prop) (C : Prop) (hA : A) (f : A → B) (g : B → C) : C =>
-"Jetzt ist es ein altbekanntes Spiel von `apply`-Anwendungen."
+Die Mitarbeiterin ist zufrieden und wünscht euch Glück auf der Mission."
 
-HiddenHint (A : Prop) (B : Prop) (C : Prop) (hA : A) (f : A → B) (g : B → C) : C =>
-"Du willst $C$ beweisen. Suche also nach einer Implikation $\\ldots \\Rightarrow C$ und wende
-diese mit `apply` an."
-
-NewTactics intro apply assumption revert
+DisabledTactic tauto

@@ -22,7 +22,7 @@ man die de-Morganschen Regeln einfach selber beweisen könnten.
 
 
 Die meisten Aufgaben über Mengen sind eine Kombination von `rw` und `simp_rw` verschiedenster
-NewLemmas in `import Mathlib.Data.Set`.
+NewLemma in `import Mathlib.Data.Set`.
 
 Die Taktik `simp_rw` funktioniert ähnlich wie `rw`, aber sie versucht jedes Lemma so oft
 wie möglich anzuwenden. Wir kennen also 4 etwas verwandte Optionen um Lemmas und Theoreme zu
@@ -52,7 +52,7 @@ Statement
   rw [diff_eq_compl_inter]
   rw [inter_comm]
 
-NewTactics constructor intro rw assumption rcases simp tauto trivial
+NewTactic constructor intro rw assumption rcases simp tauto trivial
 
 -- TODOs
 -- Lemmas compl_union compl_inter mem_compl_iff

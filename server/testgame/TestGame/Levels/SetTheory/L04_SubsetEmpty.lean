@@ -54,8 +54,8 @@ Statement subset_empty_iff
   rcases a with ⟨h₁, h₂⟩
   assumption
 
-NewTactics constructor intro rw assumption rcases simp tauto trivial
+NewTactic constructor intro rw assumption rcases simp tauto trivial
 
-NewLemmas Subset.antisymm_iff empty_subset
+NewLemma Subset.antisymm_iff empty_subset
 
 end MySet

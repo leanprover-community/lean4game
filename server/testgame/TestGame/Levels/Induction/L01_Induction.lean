@@ -24,7 +24,7 @@ Statement
   rw [Nat.pow_succ, Nat.mul_succ, add_assoc, h, mul_comm, ←mul_add]
   simp
 
---NewLemmas Nat.pow_succ, Nat.mul_succ, add_assoc, mul_comm, ←mul_add
+--NewLemma Nat.pow_succ, Nat.mul_succ, add_assoc, mul_comm, ←mul_add
 
 -- example (n : ℕ) : Even (n^2 + n) := by
 --   induction n

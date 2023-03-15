@@ -9,25 +9,27 @@ Title "Natürliche Zahlen"
 
 Introduction
 "
-Oft braucht man eine Kombination von `rw` und `ring` um Gleichungen zu lösen.
+*Evenines* Berater meldet sich.
 
-Zuerst setzt man mit `rw` die vorhandenen Annahmen ein, und sobald die beiden Seiten
-einer Gleichung im Goal rechnerisch gleich sind, kan `ring` dies beweisen.
+**Berater**: Das stimmt wohl, aber das Problem, das uns eigentlich beschäftigt hat, eure
+Natürlichkeit, war folgendes:
 "
 
 Statement
-    "Angenommen, man hat die Gleichung $x = 2 * y + 1$, zeige
-    $x ^ 2 = 4 * y ^ 2 + 3 * y + 1 + y$.  "
-    (x y : ℕ) (h : x = 2 * y + 1) : x ^ 2 = 4 * y ^ 2 + 3 * y + 1 + y := by
-  rw [h]
+    (x y z : ℕ) (h : x = 2 * y + 1) (g : z  = 3 * y + 1): x ^ 2 = 4 * y ^ 2 + z + y := by
+  Hint "**Du**: Ich versteh das Pattern. Wenn ich zuerst alles so umschreibe, dass
+  das Goal nur noch rechnen und umsortieren ist, dann kann `ring` den Rest machen!
+
+  **Robo**: Noch ein Trick: Entweder kannst du zwei Befehle `rw [h₁]` und `rw [h₂]` schreiben,
+  oder du kannst das gleich in einem machen : rw [h₁, h₂]."
+  rw [h, g]
   ring
 
-Hint (x : ℕ) (y : ℕ) (h : x = 2 * y + 1) : x ^ 2 = 4 * y ^ 2 + 3 * y + 1 + y =>
-  "Die Annahme `h` kannst du mit `rw [h]` benützen."
 
-Hint (y : ℕ) : (2 * y + 1) ^ 2 = 4 * y ^ 2 + 3 * y + 1 + y =>
-  "Jetzt kann `ring` übernehmen."
+Conclusion
+"
+*Evenine* bedankt sich nochmals für die Botschaft und ihr werdet zu einem kleineren Busch geführt,
+der ein gemütlich warmes Innenleben an den Tag legt.
+"
 
-Conclusion ""
-
-NewTactics ring rw
+NewTactic ring rw

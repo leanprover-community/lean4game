@@ -43,9 +43,9 @@ Statement
   rw [Fin.sum_univ_castSucc (n := m + 1)]
   rfl
 
-OnlyTactics rw rfl
+OnlyTactic rw rfl
 
-NewLemmas Fin.sum_univ_castSucc
+NewLemma Fin.sum_univ_castSucc
 
 HiddenHint (m : ℕ) :
   ∑ i : Fin (m + 1), (i : ℕ) + (m + 1) = ∑ i : Fin (Nat.succ m + 1), ↑i =>

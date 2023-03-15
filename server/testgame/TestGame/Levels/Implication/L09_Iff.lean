@@ -10,33 +10,35 @@ Title "Genau dann wenn"
 
 Introduction
 "
-Und noch die letzte Option:
+Noch während der Koch wieder zu seiner Suppe geht, kommt sein erster Gehilfe hervor.
 
-2. Mit `rcases h with ⟨h₁, h₂⟩` könnte man die Struktur `h` zerlegen und man erhält zwei
-   separate Annahmen `(h₁ : A → B)` und `(h₂ : B → A)`
-
-Als letzte Option kannst du `rcases h with ⟨h₁, h₂⟩` auch auf eine Annahme `(h : A ↔ B)`
-anwenden, genau wie du dies bei einer Annahme `(h' : A ∧ B)` gemacht hast.
+**Gehilfe**: Ich hab gestern noch was anderes gehört, könnt ihr mir da auch helfen?
+Aber ich versteh nicht ganz was ihr meinem Chef erklärt habt.
 "
-Statement
-"Angenommen man hat $A \\iff B$ und $B \\Rightarrow C$, zeige $A \\Rightarrow C$."
-    (A B : Prop) : (A ↔ B) → (A → B) := by
+
+Statement (A B : Prop) : (A ↔ B) → (A → B) := by
+  Hint "**Du**: Hmm, mindestens mit der Implikation kann ich anfangen."
+  Hint (hidden := true) "**Robo**: Genau, das war `intro`."
   intro h
-  rcases h
+  Hint "**Du**: Also ich kenn `rw [h]` und `apply h.mp`, aber das will er wohl nicht hören.
+
+  **Robo**: Was du machen könntest ist mit `rcases h with ⟨mp, mpr⟩` die Annahme in zwei
+  Teile aufteilen."
+  Branch
+    intro a
+    Hint "**Robo**: Hier müsstest du jetzt `rw [←h]` oder `apply h.mp` benützen, aber der
+    Gehilfe will, dass du zwingend eine dritte Variante benützt. Geh doch einen
+    Schritt zurück so dass das Goal `A → B` ist."
+  rcases h with ⟨mp, mpr⟩
+  Hint (hidden := true) "**Du**: Ah und jetzt ist das Resultat in den Annahmen."
   assumption
-
-HiddenHint (A : Prop) (B : Prop) : (A ↔ B) → A → B =>
-"Angefangen mit `intro h` kannst du annehmen, dass `(h : A ↔ B)` wahr ist."
-
-HiddenHint (A : Prop) (B : Prop) (h : A ↔ B) : A → B =>
-"Mit `rcases h with ⟨h₁, h₂⟩` kannst du jetzt die Annahme `(h : A ↔ B)` zerlegen."
-
 
 Conclusion
 "
+**Gehilfe**: Ah danke! Und jetzt versteh ich auch die Zusammenhänge!
 "
-
-NewTactics intro apply rcases assumption
+OnlyTactic intro rcases assumption
+DisabledTactic rw apply tauto
 
 -- -- TODO: The new `cases` works differntly. There is also `cases'`
 -- example (A B : Prop) : (A ↔ B) → (A → B) := by

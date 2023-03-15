@@ -58,4 +58,4 @@ Hint (n : ℕ) (hn : odd n) (h : ∀ (x : ℕ), (odd x) → even (x + 1)) : even
 "`∀ (x : ℕ), (odd x) → even (x + 1)` ist eigentlich das gleiche wie
 `(x : ℕ) → `"
 
-NewTactics ring intro unfold
+NewTactic ring intro unfold
