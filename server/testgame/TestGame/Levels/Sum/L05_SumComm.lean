@@ -18,19 +18,32 @@ Title "Summe vertauschen"
 
 Introduction
 "
-Verschachtelte endliche Summen kann man beliebig tauschen.
+Nun aber zeigt euch eure Begleiterin zwei weitere Türme mit einer kleinen Brücke, die
+zwischen den beiden verläuft. Die Tafel am Eingang wurde von einem herunterfallenden Stein
+zerstört. Auf der oberen Hälfte steht nur folgendes:
 
 $$\\sum_{i=0}^n\\sum_{j=0}^m a_{ij} = \\sum_{j=0}^m\\sum_{i=0}^n a_{ij}$$
 
-Dieses Lemma heisst `Finset.sum_comm`
+**Du**: Ich glaube, ich kann das in eurem Dialekt formulieren und euch damit helfen!
 "
 
 
 Statement
-"Zeige dass
-$\\sum_{i=0}^n\\sum_{j=0}^m  2^i (1 + j) = \\sum_{j=0}^m\\sum_{i=0}^n  2^i (1 + j)$."
-    (n m : ℕ) : ∑ i : Fin n, ∑ j : Fin m, ( 2^i * (1 + j) : ℕ) =
+(n m : ℕ) : ∑ i : Fin n, ∑ j : Fin m, ( 2^i * (1 + j) : ℕ) =
     ∑ j : Fin m, ∑ i : Fin n, ( 2^i * (1 + j) : ℕ) := by
+  Hint "**Robo**: Das sieht gut aus, aber du solltest das kurz beweisen, um sicher zu sein.
+
+  **Du**: Hast du nicht ein Lemma dafür?
+
+  **Robo**: Doch, probier mal `Finset.sum_comm`."
   rw [Finset.sum_comm]
 
 NewLemma Finset.sum_comm
+
+Conclusion "
+  Euer Begleiter ist ganz begeistert als er dir das Stück Papier aus den Händen nimmt,
+  auf dem du die Aussage gekritzelt hast. Gleich zückt sie einen Meißel und beginnt eine
+  neue Platte zu erstellen.
+
+  Ihr winkt ihr noch zum Abschied und geht weiter.
+"

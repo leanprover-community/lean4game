@@ -3,6 +3,8 @@ import TestGame.Metadata
 import Init.Data.ToString
 -- #check List UInt8
 
+set_option tactic.hygienic false
+
 Game "TestGame"
 World "Implication"
 Level 7

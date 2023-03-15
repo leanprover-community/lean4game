@@ -12,67 +12,42 @@ Title "Kleinergleich"
 
 Introduction
 "
-Es gibt zwei intrinsische Möglichkeiten, zu sagen dass `(n : ℕ)` nicht Null ist:
-`n ≠ 0` oder `0 < n`.
+*weitere Person*: …ich sag dir, eine positive Zahl kann man sowohl mit `0 < n`
+als auch `n ≠ 0` darstellen.
 
-Das folgende Lemma kannst du immer brauchen um zwischen den beiden zu wechseln.
+*Robo*: Und da gibts leider keinen Standard dazu.
 
-(*Note:* `0 < n` wird in Lemma-Namen oft mit `_pos` beschrieben anstatt `zero_lt`, siehe z.B.
-`Nat.succ_pos`.)
-
-
+**weitere Person*: Ja und, da kann man ja einfach mit `Nat.pos_iff_ne_zero`
+wechseln. Wart mal, wieso galt das nochmals…
 "
 
-Statement Nat.pos_iff_ne_zero
-"Benutze Induktion um zu zeigen, dass $0 < n$ und $n \\ne 0$ äquivalent sind."
-    (n : ℕ) : 0 < n ↔ n ≠ 0 := by
-  induction n
+Statement Nat.pos_iff_ne_zero (n : ℕ) : 0 < n ↔ n ≠ 0 := by
+  Hint "**Robo** (*flüsternd*): Wenn du ein bisschen schwere Maschinerie auffahren willst,
+  um in zu beeindrucken, hab ich was. Mach doch eine Fallunterscheidung ob `n` Null ist
+  oder nicht!
+
+  **Du** (*flüsternd*): Und wie geht das?
+
+  **Robo** (*laut und selbstsicher*): Wir fangen mit `rcases n` an!"
+  rcases n
+  Hint "**Du**: Hmm, das muss man doch vereinfachen können.
+
+  **Robo** (*flüsternd*): Zweiter pompöser Auftritt: sag einfach `simp` und lass das alles
+  automatisch geschehen."
   simp
+  Hint "**Du**: Und hier fang ich wohl am besten an wie ich das schon kenne."
   constructor
   intro
   simp
   intro
+  Hint "**Robo**: Warte! Den Rest geb ich dir als Lemma: `Nat.suc_pos`."
   apply Nat.succ_pos
 
 NewTactic simp
 NewLemma Nat.succ_pos
+DisabledLemma Nat.pos_iff_ne_zero
 
-Hint : 0 < Nat.zero ↔ Nat.zero ≠ 0 =>
-"Den Induktionsanfang kannst du oft mit `simp` lösen."
+Conclusion "**Du**: Oh `simp` ist ja echt nicht schlecht…
 
-Hint (n : ℕ) (h : 0 < n ↔ n ≠ 0) : 0 < Nat.succ n ↔ Nat.succ n ≠ 0 =>
-"Jetzt der Induktionsschritt. Fang mal mit `constructor` an."
-
-HiddenHint (n : ℕ) : 0 < Nat.succ n → Nat.succ n ≠ 0 =>
-"Auch das kann `simp`."
-
-Hint (n : ℕ) : n.succ ≠ 0 =>
-"Auch das kann `simp`."
-
-Hint (n : ℕ) : 0 < Nat.succ n =>
-"Hier kannst du das Lemma `Nat.succ_pos` mit `apply` anwenden."
-
-
-
-/- Second, less ideal path -/
-
-Hint (n : ℕ) (h : 0 < n) : n ≠ 0 =>
-"An dieser Stelle fürst du am besten einen Beweis durch Widerspruch."
-
-HiddenHint (n : ℕ) (h : 0 < n) : n ≠ 0 =>
-"Das macht man mit `by_contra`."
-
-Hint (n : ℕ) (h : 0 < n) (g : n = 0) : False =>
-"Brauche `rw [_] at _` um eine Annahme `0 < 0` zu erzeugen."
-
-HiddenHint (h : 0 < 0) : False =>
-"Mit `contradiction` schliesst du den Widerspruchsbeweis."
-
-Hint (n : ℕ) (h : n ≠ 0) : 0 < n =>
-"Diese Richtung beweist du am besten per Induktion."
-
-HiddenHint (n : ℕ) (h : n ≠ 0) : 0 < n =>
-"Starte mit `induction n`."
-
- HiddenHint : 0 < Nat.zero =>
-"Mit `contradiction` kannst du den Induktionsanfang schliessen."
+Die andere Person scheint beeindruckt, hat aber gleichzeitig auch das Bedürfnis, Dich aus
+der Reserve zu locken."

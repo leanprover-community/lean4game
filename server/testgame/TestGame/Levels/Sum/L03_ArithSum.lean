@@ -15,78 +15,75 @@ Title "Arithmetische Summe"
 
 Introduction
 "
-Oft beweist man Aussagen über Summen am besten per Induktion.
+**Du**: Wie werden solche Meisterwerke eigentlich gebaut?
 
-Mit `induction n` startet man einen Induktionsbeweis. Dies erstellt 2 neue Goals:
+Da zeigt eure Begleitung auf eine kleine Steinplatte neben dem Eingang,
+auf der eien Beschreibung gekritzelt ist.
 
-* **Induktionsanfang**: `n = 0`. Dieser kann ganz oft direkt mit `simp` bewiesen werden.
-* **Induktionsschritt**: Man kriegt eine Annahme `(n_ih : P n)` und muss `P (n + 1)`
-  beweisen. Für endliche Summen will man normalerweise danach zuerst
-  `rw [Fin.sum_univ_castSucc]` brauchen, welches
-  $$\\sum_{i=0}^{n} a_i = \\sum_{i=0}^{n-1} a_i + a_n$$
-  umschreibt.
-
-**Bemerkung:**
-
-Eine technische Sonderheit bezüglich endlichen Summen
-ist der kleine Pfeil `↑` in `∑ i : Fin (n + 1), ↑i`.
-Da `i : Fin n` technisch keine natürliche Zahl ist (sondern vom Typ `Fin n`), muss man
-dieses zuerst mit `↑i` oder `(i : ℕ)` in eine natürliche Zahl umwandeln. Diese nennt man
-*Coersion*.
-
-Gleichermassen, kommen hier im Induktionsschritt die Terme `↑(↑Fin.castSucc.toEmbedding i)`
-und `↑(Fin.last (n + 1))` vor. Diese Terme können mit `simp` vereinfacht werden.
+**Robo**: Das ist wohl der bekannte arithmetische Turm von Indu, über den hab ich schon
+einmal Daten verarbeitet. Und die antwort auf deine Frage: Vermutlich ein Stein nach
+dem anderen.
 "
 
 open BigOperators
 
 Statement arithmetic_sum
-"Zeige $2 \\cdot \\sum_{i = 0}^n i = n \\cdot (n + 1)$."
+    "$2 \\cdot \\sum_{i = 0}^n i = n \\cdot (n + 1)$."
     (n : ℕ) : 2 * (∑ i : Fin (n + 1), ↑i) = n * (n + 1) := by
+  Hint "**Du**: Klar, die werden ja nicht oben anfangen mit bauen. Sag mal,
+  wie zeige ich denn die arithmetische Summe, die hier gekritzelt steht?
+  Ich würde gerne Induktion über $n$ anwenden.
+
+  **Robo**: Ja dann ist's einfach `induction n`, ist doch logisch!"
   induction n
+  Hint "**Du**: Zuerst den Induktionsanfang…
+
+  **Robo**: Diesen kannst du oft mit `simp` abkürzen!"
   simp
+  Hint "**Robo**: Jetzt im Induktionsschritt: Bei Induktion über endlichen Summen willst du
+  immer mit `rw [Fin.sum_univ_castSucc]` anfangen" -- :
+
+  -- $$\\sum_\{i=0}^n a_i = \\sum_{i=0}^\{n-1} a_i + a_n$$"
   rw [Fin.sum_univ_castSucc]
-  rw [mul_add]
+  -- TODO: Bug. Dieser Hint wird nicht angezeigt.
+  Hint "**Du**: Oh das sieht jetz aber kompliziert aus…
+
+  **Robo**: Da musst du etwas drüber hinweg lesen. Am besten machst du kurz `simp`,
+  dann sieht's schon wieder besser aus."
   simp
+  Hint "**Du**: Was bedeutet eigentlich der kleine Pfeil `↑`?
+
+  **Robo**: Das ist eine *Coersion*. Sowas wie wenn man eine natürliche Zahl als Integer anschaut,
+  also die natürliche Abbildung `ℕ ↪ ℤ`. Oder hier, wenn ein Element `x : Fin n` stattdessen als
+  Element in `(↑x : ℕ)` angeschaut wird.
+
+  **Robo**: Übrigens, um die Induktionshypothese anzuwenden brauchst du zuerst das Lemma
+  `mul_add`."
+  rw [mul_add]
+  Hint "**Du**: Und wie wende ich jetzt die Induktionshypothese an?
+
+  **Robo mit `rw` wie jede andere Annahme auch."
   rw [n_ih]
+  Hint "**Robo**: Jetzt musst du noch kurz `rw [Nat.succ_eq_add_one]` anwenden.
+
+  **Du**: Aber wieso?
+
+  **Robo**: Naja, `ring` ist jetzt auch noch nicht so stark, und erkennt nicht dass `n.succ`
+  und `n + 1` das gleiche sind.
+
+  **Du**: Aber das könnte man doch ändern, oder?
+
+  **Robo**: Vielleicht wenn wir einmal einem Techniker begegnen, der mir ein Update
+  einspielen kann…"
+  Branch
+    ring_nf
+    Hint "**Robo**: Wie gesagt, brauch doch `rw [Nat.succ_eq_add_one]` als Fix für meine
+    kleinen Maken."
   rw [Nat.succ_eq_add_one]
   ring
 
 NewTactic induction
 NewLemma Fin.sum_univ_castSucc Nat.succ_eq_add_one mul_add add_mul
 
-Hint (n : ℕ) : 2 * (∑ i : Fin (n + 1), ↑i) = n * (n + 1) =>
-"Als Erinnerung, einen Induktionsbeweis startet man mit `induction n`."
-
-Hint : 2 * ∑ i : Fin (Nat.zero + 1), ↑i = Nat.zero * (Nat.zero + 1) =>
-"Den Induktionsanker $n = 0$ kann `simp` oft beweisen."
-
-Hint (n : ℕ) (hn : 2 * ∑ i : Fin (n + 1), ↑i = n * (n + 1)) :
-  2 * ∑ i : Fin (Nat.succ n + 1), ↑i = Nat.succ n * (Nat.succ n + 1) =>
-"Den Induktionsschritt beginnt man oft mit `rw [Fin.sum_univ_castSucc]`."
-
--- Hint (n : ℕ) (hn : 2 * ∑ i : Fin (n + 1), ↑i = n * (n + 1)) :
---   2 * (∑ i : Fin (n + 1), ↑(Fin.castSucc.toEmbedding i) +
---   ↑(Fin.last (n + 1))) = Nat.succ n * (Nat.succ n + 1) =>
--- "Die Taktik `simp` vereinfacht `↑(↑Fin.castSucc.toEmbedding i)`. "
-
-Hint (n : ℕ) (hn : 2 * ∑ i : Fin (n + 1), ↑i = n * (n + 1)) :
-  2 * (∑ x : Fin (n + 1), ↑x + (n + 1)) = Nat.succ n * (Nat.succ n + 1) =>
-"Um Die Induktionshypothese anzuwenden muss man noch
-$$2 \\cdot ((\\sum_\{x=0}^n x) + (n + 1)) = 2 \\cdot \\sum_\{x=0}^n x + 2 \\cdot (n + 1))$$
-umschreiben. Dazu kannst du `mul_add` benützen.
-"
-
-Hint (n : ℕ) (hn : 2 * ∑ i : Fin (n + 1), ↑i = n * (n + 1)) :
-  2 * ∑ x : Fin (n + 1), ↑x + 2 * (n + 1) = Nat.succ n * (Nat.succ n + 1) =>
-"`simp` vereinfacht `↑(↑Fin.castSucc.toEmbedding i)` zu `↑i`.
-Danach kann die Induktionshypothese mit `rw` angewendet werden."
-
-Hint (n : ℕ) (hn : 2 * ∑ i : Fin (n + 1), ↑i = n * (n + 1)) :
-  n * (n + 1) + 2 * (n + 1) = Nat.succ n * (Nat.succ n + 1) =>
-"
-Im Moment muss man hier `ring` noch helfen,
-indem man mit `rw [Nat.succ_eq_add_one]` zuerst `Nat.succ n = n + 1` umschreibt.
-
-(Dies wird irgendwann noch gefixt)
-"
+Conclusion "Du schaust dich um und bewunderst das Tal in dem hunderte, wenn nicht tausende,
+Steintürme in allen Formen und Höhen stehen."

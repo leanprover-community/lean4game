@@ -22,9 +22,9 @@ Statement ""
 
 **Robo** Ja.  Da kommst Du jetzt selbst drauf, wie das geht, oder?
 "
-  Hint (hidden := true) "Ist doch genau wie eben:
+  Hint (hidden := true) "**Robo**: Ist doch genau wie eben:
 die Aussage, die zu beweisen ist, gehört selbst zu den Annahmen.
-Also wird `asumption` auch wieder funktionieren."
+Also wird `assumption` auch wieder funktionieren."
   assumption
 
 Conclusion

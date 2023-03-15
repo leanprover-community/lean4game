@@ -13,29 +13,42 @@ Title "endliche Summe"
 
 Introduction
 "
-Generell sind aber nur solche Lemmas `@[simp]` markiert, klar eine Vereinfachung darstellen.
-
-So ist ein Lemma wie `Finset.sum_add_distrib` kein `simp`-Lemma, da beide Seiten je
-nach Situation bevorzugt sein könnte:
-
-$$
-  \\sum_{i = 0}^n a_i + b_i = \\sum_{i = 0}^n a_i + \\sum_{j = 0}^n b_j
-$$
-
-Dieses Lemma kann aber mit `rw` angewendet werden.
+Während euch die Person zu einem besonders herausragenden Steinturm führt, löchert
+sie euch noch weiter mit Fragen.
 "
 
 open BigOperators
 
 Statement
-"Zeige dass $\\sum_{i=0}^{n-1} (i + 1) = n + \\sum_{i=0}^{n-1} i$."
+    "$\\sum_{i=0}^{n-1} (i + 1) = n + \\sum_{i=0}^{n-1} i$."
     (n : ℕ) : ∑ i : Fin n, ((i : ℕ) + 1) = n + (∑ i : Fin n, (i : ℕ)) := by
-  rw [Finset.sum_add_distrib]
-  Hint "Die zweite Summe `∑ x : Fin n, 1` kann `simp` zu `n` vereinfacht werden."
-  simp
-  Hint "Bis auf Umordnung sind jetzt beide Seiten gleich, darum kann `ring` das Goal schließen.
+  -- Hint "**Du**: Hmm, wieder `simp`?
 
-    Alternativ kann man auch mit `rw [add_comm]` dies explizit umordnen."
+  -- **Robo**: Nicht ganz. `simp` benützt nur Lemmas, die klar eine Vereinfachung darstellen,
+  -- und in deiner Bibliothek mit `@[simp]` markiert wird. Hier brauchen wir eine andere
+  -- Umformung:
+
+  -- $$
+  -- \\sum_\{i = 0}^n a_i + b_i = \\sum_\{i = 0}^n a_i + \\sum_\{j = 0}^n b_j
+  -- $$
+
+  -- **Robo*: Da unklar ist, welche Seite \"einfacher\" ist, wird so ein Lemma nicht mit
+  -- `@[simp]` markiert. Das heisst du musst `Finset.sum_add_distrib` mit `rw`
+  -- explizit anwenden.
+  -- "
+  rw [Finset.sum_add_distrib]
+  Hint "**Robo**: Die zweite Summe `∑ x : Fin n, 1` kann jetzt aber mit
+  `simp` zu `n` vereinfacht werden."
+  simp
+  Hint "**Robo**: Bis auf Umordnung sind jetzt beide Seiten gleich!
+
+  **Du**: Dann greift jetzt wohl `ring`!
+
+  **Robo**: Genau! Und alternativ könntest du mit `rw [add_comm]` die Arbeit von `ring`
+  auch manuell machen."
   ring
 
 NewLemma Finset.sum_add_distrib add_comm
+
+Conclusion "Eure Begleitung scheint mit der Antwort zu frieden zu sein und zeigt
+freudig an dem Turm empor, den ihr soeben erreicht habt."

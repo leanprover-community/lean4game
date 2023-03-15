@@ -8,17 +8,26 @@ Title "Kleinergleich"
 
 Introduction
 "
-Ungleichheiten werden in Lean generell immer als Kleinergleich `≤` (`\\le`) oder `<`
-geschrieben.
+*(Gesrpäch)*
 
-Die Symbole `≥` und `>` gibt es zwar auch, sind aber nur Notation für die gleiche
-Aussage mit `≤` und `<`.
+**Robo** (*lallend*, oder war's fröhlich proklamierend?):
+…und deshalb sind `≥` und `>` eigentlich nur Notationen für `≤`,
+welches man übrigens `\\le` schreibt, was für Less-Equal (also Kleinergleich) steht…
 
-Zudem sind `<` und `≤` auf `ℕ` so definiert, dass `0 < n` und `1 ≤ n` per Definition
-äquivalent sind. Die folgende Aussage ist also mit `rfl` beweisbar.
+**Du**: Wir haben's verstanden, man benützt also Standartmässig lieber `≤` und `<`,
+aber damit weiß ich eh nichts anzufangen.
+
+**dritte Person**: Komm schon, das kannst du ja sicher:
 "
 
 Statement
-"$0 < n$ und $1 ≤ n$ sind äquivalente Aussagen."
-    (n m : ℕ) : m < n ↔ m.succ ≤ n := by
+  (n m : ℕ) : m < n ↔ m.succ ≤ n := by
+  Hint "**Robo**: Du Narr! Das ist doch eine Kuriosität, dass `m < n` auf `ℕ` per Definition
+  als `m + 1 ≤ n` definiert ist!
+
+  **dritte Person**: Du verdirbst den Witz! Ich wollte ihn doch nur testen."
   rfl
+
+OnlyTactic rfl
+
+Conclusion "**Du**: Ha. ha… Na aber jetzt mal ehrlich, wie funktioniert das eigentlich?"

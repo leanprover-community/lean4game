@@ -9,15 +9,18 @@ Title "Linarith"
 
 Introduction
 "
-Die Taktik `linarith` kann alle Systeme von linearen (Un-)gleichungen über `ℤ`, `ℚ`, etc. lösen.
-Über `ℕ` ist sie etwas schwächer, aber einfache Aussagen kann sie trotzdem beweisen.
+**dritte Person**: Nah wenn wir so spielen:
 "
 
-Statement
-"Wenn $n \\ge 2$, zeige, dass $n$ nich Null sein kann."
-    (n : ℕ) (h : 2 ≤ n) : n ≠ 0 := by
+Statement (n : ℕ) (h : 2 ≤ n) : n ≠ 0 := by
+  Hint "**Du**: `simp` geht hier nicht, was mir ja auch einläuchtet.
+
+  **Robo**: Ist auch keine Vereinfachung, die du machen willst. Stattdessen,
+  `linarith` kann lineare Gleichungen und Ungleichungen lösen. Das ist das Powertool
+  in der hinsicht."
   linarith
 
 NewTactic linarith
-
 NewLemma Nat.pos_iff_ne_zero
+
+Conclusion "**Du**: Naja so beeindruckend war das jetzt auch noch nicht."

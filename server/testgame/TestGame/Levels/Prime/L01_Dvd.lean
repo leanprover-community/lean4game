@@ -1,6 +1,7 @@
 import TestGame.Metadata
 
 import Mathlib.Tactic.Ring
+import Mathlib
 
 Game "TestGame"
 World "Prime"
@@ -10,43 +11,39 @@ Title "Teilbarkeit"
 
 Introduction
 "
-Die Aussage \"$m$ teilt $n$.\" wird in Lean als `m | n` (`\\|`) geschrieben.
+Ihr begenet einer Frau, die mit Vorschlaghammer und Schaufel anscheinend an einer Erweiterung
+ihres Hauses baut. Im gespräch erzählt sie euch wie die Dornenwände gezüchtet wurden vor ihrer
+Zeit, und über's Wetter und so.
 
-**Wichtig:** `∣` (Teilbarkeit) ist ein spezielles Unicode Symbol, das nicht dem
-senkrechten Strich auf der Tastatur (`|`) entspricht. Man erhält es mit `\\|`.
-
-`m ∣ n` bedeutet `∃ c, n = m * c`, das heisst, man kann damit genau gleich umgehen
-wie mit einem `∃`-Quantifier.
+**Handwerkerin**: (*langer Monolog*) …, und dann gestern habe ich zwei Herren überhört,
+wie sie an folgender Aufgabe gesessen sind, könnt ihr mir das erklären?
 "
 
-Statement dvd_add
-  "Wenn $m$ ein Teiler von $n$ und $k$ ist, dann teilt es die Summe."
-  (n m k : ℕ) (h : m ∣ n) (g : m ∣ k) : m ∣ n + k := by
+-- Die Aussage \"$m$ teilt $n$.\" wird in Lean als `m | n` (`\\|`) geschrieben.
+
+-- **Wichtig:** `∣` (Teilbarkeit) ist ein spezielles Unicode Symbol, das nicht dem
+-- senkrechten Strich auf der Tastatur (`|`) entspricht. Man erhält es mit `\\|`.
+
+-- `m ∣ n` bedeutet `∃ c, n = m * c`, das heisst, man kann damit genau gleich umgehen
+-- wie mit einem `∃`-Quantifier.
+
+Statement dvd_add (n m k : ℕ) (h : m ∣ n) (g : m ∣ k) : m ∣ n + k := by
+  Hint "**Robo**: `n ∣ m` bedeutet \"$n$ teilt $m$\", der senkrechte Strich ist allerdings
+  ein spezieller, den man mit `\\|` schreibt.
+  Definiert ist dieses Symbol als `∃ c, n = m * c`.
+
+  **Du**: Dann kann ich direkt `rcases` und `use` verwenden, wie wenns ein `∃` wäre?
+
+  **Robo**: Genau!"
+  Hint (hidden := true) "**Robo**: Fang doch damit an, mit `rcases _ with ⟨x ,hx⟩`
+  alle Hyptothesen aufzuteilen."
   rcases h with ⟨x, h⟩
   rcases g with ⟨y, g⟩
+  Hint (hidden := true) "**Robo**: Jetzt musst du mit `use _` eine Zahl angeben so dass
+  `{n} + {k} = {m} * _` gilt."
   use x + y
+  Hint (hidden := true) "**Du**: Mit ein bisschen umschreiben kann man sicer `ring` verwenden."
   rw [h, g]
   ring
 
-HiddenHint (n : ℕ) (m : ℕ) (k : ℕ) (h : m ∣ n) (g : m ∣ k) : m ∣ n + k =>
-"
-Wenn man explizit mit der Definition von Teilbarkeit arbeiten will,
-sollte man als erstes alle Annahmen der Form `x ∣ y` mit `rcases` aufteilen.
-"
-
-HiddenHint (n : ℕ) (m : ℕ) (k : ℕ) (x : ℕ) (h : n = m * x) (g : m ∣ k) : m ∣ n + k =>
-"
-Wenn man explizit mit der Definition von Teilbarkeit arbeiten will,
-sollte man als erstes alle Annahmen der Form `x ∣ y` mit `rcases` aufteilen.
-"
-
-HiddenHint (n : ℕ) (m : ℕ) (k : ℕ) (y : ℕ)  (h : m ∣ n) (g : k = m * y) : m ∣ n + k =>
-"
-Wenn man explizit mit der Definition von Teilbarkeit arbeiten will,
-sollte man als erstes alle Annahmen der Form `x ∣ y` mit `rcases` aufteilen.
-"
-
-HiddenHint (n : ℕ) (m : ℕ) (k : ℕ) (x : ℕ) (y : ℕ) (h : n = m * x) (g : k = m * y) : m ∣ n + k =>
-"
-Jetzt kannst du mit `use` eine Zahl angeben, so dass $m * X = n + k$.
-"
+DisabledLemma dvd_add

@@ -11,7 +11,7 @@ import TestGame.Levels.Sum
 import TestGame.Levels.Numbers
 import TestGame.Levels.Inequality
 
-import TestGame.Levels.LeanStuff
+import TestGame.Levels.Lean
 import TestGame.Levels.SetTheory
 import TestGame.Levels.Function
 import TestGame.Levels.SetFunction
@@ -23,23 +23,22 @@ Game "TestGame"
 Title "Lean 4 game"
 Introduction
 "
-TODO
 "
 
 Conclusion
 "Fertig!"
 
 
-Path Proposition → Implication → Predicate
-Path Predicate → Contradiction → Sum → LeanStuff
-Path LeanStuff → SetTheory → SetTheory2 → SetFunction
+Path Proposition → Implication → Predicate → Predicate → Contradiction → Sum → Lean
+Path Predicate → Inequality → Sum
+-- Path Predicate → Prime -- → Induction
+-- Path Sum → Inequality -- → Induction
 
-Path Predicate → Prime -- → Induction
-Path Sum → Inequality -- → Induction
-Path Inequality → Function
+Path Lean → SetTheory → SetTheory2 → SetFunction
+Path Lean → Function → SetFunction
+
 
 Path SetTheory2 → Numbers
 Path Module → Basis → Module2
-Path LeanStuff → Function → SetFunction
 
 MakeGame

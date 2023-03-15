@@ -33,6 +33,6 @@ Hint : Bijective (fun (n : ℤ) ↦ n + 1) =>
 
 Conclusion
 "Zufrieden drückt euch der Gelehrte eine neue Fackel in die Hand und
-zeigt euch den Weg nach draussen."
+zeigt euch den Weg nach draußen."
 
 NewDefinition Bijective

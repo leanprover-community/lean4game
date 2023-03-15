@@ -18,7 +18,8 @@ Statement (A B : Prop) (hb : B) : A → (A ∧ B) := by
   Hint "**Du**: Einen Moment, das ist eine Implikation (`\\to`),
   also `A` impliziert `A und B`, soweit so gut, also eine Tautologie.
 
-  **Robo**: Die scheinen hier `tauto` auch nicht zu verstehen.
+  **Robo**: Du hast recht, eigentlich könnte man `tauto` sagen,
+  aber das scheinen die hier tauto nicht zu verstehen.
   Implikationen kannst du aber mit `intro h` angehen."
   intro hA
   Hint "**Du**: Jetzt habe ich also angenommen, dass `A` wahr ist und muss `A ∧ B` zeigen,

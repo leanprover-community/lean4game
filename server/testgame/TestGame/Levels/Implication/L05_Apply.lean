@@ -8,7 +8,7 @@ Title "Implikation"
 
 Introduction
 "
-Selbstsicher folgt ihr den Anweisungen und geht nach draussen zum
+Selbstsicher folgt ihr den Anweisungen und geht nach draußen zum
 defekten Kontrollelement. Dieses zeigt ein kompliziertes Diagram:
 $$
 \\begin{CD}
