@@ -1,7 +1,6 @@
 import Lean
 
 import GameServer.EnvExtensions
-import GameServer.StrInterpolation
 
 open Lean Meta
 
@@ -64,11 +63,41 @@ def reprint (stx : Syntax) : Format :=
 
 syntax hintArg := atomic(" (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")")
 
+/-- Remove any spaces at the beginning of a new line -/
+partial def removeIndentation (s : String) : String :=
+  let rec loop (i : String.Pos) (acc : String) (removeSpaces := false) : String :=
+    let c := s.get i
+    let i := s.next i
+    if s.atEnd i then
+      acc.push c
+    else if removeSpaces && c == ' ' then
+      loop i acc (removeSpaces := true)
+    else if c == '\n' then
+      loop i (acc.push c) (removeSpaces := true)
+    else
+      loop i (acc.push c)
+  loop ⟨0⟩ ""
+
 /-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
 see hints. The tactic does not affect the goal state. -/
-elab "Hint" args:hintArg* msg:Lean.Parser.interpolatedStrNoIndent : tactic => do
+elab "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
   let mut strict := false
   let mut hidden := false
+
+  -- remove spaces at the beginngng of new lines
+  let msg := TSyntax.mk $ msg.raw.setArgs $ ← msg.raw.getArgs.mapM fun m => do
+    match m with
+    | Syntax.node info k args =>
+      logInfo k
+      if k == interpolatedStrLitKind && args.size == 1 then
+        match args.get! 0 with
+        | (Syntax.atom info' val) =>
+          let val := removeIndentation val
+          return Syntax.node info k #[Syntax.atom info' val]
+        | _ => return m
+      else
+        return m
+    | _ => return m
 
   for arg in args do
     match arg with
@@ -85,7 +114,7 @@ elab "Hint" args:hintArg* msg:Lean.Parser.interpolatedStrNoIndent : tactic => do
     -- named differently by the player.
     let varsName := `vars
     let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
-      let mut text ← expandInterpolatedStr ⟨msg.raw⟩ (← `(MessageData)) (← `(toMessageData))
+      let mut text ← `(m! $msg)
       let goalDecl ← goal.getDecl
       let decls := goalDecl.lctx.decls.toArray.filterMap id
       for i in [:decls.size] do
