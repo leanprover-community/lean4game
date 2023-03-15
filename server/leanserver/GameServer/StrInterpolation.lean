@@ -118,7 +118,7 @@ private partial def decodeInterpStrLit (s : String) : Option String :=
     else
       loop i (acc.push c)
   let c := s.get 0
-  if c == '\"' || c == '{' then
+  if c == '\"' || c == '}' then
     loop ⟨1⟩ ""
   else
     loop ⟨0⟩ ""
