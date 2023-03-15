@@ -4,7 +4,7 @@ import TestGame.Levels.Proposition
 import TestGame.Levels.Implication
 import TestGame.Levels.Predicate
 import TestGame.Levels.Contradiction
-import TestGame.Levels.Prime
+-- import TestGame.Levels.Prime
 import TestGame.Levels.Sum
 -- import TestGame.Levels.Induction
 
@@ -31,7 +31,7 @@ Conclusion
 
 Path Proposition → Implication → Predicate → Predicate → Contradiction → Sum → Lean
 Path Predicate → Inequality → Sum
--- Path Predicate → Prime -- → Induction
+-- Path Inequality → Prime
 -- Path Sum → Inequality -- → Induction
 
 Path Lean → SetTheory → SetTheory2 → SetFunction
