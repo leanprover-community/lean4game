@@ -12,6 +12,7 @@ interface GameInfo {
 
 export interface ComputedInventoryItem {
   name: string,
+  displayName: string,
   category: string,
   disabled: boolean,
   locked: boolean
@@ -31,6 +32,7 @@ interface LevelInfo {
 
 interface Doc {
   name: string,
+  displayName: string,
   text: string
 }
 

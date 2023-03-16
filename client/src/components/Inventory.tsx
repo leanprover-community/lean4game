@@ -55,14 +55,14 @@ function InventoryList({items, docType, openDoc} : {items: ComputedInventoryItem
     ).map(item => {
         if (tab == item.category) {
           return <InventoryItem key={item.name} showDoc={() => {openDoc(item.name, docType)}}
-            name={item.name} locked={item.locked} disabled={item.disabled} />
+            name={item.name} displayName={item.displayName} locked={item.locked} disabled={item.disabled} />
         }
       }) }
     </div>
     </>
 }
 
-function InventoryItem({name, locked, disabled, showDoc}) {
+function InventoryItem({name, displayName, locked, disabled, showDoc}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : ""
   const className = locked ? "locked" : disabled ? "disabled" : ""
@@ -73,7 +73,7 @@ function InventoryItem({name, locked, disabled, showDoc}) {
     }
   }
 
-  return <div className={`item ${className}`} onClick={handleClick}>{icon} {name}</div>
+  return <div className={`item ${className}`} onClick={handleClick}>{icon} {displayName}</div>
 }
 
 export function Documentation({name, type}) {
@@ -81,7 +81,7 @@ export function Documentation({name, type}) {
   const doc = useLoadDocQuery({type: type, name: name})
 
   return <>
-    <h2 className="doc">{doc.data?.name}</h2>
+    <h2 className="doc">{doc.data?.displayName}</h2>
     <Markdown>{doc.data?.text}</Markdown>
   </>
 }
