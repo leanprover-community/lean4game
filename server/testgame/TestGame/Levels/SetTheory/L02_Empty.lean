@@ -20,15 +20,16 @@ open Set
 
 Statement not_mem_empty "" {A : Type} (x : A) :
     x ∉ (∅ : Set A) := by
+  Hint "**Du**: Kein Element ist in der leeren Menge enthalten? Das ist ja alles
+  tautologisches Zeugs...
+
+  **Robo**: Dann behaupte das doch."
   tauto
 
 NewLemma mem_univ
 
-Hint (A : Type) (x : A) : x ∉ (∅ : Set A) =>
-"**Du**: Kein Element ist in der leeren Menge enthalten? Das ist ja alles tautologisches Zeugs...
-
-**Robo**: Dann behaupte das doch. (`\\empty`)"
-
 Conclusion "Der Junge rennt weiter.
 
-**Du**: So wird das ganze schon angenehmer."
+**Du**: So wird das ganze schon angenehmer.
+
+**Robo**: Die Leere Menge schreibst du mit `\\empty` falls du die nochmals brauchst."

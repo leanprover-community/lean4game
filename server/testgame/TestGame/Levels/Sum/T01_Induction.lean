@@ -36,5 +36,3 @@ example (n : ℕ) (h : 5 ≤ n) : n^2 < 2 ^ n
 | 0 | 1 | 2 | 3 | 4 => by
   sorry
 | n + 5  => by sorry
-
-NewTactic rw simp ring

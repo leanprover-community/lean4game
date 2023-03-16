@@ -30,4 +30,5 @@ Statement
 
 OnlyTactic rfl
 
-Conclusion "**Du**: Ha. ha… Na aber jetzt mal ehrlich, wie funktioniert das eigentlich?"
+Conclusion "**Du**: Ha. ha… Na aber jetzt mal ehrlich, könnt ihr mir ein bisschen mehr
+erzählen?"

@@ -34,7 +34,7 @@ vermutlich noch viel besser mit alter Sprache und Schrift auskennt.
 
 **Du**: Hoffen wir, dass sie uns weiterhelfen können dieses Buch der Urbilder zu entschlüsseln.
 
-Sofort begrüßt euch eine ältere Frau, die sich als *Mengitte*, die Beschützerin des Mondes,
+Sofort begrüßt euch eine ältere Frau, die sich als *Mengea*, die Beschützerin des Mondes,
 vorstellt.
 "
 

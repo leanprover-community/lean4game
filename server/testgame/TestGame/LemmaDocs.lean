@@ -204,3 +204,5 @@ LemmaDoc congrFun as "congrFun" in "Function"
 
 LemmaDoc Iff.symm as "Iff.symm" in "Logic"
 ""
+
+DefinitionDoc subset as "⊆" "Test"

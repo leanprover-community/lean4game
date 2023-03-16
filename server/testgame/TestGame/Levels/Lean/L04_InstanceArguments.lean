@@ -51,7 +51,7 @@ sein neustes Buch, das er leider nicht lesen kann. Nich tnur ist es der zweite B
 (der Erste hat offensichtlich was mit \"Urbildern\" zu tun), sondern ist es auch in einem
 Dialekt geschrieben, der anscheinend nur auf einem Nachbarsmond gesprochen wird.
 
-Ihr beschliesst dem herzlichen Golem zu helfen und sowohl dem Mond einen Besuch abzustatten,
-um den Dialekt zu lernen, wie auch auf dem zweiten Mond in der Bibliothek nach dem
+Ihr beschliesst dem herzlichen Golem zu helfen und beiden Monden einen Besuch abzustatten,
+sowohl um den Dialekt zu lernen, wie auch in der Bibliothek auf dem anderen Mond nach dem
 ersten Band zu suchen.
 "

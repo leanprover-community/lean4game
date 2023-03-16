@@ -13,6 +13,10 @@ Title "Teilmengen"
 
 Introduction
 "
+Ihr bemerkt, dass mit dem Jungen noch zwei andere
+Kinder zuhörten. Eines der beiden Mädchen hat ebenfalls eine Frage.
+
+
 Hat man zwei Mengen `(A B : Set ℕ)` kann man fragen, ob diese Teilmengen
 voneinander sind: `A ⊆ B` (`\\sub`/`\\ss`) ist die Notation für Teilmengen, die auch gleich
 sein können.
@@ -28,18 +32,15 @@ namespace MySet
 
 open Set
 
--- theorem mem_univ {A : Type _} (x : A) : x ∈ (univ : Set A) := by
---   trivial
+Statement (A : Set ℕ) : A ⊆ univ := by
+  Hint "**Robo**: `A ⊆ B` ist als `∀ x, x ∈ A → x ∈ B` definiert.
 
--- theorem not_mem_empty {A : Type _} (x : A) : x ∉ (∅ : Set A) := by
---   tauto
-
-Statement subset_empty_iff
-"." (A : Set ℕ) : A ⊆ univ := by
+  **Du**: Also kann ich mit `intro` anfangen, wie ich das bei einem `∀`?"
   intro h hA
   trivial --apply mem_univ -- or `trivial`.
 
 NewTactic intro trivial apply
+NewDefinition subset
 -- blocked: tauto simp
 
 end MySet

@@ -32,4 +32,3 @@ Statement
 --   ring
 --   rw [Nat.succ_eq_one_add]
 --   rw []
-NewTactic rw simp ring
