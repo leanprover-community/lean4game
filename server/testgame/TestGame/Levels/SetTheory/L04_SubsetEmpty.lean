@@ -14,10 +14,14 @@ Title "Teilmengen"
 
 Introduction
 "
+Etwas weiter kommt ihr an einem kleinen Gemüsestand vorbei. Da ihr nicht so
+richtig einen Plan habt, fragt ihr den Verkäufer.
+
+**Verkäufer**: Hier ist was ganz wichtiges, was ihr noch oft brauchen werdet:
 Ein zentrales Lemma ist `Subset.antisymm_iff` welches folgendes sagt:
 
 ```
-A = B ↔ A ⊆ B ∧ B ⊆ A
+lemma antisymm_iff {α : Type} {A B : Set α} : A = B ↔ A ⊆ B ∧ B ⊆ A
 ```
 
 Fast immer wenn man Gleichheiten von Mengen zeigen muss, will man diese in zwei Ungleichungen
@@ -26,7 +30,7 @@ aufteilen.
 
 namespace MySet
 
-open Set
+open Set Subset
 
 -- Copied some lemmas from `Matlib.Data.Set.Basic` in order to not import the entire file.
 theorem tmp {α : Type _} {s t : Set α} : s = t → s ⊆ t :=
@@ -39,10 +43,13 @@ theorem Subset.antisymm_iff {α : Type _} {a b : Set α} : a = b ↔ a ⊆ b ∧
 theorem empty_subset {α : Type _} (s : Set α) : ∅ ⊆ s :=
   fun.
 
-Statement subset_empty_iff
-"Die einzige Teilmenge der leeren Menge ist die leere Menge."
-    {A : Type _} (s : Set A) :
+Statement subset_empty_iff {A : Type _} (s : Set A) :
     s ⊆ ∅ ↔ s = ∅ := by
+  Hint "**Du**: Ja, die einzige Teilmenge der leeren Menge ist die leere Menge.
+  Das ist doch eine Tautologie?
+
+  **Robo**: Naja nicht ganz, "
+
   constructor
   intro h
   rw [Subset.antisymm_iff]

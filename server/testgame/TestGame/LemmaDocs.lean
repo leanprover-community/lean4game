@@ -153,6 +153,9 @@ LemmaDoc Fin.sum_univ_castSucc as "Fin.sum_univ_castSucc" in "Sum"
 LemmaDoc Nat.succ_eq_add_one as "Nat.succ_eq_add_one" in "Sum"
 ""
 
+LemmaDoc Nat.zero_eq as "Nat.succ_eq_add_one" in "Sum"
+""
+
 LemmaDoc add_comm as "add_comm" in "Nat"
 ""
 
@@ -205,4 +208,4 @@ LemmaDoc congrFun as "congrFun" in "Function"
 LemmaDoc Iff.symm as "Iff.symm" in "Logic"
 ""
 
-DefinitionDoc subset as "⊆" "Test"
+DefinitionDoc Symbol.Subset as "⊆" "Test"

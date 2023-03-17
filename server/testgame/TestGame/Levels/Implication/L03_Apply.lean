@@ -11,17 +11,10 @@ Introduction
 "
 Sein Kollege zieht eine Linie unter deinen Beweis, schreibt ein durchgestrichenes ~`revert`~
 hin und gibt dir das Blatt wieder.
-`revert` ist aber nur selten der richtige Weg.
-
-Im vorigen Beispiel würde man besser die Implikation $A \\Rightarrow B$ *anwenden*, also
-sagen \"Es genügt $A$ zu zeigen, denn $A \\Rightarrow B$\" und danach $A$ beweisen.
-
-Wenn man eine Implikation `(g : A → B)` in den Annahmen hat, bei welcher die Konsequenz
-(also $B$) mit dem Goal übereinstimmt, kann man `apply g` genau dies machen.
 "
 
 Statement (A B : Prop) (hA : A) (h : A → B) : B := by
-  Hint "**Robo**: Du hast natürlich recht, normalerweise ist es viel schöner mit
+  Hint "**Robo**: Da hat er natürlich recht, normalerweise ist es viel schöner mit
   `apply {h}` die Implikation anzuwenden."
   apply h
   Hint "**Du**: Und jetzt genügt es also `A` zu zeigen."

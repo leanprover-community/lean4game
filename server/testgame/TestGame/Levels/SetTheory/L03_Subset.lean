@@ -2,6 +2,7 @@ import TestGame.Metadata
 
 import Mathlib.Init.Set
 import Mathlib.Tactic.Tauto
+import Mathlib
 
 set_option tactic.hygienic false
 
@@ -35,12 +36,16 @@ open Set
 Statement (A : Set ℕ) : A ⊆ univ := by
   Hint "**Robo**: `A ⊆ B` ist als `∀ x, x ∈ A → x ∈ B` definiert.
 
-  **Du**: Also kann ich mit `intro` anfangen, wie ich das bei einem `∀`?"
+  **Du**: Also kann ich mit `intro` anfangen, wie ich das bei einem `∀` funktioniert?
+
+  **Robo**: Das ist korrekt."
   intro h hA
+  Hint (hidden := true) "**Robo**: Das dürfte eine Trivialität sein."
   trivial --apply mem_univ -- or `trivial`.
 
-NewTactic intro trivial apply
-NewDefinition subset
--- blocked: tauto simp
+DisabledTactic tauto simp
+NewDefinition Symbol.Subset
+
+Conclusion "Damit drehen sich die beiden Mädchen um und folgen dem Jungen."
 
 end MySet
