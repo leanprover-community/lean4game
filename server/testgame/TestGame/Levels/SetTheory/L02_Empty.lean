@@ -26,7 +26,7 @@ Statement not_mem_empty "" {A : Type} (x : A) :
   **Robo**: Dann behaupte das doch."
   tauto
 
-NewLemma mem_univ
+NewLemma Set.mem_univ
 
 Conclusion "Der Junge rennt weiter.
 

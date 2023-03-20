@@ -27,5 +27,3 @@ Statement
   simp
 
 NewTactic constructor intro rw assumption rcases simp tauto trivial
-
-NewLemma Subset.antisymm_iff empty_subset

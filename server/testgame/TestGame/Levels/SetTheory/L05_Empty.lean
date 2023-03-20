@@ -47,6 +47,4 @@ Statement eq_empty_iff_forall_not_mem
 
 NewTactic constructor intro rw assumption rcases simp tauto trivial
 
-NewLemma Subset.antisymm_iff empty_subset
-
 end MySet

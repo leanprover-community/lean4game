@@ -106,4 +106,4 @@ ist deine!
 "
 
 NewTactic push_neg
-NewLemma even_iff_not_odd odd_iff_not_even not_exists not_forall
+NewLemma Nat.even_iff_not_odd Nat.odd_iff_not_even not_exists not_forall
