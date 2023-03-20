@@ -10,7 +10,6 @@ import TestGame.Levels.LinearAlgebra.L08_GeneratingSet
 import TestGame.Levels.LinearAlgebra.M01_LinearMap
 import TestGame.Levels.LinearAlgebra.M02_LinearIndep
 import TestGame.Levels.LinearAlgebra.M04_Basis
-import TestGame.Levels.LinearAlgebra.M05_Basis
 
 import TestGame.Levels.LinearAlgebra.N01_Span
 import TestGame.Levels.LinearAlgebra.N02_Span

@@ -62,6 +62,6 @@ Statement subset_empty_iff {A : Type _} (s : Set A) :
 
 NewTactic constructor intro rw assumption rcases simp tauto trivial
 
-NewLemma Subset.antisymm empty_subset
+NewLemma Subset.antisymm Subset.antisymm_iff empty_subset
 
 end MySet
