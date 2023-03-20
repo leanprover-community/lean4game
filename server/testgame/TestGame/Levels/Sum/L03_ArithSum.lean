@@ -83,7 +83,7 @@ Statement arithmetic_sum
   ring
 
 NewTactic induction
-NewLemma Fin.sum_univ_castSucc Nat.succ_eq_add_one mul_add add_mul
+NewLemma Fin.sum_univ_castSucc Nat.succ_eq_add_one mul_add add_mul Nat.zero_eq
 
 Conclusion "Du schaust dich um und bewunderst das Tal in dem hunderte, wenn nicht tausende,
 Steintürme in allen Formen und Höhen stehen."

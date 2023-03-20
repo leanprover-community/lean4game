@@ -3,69 +3,389 @@ import GameServer.Commands
 -- Wird im Level "Implication 11" ohne Beweis angenommen.
 LemmaDoc not_not as "not_not" in "Logic"
 "
-### Aussage
+`not_not {A : Prop} : ¬¬A ↔ A`
 
-`¬¬A ↔ A`
-
-### Annahmen
-
-`(A : Prop)`
+* `simp`-Lemma: Ja
+* Namespace: `Classical`
+* Minimal Import: `Std.Logic`
+* Mathlib Doc: [#not_not](https://leanprover-community.github.io/mathlib4_docs/Std/Logic.html#Classical.not_not)
 "
 
 -- Wird im Level "Implication 10" ohne Beweis angenommen.
 LemmaDoc not_or_of_imp as "not_or_of_imp" in "Logic"
 "
-### Aussage
+`not_or_of_imp {A B : Prop} : (A → B) → ¬A ∨ B`
 
-`¬A ∨ B`
-
-### Annahmen
-
-`(A B : Prop)`\\
-`(h : A → B)`
+* `simp`-Lemma: Nein
+* Namespace: `-`
+* Minimal Import: `Mathlib.Logic.Basic`
+* Mathlib Doc: [#not_or_of_imp](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Logic/Basic.html#not_or_of_imp)
 "
 
 -- Wird im Level "Implication 12" bewiesen.
 LemmaDoc imp_iff_not_or as "imp_iff_not_or" in "Logic"
 "
-### Aussage
+`imp_iff_not_or {A B : Prop} : (A → B) ↔ (¬A ∨ B)`
 
-`(A → B) ↔ ¬A ∨ B`
-
-### Annahmen
-
-`(A B : Prop)`
+* `simp`-Lemma: Nein
+* Namespace: `-`
+* Minimal Import: `Mathlib.Logic.Basic`
+* Mathlib Doc: [#imp_iff_not_or](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Logic/Basic.html#imp_iff_not_or)
 "
 
+LemmaDoc Nat.succ_pos as "succ_pos" in "Nat"
+"
+`Nat.succ_pos (n : ℕ) : 0 < n.succ`
 
-LemmaDoc Nat.succ_pos as "Nat.succ_pos" in "Nat"
-"
+$n + 1$ ist strikt grösser als Null.
+
+## Eigenschaften
+
+* `simp` Lemma: Nein
+* Namespace: `Nat`
+* Minimal Import: `Mathlib.Init.Prelude`
+* Mathlib Doc: [#Nat.succ_pos](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Nat.succ_pos)
 "
 
-LemmaDoc Nat.pos_iff_ne_zero as "Nat.pos_iff_ne_zero" in "Nat"
+LemmaDoc Nat.pos_iff_ne_zero as "pos_iff_ne_zero" in "Nat"
 "
+`Nat.pos_iff_ne_zero {n : ℕ} : 0 < n ↔ n ≠ 0`
+
+* `simp`-Lemma: Nein
+* Namespace: `Nat`
+* Minimal Import: `Std.Data.Nat.Lemmas`
+* Mathlib Doc: [#Nat.pos_iff_ne_zero](https://leanprover-community.github.io/mathlib4_docs/Std/Data/Nat/Lemmas.html#Nat.pos_iff_ne_zero)
 "
 
+-- TODO: Not minimal description
 LemmaDoc zero_add as "zero_add" in "Addition"
-"This lemma says `∀ a : ℕ, 0 + a = a`."
+"zero_add (a : ℕ) : 0 + a = a`.
+
+
+* `simp`-Lemma: Ja
+* Namespace: `-`
+* Import: `Mathlib.Nat.Basic`
+* Mathlib Doc: [#zero_add](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Group/Defs.html#zero_add)
+"
 
 LemmaDoc add_zero as "add_zero" in "Addition"
-"This lemma says `∀ a : ℕ, a + 0 = a`."
+"This lemma says `∀ a : ℕ, a + 0 = a`.
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc"
 
 LemmaDoc add_succ as "add_succ" in "Addition"
-"This lemma says `∀ a b : ℕ, a + succ b = succ (a + b)`."
+"This lemma says `∀ a b : ℕ, a + succ b = succ (a + b)`.
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()"
 
 LemmaDoc not_forall as "not_forall" in "Logic"
-"`∀ (A : Prop), ¬(∀ x, A) ↔ ∃x, (¬A)`."
+"
+`not_forall {α : Sort _} {P : α → Prop} : ¬(∀ x, → P x) ↔ ∃ x, ¬P x`
+
+* `simp`-Lemma: Ja
+* Namespace: `-`
+* Minimal Import: `Mathlib.Logic.Basic`
+* Mathlib Doc: [#not_forall](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Logic/Basic.html#not_forall)
+"
 
 LemmaDoc not_exists as "not_exists" in "Logic"
-"`∀ (A : Prop), ¬(∃ x, A) ↔ ∀x, (¬A)`."
+"`∀ (A : Prop), ¬(∃ x, A) ↔ ∀x, (¬A)`.
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()"
+
+LemmaDoc even_iff_not_odd as "even_iff_not_odd" in "Nat"
+"`Even n ↔ ¬ (Odd n)`
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()"
+
+LemmaDoc odd_iff_not_even as "odd_iff_not_even" in "Nat"
+"`Odd n ↔ ¬ (Even n)`
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()"
+
+LemmaDoc even_square as "even_square" in "Nat"
+"`∀ (n : ℕ), Even n → Even (n ^ 2)`
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+
+
+
+LemmaDoc mem_univ as "mem_univ" in "Set"
+"x ∈ @univ α
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc not_mem_empty as "not_mem_empty" in "Set"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc empty_subset as "empty_subset" in "Set"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Subset.antisymm_iff as "Subset.antisymm_iff" in "Set"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+
+
+LemmaDoc Nat.prime_def_lt'' as "Nat.prime_def_lt''" in "Nat"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+
+LemmaDoc Finset.sum_add_distrib as "Finset.sum_add_distrib" in "Sum"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Fin.sum_univ_castSucc as "Fin.sum_univ_castSucc" in "Sum"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Nat.succ_eq_add_one as "Nat.succ_eq_add_one" in "Sum"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Nat.zero_eq as "Nat.succ_eq_add_one" in "Sum"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc add_comm as "add_comm" in "Nat"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc mul_add as "mul_add" in "Nat"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc add_mul as "add_mul" in "Nat"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc arithmetic_sum as "arithmetic_sum" in "Sum"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc add_pow_two as "add_pow_two" in "Nat"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Finset.sum_comm as "Finset.sum_comm" in "Sum"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Function.comp_apply as "Function.comp_apply" in "Function"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc not_le as "not_le" in "Logic"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc if_pos as "if_pos" in "Logic"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc if_neg as "if_neg" in "Logic"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc StrictMono.injective as "StrictMono.injective" in "Function"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc StrictMono.add as "StrictMono.add" in "Function"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Odd.strictMono_pow as "Odd.strictMono_pow" in "Function"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Exists.choose as "Exists.choose" in "Function"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Exists.choose_spec as "Exists.choose_spec" in "Function"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+LemmaDoc congrArg as "congrArg" in "Function"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+LemmaDoc congrFun as "congrFun" in "Function"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+LemmaDoc Iff.symm as "Iff.symm" in "Logic"
+"
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
+"
+
+
+
+/-! ## Definitions -/
 
 DefinitionDoc Even as "Even"
 "
 `even n` ist definiert als `∃ r, a = 2 * r`.
 Die Definition kann man mit `unfold even at *` einsetzen.
-"
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()"
 
 DefinitionDoc Odd as "Odd"
 "
@@ -94,14 +414,29 @@ DefinitionDoc Surjective as "Surjective"
 
 DefinitionDoc Bijective as "Bijective"
 "
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
 "
 
 DefinitionDoc LeftInverse as "LeftInverse"
 "
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
 "
 
 DefinitionDoc RightInverse as "RightInverse"
 "
+
+* `simp`-Lemma:
+* Namespace: `-`
+* Minimal Import: `Mathlib.`
+* Mathlib Doc: [#]()
 "
 
 DefinitionDoc StrictMono as "StrictMono"
@@ -114,98 +449,5 @@ DefinitionDoc StrictMono as "StrictMono"
 
 "
 
-LemmaDoc even_iff_not_odd as "even_iff_not_odd" in "Nat"
-"`Even n ↔ ¬ (Odd n)`"
-
-LemmaDoc odd_iff_not_even as "odd_iff_not_even" in "Nat"
-"`Odd n ↔ ¬ (Even n)`"
-
-LemmaDoc even_square as "even_square" in "Nat"
-"`∀ (n : ℕ), Even n → Even (n ^ 2)`"
-
-
-
-
-LemmaDoc mem_univ as "mem_univ" in "Set"
-"x ∈ @univ α"
-
-LemmaDoc not_mem_empty as "not_mem_empty" in "Set"
-""
-
-LemmaDoc empty_subset as "empty_subset" in "Set"
-""
-
-LemmaDoc Subset.antisymm_iff as "Subset.antisymm_iff" in "Set"
-""
-
-
-
-LemmaDoc Nat.prime_def_lt'' as "Nat.prime_def_lt''" in "Nat"
-""
-
-
-LemmaDoc Finset.sum_add_distrib as "Finset.sum_add_distrib" in "Sum"
-""
-
-LemmaDoc Fin.sum_univ_castSucc as "Fin.sum_univ_castSucc" in "Sum"
-""
-
-LemmaDoc Nat.succ_eq_add_one as "Nat.succ_eq_add_one" in "Sum"
-""
-
-LemmaDoc Nat.zero_eq as "Nat.succ_eq_add_one" in "Sum"
-""
-
-LemmaDoc add_comm as "add_comm" in "Nat"
-""
-
-LemmaDoc mul_add as "mul_add" in "Nat"
-""
-
-LemmaDoc add_mul as "add_mul" in "Nat"
-""
-
-LemmaDoc arithmetic_sum as "arithmetic_sum" in "Sum"
-""
-
-LemmaDoc add_pow_two as "add_pow_two" in "Nat"
-""
-
-LemmaDoc Finset.sum_comm as "Finset.sum_comm" in "Sum"
-""
-
-LemmaDoc Function.comp_apply as "Function.comp_apply" in "Function"
-""
-
-LemmaDoc not_le as "not_le" in "Logic"
-""
-
-LemmaDoc if_pos as "if_pos" in "Logic"
-""
-
-LemmaDoc if_neg as "if_neg" in "Logic"
-""
-
-LemmaDoc StrictMono.injective as "StrictMono.injective" in "Function"
-""
-
-LemmaDoc StrictMono.add as "StrictMono.add" in "Function"
-""
-
-LemmaDoc Odd.strictMono_pow as "Odd.strictMono_pow" in "Function"
-""
-
-LemmaDoc Exists.choose as "Exists.choose" in "Function"
-""
-
-LemmaDoc Exists.choose_spec as "Exists.choose_spec" in "Function"
-""
-LemmaDoc congrArg as "congrArg" in "Function"
-""
-LemmaDoc congrFun as "congrFun" in "Function"
-""
-
-LemmaDoc Iff.symm as "Iff.symm" in "Logic"
-""
 
 DefinitionDoc Symbol.Subset as "⊆" "Test"

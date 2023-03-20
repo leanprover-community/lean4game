@@ -521,4 +521,9 @@ TacticDoc use
 "
 Wenn das Goal von der Form `∃x, P x` ist, kann man mit `use n` ein konkretes Element angeben
 mit dem man das Goal beweisen möchte.
+
+## Details
+
+`use n` versucht zudem anschliessend `rfl` aufzurufen, und kann das Goal damit manchmal direkt
+schließen.
 "
