@@ -205,7 +205,9 @@ function PlayableLevel({worldId, levelId}) {
         </EditorContext.Provider>
 
         {completed && <div className="conclusion">
-          <Markdown>{level?.data?.conclusion}</Markdown>
+          <Alert severity="info" sx={{ mt: 1 }}>
+            <Markdown>{level?.data?.conclusion}</Markdown>
+          </Alert>
           {levelId >= gameInfo.data?.worldSize[worldId] ?
           <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button> :
           <Button to={`/world/${worldId}/level/${levelId + 1}`}>
