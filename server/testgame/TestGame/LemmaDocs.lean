@@ -84,9 +84,6 @@ This lemma says `∀ a : ℕ, a + 0 = a`.
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
 * Mathlib Doc"
 
 LemmaDoc add_succ as "add_succ" in "Addition"
@@ -94,9 +91,6 @@ LemmaDoc add_succ as "add_succ" in "Addition"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
 * Mathlib Doc: [#]()"
 
 LemmaDoc not_forall as "not_forall" in "Logic"
@@ -223,6 +217,7 @@ LemmaDoc Subset.antisymm_iff as "Subset.antisymm_iff" in "Set"
 `Set.Subset.antisymm_iff {α : Type u} {a : Set α} {b : Set α} : a = b ↔ a ⊆ b ∧ b ⊆ a`
 
 Zwei Mengen sind identisch, wenn sowohl $A \\subseteq B$ wie auch $B \\subseteq A$.
+
 ## Details
 
 `rw [Subset.antisymm_iff]` ist eine Möglichkeit Gleichungen von Mengen zu zeigen.
@@ -240,60 +235,57 @@ für eine verwandte Version.
 "
 
 
-LemmaDoc Nat.prime_def_lt'' as "Nat.prime_def_lt''" in "Nat"
+LemmaDoc Nat.prime_def_lt'' as "prime_def_lt''" in "Nat"
+"
+`Nat.prime_def_lt'' {p : ℕ} :
+Nat.Prime p ↔ 2 ≤ p ∧ ∀ (m : ℕ), m ∣ p → m = 1 ∨ m = p`
+
+Die bekannte Definition einer Primmzahl in `ℕ`: Eine Zahl (`p ≥ 2`) mit genau zwei Teilern.
+
+## Eigenschaften
+
+* `simp`-Lemma: Nein
+* Namespace: `Nat`
+* Mathlib Doc: [#Nat.prime_def_lt''](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Prime.html#Nat.prime_def_lt'')
+"
+
+
+LemmaDoc Finset.sum_add_distrib as "sum_add_distrib" in "Sum"
 "
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* `simp`-Lemma: Nein
+* Namespace: `Finset`
+* Mathlib Doc: [#Finset.sum_add_distrib](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Basic.html#Finset.sum_add_distrib)
 "
 
-
-LemmaDoc Finset.sum_add_distrib as "Finset.sum_add_distrib" in "Sum"
-"
-
-## Eigenschaften
-
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
-"
-
-LemmaDoc Fin.sum_univ_castSucc as "Fin.sum_univ_castSucc" in "Sum"
+LemmaDoc Fin.sum_univ_castSucc as "sum_univ_castSucc" in "Sum"
 "
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* `simp`-Lemma: Nein
+* Namespace: `Fin`
+* Mathlib Doc: [#sum_univ_castSucc](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Fin.html#Fin.sum_univ_castSucc)
 "
 
-LemmaDoc Nat.succ_eq_add_one as "Nat.succ_eq_add_one" in "Sum"
-"
-
-## Eigenschaften
-
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
-"
-
-LemmaDoc Nat.zero_eq as "Nat.succ_eq_add_one" in "Sum"
+LemmaDoc Nat.succ_eq_add_one as "succ_eq_add_one" in "Sum"
 "
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* `simp`-Lemma: Nein
+* Namespace: `Nat`
+* Mathlib Doc: [#succ_eq_add_one](https://leanprover-community.github.io/mathlib4_docs/Init/Data/Nat/Basic.html#Nat.succ_eq_add_one)
+"
+
+LemmaDoc Nat.zero_eq as "zero_eq" in "Sum"
+"
+
+## Eigenschaften
+
+* Mathlib Doc: [#zero_eq](https://leanprover-community.github.io/mathlib4_docs/Init/Data/Nat/Basic.html#Nat.zero_eq)
 "
 
 LemmaDoc add_comm as "add_comm" in "Nat"
@@ -301,10 +293,7 @@ LemmaDoc add_comm as "add_comm" in "Nat"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#add_comm](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Group/Defs.html#add_comm)
 "
 
 LemmaDoc mul_add as "mul_add" in "Nat"
@@ -312,10 +301,7 @@ LemmaDoc mul_add as "mul_add" in "Nat"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#mul_add](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Ring/Defs.html#mul_add)
 "
 
 LemmaDoc add_mul as "add_mul" in "Nat"
@@ -323,10 +309,7 @@ LemmaDoc add_mul as "add_mul" in "Nat"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#add_mul](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Ring/Defs.html#add_mul)
 "
 
 LemmaDoc arithmetic_sum as "arithmetic_sum" in "Sum"
@@ -334,10 +317,7 @@ LemmaDoc arithmetic_sum as "arithmetic_sum" in "Sum"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Not a mathlib lemma.
 "
 
 LemmaDoc add_pow_two as "add_pow_two" in "Nat"
@@ -345,10 +325,7 @@ LemmaDoc add_pow_two as "add_pow_two" in "Nat"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#add_pow_two](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Ring.html#add_pow_two)
 "
 
 LemmaDoc Finset.sum_comm as "Finset.sum_comm" in "Sum"
@@ -356,10 +333,7 @@ LemmaDoc Finset.sum_comm as "Finset.sum_comm" in "Sum"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#sum_comm](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Basic.html#Finset.sum_comm)
 "
 
 LemmaDoc Function.comp_apply as "Function.comp_apply" in "Function"
@@ -367,10 +341,7 @@ LemmaDoc Function.comp_apply as "Function.comp_apply" in "Function"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#comp_apply](https://leanprover-community.github.io/mathlib4_docs/Init/Core.html#Function.comp_apply)
 "
 
 LemmaDoc not_le as "not_le" in "Logic"
@@ -378,10 +349,7 @@ LemmaDoc not_le as "not_le" in "Logic"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#not_le](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Algebra/Order.html#not_le)
 "
 
 LemmaDoc if_pos as "if_pos" in "Logic"
@@ -389,10 +357,7 @@ LemmaDoc if_pos as "if_pos" in "Logic"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#if_pos](https://leanprover-community.github.io/mathlib4_docs/Init/Core.html#if_pos)
 "
 
 LemmaDoc if_neg as "if_neg" in "Logic"
@@ -400,10 +365,7 @@ LemmaDoc if_neg as "if_neg" in "Logic"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#if_neg](https://leanprover-community.github.io/mathlib4_docs/Init/Core.html#if_neg)
 "
 
 LemmaDoc StrictMono.injective as "StrictMono.injective" in "Function"
@@ -411,10 +373,7 @@ LemmaDoc StrictMono.injective as "StrictMono.injective" in "Function"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#StrictMono.injective](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Order/Monotone/Basic.html#StrictMono.injective)
 "
 
 LemmaDoc StrictMono.add as "StrictMono.add" in "Function"
@@ -422,10 +381,7 @@ LemmaDoc StrictMono.add as "StrictMono.add" in "Function"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#StrictMono.add](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Order/Monoid/Lemmas.html#StrictMono.add)
 "
 
 LemmaDoc Odd.strictMono_pow as "Odd.strictMono_pow" in "Function"
@@ -433,10 +389,7 @@ LemmaDoc Odd.strictMono_pow as "Odd.strictMono_pow" in "Function"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#Odd.strictMono_pow](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Parity.html#Odd.strictMono_pow)
 "
 
 LemmaDoc Exists.choose as "Exists.choose" in "Function"
@@ -444,10 +397,7 @@ LemmaDoc Exists.choose as "Exists.choose" in "Function"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#Exists.choose](https://leanprover-community.github.io/mathlib4_docs/Std/Logic.html#Exists.choose)
 "
 
 LemmaDoc Exists.choose_spec as "Exists.choose_spec" in "Function"
@@ -455,30 +405,21 @@ LemmaDoc Exists.choose_spec as "Exists.choose_spec" in "Function"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#Exists.choose_spec](https://leanprover-community.github.io/mathlib4_docs/Std/Logic.html#Exists.choose_spec)
 "
 LemmaDoc congrArg as "congrArg" in "Function"
 "
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#congrArg](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#congrArg)
 "
 LemmaDoc congrFun as "congrFun" in "Function"
 "
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#congrFun](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#congrFun)
 "
 
 LemmaDoc Iff.symm as "Iff.symm" in "Logic"
@@ -486,10 +427,7 @@ LemmaDoc Iff.symm as "Iff.symm" in "Logic"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#Iff.symm](https://leanprover-community.github.io/mathlib4_docs/Init/Core.html#Iff.symm)
 "
 
 
@@ -502,16 +440,14 @@ DefinitionDoc Even as "Even"
 Die Definition kann man mit `unfold even at *` einsetzen.
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()"
+* Mathlib Doc: [#Even](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Parity.html#Even)"
 
 DefinitionDoc Odd as "Odd"
 "
 `odd n` ist definiert als `∃ r, a = 2 * r + 1`.
 Die Definition kann man mit `unfold odd at *` einsetzen.
-"
+
+* Mathlib Doc: [Odd](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Parity.html#Odd)"
 
 DefinitionDoc Injective as "Injective"
 "
@@ -521,7 +457,8 @@ DefinitionDoc Injective as "Injective"
 ∀ a b, f a = f b → a = b
 ```
 definiert.
-"
+
+* Mathlib Doc: [Injective](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Function.html#Function.Injective)"
 
 DefinitionDoc Surjective as "Surjective"
 "
@@ -530,17 +467,15 @@ DefinitionDoc Surjective as "Surjective"
 ```
 ∀ a, (∃ b, f a = b)
 ```
-"
+
+* Mathlib Doc: [Surjective](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Function.html#Function.Surjective)"
 
 DefinitionDoc Bijective as "Bijective"
 "
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#Bijective](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Function.html#Function.Bijective)
 "
 
 DefinitionDoc LeftInverse as "LeftInverse"
@@ -548,10 +483,7 @@ DefinitionDoc LeftInverse as "LeftInverse"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#LeftInverse](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Function.html#Function.LeftInverse)
 "
 
 DefinitionDoc RightInverse as "RightInverse"
@@ -559,10 +491,7 @@ DefinitionDoc RightInverse as "RightInverse"
 
 ## Eigenschaften
 
-* `simp`-Lemma:
-* Namespace: `-`
-* Minimal Import: `Mathlib.`
-* Mathlib Doc: [#]()
+* Mathlib Doc: [#RightInverse](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Logic.html#RightInverse)
 "
 
 DefinitionDoc StrictMono as "StrictMono"
@@ -573,7 +502,13 @@ DefinitionDoc StrictMono as "StrictMono"
 ∀ a b, a < b → f a < f b
 ```
 
+## Eigenschaften
+
+* Mathlib Doc: [#StrictMono](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Order/Monotone/Basic.html#StrictMono)
+
 "
 
+DefinitionDoc Symbol.Subset as "⊆" "
 
-DefinitionDoc Symbol.Subset as "⊆" "Test"
+Auf Mengen (`Set`) ist `A ⊆ B` als `∀x, x ∈ A → x ∈ B` implementiert.
+"

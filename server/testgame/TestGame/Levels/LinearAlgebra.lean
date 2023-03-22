@@ -25,6 +25,13 @@ Game "TestGame"
 World "Module"
 Title "Vektorraum"
 
+Introduction "Hier lernst du die Grundlagen zur linearen Algebra.
+
+Vektorräume sind in Lean etwas algemeiner definiert als dies normalerweise in
+einer Einführungsvorlesung antrifft: Man definiert ein \"Modul\" (Plural: Moduln)
+über einem Ring. Ein Modul über einem *Körper* wird dann auch \"Vektorraum\" genannt.
+"
+
 Game "TestGame"
 World "Basis"
 Title "Lineare Abbildungen"

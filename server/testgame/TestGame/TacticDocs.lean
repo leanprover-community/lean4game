@@ -90,6 +90,28 @@ widersprechen.
 in ähnlichen Situationen nutzbar wie `by_contra`
 "
 
+TacticDoc change
+"
+`change t` ändert das Goal zu `t`. Voraussetzung ist, dass `t` und das alte Goal defEq sind.
+
+## Details
+
+Dies ist insbesonder hilfreich wenn eine Taktik nicht merkt, dass das Goal defEq ist zu einem
+Term, der eigentlich gebraucht würde.
+
+## Beispiel
+
+Aktuelles Goal:
+
+```
+b: ℝ
+⊢ 1 • b = b
+```
+Wobei die Skalarmultiplikation als `fun (a : ℚ) (r : ℝ) => ↑a * r` definiert war. Dann
+kann man mit `change (1 : ℚ) * b = b` das Goal umschreiben und anschliessend mit Lemmas
+über die Multiplikation beweisen.
+"
+
 TacticDoc constructor
 "
 `constructor` teilt ein Goal auf, wenn das Goal eine Struktur ist
@@ -155,6 +177,11 @@ eine Beweis durch Kontraposition.
 
 * `revert h` kann nützlich sein um eine Annahme als Implikationsprämisse zu schreiben bevor man
   `contrapose` verwendet.
+"
+
+TacticDoc exact
+"
+`exact h` schliesst das Goal wenn der Term `h` mit dem Goal übereinstimmt.
 "
 
 TacticDoc fin_cases
@@ -330,6 +357,16 @@ erzeugen, einmal unter Annahme der linken Seite, einmal unter Annahme der Rechte
   ```
   Hier sind `inl`/`inr` die Namen der Fälle und `ha`/`hb` sind frei gewählte Namen für die
   freien Variablen
+"
+
+TacticDoc refine
+"
+`refine { ?..! }` wird benötigt um eine Struktur (z.B. ein $R$-Modul) im Taktikmodus in einzelne
+Goals aufzuteilen. Danach hat man ein Goal pro Strukturfeld.
+
+(*Bemerkung*: Es gibt in Lean verschiedenste bessere Varianten dies zu erreichen,
+z.B. \"Term Modus\" oder \"anonyme Konstruktoren\", aber für den Zweck des Spieles bleiben wir
+bei diesem Syntax.)
 "
 
 TacticDoc revert

@@ -34,7 +34,7 @@ Path Predicate → Inequality → Sum
 -- Path Inequality → Prime
 -- Path Sum → Inequality -- → Induction
 
-Path Lean → SetTheory → SetTheory2 → SetFunction
+Path Lean → SetTheory → SetTheory2 → SetFunction → Module
 Path Lean → Function → SetFunction
 
 

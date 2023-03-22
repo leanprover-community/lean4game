@@ -3,7 +3,10 @@ import Mathlib
 
 
 example : Module ℚ ℝ := by
-  refine { smul := fun a r => ↑a * r  ?..! }
+  refine { ?..! }
+  exact fun a r => a * r
+  intro b
+  sorry
   sorry
   sorry
   sorry
