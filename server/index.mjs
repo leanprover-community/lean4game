@@ -45,7 +45,8 @@ function startServerProcess(gameId) {
             ["--server", gameId, games[gameId].module, games[gameId].name],
             { cwd: "./leanserver/build/bin/" })
         : cp.spawn("docker",
-            ["run", "--runtime=runsc", "--network=none", "--rm", "-i", `${gameId}:latest`],
+            ["run", "--runtime=runsc", "--network=none", "--rm", "-i", `${gameId}:latest`,
+              "./gameserver", "--server", gameId, games[gameId].module, games[gameId].name],
             { cwd: "." })
     serverProcess.on('error', error =>
         console.error(`Launching Lean Server failed: ${error}`)
