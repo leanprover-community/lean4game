@@ -3,6 +3,7 @@ import TestGame.Levels.SetTheory.L03_Subset
 
 import Mathlib.Init.Set
 import Mathlib.Tactic.Tauto
+import Mathlib
 
 set_option tactic.hygienic false
 
@@ -48,10 +49,11 @@ Statement subset_empty_iff {A : Type _} (s : Set A) :
   Hint "**Du**: Ja, die einzige Teilmenge der leeren Menge ist die leere Menge.
   Das ist doch eine Tautologie?
 
-  **Robo**: Naja nicht ganz, "
-
+  **Robo**: Ja schon, aber zuerst einmal explizit."
+  Hint (hidden := true) "**Robo**: Fang doch einmal mit `constructor` an."
   constructor
   intro h
+  Hint "**Robo**: "
   apply Subset.antisymm
   assumption
   simp only [empty_subset]
@@ -60,8 +62,7 @@ Statement subset_empty_iff {A : Type _} (s : Set A) :
   rcases a with ⟨h₁, h₂⟩
   assumption
 
-NewTactic constructor intro rw assumption rcases simp tauto trivial
-
+DisabledTactic tauto
 NewLemma Subset.antisymm Subset.antisymm_iff empty_subset
 
 end MySet

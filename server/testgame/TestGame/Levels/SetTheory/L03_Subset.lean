@@ -2,7 +2,6 @@ import TestGame.Metadata
 
 import Mathlib.Init.Set
 import Mathlib.Tactic.Tauto
-import Mathlib
 
 set_option tactic.hygienic false
 
