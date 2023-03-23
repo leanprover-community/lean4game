@@ -1,11 +1,11 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib
-import TestGame.ToBePorted
+import Adam.ToBePorted
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Lean"
 Level 4
 

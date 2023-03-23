@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Init.Set
 import Mathlib.Tactic.Tauto
@@ -6,7 +6,7 @@ import Mathlib.Tactic.Tauto
 set_option tactic.hygienic false
 set_option autoImplicit false
 
-Game "TestGame"
+Game "Adam"
 World "SetTheory"
 Level 1
 

@@ -1,11 +1,11 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.LinearAlgebra.Span
 
 open Submodule
 
-Game "TestGame"
+Game "Adam"
 World "Module2"
 Level 6
 

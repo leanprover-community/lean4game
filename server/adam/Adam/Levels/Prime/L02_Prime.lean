@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Mathlib.Data.Nat.Prime
 
 import Std.Tactic.RCases
@@ -9,9 +9,9 @@ import Mathlib.Tactic.Ring
 
 -- import Data.Nat.Prime
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 
-Game "TestGame"
+Game "Adam"
 World "Prime"
 Level 2
 

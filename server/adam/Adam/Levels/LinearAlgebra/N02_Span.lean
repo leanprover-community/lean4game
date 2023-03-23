@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.Data.Real.Basic            -- definiert `ℝ`
@@ -11,7 +11,7 @@ import Mathlib
 
 open Submodule
 
-Game "TestGame"
+Game "Adam"
 World "Module2"
 Level 2
 

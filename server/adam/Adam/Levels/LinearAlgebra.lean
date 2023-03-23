@@ -1,27 +1,27 @@
-import TestGame.Levels.LinearAlgebra.L01_Module
-import TestGame.Levels.LinearAlgebra.L02_VectorNotation
-import TestGame.Levels.LinearAlgebra.L03_VectorNotation
-import TestGame.Levels.LinearAlgebra.L04_Submodule
-import TestGame.Levels.LinearAlgebra.L05_Submodule
-import TestGame.Levels.LinearAlgebra.L06_Span
-import TestGame.Levels.LinearAlgebra.L07_Span
-import TestGame.Levels.LinearAlgebra.L08_GeneratingSet
+import Adam.Levels.LinearAlgebra.L01_Module
+import Adam.Levels.LinearAlgebra.L02_VectorNotation
+import Adam.Levels.LinearAlgebra.L03_VectorNotation
+import Adam.Levels.LinearAlgebra.L04_Submodule
+import Adam.Levels.LinearAlgebra.L05_Submodule
+import Adam.Levels.LinearAlgebra.L06_Span
+import Adam.Levels.LinearAlgebra.L07_Span
+import Adam.Levels.LinearAlgebra.L08_GeneratingSet
 
-import TestGame.Levels.LinearAlgebra.M01_LinearMap
-import TestGame.Levels.LinearAlgebra.M02_LinearIndep
-import TestGame.Levels.LinearAlgebra.M04_Basis
+import Adam.Levels.LinearAlgebra.M01_LinearMap
+import Adam.Levels.LinearAlgebra.M02_LinearIndep
+import Adam.Levels.LinearAlgebra.M04_Basis
 
-import TestGame.Levels.LinearAlgebra.N01_Span
-import TestGame.Levels.LinearAlgebra.N02_Span
-import TestGame.Levels.LinearAlgebra.N03_Idempotent
-import TestGame.Levels.LinearAlgebra.N04_Idempotent
-import TestGame.Levels.LinearAlgebra.N05_Sum
-import TestGame.Levels.LinearAlgebra.N06_Sum
-import TestGame.Levels.LinearAlgebra.N07_Prod
-import TestGame.Levels.LinearAlgebra.N08_Prod
-import TestGame.Levels.LinearAlgebra.N09_Prod
+import Adam.Levels.LinearAlgebra.N01_Span
+import Adam.Levels.LinearAlgebra.N02_Span
+import Adam.Levels.LinearAlgebra.N03_Idempotent
+import Adam.Levels.LinearAlgebra.N04_Idempotent
+import Adam.Levels.LinearAlgebra.N05_Sum
+import Adam.Levels.LinearAlgebra.N06_Sum
+import Adam.Levels.LinearAlgebra.N07_Prod
+import Adam.Levels.LinearAlgebra.N08_Prod
+import Adam.Levels.LinearAlgebra.N09_Prod
 
-Game "TestGame"
+Game "Adam"
 World "Module"
 Title "Vektorraum"
 
@@ -32,10 +32,10 @@ einer Einführungsvorlesung antrifft: Man definiert ein \"Modul\" (Plural: Modul
 über einem Ring. Ein Modul über einem *Körper* wird dann auch \"Vektorraum\" genannt.
 "
 
-Game "TestGame"
+Game "Adam"
 World "Basis"
 Title "Lineare Abbildungen"
 
-Game "TestGame"
+Game "Adam"
 World "Module2"
 Title "Mehr Vektorräume"

@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.Contrapose
 import Mathlib.Tactic.Use
@@ -21,7 +21,7 @@ lemma even_square (n : ℕ) : even n → even (n ^ 2) := by
 
 def prime (n : ℕ) : Prop := (2 ≤ n) ∧ ∀ a b, n = a * b → a = 1 ∨ b = 1
 
-Game "TestGame"
+Game "Adam"
 World "Nat"
 Level 4
 

@@ -1,11 +1,11 @@
-import TestGame.Metadata
-import TestGame.Levels.SetTheory.L05_Empty
+import Adam.Metadata
+import Adam.Levels.SetTheory.L05_Empty
 
 import Mathlib.Data.Set.Basic
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "SetTheory"
 Level 6
 

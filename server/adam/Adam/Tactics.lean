@@ -1,5 +1,5 @@
 import Lean
--- import TestGame.MyNat
+-- import Adam.MyNat
 
 open Lean Elab Tactic
 

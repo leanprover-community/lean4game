@@ -1,12 +1,12 @@
-import TestGame.Metadata
+import Adam.Metadata
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 
-Game "TestGame"
+Game "Adam"
 World "Sum"
 Level 5
 

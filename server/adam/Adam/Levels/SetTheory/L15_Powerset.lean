@@ -1,12 +1,12 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Data.Set.Basic
 import Mathlib.Algebra.Parity
 import Mathlib.Tactic.Ring
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 
-Game "TestGame"
+Game "Adam"
 World "SetTheory2"
 Level 2
 

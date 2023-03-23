@@ -1,9 +1,9 @@
-import TestGame.Levels.Prime.L01_Dvd
--- import TestGame.Levels.Prime.L04_Prime
--- import TestGame.Levels.Prime.L05_Prime
--- import TestGame.Levels.Prime.L06_ExistsUnique
+import Adam.Levels.Prime.L01_Dvd
+-- import Adam.Levels.Prime.L04_Prime
+-- import Adam.Levels.Prime.L05_Prime
+-- import Adam.Levels.Prime.L06_ExistsUnique
 
-Game "TestGame"
+Game "Adam"
 World "Prime"
 Title "Teilbarkeit"
 

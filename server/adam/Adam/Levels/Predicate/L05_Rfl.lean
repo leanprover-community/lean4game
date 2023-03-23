@@ -1,6 +1,6 @@
-import TestGame.Metadata
+import Adam.Metadata
 
-Game "TestGame"
+Game "Adam"
 World "Predicate"
 Level 5
 

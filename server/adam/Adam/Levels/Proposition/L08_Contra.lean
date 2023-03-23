@@ -1,10 +1,10 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 
-Game "TestGame"
+Game "Adam"
 World "Proposition"
 Level 9
 

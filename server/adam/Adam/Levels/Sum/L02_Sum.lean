@@ -1,11 +1,11 @@
-import TestGame.Metadata
+import Adam.Metadata
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 import Mathlib
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Sum"
 Level 2
 

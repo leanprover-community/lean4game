@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.Contrapose
 import Mathlib.Tactic.Use
@@ -8,7 +8,7 @@ import Mathlib.Algebra.Parity
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Predicate"
 Level 6
 

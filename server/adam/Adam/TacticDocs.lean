@@ -1,5 +1,5 @@
 import GameServer.Commands
-import TestGame.Tactics
+import Adam.Tactics
 
 TacticDoc assumption
 "

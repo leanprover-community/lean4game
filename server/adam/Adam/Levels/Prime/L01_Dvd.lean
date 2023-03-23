@@ -1,9 +1,9 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Tactic.Ring
 import Mathlib
 
-Game "TestGame"
+Game "Adam"
 World "Prime"
 Level 1
 

@@ -1,13 +1,13 @@
-import TestGame.Metadata
+import Adam.Metadata
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
 
-import TestGame.ToBePorted
-import TestGame.Options.ArithSum
+import Adam.ToBePorted
+import Adam.Options.ArithSum
 
-Game "TestGame"
+Game "Adam"
 World "Sum"
 Level 6
 

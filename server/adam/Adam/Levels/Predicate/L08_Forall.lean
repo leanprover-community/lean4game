@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.Contrapose
 import Mathlib.Tactic.Use
@@ -7,7 +7,7 @@ import Mathlib.Tactic.Ring
 import Mathlib.Algebra.Parity
 import Mathlib
 
-Game "TestGame"
+Game "Adam"
 World "Predicate"
 Level 8
 

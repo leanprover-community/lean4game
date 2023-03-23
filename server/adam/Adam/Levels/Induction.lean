@@ -1,5 +1,5 @@
-import TestGame.Levels.Induction.L01_Induction
+import Adam.Levels.Induction.L01_Induction
 
-Game "TestGame"
+Game "Adam"
 World "Induction"
 Title "Übungen Induktions"

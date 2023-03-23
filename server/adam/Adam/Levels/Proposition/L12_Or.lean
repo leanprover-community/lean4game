@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 
@@ -7,7 +7,7 @@ set_option tactic.hygienic false
 --set_option autoImplicit false
 
 
-Game "TestGame"
+Game "Adam"
 World "Proposition"
 Level 13
 

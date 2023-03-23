@@ -20,7 +20,7 @@ monacoSetup()
 const router = createHashRouter([
   {
     path: "/",
-    loader: () => redirect("/game/testgame")
+    loader: () => redirect("/game/adam")
   },
   {
     path: "/game/:gameId",

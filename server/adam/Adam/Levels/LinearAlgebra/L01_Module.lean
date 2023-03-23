@@ -1,13 +1,13 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Data.Real.Basic      -- definiert `ℝ`
 import Mathlib.Algebra.Module.Basic -- definiert `module`
 import Mathlib.Tactic.LibrarySearch
-import TestGame.StructInstWithHoles
+import Adam.StructInstWithHoles
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Module"
 Level 1
 

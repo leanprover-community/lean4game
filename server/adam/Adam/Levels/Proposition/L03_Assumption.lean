@@ -1,7 +1,7 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Mathlib.Data.Nat.Basic -- TODO
 
-Game "TestGame"
+Game "Adam"
 World "Proposition"
 Level 4
 

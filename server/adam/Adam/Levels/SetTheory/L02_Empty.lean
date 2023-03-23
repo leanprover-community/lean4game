@@ -1,11 +1,11 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Init.Set
 import Mathlib.Tactic.Tauto
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "SetTheory"
 Level 2
 

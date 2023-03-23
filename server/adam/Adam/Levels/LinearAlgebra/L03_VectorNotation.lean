@@ -1,11 +1,11 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Data.Real.Basic            -- definiert `ℝ`
 import Mathlib.Algebra.Module.Pi          -- definiert `Module ℚ (fin 2 → ℚ)`
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Tactic.FinCases
 
-Game "TestGame"
+Game "Adam"
 World "Module"
 Level 3
 

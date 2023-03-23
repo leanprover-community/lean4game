@@ -1,11 +1,11 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 import Mathlib
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Implication"
 Level 13
 

@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.Data.Real.Basic            -- definiert `ℝ`
@@ -10,7 +10,7 @@ import Mathlib.LinearAlgebra.Span
 import Mathlib.Tactic.LibrarySearch
 import Mathlib
 
-Game "TestGame"
+Game "Adam"
 World "Module"
 Level 7
 

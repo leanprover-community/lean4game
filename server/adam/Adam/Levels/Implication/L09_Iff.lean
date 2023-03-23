@@ -1,8 +1,8 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.Cases
 
-Game "TestGame"
+Game "Adam"
 World "Implication"
 Level 9
 

@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib
 import Duper.Tactic
@@ -8,7 +8,7 @@ import Mathlib.Order.Disjoint
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "SetTheory"
 Level 4
 

@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.Data.Real.Basic            -- definiert `ℝ`
@@ -8,7 +8,7 @@ import Mathlib.Tactic.FinCases
 import Mathlib.Algebra.BigOperators.Finsupp -- default?
 import Mathlib.LinearAlgebra.Span
 
-Game "TestGame"
+Game "Adam"
 World "Module"
 Level 8
 

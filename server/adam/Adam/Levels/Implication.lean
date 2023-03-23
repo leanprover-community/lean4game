@@ -1,18 +1,18 @@
-import TestGame.Levels.Implication.L01_Intro
-import TestGame.Levels.Implication.L02_Revert
-import TestGame.Levels.Implication.L03_Apply
-import TestGame.Levels.Implication.L04_Apply
-import TestGame.Levels.Implication.L05_Apply
-import TestGame.Levels.Implication.L06_Iff
-import TestGame.Levels.Implication.L07_Rw
-import TestGame.Levels.Implication.L08_Iff
-import TestGame.Levels.Implication.L09_Iff
-import TestGame.Levels.Implication.L10_Apply
-import TestGame.Levels.Implication.L11_ByCases
-import TestGame.Levels.Implication.L12_Rw
-import TestGame.Levels.Implication.L13_Summary
+import Adam.Levels.Implication.L01_Intro
+import Adam.Levels.Implication.L02_Revert
+import Adam.Levels.Implication.L03_Apply
+import Adam.Levels.Implication.L04_Apply
+import Adam.Levels.Implication.L05_Apply
+import Adam.Levels.Implication.L06_Iff
+import Adam.Levels.Implication.L07_Rw
+import Adam.Levels.Implication.L08_Iff
+import Adam.Levels.Implication.L09_Iff
+import Adam.Levels.Implication.L10_Apply
+import Adam.Levels.Implication.L11_ByCases
+import Adam.Levels.Implication.L12_Rw
+import Adam.Levels.Implication.L13_Summary
 
-Game "TestGame"
+Game "Adam"
 World "Implication"
 Title "Aussagenlogik 2"
 

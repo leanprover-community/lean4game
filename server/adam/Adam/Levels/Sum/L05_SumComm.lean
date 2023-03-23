@@ -1,16 +1,16 @@
-import TestGame.Metadata
+import Adam.Metadata
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
 
-import TestGame.Options.ArithSum
+import Adam.Options.ArithSum
 
 set_option tactic.hygienic false
 
 open BigOperators
 
-Game "TestGame"
+Game "Adam"
 World "Sum"
 Level 5
 

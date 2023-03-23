@@ -1,8 +1,8 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib
 
-Game "TestGame"
+Game "Adam"
 World "Inequality"
 Level 1
 

@@ -7,9 +7,9 @@ import * as rpc from 'vscode-ws-jsonrpc';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 
 const games = {
-    testgame: {
-        name: "TestGame",
-        module: "TestGame",
+    adam: {
+        name: "Adam",
+        module: "Adam",
         queueLength: 5
     },
     nng: {

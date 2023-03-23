@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Order.SymmDiff
 import Mathlib.Logic.Function.Iterate
@@ -14,7 +14,7 @@ import Mathlib
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "SetTheory"
 Level 1
 

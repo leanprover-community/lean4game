@@ -1,10 +1,10 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Induction"
 Level 1
 

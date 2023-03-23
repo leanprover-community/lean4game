@@ -1,9 +1,9 @@
-import TestGame.Levels.Lean.L01_Type
-import TestGame.Levels.Lean.L02_Universe
-import TestGame.Levels.Lean.L03_ImplicitArguments
-import TestGame.Levels.Lean.L04_InstanceArguments
+import Adam.Levels.Lean.L01_Type
+import Adam.Levels.Lean.L02_Universe
+import Adam.Levels.Lean.L03_ImplicitArguments
+import Adam.Levels.Lean.L04_InstanceArguments
 
-Game "TestGame"
+Game "Adam"
 World "Lean"
 Title "Lean"
 

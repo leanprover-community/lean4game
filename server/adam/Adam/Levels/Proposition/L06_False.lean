@@ -1,8 +1,8 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 
-Game "TestGame"
+Game "Adam"
 World "Proposition"
 Level 7
 

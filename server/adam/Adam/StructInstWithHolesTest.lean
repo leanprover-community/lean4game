@@ -1,4 +1,4 @@
-import TestGame.StructInstWithHoles
+import Adam.StructInstWithHoles
 import Mathlib
 
 

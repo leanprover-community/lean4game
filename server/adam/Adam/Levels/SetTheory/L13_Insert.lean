@@ -1,8 +1,8 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Data.Set.Basic
 
-Game "TestGame"
+Game "Adam"
 World "SetTheory"
 Level 13
 

@@ -1,8 +1,8 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Implication"
 Level 8
 

@@ -1,11 +1,11 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Data.Real.Basic           -- definiert `ℝ`
 import Mathlib.Algebra.Module.LinearMap -- definiert `→ₗ`
 import Mathlib.Tactic.FinCases
 import Mathlib.Data.Fin.VecNotation
 
-Game "TestGame"
+Game "Adam"
 World "Basis"
 Level 1
 

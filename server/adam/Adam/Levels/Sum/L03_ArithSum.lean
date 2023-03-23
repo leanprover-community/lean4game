@@ -1,13 +1,13 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Sum"
 Level 3
 

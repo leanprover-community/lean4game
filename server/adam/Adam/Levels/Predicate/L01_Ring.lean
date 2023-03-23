@@ -1,9 +1,9 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Mathlib.Tactic.Ring
 
 --set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Predicate"
 Level 1
 

@@ -1,10 +1,10 @@
-import TestGame.Metadata
+import Adam.Metadata
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
 
-Game "TestGame"
+Game "Adam"
 World "Sum"
 Level 4
 

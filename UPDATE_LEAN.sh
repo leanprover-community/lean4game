@@ -5,7 +5,7 @@ cd $(dirname $0)
 
 cd server
 
-cd testgame
+cd adam
 lake update
 
 cp lake-packages/mathlib/lean-toolchain lean-toolchain

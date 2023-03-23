@@ -1,5 +1,5 @@
-import TestGame.Metadata
-import TestGame.Levels.SetTheory.L04_SubsetEmpty
+import Adam.Metadata
+import Adam.Levels.SetTheory.L04_SubsetEmpty
 
 --import Mathlib.Data.Set.Basic
 import Mathlib.Init.Set
@@ -8,7 +8,7 @@ import Mathlib.Tactic.PushNeg
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "SetTheory"
 Level 5
 

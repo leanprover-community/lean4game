@@ -6,9 +6,9 @@ require GameServer from ".."/"leanserver"
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"@"master"
 
-package TestGame
+package Adam
 
 @[default_target]
-lean_lib TestGame {
+lean_lib Adam {
   moreLeanArgs := #["-DautoImplicit=false"]
 }

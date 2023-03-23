@@ -1,12 +1,12 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Mathlib.Tactic.PushNeg
 import Mathlib
 
 import Mathlib.Algebra.Parity
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 
-Game "TestGame"
+Game "Adam"
 World "Predicate"
 Level 9
 

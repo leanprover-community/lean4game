@@ -1,7 +1,7 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Mathlib.Tactic.Tauto
 
-Game "TestGame"
+Game "Adam"
 World "Proposition"
 Level 1
 

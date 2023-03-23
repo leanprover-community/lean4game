@@ -1,10 +1,10 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Tactic.LibrarySearch
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Inequality"
 Level 2
 

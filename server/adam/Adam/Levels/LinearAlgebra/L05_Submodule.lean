@@ -1,8 +1,8 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Mathlib.Algebra.Module.Submodule.Lattice
 
-Game "TestGame"
+Game "Adam"
 World "Module"
 Level 5
 

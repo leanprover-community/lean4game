@@ -1,7 +1,7 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Mathlib.Tactic.Ring
 
-Game "TestGame"
+Game "Adam"
 World "Function"
 Level 1
 

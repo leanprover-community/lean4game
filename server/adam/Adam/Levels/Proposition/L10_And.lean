@@ -1,9 +1,9 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Proposition"
 Level 11
 

@@ -1,11 +1,11 @@
-import TestGame.Levels.Contradiction.L01_Have
-import TestGame.Levels.Contradiction.L02_Suffices
-import TestGame.Levels.Contradiction.L03_ByContra
-import TestGame.Levels.Contradiction.L04_ByContra
-import TestGame.Levels.Contradiction.L05_Contrapose
-import TestGame.Levels.Contradiction.L06_Summary
+import Adam.Levels.Contradiction.L01_Have
+import Adam.Levels.Contradiction.L02_Suffices
+import Adam.Levels.Contradiction.L03_ByContra
+import Adam.Levels.Contradiction.L04_ByContra
+import Adam.Levels.Contradiction.L05_Contrapose
+import Adam.Levels.Contradiction.L06_Summary
 
-Game "TestGame"
+Game "Adam"
 World "Contradiction"
 Title "Widerspruch"
 

@@ -1,7 +1,7 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Mathlib
 
-Game "TestGame"
+Game "Adam"
 World "TestWorld"
 Level 1
 

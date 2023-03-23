@@ -1,4 +1,4 @@
-import TestGame.Metadata
+import Adam.Metadata
 import Std.Tactic.RCases
 import Mathlib.Tactic.LeftRight
 import Mathlib.Tactic.Contrapose
@@ -6,9 +6,9 @@ import Mathlib.Tactic.Use
 import Mathlib.Tactic.Ring
 import Mathlib
 
-import TestGame.ToBePorted
+import Adam.ToBePorted
 
-Game "TestGame"
+Game "Adam"
 World "Contradiction"
 Level 4
 

@@ -1,25 +1,25 @@
-import TestGame.Metadata
+import Adam.Metadata
 
-import TestGame.Levels.Proposition
-import TestGame.Levels.Implication
-import TestGame.Levels.Predicate
-import TestGame.Levels.Contradiction
--- import TestGame.Levels.Prime
-import TestGame.Levels.Sum
--- import TestGame.Levels.Induction
+import Adam.Levels.Proposition
+import Adam.Levels.Implication
+import Adam.Levels.Predicate
+import Adam.Levels.Contradiction
+-- import Adam.Levels.Prime
+import Adam.Levels.Sum
+-- import Adam.Levels.Induction
 
-import TestGame.Levels.Numbers
-import TestGame.Levels.Inequality
+import Adam.Levels.Numbers
+import Adam.Levels.Inequality
 
-import TestGame.Levels.Lean
-import TestGame.Levels.SetTheory
-import TestGame.Levels.Function
-import TestGame.Levels.SetFunction
-import TestGame.Levels.LinearAlgebra
+import Adam.Levels.Lean
+import Adam.Levels.SetTheory
+import Adam.Levels.Function
+import Adam.Levels.SetFunction
+import Adam.Levels.LinearAlgebra
 
 
 
-Game "TestGame"
+Game "Adam"
 Title "Lean 4 game"
 Introduction
 "

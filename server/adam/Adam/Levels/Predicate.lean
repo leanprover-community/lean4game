@@ -1,14 +1,14 @@
-import TestGame.Levels.Predicate.L01_Ring
-import TestGame.Levels.Predicate.L02_Rewrite
-import TestGame.Levels.Predicate.L03_Rewrite
-import TestGame.Levels.Predicate.L04_Ring
-import TestGame.Levels.Predicate.L05_Rfl
-import TestGame.Levels.Predicate.L06_Exists
-import TestGame.Levels.Predicate.L07_Exists
-import TestGame.Levels.Predicate.L08_Forall
-import TestGame.Levels.Predicate.L09_PushNeg
+import Adam.Levels.Predicate.L01_Ring
+import Adam.Levels.Predicate.L02_Rewrite
+import Adam.Levels.Predicate.L03_Rewrite
+import Adam.Levels.Predicate.L04_Ring
+import Adam.Levels.Predicate.L05_Rfl
+import Adam.Levels.Predicate.L06_Exists
+import Adam.Levels.Predicate.L07_Exists
+import Adam.Levels.Predicate.L08_Forall
+import Adam.Levels.Predicate.L09_PushNeg
 
-Game "TestGame"
+Game "Adam"
 World "Predicate"
 Title "Prädikate"
 

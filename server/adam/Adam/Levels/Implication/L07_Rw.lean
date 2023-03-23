@@ -1,11 +1,11 @@
-import TestGame.Metadata
+import Adam.Metadata
 
 import Init.Data.ToString
 -- #check List UInt8
 
 set_option tactic.hygienic false
 
-Game "TestGame"
+Game "Adam"
 World "Implication"
 Level 7
 
