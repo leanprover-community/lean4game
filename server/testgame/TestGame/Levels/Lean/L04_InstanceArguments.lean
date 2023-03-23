@@ -1,7 +1,7 @@
 import TestGame.Metadata
 
 import Mathlib
-import TestGame.Options.BigOperators
+import TestGame.ToBePorted
 
 set_option tactic.hygienic false
 

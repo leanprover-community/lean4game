@@ -1,6 +1,6 @@
 import TestGame.Metadata
 
-import TestGame.Options.BigOperators
+import TestGame.ToBePorted
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
 

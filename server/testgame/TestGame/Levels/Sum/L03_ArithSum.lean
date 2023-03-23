@@ -3,7 +3,7 @@ import TestGame.Metadata
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Ring
 
-import TestGame.Options.BigOperators
+import TestGame.ToBePorted
 
 set_option tactic.hygienic false
 

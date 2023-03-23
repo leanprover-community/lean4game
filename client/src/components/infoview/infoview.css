@@ -4,9 +4,9 @@
   padding: 5px 10px;
   border-radius: 3px 3px 3px 3px;
 }
-.message.information {
-  color: #059;
-  background-color: #BEF;
+.message.info {
+  /* color: #059; */
+  background-color: #DDF6FF;
 }
 .message.warning {
   color: #9F6000;

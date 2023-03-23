@@ -74,13 +74,14 @@ Statement
   · Hint "**Robo**: Jetzt musst du alle eigenschaften eines $\\mathbb\{Q}$-Moduls zeigen,
     das sind also 6 einzelne Goals."
     intro b
-    Hint "**Robo**: Mit `change (1 : ℚ) * b = b` kannst du das Goal umschreiben, damit
+    Hint "**Robo**: Mit `change (1 : ℚ) * {b} = {b}` kannst du das Goal umschreiben, damit
     dann andere Taktiken besser damit arbeiten können."
     change (1 : ℚ) * b = b
     Hint "**Robo**: Den Teil kannst du mit `simp` beweisen."
     simp
   · intro x y b
     Hint "**Robo**: Benutze `change` um `•` durch `*` zu ersetzen."
+    Hint (hidden := true) "**Robo**: Explizit `change ({x} * {y} : ℚ) * {b} = {x} * ({y} * {b})`"
     change (x * y : ℚ) * b = x * (y * b)
     Hint "**Robo**: Mit `simp` und `ring` kannst du den Rest beweisen."
     simp
@@ -88,13 +89,17 @@ Statement
   · intro a
     simp
   · intro a x y
+    Hint (hidden := true) "**Robo**: Explizit `change {a} * ({x} + {y}) = {a} * {x} + {a} * {y}`"
     change a * (x + y) = a * x + a * y
     ring
   · intro r s x
+    Hint (hidden := true) "**Robo**: Explizit
+    `change ({r} + {s} : ℚ) * {x} = {r} * {x} + {s} * {x}`"
     change (r + s : ℚ) * x = r * x + s * x
     simp
     ring
   · intro a
+    Hint (hidden := true) "**Robo**: Explizit `change (0 : ℚ) * {a} = 0`"
     change (0 : ℚ) * a = 0
     simp
 

@@ -179,9 +179,9 @@ function PlayableLevel({worldId, levelId}) {
     <Split minSize={0} snapOffset={200} sizes={[50, 25, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
       <div className="exercise-panel">
         <div ref={introductionPanelRef} className="introduction-panel">
-          <Alert severity="info" sx={{ mt: 1 }}>
+          <div className="message info">
             <Markdown>{level?.data?.introduction}</Markdown>
-          </Alert>
+          </div>
         </div>
         <div className="exercise">
           {/* <h4>Aufgabe:</h4> */}
@@ -205,9 +205,9 @@ function PlayableLevel({worldId, levelId}) {
         </EditorContext.Provider>
 
         {completed && <div className="conclusion">
-          <Alert severity="info" sx={{ mt: 1 }}>
+          <div className="message info">
             <Markdown>{level?.data?.conclusion}</Markdown>
-          </Alert>
+          </div>
           {levelId >= gameInfo.data?.worldSize[worldId] ?
           <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button> :
           <Button to={`/world/${worldId}/level/${levelId + 1}`}>
@@ -237,11 +237,11 @@ function Introduction({worldId}) {
     <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Einführung" worldId={worldId} levelId={0} />
     <div style={gameInfo.isLoading ? {display: "none"} : null} className="exercise-panel">
       <div className="introduction-panel">
-        <Alert severity="info" sx={{ mt: 1 }}>
+        <div className="message info">
           <Markdown>
             {gameInfo.data?.worlds.nodes[worldId].introduction}
           </Markdown>
-        </Alert>
+        </div>
       </div>
       <div className="conclusion">
         {0 == gameInfo.data?.worldSize[worldId] ?

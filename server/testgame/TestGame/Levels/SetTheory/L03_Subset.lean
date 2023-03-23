@@ -16,18 +16,17 @@ Introduction
 "
 Ihr bemerkt, dass mit dem Jungen noch zwei andere
 Kinder zuhörten. Eines der beiden Mädchen hat ebenfalls eine Frage.
-
-
-Hat man zwei Mengen `(A B : Set ℕ)` kann man fragen, ob diese Teilmengen
-voneinander sind: `A ⊆ B` (`\\sub`/`\\ss`) ist die Notation für Teilmengen, die auch gleich
-sein können.
-
-`A ⊆ B` ist als `∀ x, x ∈ A → x ∈ B` definiert, das heisst, ein `⊆` kann immer auch mit `intro x hx`
-angegangen werden.
-
-Die Taktik `tauto` macht das automatisch, aber um dies zu lernen ist `tauto` hier deaktiviert.
-Benutze also `intro`:
 "
+
+-- Hat man zwei Mengen `(A B : Set ℕ)` kann man fragen, ob diese Teilmengen
+-- voneinander sind: `A ⊆ B` (`\\sub`/`\\ss`) ist die Notation für Teilmengen, die auch gleich
+-- sein können.
+
+-- `A ⊆ B` ist als `∀ x, x ∈ A → x ∈ B` definiert, das heisst, ein `⊆` kann immer auch mit `intro x hx`
+-- angegangen werden.
+
+-- Die Taktik `tauto` macht das automatisch, aber um dies zu lernen ist `tauto` hier deaktiviert.
+-- Benutze also `intro`:
 
 namespace MySet
 

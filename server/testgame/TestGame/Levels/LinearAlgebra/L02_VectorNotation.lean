@@ -15,30 +15,14 @@ Title "Konkrete Vektorräume"
 
 Introduction
 "
-Häufig in der linearen Algebra hat man ganz einfach Vektoren über `ℚ` oder `ℝ`
-und möchte diese explizit definieren.
-
-Reele Vektorräume definiert man in Lean am besten als Funktion von einem Indexset.
-
-So ist `Fin 2` eine Menge, die nur `0` und `1` enthält
-und `ℚ²` wird als `Fin 2 → ℚ` definiert. Hier machen wir uns eine
-lokale notation dafür:
+Den $\\mathbb{Q}$-Vektorraum $\\mathbb{Q}^3$ definiert man am besten mit
+der lokalen Notation
 
 ```
-notation `ℚ²` := Fin 2 → ℚ
+local notation `ℚ³` := Fin 3 → ℚ
 ```
 
-Das mag auf den ersten Blick etwas unintuitiv erscheinen, hat aber den Vorteil,
-dass man die ganze
-Infrastruktur für Funktionen einfach direkt für Vektoren und
-Matrizen mitgebrauchen kann.
-
-Wir können uns auch noch ein paar andere standardmässige `ℚ`-Vektorräume definieren.
-
-```
-notation \"ℚ³\" => Fin 3 → ℚ
-notation \"ℚ^(\" n \")\" => (Fin n) → ℚ
-```
+Dabei ist `Fin 3` die Indexmenge $\\{0, 1, 2\\}$.
 
 Die schreibweise für einen Vektor ist `![ _, _ ]`. Zu beachten ist,
 dass man bei Zahlen explizit einen Typ angeben muss, sonst denkt sich
@@ -61,8 +45,8 @@ Dann eine Vektorgleichung komponentenweise aufteilt.
 Für jede Komponente kann man dann mit `simp` und `ring` weiterkommen.
 "
 
-notation "ℚ³" => Fin 3 → ℚ
-notation "ℚ^(" n ")" => (Fin n) → ℚ
+local notation "ℚ³" => Fin 3 → ℚ
+local notation "ℚ^(" n ")" => (Fin n) → ℚ
 
 Statement
 ""
