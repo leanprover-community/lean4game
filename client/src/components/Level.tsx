@@ -76,8 +76,9 @@ function PlayableLevel({worldId, levelId}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const introductionPanelRef = useRef<HTMLDivElement>(null)
 
-  const initialCode = useAppSelector(selectCode(worldId, levelId))
-  const initialSelections = useAppSelector(selectSelections(worldId, levelId))
+  const gameId = React.useContext(GameIdContext)
+  const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
+  const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
 
   const [commandLineMode, setCommandLineMode] = useState(true)
   const [commandLineInput, setCommandLineInput] = useState("")
@@ -126,14 +127,13 @@ function PlayableLevel({worldId, levelId}) {
     }]);
   }
 
-  const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
 
   const dispatch = useAppDispatch()
 
   const onDidChangeContent = (code) => {
-    dispatch(codeEdited({world: worldId, level: levelId, code}))
+    dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code}))
 
     setCanUndo(code.trim() !== "")
   }
@@ -142,10 +142,10 @@ function PlayableLevel({worldId, levelId}) {
     const selections = monacoSelections.map(
       ({selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}) =>
       {return {selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}})
-    dispatch(changedSelection({world: worldId, level: levelId, selections}))
+    dispatch(changedSelection({game: gameId, world: worldId, level: levelId, selections}))
   }
 
-  const completed = useAppSelector(selectCompleted(worldId, levelId))
+  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
   const {editor, infoProvider, editorConnection} =
     useLevelEditor(worldId, levelId, codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
@@ -408,7 +408,7 @@ function useLoadWorldFiles(worldId) {
         if (model) {
           models.push(model)
         } else {
-          const code = selectCode(worldId, levelId)(store.getState())
+          const code = selectCode(gameId, worldId, levelId)(store.getState())
           models.push(monaco.editor.createModel(code, 'lean4', uri))
         }
       }

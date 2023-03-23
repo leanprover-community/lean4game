@@ -19,10 +19,12 @@ import { WithRpcSessions } from '../../../../node_modules/lean4-infoview/src/inf
 import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infoview/serverVersion';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { levelCompleted, selectCompleted } from '../../state/progress';
+import { GameIdContext } from '../../App';
 
 
 export function Main(props: {world: string, level: number}) {
     const ec = React.useContext(EditorContext);
+    const gameId = React.useContext(GameIdContext)
 
     const dispatch = useAppDispatch()
 
@@ -33,13 +35,13 @@ export function Main(props: {world: string, level: number}) {
 
             if (ec.events.changedCursorLocation.current &&
                 ec.events.changedCursorLocation.current.uri === params.uri) {
-                dispatch(levelCompleted({world: props.world, level: props.level}))
+                dispatch(levelCompleted({game: gameId, world: props.world, level: props.level}))
             }
         },
         []
     );
 
-    const completed = useAppSelector(selectCompleted(props.world, props.level))
+    const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
 
     /* Set up updates to the global infoview state on editor events. */
     const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;

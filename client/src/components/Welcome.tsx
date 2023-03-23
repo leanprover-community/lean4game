@@ -19,7 +19,7 @@ import { GameIdContext } from '../App';
 
 function LevelIcon({ worldId, levelId, position }) {
   const gameId = React.useContext(GameIdContext)
-  const completed = useSelector(selectCompleted(worldId,levelId))
+  const completed = useSelector(selectCompleted(gameId, worldId,levelId))
   // TODO: relative positioning?
   return (
     <Link to={`/game/${gameId}/${worldId}/level/${levelId}`} key={`/game/${gameId}/world/${worldId}/level/${levelId}`}>
