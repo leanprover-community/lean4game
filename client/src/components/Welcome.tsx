@@ -14,13 +14,15 @@ import { useGetGameInfoQuery } from '../state/api';
 import { Link } from 'react-router-dom';
 import Markdown from './Markdown';
 import { selectCompleted } from '../state/progress';
+import { GameIdContext } from '../App';
 
 
 function LevelIcon({ worldId, levelId, position }) {
+  const gameId = React.useContext(GameIdContext)
   const completed = useSelector(selectCompleted(worldId,levelId))
   // TODO: relative positioning?
   return (
-    <Link to={`/world/${worldId}/level/${levelId}`} key={`/world/${worldId}/level/${levelId}`}>
+    <Link to={`/game/${gameId}/${worldId}/level/${levelId}`} key={`/game/${gameId}/world/${worldId}/level/${levelId}`}>
       <circle fill={completed ? "green" :"#aaa"} cx={position.x + Math.sin(levelId/5) * 9} cy={position.y - Math.cos(levelId/5) * 9} r="0.8" />
     </Link>
   )
@@ -29,7 +31,8 @@ function LevelIcon({ worldId, levelId, position }) {
 function Welcome() {
   const navigate = useNavigate();
 
-  const gameInfo = useGetGameInfoQuery()
+  const gameId = React.useContext(GameIdContext)
+  const gameInfo = useGetGameInfoQuery({game: gameId})
 
   const { nodes, bounds }: any = gameInfo.data ? computeWorldLayout(gameInfo.data?.worlds) : {nodes: []}
 
@@ -55,7 +58,7 @@ function Welcome() {
       let position: cytoscape.Position = nodes[id].position
 
       svgElements.push(
-        <Link key={`world${id}`} to={`/world/${id}/level/0`}>
+        <Link key={`world${id}`} to={`/game/${gameId}/world/${id}/level/0`}>
           <circle className="world-circle" cx={position.x} cy={position.y} r="8" />
           <text className="world-name"
             x={position.x} y={position.y}>{nodes[id].data.title ? nodes[id].data.title : id}</text>

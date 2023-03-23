@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import Markdown from './Markdown';
 import { useLoadDocQuery, ComputedInventoryItem } from '../state/api';
+import { GameIdContext } from '../App';
 
 export function Inventory({ tactics, lemmas, definitions, setInventoryDoc } :
   {lemmas: ComputedInventoryItem[],
@@ -77,8 +78,8 @@ function InventoryItem({name, displayName, locked, disabled, showDoc}) {
 }
 
 export function Documentation({name, type}) {
-
-  const doc = useLoadDocQuery({type: type, name: name})
+  const gameId = React.useContext(GameIdContext)
+  const doc = useLoadDocQuery({game: gameId, type: type, name: name})
 
   return <>
     <h2 className="doc">{doc.data?.displayName}</h2>

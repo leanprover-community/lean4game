@@ -8,7 +8,7 @@ unsafe def main : List String → IO UInt32 := fun args => do
   Lean.enableInitializersExecution
 
   if args[0]? == some "--server" then
-    MyServer.Watchdog.watchdogMain []
+    MyServer.Watchdog.watchdogMain args
   else if args[0]? == some "--worker" then
     MyServer.FileWorker.workerMain {}
   else

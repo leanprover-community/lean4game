@@ -6,6 +6,18 @@ import * as url from 'url';
 import * as rpc from 'vscode-ws-jsonrpc';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 
+const games = {
+    testgame: {
+        name: "TestGame",
+        module: "TestGame",
+        queueLength: 5
+    },
+    nng: {
+        name: "NNG",
+        module: "NNG",
+        queueLength: 5
+    }
+}
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -23,23 +35,18 @@ const wss = new WebSocketServer({ server })
 const environment = process.env.NODE_ENV
 const isDevelopment = environment === 'development'
 
-let cmd, cmdArgs, cwd;
-if (isDevelopment) {
-    cmd = "./gameserver";
-    cmdArgs = ["--server"];
-    cwd = "./leanserver/build/bin/"
-} else{
-    cmd = "docker";
-    cmdArgs = ["run", "--runtime=runsc", "--network=none", "--rm", "-i", "testgame:latest"];
-    cwd = "."
-}
-
-/** We keep a queue of started Lean Server processes to be ready when a user arrives */
-const queue = []
+/** We keep queues of started Lean Server processes to be ready when a user arrives */
+const queue = {}
 const queueLength = 5
 
-function startServerProcess() {
-    const serverProcess = cp.spawn(cmd, cmdArgs, { cwd })
+function startServerProcess(gameId) {
+    const serverProcess = isDevelopment
+        ? cp.spawn("./gameserver",
+            ["--server", gameId, games[gameId].module, games[gameId].name],
+            { cwd: "./leanserver/build/bin/" })
+        : cp.spawn("docker",
+            ["run", "--runtime=runsc", "--network=none", "--rm", "-i", `${gameId}:latest`],
+            { cwd: "." })
     serverProcess.on('error', error =>
         console.error(`Launching Lean Server failed: ${error}`)
     );
@@ -52,22 +59,32 @@ function startServerProcess() {
 }
 
 /** start Lean Server processes to refill the queue */
-function fillQueue() {
-    while (queue.length < queueLength) {
-        const serverProcess = startServerProcess()
-        queue.push(serverProcess)
+function fillQueue(gameId) {
+    while (queue[gameId].length < games[gameId].queueLength) {
+        const serverProcess = startServerProcess(gameId)
+        queue[gameId].push(serverProcess)
     }
 }
 
-fillQueue()
+for (let gameId in games) {
+    queue[gameId] = []
+    fillQueue(gameId)
+}
 
-wss.addListener("connection", function(ws) {
+const urlRegEx = new RegExp("^/websocket/(.*)$")
+
+wss.addListener("connection", function(ws, req) {
+    const reRes = urlRegEx.exec(req.url)
+    if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
+    const gameId = reRes[1]
+    if (!games[gameId]) { console.error(`Unknown game: ${gameId}`); return; }
+
     let ps;
     if (isDevelopment) { // Don't use queue in development
-        ps = startServerProcess()
+        ps = startServerProcess(gameId)
     } else {
-        ps = queue.shift() // Pick the first Lean process; it's likely to be ready immediately
-        fillQueue()
+        ps = queue[gameId].shift() // Pick the first Lean process; it's likely to be ready immediately
+        fillQueue(gameId)
     }
 
     const socket = {

@@ -12,4 +12,4 @@ RUN rm -f ./build/bin/gameserver
 RUN lake build
 
 WORKDIR /leanserver/build/bin/
-CMD ["./gameserver", "--server"]
+CMD ["./gameserver", "--server", "testgame", "TestGame", "TestGame"]

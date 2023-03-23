@@ -83,9 +83,9 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
   let fw ← findFileWorker! m.uri
   -- let s ← get
   let c ← read
-  let some lvl ← GameServer.getLevelByFileName? ((System.Uri.fileUriToPath? m.uri).getD m.uri |>.toString)
+  let some lvl ← GameServer.getLevelByFileName? c.initParams ((System.Uri.fileUriToPath? m.uri).getD m.uri |>.toString)
     | do
-      c.hLog.putStr s!"Level not found: {m.uri}"
+      c.hLog.putStr s!"Level not found: {m.uri} {c.initParams.rootUri?}"
       c.hLog.flush
   -- Send an extra notification to the file worker to inform it about the level data
   fw.stdin.writeLspNotification {
