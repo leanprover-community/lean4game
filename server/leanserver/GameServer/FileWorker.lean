@@ -113,7 +113,7 @@ where addErrorMessage (info : SourceInfo) (s : MessageData) :=
 
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool)
-    (couldBeEndSnap : Bool) (levelParams : Game.DidOpenLevelParams) : IO Snapshot := do
+    (couldBeEndSnap : Bool) (levelParams : Game.DidOpenLevelParams) (initParams : Lsp.InitializeParams): IO Snapshot := do
   -- Recognize end snap
   if inputCtx.input.atEnd snap.mpState.pos ∧ couldBeEndSnap then
     let endSnap : Snapshot := {
@@ -142,7 +142,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
   let (output, _) ← IO.FS.withIsolatedStreams (isolateStderr := server.stderrAsMessages.get snap.cmdState.scopes.head!.opts) <| liftM (m := BaseIO) do
     Elab.Command.catchExceptions
       (getResetInfoTrees *> do
-        let some level ← GameServer.getLevelByFileName? inputCtx.fileName
+        let some level ← GameServer.getLevelByFileName? initParams inputCtx.fileName
           | throwError "Level not found: {inputCtx.fileName}"
         let scope := level.scope
 
@@ -244,7 +244,8 @@ where
     hOut.writeLspNotification { method := "$/game/completed", param }
 
   /-- Elaborates the next command after `parentSnap` and emits diagnostics into `hOut`. -/
-  private def nextSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken) (levelParams : Game.DidOpenLevelParams)
+  private def nextSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken)
+      (levelParams : Game.DidOpenLevelParams) (initParams : Lsp.InitializeParams)
       : AsyncElabM (Option Snapshot) := do
     cancelTk.check
     let s ← get
@@ -261,7 +262,8 @@ where
     -- Make sure that there is at least one snap after the head snap, so that
     -- we can see the current goal even on an empty document
     let couldBeEndSnap := s.snaps.size > 1
-    let snap ← compileProof m.mkInputContext lastSnap ctx.clientHasWidgets couldBeEndSnap levelParams
+    let snap ← compileProof m.mkInputContext lastSnap ctx.clientHasWidgets couldBeEndSnap
+      levelParams initParams
     set { s with snaps := s.snaps.push snap }
     -- TODO(MH): check for interrupt with increased precision
     cancelTk.check
@@ -299,7 +301,7 @@ where
       publishIleanInfoUpdate m ctx.hOut snaps
       return AsyncList.ofList snaps.toList ++ AsyncList.delayed (← EIO.asTask (ε := ElabTaskError) (prio := .dedicated) do
         IO.sleep startAfterMs
-        AsyncList.unfoldAsync (nextSnap ctx m cancelTk levelParams) { snaps })
+        AsyncList.unfoldAsync (nextSnap ctx m cancelTk levelParams ctx.initParams) { snaps })
 
 end Elab
 
@@ -362,8 +364,9 @@ section Initialization
     fileMap  := default
 
   def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
-    (levelModule : Name) : IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
-    let gameDir := "../../../testgame"
+    (levelModule : Name) (initParams : InitializeParams): IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
+    let some gameDir := GameServer.gameDirFromInitParams initParams
+      | throwServerError s!"Invalid rootUri: {initParams.rootUri?}"
 
     -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
     let out ← IO.Process.output
@@ -426,7 +429,8 @@ section Initialization
   def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
        (levelParams : Game.DidOpenLevelParams) : IO (WorkerContext × WorkerState) := do
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
-    let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets) levelParams.levelModule
+    let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)
+      levelParams.levelModule initParams
     let cancelTk ← CancelToken.new
     let ctx :=
       { hIn  := i
@@ -506,6 +510,7 @@ section MainLoop
     set st
     match msg with
     | Message.request id method (some params) =>
+      if method == "Game.getInteractiveGoals" then throwServerError "HELLO"
       handleRequest id method (toJson params)
       mainLoop levelParams
     | Message.notification "exit" none =>

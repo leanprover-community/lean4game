@@ -6,12 +6,17 @@ import { useState } from 'react';
 
 
 export class Connection {
-  private leanClient = null
+  private game: string = undefined // We only keep a connection to a single game at a time
+  private leanClient: LeanClient = null
 
-  getLeanClient(): LeanClient {
-    if (this.leanClient === null) {
-      const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/'
-
+  getLeanClient(game): LeanClient {
+    if (this.game !== game) {
+      if (this.leanClient) {
+        this.leanClient.stop() // Stop previous Lean client
+      }
+      this.game = game
+      // Start a new Lean client for the new `gameId`.
+      const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + game
       const uri = monaco.Uri.parse('file:///')
       this.leanClient = new LeanClient(socketUrl, undefined, uri, () => {})
     }
@@ -22,9 +27,9 @@ export class Connection {
   /** If not already started, starts the Lean client. resolves the returned promise as soon as a
    * Lean client is running.
    */
-  startLeanClient = () => {
+  startLeanClient = (game) => {
     return new Promise<LeanClient>((resolve) => {
-      const leanClient = this.getLeanClient()
+      const leanClient = this.getLeanClient(game)
       if (leanClient.isRunning()) {
         resolve(leanClient)
       } else {
@@ -47,8 +52,8 @@ export const connection = new Connection()
 
 export const ConnectionContext = React.createContext(null);
 
-export const useLeanClient = () => {
-  const leanClient = connection.getLeanClient()
+export const useLeanClient = (gameId) => {
+  const leanClient = connection.getLeanClient(gameId)
   const [leanClientStarted, setLeanClientStarted] = useState(leanClient.isStarted())
 
   React.useEffect(() => {

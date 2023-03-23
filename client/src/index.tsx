@@ -13,21 +13,26 @@ import ErrorPage from './ErrorPage';
 import Welcome from './components/Welcome';
 import Level from './components/Level';
 import { monacoSetup } from 'lean4web/client/src/monacoSetup';
+import { redirect } from 'react-router-dom';
 
 monacoSetup()
 
 const router = createHashRouter([
   {
     path: "/",
+    loader: () => redirect("/game/testgame")
+  },
+  {
+    path: "/game/:gameId",
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/",
+        path: "/game/:gameId",
         element: <Welcome />,
       },
       {
-        path: "/world/:worldId/level/:levelId",
+        path: "/game/:gameId/world/:worldId/level/:levelId",
         element: <Level />,
       },
     ],

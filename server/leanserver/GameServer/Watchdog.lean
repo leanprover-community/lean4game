@@ -1,6 +1,7 @@
 /- This file is mostly copied from `Lean/Server/Watchdog.lean`. -/
 import Lean
 import GameServer.Game
+import Lean.Server.Watchdog
 
 namespace MyServer.Watchdog
 open Lean
@@ -76,9 +77,7 @@ def initAndRunWatchdogAux : GameServerM Unit := do
     catch _ => pure (Message.notification "exit" none)
     | throwServerError "Got `shutdown` request, expected an `exit` notification"
 
-def createEnv : IO Environment := do
-  let gameDir := "../../../testgame"
-
+def createEnv (gameDir : String) (module : String) : IO Environment := do
   -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
   let out ← IO.Process.output
     { cwd := gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
@@ -93,11 +92,17 @@ def createEnv : IO Environment := do
   -- Set the search path
   Lean.searchPathRef.set paths
 
-  let gameName := `TestGame
-  let env ← importModules [{ module := `Init : Import }, { module := gameName : Import }] {} 0
+  let env ← importModules [{ module := `Init : Import }, { module := module : Import }] {} 0
   return env
 
 def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
+  if args.length < 4 then
+    throwServerError s!"Expected 3 command line arguments in addition to `--server`:
+      game directory, the name of the main module, and the name of the game"
+  let gameId := args[1]!
+  let gameDir := s!"../../../{gameId}"
+  let module := args[2]!
+  let gameName := args[3]!
   let workerPath := "./gameserver"
   -- TODO: Do the following commands slow us down?
   let srcSearchPath ← initSrcSearchPath (← getBuildDir)
@@ -106,8 +111,11 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
   let i ← maybeTee "wdIn.txt" false i
   let o ← maybeTee "wdOut.txt" true o
   let e ← maybeTee "wdErr.txt" true e
-  let state := {env := ← createEnv, game := `TestGame}
+  let state := {env := ← createEnv gameDir module, game := gameName}
   let initRequest ← i.readLspRequestAs "initialize" InitializeParams
+  -- We misuse the `rootUri` field to store gameId, module, and gameName
+  let rootUri? := s!"{gameId}/{module}/{gameName}"
+  let initRequest := {initRequest with param := {initRequest.param with rootUri?}}
   o.writeLspResponse {
     id     := initRequest.id
     result := {

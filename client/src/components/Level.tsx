@@ -40,6 +40,7 @@ import Markdown from './Markdown';
 
 import Split from 'react-split'
 import { Alert } from '@mui/material';
+import { GameIdContext } from '../App';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
 
@@ -75,8 +76,9 @@ function PlayableLevel({worldId, levelId}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const introductionPanelRef = useRef<HTMLDivElement>(null)
 
-  const initialCode = useAppSelector(selectCode(worldId, levelId))
-  const initialSelections = useAppSelector(selectSelections(worldId, levelId))
+  const gameId = React.useContext(GameIdContext)
+  const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
+  const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
 
   const [commandLineMode, setCommandLineMode] = useState(true)
   const [commandLineInput, setCommandLineInput] = useState("")
@@ -125,14 +127,13 @@ function PlayableLevel({worldId, levelId}) {
     }]);
   }
 
-  const gameInfo = useGetGameInfoQuery()
-
-  const level = useLoadLevelQuery({world: worldId, level: levelId})
+  const gameInfo = useGetGameInfoQuery({game: gameId})
+  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
 
   const dispatch = useAppDispatch()
 
   const onDidChangeContent = (code) => {
-    dispatch(codeEdited({world: worldId, level: levelId, code}))
+    dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code}))
 
     setCanUndo(code.trim() !== "")
   }
@@ -141,10 +142,10 @@ function PlayableLevel({worldId, levelId}) {
     const selections = monacoSelections.map(
       ({selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}) =>
       {return {selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}})
-    dispatch(changedSelection({world: worldId, level: levelId, selections}))
+    dispatch(changedSelection({game: gameId, world: worldId, level: levelId, selections}))
   }
 
-  const completed = useAppSelector(selectCompleted(worldId, levelId))
+  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
   const {editor, infoProvider, editorConnection} =
     useLevelEditor(worldId, levelId, codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
@@ -209,8 +210,8 @@ function PlayableLevel({worldId, levelId}) {
             <Markdown>{level?.data?.conclusion}</Markdown>
           </div>
           {levelId >= gameInfo.data?.worldSize[worldId] ?
-          <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button> :
-          <Button to={`/world/${worldId}/level/${levelId + 1}`}>
+          <Button to={`/game/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+          <Button to={`/game/${gameId}/world/${worldId}/level/${levelId + 1}`}>
             Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
 
         </div>}
@@ -230,7 +231,8 @@ function PlayableLevel({worldId, levelId}) {
 export default Level
 
 function Introduction({worldId}) {
-  const gameInfo = useGetGameInfoQuery()
+  const gameId = React.useContext(GameIdContext)
+  const gameInfo = useGetGameInfoQuery({game: gameId})
 
   return <>
     <div style={gameInfo.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
@@ -245,8 +247,8 @@ function Introduction({worldId}) {
       </div>
       <div className="conclusion">
         {0 == gameInfo.data?.worldSize[worldId] ?
-        <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button> :
-        <Button to={`/world/${worldId}/level/1`}>
+        <Button to={`/game/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+        <Button to={`/game/${gameId}/world/${worldId}/level/1`}>
           Start&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>}
       </div>
@@ -255,11 +257,12 @@ function Introduction({worldId}) {
 }
 
 function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
-  const gameInfo = useGetGameInfoQuery()
+  const gameId = React.useContext(GameIdContext)
+  const gameInfo = useGetGameInfoQuery({game: gameId})
 
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
     <div>
-    <Button to={`/`}><FontAwesomeIcon icon={faHome} /></Button>
+    <Button to={`/game/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button>
       <span className="app-bar-title">
         {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
       </span>
@@ -269,10 +272,10 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
         {levelTitle}
       </span>
       <Button disabled={levelId <= 0} inverted={true}
-        to={`/world/${worldId}/level/${levelId - 1}`}
+        to={`/game/${gameId}/world/${worldId}/level/${levelId - 1}`}
         ><FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous</Button>
       <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted={true}
-        to={`/world/${worldId}/level/${levelId + 1}`}
+        to={`/game/${gameId}/world/${worldId}/level/${levelId + 1}`}
         >Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>
     </div>
 
@@ -282,6 +285,7 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
 function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
 
   const connection = React.useContext(ConnectionContext)
+  const gameId = React.useContext(GameIdContext)
 
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
@@ -308,7 +312,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
       theme: 'vs-code-theme-converted'
     })
 
-    const infoProvider = new InfoProvider(connection.getLeanClient())
+    const infoProvider = new InfoProvider(connection.getLeanClient(gameId))
 
     const editorApi = infoProvider.getApi()
 
@@ -358,7 +362,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
     return () => { infoProvider.dispose(); editor.dispose() }
   }, [])
 
-  const {leanClient, leanClientStarted} = useLeanClient()
+  const {leanClient, leanClientStarted} = useLeanClient(gameId)
 
   // Create model when level changes
   useEffect(() => {
@@ -391,7 +395,8 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
 
 /** Open all files in this world on the server so that they will load faster when accessed */
 function useLoadWorldFiles(worldId) {
-  const gameInfo = useGetGameInfoQuery()
+  const gameId = React.useContext(GameIdContext)
+  const gameInfo = useGetGameInfoQuery({game: gameId})
   const store = useStore()
 
   useEffect(() => {
@@ -403,7 +408,7 @@ function useLoadWorldFiles(worldId) {
         if (model) {
           models.push(model)
         } else {
-          const code = selectCode(worldId, levelId)(store.getState())
+          const code = selectCode(gameId, worldId, levelId)(store.getState())
           models.push(monaco.editor.createModel(code, 'lean4', uri))
         }
       }

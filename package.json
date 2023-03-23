@@ -56,7 +56,7 @@
   },
   "scripts": {
     "start": "concurrently -n server,client -c blue,green \"npm run start_server\" \"npm run start_client\"",
-    "start_server": "cd server && (cd leanserver && lake build) && (cd testgame && lake exe cache get && lake build)  && NODE_ENV=development nodemon -e mjs --exec \"node ./index.mjs\"",
+    "start_server": "cd server && (cd leanserver && lake build) && (cd testgame && lake exe cache get && lake build)  && (cd nng && lake build) && NODE_ENV=development nodemon -e mjs --exec \"node ./index.mjs\"",
     "start_client": "NODE_ENV=development webpack-dev-server --hot",
     "build": "npm run build_server && npm run build_client",
     "build_server": "server/build.sh",
