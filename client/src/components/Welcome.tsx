@@ -22,7 +22,7 @@ function LevelIcon({ worldId, levelId, position }) {
   const completed = useSelector(selectCompleted(gameId, worldId,levelId))
   // TODO: relative positioning?
   return (
-    <Link to={`/game/${gameId}/${worldId}/level/${levelId}`} key={`/game/${gameId}/world/${worldId}/level/${levelId}`}>
+    <Link to={`/game/${gameId}/world/${worldId}/level/${levelId}`} key={`/game/${gameId}/world/${worldId}/level/${levelId}`}>
       <circle fill={completed ? "green" :"#aaa"} cx={position.x + Math.sin(levelId/5) * 9} cy={position.y - Math.cos(levelId/5) * 9} r="0.8" />
     </Link>
   )
