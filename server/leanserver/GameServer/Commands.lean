@@ -383,7 +383,7 @@ elab "OnlyDefinition" args:ident* : command => do
 /-- Documentation entry of a lemma. Example:
 
 ```
-LemmaDoc Nat.succ_pos as "succ_pos" in Nat "says `0 < n.succ`, etc."
+LemmaDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
 ```
 
 * The first identifier is used in the commands `[New/Only/Disabled]Lemma`.
