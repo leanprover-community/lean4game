@@ -1,12 +1,191 @@
 
-svg .world-circle {
+/* svg .world-circle {
   fill: var(--clr-primary)
+} */
+
+.welcome {
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
 }
 
-svg .world-name {
-  fill: white;
-  font-size: 2px;
+.app-content {
+  height: 100%
+}
+
+.welcome .column {
+  height: 100%;
+  overflow: auto;
+}
+
+.welcome-text {
+  padding: 20px;
+}
+
+h1 {
+  font-size: 2em;
+  margin: .67em 0;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.3em;
+}
+
+h4 {
+  font-size: 1.1em;
+  font-style: italic;
+}
+
+h5, h6 {
+  font-size: 1em;
+  font-style: italic;
+}
+
+/***************/
+/* SVG Graphic */
+/***************/
+
+svg .world-title-wrapper {
+  overflow: auto;
+}
+
+svg .world-title-wrapper div {
+  width: 100%;
+  height: 100%;
+}
+
+svg .world-title-wrapper div {
+  display: flex;
+  align-items:center;
+  justify-content:center;
+  overflow: visible;
+
+}
+
+svg .world-title {
   font-weight: 500;
-  text-anchor: middle;
-  dominant-baseline: middle;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+/******************/
+/* Privacy Button */
+/******************/
+
+.privacy {
+  width: 40px;
+  height: 40px;
+  font-size: 25px;
+  border-radius: 20px;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items:center;
+  justify-content:center;
+  color: #aaa;
+  background-color: #eee;
+  cursor: pointer;
+}
+
+.privacy p {
+  position: absolute;
+  color: #888;
+  bottom: 1.5px;
+  font-size: 6px;
+}
+
+.privacy .p1 {
+  transform: rotate(50deg);
+  left: 1.5px;
+}
+
+.privacy .p2 {
+  transform: rotate(-50deg);
+  right: 1.5px;
+}
+
+/*****************/
+/* Privacy Popup */
+/*****************/
+
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 2;
+}
+
+.modal h2 {
+  text-align: center;
+}
+
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 50%;
+  max-width: 60ch;
+  background: #fff;
+  z-index: 3;
+  padding: 2em;
+  border-radius: 1em;
+  text-align: left;
+  color: var(--vscode-breadcrumb-foreground);
+}
+
+.modal input[type="text"] {
+  width: 100%;
+}
+
+.modal .form-error {
+  color: #a00;
+  font-weight: bold;
+}
+
+.modal input[type="submit"] {
+  border: none;
+  color: var(--vscode-button-foreground);
+  background: var(--vscode-button-background);
+  cursor: pointer;
+  padding: .5em 1em;
+  border-radius: .2em;
+  display: block;
+  margin: 1em auto;
+}
+
+.modal-close {
+  float: right;
+  scale: 2;
+  color: var(--vscode-breadcrumb-foreground);
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  float: right;
+  scale: 2;
+  color: var(--vscode-breadcrumb-focusForeground);
+}
+
+.modal table {
+  width: 100%;
 }
