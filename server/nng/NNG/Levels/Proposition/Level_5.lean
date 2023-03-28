@@ -19,7 +19,6 @@ Statement
   intro p
   intro q
   exact p
-  rfl
 
 Conclusion
 "

@@ -8,7 +8,9 @@ Title "add_assoc (associativity of addition)"
 
 open MyNat
 
-theorem MyNat.zero_add (n : ℕ) : 0 + n = n := by
+namespace AdditionWorld
+
+theorem zero_add (n : ℕ) : 0 + n = n := by
   induction n with n hn
   · rw [add_zero]
     rfl

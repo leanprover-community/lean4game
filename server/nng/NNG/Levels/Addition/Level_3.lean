@@ -9,7 +9,9 @@ Title "succ_add"
 
 open MyNat
 
-theorem MyNat.add_assoc (a b c : ℕ) : (a + b) + c = a + (b + c)  := by
+namespace AdditionWorld
+
+theorem add_assoc (a b c : ℕ) : (a + b) + c = a + (b + c)  := by
   induction c with c hc
   · rw [add_zero]
     rw [add_zero]
@@ -19,7 +21,6 @@ theorem MyNat.add_assoc (a b c : ℕ) : (a + b) + c = a + (b + c)  := by
     rw [add_succ]
     rw [hc]
     rfl
-
 
 Introduction
 "
@@ -52,6 +53,7 @@ $ \\operatorname{succ}(a) + b = \\operatorname{succ}(a + b)$."
     Hint "Induction on `a` will not work."
   induction b with d hd
   · rw [add_zero]
+    rw [add_zero]
     rfl
   · rw [add_succ]
     rw [hd]

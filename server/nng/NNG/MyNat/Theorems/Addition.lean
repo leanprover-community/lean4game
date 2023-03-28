@@ -25,6 +25,7 @@ theorem MyNat.add_assoc (a b c : ℕ) : (a + b) + c = a + (b + c)  := by
 theorem MyNat.succ_add (a b : ℕ) : succ a + b = succ (a + b)  := by
   induction b with d hd
   · rw [add_zero]
+    rw [add_zero]
     rfl
   · rw [add_succ]
     rw [hd]
@@ -42,4 +43,4 @@ theorem MyNat.add_comm (a b : ℕ) : a + b = b + a := by
     rfl
 
 theorem MyNat.one_eq_succ_zero : (1 : ℕ) = succ 0 := by
-  rfl
+  simp only

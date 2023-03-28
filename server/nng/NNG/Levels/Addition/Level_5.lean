@@ -9,7 +9,9 @@ Title "succ_eq_add_one"
 
 open MyNat
 
-theorem MyNat.add_comm (a b : ℕ) : a + b = b + a := by
+namespace AdditionWorld
+
+theorem add_comm (a b : ℕ) : a + b = b + a := by
   induction b with d hd
   · rw [zero_add]
     rw [add_zero]
@@ -19,8 +21,7 @@ theorem MyNat.add_comm (a b : ℕ) : a + b = b + a := by
     rw [succ_add]
     rfl
 
-theorem MyNat.one_eq_succ_zero : (1 : ℕ) = succ 0 := by
-  rfl
+theorem one_eq_succ_zero : (1 : ℕ) = succ 0 := by simp only
 
 NewLemma MyNat.add_comm MyNat.one_eq_succ_zero
 

@@ -9,11 +9,13 @@ Title "add_right_comm"
 
 open MyNat
 
+namespace AdditionWorld
+
 Introduction
 "
 Lean sometimes writes `a + b + c`. What does it mean? The convention is
 that if there are no brackets displayed in an addition formula, the brackets
-are around the left most `+` (Lean's addition is \"left associative\"). 
+are around the left most `+` (Lean's addition is \"left associative\").
 So the goal in this level is `(a + b) + c = (a + c) + b`. This isn't
 quite `add_assoc` or `add_comm`, it's something you'll have to prove
 by putting these two theorems together.

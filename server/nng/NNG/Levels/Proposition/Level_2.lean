@@ -15,7 +15,7 @@ Introduction
 
 Statement
 ""
-    : P → P := by
+    {P : Prop} : P → P := by
   intro p
   exact p
 

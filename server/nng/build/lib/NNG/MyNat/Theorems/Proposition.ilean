@@ -1,0 +1,1 @@
+{"version":1,"references":{"c:not_iff_imp_false":{"usages":[],"definition":[0,8,0,25]},"c:Bool.false":{"usages":[[0,49,0,54]],"definition":null}},"module":"NNG.MyNat.Theorems.Proposition"}

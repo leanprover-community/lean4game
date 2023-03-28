@@ -1,0 +1,1 @@
+{"version":1,"references":{"c:MyNat.add_zero":{"usages":[[52,8,52,16]],"definition":null},"c:MyNat.add_succ":{"usages":[[57,8,57,16]],"definition":null},"c:MyNat":{"usages":[[40,9,40,10]],"definition":null},"c:Lean.Meta.tactic.hygienic":{"usages":[[10,11,10,26]],"definition":null}},"module":"NNG.Levels.Addition.Level_1"}
