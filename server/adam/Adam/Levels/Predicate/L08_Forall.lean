@@ -15,10 +15,7 @@ Title "Für alle"
 
 Introduction
 "
-Ihr macht euch also auf den Weg. Unterwegs trefft ihr einen Händler und ihr lässt euch von
-ihm den Weg zeigen, sowie einige Tipps zu den beiden Geschwistern geben.
-
-**Händler**: Also seht, die beiden sind gar nicht so verschieden. Ein altes Sprichwort sagt:
+Nach längerem Durcheinander findet ein weiteres Blatt aus der Menge zu Euch.
 "
 
 --   Zum `∃` gehört auch das \"für alle\" `∀` (`\\forall`).
@@ -40,7 +37,7 @@ ihm den Weg zeigen, sowie einige Tipps zu den beiden Geschwistern geben.
 Statement : ∀ (x : ℕ), (Even x) → Odd (1 + x) := by
   Hint "**Du**: Das `∀` heisst sicher \"für alle\".
 
-  **Robo**: Und man schreibt `\\forall`. Ein `∀ x, …` im Goal kannst du wie eine
+  **Robo**: Und man schreibt `\\forall`. Ein `∀ x, …` im Beweisziel kannst Du wie eine
   Implikation mit `intro x` angehen."
   intro x h
   unfold Even at h
@@ -50,4 +47,4 @@ Statement : ∀ (x : ℕ), (Even x) → Odd (1 + x) := by
   rw [hy]
   ring
 
-Conclusion "**Händler**: Sichere Reise!"
+Conclusion "Wieder werdet Ihr mit einem Applaus belohnt, und die Formalosophinnen beratschlagen sich, was sie Euch noch vorlegen wollen."

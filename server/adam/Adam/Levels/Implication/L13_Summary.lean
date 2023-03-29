@@ -65,11 +65,11 @@ Ihr wollt bestimmt weiter zu Quantus, unserem Schestermond, oder?
 
 **Du**: Ehm, vielleicht …
 
-**Operationsleiter**: Dann habe ich noch eine letzte Bitte. Ich habe hier noch einen Brief für die Königin von Quantus!  Auch schon von meinem Vorgänger geerbt. Die Post will ihn nicht annehmen, weil ich die Adresse nicht weiß.  Könntet Ihr ihn vielleicht zu ihr mitnehmen?
+**Operationsleiter**: Dann habe ich noch eine letzte Bitte. Ich habe hier noch ein Päckchen für die Königin von Quantus!  Auch schon von meinem Vorgänger geerbt. Die Post will es nicht annehmen, weil ich die Adresse nicht weiß.  Könntet Ihr es vielleicht zu ihr mitnehmen?
 
 **Du**: Klar! Robo, halt mal.
 
-Robo nimmt den Brief und lässt ihn irgendwo in seinem Innern verschwinden. 
+Robo nimmt das Päckchen und lässt es irgendwo in seinem Innern verschwinden. 
 Der Operationsleiter sieht ihn entgeistert an.
 
 **Robo**: Keine Angst, ich verdaue nichts!"
