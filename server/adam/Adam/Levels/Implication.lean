@@ -18,17 +18,20 @@ Title "Aussagenlogik 2"
 
 Introduction
 "
-Zurück im Raumschiff macht ihr euch auf den Weg zum einem der beiden Monde, die ebenfalls
-beide bewohnt zu sein scheinen.
+Zurück im Raumschiff macht ihr euch auf den Weg zu einem der beiden Monde, die ebenfalls
+bewohnt zu sein scheinen.
 
-**Du**: Sag mal Robo, Königin *Logisindes* hat under anderem von Implikationen gesprochen,
-aber niemand von den Einwohnern wusste was davon...
+**Du**: Ich habe immer noch das Gefühl, dass ich die Aufgabe von Königin *Logisinde* ohne `tauto` nicht hätte lösen können.
+Kamen in der Aufgabe nicht auch Implikationen vor? 
 
-**Robo**: Auf dem Mond *Implis* den wir gerade ansteuern können sie uns vielleicht mehr
-erzählen…
+**Robo**: Vielleicht haben wir ja auf dem Mond *Implis*, den wir gerade ansteuern, Gelegenheit, noch etwas dazuzulernen.  Festhalten bitte …
 
-Und damit leitet Robo den Landeanflug ein. Implis scheint ein riesiger Tagbau zu sein auf
-dem nach allem möglichen gegraben wird. Überall seht ihr Förderbänder kreuz und quer.
+Und damit leitet Robo den Landeanflug ein. 
 
-Das Operationsteam begrüsst euch freundlich und lädt zum Essen im Kommandoturm.
+Implis scheint ein riesiger Tagebau zu sein.
+Überall verlaufen Förderbänder, kreuz und quer, aber die meisten stehen still.
+Ein schüchterner Operationsleiter erwartet Euch bereits.
+
+**Operationsleiter**:  Ihr kommt mir gerade recht!  Ich habe schon gehört.  Echte Mathematiker!  Wisst Ihr, wir fördern hier Wahrheitswerte.  Und dabei muss man höllisch aufpassen.  Ein Fehler, und alles bricht zusammen.  Aber ich bin sehr vorsichtig.  Ich sage immer:  Lieber Stillstand als Untergang!
+
 "

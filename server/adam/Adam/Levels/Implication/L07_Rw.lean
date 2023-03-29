@@ -9,19 +9,17 @@ Game "Adam"
 World "Implication"
 Level 7
 
-Title "Genau dann wenn"
+Title "Genau dann, wenn"
 
 Introduction
 "
-Als nächstes begenet ihr jemandem im Flur.
-
-Dieser hat schon von euch gehört und will sofort wissen, ob ihr ihm helfen könnt:
+**Operationsleiter**: Hier ist noch so etwas.
 "
 
 Statement (A B C D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : B ↔ C := by
   Hint "**Du**: $B \\iff A \\iff D \\iff C$, die sind doch alle äquivalent…
 
-  **Robo**: Ja aber du musst ihm helfen umzuschreiben. Mit `rw [h₁]` kannst du `C` durch `D`
+  **Robo**: Ja, aber du musst ihm helfen, die Äquivalenzen umzuschreiben. Mit `rw [h₁]` kannst du `C` durch `D`
   ersetzen."
   rw [h₁]
   Hint "**Du** Und wenn ich in die andere Richtung umschreiben möchte?
@@ -29,18 +27,18 @@ Statement (A B C D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : 
   **Robo**: Dann schreibst du ein `←` vor den Namen, also `rw [← hₓ]`."
   Branch
     rw [← h₃]
-    Hint "**Du**: Ehm, das ist verkehrt.
+    Hint "**Du**: Ehm, das war verkehrt.
 
-    **Robo**: Andersrum wär's besser gewesen, aber wenn du jetzt einfach weitermachst bis du
-    sowas wie `A ↔ A` kriegst, kann `rfl` das beweisen.
+    **Robo**: Ja, anders herum wär's besser gewesen.  Aber wenn du jetzt einfach weitermachst, bis Du
+    sowas wie `A ↔ A` erhältst, kann `rfl` das beweisen.
 
-    **Robo: Da fällt mir ein, `rw` versucht automatisch `rfl` am Ende. Das heisst, du musst
-    das nicht einmal mehr schreiben."
+    **Robo: Da fällt mir ein, `rw` wendet ohnehin auch versuchsweise `rfl` an. 
+  Das heißt, Du musst `rfl` nicht einmal ausschreiben."
     rw [h₂]
   rw [←h₂]
   assumption
 
-Conclusion "Ihr geht weiter und der Operationsleiter zeigt euch die Küche."
+Conclusion "**Operationsleiter**:  Wenn Ihr so weitermacht, dann kommen wir ja durch den ganzen Packen durch!"
 
 NewTactic rw assumption
 DisabledTactic tauto

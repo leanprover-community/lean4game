@@ -9,22 +9,27 @@ Level 2
 Title "Revert"
 
 Introduction
-"Jemand aus der Gruppe gibt dir ein Blatt Papier mit einer Zeile Text:"
+"Der Operationsleiter holt aus einem Container einen Stapel Papier hervor.  
+
+**Operationsleiter:** Hier hat sich echt einiges angesammelt.  Wäre echt super, wenn Ihr mir noch ein bisschen helfen könntet. 
+
+Er übergibt Euch das oberste Blatt."
 
 Statement (A B : Prop) (ha : A) (h : A → B) : B := by
-  Hint "**Robo**: Mit `revert {ha}` kann man die Annahme `ha` als
-  Implikationsprämisse vorne ans Goal anhängen, dann ist das Goal `{A} → {B}`.
+  Hint "**Operationsleiter:** Das ist von einem Kollegen.
 
-  **Du**: Das wirkt etwas unnatürlich.
+  **Robo**:  Oh, das hab ich schon einmal irgendwo gelesen.  Warte mal … Richtig!  Das war damals, als ich Wikipedia gecrawlt habe: `Der Modus ponens ist eine schon in der antiken Logik geläufige Schlussfigur, die in vielen logischen …`
 
-  **Robo**: Schon, ja. Aber als Tool kann das manchmal nützlich sein."
+  **Du**:  Robo!  Gefragt ist ein Beweis und kein historischer Aufsatz!   Oder komme ich hier etwa mit `mopo` oder so etwas weiter?
+
+  **Robo**:  Ok, nein, sorry.  `mopo` gibt es nicht.  Probier lieber `revert {ha}`."
   revert ha
+  Hint "**Du**:  Aha.  `revert` ist qausi `intro` rückwärts.  
+
+  **Robo:** Genau.  `intro` nimmt die Prämisse aus einer Implikation `{A} \\to {B}` im Beweisziel und macht daraus eine Annahme.  `revert` nimmt umgekehrt eine Annahme und setzt sie als Implikationsprämisse vor das Beweisziel.  Aber nun mach schon fertig."
   assumption
 
-Conclusion "**Du**: Aber das müsste doch auch anders gehen, ich hätte jetzt intuitiv
-die Implikation $A \\Rightarrow B$ angewendet und behauptet, dass es genügt $A$ zu zeigen…
-
-Daraufhin lächelt der Fragende nur vorahnend."
+Conclusion "Der Operationsleiter nimmt erfreut Eure Lösung entgegen, und greift zum Telefon."
 
 NewTactic revert
 DisabledTactic tauto

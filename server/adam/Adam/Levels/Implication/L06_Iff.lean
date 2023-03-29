@@ -4,42 +4,36 @@ Game "Adam"
 World "Implication"
 Level 6
 
-Title "Genau dann wenn"
+Title "Genau dann, wenn"
 
 Introduction
 "
-Als erstes kommt ihr in einen kleinen Raum mit ganz vielen Bildschirmen.
-
-Ein junges Wesen dreht sich auf dem Stuhl um, und sagt:
-
-**Mitarbeiter**: Oh hallo! Schaut euch mal das hier an!
+**Operationsleiter:** Wir hatten auch mal ein paar Förderbänder, die in beide Richtungen laufen konnten.  Die hatte ich vorsichtshalber alle abgestellt, weil in den neusten Handbüchern von solchen Doppelbändern abgeraten wird.  Aber vielleicht sind sie ja unter bestimmten Voraussetzungen doch sicher?  Was meint Ihr zu diesem Fall?
 "
 
 Statement (A B : Prop) (mp : A → B) (mpr : B → A) : A ↔ B := by
-  Hint "**Robo**: Das ist ein genau-dann-wenn Pfeil: `\\iff`. Er besteht aus zwei Teilen:
-  `A ↔ B` ist als `⟨A → B, B → A⟩` definiert.
+  Hint "**Robo**: `→` ist natürlich Leansch für `$\iff$`.  
+  Die Aussage `A ↔ B` besteht also aus zwei Teilen; sie ist als `⟨A → B, B → A⟩` definiert.
 
   **Du**: Also ganz ähnlich wie das UND, `A ∧ B`?
 
-  **Robo**: Genau. Entsprechend kannst du hier auch mit `constructor` anfangen."
+  **Robo**: Genau. Entsprechend kannst Du auch hier mit `constructor` anfangen."
   constructor
-  Hint "**Du**: Ah und die beiden hab ich schon in den Annahmen."
+  Hint "**Du**: Ah, und die beiden Teile habe ich schon in den Annahmen."
   assumption
   assumption
 
 Conclusion
 "
-**Robo**: Übrigens, bei `(h : A ∧ B)` haben die beiden Teile `h.left` und `h.right` geheissen,
-hier bei `(h : A ↔ B)` heissen sie `h.mp` und `h.mpr`.
+**Operationsleiter**: Ok, das leuchtet mir ein.  
+
+**Robo** *(zu Dir)*: Übrigens, so wie bei `(h : A ∧ B)` die beiden Teile `h.left` und `h.right` heißen,
+heißen bei `(h : A ↔ B)` die beiden Teile `h.mp` und `h.mpr`.
 
 **Du**: Also `h.mp` ist `A → B`? Wieso `mp`?
 
-**Operationsleiter**: \"Modulo Ponens\" ist ein lokaler Begriff hier,
-aber das ist doch nicht wichtig.
-
-**Robo**: Und das \"r\" in `mpr` stünde für \"reverse\" weil's die Rückrichtung ist.
+**Robo**: `mp` steht für Modus Ponens`.  Der Modus ponens ist eine schon in der antiken Logik geläufige Schlussfigur, die in vielen logischen Systemen …  Ach nee, das wolltest Du ja nicht hören.  Das \"r\" in `mpr` steht für \"reverse\", weil's die Rückrichtung ist.
 "
-
 NewTactic constructor
 DisabledTactic tauto rw
 
