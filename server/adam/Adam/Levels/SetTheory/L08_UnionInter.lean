@@ -31,3 +31,4 @@ Statement
   rw [univ_union]
 
 NewTactic constructor intro rw assumption rcases simp tauto trivial
+NewLemma Set.diff_inter Set.union_assoc Set.union_diff_distrib Set.univ_union

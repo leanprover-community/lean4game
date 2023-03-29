@@ -29,8 +29,8 @@ Statement (A B : Prop) (mp : A → B) (mpr : B → A) : A ↔ B := by
 
 Conclusion
 "
-**Robo**: Übrigens, bei `(h : A ∧ B)` haben die beiden Teile `h.left` und `h.right` geheissen,
-hier bei `(h : A ↔ B)` heissen sie `h.mp` und `h.mpr`.
+**Robo**: Übrigens, bei `(h : A ∧ B)` haben die beiden Teile `h.left` und `h.right` geheißen,
+hier bei `(h : A ↔ B)` heißen sie `h.mp` und `h.mpr`.
 
 **Du**: Also `h.mp` ist `A → B`? Wieso `mp`?
 

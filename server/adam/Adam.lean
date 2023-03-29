@@ -23,6 +23,33 @@ Game "Adam"
 Title "Lean 4 game"
 Introduction
 "
+
+# Game Over oder QED?
+
+Willkommen zu unserem Prototyp eines Lean4-Lernspiels. Hier lernst du Computer-gestütztes
+Beweisen. Das Interface ist anfangs etwas vereinfacht, der \"Editor Mode\" funktioniert aber
+ziemlich gleich wie wenn du später Lean im VSCode benützt.
+
+Rechts siehst du eine Übersicht der Welt dieses Spiels. Jeder Planet hat mehrere Levels,
+die in Form von grauen Punkten dargestellt sind. Gelöste Levels werden dann grün.
+
+Klicke auf die erste Welt \"Aussagenlogik 1\" um deine Reise zu starten.
+
+### Spielstand
+
+Dein Spielstand wird lokal in deinem Browser als \"site data\" gespeichert.
+Solltest du diese löschen, verlierst du deinen Spielstand! Du kannst aber jederzeit jeden
+Level spielen, auch wenn frühere Levels nicht grün sind.
+
+(oft werden *Site data & Cookies* zusammen gelöscht).
+
+### Kontakt
+
+Wenn du Bugs findest, schreib doch ein Email oder erstelle einen
+[Issue auf Github](https://github.com/leanprover-community/lean4game/issues).
+
+Jon Eugster, jon.eugster@hhu.de
+
 "
 
 Conclusion

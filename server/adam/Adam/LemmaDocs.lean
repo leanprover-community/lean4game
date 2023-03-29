@@ -165,7 +165,7 @@ Jedes Element ist in `univ`, der Menge aller Elemente eines Typs `α`.
 * Mathlib Doc: [#mem_univ](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.mem_univ)
 "
 
-LemmaDoc not_mem_empty as "not_mem_empty" in "Set"
+LemmaDoc Set.not_mem_empty as "not_mem_empty" in "Set"
 "
 `Set.not_mem_empty {α : Type _} (x : α) : x ∉ ∅`
 
@@ -175,11 +175,21 @@ Kein Element ist in der leeren Menge.
 
 * `simp`-Lemma: Nein
 * Namespace: `Set`
-* Minimal Import: `Mathlib.Data.Set.Basic`
 * Mathlib Doc: [#not_mem_empty](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.not_mem_empty)
 "
 
-LemmaDoc empty_subset as "empty_subset" in "Set"
+LemmaDoc Set.subset_empty_iff as "subset_empty_iff" in "Set"
+"
+`Set.subset_empty_iff.{u} {α : Type u} {s : Set α} : s ⊆ ∅ ↔ s = ∅`
+
+## Eigenschaften
+
+* `simp`-Lemma: Nein
+* Namespace: `Set`
+* Mathlib Doc: [#empty_subset](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.subset_empty_iff)
+"
+
+LemmaDoc Set.empty_subset as "empty_subset" in "Set"
 "
 `Set.empty_subset {α : Type u} (s : Set α) : ∅ ⊆ s`
 
@@ -187,11 +197,10 @@ LemmaDoc empty_subset as "empty_subset" in "Set"
 
 * `simp`-Lemma: Ja
 * Namespace: `Set`
-* Minimal Import: `Mathlib.Data.Set.Basic`
 * Mathlib Doc: [#empty_subset](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.empty_subset)
 "
 
-LemmaDoc Subset.antisymm as "Subset.antisymm" in "Set"
+LemmaDoc Set.Subset.antisymm as "Subset.antisymm" in "Set"
 "
 `Set.Subset.antisymm {α : Type u} {a : Set α} {b : Set α} (h₁ : a ⊆ b) (h₂ : b ⊆ a) : a = b`
 
@@ -212,7 +221,7 @@ für die Iff-Version.
 * Mathlib Doc: [#Subset.antisymm](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.Subset.antisymm)
 "
 
-LemmaDoc Subset.antisymm_iff as "Subset.antisymm_iff" in "Set"
+LemmaDoc Set.Subset.antisymm_iff as "Subset.antisymm_iff" in "Set"
 "
 `Set.Subset.antisymm_iff {α : Type u} {a : Set α} {b : Set α} : a = b ↔ a ⊆ b ∧ b ⊆ a`
 
@@ -234,6 +243,17 @@ für eine verwandte Version.
 * Mathlib Doc: [#Subset.antisymm_iff](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.Subset.antisymm_iff)
 "
 
+LemmaDoc Set.diff_inter as "union_assoc" in "Set"
+""
+
+LemmaDoc Set.union_assoc as "union_assoc" in "Set"
+""
+
+LemmaDoc Set.union_diff_distrib as "union_diff_distrib" in "Set"
+""
+
+LemmaDoc Set.univ_union as "univ_union" in "Set"
+""
 
 LemmaDoc Nat.prime_def_lt'' as "prime_def_lt''" in "Nat"
 "
@@ -248,7 +268,6 @@ Die bekannte Definition einer Primmzahl in `ℕ`: Eine Zahl (`p ≥ 2`) mit gena
 * Namespace: `Nat`
 * Mathlib Doc: [#Nat.prime_def_lt''](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Prime.html#Nat.prime_def_lt'')
 "
-
 
 LemmaDoc Finset.sum_add_distrib as "sum_add_distrib" in "Sum"
 "
@@ -278,6 +297,22 @@ LemmaDoc Nat.succ_eq_add_one as "succ_eq_add_one" in "Sum"
 * `simp`-Lemma: Nein
 * Namespace: `Nat`
 * Mathlib Doc: [#succ_eq_add_one](https://leanprover-community.github.io/mathlib4_docs/Init/Data/Nat/Basic.html#Nat.succ_eq_add_one)
+"
+
+LemmaDoc ne_eq as "ne_eq" in "Logic"
+"
+
+## Eigenschaften
+
+* Mathlib Doc: [#ne_eq](https://leanprover-community.github.io/mathlib4_docs/Init/SimpLemmas.html#ne_eq)
+"
+
+LemmaDoc Set.eq_empty_iff_forall_not_mem as "eq_empty_iff_forall_not_mem" in "Sum"
+"
+
+## Eigenschaften
+
+* Mathlib Doc: [#eq_empty_iff_forall_not_mem](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.eq_empty_iff_forall_not_mem)
 "
 
 LemmaDoc Nat.zero_eq as "zero_eq" in "Sum"
@@ -428,87 +463,4 @@ LemmaDoc Iff.symm as "Iff.symm" in "Logic"
 ## Eigenschaften
 
 * Mathlib Doc: [#Iff.symm](https://leanprover-community.github.io/mathlib4_docs/Init/Core.html#Iff.symm)
-"
-
-
-
-/-! ## Definitions -/
-
-DefinitionDoc Even as "Even"
-"
-`even n` ist definiert als `∃ r, a = 2 * r`.
-Die Definition kann man mit `unfold even at *` einsetzen.
-## Eigenschaften
-
-* Mathlib Doc: [#Even](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Parity.html#Even)"
-
-DefinitionDoc Odd as "Odd"
-"
-`odd n` ist definiert als `∃ r, a = 2 * r + 1`.
-Die Definition kann man mit `unfold odd at *` einsetzen.
-
-* Mathlib Doc: [Odd](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Parity.html#Odd)"
-
-DefinitionDoc Injective as "Injective"
-"
-`Injective f` ist definiert als
-
-```
-∀ a b, f a = f b → a = b
-```
-definiert.
-
-* Mathlib Doc: [Injective](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Function.html#Function.Injective)"
-
-DefinitionDoc Surjective as "Surjective"
-"
-`Surjective f` ist definiert als
-
-```
-∀ a, (∃ b, f a = b)
-```
-
-* Mathlib Doc: [Surjective](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Function.html#Function.Surjective)"
-
-DefinitionDoc Bijective as "Bijective"
-"
-
-## Eigenschaften
-
-* Mathlib Doc: [#Bijective](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Function.html#Function.Bijective)
-"
-
-DefinitionDoc LeftInverse as "LeftInverse"
-"
-
-## Eigenschaften
-
-* Mathlib Doc: [#LeftInverse](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Function.html#Function.LeftInverse)
-"
-
-DefinitionDoc RightInverse as "RightInverse"
-"
-
-## Eigenschaften
-
-* Mathlib Doc: [#RightInverse](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Logic.html#RightInverse)
-"
-
-DefinitionDoc StrictMono as "StrictMono"
-"
-`StrictMono f` ist definiert als
-
-```
-∀ a b, a < b → f a < f b
-```
-
-## Eigenschaften
-
-* Mathlib Doc: [#StrictMono](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Order/Monotone/Basic.html#StrictMono)
-
-"
-
-DefinitionDoc Symbol.Subset as "⊆" "
-
-Auf Mengen (`Set`) ist `A ⊆ B` als `∀x, x ∈ A → x ∈ B` implementiert.
 "

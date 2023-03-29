@@ -25,9 +25,13 @@ Statement nonempty_iff_ne_empty
 ""
     {A : Type _} (s : Set A) :
     s.Nonempty ↔ s ≠ ∅ := by
-  rw [Set.Nonempty]
+  Hint "Am besten fängst du mit `unfold Set.Nonempty` an."
+  unfold Set.Nonempty
+  Hint "Mit `ne_eq` und `eq_empty_iff_forall_not_mem` kannst du hier weiterkommen."
   rw [ne_eq, eq_empty_iff_forall_not_mem]
+  Hint (hidden := true) "`push_neg` kann hier helfen."
   push_neg
   rfl
 
-NewTactic constructor intro rw assumption rcases simp tauto trivial
+NewLemma ne_eq Set.eq_empty_iff_forall_not_mem
+NewDefinition Set.Nonempty
