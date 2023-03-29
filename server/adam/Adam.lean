@@ -23,6 +23,7 @@ Game "Adam"
 Title "Lean 4 game"
 Introduction
 "
+[This is a prototpye of a gamified introduction to the interactive proof assistent Lean, developed within the project [ADAM: Anticipating the Digital Age of Mathematics](https://hhu-adam.github.io/).  The project is based at Heinrich Heine University Düsseldorf and funded by Stiftung Innovation in der Hochschullehre.]
 "
 
 Conclusion
