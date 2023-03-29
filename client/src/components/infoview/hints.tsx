@@ -4,7 +4,7 @@ import { Alert, FormControlLabel, Switch } from '@mui/material';
 import Markdown from '../Markdown';
 
 function Hint({hint} : {hint: GameHint}) {
-  return <Alert severity="info" sx={{ mt: 1 }}><Markdown>{hint.text}</Markdown></Alert>
+  return <div className="message info"><Markdown>{hint.text}</Markdown></div>
 }
 
 export function Hints({hints} : {hints: GameHint[]}) {

@@ -1,7 +1,6 @@
 import Lean
 
 import GameServer.EnvExtensions
-import GameServer.StrInterpolation
 
 open Lean Meta
 
@@ -62,13 +61,43 @@ partial def reprintCore : Syntax → Option Format
 def reprint (stx : Syntax) : Format :=
   reprintCore stx |>.getD ""
 
-syntax hintArg := " (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")"
+syntax hintArg := atomic(" (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")")
+
+/-- Remove any spaces at the beginning of a new line -/
+partial def removeIndentation (s : String) : String :=
+  let rec loop (i : String.Pos) (acc : String) (removeSpaces := false) : String :=
+    let c := s.get i
+    let i := s.next i
+    if s.atEnd i then
+      acc.push c
+    else if removeSpaces && c == ' ' then
+      loop i acc (removeSpaces := true)
+    else if c == '\n' then
+      loop i (acc.push c) (removeSpaces := true)
+    else
+      loop i (acc.push c)
+  loop ⟨0⟩ ""
 
 /-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
 see hints. The tactic does not affect the goal state. -/
-elab "Hint" args:hintArg* msg:Lean.Parser.interpolatedStrNoIndent : tactic => do
+elab "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
   let mut strict := false
   let mut hidden := false
+
+  -- remove spaces at the beginngng of new lines
+  let msg := TSyntax.mk $ msg.raw.setArgs $ ← msg.raw.getArgs.mapM fun m => do
+    match m with
+    | Syntax.node info k args =>
+      logInfo k
+      if k == interpolatedStrLitKind && args.size == 1 then
+        match args.get! 0 with
+        | (Syntax.atom info' val) =>
+          let val := removeIndentation val
+          return Syntax.node info k #[Syntax.atom info' val]
+        | _ => return m
+      else
+        return m
+    | _ => return m
 
   for arg in args do
     match arg with
@@ -85,7 +114,7 @@ elab "Hint" args:hintArg* msg:Lean.Parser.interpolatedStrNoIndent : tactic => do
     -- named differently by the player.
     let varsName := `vars
     let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
-      let mut text ← expandInterpolatedStr ⟨msg.raw⟩ (← `(MessageData)) (← `(toMessageData))
+      let mut text ← `(m! $msg)
       let goalDecl ← goal.getDecl
       let decls := goalDecl.lctx.decls.toArray.filterMap id
       for i in [:decls.size] do
@@ -274,14 +303,21 @@ def checkInventoryDoc (type : InventoryType) (name : Name) : CommandElabM Unit :
 
 /-! ### Tactics -/
 
-/-- Declare a documentation entry for some tactic.
-Expect an identifier and then a string literal. -/
+/-- Documentation entry of a tactic. Example:
+
+```
+TacticDoc rw "`rw` stands for rewrite, etc. "
+```
+
+* The identifier is the tactics name. Some need to be escaped like `«have»`.
+* The description is a string supporting Markdown.
+ -/
 elab "TacticDoc" name:ident content:str : command =>
   modifyEnv (inventoryDocExt.addEntry · {
     category := default
     type := .Tactic
     name := name.getId,
-    userName := name.getId,
+    displayName := name.getId.toString,
     content := content.getString })
 
 /-- Declare tactics that are introduced by this level. -/
@@ -304,14 +340,23 @@ elab "OnlyTactic" args:ident* : command => do
 
 /-! ### Definitions -/
 
-/-- Declare a documentation entry for some definition.
-Expect an identifier and then a string literal. -/
-elab "DefinitionDoc" name:ident content:str : command =>
+/-- Documentation entry of a definition. Example:
+
+```
+DefinitionDoc Function.Bijective as "Bijective" "defined as `Injective f ∧ Surjective`, etc."
+```
+
+* The first identifier is used in the commands `[New/Only/Disabled]Definition`.
+  It is preferably the true name of the definition. However, this is not required.
+* The string following `as` is the displayed name (in the Inventory).
+* The description is a string supporting Markdown.
+ -/
+elab "DefinitionDoc" name:ident "as" displayName:str content:str : command =>
   modifyEnv (inventoryDocExt.addEntry · {
     category := default
     type := .Definition
     name := name.getId,
-    userName := name.getId,
+    displayName := displayName.getString,
     content := content.getString })
 
 /-- Declare definitions that are introduced by this level. -/
@@ -335,15 +380,23 @@ elab "OnlyDefinition" args:ident* : command => do
 
 /-! ### Lemmas -/
 
-/-- Declare a documentation entry for some lemma.
-Expect two identifiers and then a string literal. The first identifier is meant
-as the real name of the lemma while the second is the displayed name. Currently
-the real name isn't used. -/
-elab "LemmaDoc" name:ident "as" userName:ident "in" category:str content:str : command =>
+/-- Documentation entry of a lemma. Example:
+
+```
+LemmaDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
+```
+
+* The first identifier is used in the commands `[New/Only/Disabled]Lemma`.
+  It is preferably the true name of the lemma. However, this is not required.
+* The string following `as` is the displayed name (in the Inventory).
+* The identifier after `in` is the category to group lemmas by (in the Inventory).
+* The description is a string supporting Markdown.
+ -/
+elab "LemmaDoc" name:ident "as" displayName:str "in" category:str content:str : command =>
   modifyEnv (inventoryDocExt.addEntry · {
     name := name.getId,
     type := .Lemma
-    userName := userName.getId,
+    displayName := displayName.getString,
     category := category.getString,
     content := content.getString })
 
@@ -401,9 +454,11 @@ elab "MakeGame" : command => do
     let Availability₀ : HashMap Name ComputedInventoryItem :=
       HashMap.ofList $
         ← allItems.toList.mapM fun name => do
+          let data := (← getInventoryDoc? name inventoryType).get!
           return (name, {
             name
-            category := (← getInventoryDoc? name inventoryType).get!.category
+            displayName := data.displayName
+            category := data.category
             locked := true
             disabled := false})
 
@@ -414,9 +469,11 @@ elab "MakeGame" : command => do
       let predecessors := game.worlds.predecessors worldId
       for predWorldId in predecessors do
         for item in newItemsInWorld.find! predWorldId do
+          let data := (← getInventoryDoc? item inventoryType).get!
           items := items.insert item {
             name := item
-            category := (← getInventoryDoc? item inventoryType).get!.category
+            displayName := data.displayName
+            category := data.category
             locked := false
             disabled := false
           }
@@ -429,13 +486,25 @@ elab "MakeGame" : command => do
 
       for (levelId, level) in levels do
         for item in (level.getInventory inventoryType).new do
-          let category := (← getInventoryDoc? item inventoryType).get!.category
-          items := items.insert item {name := item, category, locked := false, disabled := false}
+          let data := (← getInventoryDoc? item inventoryType).get!
+          items := items.insert item {
+            name := item
+            displayName := data.displayName
+            category := data.category
+            locked := false
+            disabled := false
+          }
 
         let mut disabled : HashSet Name := {}
         for item in (level.getInventory inventoryType).disabled do
-          let category := (← getInventoryDoc? item inventoryType).get!.category
-          items := items.insert item {name := item, category, locked := false, disabled := false}
+          let data := (← getInventoryDoc? item inventoryType).get!
+          items := items.insert item {
+            name := item
+            displayName := data.displayName
+            category := data.category
+            locked := false
+            disabled := false
+          }
           -- (we set disabled to false at first because it applies only to the current level)
           disabled := disabled.insert item
 

@@ -66,6 +66,7 @@ structure DidOpenLevelParams where
 
 structure Doc where
   name: String
+  displayName: String
   text: String
 deriving ToJson
 
@@ -80,11 +81,11 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
   -- Execute the regular handling of the `didOpen` event
   handleDidOpen p
   let fw ← findFileWorker! m.uri
-  let s ← get
+  -- let s ← get
   let c ← read
-  let some lvl ← GameServer.getLevelByFileName? ((System.Uri.fileUriToPath? m.uri).getD m.uri |>.toString)
+  let some lvl ← GameServer.getLevelByFileName? c.initParams ((System.Uri.fileUriToPath? m.uri).getD m.uri |>.toString)
     | do
-      c.hLog.putStr s!"Level not found: {m.uri}"
+      c.hLog.putStr s!"Level not found: {m.uri} {c.initParams.rootUri?}"
       c.hLog.flush
   -- Send an extra notification to the file worker to inform it about the level data
   fw.stdin.writeLspNotification {
@@ -132,7 +133,7 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       return true
     | Message.request id "loadDoc" params =>
       let p ← parseParams LoadDocParams (toJson params)
-      let s ← get
+      -- let s ← get
       let c ← read
       let some doc ← getInventoryDoc? p.name p.type
         | do
@@ -140,6 +141,7 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             return true
       let doc : Doc :=
           { name := doc.name.toString
+            displayName := doc.displayName
             text := doc.content }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson doc⟩
       return true

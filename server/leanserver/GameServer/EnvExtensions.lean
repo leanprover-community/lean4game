@@ -43,7 +43,7 @@ instance : ToString InventoryType := ⟨fun t => match t with
 structure InventoryDocEntry where
   name : Name
   type : InventoryType
-  userName : Name
+  displayName : String
   category : String
   content : String
   deriving ToJson, Repr, Inhabited
@@ -122,6 +122,7 @@ deriving Inhabited
 
 structure ComputedInventoryItem where
   name : Name
+  displayName : String
   category : String
   locked : Bool
   disabled : Bool

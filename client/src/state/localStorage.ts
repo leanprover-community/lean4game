@@ -1,4 +1,4 @@
-const KEY = "progress";
+const KEY = "game_progress";
 export function loadState() {
   try {
     const serializedState = localStorage.getItem(KEY);

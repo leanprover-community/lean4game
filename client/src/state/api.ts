@@ -12,6 +12,7 @@ interface GameInfo {
 
 export interface ComputedInventoryItem {
   name: string,
+  displayName: string,
   category: string,
   disabled: boolean,
   locked: boolean
@@ -31,18 +32,19 @@ interface LevelInfo {
 
 interface Doc {
   name: string,
+  displayName: string,
   text: string
 }
 
 
 const customBaseQuery = async (
-  args : {method: string, params?: any},
+  args : {game: string, method: string, params?: any},
   { signal, dispatch, getState, extra },
   extraOptions
 ) => {
   try {
     const connection : Connection = extra.connection
-    let leanClient = await connection.startLeanClient()
+    let leanClient = await connection.startLeanClient(args.game)
     console.log(`Sending request ${args.method}`)
     let res = await leanClient.sendRequest(args.method, args.params)
     console.log('Received response', res)
@@ -57,14 +59,14 @@ export const apiSlice = createApi({
   reducerPath: 'gameApi',
   baseQuery: customBaseQuery,
   endpoints: (builder) => ({
-    getGameInfo: builder.query<GameInfo, void>({
-      query: () => {return {method: 'info', params: {}}},
+    getGameInfo: builder.query<GameInfo, {game: string}>({
+      query: ({game}) => {return {game, method: 'info', params: {}}},
     }),
-    loadLevel: builder.query<LevelInfo, {world: string, level: number}>({
-      query: ({world, level}) => {return {method: "loadLevel", params: {world, level}}},
+    loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
+      query: ({game, world, level}) => {return {game, method: "loadLevel", params: {world, level}}},
     }),
-    loadDoc: builder.query<Doc, {name: string, type: "lemma"|"tactic"}>({
-      query: ({name, type}) => {return {method: "loadDoc", params: {name, type}}},
+    loadDoc: builder.query<Doc, {game: string, name: string, type: "lemma"|"tactic"}>({
+      query: ({game, name, type}) => {return {game, method: "loadDoc", params: {name, type}}},
     }),
   }),
 })

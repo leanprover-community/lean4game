@@ -170,21 +170,6 @@ export function CommandLine() {
     return () => { l.dispose() }
   }, [oneLineEditor, runCommand])
 
-  // Effect when command line mode gets enabled
-  useEffect(() => {
-    if (commandLineMode) {
-      const endPos = editor.getModel().getFullModelRange().getEndPosition()
-      if (editor.getModel().getLineContent(endPos.lineNumber).trim() !== "") {
-        editor.executeEdits("command-line", [{
-          range: monaco.Selection.fromPositions(endPos, endPos),
-          text: commandLineInput + "\n",
-          forceMoveMarkers: false
-        }]);
-      }
-      editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
-    }
-  }, [commandLineMode])
-
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault()
     runCommand()

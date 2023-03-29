@@ -13,15 +13,26 @@ open Meta
 
 namespace GameServer
 
-def levelIdFromFileName? (fileName : String) : Option LevelId := Id.run do
-  let fileParts := fileName.splitOn "/"
-  if fileParts.length == 3 then
-    if let some level := fileParts[2]!.toNat? then
-      return some {game := `TestGame, world := fileParts[1]!, level := level}
+def splitRootUri (initParams : Lsp.InitializeParams) (i : Nat): Option String := Id.run do
+  let some rootUri := initParams.rootUri?
+    | return none
+  let rootUriParts := rootUri.splitOn "/"
+  if rootUriParts.length == 3 then
+    return rootUriParts[i]?
   return none
 
-def getLevelByFileName? [Monad m] [MonadEnv m] (fileName : String) : m (Option GameLevel) := do
-  let some levelId := levelIdFromFileName? fileName
+def levelIdFromFileName? (initParams : Lsp.InitializeParams) (fileName : String) : Option LevelId := Id.run do
+  let fileParts := fileName.splitOn "/"
+  if fileParts.length == 3 then
+    if let (some level, some game) := (fileParts[2]!.toNat?, splitRootUri initParams 2) then
+      return some {game, world := fileParts[1]!, level := level}
+  return none
+
+def gameDirFromInitParams (initParams : Lsp.InitializeParams) : Option String :=
+  (splitRootUri initParams 0).map (s!"../../../{·}")
+
+def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameLevel) := do
+  let some levelId := levelIdFromFileName? initParams fileName
     | return none
   return ← getLevel? levelId
 
@@ -114,9 +125,9 @@ def evalHintMessage : Expr → MetaM (Array Expr → MessageData) := fun _ => pu
 
 open Meta in
 /-- Find all hints whose trigger matches the current goal -/
-def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array GameHint) := do
+def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) (initParams : Lsp.InitializeParams) : MetaM (Array GameHint) := do
   goal.withContext do
-    let some level ← getLevelByFileName? doc.meta.mkInputContext.fileName
+    let some level ← getLevelByFileName? initParams doc.meta.mkInputContext.fileName
       | throwError "Level not found: {doc.meta.mkInputContext.fileName}"
     let hints ← level.hints.filterMapM fun hint => do
       openAbstractCtxResult hint.goal fun hintFVars hintGoal => do
@@ -137,6 +148,7 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) : MetaM (Array
 open RequestM in
 def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option InteractiveGoals)) := do
   let doc ← readDoc
+  let rc ← readThe RequestContext
   let text := doc.meta.text
   let hoverPos := text.lspPosToUtf8Pos p.position
   -- TODO: I couldn't find a good condition to find the correct snap. So we are looking
@@ -152,7 +164,7 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
             return List.toArray <| if useAfter then ti.goalsAfter else ti.goalsBefore
           let goals ← ci.runMetaM {} do
              goals.mapM fun goal => do
-              let hints ← findHints goal doc
+              let hints ← findHints goal doc rc.initParams
               return ← goalToInteractive goal hints
           -- compute the goal diff
           -- let goals ← ciAfter.runMetaM {} (do
