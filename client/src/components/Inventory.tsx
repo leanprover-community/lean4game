@@ -4,14 +4,14 @@ import './inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import Markdown from './Markdown';
-import { useLoadDocQuery, ComputedInventoryItem } from '../state/api';
+import { useLoadDocQuery, ComputedInventoryItem, LevelInfo } from '../state/api';
 import { GameIdContext } from '../App';
 
-export function Inventory({ tactics, lemmas, definitions, setInventoryDoc } :
-  {lemmas: ComputedInventoryItem[],
-  tactics: ComputedInventoryItem[],
-  definitions: ComputedInventoryItem[],
-  setInventoryDoc: (inventoryDoc: {name: string, type: string}) => void}) {
+export function Inventory({levelInfo, setInventoryDoc } :
+  {
+    levelInfo: LevelInfo,
+    setInventoryDoc: (inventoryDoc: {name: string, type: string}) => void,
+  }) {
 
   function openDoc(name, type) {
     setInventoryDoc({name, type})
@@ -22,18 +22,28 @@ export function Inventory({ tactics, lemmas, definitions, setInventoryDoc } :
     {/* TODO: Click on Tactic: show info
       TODO: click on paste icon -> paste into command line */}
       <h2>Tactics</h2>
-      <InventoryList items={tactics} docType="Tactic" openDoc={openDoc} />
+      <InventoryList items={levelInfo?.tactics} docType="Tactic" openDoc={openDoc} />
 
       <h2>Definitions</h2>
-      <InventoryList items={definitions} docType="Definition" openDoc={openDoc} />
+      <InventoryList items={levelInfo?.definitions} docType="Definition" openDoc={openDoc} />
 
       <h2>Lemmas</h2>
-      <InventoryList items={lemmas} docType="Lemma" openDoc={openDoc} />
+      <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc}
+        defaultTab={levelInfo?.lemmaTab} level={levelInfo}/>
     </div>
   )
 }
 
-function InventoryList({items, docType, openDoc} : {items: ComputedInventoryItem[], docType: string, openDoc(name: string, type: string): void}) {
+function InventoryList({items, docType, openDoc, defaultTab=null, level=undefined} :
+  {
+    items: ComputedInventoryItem[],
+    docType: string,
+    openDoc(name: string, type: string): void,
+    defaultTab? : string,
+    level? : LevelInfo,
+  }) {
+  // TODO: `level` is only used in the `useEffect` below to check if a new level has
+  // been loaded. Is there a better way to observe this?
 
   const categorySet = new Set<string>()
   for (let item of items) {
@@ -41,20 +51,27 @@ function InventoryList({items, docType, openDoc} : {items: ComputedInventoryItem
   }
   const categories = Array.from(categorySet).sort()
 
-  const [tab, setTab] = useState(categories[0]);
+  const [tab, setTab] = useState(defaultTab);
+
+  useEffect(() => {
+    // If the level specifies `LemmaTab "Nat"`, we switch to this tab on loading.
+    // `defaultTab` is `null` or `undefined` otherwise, in which case we don't want to switch.
+    if (defaultTab) {
+      setTab(defaultTab)
+    }}, [level])
 
   return <>
     {categories.length > 1 &&
       <div className="tab-bar">
         {categories.map((cat) =>
-          <div className={`tab ${cat == tab ? "active": ""}`} onClick={() => { setTab(cat) }}>{cat}</div>)}
+          <div className={`tab ${cat == (tab ?? categories[0]) ? "active": ""}`} onClick={() => { setTab(cat) }}>{cat}</div>)}
       </div>}
     <div className="inventory-list">
     { [...items].sort(
-      // sort unavailable tactics/lemmas/def to the back.
+      // Sort entries `available > disabled > locked`.
       (x, y) => +x.locked - +y.locked || +x.disabled - +y.disabled
     ).map(item => {
-        if (tab == item.category) {
+        if ((tab ?? categories[0]) == item.category) {
           return <InventoryItem key={item.name} showDoc={() => {openDoc(item.name, docType)}}
             name={item.name} displayName={item.displayName} locked={item.locked} disabled={item.disabled} />
         }

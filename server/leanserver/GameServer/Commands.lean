@@ -400,6 +400,12 @@ elab "LemmaDoc" name:ident "as" displayName:str "in" category:str content:str : 
     category := category.getString,
     content := content.getString })
 
+/-- Define which tab of Lemmas is opened by default. Usage: `LemmaTab "Nat"`.
+
+If omitted, the first tab will be open by default. -/
+elab "LemmaTab"  category:str : command =>
+  modifyCurLevel fun level => pure {level with lemmaTab := category.getString}
+
 /-- Declare lemmas that are introduced by this level. -/
 elab "NewLemma" args:ident* : command => do
   let names := args.map (·.getId)
