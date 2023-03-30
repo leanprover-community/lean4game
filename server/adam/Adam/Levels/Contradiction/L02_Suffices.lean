@@ -11,13 +11,11 @@ Game "Adam"
 World "Contradiction"
 Level 2
 
-Title "Suffices"
+Title "Es reicht!"
 
 Introduction
 "
-*Oddeus*' Partner meldet sich.
-
-**Partner**: Ich habe letzthin was änliches gesehen, aber irgendwie verdreht.
+**Benedictus**:  Ihr hättet natürlich auch erst das Hauptresultat und dann das Zwischenresultat beweisen können.  Das könnt Ihr ja mal an dieser Aufgabe probieren, die ist ganz ähnlich.
 "
 
 -- Die Taktik `suffices` funktioniert genau gleich wie `have`,
@@ -35,29 +33,27 @@ Introduction
 -- dass der erste Beweisblock der kürzere ist. Zum Beispiel wäre bei der vorigen Aufgabe
 -- `suffices` schöner gewesen:
 
+--   "Angenommen, man hat eine Implikation $A \\Rightarrow \\neg B$ und weiss, dass
+--    $A \\land B$ wahr ist. Zeige, dass dies zu einem Widerspruch führt."
+
 Statement
-    "Angenommen, man hat eine Implikation $A \\Rightarrow \\neg B$ und weiss, dass
-    $A \\land B$ wahr ist. Zeige, dass dies zu einem Widerspruch führt."
     (A B : Prop) (h : A → ¬ B) (k₁ : A) (k₂ : B) : False := by
-  Hint "**Robo**: Ich weiss was er meint! Anstatt `have` kannst du auch `suffices`
-  brauchen. Das funktioniert genau gleich, aussert dass dann die beiden Goals vertauscht sind.
+  Hint "**Robo**: Ich weiss was er meint! Anstatt `have` kannst Du auch `suffices`
+  verwenden. Das funktioniert genau gleich, außer, dass dann die beiden Beweisziele vertauscht sind.
 
   **Du**: Also nach `suffices g : ¬B` muss ich dann zuerst zeigen, wie man mit `g` den Beweis
-  abschliesst bevor ich `g` beweise?
+  abschliesst, bevor ich `g` beweise?
 
-  **Robo**: Genau! Verwendende `have` und `suffices` einfach nach gutdünken."
+  **Robo**: Genau!"
   suffices g : ¬ B
-  Hint "**Robo**: Also hier beendest du den Beweis angenommen {g} sei wahr."
+  Hint "**Robo**: Also hier beendest Du den Beweis unter der Annahme `{g}` sei wahr."
   contradiction
-  Hint "**Robo**: Und hier beweist du das Zwischenresultat."
+  Hint "**Robo**: Und hier beweist Du das Zwischenresultat."
   apply h
   assumption
 
 NewTactic «suffices»
 DisabledTactic «have»
 
-Conclusion "*Oddeus* nimmt den Brief, schaut ihn an und, rollt ihn zusammen.
+Conclusion "**Benedictus**:  Genau so meinte ich das.  Ob Ihr nun in Zukunft  `have` und `suffices` verwendet, ist reine Geschmacksfrage.  Hauptsache, Ihr wisst, wie Ihr entfernte Ziele in kleinen Schritte erreicht. 
 
-**Oddeus**: Ich verstehe meine Schwester nie. Kommt, vielleicht könnt ihr mir helfen.
-
-Und er führt euch durch seinen Rosengarten."

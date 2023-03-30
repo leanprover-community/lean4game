@@ -73,10 +73,17 @@ Statement : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) := by
   --ring
 
 Conclusion "Die Formalosophinnen sind ganz begeistert.  
+Nachdem sich der Beifall gelegt hat, hast Du auch einmal eine Frage.
 
-**Du**: Kannst Du mir nochmal einen neun Überblick geben?
+**Du**: Kann uns hier irgendjemand vielleicht ein bisschen Orientierung im Formaloversum geben?
 
-**Robo**:
+**Alle**:  Ja, ja.  
+
+**Du**:  Wer denn?
+
+Die Frage war wieder zu konkret.  Betretenes Schweigen.
+
+**Robo**:  Lass nur.  Ich schlage vor, wir machen als nächstes einen Ausflug auf den Asteroiden da drüben.  Und bevor Du fragst – hier ist wieder ein Überblick, was Du auf diesem Planeten gelernt hast.
 
 |               | Beschreibung                |
 |:--------------|:----------------------------|

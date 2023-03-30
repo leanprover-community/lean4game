@@ -14,14 +14,7 @@ Title "Kontraposition"
 
 Introduction
 "
-*Oddeus* reicht euch das Papier.
-
-**Du**: Da steht etwas über `contrapose` hier…
-
-**Oddeus**: Das ist doch klar eine Aggression uns gegenüber!
-
-**Robo**: Wartet mal, vielleicht wollte euch eure Schwester einfach von ihren neuen
-Endeckungen zeigen. Schaut, darunter ist eine Aufgabe.
+**Benedictus**:  Gut, hier ist die angekündigte Frage.  Versucht mal einen *direkten* Beweis, ohne `contrapose`.
 "
 
 -- Ein Beweis durch Kontraposition benützt im Grunde das eben bewiesene Lemma
@@ -45,26 +38,24 @@ Endeckungen zeigen. Schaut, darunter ist eine Aufgabe.
 open Nat
 
 Statement (n : ℕ) (h : Odd (n ^ 2)): Odd n := by
-  Hint "**Oddeus**: Wie soll das den gehen?
+  Hint "**Robo**: Ich schlage vor, wir führen das auf das Lemma `even_square` zurück, das wir auf Quantus schon gezeigt hatten.  Hier steht ja im Grunde `Odd (n^2) → Odd n`.  Und unter Kontraposition ist das äquivalent zu `Even n → Even (n^2)`.
 
-  **Robo**: `contrapose` benutzt das Lemma eurer Gelehrter, `not_imp_not`. Also es wandelt
-  ein Goal `A → B` zu `¬B → ¬A ` um.
+  **Du**:  Richtig. Von hinten durch die Brust … Aber warte, im Moment steht da doch gar kein `→`.
 
-  **Du**: Aber das Goal ist doch gar keine Implikation?
-
-  **Robo**: Mit `revert {h}` kannst du die Annahme `{h}` als Implikationsannahme ins Goal
-  schieben."
+  **Robo**:  Erinner Dich an `revert`.  Mit `revert {h}` kannst du die Annahme `{h}` als Implikationsannahme ins Beweissziel schieben."
   revert h
-  Hint "*Oddeus*: Ob man jetzt wohl dieses `contrapose` benutzen kann?"
+  Hint "**Du**: Und jetzt kann ich dieses Kontrapositionslemma anwenden?  Wie hieß das noch einmal?  
+
+  **Robo**: Tatsächlich kannst auch einfach `contrapose` schreiben.
+  "
   contrapose
-  Hint (hidden := true) "**Du**: Warte mal, jetzt kann man wohl `even_iff_not_odd` verwenden…"
+  Hint (hidden := true) "**Robo**: Vielleicht hilft jetzt `even_iff_not_odd` weiter?"
   rw [← even_iff_not_odd]
   rw [← even_iff_not_odd]
-  Hint "**Robo**: Und den Rest hast du bei *Evenine* als Lemma gezeigt!"
+  Hint "**Du**:  Das sieht schon ganz gut aus.  Jetzt kann ich tatsächlich das alte Lemma anwenden!"
   apply even_square
 
 NewTactic contrapose
 DisabledTactic by_contra
 
-Conclusion "**Oddeus**: Ah ich sehe, die Aussage ist, dass wir das nur zusammen lösen konnten.
-Ich danke euch, darauf wäre ich nie gekommen."
+Conclusion "**Benedictus**: Hervorragend!  Ich glaube, damit seid Ihr jetzt ganz gut gewappnet."  

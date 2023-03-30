@@ -12,17 +12,10 @@ Game "Adam"
 World "Contradiction"
 Level 3
 
-Title "Per Widerspruch"
+Title "Widerspruch"
 
 Introduction
-"**Oddeus**: Ich verstehe *Evenine* einfach nicht. Ich will euch auch gleich zeigen,
-was sie mir letzthin geschrieben hat, aber zuerst schaut einmal unseren
-wunderschönen Absurda-Tempel an!
-
-Damit kommt ihr vor einen sehr hohen Turm, der ausschliesslich aus Dornenranken gewachsen
-scheint.
-
-**Oddeus**: Versteht ihr, was hier über dem Eingang steht?
+"**Benedictus**: Hier ist noch eine Variante.
 "
 
 --   Eine sehr nützliche Beweismethode ist per Widerspruch.
@@ -37,29 +30,24 @@ scheint.
 -- steht:
 
 Statement (A B : Prop) (g : A → B) (b : ¬ B) : ¬ A := by
-  Hint "**Robo**: Ein `¬` im Goal heisst häufig, dass du einen Widerspruchsbeweis führen
+  Hint "**Robo**: Ein `¬` im Goal heißt häufig, dass Du einen Widerspruchsbeweis führen
   möchtest.
 
-  **Du**: Und wie mach ich das? Mit `contradiction`?
+  **Du**: Und wie mache ich das? Mit `contradiction`?
 
-  **Robo**: Mit `by_contra h` fängst du einen an. Mit `contradiction` schliesst du ihn dann
-  später ab."
+  **Robo**: Mit `by_contra h` fängst Du einen Widerspruchsbeweis an. Und mit `contradiction` schließt Du ihn ab."
   by_contra h
-  Hint "**Robo**: Jetzt hast du also eine Annahme `{h} : ¬ {A}`, und damit musst du einen
-  Widerspruch herbeileiten.
+  Hint "**Robo**: Jetzt hast du also eine Annahme `{h} : {A}`, und damit musst Du einen Widerspruch herleiten.
 
-  Ein Methode ist, dass du jetzt mit `suffices` sagts, zu was du denn gerne den Widerspruch
-  haben möchtest, zum Beispiel `suffices k : B`
+  Du könntest zum Beispiel jetzt mit `suffices` sagten, welchen Widerspruch Du gern herleiten möchtest, etwa `suffices k : B`
   "
   suffices k : B
-  Hint "**Du**: Ah und jetzt kann ich einfach sagen dass sich die Anahmen `{B}` und `¬{B}`
-  widersprechen."
+  Hint "**Du**: Ah, und jetzt kann ich einfach sagen dass sich die Annahmen `{B}` und `¬{B}` sich widersprechen."
   contradiction
-  Hint "**Robo**: Und jetzt kannst du noch das Ergebnis zeigen, das zu einem Widerspruch
-  geführt hat."
+  Hint "**Robo**: Und jetzt musst Du nur noch das Zwischenresultat herleiten, dass zu diesem Widerspruch geführt hat."
   apply g
   assumption
 
 NewTactic by_contra
 
-Conclusion "**Oddeus**: Sehr gut, kommt mit hinein!"
+Conclusion "**Benedictus**:  Ich sehe schon, Ihr lernt schnell!"
