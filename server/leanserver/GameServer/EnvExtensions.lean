@@ -125,7 +125,8 @@ structure ComputedInventoryItem where
   displayName : String
   category : String
   locked : Bool
-  disabled : Bool
+  -- items that are temporarily blocked in this level.
+  disabled : Bool := false
 deriving ToJson, FromJson, Repr, Inhabited
 
 structure InventoryInfo where

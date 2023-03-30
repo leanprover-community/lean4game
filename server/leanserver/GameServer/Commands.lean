@@ -326,7 +326,8 @@ elab "NewTactic" args:ident* : command => do
   for name in names do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with tactics := {level.tactics with new := names}}
 
-/-- Declare tactics that are temporarily disabled in this level -/
+/-- Declare tactics that are temporarily disabled in this level.
+This is ignored if `OnlyTactic` is set. -/
 elab "DisabledTactic" args:ident* : command => do
   let names := args.map (·.getId)
   -- for name in names do checkInventoryDoc .Tactic name
@@ -371,7 +372,8 @@ elab "DisabledDefinition" args:ident* : command => do
   -- for name in names do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with definitions := {level.definitions with disabled := names}}
 
-/-- Temporarily disable all definitions except the ones declared here -/
+/-- Temporarily disable all definitions except the ones declared here.
+This is ignored if `OnlyDefinition` is set. -/
 elab "OnlyDefinition" args:ident* : command => do
   let names := args.map (·.getId)
   for name in names do checkInventoryDoc .Definition name
@@ -412,7 +414,8 @@ elab "NewLemma" args:ident* : command => do
   for name in names do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with new := names}}
 
-/-- Declare lemmas that are temporarily disabled in this level -/
+/-- Declare lemmas that are temporarily disabled in this level.
+This is ignored if `OnlyLemma` is set. -/
 elab "DisabledLemma" args:ident* : command => do
   let names := args.map (·.getId)
   -- for name in names do checkInventoryDoc .Lemma name
@@ -456,17 +459,16 @@ elab "MakeGame" : command => do
         allItems := allItems.insertMany (level.getInventory inventoryType).new
       newItemsInWorld := newItemsInWorld.insert worldId newItems
 
-    -- Basic inventory item availability: all locked, none disabled.
+    -- Basic inventory item availability: all locked.
     let Availability₀ : HashMap Name ComputedInventoryItem :=
       HashMap.ofList $
-        ← allItems.toList.mapM fun name => do
-          let data := (← getInventoryDoc? name inventoryType).get!
-          return (name, {
-            name
+        ← allItems.toList.mapM fun item => do
+          let data := (← getInventoryDoc? item inventoryType).get!
+          return (item, {
+            name := item
             displayName := data.displayName
             category := data.category
-            locked := true
-            disabled := false})
+            locked := true })
 
     -- Availability after a given world
     let mut itemsInWorld : HashMap Name (HashMap Name ComputedInventoryItem) := {}
@@ -480,9 +482,7 @@ elab "MakeGame" : command => do
             name := item
             displayName := data.displayName
             category := data.category
-            locked := false
-            disabled := false
-          }
+            locked := false }
       itemsInWorld := itemsInWorld.insert worldId items
 
     for (worldId, world) in game.worlds.nodes.toArray do
@@ -491,33 +491,28 @@ elab "MakeGame" : command => do
       let levels := world.levels.toArray.insertionSort fun a b => a.1 < b.1
 
       for (levelId, level) in levels do
-        for item in (level.getInventory inventoryType).new do
-          let data := (← getInventoryDoc? item inventoryType).get!
-          items := items.insert item {
-            name := item
-            displayName := data.displayName
-            category := data.category
-            locked := false
-            disabled := false
-          }
+        let levelInfo := level.getInventory inventoryType
 
-        let mut disabled : HashSet Name := {}
-        for item in (level.getInventory inventoryType).disabled do
+        -- add items in `levelInfo.new` permanently as unlocked
+        for item in levelInfo.new do
           let data := (← getInventoryDoc? item inventoryType).get!
           items := items.insert item {
             name := item
             displayName := data.displayName
             category := data.category
-            locked := false
-            disabled := false
-          }
-          -- (we set disabled to false at first because it applies only to the current level)
-          disabled := disabled.insert item
+            locked := false }
 
         let itemsArray := items.toArray
           |>.insertionSort (fun a b => a.1.toString < b.1.toString)
           |>.map (·.2)
-          |>.map (fun item => {item with disabled := disabled.contains item.name})
+          |>.map (fun item => { item with
+            -- if `levelInfo.only` is set, disable everything not in there,
+            -- otherwise disable all in `levelInfo.disabled`
+            disabled := if levelInfo.only.size == 0 then
+              levelInfo.disabled.contains item.name
+            else
+              not (levelInfo.only.contains item.name)
+            })
 
         modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
           return level.setComputedInventory inventoryType itemsArray
