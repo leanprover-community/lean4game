@@ -55,5 +55,4 @@ Statement
 NewTactic «suffices»
 DisabledTactic «have»
 
-Conclusion "**Benedictus**:  Genau so meinte ich das.  Ob Ihr nun in Zukunft  `have` und `suffices` verwendet, ist reine Geschmacksfrage.  Hauptsache, Ihr wisst, wie Ihr entfernte Ziele in kleinen Schritte erreicht. 
-
+Conclusion "**Benedictus**:  Genau so meinte ich das.  Ob Ihr nun in Zukunft  `have` und `suffices` verwendet, ist reine Geschmacksfrage.  Hauptsache, Ihr wisst, wie Ihr entfernte Ziele in kleinen Schritte erreicht."

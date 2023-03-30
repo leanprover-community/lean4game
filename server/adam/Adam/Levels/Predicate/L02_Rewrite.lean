@@ -14,7 +14,9 @@ Statement (a b c d : ℕ) (h₁ : c = d) (h₂ : a = b) (h₃ : a = d) : b = c :
   Hint "**Du**: Schau mal, dieses Problem sieht so ähnlich aus wie eines, das wir auf *Implis* schon gelöst hatten.
   Nur, das hier jetzt Gleichheiten von Zahlen statt Genau-Dann-Wenn-Aussagen stehen!
 
-  **Robo**: Richtig.  Und im Grunde macht das gar keinen Unterscheid.  Du kannst `=` und `↔` praktisch mit `rw` praktisch g"""""leich behandeln."
+  **Robo**: Richtig.  Und im Grunde macht das gar keinen Unterscheid.
+  Du kannst `=` und `↔` praktisch mit `rw` praktisch gleich behandeln."
+
   Hint (hidden := true) "**Du**: Also auch `rw [hₓ]` und `rw [← hₓ]`?
 
   **Robo**: Probiers doch einfach."

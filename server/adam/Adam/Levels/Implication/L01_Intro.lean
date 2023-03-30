@@ -16,11 +16,11 @@ Introduction
 
 Statement (A B : Prop) (hb : B) : A → (A ∧ B) := by
   Hint "
-  **Operationsleiter:**  Die Arbeiten meinen, das wäre so richtig und wir würden das dringend brauchen.  Aber keiner kann es mir beweisen.  
+  **Operationsleiter:**  Die Arbeiten meinen, das wäre so richtig und wir würden das dringend brauchen.  Aber keiner kann es mir beweisen.
 
   **Du**: Einen Moment.  Das ist ja gerade so eine Implikation (`\\to`).  Wir nehmen an, dass `{B}` gilt, und wollen zeigen, dass dann gilt `{A}` impliziert `{A} und {B}`. Ja, klar! Natürlich stimmt das.
 
-  Der Operationsleiter sieht Dich erwartungsvoll an. 
+  Der Operationsleiter sieht Dich erwartungsvoll an.
 
   **Du** *(leise zu Robo)*:  Soll ich ihm `tauto` aufschreiben?
 
@@ -29,7 +29,7 @@ Statement (A B : Prop) (hb : B) : A → (A ∧ B) := by
 
   *Du**: Aber wie denn?  Ich glaube, ich würde als erstes gern so etwas sagen wie 'Nehmen wir also an, `{A}` gilt …'
 
-  **Robo**: Ja, gute Idee.  Wähle dazu für Deine Annahme einfach einen Namen, zum Beispiel `{h}`, und schreib `intro {h}`."
+  **Robo**: Ja, gute Idee.  Wähle dazu für Deine Annahme einfach einen Namen, zum Beispiel `h`, und schreib `intro h`."
   intro hA
   Hint "**Du**: OK.  Jetzt habe ich also sowohl `{A}` als auch `{B}` in meinen Annahmen und muss `{A} ∧ {B}` zeigen.
 
@@ -42,7 +42,7 @@ Conclusion "**Operationsleiter:** Perfekt!  Danke schön!
 
 Er geht zu einer Schalttafel und ein paar Knöpfe.  Irgendwo setzt sich lautstark ein Förderband in Bewegung.
 
-**Operationsleiter:** Habt Ihr vielleicht noch ein paar Minuten?  
+**Operationsleiter:** Habt Ihr vielleicht noch ein paar Minuten?
 "
 
 NewTactic intro
