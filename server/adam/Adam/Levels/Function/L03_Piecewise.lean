@@ -54,7 +54,7 @@ Statement ""
 NewTactic funext by_cases simp_rw linarith
 
 NewLemma not_le if_pos if_neg
-
+LemmaTab "Logic"
 
 Hint : f ∘ g = g ∘ f =>
 "

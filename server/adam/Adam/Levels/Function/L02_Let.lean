@@ -44,6 +44,7 @@ Statement "" (x : ℤ) : ∃ (g : ℤ → ℤ), (g ∘ f) x = x + 1 := by
 
 NewTactic «let»
 NewLemma Function.comp_apply
+LemmaTab "Function"
 
 Hint (x : ℤ) : ∃ g, (g ∘ f) x = x + 1 =>
 "**Du**: Ist `g ∘ f` Komposition von Funktionen?

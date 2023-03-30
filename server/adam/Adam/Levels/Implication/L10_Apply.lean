@@ -45,5 +45,6 @@ Conclusion
 **Mechanikerin**: Danke vielmals, jetzt bin ich schon viel ruhiger.
 "
 
+LemmaTab "Logic"
 NewLemma not_or_of_imp
 DisabledTactic tauto

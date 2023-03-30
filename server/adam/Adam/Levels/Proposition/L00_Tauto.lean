@@ -43,4 +43,5 @@ Aber glaubt bloß nicht, dass Ihr damit auf *diesem* Planeten viel weiterkommt!
 Meine Untertanen verstehen `tauto` nicht.  Da müsst Ihr Euch schon etwas mehr anstrengen.
 "
 
+LemmaTab "Logic"
 NewTactic tauto
