@@ -14,7 +14,7 @@ import Adam.Levels.Implication.L13_Summary
 
 Game "Adam"
 World "Implication"
-Title "Aussagenlogik 2"
+Title "Implis"
 
 Introduction
 "

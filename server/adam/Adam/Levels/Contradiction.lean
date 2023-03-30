@@ -7,7 +7,7 @@ import Adam.Levels.Contradiction.L06_Summary
 
 Game "Adam"
 World "Contradiction"
-Title "Beweisstrategien"
+Title "Spinoza"
 
 Introduction "
 **Robo**:  Ich glaube, das ist Spinoza, einer der ganz wenigen Asteroiden vom Type QED.  Schnell.  Wir müssen uns ein bisschen beeilen, sonst verpassen wir ihn.
