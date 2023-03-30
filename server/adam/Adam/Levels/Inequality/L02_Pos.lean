@@ -46,6 +46,7 @@ Statement Nat.pos_iff_ne_zero (n : ℕ) : 0 < n ↔ n ≠ 0 := by
 NewTactic simp
 NewLemma Nat.succ_pos
 DisabledLemma Nat.pos_iff_ne_zero
+LemmaTab "Nat"
 
 Conclusion "**Du**: Oh `simp` ist ja echt nicht schlecht…
 

@@ -40,3 +40,4 @@ Conclusion
 
 DisabledTactic tauto apply
 NewLemma not_not
+LemmaTab "Logic"

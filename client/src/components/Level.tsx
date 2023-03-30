@@ -218,8 +218,7 @@ function PlayableLevel({worldId, levelId}) {
       </div>
       <div className="inventory-panel">
         {!level.isLoading &&
-          <Inventory tactics={level?.data?.tactics} lemmas={level?.data?.lemmas}
-            definitions={level?.data?.definitions} setInventoryDoc={setInventoryDoc} />}
+          <Inventory levelInfo={level?.data} setInventoryDoc={setInventoryDoc} />}
       </div>
       <div className="doc-panel">
         {inventoryDoc && <Documentation name={inventoryDoc.name} type={inventoryDoc.type} />}

@@ -22,5 +22,6 @@ Statement (n : ℕ) (h : 2 ≤ n) : n ≠ 0 := by
 
 NewTactic linarith
 NewLemma Nat.pos_iff_ne_zero
+LemmaTab "Nat"
 
 Conclusion "**Du**: Naja so beeindruckend war das jetzt auch noch nicht."

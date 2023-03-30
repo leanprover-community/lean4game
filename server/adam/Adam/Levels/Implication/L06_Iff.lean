@@ -34,6 +34,7 @@ heißen bei `(h : A ↔ B)` die beiden Teile `h.mp` und `h.mpr`.
 
 **Robo**: `mp` steht für Modus Ponens`.  Der Modus ponens ist eine schon in der antiken Logik geläufige Schlussfigur, die in vielen logischen Systemen …  Ach nee, das wolltest Du ja nicht hören.  Das \"r\" in `mpr` steht für \"reverse\", weil's die Rückrichtung ist.
 "
+
 NewTactic constructor
 DisabledTactic tauto rw
 

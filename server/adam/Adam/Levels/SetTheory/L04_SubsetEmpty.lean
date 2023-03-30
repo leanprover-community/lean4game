@@ -29,20 +29,7 @@ Fast immer wenn man Gleichheiten von Mengen zeigen muss, will man diese in zwei 
 aufteilen.
 "
 
-namespace MySet
-
 open Set Subset
-
--- Copied some lemmas from `Matlib.Data.Set.Basic` in order to not import the entire file.
-theorem tmp {α : Type _} {s t : Set α} : s = t → s ⊆ t :=
-  fun h₁ _ h₂ => by rw [← h₁] ; exact h₂
-
-theorem Subset.antisymm_iff {α : Type _} {a b : Set α} : a = b ↔ a ⊆ b ∧ b ⊆ a :=
-  ⟨fun e => ⟨tmp e, tmp e.symm⟩, fun ⟨h₁, h₂⟩ => Set.ext fun _ => ⟨@h₁ _, @h₂ _⟩⟩
-
-@[simp]
-theorem empty_subset {α : Type _} (s : Set α) : ∅ ⊆ s :=
-  fun.
 
 Statement subset_empty_iff {A : Type _} (s : Set A) :
     s ⊆ ∅ ↔ s = ∅ := by
@@ -53,16 +40,16 @@ Statement subset_empty_iff {A : Type _} (s : Set A) :
   Hint (hidden := true) "**Robo**: Fang doch einmal mit `constructor` an."
   constructor
   intro h
-  Hint "**Robo**: "
+  Hint "**Robo**: Gleichheit zwischen Mengen kann man zum Beispiel zeigen,
+  indem man `A ⊆ B` und `B ⊆ A` zeigt.
+
+  Dieser Schritt ist `apply Subset.antisymm`"
   apply Subset.antisymm
   assumption
-  simp only [empty_subset]
-  intro a
-  rw [Subset.antisymm_iff] at a
-  rcases a with ⟨h₁, h₂⟩
-  assumption
+  Hint "**Robo**: Hier ist das Lemma `empty_subset` hilfreich."
+  apply empty_subset
+  intro h
+  rw [h]
 
 DisabledTactic tauto
-NewLemma Subset.antisymm Subset.antisymm_iff empty_subset
-
-end MySet
+NewLemma Set.Subset.antisymm Set.Subset.antisymm_iff Set.empty_subset

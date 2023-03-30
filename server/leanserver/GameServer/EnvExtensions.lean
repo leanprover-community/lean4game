@@ -157,6 +157,7 @@ structure GameLevel where
   tactics: InventoryInfo := default
   definitions: InventoryInfo := default
   lemmas: InventoryInfo := default
+  lemmaTab: Option String := none
   hints: Array GoalHintEntry := default
   /-- The statement in Lean. -/
   goal : TSyntax `Lean.Parser.Command.declSig := default

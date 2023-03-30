@@ -46,5 +46,6 @@ Conclusion
 Der Operationsleiter nickt zustimmend.  Offenbar war ihm `not_or_of_imp` tatsächlich bekannt.
 "
 
+LemmaTab "Logic"
 NewLemma not_or_of_imp
 DisabledTactic tauto

@@ -49,6 +49,7 @@ structure LevelInfo where
   conclusion : String
   descrText : String := ""
   descrFormat : String := ""
+  lemmaTab : Option String
 deriving ToJson, FromJson
 
 structure LoadLevelParams where
@@ -128,7 +129,8 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             descrText := lvl.descrText,
             descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction
-            conclusion := lvl.conclusion }
+            conclusion := lvl.conclusion
+            lemmaTab := lvl.lemmaTab }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson levelInfo⟩
       return true
     | Message.request id "loadDoc" params =>

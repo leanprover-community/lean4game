@@ -18,7 +18,7 @@ export interface ComputedInventoryItem {
   locked: boolean
 }
 
-interface LevelInfo {
+export interface LevelInfo {
   title: null|string,
   introduction: null|string,
   conclusion: null|string,
@@ -28,6 +28,7 @@ interface LevelInfo {
   definitions: ComputedInventoryItem[],
   descrText: null|string,
   descrFormat: null|string,
+  lemmaTab: null|string,
 }
 
 interface Doc {

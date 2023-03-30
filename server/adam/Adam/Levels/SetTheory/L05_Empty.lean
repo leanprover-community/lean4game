@@ -12,39 +12,23 @@ Game "Adam"
 World "SetTheory"
 Level 5
 
-Title "Nonempty"
+Title "Empty"
 
 Introduction
 "
-Das Gegenteil von `A = ∅` ist `A ≠ ∅`, aber in Lean wird der Ausdruck `A.Nonempty` bevorzugt.
-Dieser ist dadurch existiert, dass in `A` ein Element existiert: `∃x, x ∈ A`.
-
-Zeige dass die beiden Ausdrücke äquivalent sind:
+Zeige folgendes Lemma, welches wir gleich brauchen werden:
 "
-
-namespace MySet
 
 open Set
 
-theorem subset_empty_iff {A : Type _} (s : Set A) : s ⊆ ∅ ↔ s = ∅ := by
-  constructor
-  intro h
-  rw [Subset.antisymm_iff]
-  constructor
-  assumption
-  simp only [empty_subset]
-  intro a
-  rw [Subset.antisymm_iff] at a
-  rcases a with ⟨h₁, h₂⟩
-  assumption
 
 Statement eq_empty_iff_forall_not_mem
 ""
     {A : Type _} (s : Set A) :
     s = ∅ ↔ ∀ x, x ∉ s := by
+  Hint "Das Lemma `subset_empty_iff` von letzter Aufgabe könnte hilfreich sein."
   rw [←subset_empty_iff]
   rfl -- This is quite a miracle :)
 
 NewTactic constructor intro rw assumption rcases simp tauto trivial
-
-end MySet
+NewLemma Set.subset_empty_iff

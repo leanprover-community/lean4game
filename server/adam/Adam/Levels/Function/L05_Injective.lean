@@ -31,7 +31,7 @@ Statement "" : Injective (fun (n : ℤ) ↦ n^3 + (n + 3)) := by
 
 NewDefinition Injective
 NewLemma StrictMono.injective StrictMono.add Odd.strictMono_pow
-
+LemmaTab "Function"
 
 Hint : Injective fun (n : ℤ) => n ^ 3 + (n + 3) =>
 "**Du**: Hmm, das ist etwas schwieriger…

@@ -1,1 +1,0 @@
-{"version":1,"references":{"c:MyNat.succ":{"usages":[[45,18,45,22],[45,27,45,31]],"definition":null},"c:MyNat.add_zero":{"usages":[[52,11,52,19]],"definition":null},"c:MyNat.add_succ":{"usages":[[49,11,49,19]],"definition":null},"c:MyNat":{"usages":[[45,9,45,10]],"definition":null}},"module":"NNG.Levels.Tutorial.Level_4"}
