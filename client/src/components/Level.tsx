@@ -86,6 +86,7 @@ function PlayableLevel({worldId, levelId}) {
 
   const theme = useTheme();
 
+
   useEffect(() => {
     // Scroll to top when loading a new level
     introductionPanelRef.current!.scrollTo(0,0)
@@ -180,9 +181,11 @@ function PlayableLevel({worldId, levelId}) {
     <Split minSize={0} snapOffset={200} sizes={[50, 25, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
       <div className="exercise-panel">
         <div ref={introductionPanelRef} className="introduction-panel">
-          <div className="message info">
-            <Markdown>{level?.data?.introduction}</Markdown>
-          </div>
+          {level?.data?.introduction &&
+            <div className="message info">
+              <Markdown>{level?.data?.introduction}</Markdown>
+            </div>
+          }
         </div>
         <div className="exercise">
           {/* <h4>Aufgabe:</h4> */}
@@ -206,9 +209,11 @@ function PlayableLevel({worldId, levelId}) {
         </EditorContext.Provider>
 
         {completed && <div className="conclusion">
-          <div className="message info">
-            <Markdown>{level?.data?.conclusion}</Markdown>
-          </div>
+          {level?.data?.conclusion &&
+            <div className="message info">
+              <Markdown>{level?.data?.conclusion}</Markdown>
+            </div>
+          }
           {levelId >= gameInfo.data?.worldSize[worldId] ?
           <Button to={`/game/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
           <Button to={`/game/${gameId}/world/${worldId}/level/${levelId + 1}`}>
@@ -238,11 +243,13 @@ function Introduction({worldId}) {
     <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Einführung" worldId={worldId} levelId={0} />
     <div style={gameInfo.isLoading ? {display: "none"} : null} className="exercise-panel">
       <div className="introduction-panel">
-        <div className="message info">
-          <Markdown>
-            {gameInfo.data?.worlds.nodes[worldId].introduction}
-          </Markdown>
-        </div>
+        { gameInfo.data?.worlds.nodes[worldId].introduction &&
+          <div className="message info">
+            <Markdown>
+              {gameInfo.data?.worlds.nodes[worldId].introduction}
+            </Markdown>
+          </div>
+        }
       </div>
       <div className="conclusion">
         {0 == gameInfo.data?.worldSize[worldId] ?
