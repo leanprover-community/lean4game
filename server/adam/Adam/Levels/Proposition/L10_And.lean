@@ -11,7 +11,7 @@ Title "Und"
 
 Introduction
 "
-Langsam wird die Schlange kürzer. Die nächste Formalosophin hat folgendes Anliegen:
+Langsam wird die Schlange kürzer. Die nächste Formalosophin, ebenfalls häkelnd, hat folgendes Anliegen.
 "
 
 Statement ""

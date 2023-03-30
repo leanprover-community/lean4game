@@ -12,32 +12,29 @@ Game "Adam"
 World "Contradiction"
 Level 4
 
-Title "Per Widerspruch"
+Title "Kontraposition"
 
 Introduction
 "
-*Oddeus* Geht zu einem Regal mit vielen Dokumenten und beginnt zu suchen.
-
-**Oddeus**: Ich hab's gleich. Hier ist eine Notiz meiner Gelehrter, die mir
-mit solchen kryptischen Nachrichten helfen wollten.
-
-Auf dem Pergament steht das ein Lemma mit dem Namen `not_imp_not`:
+**Benedictus**:  Ich habe noch eine schöne Frage zu ungeraden Quadraten für Euch.  Aber vorher beweist Ihr besser noch diese Äquivalenz hier.  Ich gaube, die hat sogar bei Euch einen Namen: *Kontrapositionsäquivalenz*, oder so etwas.  Auf Leansch nennen wir die Äuqivalenz einfach `not_imp_not`.  Ist doch viel einleuchtender, oder?
 "
 
 Statement not_imp_not (A B : Prop) : A → B ↔ (¬ B → ¬ A) := by
-  Hint "**Du**: Ich glaube, dafür kenn ich das meiste schon."
+  Hint "**Du**: Ja, das habe ich tatsächlich schon einmal gesehen.
+
+  **Robo**:  Ja, klar hast Du das schon einmal gesehen.  Das benutzen Mathematiker doch ständig.  Wenn ihnen zu $A ⇒ B$ nichts einfällt, zeigen sie stattdessen $¬B ⇒ ¬A$.  Ich würde das ja statt *Kontraposition* oder `not_imp_not` eher *von_hinten_durch_die_Brust_ins_Auge* nennen.  Aber gut, ich will mich nicht einmisschen.
+  " 
   Hint (hidden := true) "**Robo**: Fang doch mal mit `constructor` an."
   constructor
   intro h b
   by_contra a
-  Hint "**Robo**: Zur Erinnerung, hier würde ich mit `suffices g : B` einen Widerspruch
-  herbeiführen."
+  Hint "**Robo**: Ich würde wieder mit `suffices g : B` einen Widerspruch herbeiführen."
   suffices b : B
   contradiction
   apply h
   assumption
   intro h a
-  Hint "**Robo**: Hier würde ich ebenfalls einen Widerspruch anfangen."
+  Hint "**Robo**: Hier würde ich ebenfalls einen Widerspruchsbeweis anfangen."
   by_contra b
   Hint (hidden := true) "**Robo**: `suffices g : ¬ A` sieht nach einer guten Option aus."
   suffices g : ¬ A
@@ -48,4 +45,4 @@ Statement not_imp_not (A B : Prop) : A → B ↔ (¬ B → ¬ A) := by
 DisabledTactic rw
 DisabledLemma not_not
 
-Conclusion "**Du**: Und wie hilft uns das jetzt, was steht denn in dem Brief?"
+Conclusion ""

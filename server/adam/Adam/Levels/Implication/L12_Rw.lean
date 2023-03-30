@@ -11,19 +11,12 @@ Title "Lemmas"
 
 Introduction
 "
-Der Arbeitskollegin der Mechanikerin, der die ganze Zeit gespannt zugehört hat, dreht sich zu
-euch.
-
-Er ist offensichtlich interessiert and existierenden Resultaten zu sein, aber offenbar
-kann er nicht viel mit `apply` anfangen.
-
-Er hat aber folgendes Resultat bereit:
-
+**Operationsleiter**:  Wieder etwas für den Kollegen ….  Und er wollte wieder einen Beweise ohne `apply`.  Ich sehe hier auch, dass ich mir schon einmal etwas hierzu notiert hatte.  Richtig, es gibt da dieses Lemma:
 ```
 lemma not_not (A : Prop) : ¬¬A ↔ A
 ```
 
-und stellt euch folgende Frage:
+**Operationsleiter**:  Schafft Ihr das damit?
 "
 
 Statement (A B C : Prop) : (A ∧ (¬¬C)) ∨ (¬¬B) ∧ C ↔ (A ∧ C) ∨ B ∧ (¬¬C) := by
@@ -33,17 +26,16 @@ Statement (A B C : Prop) : (A ∧ (¬¬C)) ∨ (¬¬B) ∧ C ↔ (A ∧ C) ∨ B
   Hint "**Du**: Häh, wieso hat das jetzt 2 von 3 der `¬¬` umgeschrieben?
 
   **Robo**: `rw` schreibt nur das erste um, das es findet, also `¬¬C`. Aber weil dieses
-  mehrmals vorkommt, werden die alle ersetzt…
+  mehrmals vorkommt, werden die alle ersetzt …
 
-  **Du**: Ah, und `¬¬B` ist was anderes, also brauch ich das Lemma nochmals."
+  **Du**: Ah, und `¬¬B` ist etwas anderes, also brauche ich das Lemma nochmals."
   rw [not_not]
 
 Conclusion
 "
-**Du**: Ah und wir sind fertig…?
+**Du**: Wir sind schon fertig …?
 
-**Robo**: Ja, `rw` versucht immer anschliessend `rfl` aufzurufen, und das hat hier
-funktioniert.
+**Robo**: Ja, `rw` versucht immer anschließend `rfl` aufzurufen, und das hat hier funktioniert.
 "
 
 DisabledTactic tauto apply

@@ -8,9 +8,7 @@ Level 3
 Title "Rewrite"
 
 Introduction
-"
-**Evenine**: Mit diesem neuen Wissen, könnt ihr mir bei folgendem helfen:
-"
+""
 
 Statement
 "
@@ -23,14 +21,13 @@ $$
 $$
 "
 (a b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : b + b ^ 2 = b + 1 := by
-  Hint "**Du**: Ah da ersetzt man ja einfach `{a}` durch `{b}` in der anderen Annahme!
+  Hint "**Du**: Hier muss man, glaube ich, einfach in Annahme `{g}` die Variable `{a}` durch `{b}` ersetzen.
 
-  **Robo**: Genau! Das machst du mit `rw [{h}] at {g}`."
+  **Robo**: Genau! Das machst Du mit `rw [{h}] at {g}`."
   rw [h] at g
   Hint (hidden := true) "**Robo**: Schau mal durch die Annahmen."
   assumption
 
 Conclusion "
-**Robo**: Noch ein Trick: Mit `rw [h] at *` kann man im weiteren `h` in **allen** Annahmen und
-dem Goal umschreiben.
+**Robo**: Noch ein Trick: Mit `rw [{h}] at *` kann man gleichzeitig mittels `{h}` **alle** Annahmen und das Goal umschreiben.
 "

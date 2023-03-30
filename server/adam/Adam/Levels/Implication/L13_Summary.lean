@@ -13,14 +13,11 @@ Title "Zusammenfassung"
 
 Introduction
 "
-**Operationsleiter**: Damit endet unsere Führung langsam. Bevor ihr weitergeht
-habe ich noch ein Problem, an dem ich mir die Zähne ausbeisse. Wir haben die
-Herleitung eines unserer Programme `imp_iff_not_or` verloren, und wissen nicht mehr
-ob es einwandfrei funktioniert.
+**Operationsleiter**: Ihr habt mir wirklich so geholfen!  Hier ist das letzte Problem.  Das habe ich von meinem Vorgänger geerbt.  Er hat behauptet, wenn wir das lösen können, dann läuft hier wieder alles.  Aber es sah mir immer viel zu schwierig aus, um es überhaupt zu versuchen. Wollt Ihr es einmal probieren?
 
-**Du**: Nah gut, mal sehen. Robo, was hab ich denn alles hier gelernt?
+**Du**: Klar, zeig her!  Robo, kannst Du mir vielleicht auch noch einmal so eine nette Zusammenfassung anzeigen, was ich theoretisch in den letzten fünf Minuten gelernt habe?
 
-**Robo**: Hier ist die Übersicht:
+**Robo**: Hier ist die Übersicht:     
 
 ## Notationen / Begriffe
 
@@ -44,34 +41,35 @@ ob es einwandfrei funktioniert.
 
 Statement imp_iff_not_or (A B : Prop) : (A → B) ↔ ¬ A ∨ B := by
   constructor
-  Hint "**Du**: Das sieht kompliziert aus…
+  Hint "**Du** *(flüsternd)*: Ist das nicht die Definition von `→`? 
 
-  **Robo** *(flüsternd)*: Ja, aber die Richtung kennst du ja schon also Lemma,
-  wend doch einfach das an."
+  **Robo** *(flüsternd)*: Könnte man so sehen.  Aber auf Leansch ist das bloß eine Äquivalenz.  
+  So oder so kennst du ja eine Richtung schon als Lemma. 
+  Also wende das doch einfach an."
   apply not_or_of_imp
   Hint "**Du**: Gibt es für die Gegenrichtung auch ein Lemma?
 
-  **Robo**: Leider nicht. Da musst du manuell ran."
-  Hint (hidden := true) "**Robo**: Na Implikationen fangst du immer mit `intro` an."
+  **Robo**: Leider nicht. Da musst Du manuell ran."
+  Hint (hidden := true) "**Robo**: Na Implikationen gehst Du immer mit `intro` an."
   intro h
   intro ha
-  Hint (hidden := true) "**Robo**: Ich wür mal die Annahme `h` mit `rcases` aufteilen."
+  Hint (hidden := true) "**Robo**: Ich würde mal die Annahme `h` mit `rcases` aufteilen."
   rcases h with h | h
   contradiction
   assumption
 
 DisabledTactic tauto
 
-Conclusion "**Operationsleiter**: Damit gehen unsere Wege auseinander. Da fällt mir ein, seit
-ihr auf dem Weg zu unserem Schwestermond?
+Conclusion "**Operationsleiter**: Das ist ja fantastisch!  Tausend Dank!  Dann will ich Euch auch gar nicht länger aufhalten.
+Ihr wollt bestimmt weiter zu Quantus, unserem Schestermond, oder?
 
-**Du**: Könnten wir sein…
+**Du**: Ehm, vielleicht …
 
-**Operationsleiter**: Ich hab hier einen Brief für *Evenine*, könntet ihr diesen mit euch führen?
+**Operationsleiter**: Dann habe ich noch eine letzte Bitte. Ich habe hier noch ein Päckchen für die Königin von Quantus!  Auch schon von meinem Vorgänger geerbt. Die Post will es nicht annehmen, weil ich die Adresse nicht weiß.  Könntet Ihr es vielleicht zu ihr mitnehmen?
 
-**Du**: Klar! Robo, halt den mal.
+**Du**: Klar! Robo, halt mal.
 
-Robo nimmt den Brief und lässt ihn irgendwo in seinem Innern verschwinden. Dabei bemerkt er
-den besorgten Blick des Operationsleiters.
+Robo nimmt das Päckchen und lässt es irgendwo in seinem Innern verschwinden. 
+Der Operationsleiter sieht ihn entgeistert an.
 
 **Robo**: Keine Angst, ich verdaue nichts!"

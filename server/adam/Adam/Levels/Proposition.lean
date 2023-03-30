@@ -15,7 +15,7 @@ import Adam.Levels.Proposition.L13_Summary
 
 Game "Adam"
 World "Proposition"
-Title "Aussagenlogik 1"
+Title "Logo"
 
 Introduction "
 Durch eine unvorhergesehene und nicht-kanonische Singularität in der Raumzeit

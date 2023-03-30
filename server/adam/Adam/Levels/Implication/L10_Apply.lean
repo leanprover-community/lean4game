@@ -11,38 +11,39 @@ Title "Lemmas"
 
 Introduction
 "
-Ihr setzt euch hin und der Gehilfe bringt euch allen Suppe. Neben euch sitzt eine Mechanikerin
-über ihre Suppe geneigt.
+Beim nächsten Problem stutzt der Operationsleiter.
 
-**Mechanikerin**: Sagt mal, ich hab unten über folgendes tiefgründiges Problem nachgedacht:
+**Operationsleiter**:  Ehrlich gesagt weiß ich gar nicht, wo dieses Blatt herkommt.  Das ist gar nicht von mir.  Sieht aber irgendwie interessant aus.
 "
 
 Statement (A : Prop) : ¬A ∨ A := by
-  Hint "**Du**: Das scheint ziemlich offensichtlich.
+  Hint "**Du**: Das scheint wieder ziemlich offensichtlich.
 
-  **Robo**: Ich glaube, sie will eine detailierte Antwort. Ich kenne ein Lemma
-  `not_or_of_imp`, was sagt `(A → B) → ¬ A ∨ B`. Da das Resultat des Lemmas mit
-  deinem Goal übreinstimmt, kannst du es mit `apply not_or_of_imp` anwenden."
-  Branch
+  **Robo**:  Nee, offensichtlich ist das nicht.  Aber ich glaube, es gibt ein wohlbekanntens Lemma, das hier weiterhilft:
+  `not_or_of_imp` besagt `(A → B) → ¬ A ∨ B`.  Da die rechte Seite der Implikation mit Deinem Beweisziel übereinstimmt, 
+  kannst Du es mit `apply not_or_of_imp` anwenden.
+
+  **Du**:  `Wohlbekannt` auf Implis?
+
+  **Robo**:  Werden wir sehen. Probiers aus!"
+  Branch     
     right
     Hint "**Du**: Und jetzt?
 
-    **Robo**: `right/left` funktioniert hier nicht, da du nicht weisst ob `A` wahr oder falsch
-    ist."
+    **Robo**: `right/left` funktioniert hier nicht, da Du nicht weißt, ob `A` wahr oder falsch ist."
   Branch
     left
     Hint "**Du**: Und jetzt?
 
-    **Robo**: `right/left` funktioniert hier nicht, da du nicht weisst ob `A` wahr oder falsch
-    ist."
+    **Robo**: `right/left` funktioniert hier nicht, da Du nicht weißt, ob `A` wahr oder falsch ist."
   apply not_or_of_imp
-  Hint (hidden := true) "**Robo**: Ich würd wieder mit `intro` weitermachen."
+  Hint (hidden := true) "**Robo**: Ich würde wieder mit `intro` weitermachen."
   intro
   assumption
 
 Conclusion
 "
-**Mechanikerin**: Danke vielmals, jetzt bin ich schon viel ruhiger.
+Der Operationsleiter nickt zustimmend.  Offenbar war ihm `not_or_of_imp` tatsächlich bekannt.
 "
 
 LemmaTab "Logic"

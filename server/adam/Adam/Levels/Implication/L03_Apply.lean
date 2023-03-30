@@ -9,21 +9,20 @@ Title "Apply"
 
 Introduction
 "
-Sein Kollege zieht eine Linie unter deinen Beweis, schreibt ein durchgestrichenes ~`revert`~
-hin und gibt dir das Blatt wieder.
+Leider läuft das Telefonat nicht so gut.  Er legt wieder auf und schüttelt mit dem Kopf.
+
+**Operationsleiter**: Der Kollege auf der anderen Seite des Mondes versteht kein `revert`. Oder er tut zumindest so.  Habt Ihr noch eine andere Idee? 
+
+Er zieht eine Linie unter Euren Beweis, ergänzt ein durchgestrichenes ~`revert`~, und legt Euch das Blatt ein zweites Mal vor.
 "
 
 Statement (A B : Prop) (hA : A) (h : A → B) : B := by
-  Hint "**Robo**: Da hat er natürlich recht, normalerweise ist es viel schöner mit
-  `apply {h}` die Implikation anzuwenden."
+  Hint "**Robo**:  Vielleicht wäre es ohnehin eleganter gewesen, mit Implikation mit `apply {h}` anzuwenden."
   apply h
-  Hint "**Du**: Und jetzt genügt es also `A` zu zeigen."
+  Hint "**Du**: Ja, das kommt mir jetzt auch natürlich vor."
   assumption
 
-Conclusion "**Robo** Übrigens mit `apply LEMMA` kannst auch jedes Lemma anwenden, dessen
-Aussage mit dem Goal übereinstimmt.
-
-Die beiden Fragenden schauen das Blatt an und murmeln zustimmend."
+Conclusion "Diesmal scheint das Telefont erfolgreich zu verlaufen."
 
 NewTactic apply
 DisabledTactic revert tauto

@@ -21,7 +21,7 @@ Du siehst Robo hilflos an.
 Statement ""
     (A B C : Prop) :
     ¬((¬B ∨ ¬ C) ∨ (A → B)) → (¬A ∨ B) ∧ ¬ (B ∧ C) := by
-  Hint "**Robo**  Das ist ganz einfach.  Mit `{A} {B} {C} : Prop` meint er:
+  Hint "**Robo**  Das ist ganz einfach.  Mit `{A} {B} {C} : Prop` meint sie:
   `{A}`, `{B}` und `{C}` sind irgendwelche Aussagen (*propositions*).
   Und mit `→` meint sie ⇒, also “impliziert”. Die anderen Symbole kennst Du, oder?
 

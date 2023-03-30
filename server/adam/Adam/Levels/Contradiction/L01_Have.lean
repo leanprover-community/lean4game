@@ -11,12 +11,11 @@ Game "Adam"
 World "Contradiction"
 Level 1
 
-Title "Have"
+Title "Was wir haben, haben wir."
 
 Introduction
 "
-**Oddeus**: Willkommen Reisende! Ich muss eingestehen ich bin in Gedanken noch
-an etwas, könnt ihr mir bei diesem widersprüchlichen Problem helfen?
+**Benedictus**:  Hier, schaut mal.  Das habe ich für Euch vorbereitet.
 "
 
 -- Manchmal, wollen wir nicht am aktuellen Goal arbeiten, sondern zuerst ein
@@ -36,17 +35,18 @@ an etwas, könnt ihr mir bei diesem widersprüchlichen Problem helfen?
 -- bevor du dann mit dem Beweis forfährst.
 
 Statement (A B : Prop) (h : A → ¬ B) (k : A ∧ B) : False := by
-  Hint "**Du**: Also als erstes Teile ich wohl mal das Und (`∧`) auf."
+  Hint "**Du**: Also als erstes teile ich wohl mal das Und (`∧`) auf."
   rcases k with ⟨h₁, h₂⟩
-  Hint "**Du**: Aber jetzt…
+  Hint "**Du**: Und jetzt …
 
-  **Robo**: Du könntest dir ein passendes Zwischenresultat zurechtlegen, das dir hilft:
-  Mach mal `have g : ¬ B`!"
+  **Benedictus**: … solltest Du Dir ein passendes Zwischenresultat zurechtlegen.
+
+  **Robo**:  Ja!  Probier mal `have g : ¬ B`!"
   have g : ¬ B
-  · Hint "**Du**: Was und jetzt hab ich einfach angenommen das sei richtig?
+  · Hint "**Du**: Was?  Jetzt hab ich einfach angenommen, dass sei richtig?
 
-    **Robo**: Ne, jetzt musst du das zuerst beweisen bevor du es dann benützen kannst."
-    Hint (hidden := true) "**Robo**: `apply` scheint passend zu sein."
+    **Robo**: Nee, jetzt musst Du das erst noch beweisen, bevor Du es dann benutzen kannst."
+    Hint (hidden := true) "**Robo**: `apply` sollte helfen"
     apply h
     assumption
   · Hint (hidden := true) "**Du**: Und wie war das nochmals wenn zwei Annahmen sich widersprechen?
@@ -57,4 +57,4 @@ Statement (A B : Prop) (h : A → ¬ B) (k : A ∧ B) : False := by
 NewTactic «have»
 DisabledTactic «suffices»
 
-Conclusion "*Oddeus*: Das stimmt wohl."
+Conclusion "**Benedictus**: Das sieht gut aus!"

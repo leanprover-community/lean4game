@@ -23,7 +23,6 @@ Game "Adam"
 Title "Lean 4 game"
 Introduction
 "
-
 # Game Over oder QED?
 
 Willkommen zu unserem Prototyp eines Lean4-Lernspiels. Hier lernst du Computer-gestütztes
@@ -42,6 +41,13 @@ Solltest du diese löschen, verlierst du deinen Spielstand! Du kannst aber jeder
 Level spielen, auch wenn frühere Levels nicht grün sind.
 
 (oft werden *Site data & Cookies* zusammen gelöscht).
+
+### Funding
+
+This game has been developed within the project
+[ADAM: Anticipating the Digital Age of Mathematics](https://hhu-adam.github.io/).
+The project is based at Heinrich Heine University Düsseldorf and funded by Stiftung
+Innovation in der Hochschullehre.
 
 ### Kontakt
 

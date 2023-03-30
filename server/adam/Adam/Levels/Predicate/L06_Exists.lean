@@ -16,8 +16,8 @@ Title "Gerade/Ungerade"
 
 Introduction
 "
-Am nächsten Tag erklärt euch *Evenine*, dass es auf dem Mond zwei Gruppierungen gibt,
-ihre und die ihres Halbbruders *Oddeus*. Die Mottos sind
+Ihr habt nun alle Fragen aus dem königlichen Päckchen beantwortet, und die Formalosophinnen applaudieren.  Dann wollen Sie aber auch noch ein paar Fragen stellen, aber sie können sich nicht einigen, welche.  
+Ihr heute abwechselnd die Rufe „Even“ und „Odd“ aus der Menge heraus. Deshalb zeigt Dir Robo vorsichtshalber schon einmal die entsprechenden Definitionen an:
 
 ```
 def Even (n : ℕ) : Prop := ∃ r, n = r + r
@@ -29,18 +29,20 @@ und
 def Odd (n : ℕ) : Prop := ∃ r, n = 2 * r + 1
 ```
 
-**Evenine**: Hier, ich zeige euch mal etwas was man bei uns machen kann:
+Schließlich taucht von irgendwo aus der Menge folgendes Papier auf:
 "
 
 Statement even_square (n : ℕ) (h : Even n) : Even (n ^ 2) := by
+  Hint "**Robo**: Du kannst Dir mit `unfold Even` auch hier auf dem Papier die Definition sehen."
   Branch
     unfold Even
-    Hint "Rob**: Am besten machst du auch noch `unfold Even at h`, damit du verstehst was los ist."
-  Hint "**Robo**: Wie du oben siehst, ist `Even n` dadurch definiert,
-    dass ein `r` existiert so dass `r + r = n`. Am besten
-    öffnest du diese Definition mit `unfold Even at *` einmal, dann siehst du besser, was los ist. "
+    Hint "Robo**: Am besten machst Du auch noch `unfold Even at h`, damit Du verstehst, was los ist."
+  Hint "**Robo**: Wie Du oben siehst, ist `Even n` dadurch definiert,
+    dass ein `r` existiert so dass `r + r = n` ist. Am besten
+    öffnest du diese Definition mit `unfold Even at *` einmal.
+    Dann siehst Du besser, was los ist. "
   unfold Even at *
-  Hint "**Du**: Also von `{h}` weiss ich jetzt dass ein `r` existiert, so dass `r + r = n`…
+  Hint "**Du**: Also von `{h}` weiß ich jetzt, dass ein `r` existiert, so dass `r + r = n` …
 
   **Robo**: Mit `rcases h with ⟨r, hr⟩` kannst du dieses `r` tatsächlich einführen."
   rcases h with ⟨r, hr⟩
@@ -48,18 +50,18 @@ Statement even_square (n : ℕ) (h : Even n) : Even (n ^ 2) := by
 
   **Robo**: Genau. Und mit `use _` gibst du diese Zahl an."
   Hint (hidden := true) "**Robo**: Also sowas ähnliches wie `use 4 * r ^ 3`, aber ich kann
-  dir leider nicht sagen, welche Zahl passt.
+  Dir leider nicht sagen, welche Zahl passt.
   "
   Branch
     rw [hr]
-    Hint "**Robo**: Das geht auch, jetzt musst du aber wirklich `use` verwenden."
+    Hint "**Robo**: Das geht auch, jetzt musst Du aber wirklich `use` verwenden."
     use 2 * r ^ 2
     ring
   use 2 * r ^ 2
-  Hint "**Du**: Ah und jetzt `ring`!
+  Hint "**Du**: Ah, und jetzt `ring`!
 
-  **Robo**: Aber zuerst must du noch mit
-  `rw` `n` durch `r + r` ersetzen, da `ring` das sonst nicht weiss."
+  **Robo**: Aber zuerst musst Du noch mit
+  `rw` `n` durch `r + r` ersetzen, da `ring` das sonst nicht weiß."
   rw [hr]
   ring
 
@@ -70,4 +72,4 @@ Statement even_square (n : ℕ) (h : Even n) : Even (n ^ 2) := by
 NewTactic unfold use
 NewDefinition Even Odd
 
-Conclusion "**Evenine**: Seht ihr?"
+Conclusion "Applaus!"
