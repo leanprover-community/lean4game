@@ -24,7 +24,7 @@ Statement (A B C D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : 
   rw [h₁]
   Hint "**Du** Und wenn ich in die andere Richtung umschreiben möchte?
 
-  **Robo**: Dann schreibst du ein `←` vor den Namen, also `rw [← hₓ]`."
+  **Robo**: Dann schreibst du ein `←` (`\\l`, also klein \"L\") vor den Namen, also `rw [← hₓ]`."
   Branch
     rw [← h₃]
     Hint "**Du**: Ehm, das war verkehrt.
@@ -32,7 +32,7 @@ Statement (A B C D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : 
     **Robo**: Ja, anders herum wär's besser gewesen.  Aber wenn du jetzt einfach weitermachst, bis Du
     sowas wie `A ↔ A` erhältst, kann `rfl` das beweisen.
 
-    **Robo: Da fällt mir ein, `rw` wendet ohnehin auch versuchsweise `rfl` an. 
+    **Robo: Da fällt mir ein, `rw` wendet ohnehin auch versuchsweise `rfl` an.
   Das heißt, Du musst `rfl` nicht einmal ausschreiben."
     rw [h₂]
   rw [←h₂]

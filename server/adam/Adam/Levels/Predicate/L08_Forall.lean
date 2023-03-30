@@ -7,6 +7,8 @@ import Mathlib.Tactic.Ring
 import Mathlib.Algebra.Parity
 import Mathlib
 
+set_option tactic.hygienic false
+
 Game "Adam"
 World "Predicate"
 Level 8

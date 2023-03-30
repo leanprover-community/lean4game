@@ -8,7 +8,7 @@ import Adam.Levels.Contradiction
 import Adam.Levels.Sum
 -- import Adam.Levels.Induction
 
-import Adam.Levels.Numbers
+--import Adam.Levels.Numbers
 import Adam.Levels.Inequality
 
 import Adam.Levels.Lean
@@ -32,7 +32,7 @@ ziemlich gleich wie wenn du später Lean im VSCode benützt.
 Rechts siehst du eine Übersicht der Welt dieses Spiels. Jeder Planet hat mehrere Levels,
 die in Form von grauen Punkten dargestellt sind. Gelöste Levels werden dann grün.
 
-Klicke auf die erste Welt \"Aussagenlogik 1\" um deine Reise zu starten.
+Klicke auf die erste Welt \"Logo\" um deine Reise zu starten.
 
 ### Spielstand
 
@@ -71,7 +71,7 @@ Path Lean → SetTheory → SetTheory2 → SetFunction → Module
 Path Lean → Function → SetFunction
 
 
-Path SetTheory2 → Numbers
+-- Path SetTheory2 → Numbers
 Path Module → Basis → Module2
 
 MakeGame

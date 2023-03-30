@@ -39,5 +39,5 @@ Conclusion
 "
 
 DisabledTactic tauto apply
-NewLemma not_not
+NewLemma Classical.not_not
 LemmaTab "Logic"

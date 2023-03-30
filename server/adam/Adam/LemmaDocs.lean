@@ -1,7 +1,7 @@
 import GameServer.Commands
 
 -- Wird im Level "Implication 11" ohne Beweis angenommen.
-LemmaDoc not_not as "not_not" in "Logic"
+LemmaDoc Classical.not_not as "not_not" in "Logic"
 "
 `not_not {A : Prop} : ¬¬A ↔ A`
 

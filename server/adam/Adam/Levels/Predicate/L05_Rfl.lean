@@ -1,4 +1,5 @@
 import Adam.Metadata
+import Mathlib.Tactic.Ring
 
 Game "Adam"
 World "Predicate"

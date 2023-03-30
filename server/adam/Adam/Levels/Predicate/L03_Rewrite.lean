@@ -16,7 +16,7 @@ $$
 \\begin{aligned}
   a &= b \\\\
   a + a ^ 2 &= b + 1 \\\\
-  \\vdash b + b ^ 2 = b + 1
+  \\vdash b + b ^ 2 &= b + 1
 \\end{aligned}
 $$
 "
@@ -29,5 +29,5 @@ $$
   assumption
 
 Conclusion "
-**Robo**: Noch ein Trick: Mit `rw [{h}] at *` kann man gleichzeitig mittels `{h}` **alle** Annahmen und das Goal umschreiben.
+**Robo**: Noch ein Trick: Mit `rw [h] at *` kann man gleichzeitig mittels `h` **alle** Annahmen und das Goal umschreiben.
 "

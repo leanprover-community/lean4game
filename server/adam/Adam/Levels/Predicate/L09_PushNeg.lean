@@ -42,7 +42,7 @@ Statement : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) := by
   Branch
     unfold Odd
     push_neg
-    Hint "**Robo**: Dieser Lösungsweg scheint mir etwas zu schwierig. 
+    Hint "**Robo**: Dieser Lösungsweg scheint mir etwas zu schwierig.
     Ich würde nochmal zurückgehen und schauen,
     dass Du irgendwie `¬Odd` erhältst.
     Das kannst Du dann mit `rw [←even_iff_not_odd]`
@@ -68,22 +68,28 @@ Statement : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) := by
   use n
   Hint "**Robo**: Gute Wahl! Jetzt kannst Du `←even_iff_not_odd` verwenden."
   rw [←even_iff_not_odd]
+  -- TODO: if I write `tauto` here, I get a weird error
   unfold Even
   use n
   --ring
 
-Conclusion "Die Formalosophinnen sind ganz begeistert.  
+NewTactic push_neg
+NewLemma Nat.even_iff_not_odd Nat.odd_iff_not_even not_exists not_forall
+
+Conclusion "Die Formalosophinnen sind ganz begeistert.
 Nachdem sich der Beifall gelegt hat, hast Du auch einmal eine Frage.
 
 **Du**: Kann uns hier irgendjemand vielleicht ein bisschen Orientierung im Formaloversum geben?
 
-**Alle**:  Ja, ja.  
+**Alle**:  Ja, ja.
 
 **Du**:  Wer denn?
 
 Die Frage war wieder zu konkret.  Betretenes Schweigen.
 
-**Robo**:  Lass nur.  Ich schlage vor, wir machen als nächstes einen Ausflug auf den Asteroiden da drüben.  Und bevor Du fragst – hier ist wieder ein Überblick, was Du auf diesem Planeten gelernt hast.
+**Robo**:  Lass nur.  Ich schlage vor, wir machen als nächstes einen Ausflug auf den Asteroiden da
+drüben.  Und bevor Du fragst – hier ist wieder ein Überblick, was Du auf diesem Planeten
+gelernt hast.
 
 |               | Beschreibung                |
 |:--------------|:----------------------------|
@@ -104,6 +110,3 @@ Die Frage war wieder zu konkret.  Betretenes Schweigen.
 | 16    | `push_neg`                | Für `¬∃` und `¬∀` im Goal.                             |
 
 "
-
-NewTactic push_neg
-NewLemma Nat.even_iff_not_odd Nat.odd_iff_not_even not_exists not_forall

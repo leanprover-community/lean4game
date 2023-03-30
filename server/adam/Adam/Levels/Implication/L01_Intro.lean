@@ -27,7 +27,7 @@ Statement (A B : Prop) (hb : B) : A → (A ∧ B) := by
   **Robo** *(leise zurück)*:  So wie der aussieht, fürchte ich, das wird er auch nicht verstehen.
     Schreib den Beweis lieber aus.
 
-  *Du**: Aber wie denn?  Ich glaube, ich würde als erstes gern so etwas sagen wie 'Nehmen wir also an, `{A}` gilt …'
+  **Du**: Aber wie denn?  Ich glaube, ich würde als erstes gern so etwas sagen wie 'Nehmen wir also an, `{A}` gilt …'
 
   **Robo**: Ja, gute Idee.  Wähle dazu für Deine Annahme einfach einen Namen, zum Beispiel `h`, und schreib `intro h`."
   intro hA

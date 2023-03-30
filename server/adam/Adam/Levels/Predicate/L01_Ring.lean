@@ -10,7 +10,7 @@ Level 1
 Title "Natürliche Zahlen"
 
 Introduction
-""
+"Du schaust Dir die erste Seite an."
 
 Statement (x y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
   Hint "**Du**: Das ist doch Schulmathematik! Man rechnet das einfach aus,
