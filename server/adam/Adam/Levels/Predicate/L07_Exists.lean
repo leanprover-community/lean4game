@@ -34,11 +34,11 @@ Statement odd_square (n : ℕ) (h : Odd n) : Odd (n ^ 2) := by
     das `r` nehmen, das laut Annahme existieren muss."
     rcases h with ⟨r, hr⟩
     Hint "**Robo**: Ich hab noch einen Trick auf Lager:
-    Wenn du jetzt noch nicht weißt, welche Zahl Du einsetzen musst, könntest
-    Du schon jetzt mit `rw [{hr}]` weitermachen …"
+    Wenn du jetzt noch nicht weißt, welche Zahl du einsetzen musst, könntest
+    du schon jetzt mit `rw [{hr}]` weitermachen …"
     Branch
       rw [hr]
-      Hint "**Robo**: Wenn Du jetzt `ring` brauchst, dann schreibt es einfach alles in
+      Hint "**Robo**: Wenn du jetzt `ring` brauchst, dann schreibt es einfach alles in
       Normalform um, das hilft beim Vergleichen."
       ring
       Hint "**Du**: Was bedeutet `ring_nf`?
@@ -49,11 +49,11 @@ Statement odd_square (n : ℕ) (h : Odd n) : Odd (n ^ 2) := by
     ring
   rcases h with ⟨r, hr⟩
   Hint "**Robo**: Ich hab noch einen Trick auf Lager:
-    Wenn du jetzt noch nicht weißt, welche Zahl Du einsetzen musst, könntest
+    Wenn du jetzt noch nicht weißt, welche Zahl du einsetzen musst, könntest
     Du schon jetzt mit `rw [{hr}]` weitermachen…"
   Branch
     rw [hr]
-    Hint "**Robo**: Wenn Du jetzt `ring` brauchst, dann schreibt es einfach alles in
+    Hint "**Robo**: Wenn du jetzt `ring` brauchst, dann schreibt es einfach alles in
     Normalform um, das hilft beim Vergleichen."
     ring
     Hint "**Du**: Was bedeutet `ring_nf`?

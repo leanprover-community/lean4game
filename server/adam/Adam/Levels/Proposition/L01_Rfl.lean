@@ -14,7 +14,7 @@ Fragen stellen würden. Logisinde winkt den ersten nach vorn. Er räuspert sich.
 **Untertan** Warum ist $42 = 42$?
 
 Du schaust ihn fassungslos an.
-Er schreibt es Dir wieder auf.
+Er schreibt es dir wieder auf.
 "
 
 Statement "" :

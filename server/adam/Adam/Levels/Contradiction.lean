@@ -17,7 +17,7 @@ Ein einziger, einsamer Formalosoph, der sich als Benedictus vorstellt, erwartet 
 
 **Benedictus**: Schön, dass Ihr gekommen seid!  Ich habe schon auf Euch gewartet!  
 
-**Du**: Hast Du auch ein paar dringende Fragen … ? 
+**Du**: Hast du auch ein paar dringende Fragen … ? 
 
 **Benedictus**:  Ach nein, aus dem Alter bin ich heraus.  Aber ich kann mir denken, wie es Euch auf Implis und Quantus ergangen ist.  Und glaubt, mir auf den anderen Planeten wird es nicht viel besser.  Aber ich kann Euch vielleicht ein bisschen vorbereiten.  
 

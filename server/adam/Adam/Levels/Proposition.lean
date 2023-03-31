@@ -19,21 +19,21 @@ Title "Logo"
 
 Introduction "
 Durch eine unvorhergesehene und nicht-kanonische Singularität in der Raumzeit
-bist Du ausversehen in ein Paralleluniversum gestolpert. Wie es aussieht, gibt es kein zurück.
-Richte Dich besser darauf ein, hier bleiben und Dich zurechtzufinden zu müssen.
+bist du ausversehen in ein Paralleluniversum gestolpert. Wie es aussieht, gibt es kein zurück.
+Richte dich besser darauf ein, hier bleiben und dich zurechtzufinden zu müssen.
 
 Wie es aussieht, gibt es hier viele nette kleine Planeten. Alle bewohnbar, und bis zu
 sieben Sonnenuntergänge täglich inklusive. Nur werden sie allesamt von Formalosophen bewohnt,
 seltsamen Wesen mit ausgefallenen mathematischen Obsessionen. Und dummerweise hat sich
-herumgesprochen, dass Du in Deinem früheren Universum Mathematiker warst. Du wirst hier
-keine Ruhe finden, solange Du nicht lernst, ihren unablässigen Wissensdurst zu stillen.
+herumgesprochen, dass du in deinem früheren Universum Mathematiker warst. Du wirst hier
+keine Ruhe finden, solange du nicht lernst, ihren unablässigen Wissensdurst zu stillen.
 
 Es gibt nur zwei Schwierigkeiten: Erstens haben die Formalosophen allem Anschein nach
 überhaupt kein tieferes mathematisches Verständnis, und zweitens kommunizieren Sie über Mathematik
-exklusiv in einem Dir fremden Dialekt, den sie Leansch [liːnʃ] nennen.
+exklusiv in einem dir fremden Dialekt, den sie Leansch [liːnʃ] nennen.
 
-Zum Glück hat Robo mit Dir das Universum gewechselt.
-Robo, das ist Dein kleiner SmartElf. Robo ist war auch nicht die mathematische Leuchte, die Du Dir
+Zum Glück hat Robo mit dir das Universum gewechselt.
+Robo, das ist dein kleiner SmartElf. Robo ist war auch nicht die mathematische Leuchte, die du Dir
 in dieser Situation gewünscht hättest, aber es scheint, er hat irgendwo Leansch gelernt.
 Und das ist Gold wert.
 "

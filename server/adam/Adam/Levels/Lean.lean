@@ -9,7 +9,7 @@ Title "Lean"
 
 Introduction
 "Während ihr weiter durch Täler, über Geröllhalden und zwischen monumentalen Steintürmen
-umherzieht, fragst Du eines Tages Robo.
+umherzieht, fragst du eines Tages Robo.
 
 **Du**: Sag mal, hast du dir je Gedanken dazu gemacht, wie du eigentlich funktionierts?
 

@@ -39,7 +39,7 @@ Nach längerem Durcheinander findet ein weiteres Blatt aus der Menge zu Euch.
 Statement : ∀ (x : ℕ), (Even x) → Odd (1 + x) := by
   Hint "**Du**: Das `∀` heisst sicher \"für alle\".
 
-  **Robo**: Und man schreibt `\\forall`. Ein `∀ x, …` im Beweisziel kannst Du wie eine
+  **Robo**: Und man schreibt `\\forall`. Ein `∀ x, …` im Beweisziel kannst du wie eine
   Implikation mit `intro x` angehen."
   intro x h
   unfold Even at h

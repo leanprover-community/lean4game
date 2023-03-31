@@ -32,7 +32,7 @@ open Nat
 Statement : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) := by
   Hint "**Du**: Ich würde gern diese Negation `¬` am Quantor vorbeischieben.
 
-  **Robo**: `push_neg` macht genau das!  Oder Du könntest `rw` mit den folgenden Lemmas verwenden:
+  **Robo**: `push_neg` macht genau das!  Oder du könntest `rw` mit den folgenden Lemmas verwenden:
 
   ```
   not_exists (A : Prop) : ¬ (∃ x, A) ↔ ∀x, (¬A)
@@ -44,12 +44,12 @@ Statement : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) := by
     push_neg
     Hint "**Robo**: Dieser Lösungsweg scheint mir etwas zu schwierig.
     Ich würde nochmal zurückgehen und schauen,
-    dass Du irgendwie `¬Odd` erhältst.
-    Das kannst Du dann mit `rw [←even_iff_not_odd]`
+    dass du irgendwie `¬Odd` erhältst.
+    Das kannst du dann mit `rw [←even_iff_not_odd]`
     zu `Even` umwandeln."
   push_neg
   intro n
-  Hint "**Robo**: Jetzt brauchst Du eine Zahl mit `use`, und danach vermutlich das Lemma `←even_iff_not_odd` brauchen.
+  Hint "**Robo**: Jetzt brauchst du eine Zahl mit `use`, und danach vermutlich das Lemma `←even_iff_not_odd` brauchen.
 
   **Du**: Könnte ich jetzt schon `rw [←even_iff_not_odd]` anwenden?
 
@@ -61,12 +61,12 @@ Statement : ¬ ∃ (n : ℕ), ∀ (k : ℕ) , Odd (n + k) := by
   Ich würde jetzt lieber mit `use` eine richtige Zahl angeben, und danach umschreiben."
   Branch
     use n + 2
-    Hint "**Robo**: Gute Wahl! Jetzt kannst Du `←even_iff_not_odd` verwenden."
+    Hint "**Robo**: Gute Wahl! Jetzt kannst du `←even_iff_not_odd` verwenden."
   Branch
     use n + 4
-    Hint "**Robo**: Gute Wahl! Jetzt kannst Du `←even_iff_not_odd` verwenden."
+    Hint "**Robo**: Gute Wahl! Jetzt kannst du `←even_iff_not_odd` verwenden."
   use n
-  Hint "**Robo**: Gute Wahl! Jetzt kannst Du `←even_iff_not_odd` verwenden."
+  Hint "**Robo**: Gute Wahl! Jetzt kannst du `←even_iff_not_odd` verwenden."
   rw [←even_iff_not_odd]
   -- TODO: if I write `tauto` here, I get a weird error
   unfold Even

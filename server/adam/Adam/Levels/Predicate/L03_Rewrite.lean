@@ -23,7 +23,7 @@ $$
 (a b : ℕ) (h : a = b) (g : a + a ^ 2 = b + 1) : b + b ^ 2 = b + 1 := by
   Hint "**Du**: Hier muss man, glaube ich, einfach in Annahme `{g}` die Variable `{a}` durch `{b}` ersetzen.
 
-  **Robo**: Genau! Das machst Du mit `rw [{h}] at {g}`."
+  **Robo**: Genau! Das machst du mit `rw [{h}] at {g}`."
   rw [h] at g
   Hint (hidden := true) "**Robo**: Schau mal durch die Annahmen."
   assumption
