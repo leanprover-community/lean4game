@@ -26,4 +26,4 @@ Statement (x y : ℤ) (h₂ : 5 * y ≤ 35 - 2 * x) (h₃ : 2 * y ≤ x + 3) : y
 
 Conclusion "**Du**: Boah, das ist schon gar nicht schlecht.
 
-Und damit endet auch Deine Erinnerung und wer weiss was du anschließend gemacht hast…"
+Und damit endet auch deine Erinnerung und wer weiss was du anschließend gemacht hast…"

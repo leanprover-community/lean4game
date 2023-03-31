@@ -20,7 +20,7 @@ Statement (A B : Prop) (hb : B) : A → (A ∧ B) := by
 
   **Du**: Einen Moment.  Das ist ja gerade so eine Implikation (`\\to`).  Wir nehmen an, dass `{B}` gilt, und wollen zeigen, dass dann gilt `{A}` impliziert `{A} und {B}`. Ja, klar! Natürlich stimmt das.
 
-  Der Operationsleiter sieht Dich erwartungsvoll an.
+  Der Operationsleiter sieht dich erwartungsvoll an.
 
   **Du** *(leise zu Robo)*:  Soll ich ihm `tauto` aufschreiben?
 
@@ -29,11 +29,11 @@ Statement (A B : Prop) (hb : B) : A → (A ∧ B) := by
 
   *Du**: Aber wie denn?  Ich glaube, ich würde als erstes gern so etwas sagen wie 'Nehmen wir also an, `{A}` gilt …'
 
-  **Robo**: Ja, gute Idee.  Wähle dazu für Deine Annahme einfach einen Namen, zum Beispiel `h`, und schreib `intro h`."
+  **Robo**: Ja, gute Idee.  Wähle dazu für deine Annahme einfach einen Namen, zum Beispiel `h`, und schreib `intro h`."
   intro hA
   Hint "**Du**: OK.  Jetzt habe ich also sowohl `{A}` als auch `{B}` in meinen Annahmen und muss `{A} ∧ {B}` zeigen.
 
-  **Robo**:  Genau.  Und wie das geht, weißt Du ja schon."
+  **Robo**:  Genau.  Und wie das geht, weißt du ja schon."
   constructor
   assumption
   assumption

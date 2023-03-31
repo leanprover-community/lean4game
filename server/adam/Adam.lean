@@ -25,37 +25,36 @@ Introduction
 "
 # Game Over oder QED?
 
-Willkommen zu unserem Prototyp eines Lean4-Lernspiels. Hier lernst du Computer-gestütztes
-Beweisen. Das Interface ist anfangs etwas vereinfacht, der \"Editor Mode\" funktioniert aber
-ziemlich gleich wie wenn du später Lean im VSCode benützt.
+Willkommen zu unserem Prototyp eines Lean4-Lernspiels. Hier lernst du computer-gestützte
+Beweisführung. Das Interface ist etwas vereinfacht, aber wenn du den *Editor Mode* aktivierst, fühlt es sich 
+fast genauso an wie in VSCode, der standard IDE für Lean.
 
-Rechts siehst du eine Übersicht der Welt dieses Spiels. Jeder Planet hat mehrere Levels,
-die in Form von grauen Punkten dargestellt sind. Gelöste Levels werden dann grün.
+Rechts siehst du eine Übersicht. Das Spiel besteht aus mehreren Planeten, und jeder Planet hat mehrere Levels,
+die in Form von grauen Punkten dargestellt sind. Gelöste Levels werden grün.
 
-Klicke auf die erste Welt \"Aussagenlogik 1\" um deine Reise zu starten.
+Klicke auf den ersten Planeten *Logo*, um deine Reise zu starten.
 
 ### Spielstand
 
-Dein Spielstand wird lokal in deinem Browser als \"site data\" gespeichert.
-Solltest du diese löschen, verlierst du deinen Spielstand! Du kannst aber jederzeit jeden
-Level spielen, auch wenn frühere Levels nicht grün sind.
-
-(oft werden *Site data & Cookies* zusammen gelöscht).
+Dein Spielstand wird lokal in deinem Browser als *site data* gespeichert.
+Solltest du diese löschen, verlierst du deinen Spielstand!  
+Viele Browser löschen *site data* und *cookies* zusammen.
+Du kannst aber jederzeit jedes Level spielen, auch wenn du vorhergende Levels noch nicht gelöst hast.  
 
 ### Funding
 
-This game has been developed within the project
-[ADAM: Anticipating the Digital Age of Mathematics](https://hhu-adam.github.io/).
-The project is based at Heinrich Heine University Düsseldorf and funded by Stiftung
-Innovation in der Hochschullehre.
+Dieses Lernspiel wurde und wird im Rahmen des Projekts 
+[ADAM: Anticipating the Digital Age of Mathematics](https://hhu-adam.github.io/)
+an der Heinrich-Heine-Universität Düsseldorf entwickelt.
+Es wird finanziert durch das Programm *Freiraum 2022* der *Stiftung Innovation in der Hochschullehre*.
 
 ### Kontakt
 
-Wenn du Bugs findest, schreib doch ein Email oder erstelle einen
+Das Spiel befindet sich noch in der Entwicklung.  
+Wenn du Anregungen hast oder Bugs findest, schreib doch ein Email oder erstelle einen
 [Issue auf Github](https://github.com/leanprover-community/lean4game/issues).
 
-Jon Eugster, jon.eugster@hhu.de
-
+[Jon Eugster](https://www.math.hhu.de/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/jon-eugster)
 "
 
 Conclusion

@@ -20,8 +20,8 @@ Statement (A : Prop) : ¬A ∨ A := by
   Hint "**Du**: Das scheint wieder ziemlich offensichtlich.
 
   **Robo**:  Nee, offensichtlich ist das nicht.  Aber ich glaube, es gibt ein wohlbekanntens Lemma, das hier weiterhilft:
-  `not_or_of_imp` besagt `(A → B) → ¬ A ∨ B`.  Da die rechte Seite der Implikation mit Deinem Beweisziel übereinstimmt, 
-  kannst Du es mit `apply not_or_of_imp` anwenden.
+  `not_or_of_imp` besagt `(A → B) → ¬ A ∨ B`.  Da die rechte Seite der Implikation mit deinem Beweisziel übereinstimmt, 
+  kannst du es mit `apply not_or_of_imp` anwenden.
 
   **Du**:  `Wohlbekannt` auf Implis?
 
@@ -30,12 +30,12 @@ Statement (A : Prop) : ¬A ∨ A := by
     right
     Hint "**Du**: Und jetzt?
 
-    **Robo**: `right/left` funktioniert hier nicht, da Du nicht weißt, ob `A` wahr oder falsch ist."
+    **Robo**: `right/left` funktioniert hier nicht, da du nicht weißt, ob `A` wahr oder falsch ist."
   Branch
     left
     Hint "**Du**: Und jetzt?
 
-    **Robo**: `right/left` funktioniert hier nicht, da Du nicht weißt, ob `A` wahr oder falsch ist."
+    **Robo**: `right/left` funktioniert hier nicht, da du nicht weißt, ob `A` wahr oder falsch ist."
   apply not_or_of_imp
   Hint (hidden := true) "**Robo**: Ich würde wieder mit `intro` weitermachen."
   intro

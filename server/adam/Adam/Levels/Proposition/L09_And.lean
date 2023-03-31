@@ -41,7 +41,7 @@ konstruieren kann.
 **Robo**: Schau mal, das ist Zauberpapier.
 Jetzt haben wir auf einmal zwei Beweisziele.
 Hier ist dast Ziel `{A}`.
-Ich glaube, Du weißt schon, wie man die jeweils erreicht.
+Ich glaube, du weißt schon, wie man die jeweils erreicht.
 Die Ziele stehen ja jeweils in den *Annahmen*.
 "
   assumption
@@ -50,7 +50,7 @@ Die Ziele stehen ja jeweils in den *Annahmen*.
 **Robo**: Schau mal, das ist Zauberpapier.
 Jetzt haben wir auf einmal zwei Beweisziele.
 Hier ist dast Ziel `{B}`.
-Ich glaube, Du weißt schon, wie man die jeweils erreicht.
+Ich glaube, du weißt schon, wie man die jeweils erreicht.
 Die Ziele stehen ja jeweils in den *Annahmen*.
 "
   assumption
@@ -62,7 +62,7 @@ Conclusion
 
 Ihm scheinen diese Fragen inzwischen Spaß zu machen.
 
-**Robo** Meinst Du, dieser Hebel, an dem \"Editor mode\" steht, ist echt?
+**Robo** Meinst du, dieser Hebel, an dem \"Editor mode\" steht, ist echt?
 Oder ist der nur gemalt?  Probier mal!
 "
 

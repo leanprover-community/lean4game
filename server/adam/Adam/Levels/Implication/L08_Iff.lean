@@ -23,7 +23,7 @@ Statement (A B C : Prop) (h : A ↔ B) (g : B → C) : A → C := by
 
   **Du**: Weiß ich doch!"
   apply g
-  Hint "**Robo**: … und Du kannst die Implikation `{A} → {B}` genau gleich mit
+  Hint "**Robo**: … und du kannst die Implikation `{A} → {B}` genau gleich mit
   `apply {h}.mp` anwenden.
 
   **Du**: Aber normalerweise könnte ich hier auch `rw [← h]` sagen, oder?

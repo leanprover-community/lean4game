@@ -50,5 +50,5 @@ LemmaTab "Nat"
 
 Conclusion "**Du**: Oh `simp` ist ja echt nicht schlecht…
 
-Die andere Person scheint beeindruckt, hat aber gleichzeitig auch das Bedürfnis, Dich aus
+Die andere Person scheint beeindruckt, hat aber gleichzeitig auch das Bedürfnis, dich aus
 der Reserve zu locken."

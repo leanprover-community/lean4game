@@ -22,7 +22,7 @@ Wenn `A` wahr ist, beweisen wir die rechte Seite, sonst die Linke.
 Statement (A : Prop) : ¬A ∨ A := by
   Hint (hidden := true) "**Du**: Wie noch einmal?
 
-  **Robo**: Also `by_cases h : A` erstellt zwei Goals. Im ersten hast Du `(h : A)` zur
+  **Robo**: Also `by_cases h : A` erstellt zwei Goals. Im ersten hast du `(h : A)` zur
   Verfügung, im zweiten `(h : ¬ A)`."
   by_cases h : A
   right

@@ -20,7 +20,7 @@ Statement ""
 
 **Du** Und unter dieser Annahme sollen wir jetzt `{A}` beweisen?
 
-**Robo** Ja.  Da kommst Du jetzt selbst drauf, wie das geht, oder?
+**Robo** Ja.  Da kommst du jetzt selbst drauf, wie das geht, oder?
 "
   Hint (hidden := true) "**Robo**: Ist doch genau wie eben:
 die Aussage, die zu beweisen ist, gehört selbst zu den Annahmen.

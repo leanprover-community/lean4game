@@ -15,7 +15,7 @@ Introduction
 "
 **Operationsleiter**: Ihr habt mir wirklich so geholfen!  Hier ist das letzte Problem.  Das habe ich von meinem Vorgänger geerbt.  Er hat behauptet, wenn wir das lösen können, dann läuft hier wieder alles.  Aber es sah mir immer viel zu schwierig aus, um es überhaupt zu versuchen. Wollt Ihr es einmal probieren?
 
-**Du**: Klar, zeig her!  Robo, kannst Du mir vielleicht auch noch einmal so eine nette Zusammenfassung anzeigen, was ich theoretisch in den letzten fünf Minuten gelernt habe?
+**Du**: Klar, zeig her!  Robo, kannst du mir vielleicht auch noch einmal so eine nette Zusammenfassung anzeigen, was ich theoretisch in den letzten fünf Minuten gelernt habe?
 
 **Robo**: Hier ist die Übersicht:     
 
@@ -49,8 +49,8 @@ Statement imp_iff_not_or (A B : Prop) : (A → B) ↔ ¬ A ∨ B := by
   apply not_or_of_imp
   Hint "**Du**: Gibt es für die Gegenrichtung auch ein Lemma?
 
-  **Robo**: Leider nicht. Da musst Du manuell ran."
-  Hint (hidden := true) "**Robo**: Na Implikationen gehst Du immer mit `intro` an."
+  **Robo**: Leider nicht. Da musst du manuell ran."
+  Hint (hidden := true) "**Robo**: Na Implikationen gehst du immer mit `intro` an."
   intro h
   intro ha
   Hint (hidden := true) "**Robo**: Ich würde mal die Annahme `h` mit `rcases` aufteilen."

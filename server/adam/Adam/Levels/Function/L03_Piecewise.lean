@@ -22,7 +22,7 @@ der andere eines mit
 def g : ℚ → ℚ := fun x ↦ if 0 ≤ x then 2*x else 0
 ```
 
-und gibt Dir ein Blatt mit einer einzelnen Zeile am oberen Ende.
+und gibt dir ein Blatt mit einer einzelnen Zeile am oberen Ende.
 "
 
 open Set

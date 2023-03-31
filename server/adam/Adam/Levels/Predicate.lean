@@ -30,9 +30,9 @@ Nun herrscht betretenes Schweigen.  Alle zucken mit den Schultern.
 
 **Du**: Ist das nicht ein Widerspruch?  
 
-**Robo**: Fragst Du, Du als Mathematiker?  Nein, das ist kein Widerspruch. Das ist einfach eine „reine Existenzaussage“.
+**Robo**: Fragst du, du als Mathematiker?  Nein, das ist kein Widerspruch. Das ist einfach eine „reine Existenzaussage“.
 
-Du bist Dir nicht ganz sicher, wie ernst er das meint.
+Du bist dir nicht ganz sicher, wie ernst er das meint.
 
 **Du**:  Dann ich schlage vor, wir übergeben das Päckchen einfach an *alle* Bewohner.  Dann haben wir es ja insbesondere der Königin übergeben.  
 

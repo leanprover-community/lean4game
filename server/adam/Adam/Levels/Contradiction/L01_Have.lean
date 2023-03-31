@@ -39,13 +39,13 @@ Statement (A B : Prop) (h : A → ¬ B) (k : A ∧ B) : False := by
   rcases k with ⟨h₁, h₂⟩
   Hint "**Du**: Und jetzt …
 
-  **Benedictus**: … solltest Du Dir ein passendes Zwischenresultat zurechtlegen.
+  **Benedictus**: … solltest du dir ein passendes Zwischenresultat zurechtlegen.
 
   **Robo**:  Ja!  Probier mal `have g : ¬ B`!"
   have g : ¬ B
   · Hint "**Du**: Was?  Jetzt hab ich einfach angenommen, dass sei richtig?
 
-    **Robo**: Nee, jetzt musst Du das erst noch beweisen, bevor Du es dann benutzen kannst."
+    **Robo**: Nee, jetzt musst du das erst noch beweisen, bevor du es dann benutzen kannst."
     Hint (hidden := true) "**Robo**: `apply` sollte helfen"
     apply h
     assumption
