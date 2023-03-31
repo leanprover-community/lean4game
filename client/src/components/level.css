@@ -29,11 +29,15 @@
   overflow: auto;
 }
 
-.introduction-panel, .infoview, .exercise, .conclusion {
+.introduction-panel, .infoview, .exercise {
   padding-top: 1em;
   padding-left: 1em;
   padding-right: 1em;
   padding-bottom: 0;
+}
+
+.conclusion {
+  padding: 1em;
 }
 
 .infoview {
