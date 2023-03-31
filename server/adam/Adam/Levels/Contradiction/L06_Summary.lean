@@ -31,11 +31,11 @@ open Nat
 
 Statement (n : ℕ) (h : Odd (n ^ 2)) : Odd n := by
   Hint "Sobald Ihr Euch sicher vom Gravitationsfeld des Asteroiden befreit habt, beugt Ihr Euch wieder über die Aufgabe.
-  
+
   **Robo**:  Ok, also diesmal fangen wir mit `by_contra g` an!"
   by_contra g
   Hint "**Robo**: Jetzt würde ich einen Widerspruch zu `Odd (n ^ 2)` führen."
-  Hint "**Robo**: Also `suffices g : ¬ Odd (n ^ 2)`."
+  Hint (hidden := true) "**Robo**: Also `suffices g : ¬ Odd (n ^ 2)`."
   suffices d : ¬ Odd (n ^ 2)
   contradiction
   rw [←even_iff_not_odd] at *
@@ -49,7 +49,7 @@ Conclusion "**Robo**: Bravo! Hier ein Überblick, was uns Benediktus gezeigt hat
 
 |       | Taktik          | Beispiel                                               |
 |:------|:----------------|:-------------------------------------------------------|
-| 177   | `have`          | Zwischenresultat annehmen                              |
+| 17    | `have`          | Zwischenresultat annehmen                              |
 | 18    | `suffices`      | Zwischenresultat annehmen                              |
 | 19    | `by_contra`     | Widerspruch *(startet einen Widerspruchsbeweis)*       |
 | *3*   | `contradiction` | *(schliesst einen Widerspruchsbeweis)*                 |

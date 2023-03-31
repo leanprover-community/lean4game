@@ -33,7 +33,7 @@ Statement (A B C D : Prop) (h₁ : C ↔ D) (h₂ : A ↔ B) (h₃ : A ↔ D) : 
     sowas wie `A ↔ A` erhältst, kann `rfl` das beweisen.
 
     **Robo: Da fällt mir ein, `rw` wendet ohnehin auch versuchsweise `rfl` an.
-  Das heißt, Du musst `rfl` nicht einmal ausschreiben."
+  Das heißt, du musst `rfl` nicht einmal ausschreiben."
     rw [h₂]
   rw [←h₂]
   assumption

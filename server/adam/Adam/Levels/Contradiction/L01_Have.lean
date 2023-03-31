@@ -7,6 +7,8 @@ import Mathlib.Tactic.Ring
 
 import Adam.ToBePorted
 
+set_option tactic.hygienic false
+
 Game "Adam"
 World "Contradiction"
 Level 1
@@ -49,10 +51,10 @@ Statement (A B : Prop) (h : A → ¬ B) (k : A ∧ B) : False := by
     Hint (hidden := true) "**Robo**: `apply` sollte helfen"
     apply h
     assumption
-  · Hint (hidden := true) "**Du**: Und wie war das nochmals wenn zwei Annahmen sich widersprechen?
+  Hint "**Du**: Und wie war das nochmals wenn zwei Annahmen sich widersprechen?
 
-    **Robo**: `contradiction`."
-    contradiction
+  **Robo**: `contradiction`."
+  contradiction
 
 NewTactic «have»
 DisabledTactic «suffices»

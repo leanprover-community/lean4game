@@ -43,24 +43,25 @@ In diesem Kapitel lernen wir endliche Summen und mehr Übungen zur Induktion.
 open BigOperators
 
 Statement (n : ℕ) : (∑ i : Fin n, (0 + 0)) = 0 := by
-  Hint "BUG"
+  Hint "
+    **Du**: Oh das ist ganz schön viel neues… Mal sehen, das sagt wohl
+    $( \\sum_i 0 + 0 ) = 0$. Dann ist das vielleicht doch nicht so komplex.
 
-  -- TODO (Bug): Invalid escape sequence:
-  -- "**Du**: Oh das ist ganz schön viel neues… Mal sehen, das sagt wohl
-  -- $( \\sum_i 0 + 0 ) = 0$. Dann ist das vielleicht doch nicht so komplex.
+    **Robo**: Genau! Man schreibt `\\sum`. Beachte den Index:
+    $( \\sum_\{i=0}^\{n-1} 0 + 0 ) = 0$, also `Fin n` ist ein Typ mit den Elementen
+    $(0, \\ldots, n-1)$.
 
-  -- **Robo**: Genau! Man schreibt `\\sum`. Beachte den Index:
-  -- $( \\sum_\{i=0}^\{n-1} 0 + 0 ) = 0$, also `Fin n` ist ein Typ mit den Elementen
-  -- $\\{0, \\ldots, n-1\\}$.
+    **Du**: Oke, also `Fin n` hat `n` Elemente. Und was mach ich jetzt?
 
-  -- **Du**: Oke, also `Fin n` hat `n` Elemente. Und was mach ich jetzt?
+    **Robo**: `simp` ist eine ganz starke Taktik, die viele Terme vereinfacht, wir
+    fangen besser an, diese zu benützen.
 
-  -- **Robo**: `simp` ist eine ganz starke Taktik, die viele Terme vereinfacht, wir
-  -- fangen besser an, diese zu benützen.
-
-  -- Irgendwie hast du das Gefühl ein Déjà-vue zu haben…"
+    Irgendwie hast du das Gefühl ein Déjà-vue zu haben…"
   simp
 
 OnlyTactic simp
+LemmaTab "Sum"
 
 Conclusion "**Unbekannte**: Sehr gut, folgt mir!"
+
+-- TODO: Cannot write $\\{0\\}$ inside a hint.

@@ -9,6 +9,8 @@ Game "Adam"
 World "Lean"
 Level 3
 
+open Fin
+
 Title "Implizite Argumente"
 
 Introduction
@@ -20,8 +22,10 @@ haben als ich hinschreiben muss.
 ein Lemma von vorhin
 
 ```
-lemma Fin.sum_univ_castSucc {β : Type _} [AddCommMonoid β] {n : ℕ} (f : Fin (n + 1) → β) :
-    ∑ i : Fin (n + 1), f i = ∑ i : Fin n, f (↑Fin.castSucc.toEmbedding i) + f (Fin.last n) := by
+lemma Fin.sum_univ_castSucc {β : Type _} [AddCommMonoid β]
+    {n : ℕ} (f : Fin (n + 1) → β) :
+    ∑ i : Fin (n + 1), f i =
+    ∑ i : Fin n, f (↑Fin.castSucc.toEmbedding i) + f (Fin.last n) := by
   sorry
 ```
 
@@ -57,9 +61,11 @@ Statement (m : ℕ) : ∑ i : Fin (m + 1), (i : ℕ) + (m + 1) = ∑ i : Fin (Na
     nicht mehr geht, aber das war nicht der Punkt…"
     rfl
   rw [Fin.sum_univ_castSucc (n := m + 1)]
+  Hint "**Robo**: Gut der Rest ist easy."
   rfl
 
-OnlyTactic rw rfl
+OnlyTactic rw rfl simp trivial
+LemmaTab "Sum"
 
 Conclusion "**Du**: Gibt es auch noch ander Methoden implizite Argumente anzugeben.
 

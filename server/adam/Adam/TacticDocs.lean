@@ -231,7 +231,16 @@ Diese Taktik erstellt zwei Goals:
 * Induktionsanfang, wo `n = 0` ersetzt wird.
 * Induktionsschritt, in dem man die Induktionshypothese `n_ih` zur Verfügung hat.
 
-Der volle Syntax mit Option zum umbenennen der Induktionshypothes und -variable ist
+## Modifikationen in diesem Spiel
+
+* `induction n with d hd` benennt Induktionsvariable und -hypothese. (das ist Lean3-Syntax)
+und funktioniert ausserhalb vom Spiel nicht genau so.
+* Ausserhalb des Spiels kriegst du `Nat.zero` und `Nat.succ n` anstatt `0` und `n + 1`
+als Fälle. Diese
+Terme sind DefEq, aber manchmal benötigt man die lemmas `zero_eq` und `Nat.succ_eq_add_one`
+um zwischen den schreibweisen zu wechseln
+
+Der richtige Lean4-Syntax für `with` streckt sich über mehrere Zeilen und ist:
 
 ```
 induction n with

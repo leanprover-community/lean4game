@@ -363,7 +363,7 @@ LemmaDoc add_pow_two as "add_pow_two" in "Nat"
 * Mathlib Doc: [#add_pow_two](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Ring.html#add_pow_two)
 "
 
-LemmaDoc Finset.sum_comm as "Finset.sum_comm" in "Sum"
+LemmaDoc Finset.sum_comm as "sum_comm" in "Sum"
 "
 
 ## Eigenschaften

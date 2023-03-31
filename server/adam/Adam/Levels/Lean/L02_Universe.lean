@@ -35,7 +35,12 @@ Statement
     (R : Type u) [CommRing R] (a b : R) : a + b = b + a := by
   Hint "**Robo**: Naja, Aufgaben zu Universen sind nicht so natürlich,
   aber vorige Aufgabe würde man eigentlich besser so schreiben, da
-  kannst du mindestens das Uniersum beobachten."
+  kannst du mindestens das Uniersum beobachten.
+
+  **Du**: Ah ich sehe, `(R: Type u)` anstatt `(R : Type)`. Muss mich
+  das interessieren?
+
+  **Robo**: Nicht wirklich…"
   ring
 
 Conclusion "**Du**: Na dann. Aber gut dass ich's mal gesehen hab."

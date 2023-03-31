@@ -38,6 +38,8 @@ Da löst sich aus der Steinlandschaft plötzlich ein grosser Steingolem. Er scha
 bedrohlich an und fragt in tiefer Stimme:
 "
 
+open Fin
+
 open BigOperators
 
 Statement (m : ℕ) : (∑ i : Fin (m + 1), (i : ℕ)^3) = (∑ i : Fin (m + 1), (i : ℕ))^2 := by
@@ -45,7 +47,7 @@ Statement (m : ℕ) : (∑ i : Fin (m + 1), (i : ℕ)^3) = (∑ i : Fin (m + 1),
   induction m
   Hint "**Du**: Also den Induktionsanfang kann man einfach zeigen…"
   simp
-  Hint "**Robo**: Und jetzt wieder `rw [Fin.sum_univ_castSucc]` und `simp` um vorwärts zu
+  Hint (hidden := true) "**Robo**: Und jetzt wieder `rw [sum_univ_castSucc]` und `simp` um vorwärts zu
   kommen!"
   rw [Fin.sum_univ_castSucc]
   simp
@@ -56,9 +58,9 @@ Statement (m : ℕ) : (∑ i : Fin (m + 1), (i : ℕ)^3) = (∑ i : Fin (m + 1),
 
   Der Golem schaut dich finster an.
 
-  **Robo**: Du willst `Fin.sum_univ_castSucc` auf der rechten Seite anwenden, aber es
+  **Robo**: Du willst `sum_univ_castSucc` auf der rechten Seite anwenden, aber es
   gibt mehrere Orte, wo das Lemma passen würde.
-  Deshalb musst du mit `rw [Fin.sum_univ_castSucc (n := {n} + 1)]` angeben, wo genau.
+  Deshalb musst du mit `rw [sum_univ_castSucc (n := {n} + 1)]` angeben, wo genau.
 
   **Du**: Was bedeutet das?
 
@@ -83,9 +85,10 @@ Statement (m : ℕ) : (∑ i : Fin (m + 1), (i : ℕ)^3) = (∑ i : Fin (m + 1),
   ring
 
 NewLemma arithmetic_sum add_pow_two
+LemmaTab "Sum"
 
 Conclusion "Der Golem denkt ganz lange nach, und ihr bekommt das Gefühl, dass er gar nie
-aggressive war, sondern nur eine sehr tiefe Stimme hat.
+aggressiv war, sondern nur eine sehr tiefe Stimme hat.
 
 Mit einem kleinen Erdbeben setzt er sich hin und winkt euch dankend zu.
 

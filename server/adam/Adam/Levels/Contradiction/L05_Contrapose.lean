@@ -14,7 +14,7 @@ Title "Kontraposition"
 
 Introduction
 "
-**Benedictus**:  Gut, hier ist die angekündigte Frage.  Versucht mal einen *direkten* Beweis, ohne `contrapose`.
+**Benedictus**:  Gut, hier ist die angekündigte Frage.  Versucht mal einen *direkten* Beweis, ohne `by_contra`.
 "
 
 -- Ein Beweis durch Kontraposition benützt im Grunde das eben bewiesene Lemma
@@ -44,7 +44,7 @@ Statement (n : ℕ) (h : Odd (n ^ 2)): Odd n := by
 
   **Robo**:  Erinner dich an `revert`.  Mit `revert {h}` kannst du die Annahme `{h}` als Implikationsannahme ins Beweissziel schieben."
   revert h
-  Hint "**Du**: Und jetzt kann ich dieses Kontrapositionslemma anwenden?  Wie hieß das noch einmal?  
+  Hint "**Du**: Und jetzt kann ich dieses Kontrapositionslemma anwenden?  Wie hieß das noch einmal?
 
   **Robo**: Tatsächlich kannst auch einfach `contrapose` schreiben.
   "
@@ -52,10 +52,13 @@ Statement (n : ℕ) (h : Odd (n ^ 2)): Odd n := by
   Hint (hidden := true) "**Robo**: Vielleicht hilft jetzt `even_iff_not_odd` weiter?"
   rw [← even_iff_not_odd]
   rw [← even_iff_not_odd]
-  Hint "**Du**:  Das sieht schon ganz gut aus.  Jetzt kann ich tatsächlich das alte Lemma anwenden!"
+  Hint "**Du**:  Das sieht schon ganz gut aus.  Jetzt kann ich tatsächlich das alte Lemma
+  `even_square` anwenden!"
   apply even_square
 
+NewLemma even_square
 NewTactic contrapose
 DisabledTactic by_contra
+LemmaTab "Nat"
 
-Conclusion "**Benedictus**: Hervorragend!  Ich glaube, damit seid Ihr jetzt ganz gut gewappnet."  
+Conclusion "**Benedictus**: Hervorragend!  Ich glaube, damit seid Ihr jetzt ganz gut gewappnet."

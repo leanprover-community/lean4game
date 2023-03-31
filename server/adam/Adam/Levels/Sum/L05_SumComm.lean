@@ -9,6 +9,7 @@ import Adam.Options.ArithSum
 set_option tactic.hygienic false
 
 open BigOperators
+open Finset
 
 Game "Adam"
 World "Sum"
@@ -35,10 +36,11 @@ Statement
 
   **Du**: Hast du nicht ein Lemma dafür?
 
-  **Robo**: Doch, probier mal `Finset.sum_comm`."
+  **Robo**: Doch, probier mal `sum_comm`."
   rw [Finset.sum_comm]
 
 NewLemma Finset.sum_comm
+LemmaTab "Sum"
 
 Conclusion "
   Euer Begleiter ist ganz begeistert als er dir das Stück Papier aus den Händen nimmt,

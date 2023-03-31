@@ -25,7 +25,7 @@ Richte dich besser darauf ein, hier bleiben und dich zurechtzufinden zu müssen.
 Wie es aussieht, gibt es hier viele nette kleine Planeten. Alle bewohnbar, und bis zu
 sieben Sonnenuntergänge täglich inklusive. Nur werden sie allesamt von Formalosophen bewohnt,
 seltsamen Wesen mit ausgefallenen mathematischen Obsessionen. Und dummerweise hat sich
-herumgesprochen, dass du in deinem früheren Universum Mathematiker warst. Du wirst hier
+herumgesprochen, dass du in deinem früheren Universum Mathematiker warst. du wirst hier
 keine Ruhe finden, solange du nicht lernst, ihren unablässigen Wissensdurst zu stillen.
 
 Es gibt nur zwei Schwierigkeiten: Erstens haben die Formalosophen allem Anschein nach

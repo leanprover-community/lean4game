@@ -23,7 +23,7 @@ Statement not_imp_not (A B : Prop) : A → B ↔ (¬ B → ¬ A) := by
   Hint "**Du**: Ja, das habe ich tatsächlich schon einmal gesehen.
 
   **Robo**:  Ja, klar hast du das schon einmal gesehen.  Das benutzen Mathematiker doch ständig.  Wenn ihnen zu $A ⇒ B$ nichts einfällt, zeigen sie stattdessen $¬B ⇒ ¬A$.  Ich würde das ja statt *Kontraposition* oder `not_imp_not` eher *von_hinten_durch_die_Brust_ins_Auge* nennen.  Aber gut, ich will mich nicht einmisschen.
-  " 
+  "
   Hint (hidden := true) "**Robo**: Fang doch mal mit `constructor` an."
   constructor
   intro h b
@@ -44,5 +44,6 @@ Statement not_imp_not (A B : Prop) : A → B ↔ (¬ B → ¬ A) := by
 
 DisabledTactic rw
 DisabledLemma not_not
+LemmaTab "Logic"
 
 Conclusion ""

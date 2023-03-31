@@ -8,7 +8,7 @@ Title "Kleinergleich"
 
 Introduction
 "
-*(Gesrpäch)*
+*(Gespräch)*
 
 **Robo** (*lallend*, oder war's fröhlich proklamierend?):
 …und deshalb sind `≥` und `>` eigentlich nur Notationen für `≤`,

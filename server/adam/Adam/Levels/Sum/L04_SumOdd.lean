@@ -18,6 +18,8 @@ Du gehst zu einem etwas kleineren Nachbarsturm.
 "
 set_option tactic.hygienic false
 
+open Fin
+
 open BigOperators
 
 Statement odd_arithmetic_sum
@@ -26,8 +28,12 @@ Statement odd_arithmetic_sum
   Hint "**Robo**: Das funktioniert genau gleich wie zuvor, viel Glück."
   induction n
   simp
-  rw [Fin.sum_univ_castSucc]
+  Hint (hidden := true) "Den Induktionschritt mit Summen willst du
+  eigentlich immer mit `rw [sum_univ_castSucc]` beginnen."
+  rw [sum_univ_castSucc]
   simp
   rw [n_ih]
-  rw [Nat.succ_eq_add_one]
+  --rw [Nat.succ_eq_add_one]
   ring
+
+LemmaTab "Sum"

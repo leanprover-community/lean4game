@@ -20,7 +20,7 @@ Statement
     (A B : Prop) (hA : A) : A ∨ (¬ B) := by
   Hint "**Du** Muss ich jetzt wieder das Beweisziel de-konstruieren?
 
-**Robo** Nein, viel einfacher.  Wenn du eine Oder-Aussage beweisen sollst, musst du Dich
+**Robo** Nein, viel einfacher.  Wenn du eine Oder-Aussage beweisen sollst, musst du dich
 einfach entscheiden, ob du die linke oder rechte Seite beweisen willst.
 
 **Du** Und wie erkläre ich meinem Formalosophen, welche Seite ich gern beweisen würde?

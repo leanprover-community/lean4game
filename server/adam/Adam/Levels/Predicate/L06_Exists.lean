@@ -39,7 +39,7 @@ Statement even_square (n : ℕ) (h : Even n) : Even (n ^ 2) := by
   Dann siehst du besser, was los ist."
   Branch
     unfold Even
-    Hint "Robo**: Am besten machst Du auch noch `unfold Even at h`, damit Du verstehst, was los ist."
+    Hint "Robo**: Am besten machst du auch noch `unfold Even at h`, damit du verstehst, was los ist."
   unfold Even at *
   Hint "**Du**: Also von `{h}` weiß ich jetzt, dass ein `r` existiert, so dass `r + r = n` …
 

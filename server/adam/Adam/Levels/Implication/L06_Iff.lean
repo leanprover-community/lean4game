@@ -27,7 +27,7 @@ Conclusion
 "
 **Operationsleiter**: Ok, das leuchtet mir ein.
 
-**Robo** *(zu Dir)*: Übrigens, so wie bei `(h : A ∧ B)` die beiden Teile `h.left` und `h.right` heißen,
+**Robo** *(zu dir)*: Übrigens, so wie bei `(h : A ∧ B)` die beiden Teile `h.left` und `h.right` heißen,
 heißen bei `(h : A ↔ B)` die beiden Teile `h.mp` und `h.mpr`.
 
 **Du**: Also `h.mp` ist `A → B`? Wieso `mp`?

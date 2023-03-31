@@ -9,8 +9,7 @@ Game "Adam"
 World "Sum"
 Title "Endliche Summe"
 
-Introduction "Mit dem Gefühl, dass sich *Evenine* und *Oddeus* in Zukunft wieder
-besser verstehen werden, steigt ihr in eurer Raumschiff und setzt eure Reise fort.
+Introduction "Ihr steigt in eurer Raumschiff und setzt eure Reise fort.
 
 Bald erreicht ihr einen neuen Planet. Die oberfläche scheint steinig zu sein, aber nicht etwa
 geröll oder Chaos. Stattdessen, scheinen unzählige Steinplatten zu bizzaren hohen Türme

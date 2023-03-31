@@ -77,7 +77,7 @@ NewTactic push_neg
 NewLemma Nat.even_iff_not_odd Nat.odd_iff_not_even not_exists not_forall
 
 Conclusion "Die Formalosophinnen sind ganz begeistert.
-Nachdem sich der Beifall gelegt hat, hast Du auch einmal eine Frage.
+Nachdem sich der Beifall gelegt hat, hast du auch einmal eine Frage.
 
 **Du**: Kann uns hier irgendjemand vielleicht ein bisschen Orientierung im Formaloversum geben?
 
@@ -88,7 +88,7 @@ Nachdem sich der Beifall gelegt hat, hast Du auch einmal eine Frage.
 Die Frage war wieder zu konkret.  Betretenes Schweigen.
 
 **Robo**:  Lass nur.  Ich schlage vor, wir machen als nächstes einen Ausflug auf den Asteroiden da
-drüben.  Und bevor Du fragst – hier ist wieder ein Überblick, was Du auf diesem Planeten
+drüben.  Und bevor du fragst – hier ist wieder ein Überblick, was du auf diesem Planeten
 gelernt hast.
 
 |               | Beschreibung                |

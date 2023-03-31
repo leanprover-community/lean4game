@@ -35,12 +35,13 @@ open BigOperators
 
 Statement (m : ℕ) :
       ∑ i : Fin (m + 1), (i : ℕ) + (m + 1) = ∑ i : Fin (Nat.succ m + 1), ↑i := by
-  Hint "*Robo*: Schreibe `rw [@Fin.sum_univ_castSucc _ _ (m + 1)]`
+  Hint "**Robo**: Schreibe `rw [@Fin.sum_univ_castSucc _ _ (m + 1)]`
   anstatt `rw [Fin.sum_univ_castSucc (n := m + 1)]`!"
   rw [@Fin.sum_univ_castSucc _ _ (m + 1)]
   rfl
 
-OnlyTactic rw rfl
+OnlyTactic rw rfl simp trivial
+LemmaTab "Sum"
 
 Conclusion "
 **Du**: Danke Robo!

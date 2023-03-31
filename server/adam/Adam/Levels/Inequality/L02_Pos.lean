@@ -4,6 +4,8 @@ import Mathlib.Tactic.LibrarySearch
 
 set_option tactic.hygienic false
 
+open Nat
+
 Game "Adam"
 World "Inequality"
 Level 2
@@ -12,12 +14,12 @@ Title "Kleinergleich"
 
 Introduction
 "
-*weitere Person*: …ich sag dir, eine positive Zahl kann man sowohl mit `0 < n`
+**weitere Person**: …ich sag dir, eine positive Zahl kann man sowohl mit `0 < n`
 als auch `n ≠ 0` darstellen.
 
-*Robo*: Und da gibts leider keinen Standard dazu.
+**Robo**: Und da gibts leider keinen Standard dazu.
 
-**weitere Person*: Ja und, da kann man ja einfach mit `Nat.pos_iff_ne_zero`
+**weitere Person**: Ja und, da kann man ja einfach mit `Nat.pos_iff_ne_zero`
 wechseln. Wart mal, wieso galt das nochmals…
 "
 
@@ -35,7 +37,11 @@ Statement Nat.pos_iff_ne_zero (n : ℕ) : 0 < n ↔ n ≠ 0 := by
   **Robo** (*flüsternd*): Zweiter pompöser Auftritt: sag einfach `simp` und lass das alles
   automatisch geschehen."
   simp
-  Hint "**Du**: Und hier fang ich wohl am besten an wie ich das schon kenne."
+  Hint "**Du**: Ah und jetzt falls `n ≠ 0`."
+  Branch
+    simp
+    Hint "**Robo**: Warte! Den Rest geb ich dir als Lemma: `Nat.suc_pos`."
+    apply Nat.succ_pos
   constructor
   intro
   simp
