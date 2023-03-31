@@ -139,71 +139,6 @@ elab "Branch" t:tacticSeq : tactic => do
   b.restore
   Core.setMessageLog msgs
 
-/-- Define the statement of the current level.
-
-Arguments:
-- ident: (Optional) The name of the statemtent.
-- descr: (Optional) The human-readable version of the lemma as string. Accepts Markdown and Mathjax.
--/
-elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
-
-  let lvlIdx ← getCurLevelIdx
-  let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
-    ("level" ++ toString lvlIdx : String)
-
-  -- save the messages before evaluation of the proof
-  let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
-
-  let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
-  -- let thmStatement' ← match statementName with
-  -- | none => `(lemma $(mkIdent "XX") $sig $val) -- TODO: Make it into an `example`
-  -- | some name => `(lemma $name $sig $val)
-  elabCommand thmStatement
-
-  let msgs := (← get).messages
-
-  let mut hints := #[]
-  let mut nonHintMsgs := #[]
-  for msg in msgs.msgs do
-    -- Look for messages produced by the `Hint` tactic. They are used to pass information about the
-    -- intermediate goal state
-    if let MessageData.withNamingContext _ $ MessageData.withContext ctx $
-        .tagged `Hint $
-        .nest strict $
-        .nest hidden $
-        .compose (.ofGoal text) (.ofGoal goal) := msg.data then
-      let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
-        return {
-          goal := ← abstractCtx goal
-          text := ← instantiateMVars (mkMVar text)
-          strict := strict == 1
-          hidden := hidden == 1
-        }
-      hints := hints.push hint
-    else
-      nonHintMsgs := nonHintMsgs.push msg
-
-  -- restore saved messages and non-hint messages
-  modify fun st => { st with
-    messages := initMsgs ++ ⟨nonHintMsgs.toPArray'⟩
-  }
-
-  let scope ← getScope
-  let env ← getEnv
-
-  modifyCurLevel fun level => pure {level with
-    module := env.header.mainModule
-    goal := sig,
-    scope := scope,
-    descrText := match descr with
-    | none => ""
-    | some s => s.getString
-    descrFormat := match statementName with
-    | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
-    | some name => (Format.join ["lemma ", reprint name.raw, " ", reprint sig.raw, " := by"]).pretty 10  -- "lemma "  ++ (toString <| reprint name.raw) ++ " " ++ (Format.pretty (reprint sig.raw) 40) ++ " := by"
-    hints := hints
-  } -- Format.pretty <| format thmStatement.raw }
-
 /-- Define the conclusion of the current game or current level if some
 building a level. -/
 elab "Conclusion" t:str : command => do
@@ -381,6 +316,73 @@ elab "OnlyDefinition" args:ident* : command => do
 
 
 /-! ### Lemmas -/
+
+
+/-- Define the statement of the current level.
+
+Arguments:
+- ident: (Optional) The name of the statemtent.
+- descr: (Optional) The human-readable version of the lemma as string. Accepts Markdown and Mathjax.
+-/
+elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
+
+  let lvlIdx ← getCurLevelIdx
+  let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
+    ("level" ++ toString lvlIdx : String)
+
+  -- save the messages before evaluation of the proof
+  let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
+
+  let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
+  -- let thmStatement' ← match statementName with
+  -- | none => `(lemma $(mkIdent "XX") $sig $val) -- TODO: Make it into an `example`
+  -- | some name => `(lemma $name $sig $val)
+  elabCommand thmStatement
+
+  let msgs := (← get).messages
+
+  let mut hints := #[]
+  let mut nonHintMsgs := #[]
+  for msg in msgs.msgs do
+    -- Look for messages produced by the `Hint` tactic. They are used to pass information about the
+    -- intermediate goal state
+    if let MessageData.withNamingContext _ $ MessageData.withContext ctx $
+        .tagged `Hint $
+        .nest strict $
+        .nest hidden $
+        .compose (.ofGoal text) (.ofGoal goal) := msg.data then
+      let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
+        return {
+          goal := ← abstractCtx goal
+          text := ← instantiateMVars (mkMVar text)
+          strict := strict == 1
+          hidden := hidden == 1
+        }
+      hints := hints.push hint
+    else
+      nonHintMsgs := nonHintMsgs.push msg
+
+  -- restore saved messages and non-hint messages
+  modify fun st => { st with
+    messages := initMsgs ++ ⟨nonHintMsgs.toPArray'⟩
+  }
+
+  let scope ← getScope
+  let env ← getEnv
+
+  modifyCurLevel fun level => pure {level with
+    module := env.header.mainModule
+    goal := sig,
+    scope := scope,
+    descrText := match descr with
+    | none => ""
+    | some s => s.getString
+    descrFormat := match statementName with
+    | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
+    | some name => (Format.join ["lemma ", reprint name.raw, " ", reprint sig.raw, " := by"]).pretty 10  -- "lemma "  ++ (toString <| reprint name.raw) ++ " " ++ (Format.pretty (reprint sig.raw) 40) ++ " := by"
+    hints := hints
+  } -- Format.pretty <| format thmStatement.raw }
+
 
 /-- Documentation entry of a lemma. Example:
 
