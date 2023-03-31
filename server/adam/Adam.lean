@@ -27,7 +27,7 @@ Introduction
 
 Willkommen zu unserem Prototyp eines Lean4-Lernspiels. Hier lernst du computer-gestützte
 Beweisführung. Das Interface ist etwas vereinfacht, aber wenn du den *Editor Mode* aktivierst, fühlt es sich
-fast genauso an wie in VSCode, der standard IDE für Lean.
+fast genauso an wie in VSCode, der Standard-IDE für Lean.
 
 Rechts siehst du eine Übersicht. Das Spiel besteht aus mehreren Planeten, und jeder Planet hat mehrere Levels,
 die in Form von grauen Punkten dargestellt sind. Gelöste Levels werden grün.
