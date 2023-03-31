@@ -23,8 +23,8 @@ Statement ""
 
 **Du** Moment, wie schreib ich *das* denn hier auf?
 
-**Robo** Die bleiden Klammern schreibst Du als `\\<` und `\\>`, oder gleichzeitig als `\\<>`.
-Und h₁ schreibst Du einfach als `h\\1`.  Aber Du kannst Dir auch einfach andere Namen
+**Robo** Die bleiden Klammern schreibst du als `\\<` und `\\>`, oder gleichzeitig als `\\<>`.
+Und h₁ schreibst du einfach als `h\\1`.  Aber du kannst dir auch einfach andere Namen
 für `h₁` und `h₂`, zum Beispiel `rcases {h} with ⟨hA, hBC⟩`
 "
   Branch

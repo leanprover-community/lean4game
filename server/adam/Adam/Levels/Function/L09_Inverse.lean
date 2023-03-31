@@ -14,7 +14,7 @@ eine Inverse Funktion bestehe. Jetzt steht ihr aber schon seit einer halben Stun
 und der Gelehrte möchte wissen, wie das den genau ginge.
 
 Offensichtlich kennt er diese Aussage als `Function.bijective_iff_has_inverse` aus seinen Büchern,
-aber er möchte, dass Du ihm das hier und jetzt nochmals von Grund auf zeigst.
+aber er möchte, dass du ihm das hier und jetzt nochmals von Grund auf zeigst.
 "
 
 open Function

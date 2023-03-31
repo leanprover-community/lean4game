@@ -23,10 +23,10 @@ Statement odd_square (n : ℕ) (h : Odd n) : Odd (n ^ 2) := by
   unfold Odd at *
   rcases h with ⟨r, hr⟩
   Hint "**Robo**: Ich hab noch einen Trick auf Lager:
-  Wenn du jetzt herausfinden willst, welche Zahl Du einsetzen musst, könntest
+  Wenn du jetzt herausfinden willst, welche Zahl du einsetzen musst, könntest
   Du schon jetzt mit `rw [{hr}]` weitermachen …"
   rw [hr]
-  Hint "**Robo**: Wenn Du jetzt `ring` benötigst, dann schreibt es einfach alles in
+  Hint "**Robo**: Wenn du jetzt `ring` benötigst, dann schreibt es einfach alles in
   Normalform um, das hilft beim Vergleichen."
   ring
   Hint "**Du**: Was bedeutet `ring_nf`?

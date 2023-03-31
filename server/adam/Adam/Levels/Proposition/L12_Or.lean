@@ -37,16 +37,16 @@ Wir sind ja gleich hier fertig, und können zu einem interessanteren Planeten we
 **Robo** Ja, aber diesmal nicht `rcases {h} with ⟨h₁, h₂⟩`, sondern `rcases {h} with h | h`."
   rcases h with h | h
   Hint "**Robo**
-Jetzt musst Du Dein Ziel zweimal beweisen:
+Jetzt musst du dein Ziel zweimal beweisen:
 Einmal unter Annahme der linken Seite `{A} ∨ {B}`,
 und einmal unter Annahme der rechten Seite `{A}`.
 Hier haben nehmen wir an, die linke Seite
 sei wahr."
   Hint (hidden := true) " **Robo** Wie man mit einem Und in den Annahmen umgeht,
-weißt Du doch schon:
-`rcases h with ⟨h₁, h₂⟩`.  Zur Erinnerung: Für die Klammern schreibst Du `\\<>`."
+weißt du doch schon:
+`rcases h with ⟨h₁, h₂⟩`.  Zur Erinnerung: Für die Klammern schreibst du `\\<>`."
   rcases h with ⟨h₁, h₂⟩
-  Hint "**Robo** Jetzt musst Du Dein Ziel zweimal beweisen:
+  Hint "**Robo** Jetzt musst du dein Ziel zweimal beweisen:
 Einmal unter Annahme der linken Seite `{A}`,
 und einmal unter Annahme der rechten Seite `{A} ∨ {B}`. Hier haben nehmen wir an, die linke Seite
 sei wahr."
@@ -55,10 +55,10 @@ sei wahr."
 
 Conclusion
 "**Du**  Ok, das scheint ihn zufriedenzustellen. Nur noch eine Seele…
-Kannst Du mir vorher noch einmal kurz alles Leansch zusammenfassen,
-das Du mir bis hierher beigebracht hast?
+Kannst du mir vorher noch einmal kurz alles Leansch zusammenfassen,
+das du mir bis hierher beigebracht hast?
 
-Robo strahlt überglücklich.  Noch *nie* warst Du so auf ihn angewiesen.
+Robo strahlt überglücklich.  Noch *nie* warst du so auf ihn angewiesen.
 
 **Robo** Na klar, schau her!
 
@@ -89,7 +89,7 @@ Robo strahlt überglücklich.  Noch *nie* warst Du so auf ihn angewiesen.
 
 ## Taktiken
 
-Die Worte, die Du aktiv gebrauchen musst, heißen zusammengefasst `Taktiken`.  Hier sind alle Taktiken, die wir auf diesem Planeten gebraucht haben:
+Die Worte, die du aktiv gebrauchen musst, heißen zusammengefasst `Taktiken`.  Hier sind alle Taktiken, die wir auf diesem Planeten gebraucht haben:
 
 |    | Taktik                    | Beispiel                                          |
 |:---|:--------------------------|:--------------------------------------------------|
@@ -102,7 +102,7 @@ Die Worte, die Du aktiv gebrauchen musst, heißen zusammengefasst `Taktiken`.  H
 | 7ᵃ | `rcases h with ⟨h₁, h₂⟩`  | Teilt ein UND in den Annahmen auf.                |
 | 7ᵇ | `rcases h with h \\| h`   | Teilt ein ODER in den Annahmen in zwei Fälle auf. |
 
-**Du** Woher weißt Du das eigentlich alles?
+**Du** Woher weißt du das eigentlich alles?
 
 **Robo** Keine Ahnung.  War, glaube ich, vorinstalliert.
 "

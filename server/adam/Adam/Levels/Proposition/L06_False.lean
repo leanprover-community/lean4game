@@ -28,7 +28,7 @@ Insbesondere die gesuchte Aussage `{A}`.
 
 **Du** Und wie erkläre ich das jetzt diesem Formalosophen?
 
-**Robo** Ich glaube, Du musst ihn darauf hinweisen, dass zwischen der allgemeingültigen
+**Robo** Ich glaube, du musst ihn darauf hinweisen, dass zwischen der allgemeingültigen
 Annahme `True` und seiner Annahme `False` ein Widerspruch besteht.  Probier mal `contradiction`."
   contradiction
 

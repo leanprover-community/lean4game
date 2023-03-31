@@ -16,7 +16,7 @@ Statement (x y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
   Hint "**Du**: Das ist doch Schulmathematik! Man rechnet das einfach aus,
   indem man die Terme umsortiert.
 
-  **Robo**: Wenn die Gleichung stimmt, kannst Du auf Leansch sogar einfach mit `ring` beweisen, dass das so ist.
+  **Robo**: Wenn die Gleichung stimmt, kannst du auf Leansch sogar einfach mit `ring` beweisen, dass das so ist.
 
   **Du**: Aber `ℕ` ist doch gar kein Ring?
 

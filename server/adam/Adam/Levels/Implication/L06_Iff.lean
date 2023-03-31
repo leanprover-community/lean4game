@@ -17,7 +17,7 @@ Statement (A B : Prop) (mp : A → B) (mpr : B → A) : A ↔ B := by
 
   **Du**: Also ganz ähnlich wie das UND, `A ∧ B`?
 
-  **Robo**: Genau. Entsprechend kannst Du auch hier mit `constructor` anfangen."
+  **Robo**: Genau. Entsprechend kannst du auch hier mit `constructor` anfangen."
   constructor
   Hint "**Du**: Ah, und die beiden Teile habe ich schon in den Annahmen."
   assumption
@@ -32,7 +32,7 @@ heißen bei `(h : A ↔ B)` die beiden Teile `h.mp` und `h.mpr`.
 
 **Du**: Also `h.mp` ist `A → B`? Wieso `mp`?
 
-**Robo**: `mp` steht für Modus Ponens`.  Der Modus ponens ist eine schon in der antiken Logik geläufige Schlussfigur, die in vielen logischen Systemen …  Ach nee, das wolltest Du ja nicht hören.  Das \"r\" in `mpr` steht für \"reverse\", weil's die Rückrichtung ist.
+**Robo**: `mp` steht für Modus Ponens`.  Der Modus ponens ist eine schon in der antiken Logik geläufige Schlussfigur, die in vielen logischen Systemen …  Ach nee, das wolltest du ja nicht hören.  Das \"r\" in `mpr` steht für \"reverse\", weil's die Rückrichtung ist.
 "
 
 NewTactic constructor

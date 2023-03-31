@@ -26,20 +26,20 @@ Introduction
 # Game Over oder QED?
 
 Willkommen zu unserem Prototyp eines Lean4-Lernspiels. Hier lernst du computer-gestützte
-Beweisführung. Das Interface ist etwas vereinfacht, aber wenn Du den *Editor Mode* aktivierst, fühlt es sich 
+Beweisführung. Das Interface ist etwas vereinfacht, aber wenn du den *Editor Mode* aktivierst, fühlt es sich 
 fast genauso an wie eine professionalle IDE, etwa VSCode.
 
 Rechts siehst du eine Übersicht. Das Spiel besteht aus mehreren Planeten, und jeder Planet hat mehrere Levels,
 die in Form von grauen Punkten dargestellt sind. Gelöste Levels werden grün.
 
-Klicke auf den ersten Planeten \"Logo\", um deine Reise zu starten.
+Klicke auf den ersten Planeten *Logo*, um deine Reise zu starten.
 
 ### Spielstand
 
 Dein Spielstand wird lokal in deinem Browser als *site data* gespeichert.
 Solltest du diese löschen, verlierst du deinen Spielstand!  
 Viele Browser löschen *site data* und *cookies* zusammen.
-Du kannst aber jederzeit jedes Level spielen, auch wenn Du vorhergende Levels noch nicht gelöst hast.  
+Du kannst aber jederzeit jedes Level spielen, auch wenn du vorhergende Levels noch nicht gelöst hast.  
 
 ### Funding
 

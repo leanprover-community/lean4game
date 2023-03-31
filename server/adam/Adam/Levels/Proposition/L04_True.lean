@@ -18,7 +18,7 @@ bedingungslos wahr ist.
 
 **Du** Und was genau ist dann zu beweisen?
 
-**Robo** Ich glaube, nichts. Ich glaube, Du kannst einfach `trivial` schreiben.
+**Robo** Ich glaube, nichts. Ich glaube, du kannst einfach `trivial` schreiben.
 "
   trivial
 
