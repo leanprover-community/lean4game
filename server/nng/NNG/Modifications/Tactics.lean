@@ -32,7 +32,7 @@ syntax (name := rewriteSeq) "rw" (config)? rwRuleSeq (location)? : tactic
 # Modified `induction` tactic
 
 Modify `induction` tactic to always show `(0 : MyNat)` instead of `MyNat.zero` and
-to support the lean3-style `while` keyword.
+to support the lean3-style `with` keyword.
 
 This is mainly copied and modified from the mathlib-tactic `induction'`.
 -/
