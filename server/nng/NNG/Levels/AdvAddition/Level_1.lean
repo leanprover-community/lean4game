@@ -17,7 +17,7 @@ theorem MyNat.succ_inj {a b : ℕ} : succ a = succ b → a = b := by simp only [
 
 theorem MyNat.zero_ne_succ (a : ℕ) : zero ≠ succ a := by simp only [ne_eq, not_false_iff]
 
-Statement succ_inj'
+Statement -- MyNat.succ_inj'
 ""
     {a b : ℕ} (hs : succ a = succ b) :  a = b := by
     exact succ_inj hs

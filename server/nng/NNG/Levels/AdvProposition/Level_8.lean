@@ -15,7 +15,7 @@ Introduction
 
 "
 
-Statement and_or_distrib_left
+Statement --and_or_distrib_left
 ""
     (P Q R : Prop) : P ∧ (Q ∨ R) ↔ (P ∧ Q) ∨ (P ∧ R) := by
   constructor

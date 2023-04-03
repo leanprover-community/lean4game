@@ -32,7 +32,7 @@ erklärt mir doch folgendes:
 
 open Set
 
-Statement mem_univ "" {A : Type} (x : A) : x ∈ (univ : Set A) := by
+Statement Set.mem_univ "" {A : Type} (x : A) : x ∈ (univ : Set A) := by
   Hint "**Du**: Also `A` ist ein `Type`, `x` ist ein Element in `A`…
 
   **Robo** … und `univ` ist die Menge aller Elemente in `A`.

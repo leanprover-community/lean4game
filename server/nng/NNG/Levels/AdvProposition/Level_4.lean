@@ -14,7 +14,7 @@ Introduction
 
 "
 
-Statement iff_trans
+Statement --iff_trans
 ""
     (P Q R : Prop) : (P ↔ Q) → (Q ↔ R) → (P ↔ R) := by
   intro hpq

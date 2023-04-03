@@ -19,7 +19,7 @@ Introduction
 Sofort taucht das nächste Blatt auf.  Anscheinend hatten sie sich auf einen Kompromiss geeinigt.
 "
 
-Statement odd_square (n : ℕ) (h : Odd n) : Odd (n ^ 2) := by
+Statement (n : ℕ) (h : Odd n) : Odd (n ^ 2) := by
   Hint (hidden := true) "**Robo**: mit `rcases h with ⟨r, hr⟩` kannst du wieder
   das `r` nehmen, das laut Annahme existieren muss.
 

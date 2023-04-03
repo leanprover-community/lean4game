@@ -35,7 +35,7 @@ additions of the form `a + ?`, and `rw add_comm a b,` will only
 swap additions of the form `a + b`.
 "
 
-Statement add_right_comm
+Statement --add_right_comm
 "For all natural numbers $a, b$ and $c$, we have
 $a + b + c = a + c + b$."
     (a b c : ℕ) : a + b + c = a + c + b := by

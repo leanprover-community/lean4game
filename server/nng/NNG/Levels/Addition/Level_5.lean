@@ -40,7 +40,7 @@ some theorems about $0$ (`zero_add`, `add_zero`), but, other than `1 = succ 0`,
 no theorems at all which mention $1$. Let's prove one now.
 "
 
-Statement succ_eq_add_one
+Statement --MyNat.succ_eq_add_one
 "For any natural number $n$, we have
 $ \\operatorname{succ}(n) = n+1$ ."
     (n : ℕ) : succ n = n + 1 := by

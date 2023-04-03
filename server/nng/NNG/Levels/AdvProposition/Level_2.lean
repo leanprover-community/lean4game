@@ -16,7 +16,7 @@ Introduction
 
 set_option tactic.hygienic false
 
-Statement and_symm
+Statement --and_symm
 ""
     (P Q : Prop) : P ∧ Q → Q ∧ P :=  by
   intro h

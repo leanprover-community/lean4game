@@ -21,8 +21,7 @@ Zeige dass die beiden Ausdrücke äquivalent sind:
 
 open Set
 
-Statement nonempty_iff_ne_empty
-""
+Statement Set.nonempty_iff_ne_empty
     {A : Type _} (s : Set A) :
     s.Nonempty ↔ s ≠ ∅ := by
   Hint "Am besten fängst du mit `unfold Set.Nonempty` an."

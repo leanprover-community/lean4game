@@ -18,7 +18,7 @@ Ihr zieht also durch die Gegend und redet mit den Leuten. Ein Junge rennt zu euc
 
 open Set
 
-Statement not_mem_empty "" {A : Type} (x : A) :
+Statement Set.not_mem_empty "" {A : Type} (x : A) :
     x ∉ (∅ : Set A) := by
   Hint "**Du**: Kein Element ist in der leeren Menge enthalten? Das ist ja alles
   tautologisches Zeugs...

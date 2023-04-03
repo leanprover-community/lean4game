@@ -14,7 +14,7 @@ Introduction
 
 "
 
-Statement and_trans
+Statement --and_trans
 ""
     (P Q R : Prop) : P ∧ Q → Q ∧ R → P ∧ R := by
   intro hpq

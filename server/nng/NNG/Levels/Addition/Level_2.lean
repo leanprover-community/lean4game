@@ -30,7 +30,7 @@ that addition, as defined the way we've defined it, is associative.
 See if you can prove associativity of addition.
 "
 
-Statement add_assoc
+Statement MyNat.add_assoc
 "On the set of natural numbers, addition is associative.
 In other words, for all natural numbers $a, b$ and $c$, we have
 $ (a + b) + c = a + (b + c). $"

@@ -29,7 +29,7 @@ Look in your inventory to see the proofs you have available.
 These should be enough.
 "
 
-Statement add_comm
+Statement MyNat.add_comm
 "On the set of natural numbers, addition is commutative.
 In other words, for all natural numbers $a$ and $b$, we have
 $a + b = b + a$."

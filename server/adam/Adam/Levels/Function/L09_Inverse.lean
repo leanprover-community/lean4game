@@ -20,7 +20,8 @@ aber er möchte, dass du ihm das hier und jetzt nochmals von Grund auf zeigst.
 open Function
 
 --TODO: This is a really hard proof
-Statement bijective_iff_has_inverse "" {A B : Type} (f : A → B) :
+-- bijective_iff_has_inverse
+Statement "" {A B : Type} (f : A → B) :
     Bijective f ↔ ∃ g, LeftInverse g f ∧ RightInverse g f := by
   constructor
   intro h

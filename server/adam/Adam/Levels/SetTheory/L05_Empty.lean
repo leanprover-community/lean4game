@@ -22,7 +22,7 @@ Zeige folgendes Lemma, welches wir gleich brauchen werden:
 open Set
 
 
-Statement eq_empty_iff_forall_not_mem
+Statement Set.eq_empty_iff_forall_not_mem
 ""
     {A : Type _} (s : Set A) :
     s = ∅ ↔ ∀ x, x ∉ s := by

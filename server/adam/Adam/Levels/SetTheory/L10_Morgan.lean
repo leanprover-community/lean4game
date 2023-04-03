@@ -42,7 +42,6 @@ open Set
 #check mem_compl_iff
 
 Statement
-""
     (A B C : Set ℕ) : (A \ B)ᶜ ∩ (C \ B)ᶜ = ((univ \ A) \ C) ∪ (univ \ Bᶜ) := by
   rw [←compl_union]
   rw [←union_diff_distrib]

@@ -15,7 +15,7 @@ Introduction
 
 "
 
-Statement or_symm
+Statement --or_symm
 ""
     (P Q : Prop) : P ∨ Q → Q ∨ P := by
   intro h

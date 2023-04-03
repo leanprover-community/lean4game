@@ -464,3 +464,21 @@ LemmaDoc Iff.symm as "Iff.symm" in "Logic"
 
 * Mathlib Doc: [#Iff.symm](https://leanprover-community.github.io/mathlib4_docs/Init/Core.html#Iff.symm)
 "
+
+LemmaDoc not_imp_not as "not_imp_not" in "Logic"
+"
+`theorem not_imp_not {a : Prop} {b : Prop} : ¬a → ¬b ↔ b → a`
+
+## Eigenschaften
+
+* Mathlib Doc: [#not_imp_not](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Logic/Basic.html#not_imp_not)
+"
+
+LemmaDoc Set.nonempty_iff_ne_empty as "nonempty_iff_ne_empty" in "Logic"
+"
+`theorem Set.nonempty_iff_ne_empty {α : Type u} {s : Set α} : Set.Nonempty s ↔ s ≠ ∅`
+
+## Eigenschaften
+
+* Mathlib Doc: [#nonempty_iff_ne_empty](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.nonempty_iff_ne_empty)
+"

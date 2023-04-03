@@ -22,7 +22,7 @@ open Fin
 
 open BigOperators
 
-Statement odd_arithmetic_sum
+Statement
     "$\\sum_{i = 0}^n (2n + 1) = n ^ 2$."
     (n : ℕ) : (∑ i : Fin n, (2 * (i : ℕ) + 1)) = n ^ 2 := by
   Hint "**Robo**: Das funktioniert genau gleich wie zuvor, viel Glück."

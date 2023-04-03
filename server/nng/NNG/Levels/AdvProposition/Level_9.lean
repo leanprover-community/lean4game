@@ -17,7 +17,7 @@ Introduction
 
 "
 
-Statement contra
+Statement --contra
 ""
   (P Q : Prop) : (P ∧ ¬ P) → Q := by
   intro h

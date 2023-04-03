@@ -31,7 +31,7 @@ aufteilen.
 
 open Set Subset
 
-Statement subset_empty_iff {A : Type _} (s : Set A) :
+Statement Set.subset_empty_iff {A : Type _} (s : Set A) :
     s ⊆ ∅ ↔ s = ∅ := by
   Hint "**Du**: Ja, die einzige Teilmenge der leeren Menge ist die leere Menge.
   Das ist doch eine Tautologie?
