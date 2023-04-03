@@ -17,6 +17,10 @@ Introduction
 open Function
 
 Statement "" : Bijective (fun (n : ℤ) ↦ n + 1) := by
+  Hint "
+  **Robo** *(flüsternd)*: `Bijectve f` ist als `Injective f ∧ Surjective f` definiert.
+
+  **Du**: Dann ist das ja ganz simpel!"
   unfold Bijective
   constructor
   intro a b
@@ -25,14 +29,9 @@ Statement "" : Bijective (fun (n : ℤ) ↦ n + 1) := by
   use y-1
   simp
 
-Hint : Bijective (fun (n : ℤ) ↦ n + 1) =>
-"**Robo** *(flüsternd)*: `Bijectve f` ist als `Injective f ∧ Surjective f` definiert.
-
-**Du**: Dann ist das ja ganz simpel!
-"
+NewDefinition Bijective
+LemmaTab "Function"
 
 Conclusion
 "Zufrieden drückt euch der Gelehrte eine neue Fackel in die Hand und
 zeigt euch den Weg nach draußen."
-
-NewDefinition Bijective

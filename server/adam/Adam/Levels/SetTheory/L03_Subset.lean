@@ -31,7 +31,7 @@ namespace MySet
 
 open Set
 
-Statement (A : Set ℕ) : A ⊆ univ := by
+Statement Set.subset_univ (A : Set ℕ) : A ⊆ univ := by
   Hint "**Robo**: `A ⊆ B` ist als `∀ x, x ∈ A → x ∈ B` definiert.
 
   **Du**: Also kann ich mit `intro` anfangen, wie ich das bei einem `∀` funktioniert?
@@ -43,6 +43,7 @@ Statement (A : Set ℕ) : A ⊆ univ := by
 
 DisabledTactic tauto simp
 NewDefinition Symbol.Subset
+LemmaTab "Set"
 
 Conclusion "Damit drehen sich die beiden Mädchen um und folgen dem Jungen."
 

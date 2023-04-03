@@ -76,12 +76,37 @@ DefinitionDoc StrictMono as "StrictMono"
 
 "
 
-DefinitionDoc Symbol.Subset as "⊆" "
-
-Auf Mengen (`Set`) ist `A ⊆ B` als `∀x, x ∈ A → x ∈ B` implementiert.
+DefinitionDoc Disjoint as "Disjoint"
 "
+"
+
+
+DefinitionDoc Set.preimage as "preimage"
+"
+"
+
 
 DefinitionDoc Set.Nonempty as "Nonempty" "
 
 `A.Nonemty` ist als `∃ x, x ∈ A` definiert.
+"
+
+
+DefinitionDoc Symbol.Subset as "⊆" "
+
+Auf Mengen (`Set`) ist `A ⊆ B` als `∀x, x ∈ A → x ∈ B` implementiert.
+
+Im goal kann man direkt `intro x hx` machen, in einer Annahme, kann man mit `rcases`
+loslegen.
+
+Alternativ kann man mit `rw[Set.subset_def]` die Definition explizit einsetzen.
+"
+
+
+DefinitionDoc Symbol.function as "fun x => _" "
+
+Anonyme funktionen kann man mit `fun (x : ℤ) => 2 * x` definieren und
+wie andere Objekte verwenden.
+
+Note: `=>` wird in mathlib oft auch `↦` (`\\maps`) geschrieben.
 "

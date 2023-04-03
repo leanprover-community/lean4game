@@ -25,11 +25,14 @@ dieses Element erfüllt ist.
 
 open Set
 
-Statement
-"" :
-    3 ∈ {n : ℕ | Odd n}  := by
+Statement : 3 ∈ {n : ℕ | Odd n}  := by
   rw [mem_setOf]
+  Hint (hidden := true) "**Robo**: Zur Erinnerung, wenn du nicht mehr weisst, wie `Odd` definiert
+  ist, benutze `rw [Odd]`."
+  Branch
+    rw [Odd]
   use 1
   ring
 
-NewTactic constructor intro rw assumption rcases simp tauto trivial
+NewLemma Set.mem_setOf
+LemmaTab "Set"

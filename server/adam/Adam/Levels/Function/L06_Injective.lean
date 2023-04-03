@@ -40,31 +40,23 @@ def f : ℕ → ℕ := fun n ↦ if Even n then n^2 else n+1
 
 Statement "" : ¬ (f + f).Injective := by
   unfold Injective
+  Hint "**Robo**: Das ist sicher ein Hinweis.
+
+  **Du**: Aber `¬ Injective` sagt mir nichts…
+
+  **Robo**: Könntest du etwas mit `¬ ∀` anfangen? Dann könntest du ja `Injektive` zuerst öffnen.
+
+  **Du**: Darüber haben wir doch mal was gelernt…"
+  Hint (hidden := true) "**Robo**: Das war `push_neg`."
   push_neg
+  Hint "**Du** Jetzt muss ich einfach ein Gegenbeispiel nennen, oder?
+
+  **Robo** Genau! Welche beiden Zahlen möchtest du denn verwenden?"
   use 2
   use 3
   simp
 
-Hint : ¬ (Injective (f + f)) =>
-"
-**Robo**: Das ist sicher ein Hinweis.
-
-**Du**: Aber `¬ Injective` sagt mir nichts…
-
-**Robo**: Könntest du etwas mit `¬ ∀` anfangen? Dann könntest du ja `Injektive` zuerst öffnen.
-
-**Du**: Darüber haben wir doch mal was gelernt…
-"
-
-HiddenHint : ¬ (Injective (f + f)) =>
-"
-**Robo**: Das war `push_neg`.
-"
-
-Hint : ∃ a b, (f + f) a = (f + f) b ∧ a ≠ b =>
-"**Du** Jetzt muss ich einfach ein Gegenbeispiel nennen, oder?
-
-**Robo** Genau! Welche beiden Zahlen möchtest du denn verwenden?"
+LemmaTab "Function"
 
 Conclusion
 "

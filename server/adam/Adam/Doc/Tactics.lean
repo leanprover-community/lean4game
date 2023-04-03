@@ -573,3 +573,7 @@ mit dem man das Goal beweisen möchte.
 `use n` versucht zudem anschliessend `rfl` aufzurufen, und kann das Goal damit manchmal direkt
 schließen.
 "
+
+TacticDoc ext
+"
+"

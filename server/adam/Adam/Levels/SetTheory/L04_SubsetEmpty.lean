@@ -52,4 +52,5 @@ Statement Set.subset_empty_iff {A : Type _} (s : Set A) :
   rw [h]
 
 DisabledTactic tauto
-NewLemma Set.Subset.antisymm Set.Subset.antisymm_iff Set.empty_subset
+NewLemma Set.Subset.antisymm Set.Subset.antisymm_iff Set.empty_subset Set.subset_univ
+LemmaTab "Set"

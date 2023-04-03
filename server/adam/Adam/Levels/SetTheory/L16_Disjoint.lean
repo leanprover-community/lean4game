@@ -25,15 +25,23 @@ das gleiche.
 
 open Set
 
-Statement
-"" :
+Statement :
     ¬Disjoint ({n : ℤ | ∃ k, n = 2 * k} : Set ℤ) ({3, 5, 6, 9, 11} : Set ℤ) := by
-  unfold Disjoint
-  rw [not_forall] -- why not `push_neg`?
+  Hint "**Robo**: Öffne als erstes mal `Disjoint`."
+  rw [Disjoint]
+  Branch
+    rw [not_forall] -- why not `push_neg`?
+  push_neg
+  Hint "**Robo**: Das sieht jetzt ein bisschen gefürchig aus, aber das ist einfach ein `∃`.
+  Was du jetzt angeben musst, ist eine Menge, die Teilmenge beider Mengen
+  `\{n : ℤ | ∃ k, n = 2 * k}` und `\{3, 5, 6, 9, 11}` ist.
+  "
+  Hint (hidden := true) "**Robo**: Versuch einmal `use \{6}`."
   use {6}
+  Hint "**Robo**: Schau mal wie weit `simp` kommt."
   simp
   use 3
   ring
 
-
-NewTactic constructor intro rw assumption rcases simp tauto trivial
+NewDefinition Disjoint
+LemmaTab "Set"

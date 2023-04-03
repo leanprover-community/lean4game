@@ -20,18 +20,17 @@ Bevor er dieses aushändigt, will er aber folgendes wissen:
 open Function
 
 Statement "" : Surjective (fun (n : ℤ) ↦ n + 1) := by
+  Hint "**Robo**: Die Definition von `Surjective f` ist `∀ y, (∃ x, f x = y)`.
+
+  **Du**: Dann kann ich das auch einfach wie Quantifier behandeln?
+
+  **Robo**: Schieß drauf los!"
   intro y
   use y-1
   simp
 
 NewDefinition Surjective
-
-Hint : Surjective (fun (n : ℤ) ↦ n + 1) =>
-"**Robo**: Die Definition von `Surjective f` ist `∀ y, (∃ x, f x = y)`.
-
-**Du**: Dann kann ich das auch einfach wie Quantifier behandeln?
-
-**Robo**: Schieß drauf los!"
+LemmaTab "Function"
 
 Conclusion
 "Der Gelehrte händigt euch schmunzelnd das Buch aus."

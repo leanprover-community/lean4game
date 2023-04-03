@@ -19,18 +19,20 @@ Zudem kann man mit `rw [ssubset_def]` explizit die Definition einsetzen.
 Note: `rw [subset_def]` macht das gleiche für `⊆`.
 "
 
---open Set
+open Set
 
 Statement
 ""
     (A B : Set ℕ) (h : A ⊂ B) : ∃ x, x ∈ B \ A := by
   cases' h with h₁ h₂
-  rw [Set.subset_def] at h₂
+  rw [subset_def] at h₂
   rw [not_forall] at h₂
   cases' h₂ with x hx
   use x
   rw [not_imp] at hx
-  rw [Set.mem_diff]
+  rw [mem_diff]
   exact hx
 
 NewTactic constructor intro rw assumption rcases simp tauto trivial
+NewLemma Set.subset_def Set.ssubset_def not_imp Set.mem_diff
+LemmaTab "Set"

@@ -27,6 +27,7 @@ Statement Set.not_mem_empty "" {A : Type} (x : A) :
   tauto
 
 NewLemma Set.mem_univ
+LemmaTab "Set"
 
 Conclusion "Der Junge rennt weiter.
 

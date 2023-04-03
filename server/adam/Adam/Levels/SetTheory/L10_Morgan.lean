@@ -43,6 +43,9 @@ open Set
 
 Statement
     (A B C : Set ℕ) : (A \ B)ᶜ ∩ (C \ B)ᶜ = ((univ \ A) \ C) ∪ (univ \ Bᶜ) := by
+  Hint "Oft kann es auch nützlich sein, mit `rw [← …]` rückwärts umzuschreiben.
+  Der ganze Level ist mit `rw`/`simp_rw` und den Lemmas in deiner Bibliothek
+  lösbar."
   rw [←compl_union]
   rw [←union_diff_distrib]
   rw [diff_diff]
@@ -51,7 +54,8 @@ Statement
   rw [diff_eq_compl_inter]
   rw [inter_comm]
 
-NewTactic constructor intro rw assumption rcases simp tauto trivial
-
--- TODOs
--- Lemmas compl_union compl_inter mem_compl_iff
+OnlyTactic rw simp_rw tauto trivial assumption rfl «have» «suffices»
+NewTactic simp_rw
+LemmaTab "Set"
+NewLemma Set.mem_compl_iff Set.compl_union Set.diff_diff Set.compl_inter
+  Set.diff_eq_compl_inter Set.inter_comm

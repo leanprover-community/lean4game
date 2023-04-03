@@ -33,12 +33,35 @@ def f (x : ℤ) : ℤ := (x + 4)
 und:
 "
 
+open Function
+
 def f (x : ℤ) : ℤ := (x + 4)
 
 Statement "" (x : ℤ) : ∃ (g : ℤ → ℤ), (g ∘ f) x = x + 1 := by
+  Hint
+  "**Du**: Ist `g ∘ f` Komposition von Funktionen?
+
+  **Robo**: Richtig! Das schreibt man mit `\\comp`.
+
+    **Du** Und hier könnte ich also zuerst
+  `let g := fun (x : ℤ) ↦ _` definieren, anstatt direkt
+  `use fun (x : ℤ) ↦ _`?
+
+  **Robo**: Genau! Das ist zwar praktisch das gleiche, aber kann manchmal nützlich sein."
+  Branch
+    use fun (x : ℤ) ↦ x - 3
+    Hint "**Robo**: `((fun (x : ℤ) ↦ x - 3) ∘ f) x` ist per Definition `(fun (x : ℤ) ↦ x - 3) (f x)`, aber mit
+    `rw [comp_apply]` kann man das explizit umschreiben, aber `simp` kennt das
+    Lemma auch."
   let g := fun (x : ℤ) ↦ x - 3
+  Hint "**Robo**: gute Wahl! Jetzt kannst du diese mit `use g` benützen."
   use g
+  Hint "**Robo**: `({g} ∘ f) x` ist per Definition `{g} (f x)`, aber mit
+  `rw [comp_apply]` kann man das explizit umschreiben, aber `simp` kennt das
+  Lemma auch."
   simp
+  Hint "**Robo**: Wie schon gehabt hat `ring` Schwierigkeiten, Definitionen zu öffnen.
+  Du kannst mit `unfold f` oder `rw [f]` nachhelfen."
   unfold f
   ring
 
@@ -46,38 +69,9 @@ NewTactic «let»
 NewLemma Function.comp_apply
 LemmaTab "Function"
 
-Hint (x : ℤ) : ∃ g, (g ∘ f) x = x + 1 =>
-"**Du**: Ist `g ∘ f` Komposition von Funktionen?
-
-**Robo**: Richtig! Das schreibt man mit `\\comp`.
-
-  **Du** Und hier könnte ich also zuerst
-`let g := fun (x : ℤ) ↦ _` definieren, anstatt direkt
-`use fun (x : ℤ) ↦ _`?
-
-**Robo**: Genau! Das ist zwar praktisch das gleiche, aber kann manchmal nützlich sein.
-"
-
--- TODO: Make some hints work here
-Hint (x : ℤ) : ((fun (x : ℤ) ↦ x - 3) ∘ f) x = x + 1 =>
-"**Robo**: Manchmal must du nachhelfen und Funktionen mit `unfold f` öffnen, manchmal nicht.
-Um erlich zu sein, sagt mein Programm nicht genau wann man das machen muss…"
-
--- TODO : Make this work
-Hint (x : ℤ) (g := (fun (x : ℤ) ↦ x - 3)) : (g ∘ f) x = x + 1 =>
-"**Robo**: `(g ∘ f) x` ist per Definition `g (f x)`, aber mit
-`rw [Function.comp_apply]` kann man das explizit umschreiben, aber `simp` kennt das
-Lemma auch."
-
-Hint (x : ℤ) : f x - 3 = x + 1 =>
-"**Robo**: Manchmal must du nachhelfen und Definitionen mit `unfold f` öffnen, mamchmal klappts
-ohne.
-Um erlich zu sein, sagt mein Programm nicht genau wann man das machen muss…"
-
--- TODO: Block simp-Lemma
-
 Conclusion "**Du**: Dann verstehst du etwas Mathe?
 
-**Robo**: Ich hatte ja keine Ahnung ob die generierte Aufgabe beweisbar ist…
+**Robo**: Ich hatte ja keine Ahnung ob die generierte Aufgabe beweisbar ist… aber offenbar
+hatte ich Glück.
 
 Und damit erreicht ihr den Hügel mit der Bibliothek."

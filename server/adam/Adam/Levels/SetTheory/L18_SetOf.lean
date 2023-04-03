@@ -26,6 +26,6 @@ open Set
 Statement
 "" (S : Set ℤ) :
     { x ∈ (S : Set ℤ) | 0 ≤ x} ⊆ S := by
-  library_search
+  simp
 
-NewTactic constructor intro rw assumption rcases simp tauto trivial
+LemmaTab "Set"

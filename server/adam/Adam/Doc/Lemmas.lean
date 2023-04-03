@@ -243,17 +243,45 @@ für eine verwandte Version.
 * Mathlib Doc: [#Subset.antisymm_iff](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.Subset.antisymm_iff)
 "
 
-LemmaDoc Set.diff_inter as "union_assoc" in "Set"
-""
+LemmaDoc Set.diff_inter as "diff_inter" in "Set"
+"
+`{α : Type u} {s t u : Set α} : s \\ (t ∩ u) = s \\ t ∪ s \\ u`
+
+## Eigenschaften
+* Namespace: `Set`
+* Mathlib Doc: [#Set.diff_inter](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.diff_inter)
+
+"
 
 LemmaDoc Set.union_assoc as "union_assoc" in "Set"
-""
+"
+` {α : Type u} (a b c : Set α) : a ∪ b ∪ c = a ∪ (b ∪ c)`
+
+## Eigenschaften
+* Namespace: `Set`
+* Mathlib Doc: [#Set.union_assoc](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.union_assoc)
+
+"
 
 LemmaDoc Set.union_diff_distrib as "union_diff_distrib" in "Set"
-""
+"
+`{α : Type u} {s t u : Set α} : (s ∪ t) \\ u = s \\ u ∪ t \\ u`
+
+## Eigenschaften
+* Namespace: `Set`
+* Mathlib Doc: [#Set.union_diff_distrib](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.union_diff_distrib)
+
+"
 
 LemmaDoc Set.univ_union as "univ_union" in "Set"
-""
+"
+` {α : Type u} {s : Set α} : Set.univ ∪ s = Set.univ`
+
+## Eigenschaften
+* Namespace: `Set`
+* Mathlib Doc: [#Set.univ_union](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.univ_union)
+
+"
 
 LemmaDoc Nat.prime_def_lt'' as "prime_def_lt''" in "Nat"
 "
@@ -315,7 +343,7 @@ LemmaDoc Set.eq_empty_iff_forall_not_mem as "eq_empty_iff_forall_not_mem" in "Su
 * Mathlib Doc: [#eq_empty_iff_forall_not_mem](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.eq_empty_iff_forall_not_mem)
 "
 
-LemmaDoc Nat.zero_eq as "zero_eq" in "Sum"
+LemmaDoc Nat.zero_eq as "zero_eq" in "Nat"
 "
 
 ## Eigenschaften
@@ -371,7 +399,7 @@ LemmaDoc Finset.sum_comm as "sum_comm" in "Sum"
 * Mathlib Doc: [#sum_comm](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Basic.html#Finset.sum_comm)
 "
 
-LemmaDoc Function.comp_apply as "Function.comp_apply" in "Function"
+LemmaDoc Function.comp_apply as "comp_apply" in "Function"
 "
 
 ## Eigenschaften
@@ -427,7 +455,7 @@ LemmaDoc Odd.strictMono_pow as "Odd.strictMono_pow" in "Function"
 * Mathlib Doc: [#Odd.strictMono_pow](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Parity.html#Odd.strictMono_pow)
 "
 
-LemmaDoc Exists.choose as "Exists.choose" in "Function"
+LemmaDoc Exists.choose as "Exists.choose" in "Logic"
 "
 
 ## Eigenschaften
@@ -435,21 +463,21 @@ LemmaDoc Exists.choose as "Exists.choose" in "Function"
 * Mathlib Doc: [#Exists.choose](https://leanprover-community.github.io/mathlib4_docs/Std/Logic.html#Exists.choose)
 "
 
-LemmaDoc Exists.choose_spec as "Exists.choose_spec" in "Function"
+LemmaDoc Exists.choose_spec as "Exists.choose_spec" in "Logic"
 "
 
 ## Eigenschaften
 
 * Mathlib Doc: [#Exists.choose_spec](https://leanprover-community.github.io/mathlib4_docs/Std/Logic.html#Exists.choose_spec)
 "
-LemmaDoc congrArg as "congrArg" in "Function"
+LemmaDoc congrArg as "congrArg" in "Logic"
 "
 
 ## Eigenschaften
 
 * Mathlib Doc: [#congrArg](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#congrArg)
 "
-LemmaDoc congrFun as "congrFun" in "Function"
+LemmaDoc congrFun as "congrFun" in "Logic"
 "
 
 ## Eigenschaften
@@ -481,4 +509,128 @@ LemmaDoc Set.nonempty_iff_ne_empty as "nonempty_iff_ne_empty" in "Logic"
 ## Eigenschaften
 
 * Mathlib Doc: [#nonempty_iff_ne_empty](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Set/Basic.html#Set.nonempty_iff_ne_empty)
+"
+
+LemmaDoc Set.subset_univ as "subset_univ" in "Set"
+"
+`{α : Type u} {s : Set α} : s ⊆ univ`
+"
+
+LemmaDoc Set.not_mem_compl_iff as "not_mem_compl_iff" in "Set"
+"
+` {α : Type u} {s : Set α} {x : α} : ¬x ∈ sᶜ ↔ x ∈ s`
+"
+
+LemmaDoc Set.mem_of_subset_of_mem as "mem_of_subset_of_mem" in "Set"
+"
+`{α : Type u} {s₁ : Set α} {s₂ : Set α} {a : α} (h : s₁ ⊆ s₂) :
+a ∈ s₁ → a ∈ s₂`
+"
+
+LemmaDoc Set.compl_eq_univ_diff as "compl_eq_univ_diff" in "Set"
+"
+` {α : Type u} (s : Set α) :
+sᶜ = Set.univ \\ s`
+"
+
+LemmaDoc Set.compl_union as "compl_union" in "Set"
+"
+` {α : Type u} (s t : Set α) :
+(s ∪ t)ᶜ = sᶜ ∩ tᶜ`
+"
+
+LemmaDoc Set.diff_diff as "diff_diff" in "Set"
+"
+` {α : Type u} {s t u : Set α} :
+(s \\ t) \\ u = s \\ (t ∪ u)`
+"
+
+LemmaDoc Set.compl_inter as "compl_inter" in "Set"
+"
+` {α : Type u} (s t : Set α) :
+(s ∩ t)ᶜ = sᶜ ∪ tᶜ`
+"
+
+LemmaDoc Set.diff_eq_compl_inter as "diff_eq_compl_inter" in "Set"
+"
+`{α : Type u} {s t : Set α} : s \\ t = tᶜ ∩ s`
+"
+
+LemmaDoc Set.inter_comm as "inter_comm" in "Set"
+"
+`{α : Type u} (a b : Set α) : a ∩ b = b ∩ a`
+"
+
+LemmaDoc Set.mem_compl_iff as "mem_compl_iff" in "Set"
+"
+`{α : Type u} (s : Set α) (x : α) : x ∈ sᶜ ↔ ¬x ∈ s`
+"
+
+LemmaDoc Set.subset_def as "subset_def" in "Set"
+"
+``
+"
+
+LemmaDoc Set.ssubset_def as "ssubset_def" in "Set"
+"
+``
+"
+
+LemmaDoc not_imp as "not_imp" in "Logic"
+"
+`{a : Prop} {b : Prop} : (a → b) ↔ a ∧ ¬b`
+"
+
+LemmaDoc Set.mem_diff as "mem_diff" in "Set"
+"
+``
+"
+
+LemmaDoc Set.mem_insert_iff as "mem_insert_iff" in "Logic"
+"
+``
+"
+
+LemmaDoc Set.mem_singleton_iff as "mem_singleton_iff" in "Set"
+"
+``
+"
+
+LemmaDoc Function.bijective_iff_has_inverse as "bijective_iff_has_inverse" in "Function"
+"
+``
+"
+
+LemmaDoc Set.mem_setOf as "mem_setOf" in "Set"
+"
+``
+"
+
+LemmaDoc Set.mem_powerset_iff as "mem_powerset_iff" in "Set"
+"
+``
+"
+
+LemmaDoc Set.subset_union_of_subset_left as "subset_union_of_subset_left" in "Set"
+"
+``
+"
+
+LemmaDoc Set.subset_union_of_subset_right as "subset_union_of_subset_right" in "Set"
+"
+``
+"
+
+LemmaDoc Set.setOf_or as "setOf_or" in "Set"
+"
+``
+"
+
+LemmaDoc Set.setOf_and as "setOf_and" in "Set"
+"
+``
+"
+  LemmaDoc Set.mem_inter_iff as "mem_inter_iff" in "Set"
+"
+``
 "

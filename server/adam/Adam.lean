@@ -61,16 +61,16 @@ Conclusion
 "Fertig!"
 
 
-Path Proposition → Implication → Predicate → Predicate → Contradiction → Sum → Lean
+Path Proposition → Implication → Predicate → Predicate → Contradiction → Sum → Lean → Function
 Path Predicate → Inequality → Sum
 -- Path Inequality → Prime
 -- Path Sum → Inequality -- → Induction
-
-Path Lean → SetTheory → SetTheory2 → SetFunction → Module
-Path Lean → Function → SetFunction
-
-
 -- Path SetTheory2 → Numbers
+
+Path Lean → SetTheory → SetTheory2
+
+Path SetTheory2 → SetFunction → Module
+Path Function → SetFunction
 Path Module → Basis → Module2
 
 MakeGame

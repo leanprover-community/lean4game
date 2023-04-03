@@ -33,5 +33,5 @@ Statement
   rw [hx]
   ring
 
-
-NewTactic constructor intro rw assumption rcases simp tauto trivial
+NewLemma Set.setOf_or Set.setOf_and Set.mem_inter_iff
+LemmaTab "Set"

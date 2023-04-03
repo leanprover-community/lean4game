@@ -7,7 +7,6 @@ import Adam.Levels.Function.L06_Injective
 import Adam.Levels.Function.L07_Surjective
 import Adam.Levels.Function.L08_Bijective
 import Adam.Levels.Function.L09_Inverse
-import Adam.Levels.Function.L11_Inverse
 
 Game "Adam"
 World "Function"

@@ -14,17 +14,19 @@ import Adam.Levels.SetTheory.L13_Insert
 import Adam.Levels.SetTheory.L14_SetOf
 import Adam.Levels.SetTheory.L15_Powerset
 import Adam.Levels.SetTheory.L16_Disjoint
-import Adam.Levels.SetTheory.L17_SetOf
-import Adam.Levels.SetTheory.L18_SetOf
-import Adam.Levels.SetTheory.L19_Subtype
-
+-- import Adam.Levels.SetTheory.L17_SetOf
+-- import Adam.Levels.SetTheory.L18_SetOf
+-- import Adam.Levels.SetTheory.L19_Subtype
 
 Game "Adam"
 World "SetTheory"
 Title "Mengenlehre"
 
 Introduction
-"Der größere der beiden Monde sieht dunkelrot und karg aus. Trotzdem sollen dort nomadische
+"[Note: von hier an sind die Levels leider noch nicht vollständig. Evt. müsst ihr etwas ausprobieren oder
+fragen, wenn ihr nicht weiterkommt.]
+
+Der größere der beiden Monde sieht dunkelrot und karg aus. Trotzdem sollen dort nomadische
 Gesellschaften wohnen, die sich in der Einöde zurechtfinden.
 
 Ihr steuert einen der wenigen befestigten Standorte am Fusse eines Berges an.

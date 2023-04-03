@@ -34,3 +34,4 @@ Statement Set.nonempty_iff_ne_empty
 
 NewLemma ne_eq Set.eq_empty_iff_forall_not_mem
 NewDefinition Set.Nonempty
+LemmaTab "Set"

@@ -32,3 +32,4 @@ Statement Set.eq_empty_iff_forall_not_mem
 
 NewTactic constructor intro rw assumption rcases simp tauto trivial
 NewLemma Set.subset_empty_iff
+LemmaTab "Set"

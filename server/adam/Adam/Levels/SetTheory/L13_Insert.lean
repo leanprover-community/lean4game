@@ -18,7 +18,7 @@ einfaches Rezept:
 simp_rw [mem_insert_iff, mem_singleton_iff] at *
 ```
 
-vereinfacht Aussagen der Form `6 ∈ { 0, 6, 1}` zu `(6 = 0) ∨ (6 = 6) ∨ (6 = 1)`,
+vereinfacht Aussagen der Form `6 ∈ {0, 6, 1}` zu `(6 = 0) ∨ (6 = 6) ∨ (6 = 1)`,
 und dann kann `tauto` diese Aussage beweisen.
 
 Bei `⊆` kann man wie schon vorher zuerst mit `intro x hx` die Definition
@@ -28,12 +28,12 @@ auseinandernehmen und dann gleich vorgehen.
 
 open Set
 
-Statement
-"" :
+Statement :
     ({2, 3, 5} : Set ℕ) ⊆ {4, 2, 5, 7, 3} := by
+  Hint "Fang wieder mit `rw [subset_def]` oder direkt mit `intro` an."
   intro x hx
   simp_rw [mem_insert_iff, mem_singleton_iff] at *
   tauto
 
-NewTactic simp_rw intro tauto rw
---Lemmas Subset.antisymm_iff empty_subset
+NewLemma Set.mem_insert_iff Set.mem_singleton_iff
+LemmaTab "Set"

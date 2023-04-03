@@ -23,3 +23,4 @@ Statement
 "" : True := sorry
 
 NewTactic constructor intro rw assumption rcases simp tauto trivial
+LemmaTab "Set"

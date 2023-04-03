@@ -9,6 +9,8 @@ Title ""
 
 Introduction
 "
+Wenn man Aussagen über Familien von Mengen machen will, macht man das mit
+`(N : I → Set V)`, also also Funktionen von einer Indexmenge.
 "
 
 Statement
