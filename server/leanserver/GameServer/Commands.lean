@@ -326,6 +326,11 @@ Arguments:
 -/
 elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
 
+  -- Check that the statement name is a lemma in the doc
+  match statementName with
+  | some name => checkInventoryDoc .Lemma name.getId
+  | none => pure Unit.unit
+
   let lvlIdx ← getCurLevelIdx
   let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
