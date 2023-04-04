@@ -1,9 +1,7 @@
 import Adam.Metadata
 import Adam.Levels.SetTheory.L03_Subset
 
-import Mathlib.Init.Set
-import Mathlib.Tactic.Tauto
-import Mathlib
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 

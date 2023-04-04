@@ -1,7 +1,7 @@
 import Adam.Metadata
 
-import Mathlib.Tactic.Ring
-import Mathlib
+import Adam.Options.MathlibPart
+
 
 Game "Adam"
 World "Prime"

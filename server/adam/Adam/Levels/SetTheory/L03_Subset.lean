@@ -1,7 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Init.Set
-import Mathlib.Tactic.Tauto
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 

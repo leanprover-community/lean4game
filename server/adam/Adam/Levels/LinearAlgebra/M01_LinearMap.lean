@@ -1,9 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Data.Real.Basic           -- definiert `ℝ`
-import Mathlib.Algebra.Module.LinearMap -- definiert `→ₗ`
-import Mathlib.Tactic.FinCases
-import Mathlib.Data.Fin.VecNotation
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "Basis"

@@ -1,4 +1,4 @@
-import Mathlib
+import Adam.Options.MathlibPart
 
 open BigOperators
 

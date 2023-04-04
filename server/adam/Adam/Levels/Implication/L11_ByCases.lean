@@ -1,7 +1,6 @@
 import Adam.Metadata
-import Std.Tactic.RCases
-import Mathlib.Tactic.Cases
-import Mathlib
+import Adam.Options.MathlibPart
+
 
 Game "Adam"
 World "Implication"
@@ -11,7 +10,7 @@ Title "by_cases"
 
 Introduction
 "
-**Du**: Sag mal, hätten wir nicht auch einfach zwei Fälle anschauen können? 
+**Du**: Sag mal, hätten wir nicht auch einfach zwei Fälle anschauen können?
 Wenn `A` wahr ist, beweisen wir die rechte Seite, sonst die Linke.
 
 **Robo**: Tatsächlich, `by_cases h : A` würde genau das machen!

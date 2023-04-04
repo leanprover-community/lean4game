@@ -1,5 +1,5 @@
 import Adam.Metadata
-import Mathlib.Data.Nat.Basic -- TODO
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "Proposition"

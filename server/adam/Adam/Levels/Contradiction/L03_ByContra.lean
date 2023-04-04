@@ -1,10 +1,4 @@
 import Adam.Metadata
-import Std.Tactic.RCases
-import Mathlib.Tactic.LeftRight
-import Mathlib.Tactic.Contrapose
-import Mathlib.Tactic.Use
-import Mathlib.Tactic.Ring
-import Mathlib
 
 import Adam.ToBePorted
 

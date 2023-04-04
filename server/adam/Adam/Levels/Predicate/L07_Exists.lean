@@ -1,10 +1,5 @@
 import Adam.Metadata
-import Std.Tactic.RCases
-import Mathlib.Tactic.Contrapose
-import Mathlib.Tactic.Use
-import Mathlib.Tactic.Ring
-
-import Mathlib.Algebra.Parity
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 

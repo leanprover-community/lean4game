@@ -1,5 +1,4 @@
-import Mathlib.Tactic.Ring
-import Mathlib.Algebra.BigOperators.Fin
+import Adam.Options.MathlibPart
 
 open BigOperators
 

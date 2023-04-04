@@ -1,5 +1,6 @@
 import Adam.Metadata
-import Mathlib
+
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "Function"
@@ -50,7 +51,7 @@ Statement "" : ∃ f : ℤ → ℤ, ∀ x, f x < x := by
   Branch
     intro x
     Hint (hidden := true) "**Du**: Zu was sich das wohl vereinfacht?"
-  simp
+  simp only [sub_lt_self_iff, forall_const]
 
 NewDefinition Symbol.function
 LemmaTab "Function"

@@ -1,6 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Algebra.Module.Submodule.Lattice
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "Module"

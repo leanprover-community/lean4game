@@ -1,13 +1,5 @@
 import Adam.Metadata
-import Mathlib.Data.Nat.Prime
-
-import Std.Tactic.RCases
-import Mathlib.Tactic.LeftRight
-import Mathlib.Tactic.Contrapose
-import Mathlib.Tactic.Use
-import Mathlib.Tactic.Ring
-
--- import Data.Nat.Prime
+import Adam.Options.MathlibPart
 
 import Adam.ToBePorted
 

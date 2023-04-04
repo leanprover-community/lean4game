@@ -1,6 +1,6 @@
 import Adam.Metadata
 import Std.Tactic.RCases
-import Mathlib.Tactic.LeftRight
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 

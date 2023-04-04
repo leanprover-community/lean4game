@@ -1,5 +1,6 @@
 import Adam.Metadata
-import Mathlib
+
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "Function"

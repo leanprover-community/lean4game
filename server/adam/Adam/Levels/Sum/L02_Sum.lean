@@ -1,7 +1,8 @@
 import Adam.Metadata
 
 import Adam.ToBePorted
-import Mathlib
+
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 open Finset

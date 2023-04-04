@@ -1,6 +1,6 @@
 import Adam.Metadata
 
-import Mathlib
+
 
 set_option tactic.hygienic false
 

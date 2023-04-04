@@ -1,8 +1,6 @@
 import Adam.Metadata
-import Mathlib.Tactic.PushNeg
-import Mathlib
+import Adam.Options.MathlibPart
 
-import Mathlib.Algebra.Parity
 
 import Adam.ToBePorted
 

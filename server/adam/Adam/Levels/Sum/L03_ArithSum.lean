@@ -1,7 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Algebra.BigOperators.Fin
-import Mathlib.Tactic.Ring
+import Adam.Options.MathlibPart
 
 import Adam.ToBePorted
 

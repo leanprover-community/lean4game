@@ -1,9 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Data.Real.Basic            -- definiert `ℝ`
-import Mathlib.Algebra.Module.Pi          -- definiert `Module ℚ (fin 2 → ℚ)`
-import Mathlib.Data.Fin.VecNotation
-import Mathlib.Tactic.FinCases
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 

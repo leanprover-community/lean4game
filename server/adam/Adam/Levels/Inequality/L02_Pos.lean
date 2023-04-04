@@ -1,6 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Tactic.LibrarySearch
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 
@@ -39,9 +39,11 @@ Statement Nat.pos_iff_ne_zero (n : ℕ) : 0 < n ↔ n ≠ 0 := by
   simp
   Hint "**Du**: Ah und jetzt falls `n ≠ 0`."
   Branch
-    simp
+    simp only [ne_eq, succ_ne_zero, not_false_iff, iff_true]
     Hint "**Robo**: Warte! Den Rest geb ich dir als Lemma: `Nat.suc_pos`."
     apply Nat.succ_pos
+  Branch
+    simp?
   constructor
   intro
   simp
@@ -51,7 +53,7 @@ Statement Nat.pos_iff_ne_zero (n : ℕ) : 0 < n ↔ n ≠ 0 := by
 
 NewTactic simp
 NewLemma Nat.succ_pos
-DisabledLemma Nat.pos_iff_ne_zero
+DisabledLemma Nat.pos_iff_ne_zero Nat.succ_pos'
 LemmaTab "Nat"
 
 Conclusion "**Du**: Oh `simp` ist ja echt nicht schlecht…

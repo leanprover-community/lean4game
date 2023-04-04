@@ -1,8 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Algebra.Module.Submodule.Lattice
-import Mathlib.Data.Real.Basic
-import Mathlib.LinearAlgebra.Span
+import Adam.Options.MathlibPart
 
 universe u
 

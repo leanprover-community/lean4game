@@ -1,10 +1,7 @@
 import Adam.Metadata
 import Adam.Levels.SetTheory.L04_SubsetEmpty
 
---import Mathlib.Data.Set.Basic
-import Mathlib.Init.Set
-import Mathlib.Tactic.Tauto
-import Mathlib.Tactic.PushNeg
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 

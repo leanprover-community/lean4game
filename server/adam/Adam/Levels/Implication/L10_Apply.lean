@@ -1,7 +1,6 @@
 import Adam.Metadata
-import Std.Tactic.RCases
-import Mathlib.Tactic.Cases
-import Mathlib
+import Adam.Options.MathlibPart
+
 
 Game "Adam"
 World "Implication"
@@ -20,13 +19,13 @@ Statement (A : Prop) : ¬A ∨ A := by
   Hint "**Du**: Das scheint wieder ziemlich offensichtlich.
 
   **Robo**:  Nee, offensichtlich ist das nicht.  Aber ich glaube, es gibt ein wohlbekanntens Lemma, das hier weiterhilft:
-  `not_or_of_imp` besagt `(A → B) → ¬ A ∨ B`.  Da die rechte Seite der Implikation mit deinem Beweisziel übereinstimmt, 
+  `not_or_of_imp` besagt `(A → B) → ¬ A ∨ B`.  Da die rechte Seite der Implikation mit deinem Beweisziel übereinstimmt,
   kannst du es mit `apply not_or_of_imp` anwenden.
 
   **Du**:  `Wohlbekannt` auf Implis?
 
   **Robo**:  Werden wir sehen. Probiers aus!"
-  Branch     
+  Branch
     right
     Hint "**Du**: Und jetzt?
 

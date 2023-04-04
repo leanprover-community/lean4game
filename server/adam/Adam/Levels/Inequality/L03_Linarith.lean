@@ -1,5 +1,5 @@
 import Adam.Metadata
-import Mathlib.Tactic.Linarith
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "Inequality"

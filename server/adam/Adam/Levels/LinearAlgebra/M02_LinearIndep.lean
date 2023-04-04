@@ -1,14 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Algebra.Module.Submodule.Lattice
-import Mathlib.Data.Real.Basic           -- definiert `ℝ`
-import Mathlib.Algebra.Module.LinearMap -- definiert `→ₗ`
-import Mathlib.Tactic.FinCases
-import Mathlib.Data.Fin.VecNotation
--- import Mathlib.LinearAlgebra.Finsupp
-import Mathlib.Algebra.BigOperators.Basic -- default
--- import Mathlib.LinearAlgebra.LinearIndependent
-import Mathlib
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "Basis"

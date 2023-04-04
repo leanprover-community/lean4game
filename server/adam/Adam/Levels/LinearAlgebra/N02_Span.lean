@@ -1,13 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Algebra.Module.Submodule.Lattice
-import Mathlib.Data.Real.Basic            -- definiert `ℝ`
-import Mathlib.Data.Fin.VecNotation       -- Importiert Matrix/Vektor-Notation
---import Mathlib.LinearAlgebra.FinSupp -- contains `top_le_span_range_iff_forall_exists_fun`
-import Mathlib.Tactic.FinCases
-import Mathlib.Algebra.BigOperators.Finsupp -- default?
-import Mathlib.LinearAlgebra.Span
-import Mathlib
+import Adam.Options.MathlibPart
 
 open Submodule
 

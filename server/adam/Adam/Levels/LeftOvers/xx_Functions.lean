@@ -1,5 +1,5 @@
 import Adam.Metadata
-import Mathlib.Tactic.Ring
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "Function"

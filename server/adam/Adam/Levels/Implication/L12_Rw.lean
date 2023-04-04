@@ -1,7 +1,5 @@
 import Adam.Metadata
-import Std.Tactic.RCases
-import Mathlib.Tactic.Cases
-import Mathlib.Logic.Basic
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "Implication"

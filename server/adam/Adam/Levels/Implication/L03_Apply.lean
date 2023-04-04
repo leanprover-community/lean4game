@@ -1,5 +1,4 @@
 import Adam.Metadata
-import Mathlib
 
 Game "Adam"
 World "Implication"
@@ -11,7 +10,7 @@ Introduction
 "
 Leider läuft das Telefonat nicht so gut.  Er legt wieder auf und schüttelt mit dem Kopf.
 
-**Operationsleiter**: Der Kollege auf der anderen Seite des Mondes versteht kein `revert`. Oder er tut zumindest so.  Habt Ihr noch eine andere Idee? 
+**Operationsleiter**: Der Kollege auf der anderen Seite des Mondes versteht kein `revert`. Oder er tut zumindest so.  Habt Ihr noch eine andere Idee?
 
 Er zieht eine Linie unter Euren Beweis, ergänzt ein durchgestrichenes ~`revert`~, und legt Euch das Blatt ein zweites Mal vor.
 "

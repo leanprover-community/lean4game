@@ -1,7 +1,6 @@
 import Adam.Metadata
-import Std.Tactic.RCases
-import Mathlib.Tactic.LeftRight
-import Mathlib
+
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 
@@ -17,7 +16,7 @@ Introduction
 
 **Du**: Klar, zeig her!  Robo, kannst du mir vielleicht auch noch einmal so eine nette Zusammenfassung anzeigen, was ich theoretisch in den letzten fünf Minuten gelernt habe?
 
-**Robo**: Hier ist die Übersicht:     
+**Robo**: Hier ist die Übersicht:
 
 ## Notationen / Begriffe
 
@@ -41,10 +40,10 @@ Introduction
 
 Statement imp_iff_not_or (A B : Prop) : (A → B) ↔ ¬ A ∨ B := by
   constructor
-  Hint "**Du** *(flüsternd)*: Ist das nicht die Definition von `→`? 
+  Hint "**Du** *(flüsternd)*: Ist das nicht die Definition von `→`?
 
-  **Robo** *(flüsternd)*: Könnte man so sehen.  Aber auf Leansch ist das bloß eine Äquivalenz.  
-  So oder so kennst du ja eine Richtung schon als Lemma. 
+  **Robo** *(flüsternd)*: Könnte man so sehen.  Aber auf Leansch ist das bloß eine Äquivalenz.
+  So oder so kennst du ja eine Richtung schon als Lemma.
   Also wende das doch einfach an."
   apply not_or_of_imp
   Hint "**Du**: Gibt es für die Gegenrichtung auch ein Lemma?
@@ -69,7 +68,7 @@ Ihr wollt bestimmt weiter zu Quantus, unserem Schestermond, oder?
 
 **Du**: Klar! Robo, halt mal.
 
-Robo nimmt das Päckchen und lässt es irgendwo in seinem Innern verschwinden. 
+Robo nimmt das Päckchen und lässt es irgendwo in seinem Innern verschwinden.
 Der Operationsleiter sieht ihn entgeistert an.
 
 **Robo**: Keine Angst, ich verdaue nichts!"

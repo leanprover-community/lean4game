@@ -1,7 +1,7 @@
 import Adam.Metadata
 import Adam.Levels.SetTheory.L05_Empty
 
-import Mathlib.Data.Set.Basic
+import Adam.Options.MathlibPart
 
 set_option tactic.hygienic false
 

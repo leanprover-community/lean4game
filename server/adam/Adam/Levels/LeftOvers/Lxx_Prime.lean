@@ -1,8 +1,5 @@
 import Adam.Metadata
-import Std.Tactic.RCases
-import Mathlib.Tactic.Contrapose
-import Mathlib.Tactic.Use
-import Mathlib.Tactic.Ring
+import Adam.Options.MathlibPart
 
 -- TODO: `even`/`odd` sind in Algebra.Parity. Not ported yet
 def even (a : ℕ) : Prop := ∃ r, a = 2 * r

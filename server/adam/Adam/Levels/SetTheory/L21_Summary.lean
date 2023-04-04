@@ -1,8 +1,6 @@
 import Adam.Metadata
 
-import Mathlib.Data.Set.Basic
-import Mathlib.Algebra.Parity
-import Mathlib.Tactic.Ring
+import Adam.Options.MathlibPart
 
 Game "Adam"
 World "SetTheory"

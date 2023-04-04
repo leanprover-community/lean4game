@@ -1,5 +1,5 @@
 import Adam.Metadata
-import Mathlib
+
 
 -- -- INCORPORATED
 -- example (A  B : Prop) : (A → B) ↔ (¬ B → ¬A) := by
