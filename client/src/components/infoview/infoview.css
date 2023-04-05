@@ -79,3 +79,52 @@
 .other-goals .goals-section-title, .other-goals summary, .other-goals summary .font-code {
   color: #5191d1;
 }
+
+.goals-section {
+  display: flex;
+  flex-direction: row;
+}
+
+.goals-section div {
+  flex-grow: 1;
+}
+
+#current-proof, #main-assumptions {
+  margin-right: 0.8em;
+}
+
+#current-proof, #other-goals {
+  margin-left: 0.8em;
+}
+
+.proof-display {
+  max-height: 6em;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-snap-type: y proximity;
+  color: #ccc;
+
+}
+
+.proof-display div:nth-last-child(4) {
+  color: #999;
+}
+
+.proof-display div:nth-last-child(3) {
+  color: #666;
+}
+
+.proof-display div:nth-last-child(2) {
+  color: #333;
+}
+
+.proof-display div:nth-last-child(1) {
+  color: #000;
+  scroll-snap-align: end;
+}
+
+.proof-display-wrapper {
+  background-color: #f0f0f0;
+  border-radius: 1em;
+  padding: 0.6em;
+}

@@ -114,12 +114,22 @@ function Hyp({ hyp: h, mvarId }: HypProps) {
     </div>
 }
 
+interface GoalProps2 {
+  goals: InteractiveGoal[]
+  filter: GoalFilterState
+}
+
 interface GoalProps {
     goal: InteractiveGoal
     filter: GoalFilterState
     showHints?: boolean
     commandLine: boolean
 }
+
+interface ProofDisplayProps {
+  proof: string
+}
+
 
 /**
  * Displays the hypotheses, target type and optional case label of a goal according to the
@@ -154,16 +164,89 @@ export const Goal = React.memo((props: GoalProps) => {
     return <div>
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
         {filter.reverse && goalLi}
-        { objectHyps.length > 0 &&
+        {! commandLine && objectHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Objekte:</div>
             {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        { assumptionHyps.length > 0 &&
+        {!commandLine && assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Annahmen:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {commandLine && commandLineMode && <CommandLine />}
         {!filter.reverse && goalLi}
         {showHints && hints}
     </div>
+})
+
+export const MainAssumptions = React.memo((props: GoalProps2) => {
+  const { goals, filter } = props
+
+  const goal = goals[0]
+  const filteredList = getFilteredHypotheses(goal.hyps, filter);
+  const hyps = filter.reverse ? filteredList.slice().reverse() : filteredList;
+  const locs = React.useContext(LocationsContext)
+
+  const goalLocs = React.useMemo(() =>
+    locs && goal.mvarId ?
+      { ...locs, subexprTemplate: { mvarId: goal.mvarId, loc: { target: '' }}} :
+        undefined,
+      [locs, goal.mvarId])
+
+  const goalLi = <div key={'goal'}>
+    <div className="goal-title">Goal: </div>
+    <LocationsContext.Provider value={goalLocs}>
+      <InteractiveCode fmt={goal.type} />
+    </LocationsContext.Provider>
+  </div>
+
+  const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
+  const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
+
+  return <div id="main-assumptions">
+    <div className="goals-section-title">Aktuelles Goal</div>
+    {filter.reverse && goalLi}
+    { objectHyps.length > 0 &&
+      <div className="hyp-group"><div className="hyp-group-title">Objekte:</div>
+      {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
+    { assumptionHyps.length > 0 &&
+      <div className="hyp-group">
+        <div className="hyp-group-title">Annahmen:</div>
+        {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
+      </div> }
+  </div>
+})
+
+export const OtherGoals = React.memo((props: GoalProps2) => {
+  const { goals, filter } = props
+  return <>
+    {goals && goals.length > 1 &&
+      <div id="other-goals" className="other-goals">
+        <div className="goals-section-title">Weitere Goals</div>
+        {goals.slice(1).map((goal, i) =>
+          <details key={i}>
+            <summary>
+              <InteractiveCode fmt={goal.type} />
+            </summary>
+            <Goal commandLine={false} filter={filter} goal={goal} />
+          </details>)}
+      </div>}
+  </>
+})
+
+export const ProofDisplay = React.memo((props : ProofDisplayProps) => {
+  const { proof } = props
+  const steps = proof.match(/.+/g)
+  return <>
+    { steps &&
+      <div id="current-proof">
+        <div className="goals-section-title">Bisheriger Beweis</div>
+        <div className="proof-display-wrapper">
+          <div className="proof-display">
+            {steps.map((s) =>
+              <div>{s}</div>
+            )}
+          </div>
+        </div>
+      </div>}
+  </>
 })
 
 interface GoalsProps {
@@ -176,7 +259,7 @@ export function Goals({ goals, filter }: GoalsProps) {
         return <>No goals</>
     } else {
         return <>
-            {goals.goals.map((g, i) => <Goal commandLine={false} key={i} goal={g} filter={filter} />)}
+          {goals.goals.map((g, i) => <Goal commandLine={false} key={i} goal={g} filter={filter} />)}
         </>
     }
 }

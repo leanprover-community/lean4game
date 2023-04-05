@@ -3,7 +3,7 @@
 import * as React from 'react';
 import type { Location, Diagnostic } from 'vscode-languageserver-protocol';
 
-import { goalsToString, Goal, FilteredGoals } from './goals'
+import { goalsToString, Goal, MainAssumptions, OtherGoals, FilteredGoals, ProofDisplay } from './goals'
 import { basename, DocumentPosition, RangeHelpers, useEvent, usePausableState, discardMethodNotFound,
     mapRpcError, useAsyncWithTrigger, PausableProps } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { ConfigContext, EditorContext, LspDiagnosticsContext, ProgressContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
@@ -17,6 +17,8 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-i
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { CircularProgress } from '@mui/material';
+import { InputModeContext, MonacoEditorContext } from '../Level'
+
 
 type InfoStatus = 'updating' | 'error' | 'ready';
 type InfoKind = 'cursor' | 'pin';
@@ -84,10 +86,11 @@ interface InfoDisplayContentProps extends PausableProps {
     error?: string;
     userWidgets: UserWidgetInstance[];
     triggerUpdate: () => Promise<void>;
+    proof? : string;
 }
 
 const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
-    const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused} = props;
+    const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused, proof} = props;
 
     const hasWidget = userWidgets.length > 0;
     const hasError = !!error;
@@ -121,21 +124,26 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate(); }}>{' '}Try again.</a>
             </div>}
         <LocationsContext.Provider value={locs}>
-            <div className="goals-section">
-                { goals && (
-                    goals.goals.length > 0
-                  ? <><div className="goals-section-title">Aktuelles Goal</div>
-                    <Goal commandLine={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} /></>
-                  : <div className="goals-section-title">No Goals</div>
-                ) }
-            </div>
+          <div className="goals-section">
+            { goals &&  goals.goals.length > 0 && <>
+              <MainAssumptions filter={goalFilter} key='mainGoal' goals={goals.goals} />
+              <ProofDisplay proof={proof}/>
+              <OtherGoals filter={goalFilter} goals={goals.goals} />
+            </>}
+          </div>
+          <div>
+            { goals && (goals.goals.length > 0
+              ? <Goal commandLine={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />
+              : <div className="goals-section-title">No Goals</div>
+            )}
+          </div>
         </LocationsContext.Provider>
         {userWidgets.map(widget =>
-            <details key={`widget::${widget.id}::${widget.range?.toString()}`} open>
-                <summary className='mv2 pointer'>{widget.name}</summary>
-                <PanelWidgetDisplay pos={pos} goals={goals ? goals.goals.map (goal => goal) : []} termGoal={termGoal}
-                    selectedLocations={selectedLocs} widget={widget}/>
-            </details>
+          <details key={`widget::${widget.id}::${widget.range?.toString()}`} open>
+            <summary className='mv2 pointer'>{widget.name}</summary>
+            <PanelWidgetDisplay pos={pos} goals={goals ? goals.goals.map (goal => goal) : []}
+              termGoal={termGoal} selectedLocations={selectedLocs} widget={widget}/>
+          </details>
         )}
         {nothingToShow && (
             isPaused ?
@@ -203,12 +211,14 @@ function InfoDisplay(props0: InfoDisplayProps & InfoPinnable) {
         setPaused(isPaused => !isPaused);
     });
 
+    const editor = React.useContext(MonacoEditorContext)
+
     return (
     <RpcContext.Provider value={rpcSess}>
     {/* <details open> */}
         {/* <InfoStatusBar {...props} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} /> */}
         <div>
-            <InfoDisplayContent {...props} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} />
+            <InfoDisplayContent {...props} proof={editor.getValue()} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} />
         </div>
     {/* </details> */}
     </RpcContext.Provider>
