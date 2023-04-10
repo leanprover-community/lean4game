@@ -84,6 +84,8 @@ function InventoryItem({name, displayName, locked, disabled, showDoc}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : ""
   const className = locked ? "locked" : disabled ? "disabled" : ""
+  const title = locked ? "Not unlocked yet" :
+                disabled ? "Not available in this level" : ""
 
   const handleClick = () => {
     if (!locked && !disabled) {
@@ -91,7 +93,7 @@ function InventoryItem({name, displayName, locked, disabled, showDoc}) {
     }
   }
 
-  return <div className={`item ${className}`} onClick={handleClick}>{icon} {displayName}</div>
+  return <div className={`item ${className}`} onClick={handleClick} title={title}>{icon} {displayName}</div>
 }
 
 export function Documentation({name, type}) {
