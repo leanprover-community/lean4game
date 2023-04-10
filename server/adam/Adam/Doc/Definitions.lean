@@ -110,3 +110,15 @@ wie andere Objekte verwenden.
 
 Note: `=>` wird in mathlib oft auch `↦` (`\\maps`) geschrieben.
 "
+
+DefinitionDoc Inhabited as "Inhabited" "
+`Inhabited U` ist eine Instanz, die aussagt, dass `U` mindestens ein Element
+enthält.
+
+Hat man eine solche Instanz, kann man immer das Element `(default : U)` verwenden.
+
+Was `default` genau ist hängt davon ab, wie `Inhabited U` bewiesen wurde. Es könnte
+also alles sein und man sollte sich nicht darauf verlassen, dass `default` eine
+bestimmte Eigenschaft hat. Z.B. ist `(default : ℕ) = 0` aber es hätte genau so gut
+als `1` oder `2` definiert werden können.
+"
