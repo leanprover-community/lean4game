@@ -1,5 +1,5 @@
 import NNG.Metadata
-import NNG.MyNat.Addition
+--import NNG.MyNat.Power
 
 Game "NNG"
 World "Power"
@@ -14,11 +14,12 @@ Introduction
 "
 
 Statement
-""
-    : true := by
+"$0 ^ 0 = 1$"
+    : true := by -- (0 : ℕ) ^ (0 : ℕ) = 1 := by
   trivial
 
 Conclusion
 "
 
 "
+

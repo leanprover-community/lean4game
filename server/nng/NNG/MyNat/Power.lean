@@ -1,21 +1,21 @@
-import NNG.MyNat.Definition
+import NNG.MyNat.Multiplication
 namespace MyNat
 open MyNat
 
-def pow : MyNat → MyNat → MyNat
+def pow : ℕ → ℕ → ℕ
 | _, zero => one
 | m, (succ n) => pow m n * m
 
-instance : Pow MyNat MyNat where
+instance : Pow ℕ ℕ where
   pow := pow
 
 -- notation a ^ b := pow a b
 
-example : (1 : MyNat) ^ (1 : MyNat) = 1 := rfl
+example : (1 : ℕ) ^ (1 : ℕ) = 1 := rfl
 
-lemma pow_zero (m : MyNat) : m ^ (0 : MyNat) = 1 := rfl
+lemma pow_zero (m : ℕ) : m ^ (0 : ℕ) = 1 := rfl
 
-lemma pow_succ (m n : MyNat) : m ^ (succ n) = m ^ n * m := rfl
+lemma pow_succ (m n : ℕ) : m ^ (succ n) = m ^ n * m := rfl
 
 end MyNat
 
