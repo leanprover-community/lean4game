@@ -155,14 +155,14 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 </span> :
                 <><CircularProgress /><div>Loading goal...</div></>)}
         <AllMessages />
-        <LocationsContext.Provider value={locs}>
+        {/* <LocationsContext.Provider value={locs}>
             {goals && goals.goals.length > 1 && <div className="goals-section other-goals">
                     <div className="goals-section-title">Weitere Goals</div>
 
                     {goals.goals.slice(1).map((goal, i) =>
                         <details key={i}><summary><InteractiveCode fmt={goal.type} /></summary> <Goal commandLine={false} filter={goalFilter} goal={goal} /></details>)}
                 </div>}
-        </LocationsContext.Provider>
+        </LocationsContext.Provider> */}
     </>
 })
 
