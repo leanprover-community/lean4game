@@ -1,5 +1,4 @@
 import NNG.Metadata
-import NNG.MyNat.Addition
 import NNG.Levels.Addition.Level_3
 
 Game "NNG"
@@ -9,9 +8,7 @@ Title "`add_comm` (boss level)"
 
 open MyNat
 
-namespace AdditionWorld
-
-theorem succ_add (a b : ℕ) : succ a + b = succ (a + b)  := by
+theorem MyNat.succ_add (a b : ℕ) : succ a + b = succ (a + b)  := by
   induction b with d hd
   · rw [add_zero]
     rw [add_zero]
@@ -51,8 +48,6 @@ $a + b = b + a$."
     rw [hd]
     rw [succ_add]
     rfl
-
-NewLemma MyNat.succ_add
 
 Conclusion
 "

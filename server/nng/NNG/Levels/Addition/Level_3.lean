@@ -1,5 +1,4 @@
 import NNG.Metadata
-import NNG.MyNat.Addition
 import NNG.Levels.Addition.Level_2
 
 Game "NNG"
@@ -9,9 +8,7 @@ Title "succ_add"
 
 open MyNat
 
-namespace AdditionWorld
-
-theorem add_assoc (a b c : ℕ) : (a + b) + c = a + (b + c)  := by
+theorem MyNat.add_assoc (a b c : ℕ) : (a + b) + c = a + (b + c)  := by
   induction c with c hc
   · rw [add_zero]
     rw [add_zero]
@@ -59,8 +56,6 @@ $ \\operatorname{succ}(a) + b = \\operatorname{succ}(a + b)$."
     rw [hd]
     rw [add_succ]
     rfl
-
-NewLemma MyNat.add_assoc
 
 Conclusion
 "

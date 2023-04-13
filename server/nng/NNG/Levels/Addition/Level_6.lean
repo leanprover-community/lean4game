@@ -9,8 +9,6 @@ Title "add_right_comm"
 
 open MyNat
 
-namespace AdditionWorld
-
 Introduction
 "
 Lean sometimes writes `a + b + c`. What does it mean? The convention is

@@ -230,7 +230,7 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
   -- Check that the statement name is a lemma in the doc
   match statementName with
   | some name => checkInventoryDoc .Lemma name.getId
-  | none => pure Unit.unit
+  | none => pure ()
 
   let lvlIdx ← getCurLevelIdx
   let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
@@ -283,6 +283,9 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
     descrText := match descr with
     | none => ""
     | some s => s.getString
+    statementName := match statementName with
+    | none => default
+    | some name => name.getId
     descrFormat := match statementName with
     | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
     | some name => (Format.join ["lemma ", reprint name.raw, " ", reprint sig.raw, " := by"]).pretty 10  -- "lemma "  ++ (toString <| reprint name.raw) ++ " " ++ (Format.pretty (reprint sig.raw) 40) ++ " := by"
@@ -404,14 +407,42 @@ elab "MakeGame" : command => do
     throwError "World graph must not contain loops! Check your `Path` declarations."
 
   -- Compute which inventory items are available in which level:
-  for inventoryType in open InventoryType in #[Tactic, Definition, Lemma] do
+  for inventoryType in #[.Tactic, .Definition, .Lemma] do
     let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
+    let mut lemmaStatements : HashMap (Name × Nat) Name := {}
     let mut allItems : HashSet Name := {}
     for (worldId, world) in game.worlds.nodes.toArray do
       let mut newItems : HashSet Name := {}
-      for (_, level) in world.levels.toArray do
-        newItems := newItems.insertMany (level.getInventory inventoryType).new
-        allItems := allItems.insertMany (level.getInventory inventoryType).new
+      for (levelId, level) in world.levels.toArray do
+        let newLemmas := (level.getInventory inventoryType).new
+        newItems := newItems.insertMany newLemmas
+        allItems := allItems.insertMany newLemmas
+        if inventoryType == .Lemma then
+          -- For levels `2, 3, …` we check if the previous level was named
+          -- in which case we add it as available lemma.
+          match levelId with
+          | 0 => pure ()
+          | 1 => pure () -- level ids start with 1, so we need to skip 1, too.
+          | i₀ + 1 =>
+            -- add named statement from previous level to the available lemmas.
+            match (world.levels.find! (i₀)).statementName with
+            | .anonymous => pure ()
+            | .num _ _ => panic "Did not expect to get a numerical statement name!"
+            | .str pre s =>
+              let name := Name.str pre s
+              newItems := newItems.insert name
+              allItems := allItems.insert name
+              lemmaStatements := lemmaStatements.insert (worldId, levelId) name
+      if inventoryType == .Lemma then
+        -- if named, add the lemma from the last level of the world to the inventory
+        let i₀ := world.levels.size
+        match (world.levels.find! (i₀)).statementName with
+        | .anonymous => pure ()
+        | .num _ _ => panic "Did not expect to get a numerical statement name!"
+        | .str pre s =>
+          let name := Name.str pre s
+          newItems := newItems.insert name
+          allItems := allItems.insert name
       newItemsInWorld := newItemsInWorld.insert worldId newItems
 
     -- Basic inventory item availability: all locked.
@@ -456,6 +487,18 @@ elab "MakeGame" : command => do
             displayName := data.displayName
             category := data.category
             locked := false }
+
+        -- add the statement from the previous level permanently as unlocked
+        if inventoryType == .Lemma then
+          match lemmaStatements.find? (worldId, levelId) with
+          | none => pure ()
+          | some name =>
+            let data := (← getInventoryDoc? name inventoryType).get!
+            items := items.insert name {
+              name := name
+              displayName := data.displayName
+              category := data.category
+              locked := false }
 
         let itemsArray := items.toArray
           |>.insertionSort (fun a b => a.1.toString < b.1.toString)

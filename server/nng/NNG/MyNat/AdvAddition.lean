@@ -1,4 +1,4 @@
-import NNG.MyNat.Theorems.Addition
+import NNG.Levels.Addition.Level_6
 
 namespace MyNat
 open MyNat

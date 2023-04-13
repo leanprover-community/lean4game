@@ -173,6 +173,9 @@ structure GameLevel where
   /-- Introduction text shown all the time. (markdown) -/
   introduction: String := default
   conclusion: String := default
+  /-- The name of the exercise proven. If provided this lemma will be available in
+  future levels. -/
+  statementName: Name := default
   hints: Array GoalHintEntry := default
   /-- The statement in Lean. -/
   goal : TSyntax `Lean.Parser.Command.declSig := default
@@ -188,6 +191,7 @@ structure GameLevel where
   definitions: InventoryInfo := default
   lemmas: InventoryInfo := default
   deriving Inhabited, Repr
+
 
 /-! ## World -/
 

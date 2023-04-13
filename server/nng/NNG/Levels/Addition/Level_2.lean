@@ -1,5 +1,5 @@
 import NNG.Metadata
-import NNG.MyNat.Addition
+import NNG.Levels.Addition.Level_1
 
 Game "NNG"
 World "Addition"
@@ -8,9 +8,7 @@ Title "add_assoc (associativity of addition)"
 
 open MyNat
 
-namespace AdditionWorld
-
-theorem zero_add (n : ℕ) : 0 + n = n := by
+theorem MyNat.zero_add (n : ℕ) : 0 + n = n := by
   induction n with n hn
   · rw [add_zero]
     rfl
@@ -31,6 +29,7 @@ See if you can prove associativity of addition.
 "
 
 Statement MyNat.add_assoc
+
 "On the set of natural numbers, addition is associative.
 In other words, for all natural numbers $a, b$ and $c$, we have
 $ (a + b) + c = a + (b + c). $"

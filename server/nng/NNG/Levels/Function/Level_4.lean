@@ -1,5 +1,5 @@
 import NNG.Metadata
-import NNG.MyNat.Theorems.Addition
+import NNG.Levels.Addition.Level_6
 import NNG.MyNat.Multiplication
 
 Game "NNG"
