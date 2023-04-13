@@ -84,94 +84,94 @@ NewTactic funext by_cases simp_rw linarith
 NewLemma not_le if_pos if_neg
 LemmaTab "Logic"
 
--- TODO : This does not trigger.
--- TODO: These 5 hints should be mutually exclusive. i.e. they should not trigger
--- if a assumption is missing.
-Hint (x : ℚ) : (f ∘ g) x = (g ∘ f) x => ""
+-- -- TODO : This does not trigger.
+-- -- TODO: These 5 hints should be mutually exclusive. i.e. they should not trigger
+-- -- if a assumption is missing.
+-- Hint (x : ℚ) : (f ∘ g) x = (g ∘ f) x => ""
 
 
-Hint (x : ℚ) (h : 0 ≤ x) : f (g x) = g (f x) =>
-"
+-- Hint (x : ℚ) (h : 0 ≤ x) : f (g x) = g (f x) =>
+-- "
 
-"
+-- "
 
-Hint (x : ℚ) (h : 0 ≤ x) (h₂ : 0 ≤ f x) : f (g x) = g (f x) =>
-"
-**Du**: Mit den beiden Annahmen sagt die Definition von `g` ja z.B.
-`(if 0 ≤ x then _)` wobei ich weiss dass `0 ≤ x` wahr ist,
-kann ich das dann einfach vereinfachen?
+-- Hint (x : ℚ) (h : 0 ≤ x) (h₂ : 0 ≤ f x) : f (g x) = g (f x) =>
+-- "
+-- **Du**: Mit den beiden Annahmen sagt die Definition von `g` ja z.B.
+-- `(if 0 ≤ x then _)` wobei ich weiss dass `0 ≤ x` wahr ist,
+-- kann ich das dann einfach vereinfachen?
 
-**Robo**: Dafür must du zuerst die Definition von `g` öffnen, also `unfold`. Und dann mit
-dem Lemma `if_pos {h}` das umschreiben.
-"
+-- **Robo**: Dafür must du zuerst die Definition von `g` öffnen, also `unfold`. Und dann mit
+-- dem Lemma `if_pos {h}` das umschreiben.
+-- "
 
-Hint (x : ℚ) (h : ¬ 0 ≤ x) : f (g x) = g (f x) =>
-"
-**Du**: Ich sehe, das ist jetzt der zweite Fall, da brauch ich sicher wieder eine zweite Annahme
-`¬(0 ≤ f x)`…
-"
+-- Hint (x : ℚ) (h : ¬ 0 ≤ x) : f (g x) = g (f x) =>
+-- "
+-- **Du**: Ich sehe, das ist jetzt der zweite Fall, da brauch ich sicher wieder eine zweite Annahme
+-- `¬(0 ≤ f x)`…
+-- "
 
-Hint (x : ℚ) (h : ¬ 0 ≤ x) (h₂ : ¬ 0 ≤ f x) : f (g x) = g (f x) =>
-"
-**Robo**: Jetzt ist der Zeitpunkt wo die Definition von `g` geöffnet sein sollte.
+-- Hint (x : ℚ) (h : ¬ 0 ≤ x) (h₂ : ¬ 0 ≤ f x) : f (g x) = g (f x) =>
+-- "
+-- **Robo**: Jetzt ist der Zeitpunkt wo die Definition von `g` geöffnet sein sollte.
 
-**Robo**: Wenn man ein If-Statement mit wahrer Prämisse mit `if_pos` vereinfacht, dann
-braucht man für eine falsche Prämisse…
+-- **Robo**: Wenn man ein If-Statement mit wahrer Prämisse mit `if_pos` vereinfacht, dann
+-- braucht man für eine falsche Prämisse…
 
-**Du**: `if_neg`?
-"
--- END TODO
-HiddenHint (x : ℚ) (h : 0 ≤ x) (h₂ : 0 ≤ f x) : f (2 * x) = g (f x) =>
-"
-**Robo**: Jetzt das Gleiche noch mit `if_pos {h₂}`.
-"
+-- **Du**: `if_neg`?
+-- "
+-- -- END TODO
+-- HiddenHint (x : ℚ) (h : 0 ≤ x) (h₂ : 0 ≤ f x) : f (2 * x) = g (f x) =>
+-- "
+-- **Robo**: Jetzt das Gleiche noch mit `if_pos {h₂}`.
+-- "
 
-HiddenHint (x : ℚ) (h : 0 ≤ x) (h₂ : 0 ≤ f x) : f (g x) = 2 * f x =>
-"
-**Robo**: Jetzt das Gleiche noch mit `if_pos {h}`.
-"
+-- HiddenHint (x : ℚ) (h : 0 ≤ x) (h₂ : 0 ≤ f x) : f (g x) = 2 * f x =>
+-- "
+-- **Robo**: Jetzt das Gleiche noch mit `if_pos {h}`.
+-- "
 
-Hint (x : ℚ) (h : 0 ≤ x) (h₂ : 0 ≤ f x) : f (2 * x) = 2 * f x =>
-"
-**Robo**: Wenn du jetzt noch die Definition von `f` öffnest, dann kann `ring` den
-Rest ausrechnen.
-"
-
-
--- TODO: This are also showing in the case of the Hint below
--- Proof of `0 ≤ f x`.
-Hint (x : ℚ) (h : 0 ≤ x) : 0 ≤ f x =>
-" **Robo**: Wenn du die Definition von `f` öffnest, dann hast du schon das wissen,
-um das zu beweisen."
-HiddenHint (x : ℚ) (h : 0 ≤ x) : 0 ≤ f x =>
-"**Du** *(in Gedanken)*: Was war das nochmals... Ungleichungen... `linarith`!"
-
-HiddenHint (x : ℚ) (h : ¬0 ≤ x) : ¬ 0 ≤ f x =>
-" **Robo**: Das ist das selbe wie vorhin…"
+-- Hint (x : ℚ) (h : 0 ≤ x) (h₂ : 0 ≤ f x) : f (2 * x) = 2 * f x =>
+-- "
+-- **Robo**: Wenn du jetzt noch die Definition von `f` öffnest, dann kann `ring` den
+-- Rest ausrechnen.
+-- "
 
 
--- Hint for modifying `h` wrongly.
-Hint (x : ℚ) (h : x < 0) : f (g x) = g (f x) =>
-"
-**Robo**: Das war nicht so ideal, hier brauchst du die Annahme in der Form `({h} : ¬ 0 ≤ {x})`!
-"
+-- -- TODO: This are also showing in the case of the Hint below
+-- -- Proof of `0 ≤ f x`.
+-- Hint (x : ℚ) (h : 0 ≤ x) : 0 ≤ f x =>
+-- " **Robo**: Wenn du die Definition von `f` öffnest, dann hast du schon das wissen,
+-- um das zu beweisen."
+-- HiddenHint (x : ℚ) (h : 0 ≤ x) : 0 ≤ f x =>
+-- "**Du** *(in Gedanken)*: Was war das nochmals... Ungleichungen... `linarith`!"
 
--- TODO: In this case we get to see the Hints above
-Hint (x : ℚ) (h : 0 ≤ x) : 0 ≤ x =>
-"**Robo**: Dieses Goal ist entstanden, als du `rw [if_pos]` anstatt `rw [if_pos {h}]`
-geschrieben hast."
+-- HiddenHint (x : ℚ) (h : ¬0 ≤ x) : ¬ 0 ≤ f x =>
+-- " **Robo**: Das ist das selbe wie vorhin…"
 
-Hint (x : ℚ) (h : 0 ≤ f x) : 0 ≤ f x =>
-"**Robo**: Dieses Goal ist entstanden, als du `rw [if_pos]` anstatt `rw [if_pos {h}]`
-geschrieben hast."
 
-Hint (x : ℚ) (h : ¬ 0 ≤ x) : ¬ 0 ≤ x =>
-"**Robo**: Dieses Goal ist entstanden, als du `rw [if_neg]` anstatt `rw [if_neg {h}]`
-geschrieben hast."
+-- -- Hint for modifying `h` wrongly.
+-- Hint (x : ℚ) (h : x < 0) : f (g x) = g (f x) =>
+-- "
+-- **Robo**: Das war nicht so ideal, hier brauchst du die Annahme in der Form `({h} : ¬ 0 ≤ {x})`!
+-- "
 
-Hint (x : ℚ) (h : ¬ 0 ≤ f x) : ¬ 0 ≤ f x =>
-"**Robo**: Dieses Goal ist entstanden, als du `rw [if_neg]` anstatt `rw [if_neg {h}]`
-geschrieben hast."
+-- -- TODO: In this case we get to see the Hints above
+-- Hint (x : ℚ) (h : 0 ≤ x) : 0 ≤ x =>
+-- "**Robo**: Dieses Goal ist entstanden, als du `rw [if_pos]` anstatt `rw [if_pos {h}]`
+-- geschrieben hast."
+
+-- Hint (x : ℚ) (h : 0 ≤ f x) : 0 ≤ f x =>
+-- "**Robo**: Dieses Goal ist entstanden, als du `rw [if_pos]` anstatt `rw [if_pos {h}]`
+-- geschrieben hast."
+
+-- Hint (x : ℚ) (h : ¬ 0 ≤ x) : ¬ 0 ≤ x =>
+-- "**Robo**: Dieses Goal ist entstanden, als du `rw [if_neg]` anstatt `rw [if_neg {h}]`
+-- geschrieben hast."
+
+-- Hint (x : ℚ) (h : ¬ 0 ≤ f x) : ¬ 0 ≤ f x =>
+-- "**Robo**: Dieses Goal ist entstanden, als du `rw [if_neg]` anstatt `rw [if_neg {h}]`
+-- geschrieben hast."
 
 Conclusion
 "Zufrieden tauschen die beiden Wächter ihren Platz und geben so dabei den
