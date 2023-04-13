@@ -51,7 +51,7 @@ namespace Lean.Parser.Tactic
 open Meta Elab Elab.Tactic
 
 open private getAltNumFields in evalCases ElimApp.evalAlts.go in
-def ElimApp.evalNames (elimInfo : ElimInfo) (alts : Array ElimApp.Alt) (withArg : Syntax)
+def ElimApp.evalNames.MyNat (elimInfo : ElimInfo) (alts : Array ElimApp.Alt) (withArg : Syntax)
     (numEqs := 0) (numGeneralized := 0) (toClear : Array FVarId := #[]) :
     TermElabM (Array MVarId) := do
   let mut names : List Syntax := withArg[1].getArgs |>.toList
@@ -96,7 +96,7 @@ elab (name := _root_.MyNat.induction) "induction " tgts:(casesTarget,+)
       let elimArgs := result.elimApp.getAppArgs
       ElimApp.setMotiveArg g elimArgs[elimInfo.motivePos]!.mvarId! targetFVarIds
       g.assign result.elimApp
-      let subgoals ← ElimApp.evalNames elimInfo result.alts withArg
+      let subgoals ← ElimApp.evalNames.MyNat elimInfo result.alts withArg
         (numGeneralized := fvarIds.size) (toClear := targetFVarIds)
       setGoals <| (subgoals ++ result.others).toList ++ gs
 

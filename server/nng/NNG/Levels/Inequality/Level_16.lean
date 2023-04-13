@@ -1,5 +1,6 @@
 import NNG.Metadata
-import NNG.MyNat.Addition
+import NNG.MyNat.LE
+import Mathlib.Tactic.Use
 
 Game "NNG"
 World "Inequality"
