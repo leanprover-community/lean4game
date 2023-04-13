@@ -8,7 +8,6 @@ The game framework stores almost all its game building data in environment exten
 defined in this file.
 -/
 
-
 open Lean
 
 /-! ## Hints -/
@@ -20,9 +19,9 @@ structure GoalHintEntry where
   goal : AbstractCtxResult
   /-- Text of the hint as an expression of type `Array Expr → MessageData` -/
   text : Expr
-  /--  If true, then hint should be hidden and only be shown on player's request -/
+  /-- If true, then hint should be hidden and only be shown on player's request -/
   hidden : Bool := false
-  /--  If true, then the goal must contain only the assumptions specified in `goal` and no others -/
+  /-- If true, then the goal must contain only the assumptions specified in `goal` and no others -/
   strict : Bool := false
 
 instance : Repr GoalHintEntry := {
@@ -40,13 +39,44 @@ instance : ToString InventoryType := ⟨fun t => match t with
 | .Definition => "Definition"
 ⟩
 
+/-- An inventory item represents the documentation of a tactic/lemma/definitions. -/
 structure InventoryDocEntry where
+  /--
+  The name of the item. The restrictions are:
+
+  * for Tactics: The name of the tactic.
+  * for Lemmas: *Fully qualified* lemma name.
+  * for Definitions: no restrictions.
+  -/
   name : Name
+  /-- One of `Tactic`, `Lemma` and `Definition`. -/
   type : InventoryType
+  /-- The display name shown in the inventory. This can be free-text. -/
   displayName : String
+  /-- Category to group inventory items by. (currently only used for lemmas) -/
   category : String
+  /-- The description (doc) of the item. (free-text) -/
   content : String
   deriving ToJson, Repr, Inhabited
+
+structure ComputedInventoryItem where
+  /--
+  The name of the item. The restrictions are:
+
+  * for Tactics: The name of the tactic.
+  * for Lemmas: *Fully qualified* lemma name.
+  * for Definitions: no restrictions.
+  -/
+  name : Name
+  /-- The display name shown in the inventory. This can be free-text. -/
+  displayName : String
+  /-- Category to group inventory items by (currently only used for lemmas). -/
+  category : String
+  /-- If `true` then the item only gets unlocked in a later level. -/
+  locked : Bool
+  /-- If `true` then the item is blocked for this level. -/
+  disabled : Bool := false
+deriving ToJson, FromJson, Repr, Inhabited
 
 /-- Environment extension for inventory documentation. -/
 initialize inventoryDocExt : SimplePersistentEnvExtension InventoryDocEntry (Array InventoryDocEntry) ←
@@ -120,15 +150,6 @@ structure LevelId where
   level : Nat
 deriving Inhabited
 
-structure ComputedInventoryItem where
-  name : Name
-  displayName : String
-  category : String
-  locked : Bool
-  -- items that are temporarily blocked in this level.
-  disabled : Bool := false
-deriving ToJson, FromJson, Repr, Inhabited
-
 structure InventoryInfo where
   -- new inventory items introduced by this level:
   new : Array Name
@@ -148,35 +169,41 @@ instance : Repr Elab.Command.Scope := ⟨fun s _ => repr s.currNamespace⟩
 
 structure GameLevel where
   index: Nat
+  /-- The title of the level. -/
   title: String := default
-  /-- introduction: Theory block shown all the time -/
+  /-- Introduction text shown all the time. (markdown) -/
   introduction: String := default
-  /-- The mathematical statemtent in mathematician-readable form -/
-  description: String := default
-  /-- conclusion displayed when level is completed. -/
   conclusion: String := default
-  tactics: InventoryInfo := default
-  definitions: InventoryInfo := default
-  lemmas: InventoryInfo := default
-  lemmaTab: Option String := none
   hints: Array GoalHintEntry := default
   /-- The statement in Lean. -/
   goal : TSyntax `Lean.Parser.Command.declSig := default
   scope : Elab.Command.Scope := default
+  /-- The mathematical statement in mathematician-readable form. (markdown) -/
   descrText: String := default
   descrFormat : String := default
-  -- The module to be imported when playing this level:
+  /-- The `category` of lemmas to be open by default -/
+  lemmaTab: Option String := none
+  /-- The module to be imported when playing this level -/
   module : Name := default
+  tactics: InventoryInfo := default
+  definitions: InventoryInfo := default
+  lemmas: InventoryInfo := default
   deriving Inhabited, Repr
 
 /-! ## World -/
 
+/-- A world is a collection of levels, like a chapter. -/
 structure World where
+  /- Internal name of the world. Not visible to the player. -/
   name: Name
-  title: String := ""
-  introduction: String := ""
-  conclusion : String := ""
-  levels: HashMap Nat GameLevel := {}
+  /-- Display title of the world. -/
+  title: String := default
+  /-- World introduction to be shown before the first level is loaded. (markdown) -/
+  introduction: String := default
+  /-- TODO: This is currently unused. -/
+  conclusion : String := default
+  /-- The levels of the world. -/
+  levels: HashMap Nat GameLevel := default
 deriving Inhabited
 
 instance : ToJson World := ⟨
@@ -189,12 +216,17 @@ instance : ToJson World := ⟨
 /-! ## Game -/
 
 structure Game where
+  /-- Internal name of the game. -/
   name : Name
-  title : String := ""
-  introduction : String := ""
-  conclusion : String := ""
-  authors : List String := []
-  worlds : Graph Name World := {}
+  /-- TODO: currently unused. -/
+  title : String := default
+  /-- Text displayed on the main landing page of the game. -/
+  introduction : String := default
+  /-- TODO: currently unused. -/
+  conclusion : String := default
+  /-- TODO: currently unused. -/
+  authors : List String := default
+  worlds : Graph Name World := default
 deriving Inhabited, ToJson
 
 /-! ## Game environment extension -/
