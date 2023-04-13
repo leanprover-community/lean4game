@@ -1,4 +1,3 @@
-import Lean
 import GameServer.EnvExtensions
 import GameServer.InteractiveGoal
 

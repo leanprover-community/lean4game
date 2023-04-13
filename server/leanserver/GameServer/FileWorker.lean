@@ -1,11 +1,6 @@
 /- This file is mostly copied from `Lean/Server/FileWorker.lean`. -/
-
-import Lean
-import GameServer.EnvExtensions
-import GameServer.RpcHandlers
-import GameServer.Game
-
 import Lean.Server.FileWorker
+import GameServer.Game
 
 namespace MyModule
 open Lean

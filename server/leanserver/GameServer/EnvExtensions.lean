@@ -1,6 +1,5 @@
-import Lean
-import GameServer.Graph
 import GameServer.AbstractCtx
+import GameServer.Graph
 
 /-! # Environment extensions
 

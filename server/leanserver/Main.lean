@@ -1,6 +1,5 @@
-import GameServer.Watchdog
 import GameServer.FileWorker
-
+import GameServer.Watchdog
 
 unsafe def main : List String → IO UInt32 := fun args => do
   let e ← IO.getStderr

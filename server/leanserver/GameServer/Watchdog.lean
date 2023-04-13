@@ -1,7 +1,6 @@
 /- This file is mostly copied from `Lean/Server/Watchdog.lean`. -/
-import Lean
-import GameServer.Game
 import Lean.Server.Watchdog
+import GameServer.Game
 
 namespace MyServer.Watchdog
 open Lean
