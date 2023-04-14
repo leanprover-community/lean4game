@@ -29,6 +29,7 @@ export interface LevelInfo {
   descrText: null|string,
   descrFormat: null|string,
   lemmaTab: null|string,
+  statementName: null|string
 }
 
 interface Doc {

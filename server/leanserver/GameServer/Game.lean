@@ -47,6 +47,7 @@ structure LevelInfo where
   descrText : String := ""
   descrFormat : String := ""
   lemmaTab : Option String
+  statementName : Option String
 deriving ToJson, FromJson
 
 structure LoadLevelParams where
@@ -117,6 +118,8 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
           c.hOut.writeLspResponseError ⟨id, .invalidParams, s!"Level not found: world {p.world}, level {p.level}", none⟩
           return true
 
+      let env ← getEnv
+
       let levelInfo : LevelInfo :=
           { index := lvl.index,
             title := lvl.title,
@@ -127,7 +130,16 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction
             conclusion := lvl.conclusion
-            lemmaTab := lvl.lemmaTab }
+            lemmaTab := lvl.lemmaTab
+            statementName := match lvl.statementName with
+              | .anonymous => none
+              | name => match (inventoryDocExt.getState env).find?
+                  (fun x => x.name == name && x.type == .Lemma) with
+                | some n => n.displayName
+                | none => name.toString
+                -- Note: we could call `.find!` because we check in `Statement` that the
+                -- lemma doc must exist.
+            }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson levelInfo⟩
       return true
     | Message.request id "loadDoc" params =>

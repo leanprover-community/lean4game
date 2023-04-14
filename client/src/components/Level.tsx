@@ -188,8 +188,14 @@ function PlayableLevel({worldId, levelId}) {
           }
         </div>
         <div className="exercise">
-          {/* <h4>Aufgabe:</h4> */}
-          <Markdown>{level?.data?.descrText}</Markdown>
+          <Markdown>
+            {(level?.data?.statementName ?
+              `**Theorem** \`${level?.data?.statementName}\`: `
+              :
+              level?.data?.descrText && "**Exercise**: ")
+              + `${level?.data?.descrText}`
+            }
+          </Markdown>
           <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{level?.data?.descrFormat}</code></div>
           <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div>
         </div>
