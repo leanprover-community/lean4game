@@ -204,8 +204,6 @@ If omitted, the current tab will remain open. -/
 elab "LemmaTab"  category:str : command =>
   modifyCurLevel fun level => pure {level with lemmaTab := category.getString}
 
-
-
 /-! # Exercise Statement -/
 
 -- TODO: Instead of this, it would be nice to have a proper syntax parser that enables
@@ -226,24 +224,44 @@ def reprint (stx : Syntax) : Format :=
 
 /-- Define the statement of the current level. -/
 elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
+  let lvlIdx ← getCurLevelIdx
 
-  -- Check that the statement name is a lemma in the doc
+  -- Save the messages before evaluation of the proof.
+  let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
+
+  -- Check that statement has a docs entry.
   match statementName with
   | some name => checkInventoryDoc .Lemma name.getId
   | none => pure ()
 
-  let lvlIdx ← getCurLevelIdx
+  -- The default name of the statement is `[Game].[World].level[no.]`, e.g. `NNG.Addition.level1`
+  -- However, this should not be used when designing the game.
   let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
 
-  -- save the messages before evaluation of the proof
-  let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
+  -- Add theorem to context.
+  match statementName with
+  | some name =>
+    let env ← getEnv
+    if env.contains name.getId then
+      logWarningAt name s!"Environment already contains {name.getId}! Only the existing statement will be available in later levels."
+      -- TODO: Check if the two agree. turn into `logInfo` in that case.
+      -- let origType := (env.constants.map₁.find! name.getId).type
+      -- -- let newType := (env.constants.map₁.find! defaultDeclName).type
+      -- dbg_trace sig
+      -- dbg_trace origType
+      --dbg_trace (env.constants.map₁.find! name.getId).value! -- that's the proof
+      --let newType := Lean.Elab.Term.elabTerm sig none
 
-  let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
-  -- let thmStatement' ← match statementName with
-  -- | none => `(lemma $(mkIdent "XX") $sig $val) -- TODO: Make it into an `example`
-  -- | some name => `(lemma $name $sig $val)
-  elabCommand thmStatement
+      let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
+      dbg_trace thmStatement
+      elabCommand thmStatement
+    else
+      let thmStatement ← `(theorem $(mkIdent name.getId) $sig $val)
+      elabCommand thmStatement
+  | none =>
+    let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
+    elabCommand thmStatement
 
   let msgs := (← get).messages
 

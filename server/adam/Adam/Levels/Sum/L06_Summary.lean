@@ -3,7 +3,7 @@ import Adam.Metadata
 import Adam.ToBePorted
 import Adam.Options.MathlibPart
 
-import Adam.Options.ArithSum
+import Adam.Levels.Sum.L05_SumComm
 
 Game "Adam"
 World "Sum"
@@ -82,7 +82,7 @@ Statement (m : ℕ) : (∑ i : Fin (m + 1), (i : ℕ)^3) = (∑ i : Fin (m + 1),
   Hint "**Du**: Jetzt sollten es eigentlich nur noch arithmetische Operationen sein."
   ring
 
-NewLemma arithmetic_sum add_pow_two
+NewLemma add_pow_two
 LemmaTab "Sum"
 
 Conclusion "Der Golem denkt ganz lange nach, und ihr bekommt das Gefühl, dass er gar nie

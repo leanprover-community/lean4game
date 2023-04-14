@@ -2,6 +2,7 @@ import Adam.Metadata
 import Std.Tactic.RCases
 
 import Adam.ToBePorted
+import Adam.Levels.Predicate.L06_Exists
 
 Game "Adam"
 World "Contradiction"
@@ -53,7 +54,6 @@ Statement (n : ℕ) (h : Odd (n ^ 2)): Odd n := by
   `even_square` anwenden!"
   apply even_square
 
-NewLemma even_square
 NewTactic contrapose
 DisabledTactic by_contra
 LemmaTab "Nat"

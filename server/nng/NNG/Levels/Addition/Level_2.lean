@@ -8,14 +8,6 @@ Title "add_assoc (associativity of addition)"
 
 open MyNat
 
-theorem MyNat.zero_add (n : ℕ) : 0 + n = n := by
-  induction n with n hn
-  · rw [add_zero]
-    rfl
-  · rw [add_succ]
-    rw [hn]
-    rfl
-
 Introduction
 "
 It's well-known that $(1 + 2) + 3 = 1 + (2 + 3)$; if we have three numbers

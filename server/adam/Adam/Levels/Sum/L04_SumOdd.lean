@@ -3,6 +3,8 @@ import Adam.Metadata
 import Adam.ToBePorted
 import Adam.Options.MathlibPart
 
+import Adam.Levels.Sum.L03_ArithSum
+
 Game "Adam"
 World "Sum"
 Level 4

@@ -1,6 +1,8 @@
 import Adam.Metadata
 
 import Adam.ToBePorted
+import Adam.Levels.Predicate.L06_Exists
+
 
 Game "Adam"
 World "Contradiction"

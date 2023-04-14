@@ -8,17 +8,6 @@ Title "succ_add"
 
 open MyNat
 
-theorem MyNat.add_assoc (a b c : ℕ) : (a + b) + c = a + (b + c)  := by
-  induction c with c hc
-  · rw [add_zero]
-    rw [add_zero]
-    rfl
-  · rw [add_succ]
-    rw [add_succ]
-    rw [add_succ]
-    rw [hc]
-    rfl
-
 Introduction
 "
 Oh no! On the way to `add_comm`, a wild `succ_add` appears. `succ_add`

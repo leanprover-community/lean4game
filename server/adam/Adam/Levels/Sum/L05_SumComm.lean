@@ -3,7 +3,7 @@ import Adam.Metadata
 import Adam.ToBePorted
 import Adam.Options.MathlibPart
 
-import Adam.Options.ArithSum
+import Adam.Levels.Sum.L04_SumOdd
 
 set_option tactic.hygienic false
 

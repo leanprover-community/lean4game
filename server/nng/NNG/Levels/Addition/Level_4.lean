@@ -8,16 +8,6 @@ Title "`add_comm` (boss level)"
 
 open MyNat
 
-theorem MyNat.succ_add (a b : ℕ) : succ a + b = succ (a + b)  := by
-  induction b with d hd
-  · rw [add_zero]
-    rw [add_zero]
-    rfl
-  · rw [add_succ]
-    rw [hd]
-    rw [add_succ]
-    rfl
-
 Introduction
 "
 [boss battle music]
