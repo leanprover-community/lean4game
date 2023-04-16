@@ -17,7 +17,7 @@ Introduction
 "
 # Natural Number Game
 
-##### version 2.0.1
+##### version 3.0.1
 
 Welcome to the natural number game -- a game which shows the power of induction.
 
@@ -45,12 +45,13 @@ If you delete it, your progress will be lost!
 
 ## Credits
 
-* **Content and Lean3-version:** Kevin Buzzard, Mohammad Pedramfar
+* **Original Lean3-version:** Kevin Buzzard, Mohammad Pedramfar
+* **Content adaptation**: Jon Eugster
 * **Game Engine:** Alexander Bentkamp, Jon Eugster, Patrick Massot
 
 ## Resources
 
-* The [Lean Zulip chat] forum
+* The [Lean Zulip chat](https://leanprover.zulipchat.com/) forum
 * [Original Lean3 version](https://www.ma.imperial.ac.uk/~buzzard/xena/natural_number_game/)
 * [A textbook-style (lean4) version of the NN-game](https://lovettsoftware.com/NaturalNumbers/TutorialWorld/Level1.lean.html)
 

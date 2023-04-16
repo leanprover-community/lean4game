@@ -33,11 +33,11 @@ Statement
   "Now both sides are identical, so you can use `rfl` to close the goal."
   rfl
 
-NewTactic rewrite rw
+NewTactic rw
 
 Conclusion
 "
-If you want to see the entire proof you created, toggle \"Editor mode\" above.
+If you want to inspect the proof you created, toggle \"Editor mode\" above.
 
 There you can also move your cursor around the proof to see the \"state\" of the proof at this point.
 

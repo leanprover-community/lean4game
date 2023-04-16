@@ -21,3 +21,6 @@ theorem add_zero (a : MyNat) : a + 0 = a := by rfl
 This theorem proves that (a + (d + 1)) = ((a + d) + 1) for a,d in MyNat.
 -/
 theorem add_succ (a d : MyNat) : a + (succ d) = succ (a + d) := by rfl
+
+-- TODO: testing. Remove me
+axiom zero_add (n : ℕ) : 0 + n = n

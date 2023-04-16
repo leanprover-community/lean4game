@@ -244,17 +244,31 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
   | some name =>
     let env ← getEnv
     if env.contains name.getId then
-      logWarningAt name s!"Environment already contains {name.getId}! Only the existing statement will be available in later levels."
-      -- TODO: Check if the two agree. turn into `logInfo` in that case.
-      -- let origType := (env.constants.map₁.find! name.getId).type
-      -- -- let newType := (env.constants.map₁.find! defaultDeclName).type
+      let origType := (env.constants.map₁.find! name.getId).type
+      -- TODO: Check if `origType` agrees with `sig` and output `logInfo` instead of `logWarning`
+      -- in that case.
+      logWarningAt name m!"Environment already contains {name.getId}!
+Only the existing statement will be available in later levels:
+
+{origType}"
+      -- let (binders, typeStx) := expandDeclSig sig
+      -- --let type ← Term.elabType typeStx
+      -- runTermElabM (fun vars =>
+      --   Term.elabBinders binders.getArgs (fun xs => do
+      --   let type ← Term.elabType typeStx
+      --   --Term.synthesizeSyntheticMVarsNoPostponing
+      --   --let type ← instantiateMVars type
+      --   --let type ← mkForallFVars xs type
+      -- ))
+      --let newType := Term.elabTerm sig.raw
+      --dbg_trace newType
+      --logInfo origType
       -- dbg_trace sig
       -- dbg_trace origType
       --dbg_trace (env.constants.map₁.find! name.getId).value! -- that's the proof
       --let newType := Lean.Elab.Term.elabTerm sig none
 
       let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
-      dbg_trace thmStatement
       elabCommand thmStatement
     else
       let thmStatement ← `(theorem $(mkIdent name.getId) $sig $val)

@@ -10,14 +10,14 @@ Introduction
 "
 Each level in this game involves proving a mathematical statement. In this first level
 you have three natural numbers $x, y, z$ (listed under \"Objects\") and you want to prove
-$x \\cdot y + z = x \\cdot y + z$ (displayed under \"Goal\").
+$xy + z = xy + z$ (displayed under \"Goal\").
 
-You can modify the Goal using *Tactics* until you can close (i.e. prove) it. 
+You can modify the Goal using *Tactics* until you can close it (i.e. prove it).
 
 The first tactic is called `rfl`, which stands for \"reflexivity\",
 a fancy way of saying that it will prove any goal of the form `A = A`. It doesn't matter how
 complicated `A` is, all that matters is that the left hand side is exactly equal to the right hand
-side (a computer scientist would say \"definitionally equal\"). I really mean \"press the same buttons
+side. I really mean \"press the same buttons
 on your computer in the same order\" equal. For example, `x * y + z = x * y + z` can be proved by `rfl`,
 but `x + y = y + x` cannot.
 "
