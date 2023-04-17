@@ -249,13 +249,11 @@ function Introduction({worldId}) {
     <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Einführung" worldId={worldId} levelId={0} />
     <div style={gameInfo.isLoading ? {display: "none"} : null} className="exercise-panel">
       <div className="introduction-panel">
-        { gameInfo.data?.worlds.nodes[worldId].introduction &&
-          <div className="message info">
+        <div className="message info">
             <Markdown>
               {gameInfo.data?.worlds.nodes[worldId].introduction}
             </Markdown>
           </div>
-        }
       </div>
       <div className="conclusion">
         {0 == gameInfo.data?.worldSize[worldId] ?

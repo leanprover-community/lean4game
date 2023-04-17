@@ -1,10 +1,14 @@
 import GameServer.Commands
 
 LemmaDoc MyNat.add_zero as "add_zero" in "Nat"
-"(missing)"
+"`add_zero (a : ℕ) : a + 0 = a`
+
+This is one of the two axioms defining addition on `ℕ`."
 
 LemmaDoc MyNat.add_succ as "add_succ" in "Nat"
-"(missing)"
+"`add_succ (a d : ℕ) : a + (succ d) = succ (a + d)`
+
+This is the second axiom definiting addition on `ℕ`"
 
 LemmaDoc MyNat.zero_add as "zero_add" in "Nat"
 "(missing)"

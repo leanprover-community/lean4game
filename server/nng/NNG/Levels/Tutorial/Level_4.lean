@@ -21,9 +21,9 @@ theorem. Note the name of this proof. Mathematicians sometimes call it
 \"Lemma 2.1\" or \"Hypothesis P6\" or something.
 But computer scientists call it `add_zero` because it tells you what the answer to
 \"x add zero\" is. It's a much better name than \"Lemma 2.1\".
-Even better, you can use the `rewrite` tactic
+Even better, you can use the `rw` tactic
 with `add_zero`. If you ever see `x + 0` in your goal,
-`rewrite [add_zero]` should simplify it to `x`. This is
+`rw [add_zero]` should simplify it to `x`. This is
 because `add_zero` is a proof that `x + 0 = x`
 (more precisely, `add_zero x` is a proof that `x + 0 = x` but
 Lean can figure out the `x` from the context).
@@ -38,23 +38,24 @@ What's going on here is that we assume `a + d` is already defined, and we define
 Note the name of this proof too: `add_succ` tells you how to add a successor
 to something.
 If you ever see `… + succ …` in your goal, you should be able to use
-`rewrite [add_succ]`, to make progress.
+`rw [add_succ]` to make progress.
 "
 
 Statement
 "For all natural numbers $a$, we have $a + \\operatorname{succ}(0) = a$."
     (a : ℕ) : a + succ 0 = succ a := by
-  Hint "You find `{a} + succ …` in the goal, so you can use `rewrite` and `add_succ`
+  Hint "You find `{a} + succ …` in the goal, so you can use `rw` and `add_succ`
   to make progress."
-  Hint (hidden := true) "Explicitely, type `rewrite [add_succ]`!"
-  rewrite [add_succ]
+  Hint (hidden := true) "Explicitely, type `rw [add_succ]`!"
+  rw [add_succ]
   Hint "Now you see a term of the form `… + 0`, so you can use `add_zero`."
-  Hint (hidden := true) "Explicitely, type `rewrite [add_zero]`!"
-  rewrite [add_zero]
+  Hint (hidden := true) "Explicitely, type `rw [add_zero]`!"
+  rw [add_zero]
   Hint (hidden := true) "Finally both sides are identical."
   rfl
 
 NewLemma MyNat.add_succ MyNat.add_zero
+NewDefinition Add
 
 Conclusion
 "

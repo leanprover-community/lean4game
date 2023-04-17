@@ -40,13 +40,13 @@ on the natural numbers, for example addition, multiplication and so on.
 
 This game is all about seeing how far these axioms of Peano can take us.
 
-Now let us practise the use of `rewrite` with this new function `succ`:
+Now let us practise the use of `rw` with this new function `succ`:
 "
 
 Statement
 "If $\\operatorname{succ}(a) = b$, then $\\operatorname{succ}(\\operatorname{succ}(a)) = \\operatorname{succ}(a)$."
     (a b : ℕ) (h : (succ a) = b) : succ (succ a) = succ b := by
-  Hint "You can use `rewrite` and your assumption `{h}` to substitute `succ a` with `b`.
+  Hint "You can use `rw` and your assumption `{h}` to substitute `succ a` with `b`.
 
   Notes:
 
@@ -54,7 +54,7 @@ Statement
   them in mathematics: `succ b` means $\\operatorname\{succ}(b)$.
   2) If you would want to substitute instead `b` with `succ a`, you can do that
   writing a small `←` (`\\l`, i.e. backslash + small letter L + space)
-  before `h` like this: `rewrite [← h]`."
+  before `h` like this: `rw [← h]`."
   Branch
     rewrite [← h]
     Hint (hidden := true) "Now both sides are identical…"

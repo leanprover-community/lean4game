@@ -97,8 +97,8 @@ elab "TacticDoc" name:ident content:str : command =>
   modifyEnv (inventoryDocExt.addEntry · {
     category := default
     type := .Tactic
-    name := name.getId,
-    displayName := name.getId.toString,
+    name := name.getId
+    displayName := name.getId.toString
     content := content.getString })
 
 /-- Documentation entry of a lemma. Example:
