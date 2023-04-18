@@ -446,6 +446,11 @@ Wenn das Goal von der Form `A ∨ B` ist, enscheidet man mit `right` die rechte 
 * `left` entscheidet sich für die linke Seite.
 "
 
+TacticDoc ring_nf
+"\"ring Normal Form\": Identisch zu `ring`. `ring` wird geschrieben, wenn die Taktik das Goal schliesst, `ring_nf`
+wenn man diese innerhalb eines Taktikblockes brauchen will.
+"
+
 TacticDoc ring
 "
 Löst Gleichungen mit den Operationen `+, -, *, ^`.

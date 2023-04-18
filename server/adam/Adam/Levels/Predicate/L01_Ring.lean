@@ -27,4 +27,5 @@ Statement (x y : ℕ) : (x + y) ^ 2 = x ^ 2 + 2 * x * y + y ^ 2 := by
 Conclusion
 ""
 
-NewTactic ring
+-- TODO: Modifiy ring so it does not show info about using ring_nf.
+NewTactic ring ring_nf
