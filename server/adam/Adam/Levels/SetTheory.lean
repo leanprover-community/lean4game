@@ -11,9 +11,9 @@ import Adam.Levels.SetTheory.L10_Morgan
 import Adam.Levels.SetTheory.L11_SSubset
 import Adam.Levels.SetTheory.L12_Insert
 import Adam.Levels.SetTheory.L13_Insert
-import Adam.Levels.SetTheory.L14_SetOf
-import Adam.Levels.SetTheory.L15_Powerset
-import Adam.Levels.SetTheory.L16_Disjoint
+-- import Adam.Levels.SetTheory.L14_SetOf
+-- import Adam.Levels.SetTheory.L15_Powerset
+-- import Adam.Levels.SetTheory.L16_Disjoint
 -- import Adam.Levels.SetTheory.L17_SetOf
 -- import Adam.Levels.SetTheory.L18_SetOf
 -- import Adam.Levels.SetTheory.L19_Subtype
@@ -40,6 +40,6 @@ Sofort begrüßt euch eine ältere Frau, die sich als *Mengea*, die Beschützeri
 vorstellt.
 "
 
-Game "Adam"
-World "SetTheory2"
-Title "Mehr Mengenlehre"
+-- Game "Adam"
+-- World "SetTheory2"
+-- Title "Mehr Mengenlehre"

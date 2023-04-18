@@ -14,8 +14,8 @@ import Adam.Levels.Inequality
 import Adam.Levels.Lean
 import Adam.Levels.SetTheory
 import Adam.Levels.Function
-import Adam.Levels.SetFunction
-import Adam.Levels.LinearAlgebra
+--import Adam.Levels.SetFunction
+--import Adam.Levels.LinearAlgebra
 
 
 
@@ -67,10 +67,10 @@ Path Predicate → Inequality → Sum
 -- Path Sum → Inequality -- → Induction
 -- Path SetTheory2 → Numbers
 
-Path Lean → SetTheory → SetTheory2
+Path Lean → SetTheory -- → SetTheory2
 
-Path SetTheory2 → SetFunction → Module
-Path Function → SetFunction
-Path Module → Basis → Module2
+-- Path SetTheory2 → SetFunction → Module
+-- Path Function → SetFunction
+-- Path Module → Basis → Module2
 
 MakeGame
