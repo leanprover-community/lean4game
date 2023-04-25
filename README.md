@@ -1,6 +1,6 @@
 # Lean 4 Game
 
-This is a prototype for a Lean 4 game platform. It is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
+This is a prototype for a Lean 4 game platform. The project is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
 (NNG)](https://www.ma.imperial.ac.uk/~buzzard/xena/natural_number_game/)
 of Kevin Buzzard and Mohammad Pedramfar.
 The project is currently mostly copied from Patrick Massot's [NNG4](https://github.com/PatrickMassot/NNG4), but we plan to extend it significantly.
@@ -8,8 +8,8 @@ The project is currently mostly copied from Patrick Massot's [NNG4](https://gith
 Building this requires a [npm](https://www.npmjs.com/) toolchain. After cloning the repository you should run
 `npm install` to pull in all dependencies. For development and experimentation, you can run `npm start` that will perform a non-optimized build and then run a local webserver on port 3000.
 
-### Progress
-This is a work in progress. In the future there are plans to host a server managing different public learning games for Lean4, but for now the target is to provide the first games (in German and eventually English) by April 2023.
+### Progress & Contributing
+Currently the interface is still undergoing bigger changes, contributions are of course welcome, but it might be better to wait with them for a bit until proper support for external games is implemented andthe existing games are separated from this repository. (ca. Sept. 2023)
 
 ## NPM Scripts
 
