@@ -34,7 +34,7 @@ note that `zero_add` is about zero add something, and `add_zero` is about someth
 The names of the proofs tell you what the theorems are. Anyway, let's prove `0 + n = n`.
 "
 
-Statement MyNat.zero_add (attr := simp)
+Statement MyNat.zero_add
 "For all natural numbers $n$, we have $0 + n = n$."
     (n : ℕ) : 0 + n = n := by
   Hint "You can start a proof by induction over `n` by typing:
