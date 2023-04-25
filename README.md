@@ -11,6 +11,14 @@ Building this requires a [npm](https://www.npmjs.com/) toolchain. After cloning 
 ### Progress & Contributing
 Currently the interface is still undergoing bigger changes, contributions are of course welcome, but it might be better to wait with them for a bit until proper support for external games is implemented andthe existing games are separated from this repository. (ca. Sept. 2023)
 
+
+### Documentation
+
+For game developers, there is a work-in-progress Documentation [Creating a Game](CREATE_GAME.md).
+Best to talk with us directly.
+
+For the game engine itself, the documentations is missing currently.
+
 ## NPM Scripts
 
 * `npm start`: Start the project in development mode. The browser will automatically reload when client files get changed. The Lean server will get recompiled and restarted when lean files get changed. The Lean server will be started without a container. The client and server can be started separately using the scripts `npm run start_client` and `npm run start_server`. The project can be accessed via `http://localhost:3000`.
