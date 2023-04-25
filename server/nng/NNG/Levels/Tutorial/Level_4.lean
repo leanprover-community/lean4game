@@ -42,7 +42,7 @@ If you ever see `… + succ …` in your goal, you should be able to use
 "
 
 Statement
-"For all natural numbers $a$, we have $a + \\operatorname{succ}(0) = a$."
+"For all natural numbers $a$, we have $a + \\operatorname{succ}(0) = \\operatorname{succ}(a)$."
     (a : ℕ) : a + succ 0 = succ a := by
   Hint "You find `{a} + succ …` in the goal, so you can use `rw` and `add_succ`
   to make progress."
