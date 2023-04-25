@@ -5,7 +5,7 @@ WORKDIR /
 
 # Copy lean files
 COPY GameServer ./GameServer
-COPY Main ./Main
+COPY Main.lean ./Main
 COPY lakefile.lean ./lakefile.lean
 COPY lake-manifest.lean ./lake-manifest.lean
 COPY lean-toolchain ./lean-toolchain
