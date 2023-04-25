@@ -1,13 +1,14 @@
-import NNG.Levels.Addition.Level_6
+import NNG.MyNat.Addition
 
 namespace MyNat
-open MyNat
+
+attribute [-simp] MyNat.succ.injEq
+example (a b : ℕ) (h : (succ a) = b) : succ (succ a) = succ b := by
+  simp
+  sorry
 
 axiom succ_inj {a b : ℕ} : succ a = succ b → a = b
 
-axiom zero_ne_succ (a : ℕ) : zero ≠ succ a
+axiom zero_ne_succ (a : ℕ) : 0 ≠ succ a
 
-axiom add_right_cancel (a t b : ℕ) : a + t = b + t → a = b
-
-axiom add_left_cancel (a b c : ℕ) : a + b = a + c → b = c
 

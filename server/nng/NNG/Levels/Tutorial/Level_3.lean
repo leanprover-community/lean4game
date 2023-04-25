@@ -56,9 +56,11 @@ Statement
   writing a small `←` (`\\l`, i.e. backslash + small letter L + space)
   before `h` like this: `rw [← h]`."
   Branch
-    rewrite [← h]
+    simp? -- TODO: `simp` should not make progress.
+  Branch
+    rw [← h]
     Hint (hidden := true) "Now both sides are identical…"
-  rewrite [h]
+  rw [h]
   Hint (hidden := true) "Now both sides are identical…"
   rfl
 

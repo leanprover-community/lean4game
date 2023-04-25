@@ -1,5 +1,4 @@
-import NNG.Metadata
-import NNG.MyNat.AdvAddition
+import NNG.Levels.AdvAddition.Level_3
 
 Game "NNG"
 World "AdvAddition"
@@ -11,19 +10,7 @@ open MyNat
 Introduction
 "
 Here is an `iff` goal. You can split it into two goals (the implications in both
-directions) using the `split` tactic, which is how you're going to have to start.
-
-`split,`
-
-Now you have two goals. The first is exactly `succ_inj` so you can close
-it with
-
-`exact succ_inj,`
-
-and the second one you could solve by looking up the name of the theorem
-you proved in the last level and doing `exact <that name>`, or alternatively
-you could get some more `intro` practice and seeing if you can prove it
-using `intro`, `rw` and `refl`.
+directions) using the `constructor` tactic, which is how you're going to have to start.
 "
 
 Statement
@@ -31,10 +18,25 @@ Statement
 "
     (a b : ℕ) : succ a = succ b ↔ a = b := by
   constructor
+  Hint "Now you have two goals. The first is exactly `succ_inj` so you can close
+  it with
+
+  ```
   exact succ_inj
-  intro H
-  rw [H]
-  rfl
+  ```
+  "
+  · exact succ_inj
+  · Hint "The second one you could solve by looking up the name of the theorem
+    you proved in the last level and doing `exact <that name>`, or alternatively
+    you could get some more `intro` practice and seeing if you can prove it
+    using `intro`, `rw` and `rfl`."
+    Branch
+      exact succ_eq_succ_of_eq
+    intro h
+    rw [h]
+    rfl
+
+LemmaTab "Nat"
 
 Conclusion
 "

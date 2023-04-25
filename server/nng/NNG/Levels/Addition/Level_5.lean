@@ -1,5 +1,3 @@
-import NNG.Metadata
-import NNG.MyNat.Addition
 import NNG.Levels.Addition.Level_4
 
 Game "NNG"
@@ -9,13 +7,11 @@ Title "succ_eq_add_one"
 
 open MyNat
 
-theorem one_eq_succ_zero : (1 : ℕ) = succ 0 := by simp only
-
-NewLemma MyNat.one_eq_succ_zero
+axiom MyNat.one_eq_succ_zero : (1 : ℕ) = succ 0
 
 Introduction
 "
-I've just added `one_eq_succ_zero` (a proof of $1 = \\operatorname{succ}(0)$)
+I've just added `one_eq_succ_zero` (a proof of `1 = succc 0`)
 to your list of theorems; this is true
 by definition of $1$, but we didn't need it until now.
 
@@ -28,7 +24,7 @@ some theorems about $0$ (`zero_add`, `add_zero`), but, other than `1 = succ 0`,
 no theorems at all which mention $1$. Let's prove one now.
 "
 
-Statement --MyNat.succ_eq_add_one
+Statement MyNat.succ_eq_add_one
 "For any natural number $n$, we have
 $ \\operatorname{succ}(n) = n+1$ ."
     (n : ℕ) : succ n = n + 1 := by
@@ -36,6 +32,10 @@ $ \\operatorname{succ}(n) = n+1$ ."
   rw [add_succ]
   rw [add_zero]
   rfl
+
+NewLemma MyNat.one_eq_succ_zero
+NewDefinition One
+LemmaTab "Add"
 
 Conclusion
 "

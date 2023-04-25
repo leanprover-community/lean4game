@@ -1,5 +1,4 @@
 import NNG.Metadata
-import NNG.Levels.Addition.Level_6
 import NNG.MyNat.Multiplication
 
 Game "NNG"
@@ -37,14 +36,14 @@ Statement
   `intro n`"
   intro n
   Hint "Our job now is to construct a natural number, which is
-  allowed to depend on $n$. We can do this using `exact` and
+  allowed to depend on ${n}$. We can do this using `exact` and
   writing a formula for the function we want to define. For example
   we imported addition and multiplication at the top of this file,
   so
 
-  `exact 3*n+2,`
+  `exact 3 * {n} + 2`
 
-  will close the goal, ultimately defining the function $f(n)=3n+2$."
+  will close the goal, ultimately defining the function $f({n})=3{n}+2$."
   exact 3 * n + 2
 
 NewTactic intro

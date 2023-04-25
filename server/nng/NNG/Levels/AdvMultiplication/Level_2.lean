@@ -1,7 +1,4 @@
-import NNG.Metadata
-import NNG.MyNat.Multiplication
-import Std.Tactic.RCases
-import Mathlib.Tactic.LeftRight
+import NNG.Levels.AdvMultiplication.Level_1
 
 Game "NNG"
 World "AdvMultiplication"
@@ -15,14 +12,14 @@ Introduction
 A variant on the previous level.
 "
 
-Statement -- eq_zero_or_eq_zero_of_mul_eq_zero
+Statement MyNat.eq_zero_or_eq_zero_of_mul_eq_zero
 "If $ab = 0$, then at least one of $a$ or $b$ is equal to zero."
     (a b : ℕ) (h : a * b = 0) :
   a = 0 ∨ b = 0 := by
   induction a with d
   left
   rfl
-  induction b with e he
+  induction b with e
   right
   rfl
   exfalso

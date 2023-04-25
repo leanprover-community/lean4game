@@ -45,14 +45,16 @@ Statement
   To solve this goal, you have to come up with a function from
   `P` (thought of as the set of proofs of $P$!) to itself. Start with
 
-  `intro p`
+  ```
+  intro p
+  ```
   "
   intro p
   Hint "
-  Our job now is to construct a proof of $P$. But $p$ is a proof of $P$.
+  Our job now is to construct a proof of $P$. But ${p}$ is a proof of $P$.
   So
 
-  `exact p`
+  `exact {p}`
 
   will close the goal. Note that `exact P` will not work -- don't
   confuse a true/false statement (which could be false!) with a proof.
@@ -60,8 +62,3 @@ Statement
   and small letters for proofs.
   "
   exact p
-
-Conclusion
-"
-
-"

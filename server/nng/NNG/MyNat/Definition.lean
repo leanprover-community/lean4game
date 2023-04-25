@@ -1,11 +1,8 @@
---import Mathlib.Tactic.Basic
---import Mathlib.Tactic.Cases 
-
 /-- Our copy of the natural numbers called `MyNat`. -/
 inductive MyNat where
 | zero : MyNat
 | succ : MyNat → MyNat
-deriving BEq, DecidableEq, Inhabited
+-- deriving BEq, DecidableEq, Inhabited
 
 @[inherit_doc]
 notation "ℕ" => MyNat
@@ -35,3 +32,7 @@ instance : ToString MyNat where
 theorem zero_eq_0 : MyNat.zero = 0 := rfl
 
 def one : MyNat := MyNat.succ 0
+
+-- TODO: Why does this not work here??
+-- We do not want `simp` to be able to do anything unless we unlock it manually.
+attribute [-simp] MyNat.succ.injEq

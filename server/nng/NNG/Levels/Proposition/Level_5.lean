@@ -13,47 +13,44 @@ Introduction
 In this level, our goal is to construct an implication, like in level 2.
 
 ```
-⊢ P → (Q → P)
+P → (Q → P)
 ```
 
 So $P$ and $Q$ are propositions, and our goal is to prove
 that $P\\implies(Q\\implies P)$.
 We don't know whether $P$, $Q$ are true or false, so initially
-this seems like a bit of a tall order. But let's give it a go. Delete
-the `sorry` and let's think about how to proceed.
-
-Our goal is `P → X` for some true/false statement $X$, and if our
-goal is to construct an implication then we almost always want to use the
-`intro` tactic from level 2, Lean's version of \"assume $P$\", or more precisely
-\"assume $p$ is a proof of $P$\". So let's start with
-
-`intro p,`
-
-and we then find ourselves in this state:
-
-```
-P Q : Prop,
-p : P
-⊢ Q → P
-```
-
-We now have a proof $p$ of $P$ and we are supposed to be constructing
-a proof of $Q\\implies P$. So let's assume that $Q$ is true and try
-and prove that $P$ is true. We assume $Q$ like this:
-
-`intro q,`
-
-and now we have to prove $P$, but have a proof handy:
-
-`exact p,`
+this seems like a bit of a tall order. But let's give it a go.
 "
 
 Statement
 "For any propositions $P$ and $Q$, we always have
 $P\\implies(Q\\implies P)$."
     (P Q : Prop) : P → (Q → P) := by
+  Hint "Our goal is `P → X` for some true/false statement $X$, and if our
+  goal is to construct an implication then we almost always want to use the
+  `intro` tactic from level 2, Lean's version of \"assume $P$\", or more precisely
+  \"assume $p$ is a proof of $P$\". So let's start with
+
+  ```
   intro p
+  ```
+  "
+  intro p
+  Hint "We now have a proof $p$ of $P$ and we are supposed to be constructing
+  a proof of $Q\\implies P$. So let's assume that $Q$ is true and try
+  and prove that $P$ is true. We assume $Q$ like this:
+
+  ```
   intro q
+  ```
+  "
+  intro q
+  Hint "Now we have to prove $P$, but have a proof handy:
+
+  ```
+  exact {p}
+  ```
+  "
   exact p
 
 Conclusion
@@ -75,6 +72,6 @@ propositions, they would rather work with concrete ones such as Fermat's Last Th
 so they do not have a convention for where the brackets go. It's important to
 remember Lean's convention though, or else you will get confused. If your goal
 is `P → Q → R` then you need to know whether `intro h` will create `h : P` or `h : P → Q`. 
-Make sure you understand which one. 
+Make sure you understand which one.
 
 "

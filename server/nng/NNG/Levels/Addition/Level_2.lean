@@ -1,4 +1,3 @@
-import NNG.Metadata
 import NNG.Levels.Addition.Level_1
 
 Game "NNG"
@@ -25,7 +24,7 @@ Statement MyNat.add_assoc
 "On the set of natural numbers, addition is associative.
 In other words, for all natural numbers $a, b$ and $c$, we have
 $ (a + b) + c = a + (b + c). $"
-    (a b c : ℕ) : (a + b) + c = a + (b + c)  := by
+    (a b c : ℕ) : (a + b) + c = a + (b + c) := by
   Hint "Because addition was defined by recursion on the right-most variable,
   use induction on the right-most variable (try other variables at your peril!).
 
@@ -34,8 +33,9 @@ $ (a + b) + c = a + (b + c). $"
   Branch
     induction a
     Hint "Good luck with that…"
-    rw [zero_add, zero_add]
-    rfl
+    simp?
+    --rw [zero_add, zero_add]
+    --rfl
   Branch
     induction b
     Hint "Good luck with that…"
@@ -54,10 +54,5 @@ $ (a + b) + c = a + (b + c). $"
   rw [hc]
   rfl
 
-
-Conclusion
-"
-
-"
-
 NewLemma MyNat.zero_add
+LemmaTab "Add"

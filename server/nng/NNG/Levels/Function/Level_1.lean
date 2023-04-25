@@ -1,6 +1,6 @@
 import NNG.Metadata
-import NNG.Levels.Addition.Level_6
-import NNG.MyNat.Multiplication
+
+-- TODO: Cannot import level from different world.
 
 Game "NNG"
 World "Function"
@@ -64,7 +64,7 @@ Statement
   "
   exact h p
 
-NewTactic exact
+NewTactic exact simp
 
 Conclusion
 "

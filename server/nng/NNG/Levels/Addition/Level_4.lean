@@ -1,4 +1,3 @@
-import NNG.Metadata
 import NNG.Levels.Addition.Level_3
 
 Game "NNG"
@@ -21,6 +20,7 @@ Statement MyNat.add_comm
 In other words, for all natural numbers $a$ and $b$, we have
 $a + b = b + a$."
     (a b : ℕ) : a + b = b + a := by
+  Hint (hidden := true) "You might want to start by induction."
   Branch
     induction a with d hd
     · rw [zero_add]
@@ -38,6 +38,8 @@ $a + b = b + a$."
     rw [hd]
     rw [succ_add]
     rfl
+
+LemmaTab "Add"
 
 Conclusion
 "

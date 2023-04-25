@@ -8,8 +8,6 @@ Title "the induction tactic."
 
 open MyNat
 
-set_option tactic.hygienic false
-
 Introduction
 "
 OK so let's see induction in action. We're going to prove
@@ -36,7 +34,7 @@ note that `zero_add` is about zero add something, and `add_zero` is about someth
 The names of the proofs tell you what the theorems are. Anyway, let's prove `0 + n = n`.
 "
 
-Statement MyNat.zero_add
+Statement MyNat.zero_add (attr := simp)
 "For all natural numbers $n$, we have $0 + n = n$."
     (n : ℕ) : 0 + n = n := by
   Hint "You can start a proof by induction over `n` by typing:
@@ -56,20 +54,25 @@ Statement MyNat.zero_add
     `{hn} : 0 + {n} = {n}` and you need to prove the statement for `succ {n}`."
     Hint (hidden := true) "look at `add_succ`."
     rw [add_succ]
+    Branch
+      simp? -- TODO
     Hint (hidden := true) "At this point you see the term `0 + {n}`, so you can use the
     induction hypothesis with `rw [{hn}]`."
     rw [hn]
     rfl
 
+attribute [simp] MyNat.zero_add
+
 NewTactic induction
+LemmaTab "Add"
 
 Conclusion
 "
 ## Now venture off on your own.
 
-Those three tactics: 
+Those three tactics:
 
-* `induction n with d hd` 
+* `induction n with d hd`
 * `rw [h]`
 * `rfl`
 
@@ -86,8 +89,7 @@ We're going to stop explaining stuff carefully now. If you get stuck or want
 to know more about Lean (e.g. how to do much harder maths in Lean),
 ask in `#new members` at
 [the Lean chat](https://leanprover.zulipchat.com)
-(login required, real name preferred). Kevin or Mohammad or one of the other
-people there might be able to help.
+(login required, real name preferred). Any of the people there might be able to help.
 
 Good luck! Click on \"Next\" to solve some levels on your own.
 "

@@ -1,5 +1,5 @@
-import NNG.Metadata
---import NNG.MyNat.Power
+import NNG.Levels.Multiplication
+import NNG.MyNat.Power
 
 Game "NNG"
 World "Power"
@@ -8,18 +8,12 @@ Title "zero_pow_zero"
 
 open MyNat
 
-Introduction
-"
-
-"
-
-Statement
+Statement MyNat.zero_pow_zero
 "$0 ^ 0 = 1$"
-    : (0 : ℕ) ^ 0 = (1 : ℕ) := by -- (0 : ℕ) ^ (0 : ℕ) = 1 := by
-  trivial
+    : (0 : ℕ) ^ 0  = 1 := by
+  rw [pow_zero]
+  rfl
 
-Conclusion
-"
-
-"
-
+NewLemma MyNat.pow_zero MyNat.pow_succ
+NewDefinition Pow
+LemmaTab "Pow"

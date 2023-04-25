@@ -16,4 +16,8 @@ Title "Advanced Proposition World"
 
 Introduction
 "
+In this world we will learn five key tactics needed to solve all the
+levels of the Natural Number Game, namely `constructor`, `rcases`, `left`, `right`, and `exfalso`.
+These, and `use` (which we'll get to in Inequality World) are all the
+tactics you will need to beat all the levels of the game.
 "

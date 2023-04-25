@@ -50,6 +50,8 @@ Statement
   rw [add_succ]
   Hint "Now you see a term of the form `… + 0`, so you can use `add_zero`."
   Hint (hidden := true) "Explicitely, type `rw [add_zero]`!"
+  Branch
+    simp? -- TODO
   rw [add_zero]
   Hint (hidden := true) "Finally both sides are identical."
   rfl

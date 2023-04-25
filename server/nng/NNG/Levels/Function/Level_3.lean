@@ -1,6 +1,4 @@
 import NNG.Metadata
-import NNG.Levels.Addition.Level_6
-import NNG.MyNat.Multiplication
 
 Game "NNG"
 World "Function"
@@ -28,8 +26,8 @@ functions looks like this pictorially:
 $$
 \\begin{CD}
   P  @>{h}>> Q       @>{i}>> R \\\\
-  @.         @V{j}VV           \\\\
-  S  @>{k}>> T       @>{l}>> U \\\\
+  @.         @VV{j}V           \\\\
+  S  @>>{k}> T       @>>{l}> U
 \\end{CD}
 $$
 
@@ -42,19 +40,26 @@ Statement
     U := by
   Hint "Indeed, we could solve this level in one move by typing
 
-  `exact l (j (h p))`
+  ```
+  exact l (j (h p))
+  ```
 
   But let us instead stroll more lazily through the level.
   We can start by using the `have` tactic to make an element of $Q$:
 
-  have q := h p"
+  ```
+  have q := h p
+  ```
+  "
   Branch
     exact l (j (h p))
   have q := h p
   Hint "
   and now we note that $j(q)$ is an element of $T$
 
-  `have t : T := j q`
+  ```
+  have t : T := j q
+  ```
 
   (notice how we can explicitly tell Lean
   what set we thought $t$ was in, with that `: T` thing before the `:=`.
@@ -64,7 +69,9 @@ Statement
   Hint "
   Now we could even define $u$ to be $l(t)$:
 
-  `have u : U := l t`
+  ```
+  have u : U := l t
+  ```
   "
   have u : U := l t
   Hint "…and then finish the level with `exact u`."

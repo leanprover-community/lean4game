@@ -1,5 +1,4 @@
 import NNG.Metadata
-import NNG.MyNat.Addition
 
 Game "NNG"
 World "Function"

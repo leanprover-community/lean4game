@@ -1,6 +1,4 @@
 import NNG.Metadata
-import NNG.Levels.Addition.Level_6
-import NNG.MyNat.Multiplication
 
 Game "NNG"
 World "Function"
@@ -15,8 +13,8 @@ Introduction
 $$
 \\begin{CD}
   P  @>{h}>> Q       @>{i}>> R \\\\
-  @.         @V{j}VV           \\\\
-  S  @>{k}>> T       @>{l}>> U \\\\
+  @.         @VV{j}V           \\\\
+  S  @>>{k}> T       @>>{l}> U
 \\end{CD}
 $$
 
@@ -41,10 +39,13 @@ by
   a function, so it would suffice to construct an element of $T$. Tell
   Lean this by starting the proof below with
 
-  `apply l`"
+  ```
+  apply l
+  ```
+  "
   apply l
   Hint "Notice that our assumptions don't change but *the goal changes*
-  from `Goal: U` to `Goal: T`.
+  from `U` to `T`.
 
   Keep `apply`ing functions until your goal is `P`, and try not
   to get lost!"
@@ -61,8 +62,3 @@ by
 
 NewTactic apply
 DisabledTactic «have»
-
-Conclusion
-"
-
-"

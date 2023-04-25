@@ -1,32 +1,8 @@
 import Mathlib.Lean.Expr.Basic
-import NNG.MyNat.Addition
 import Lean.Elab.Tactic.Basic
-
-/-!
-# Modified `rw`
-
-Modify `rw` to work like `rewrite`.
-
-This is mainly a copy of the implementation of `rewrite` in Lean core.
--/
+import NNG.MyNat.Definition
 
 namespace MyNat
-
-open Lean.Meta Lean.Elab.Tactic Lean.Parser.Tactic
-
-/--
-Modified `rw` tactic. For this game, `rw` works exactly like `rewrite`.
--/
-syntax (name := rewriteSeq) "rw" (config)? rwRuleSeq (location)? : tactic
-
-@[tactic MyNat.rewriteSeq] def evalRewriteSeq : Tactic := fun stx => do
-  let cfg ← elabRewriteConfig stx[1]
-  let loc   := expandOptLocation stx[3]
-  withRWRulesSeq stx[0] stx[2] fun symm term => do
-    withLocation loc
-      (rewriteLocalDecl term symm · cfg)
-      (rewriteTarget term symm cfg)
-      (throwTacticEx `rewrite · "did not find instance of the pattern in the current goal")
 
 /-!
 # Modified `induction` tactic
@@ -103,29 +79,4 @@ elab (name := _root_.MyNat.induction) "induction " tgts:(casesTarget,+)
 end Lean.Parser.Tactic
 
 
-/-! # `rfl` tactic
 
-Added `withReducible` to prevent `rfl` proving stuff like `n + 0 = n`.
--/
-
-namespace MyNat
-
-open Lean Meta Elab Tactic
-
--- @[match_pattern] def MyNat.rfl {α : Sort u} {a : α} : Eq a a := Eq.refl a
-
-/-- Modified `rfl` tactic.
-
-`rfl` closes goals of the form `A = A`.
-
-Note that teh version for this game is somewhat weaker than the real one. -/
-syntax (name := rfl) "rfl" : tactic
-
-@[tactic MyNat.rfl] def evalRfl : Tactic := fun _ =>
-  liftMetaTactic fun mvarId => do withReducible <| mvarId.refl; pure []
-
--- @[tactic MyNat.rfl] def evalRfl : Tactic := fun _ =>
---   liftMetaTactic fun mvarId => do mvarId.refl; pure []
--- (with_reducible rfl)
-
-end MyNat

@@ -1,5 +1,5 @@
-import NNG.Metadata
-import NNG.MyNat.AdvAddition
+import NNG.Levels.AdvAddition.Level_11
+
 
 Game "NNG"
 World "AdvAddition"
@@ -12,19 +12,21 @@ Introduction
 "
 We have
 
-  * `succ_eq_add_one (n : mynat) : succ n = n + 1`
+```
+succ_eq_add_one (n : ℕ) : succ n = n + 1
+```
 
 but sometimes the other way is also convenient.
 "
 
-theorem succ_eq_add_one (d : ℕ) : succ d = d + 1 := by sorry
-
-Statement
+Statement MyNat.add_one_eq_succ
 "For any natural number $d$, we have
 $$ d+1 = \\operatorname{succ}(d). $$"
     (d : ℕ) : d + 1 = succ d := by
   rw [succ_eq_add_one]
   rfl
+
+LemmaTab "Add"
 
 Conclusion
 "

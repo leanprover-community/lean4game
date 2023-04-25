@@ -1,6 +1,5 @@
-import NNG.Metadata
-import NNG.MyNat.AdvAddition
-import NNG.MyNat.Multiplication
+import NNG.Levels.AdvAddition.Level_9
+import Std.Tactic.RCases
 
 Game "NNG"
 World "AdvAddition"
@@ -11,64 +10,66 @@ open MyNat
 
 Introduction
 "
-In Lean, `a ≠ b` is *defined to mean* `(a = b) → false`. 
+In Lean, `a ≠ b` is *defined to mean* `(a = b) → False`.
 This means that if you see `a ≠ b` you can *literally treat
-it as saying* `(a = b) → false`. Computer scientists would
-say that these two terms are *definitionally equal*. 
+it as saying* `(a = b) → False`. Computer scientists would
+say that these two terms are *definitionally equal*.
 
 The following lemma, $a+b=0\\implies b=0$, will be useful in inequality world.
-Let me go through the proof, because it introduces several new
-concepts: 
-
-* `cases b`, where `b : mynat`
-* `exfalso`
-* `apply succ_ne_zero`
-
-We're going to prove $a+b=0\\implies b=0$. Here is the
-strategy. Each natural number is either `0` or `succ(d)` for
-some other natural number `d`. So we can start the proof
-with 
-
-`cases b with d,`
-
-and then we have two goals, the case `b = 0` (which you can solve easily)
-and the case `b = succ(d)`, which looks like this:
-
-```
-a d : mynat,
-H : a + succ d = 0
-⊢ succ d = 0
-```
-
-Our goal is impossible to prove. However our hypothesis `H`
-is also impossible, meaning that we still have a chance!
-First let's see why `H` is impossible. We can
-
-`rw add_succ at H,`
-
-to turn `H` into `H : succ (a + d) = 0`. Because
-`succ_ne_zero (a + d)` is a proof that `succ (a + d) ≠ 0`,
-it is also a proof of the implication `succ (a + d) = 0 → false`.
-Hence `succ_ne_zero (a + d) H` is a proof of `false`!
-Unfortunately our goal is not `false`, it's a generic
-false statement. 
-
-Recall however that the `exfalso` command turns any goal into `false`
-(it's logically OK because `false` implies every proposition, true or false).
-You can probably take it from here.
 "
 
-Statement -- add_left_eq_zero
-"If $a$ and $b$ are natural numbers such that 
+Statement MyNat.add_left_eq_zero
+"If $a$ and $b$ are natural numbers such that
 $$ a + b = 0, $$
 then $b = 0$."
-    {{a b : ℕ}} (H : a + b = 0) : b = 0 := by
+    {a b : ℕ} (h : a + b = 0) : b = 0 := by
+  Hint "
+  You want to start of by making a distinction `b = 0` or `b = succ d` for some
+  `d`. You can do this with
+
+  ```
+  induction b
+  ```
+  even if you are never going to use the induction hypothesis.
+  "
+
+  -- TODO: induction vs rcases
+
+  Branch
+    rcases b
+    -- TODO: `⊢ zero = 0` :(
   induction b with d
-  rfl
-  rw [add_succ] at H
-  exfalso
-  apply succ_ne_zero (a + d)
-  exact H
+  · rfl
+  · Hint "This goal seems impossible! However, our hypothesis `h` is also impossible,
+    meaning that we still have a chance!
+    First let's see why `h` is impossible. We can
+
+    ```
+    rw [add_succ] at h
+    ```
+    "
+    rw [add_succ] at h
+    Hint "
+    Because `succ_ne_zero (a + {d})` is a proof that `succ (a + {d}) ≠ 0`,
+    it is also a proof of the implication `succ (a + {d}) = 0 → False`.
+    Hence `succ_ne_zero (a + {d}) h` is a proof of `False`!
+
+    Unfortunately our goal is not `False`, it's a generic
+    false statement.
+
+    Recall however that the `exfalso` command turns any goal into `False`
+    (it's logically OK because `False` implies every proposition, true or false).
+    You can probably take it from here.
+    "
+    Branch
+      have j := succ_ne_zero (a + d) h
+      exfalso
+      exact j
+    exfalso
+    apply succ_ne_zero (a + d)
+    exact h
+
+LemmaTab "Add"
 
 Conclusion
 "

@@ -28,7 +28,7 @@ Statement
   Hint "In order to use the tactic `rfl` you can enter it above and hit \"Execute\"."
   rfl
 
-NewTactic rfl
+NewTactic rfl simp -- TODO
 NewDefinition MyNat
 
 Conclusion

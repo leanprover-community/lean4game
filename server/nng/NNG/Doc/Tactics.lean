@@ -153,7 +153,19 @@ TacticDoc left
 "
 "
 
+TacticDoc revert
+"
+"
+
+TacticDoc tauto
+"
+"
+
 TacticDoc right
+"
+"
+
+TacticDoc by_cases
 "
 "
 
@@ -162,5 +174,13 @@ TacticDoc contradiction
 "
 
 TacticDoc exfalso
+"
+"
+
+TacticDoc simp
+"
+"
+
+TacticDoc «repeat»
 "
 "

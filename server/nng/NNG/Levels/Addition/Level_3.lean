@@ -1,4 +1,3 @@
-import NNG.Metadata
 import NNG.Levels.Addition.Level_2
 
 Game "NNG"
@@ -45,6 +44,8 @@ $ \\operatorname{succ}(a) + b = \\operatorname{succ}(a + b)$."
     rw [hd]
     rw [add_succ]
     rfl
+
+LemmaTab "Add"
 
 Conclusion
 "

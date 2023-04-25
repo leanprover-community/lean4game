@@ -1,10 +1,3 @@
-import NNG.Levels.Power.Level_1
-import NNG.Levels.Power.Level_2
-import NNG.Levels.Power.Level_3
-import NNG.Levels.Power.Level_4
-import NNG.Levels.Power.Level_5
-import NNG.Levels.Power.Level_6
-import NNG.Levels.Power.Level_7
 import NNG.Levels.Power.Level_8
 
 Game "NNG"
@@ -18,17 +11,15 @@ This import gives you the power to make powers of your
 natural numbers. It is defined by recursion, just like addition and multiplication.
 Here are the two new axioms:
 
-  * `pow_zero (a : mynat) : a ^ 0 = 1`
-  * `pow_succ (a b : mynat) : a ^ succ(b) = a ^ b * a`
+  * `pow_zero (a : ℕ) : a ^ 0 = 1`
+  * `pow_succ (a b : ℕ) : a ^ succ b = a ^ b * a`
 
 The power function has various relations to addition and multiplication.
 If you have gone through levels 1--6 of addition world and levels 1--9 of
 multiplication world, you should have no trouble with this world:
-The usual tactics `induction`, `rw` and `refl` should see you through.
-You might want to fiddle with the
-drop-down menus on the left so you can see which theorems of Power World
-you have proved at any given time. Addition and multiplication -- we
-have a solid API for them now, i.e. if you need something about addition
+The usual tactics `induction`, `rw` and `rfl` should see you through.
+You should probably look at your inverntory again: addition and multiplication
+have a solid API by now, i.e. if you need something about addition
 or multiplication, it's probably already in the library we have built.
 Collectibles are indication that we are proving the right things.
 

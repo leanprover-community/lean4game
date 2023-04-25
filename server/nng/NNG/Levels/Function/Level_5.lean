@@ -1,6 +1,4 @@
 import NNG.Metadata
-import NNG.Levels.Addition.Level_6
-import NNG.MyNat.Multiplication
 
 Game "NNG"
 World "Function"
@@ -31,7 +29,9 @@ Statement
   `intro` tactic from level 2, Lean's version of \"let $p\\in P$ be arbitrary.\"
   So let's start with
 
-  `intro p`"
+  ```
+  intro p
+  ```"
   intro p
   Hint "
   We now have an arbitrary element $p\\in P$ and we are supposed to be constructing
@@ -39,11 +39,15 @@ Statement
   sends everything to $p$?
   This will work. So let $q\\in Q$ be arbitrary:
 
-  `intro q`"
+  ```
+  intro q
+  ```"
   intro q
   Hint "and then let's output `p`.
 
-  `exact p`"
+  ```
+  exact p
+  ```"
   exact p
 
 Conclusion
