@@ -4,7 +4,11 @@ namespace MyNat
 
 def le (a b : ℕ) :=  ∃ (c : ℕ), b = a + c
 
--- Another choice is to define it recursively: 
+-- Another choice is to define it recursively:
+-- (kb) note: I didn't choose this option because tests showed
+-- that mathematicians found it a lot more confusing than
+-- the existence definition.
+
 -- | le 0 _
 -- | le (succ a) (succ b) = le ab 
 

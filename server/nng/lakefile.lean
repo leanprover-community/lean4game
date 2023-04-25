@@ -1,7 +1,8 @@
 import Lake
 open Lake DSL
 
-require GameServer from ".."/"leanserver"
+require GameServer from  git
+  "https://github.com/leanprover-community/lean4game.git"@"main"/"server"/"leanserver"
 
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git" @ "fc4a489c2af75f687338fe85c8901335360f8541"

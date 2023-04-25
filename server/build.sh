@@ -14,7 +14,20 @@ docker build \
   --rm -f server.Dockerfile -t adam:latest .
 
 # Build NNG
-(cd nng && lake build)
+
+(
+  if [ ! -d nng ]
+  then
+    git clone https://github.com/hhu-adam/NNG4 nng/
+    cd nng
+  else
+    cd nng
+    git pull
+  fi
+  lake exe cache get
+  lake build
+)
+
 docker rmi nng:latest || true
 docker build \
   --build-arg GAME_DIR=nng \
