@@ -11,5 +11,6 @@
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-  }
+  },
+  "exclude": ["server"]
 }
