@@ -4,12 +4,16 @@ FROM elan:latest
 WORKDIR /
 
 # Copy lean files
-COPY leanserver ./leanserver
+COPY GameServer ./GameServer
+COPY Main ./Main
+COPY lakefile.lean ./lakefile.lean
+COPY lake-manifest.lean ./lake-manifest.lean
+COPY lean-toolchain ./lean-toolchain
 COPY $GAME_DIR ./$GAME_DIR
 # TODO: make `adam` a build argument
 
-WORKDIR /leanserver
+WORKDIR /
 RUN rm -f ./build/bin/gameserver
 RUN lake build
 
-WORKDIR /leanserver/build/bin/
+WORKDIR /build/bin/

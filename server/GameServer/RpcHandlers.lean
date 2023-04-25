@@ -28,7 +28,7 @@ def levelIdFromFileName? (initParams : Lsp.InitializeParams) (fileName : String)
   return none
 
 def gameDirFromInitParams (initParams : Lsp.InitializeParams) : Option String :=
-  (splitRootUri initParams 0).map (s!"../../../{·}")
+  (splitRootUri initParams 0).map (s!"../../{·}")
 
 def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameLevel) := do
   let some levelId := levelIdFromFileName? initParams fileName

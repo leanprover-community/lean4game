@@ -99,7 +99,7 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
     throwServerError s!"Expected 3 command line arguments in addition to `--server`:
       game directory, the name of the main module, and the name of the game"
   let gameId := args[1]!
-  let gameDir := s!"../../../{gameId}"
+  let gameDir := s!"../../{gameId}"
   let module := args[2]!
   let gameName := args[3]!
   let workerPath := "./gameserver"

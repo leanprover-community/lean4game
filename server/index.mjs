@@ -43,7 +43,7 @@ function startServerProcess(gameId) {
     const serverProcess = isDevelopment
         ? cp.spawn("./gameserver",
             ["--server", gameId, games[gameId].module, games[gameId].name],
-            { cwd: "./leanserver/build/bin/" })
+            { cwd: "./build/bin/" })
         : cp.spawn("docker",
             ["run", "--runtime=runsc", "--network=none", "--rm", "-i", `${gameId}:latest`,
               "./gameserver", "--server", gameId, games[gameId].module, games[gameId].name],
