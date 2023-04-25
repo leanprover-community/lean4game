@@ -7,7 +7,7 @@ WORKDIR /
 COPY GameServer ./GameServer
 COPY Main.lean ./Main
 COPY lakefile.lean ./lakefile.lean
-COPY lake-manifest.lean ./lake-manifest.lean
+COPY lake-manifest.json ./lake-manifest.json
 COPY lean-toolchain ./lean-toolchain
 COPY $GAME_DIR ./$GAME_DIR
 # TODO: make `adam` a build argument
