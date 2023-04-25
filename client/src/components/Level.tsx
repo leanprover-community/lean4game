@@ -215,7 +215,7 @@ function PlayableLevel({worldId, levelId}) {
         </EditorContext.Provider>
 
         {completed && <div className="conclusion">
-          {level?.data?.conclusion &&
+          {level?.data?.conclusion?.trim() &&
             <div className="message info">
               <Markdown>{level?.data?.conclusion}</Markdown>
             </div>

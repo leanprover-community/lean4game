@@ -26,6 +26,10 @@ body {
   padding-right: .3em;
 }
 
+.markdown pre code {
+  padding: 0;
+}
+
 .markdown pre {
   padding-top: .6em;
   padding-bottom: .6em;
