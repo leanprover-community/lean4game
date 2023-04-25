@@ -165,10 +165,10 @@ export const Goal = React.memo((props: GoalProps) => {
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
         {filter.reverse && goalLi}
         {! commandLine && objectHyps.length > 0 &&
-            <div className="hyp-group"><div className="hyp-group-title">Objekte:</div>
+            <div className="hyp-group"><div className="hyp-group-title">Objects:</div>
             {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {!commandLine && assumptionHyps.length > 0 &&
-            <div className="hyp-group"><div className="hyp-group-title">Annahmen:</div>
+            <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {commandLine && commandLineMode && <CommandLine />}
         {!filter.reverse && goalLi}
@@ -201,14 +201,14 @@ export const MainAssumptions = React.memo((props: GoalProps2) => {
   const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
 
   return <div id="main-assumptions">
-    <div className="goals-section-title">Aktuelles Goal</div>
+    <div className="goals-section-title">Current Goal</div>
     {filter.reverse && goalLi}
     { objectHyps.length > 0 &&
-      <div className="hyp-group"><div className="hyp-group-title">Objekte:</div>
+      <div className="hyp-group"><div className="hyp-group-title">Objects:</div>
       {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
     { assumptionHyps.length > 0 &&
       <div className="hyp-group">
-        <div className="hyp-group-title">Annahmen:</div>
+        <div className="hyp-group-title">Assumptions:</div>
         {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
       </div> }
   </div>
@@ -219,7 +219,7 @@ export const OtherGoals = React.memo((props: GoalProps2) => {
   return <>
     {goals && goals.length > 1 &&
       <div id="other-goals" className="other-goals">
-        <div className="goals-section-title">Weitere Goals</div>
+        <div className="goals-section-title">Further Goals</div>
         {goals.slice(1).map((goal, i) =>
           <details key={i}>
             <summary>
@@ -237,7 +237,7 @@ export const ProofDisplay = React.memo((props : ProofDisplayProps) => {
   return <>
     { steps &&
       <div id="current-proof">
-        <div className="goals-section-title">Bisheriger Beweis</div>
+        <div className="goals-section-title">Proof history</div>
         <div className="proof-display-wrapper">
           <div className="proof-display">
             {steps.map((s) =>
