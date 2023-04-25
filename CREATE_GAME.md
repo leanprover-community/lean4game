@@ -12,7 +12,7 @@ Title "add_zero"
 
 Introduction ""                       -- optional. Is displayed throughout the level.
 
-Statement MyNat.zero_add              -- optional. if name is specified, the lemma will be added to the inventory
+Statement MyNat.zero_add              -- optional. if name is specified, the lemma will be added to the inventory in future levels.
 "description in mathematical term"    -- optional. mathematical description
     (n : ℕ) : n + 0 = n := by         -- statement: exactly how it would be in a `theorem`. (bug: forgets about implicit arguments)
   intro k
@@ -29,8 +29,8 @@ Statement MyNat.zero_add              -- optional. if name is specified, the lem
 LemmaTab "Nat"                        -- optional. specify the tab that's open in the lemma inventory
 
 NewLemma add_zero                     -- optional. add lemma to inventory
-NewTactic rw                          -- optional. add lemma to inventory
-NewDefinition Nat                     -- optional. add lemma to inventory
+NewTactic rw                          -- optional. add tactic to inventory
+NewDefinition Nat                     -- optional. add definition to inventory
 DisabledLemma add_zero                -- optional. disable specific lemmas
 DisabledTactic tauto simp             -- optional. disable tactics
 OnlyLemma add_zero                    -- optional. disable all lemmas but these
@@ -92,6 +92,6 @@ Notes:
 * The lemma name must be **fully qualified**. The string display name can be arbitrary.
 * Tactics must have their proper name. use `TacticDoc «have» ""` if it does not work
   without french quotes.
-* Definition names can be arbitrary. E.g. I used `DefinitionDoc Symbol.Fun as "fun x ↦ x"` once.
+* Definition names can be arbitrary. E.g. I used `DefinitionDoc Symbol.Fun as "fun x ↦ x" "(missing)"` once.
 
 There will be features added to get automatic information from mathlib!

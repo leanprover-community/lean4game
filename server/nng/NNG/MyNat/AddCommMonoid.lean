@@ -12,7 +12,6 @@ namespace MyNat
 -- precisely the oddball (to my eyes) classes which nat was an instance of,
 -- but I think they would make great collectibles.
 
-
 -- instance addSemigroup : AddSemigroup ℕ :=
 -- {
 --   zero := 0

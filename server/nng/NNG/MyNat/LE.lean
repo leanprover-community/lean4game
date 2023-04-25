@@ -10,7 +10,7 @@ def le (a b : ℕ) :=  ∃ (c : ℕ), b = a + c
 -- the existence definition.
 
 -- | le 0 _
--- | le (succ a) (succ b) = le ab 
+-- | le (succ a) (succ b) = le ab
 
 -- notation
 instance : LE MyNat := ⟨MyNat.le⟩
