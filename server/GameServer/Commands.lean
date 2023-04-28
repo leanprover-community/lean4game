@@ -72,7 +72,7 @@ elab "Path" s:Parser.path : command => do
 
 /-! # Inventory
 
-The inventory contains docs for tactics, lemmas, and definitions. These are all disabled
+The inventory contains docs for tactics, lemmas, and definitions. These are all locked
 in the first level and get enabled during the game.
 -/
 
@@ -222,8 +222,11 @@ partial def reprintCore : Syntax → Option Format
 def reprint (stx : Syntax) : Format :=
   reprintCore stx |>.getD ""
 
+/-- A `attr := ...` option for `Statement`. Add attributes to the defined theorem. -/
+syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
+
 /-- Define the statement of the current level. -/
-elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
+elab "Statement" statementName:ident ? attr:statementAttr ? descr:str ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
   -- Save the messages before evaluation of the proof.
@@ -485,12 +488,12 @@ elab "MakeGame" : command => do
           return (item, {
             name := item
             displayName := data.displayName
-            category := data.category
-            locked := true })
+            category := data.category })
 
     -- Availability after a given world
     let mut itemsInWorld : HashMap Name (HashMap Name ComputedInventoryItem) := {}
     for (worldId, _) in game.worlds.nodes.toArray do
+      -- Unlock all items from previous worlds
       let mut items := Availability₀
       let predecessors := game.worlds.predecessors worldId
       for predWorldId in predecessors do
@@ -511,16 +514,18 @@ elab "MakeGame" : command => do
       for (levelId, level) in levels do
         let levelInfo := level.getInventory inventoryType
 
-        -- add items in `levelInfo.new` permanently as unlocked
+        -- unlock items that are unlocked in this level
         for item in levelInfo.new do
           let data := (← getInventoryDoc? item inventoryType).get!
           items := items.insert item {
             name := item
             displayName := data.displayName
             category := data.category
+            new := true
             locked := false }
 
-        -- add the statement from the previous level permanently as unlocked
+        -- add the exercise statement from the previous level
+        -- if it was named
         if inventoryType == .Lemma then
           match lemmaStatements.find? (worldId, levelId) with
           | none => pure ()
@@ -530,14 +535,14 @@ elab "MakeGame" : command => do
               name := name
               displayName := data.displayName
               category := data.category
+              new := true
               locked := false }
 
+        -- sort items and disable disabled ones
         let itemsArray := items.toArray
           |>.insertionSort (fun a b => a.1.toString < b.1.toString)
           |>.map (·.2)
           |>.map (fun item => { item with
-            -- if `levelInfo.only` is set, disable everything not in there,
-            -- otherwise disable all in `levelInfo.disabled`
             disabled := if levelInfo.only.size == 0 then
               levelInfo.disabled.contains item.name
             else

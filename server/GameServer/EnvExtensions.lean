@@ -72,9 +72,11 @@ structure ComputedInventoryItem where
   /-- Category to group inventory items by (currently only used for lemmas). -/
   category : String
   /-- If `true` then the item only gets unlocked in a later level. -/
-  locked : Bool
+  locked := true
   /-- If `true` then the item is blocked for this level. -/
-  disabled : Bool := false
+  disabled := false
+  /-- To mark an item that has been added freshly in this level. -/
+  new := false
 deriving ToJson, FromJson, Repr, Inhabited
 
 /-- Environment extension for inventory documentation. -/

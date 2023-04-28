@@ -73,17 +73,19 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
     ).map(item => {
         if ((tab ?? categories[0]) == item.category) {
           return <InventoryItem key={item.name} showDoc={() => {openDoc(item.name, docType)}}
-            name={item.name} displayName={item.displayName} locked={item.locked} disabled={item.disabled} />
+            name={item.name} displayName={item.displayName} locked={item.locked}
+            disabled={item.disabled} newly={item.new}/>
         }
       }) }
     </div>
     </>
 }
 
-function InventoryItem({name, displayName, locked, disabled, showDoc}) {
+function InventoryItem({name, displayName, locked, disabled, newly, showDoc}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : ""
-  const className = locked ? "locked" : disabled ? "disabled" : ""
+  const className = newly ? "new" : "old"
+  // const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
   const title = locked ? "Not unlocked yet" :
                 disabled ? "Not available in this level" : ""
 

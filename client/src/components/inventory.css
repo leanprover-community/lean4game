@@ -26,6 +26,9 @@
   color: #ccc;
 }
 
+.inventory .item.new {
+  color: rgb(247, 216, 93);
+}
 
 .inventory .item:not(.locked):not(.disabled) {
   cursor: pointer;

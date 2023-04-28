@@ -15,7 +15,8 @@ export interface ComputedInventoryItem {
   displayName: string,
   category: string,
   disabled: boolean,
-  locked: boolean
+  locked: boolean,
+  new: boolean
 }
 
 export interface LevelInfo {
