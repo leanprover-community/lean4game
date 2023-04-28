@@ -224,9 +224,10 @@ def reprint (stx : Syntax) : Format :=
 
 /-- A `attr := ...` option for `Statement`. Add attributes to the defined theorem. -/
 syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
+-- TODO
 
 /-- Define the statement of the current level. -/
-elab "Statement" statementName:ident ? attr:statementAttr ? descr:str ? sig:declSig val:declVal : command => do
+elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
   -- Save the messages before evaluation of the proof.
