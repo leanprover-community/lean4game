@@ -27,7 +27,7 @@
 }
 
 .inventory .item.new {
-  color: rgb(247, 216, 93);
+  background-color: rgb(255, 242, 190);
 }
 
 .inventory .item:not(.locked):not(.disabled) {
