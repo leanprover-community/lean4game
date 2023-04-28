@@ -84,8 +84,7 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
 function InventoryItem({name, displayName, locked, disabled, newly, showDoc}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : ""
-  const className = newly ? "new" : "old"
-  // const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
+  const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
   const title = locked ? "Not unlocked yet" :
                 disabled ? "Not available in this level" : ""
 
