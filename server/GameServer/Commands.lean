@@ -522,7 +522,6 @@ elab "MakeGame" : command => do
             name := item
             displayName := data.displayName
             category := data.category
-            new := true
             locked := false }
 
         -- add the exercise statement from the previous level
@@ -536,18 +535,19 @@ elab "MakeGame" : command => do
               name := name
               displayName := data.displayName
               category := data.category
-              new := true
               locked := false }
 
-        -- sort items and disable disabled ones
+        -- add marks for `disabled` and `new` lemmas here, so that they only apply to
+        -- the current level.
         let itemsArray := items.toArray
           |>.insertionSort (fun a b => a.1.toString < b.1.toString)
           |>.map (·.2)
           |>.map (fun item => { item with
             disabled := if levelInfo.only.size == 0 then
-              levelInfo.disabled.contains item.name
-            else
-              not (levelInfo.only.contains item.name)
+                levelInfo.disabled.contains item.name
+              else
+                not (levelInfo.only.contains item.name)
+            new := levelInfo.new.contains item.name
             })
 
         modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
