@@ -14,7 +14,7 @@ Currently the interface is still undergoing bigger changes, contributions are of
 
 ### Documentation
 
-For game developers, there is a work-in-progress Documentation [Creating a Game](CREATE_GAME.md).
+For game developers, there is a work-in-progress Documentation: [Create a Game](DOCUMENTATION.md).
 Best to talk with us directly.
 
 For the game engine itself, the documentations is missing currently.
