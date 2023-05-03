@@ -40,7 +40,7 @@ const PrivacyPolicy: React.FC = () => {
               Universitätsstr. 1<br />
               40225 Düsseldorf<br />
               Germany<br />
-              <a href="mailto:jon.eugster@hhu.de">jon.eugster@hhu.de</a>
+              <a href="https://www.math.hhu.de/en/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/jon-eugster">Contact Details</a>
 
             </p>
           </div>

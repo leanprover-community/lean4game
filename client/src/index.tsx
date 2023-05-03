@@ -11,6 +11,7 @@ import {
 } from "react-router-dom";
 import ErrorPage from './ErrorPage';
 import Welcome from './components/Welcome';
+import LandingPage from './components/LandingPage';
 import Level from './components/Level';
 import { monacoSetup } from 'lean4web/client/src/monacoSetup';
 import { redirect } from 'react-router-dom';
@@ -20,7 +21,8 @@ monacoSetup()
 const router = createHashRouter([
   {
     path: "/",
-    loader: () => redirect("/game/adam")
+    element: <LandingPage />,
+    // loader: () => redirect("/game/adam")
   },
   {
     path: "/game/:gameId",

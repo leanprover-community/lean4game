@@ -42,7 +42,13 @@ module.exports = env => {
         {
           test: /\.css$/,
           use: ["style-loader", "css-loader"]
-        }
+        },
+        {
+          test: /\.(jpg|png)$/,
+          use: {
+            loader: 'file-loader',
+          },
+        },
       ]
     },
     resolve: {
