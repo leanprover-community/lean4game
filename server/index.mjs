@@ -92,7 +92,7 @@ wss.addListener("connection", function(ws, req) {
         fillQueue(gameId)
     }
 
-    this.socketCounter += 1;
+    socketCounter += 1;
     const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
     console.log(`[${new Date()}] Socket opened - ${ip}`)
 
@@ -115,12 +115,12 @@ wss.addListener("connection", function(ws, req) {
         return message;
     });
 
-    console.log(`[${new Date()}] Number of open sockets - ${this.socketCounter}`)
+    console.log(`[${new Date()}] Number of open sockets - ${socketCounter}`)
     console.log(`[${new Date()}] Free RAM - ${Math.round(os.freemem() / 1024 / 1024)} / ${Math.round(os.totalmem() / 1024 / 1024)} GB`)
 
     ws.on('close', () => {
       console.log(`[${new Date()}] Socket closed - ${ip}`)
-      this.socketCounter -= 1;
+      socketCounter -= 1;
     })
 
     socketConnection.onClose(() => serverConnection.dispose());
