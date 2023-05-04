@@ -5,6 +5,8 @@ import * as cp from 'child_process';
 import * as url from 'url';
 import * as rpc from 'vscode-ws-jsonrpc';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
+import os from 'os';
+import anonymize from 'ip-anonymize';
 
 const games = {
     adam: {
