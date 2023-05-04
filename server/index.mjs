@@ -10,11 +10,13 @@ const games = {
     adam: {
         name: "Adam",
         module: "Adam",
+        dir: "../../../../Robo",
         queueLength: 5
     },
     nng: {
         name: "NNG",
         module: "NNG",
+        dir: "../../../../NNG4",
         queueLength: 5
     }
 }
@@ -42,11 +44,11 @@ const queueLength = 5
 function startServerProcess(gameId) {
     const serverProcess = isDevelopment
         ? cp.spawn("./gameserver",
-            ["--server", gameId, games[gameId].module, games[gameId].name],
+            ["--server", games[gameId].dir, games[gameId].module, games[gameId].name],
             { cwd: "./build/bin/" })
         : cp.spawn("docker",
             ["run", "--runtime=runsc", "--network=none", "--rm", "-i", `${gameId}:latest`,
-              "./gameserver", "--server", gameId, games[gameId].module, games[gameId].name],
+              "./gameserver", "--server", "/game/", games[gameId].module, games[gameId].name],
             { cwd: "." })
     serverProcess.on('error', error =>
         console.error(`Launching Lean Server failed: ${error}`)

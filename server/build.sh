@@ -3,6 +3,8 @@
 # Operate in the directory where this file is located
 cd $(dirname $0)
 
+# TODO: Pull prebuilt docker images from GitHub
+
 # Build elan image if not already present
 docker build --pull --rm -f elan.Dockerfile -t elan:latest .
 

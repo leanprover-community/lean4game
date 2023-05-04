@@ -5,6 +5,7 @@ open Lean
 structure GameServerState :=
 (env : Lean.Environment)
 (game : Name)
+(gameDir : String)
 
 abbrev GameServerM := StateT GameServerState Server.Watchdog.ServerM
 
@@ -57,6 +58,7 @@ structure LoadLevelParams where
 
 structure DidOpenLevelParams where
   uri : String
+  gameDir : String
   levelModule : Name
   tactics : Array ComputedInventoryItem
   lemmas : Array ComputedInventoryItem
@@ -90,7 +92,8 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
   fw.stdin.writeLspNotification {
     method := "$/game/didOpenLevel"
     param  := {
-      uri       := m.uri
+      uri := m.uri
+      gameDir := (← get).gameDir
       levelModule := lvl.module
       tactics := lvl.tactics.computed
       lemmas := lvl.lemmas.computed

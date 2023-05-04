@@ -98,8 +98,7 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
   if args.length < 4 then
     throwServerError s!"Expected 3 command line arguments in addition to `--server`:
       game directory, the name of the main module, and the name of the game"
-  let gameId := args[1]!
-  let gameDir := s!"../../{gameId}"
+  let gameDir := args[1]!
   let module := args[2]!
   let gameName := args[3]!
   let workerPath := "./gameserver"
@@ -110,10 +109,10 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
   let i ← maybeTee "wdIn.txt" false i
   let o ← maybeTee "wdOut.txt" true o
   let e ← maybeTee "wdErr.txt" true e
-  let state := {env := ← createEnv gameDir module, game := gameName}
+  let state := {env := ← createEnv gameDir module, game := gameName, gameDir := gameDir}
   let initRequest ← i.readLspRequestAs "initialize" InitializeParams
-  -- We misuse the `rootUri` field to store gameId, module, and gameName
-  let rootUri? := s!"{gameId}/{module}/{gameName}"
+  -- We misuse the `rootUri` field to the gameName
+  let rootUri? := gameName
   let initRequest := {initRequest with param := {initRequest.param with rootUri?}}
   o.writeLspResponse {
     id     := initRequest.id

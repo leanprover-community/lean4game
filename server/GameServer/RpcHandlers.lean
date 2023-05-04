@@ -12,23 +12,12 @@ open Meta
 
 namespace GameServer
 
-def splitRootUri (initParams : Lsp.InitializeParams) (i : Nat): Option String := Id.run do
-  let some rootUri := initParams.rootUri?
-    | return none
-  let rootUriParts := rootUri.splitOn "/"
-  if rootUriParts.length == 3 then
-    return rootUriParts[i]?
-  return none
-
 def levelIdFromFileName? (initParams : Lsp.InitializeParams) (fileName : String) : Option LevelId := Id.run do
   let fileParts := fileName.splitOn "/"
   if fileParts.length == 3 then
-    if let (some level, some game) := (fileParts[2]!.toNat?, splitRootUri initParams 2) then
+    if let (some level, some game) := (fileParts[2]!.toNat?, initParams.rootUri?) then
       return some {game, world := fileParts[1]!, level := level}
   return none
-
-def gameDirFromInitParams (initParams : Lsp.InitializeParams) : Option String :=
-  (splitRootUri initParams 0).map (s!"../../{·}")
 
 def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameLevel) := do
   let some levelId := levelIdFromFileName? initParams fileName

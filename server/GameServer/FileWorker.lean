@@ -359,25 +359,22 @@ section Initialization
     fileMap  := default
 
   def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
-    (levelModule : Name) (initParams : InitializeParams): IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
-    let some gameDir := GameServer.gameDirFromInitParams initParams
-      | throwServerError s!"Invalid rootUri: {initParams.rootUri?}"
-
+    (levelParams : Game.DidOpenLevelParams) (initParams : InitializeParams): IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
     -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
     let out ← IO.Process.output
-      { cwd := gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
+      { cwd := levelParams.gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
     if out.exitCode != 0 then
       throwServerError s!"Error while running Lake: {out.stderr}"
 
     -- Make the paths relative to the current directory
     let paths : List System.FilePath := System.SearchPath.parse out.stdout.trim
     let currentDir ← IO.currentDir
-    let paths := paths.map fun p => currentDir / (gameDir : System.FilePath) / p
+    let paths := paths.map fun p => currentDir / (levelParams.gameDir : System.FilePath) / p
 
     -- Set the search path
     Lean.searchPathRef.set paths
 
-    let env ← importModules [{ module := `Init : Import }, { module := levelModule : Import }] {} 0
+    let env ← importModules [{ module := `Init : Import }, { module := levelParams.levelModule : Import }] {} 0
     -- return (env, paths)
 
     -- use empty header
@@ -425,7 +422,7 @@ section Initialization
        (levelParams : Game.DidOpenLevelParams) : IO (WorkerContext × WorkerState) := do
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
     let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)
-      levelParams.levelModule initParams
+      levelParams initParams
     let cancelTk ← CancelToken.new
     let ctx :=
       { hIn  := i
