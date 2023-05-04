@@ -105,7 +105,6 @@ function LandingPage() {
         </p>
       </div>
     </header>
-
     <div className="game-list">
 
       <GameTile
@@ -115,8 +114,7 @@ function LandingPage() {
         description="
 Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet danach verschiedene Bereiche des Bachelorstudiums an.
 
-(Das Spiel befindet sich noch in der Entstehungsphase.)
-"
+(Das Spiel befindet sich noch in der Entstehungsphase.)"
         image={coverRobo}
         language="German"
         />
@@ -133,46 +131,53 @@ This is a good first introduction to Lean!"
         levels="72"
         language="English"
         />
+
     </div>
     <section>
-      <h2>Development notes</h2>
-      <p>
-        As this server runs lean on our university machines, it has a capacity of ca. 15-25
-        games running simultaneously. We hope to address this limitation in the further future.
-      </p>
-      <p>
-        Most things about the games and infrastructure is still in development. Feel free to
-        write <a target="_blank" href="https://github.com/leanprover-community/lean4game/issues">Github Issues</a> about
-        any problems you experience!
-      </p>
+      <div className="wrapper">
+        <h2>Development notes</h2>
+        <p>
+          As this server runs lean on our university machines, it has a capacity of ca. 15-25
+          games running simultaneously. We hope to address this limitation in the further future.
+        </p>
+        <p>
+          Most things about the games and infrastructure is still in development. Feel free to
+          write <a target="_blank" href="https://github.com/leanprover-community/lean4game/issues">Github Issues</a> about
+          any problems you experience!
+        </p>
+      </div>
     </section>
     <section>
-      <h2>Adding new games</h2>
-      <p>
-        If you consider writing your own game, you should use
-        the <a target="_blank" href="https://github.com/hhu-adam/NNG4">NNG Github Repo</a> as
-        a template.
-      </p>
-      <p>
-        There will be an option to load and run games through the server
-        directly by specifying a URL, but this is still in development.
-      </p>
-      <p>
-        To add games to this page, you should get in contact as
-        games will need to be added manually.
-      </p>
+      <div className="wrapper">
+        <h2>Adding new games</h2>
+        <p>
+          If you consider writing your own game, you should use
+          the <a target="_blank" href="https://github.com/hhu-adam/NNG4">NNG Github Repo</a> as
+          a template.
+        </p>
+        <p>
+          There will be an option to load and run games through the server
+          directly by specifying a URL, but this is still in development.
+        </p>
+        <p>
+          To add games to this page, you should get in contact as
+          games will need to be added manually.
+        </p>
+      </div>
     </section>
     <section>
-      <h2>Funding</h2>
-      <p>
-        This Server has been developed as part of the
-        project <a target="_blank" href="https://hhu-adam.github.io">ADAM : Anticipating the Digital Age of Mathematics</a> at
-        Heinrich-Heine-Universität in Düsseldorf.
-      </p>
+      <div className="wrapper">
+        <h2>Funding</h2>
+        <p>
+          This Server has been developed as part of the
+          project <a target="_blank" href="https://hhu-adam.github.io">ADAM : Anticipating the Digital Age of Mathematics</a> at
+          Heinrich-Heine-Universität in Düsseldorf.
+        </p>
+      </div>
     </section>
     <footer>
       <a className="link" onClick={openImpressum}>Impressum</a>
-        {impressum? <PrivacyPolicyPopup handleClose={closeImpressum} />: null}
+      {impressum? <PrivacyPolicyPopup handleClose={closeImpressum} />: null}
     </footer>
 
     {/* <PrivacyPolicy/> */}

@@ -5,6 +5,10 @@
   font-style: normal;
 } */
 
+html {
+  font-size: 16px;
+}
+
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
@@ -18,38 +22,14 @@ a {
   zoom: 1.0 ;
 }
 
-/* .landing-page {
-  position: relative;
-  margin: 20px;
-} */
-
-
-
-/* p {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-
-
-h2 {
-  margin-top: 40px;
-  margin-bottom: 20px;
-}
-
-*/
-
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  padding-top: 15px;
-  padding-bottom: 5px;
+.landing-page {
+  width: 100%;
 }
 
 .game-list {
   display: grid;
-  grid-gap: 25px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 60px;
@@ -66,6 +46,8 @@ h2 {
   flex-direction: column;
   justify-content: space-between;
   justify-self: center;
+  font-size: 1rem;
+
 }
 
 .image {
@@ -93,7 +75,7 @@ div.image {
 .short-description {
   padding-top: 5px;
   padding-bottom: 5px;
-  height: 105px;
+  height: 6.5rem;
 }
 .game-stats {
   display: block;
@@ -120,6 +102,13 @@ div.image {
   text-align: right;
 }
 
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding-top: 15px;
+  padding-bottom: 5px;
+}
+
 header {
   border: 1px solid green;
   background-repeat: none;
@@ -143,10 +132,10 @@ header {
 
 #main-title p {
   color: rgb(255, 255, 255);
-  font-size: 1.25rem;
   font-weight: bold;
   text-align: center;
   max-width: 600px;
+  font-size: 1.25rem;
 }
 
 #main-title a {
@@ -171,23 +160,30 @@ header nav {
 
 footer {
   background-color: rgba(0, 133, 162, 1);
-  display: flex;
-  justify-content: flex-end;
+  /* display: flex;
+  flex-direction: row;
+  justify-content: flex-end; */
   padding: 20px;
 }
 
 footer .link {
   color: white;
   cursor: pointer;
+  margin-left: 40px;
+  margin-right: 40px;
 }
 
 .github-link {
   height: 24px; /* TODO: why do I need that? s*/
 }
 
-
 .landing-page > section {
-  padding: 40px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  padding-left: 40px;
+  padding-right: 40px;
+  font-size: 1.25rem;
+
 }
 
 .landing-page > section h2 {
@@ -201,4 +197,21 @@ footer .link {
 
 .landing-page > section:nth-of-type(even) {
   background-color: rgb(255, 255, 255)
+}
+
+@media screen and (min-width: 1300px) {
+  .landing-page > section .wrapper {
+    max-width: 1300px;
+    margin-left: calc(50% - 650px);
+    margin-right: calc(50% - 650px);
+  }
+}
+
+/* TODO: Adjust to 180px once there are more than two games */
+@media screen and (min-width: 1300px) {
+  .game-list {
+    max-width: 1300px;
+    margin-left: calc(50% - 650px);
+    margin-right: calc(50% - 650px);
+  }
 }
