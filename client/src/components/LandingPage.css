@@ -36,6 +36,13 @@ a {
   padding-bottom: 80px;
 }
 
+
+@media screen and (max-width: 440px) {
+  .game-list {
+    grid-template-columns: 100%;
+
+  }
+}
 .game {
   cursor: pointer;
   border: 1px solid rgb(140, 140, 140);
