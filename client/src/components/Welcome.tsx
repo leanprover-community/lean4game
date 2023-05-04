@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Split from 'react-split'
 
-import PrivacyPolicy from './PrivacyPolicy';
+import {PrivacyPolicy} from './PrivacyPolicy';
 
 cytoscape.use( klay );
 

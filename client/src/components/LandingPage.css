@@ -5,25 +5,32 @@
   font-style: normal;
 } */
 
-.landing-page {
-  position: relative;
-  margin: 20px;
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-.short-description p, .info p {
-  margin-block-start: 0;
-  margin-block-end: 0;
+a {
+  text-decoration: none;
 }
+
+@viewport {
+  width: device-width ;
+  zoom: 1.0 ;
+}
+
+/* .landing-page {
+  position: relative;
+  margin: 20px;
+} */
+
+
 
 /* p {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-h1 {
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
+
 
 h2 {
   margin-top: 40px;
@@ -43,9 +50,9 @@ h2 {
   display: grid;
   grid-gap: 25px;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  /* padding-left: 20px; */
-  /* padding-right: 20px; */
-  padding-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 60px;
   padding-bottom: 80px;
 }
 
@@ -58,6 +65,7 @@ h2 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  justify-self: center;
 }
 
 .image {
@@ -76,11 +84,17 @@ div.image {
   margin-right: 10px;
 }
 
+.short-description p, .info p {
+  margin-block-start: 0;
+  margin-block-end: 0;
+
+}
+
 .short-description {
   padding-top: 5px;
   padding-bottom: 5px;
+  height: 105px;
 }
-
 .game-stats {
   display: block;
 }
@@ -106,8 +120,85 @@ div.image {
   text-align: right;
 }
 
+header {
+  border: 1px solid green;
+  background-repeat: none;
+  background-size: 100% 100%;
+  background-position: center;
+}
+
+#main-title {
+  padding: 20px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+#main-title h1 {
+  font-weight: bolder;
+  color: rgb(255, 255, 255);
+  font-size: calc(1.425rem + 2.1vw);
+  text-align: center;
+}
+
+#main-title p {
+  color: rgb(255, 255, 255);
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  max-width: 600px;
+}
+
+#main-title a {
+  color: rgb(255, 255, 255);
+  text-decoration: underline dotted;
+}
+
+#main-title a:hover {
+  color: rgb(218, 218, 218);
+}
+
+#main-title i {
+  font-style: italic;
+}
+
+header nav {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  background-color: rgba(0, 133, 162, .7);
+}
+
+footer {
+  background-color: rgba(0, 133, 162, 1);
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+footer .link {
+  color: white;
+  cursor: pointer;
+}
+
 .github-link {
-  position: absolute;
-  top : 0;
-  right: 0;
+  height: 24px; /* TODO: why do I need that? s*/
+}
+
+
+.landing-page > section {
+  padding: 40px;
+}
+
+.landing-page > section h2 {
+  font-size: calc(1.325rem + 0.9vw);
+  font-weight: bolder;
+}
+
+.landing-page > section:nth-of-type(odd) {
+  background-color: rgb(248, 249, 250)
+}
+
+.landing-page > section:nth-of-type(even) {
+  background-color: rgb(255, 255, 255)
 }
