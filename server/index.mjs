@@ -5,6 +5,8 @@ import * as cp from 'child_process';
 import * as url from 'url';
 import * as rpc from 'vscode-ws-jsonrpc';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
+import os from 'os';
+import anonymize from 'ip-anonymize';
 
 const games = {
     adam: {
@@ -33,6 +35,8 @@ const server = app
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const wss = new WebSocketServer({ server })
+
+var socketCounter = 0
 
 const environment = process.env.NODE_ENV
 const isDevelopment = environment === 'development'
@@ -90,6 +94,10 @@ wss.addListener("connection", function(ws, req) {
         fillQueue(gameId)
     }
 
+    socketCounter += 1;
+    const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
+    console.log(`[${new Date()}] Socket opened - ${ip}`)
+
     const socket = {
         onMessage: (cb) => { ws.on("message", cb) },
         onError: (cb) => { ws.on("error", cb) },
@@ -101,13 +109,22 @@ wss.addListener("connection", function(ws, req) {
     const socketConnection = jsonrpcserver.createConnection(reader, writer, () => ws.close())
     const serverConnection = jsonrpcserver.createProcessStreamConnection(ps);
     socketConnection.forward(serverConnection, message => {
-        console.log(`CLIENT: ${JSON.stringify(message)}`)
+        if (isDevelopment) {console.log(`CLIENT: ${JSON.stringify(message)}`)}
         return message;
     });
     serverConnection.forward(socketConnection, message => {
-        console.log(`SERVER: ${JSON.stringify(message)}`)
+      if (isDevelopment) {console.log(`SERVER: ${JSON.stringify(message)}`)}
         return message;
     });
+
+    console.log(`[${new Date()}] Number of open sockets - ${socketCounter}`)
+    console.log(`[${new Date()}] Free RAM - ${Math.round(os.freemem() / 1024 / 1024)} / ${Math.round(os.totalmem() / 1024 / 1024)} GB`)
+
+    ws.on('close', () => {
+      console.log(`[${new Date()}] Socket closed - ${ip}`)
+      socketCounter -= 1;
+    })
+
     socketConnection.onClose(() => serverConnection.dispose());
     serverConnection.onClose(() => socketConnection.dispose());
 })
