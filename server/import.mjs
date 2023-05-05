@@ -1,10 +1,11 @@
 import { spawn } from 'child_process'
 import fs from 'fs';
 import request from 'request'
+import decompress from 'decompress'
 import requestProgress from 'request-progress'
 import { Octokit } from 'octokit';
 
-const TOKEN = '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'
+const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const octokit = new Octokit({
   auth: TOKEN
 })
@@ -62,12 +63,28 @@ async function doImport (owner, repo, id) {
       'X-GitHub-Api-Version': '2022-11-28'
     }
   })
-  const artifact = artifacts.data.artifacts[0]
+  // choose latest artifact
+  const artifact = artifacts.data.artifacts
+    .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
   const url = artifact.archive_download_url
   progress[id].output += `Download from ${url}\n`
-  await download(id, url, "testfile")
+  await download(id, url, `artifact_${artifact.id}.zip`)
   progress[id].output += `Download finished.\n`
+  progress[id].output += `Unpacking ZIP.\n`
+  const files = await decompress(`artifact_${artifact.id}.zip`, `artifact_${artifact.id}`)
+  progress[id].output += `Unpacking TAR.\n`
+  const files_inner = await decompress(`artifact_${artifact.id}/${files[0].path}`, `artifact_${artifact.id}_inner`)
+  let manifest = fs.readFileSync(`artifact_${artifact.id}_inner/manifest.json`);
+  manifest = JSON.parse(manifest);
+  if (manifest.length !== 1) {
+    throw `Unexpected manifest: ${JSON.stringify(manifest)}`
+  }
+  manifest[0].RepoTags = [`github-${owner}:${repo}`]
+  fs.writeFileSync(`artifact_${artifact.id}_inner/manifest.json`, JSON.stringify(manifest));
+  await runProcess(id, "tar", ["-cvf", `../archive_${artifact.id}.tar`, "."], `artifact_${artifact.id}_inner/`)
+  await runProcess(id, "docker", ["load", "-i", `archive_${artifact.id}.tar`])
   progress[id].done = true
+  progress[id].output += `Done.\n`
 }
 
 export const importTrigger = (req, res) => {
