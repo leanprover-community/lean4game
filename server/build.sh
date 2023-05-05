@@ -7,8 +7,6 @@ cd $(dirname $0)
 ( rm -rf adam
   git clone https://github.com/hhu-adam/Robo adam/
   cd adam
-  lake exe cache get
-  lake build
   docker rmi adam:latest || true
   docker build \
     --rm -f Dockerfile -t adam:latest .
@@ -18,8 +16,6 @@ cd $(dirname $0)
 ( rm -rf nng
   git clone https://github.com/hhu-adam/NNG4 nng/
   cd nng
-  lake exe cache get
-  lake build
   docker rmi nng:latest || true
   docker build \
     --rm -f Dockerfile -t nng:latest .
