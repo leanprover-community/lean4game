@@ -68,6 +68,10 @@ module.exports = env => {
            target: 'ws://localhost:8080',
            ws: true
         },
+        '/import': {
+          target: 'http://localhost:3000',
+          router: () => 'http://localhost:8080',
+        },
       },
       static: path.join(__dirname, 'client/public/'),
       port: 3000,

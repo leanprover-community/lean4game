@@ -7,6 +7,7 @@ import * as rpc from 'vscode-ws-jsonrpc';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 import os from 'os';
 import anonymize from 'ip-anonymize';
+import { importTrigger, importStatus } from './import.mjs'
 
 const games = {
     adam: {
@@ -30,8 +31,14 @@ const app = express()
 
 const PORT = process.env.PORT || 8080;
 
+var router = express.Router();
+
+router.get('/import/status/:owner/:repo', importStatus)
+router.get('/import/trigger/:owner/:repo', importTrigger)
+
 const server = app
   .use(express.static(path.join(__dirname, '../client/dist/')))
+  .use('/', router)
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const wss = new WebSocketServer({ server })
