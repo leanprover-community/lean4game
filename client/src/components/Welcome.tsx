@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Split from 'react-split'
 
+import GameMenu from './GameMenu';
 import {PrivacyPolicy} from './PrivacyPolicy';
 
 cytoscape.use( klay );
@@ -17,6 +18,11 @@ import { Link } from 'react-router-dom';
 import Markdown from './Markdown';
 import { selectCompleted } from '../state/progress';
 import { GameIdContext } from '../App';
+import { Button } from './Button';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faDownload, faUpload, faEraser } from '@fortawesome/free-solid-svg-icons'
+
 
 const N = 24          // max number of levels per world
 const R = 800         // radius of a world
@@ -33,7 +39,7 @@ function LevelIcon({ worldId, levelId, position }) {
 
   // TODO: relative positioning?
   return (
-    <Link to={`/game/${gameId}/world/${worldId}/level/${levelId}`} key={`/game/${gameId}/world/${worldId}/level/${levelId}`}>
+    <Link to={`/game/${gameId}/world/${worldId}/level/${levelId}`}>
       <circle fill={completed ? "green" :"#999"} cx={x} cy={y} r={r} />
     </Link>
   )
@@ -69,7 +75,9 @@ function Welcome() {
 
       for (let i = 1; i <= gameInfo.data.worldSize[id]; i++) {
         svgElements.push(
-          <LevelIcon position={position} worldId={id} levelId={i} />
+          <LevelIcon
+            key={`/game/${gameId}/world/${id}/level/${i}`}
+            position={position} worldId={id} levelId={i} />
         )
       }
 
@@ -103,6 +111,7 @@ function Welcome() {
         </Typography>
       </div>
       <div className="column">
+        <GameMenu />
         <Box textAlign='center' sx={{ m: 5 }}>
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
               viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${s*bounds.x2 - s*bounds.x1 + 2 * padding} ${s*bounds.y2 - s*bounds.y1 + 2 * padding}` : ''}>
@@ -112,7 +121,7 @@ function Welcome() {
       </div>
     </Split>
   }
-    <PrivacyPolicy/>
+    <PrivacyPolicy />
   </div>
 }
 

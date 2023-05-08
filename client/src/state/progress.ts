@@ -49,6 +49,9 @@ export const progressSlice = createSlice({
       addLevelProgress(state, action)
       state.level[action.payload.game][action.payload.world][action.payload.level].completed = true
     },
+    deleteProgress(state, action: PayloadAction<{game: string}>) {
+      state.level[action.payload.game] = {}
+    },
   }
 })
 
@@ -85,4 +88,4 @@ export function selectProgress() {
   }
 }
 
-export const { changedSelection, codeEdited, levelCompleted } = progressSlice.actions
+export const { changedSelection, codeEdited, levelCompleted, deleteProgress } = progressSlice.actions
