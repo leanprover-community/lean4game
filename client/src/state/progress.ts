@@ -2,8 +2,13 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { loadState } from "./localStorage";
 
+export interface GameProgressState {
+  [world: string] : {[level: number]: LevelProgressState}
+
+}
+
 interface ProgressState {
-  level: {[game: string]: {[world: string]: {[level: number]: LevelProgressState}}}
+  level: {[game: string]: GameProgressState}
 }
 interface Selection {
   selectionStartLineNumber: number,
@@ -52,6 +57,10 @@ export const progressSlice = createSlice({
     deleteProgress(state, action: PayloadAction<{game: string}>) {
       state.level[action.payload.game] = {}
     },
+    loadProgress(state, action: PayloadAction<{game: string, data:GameProgressState}>) {
+      console.debug(`setting data to:\n ${action.payload.data}`)
+      state.level[action.payload.game] = action.payload.data
+    },
   }
 })
 
@@ -82,10 +91,10 @@ export function selectCompleted(game: string, world: string, level: number) {
   }
 }
 
-export function selectProgress() {
+export function selectProgress(game: string) {
   return (state) => {
-    return state.progress
+    return state.progress.level[game] ?? null
   }
 }
 
-export const { changedSelection, codeEdited, levelCompleted, deleteProgress } = progressSlice.actions
+export const { changedSelection, codeEdited, levelCompleted, deleteProgress, loadProgress } = progressSlice.actions

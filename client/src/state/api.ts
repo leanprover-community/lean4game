@@ -50,7 +50,7 @@ const customBaseQuery = async (
     let leanClient = await connection.startLeanClient(args.game)
     console.log(`Sending request ${args.method}`)
     let res = await leanClient.sendRequest(args.method, args.params)
-    console.log('Received response', res)
+    console.log('Received response') //, res)
     return {'data': res}
    } catch (e) {
     return {'error': e}

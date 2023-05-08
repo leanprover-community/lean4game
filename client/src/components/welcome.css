@@ -23,6 +23,10 @@
   padding: 20px;
 }
 
+i {
+  font-style: italic;
+}
+
 h1 {
   font-size: 2em;
   margin: .67em 0;
@@ -202,4 +206,11 @@ svg .world-title {
   margin-left: .4em;
   margin-right: .4em;
   margin-bottom: .2em;
+}
+
+.modal a.download-link {
+  cursor: pointer;
+  font-style: italic;
+  text-decoration: underline dotted;
+
 }
