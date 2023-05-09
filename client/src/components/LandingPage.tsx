@@ -136,8 +136,9 @@ This is a good first introduction to Lean!"
       <div className="wrapper">
         <h2>Development notes</h2>
         <p>
-          As this server runs lean on our university machines, it has a limited capacity of 15-25
-          games running simultaneously. We hope to address this limitation in the future.
+          As this server runs lean on our university machines, it has a limited capacity.
+          Our current estimate is about 55 copies of the NNG or 25 copies of games importing
+          mathlib. We hope to address this limitation in the future.
         </p>
         <p>
           Most aspects of the games and the infrastructure are still in development. Feel free to
