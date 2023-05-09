@@ -55,36 +55,53 @@ async function download(id, url, dest) {
 }
 
 async function doImport (owner, repo, id) {
-
-  const artifacts = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
-    owner,
-    repo,
-    headers: {
-      'X-GitHub-Api-Version': '2022-11-28'
+  let artifactId = null
+  try {
+    const artifacts = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
+      owner,
+      repo,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    })
+    // choose latest artifact
+    const artifact = artifacts.data.artifacts
+      .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
+    artifactId = artifact.id
+    const url = artifact.archive_download_url
+    if (!fs.existsSync("tmp")){
+      fs.mkdirSync("tmp");
     }
-  })
-  // choose latest artifact
-  const artifact = artifacts.data.artifacts
-    .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
-  const url = artifact.archive_download_url
-  progress[id].output += `Download from ${url}\n`
-  await download(id, url, `artifact_${artifact.id}.zip`)
-  progress[id].output += `Download finished.\n`
-  progress[id].output += `Unpacking ZIP.\n`
-  const files = await decompress(`artifact_${artifact.id}.zip`, `artifact_${artifact.id}`)
-  progress[id].output += `Unpacking TAR.\n`
-  const files_inner = await decompress(`artifact_${artifact.id}/${files[0].path}`, `artifact_${artifact.id}_inner`)
-  let manifest = fs.readFileSync(`artifact_${artifact.id}_inner/manifest.json`);
-  manifest = JSON.parse(manifest);
-  if (manifest.length !== 1) {
-    throw `Unexpected manifest: ${JSON.stringify(manifest)}`
+    progress[id].output += `Download from ${url}\n`
+    await download(id, url, `tmp/artifact_${artifactId}.zip`)
+    progress[id].output += `Download finished.\n`
+    progress[id].output += `Unpacking ZIP.\n`
+    const files = await decompress(`tmp/artifact_${artifactId}.zip`, `tmp/artifact_${artifactId}`)
+    if (files.length != 1) { throw Error(`Unexpected number of files in ZIP: ${files.length}`) }
+    progress[id].output += `Unpacking TAR.\n`
+    const files_inner = await decompress(`tmp/artifact_${artifactId}/${files[0].path}`, `tmp/artifact_${artifactId}_inner`)
+    let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
+    manifest = JSON.parse(manifest);
+    if (manifest.length !== 1) {
+      throw `Unexpected manifest: ${JSON.stringify(manifest)}`
+    }
+    manifest[0].RepoTags = [`github-${owner}:${repo}`]
+    fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
+    await runProcess(id, "tar", ["-cvf", `../archive_${artifactId}.tar`, "."], `tmp/artifact_${artifactId}_inner/`)
+    await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
+    progress[id].done = true
+    progress[id].output += `Done.\n`
+  } catch (e) {
+    progress[id].output += `Error: ${e.toString()}\n${e.stack}`
+  } finally {
+    if (artifactId) {
+      fs.rmSync(`tmp/artifact_${artifactId}.zip`, {force: true, recursive: true});
+      fs.rmSync(`tmp/artifact_${artifactId}`, {force: true, recursive: true});
+      fs.rmSync(`tmp/artifact_${artifactId}_inner`, {force: true, recursive: true});
+      fs.rmSync(`tmp/archive_${artifactId}.tar`, {force: true, recursive: true});
+    }
+    progress[id].done = true
   }
-  manifest[0].RepoTags = [`github-${owner}:${repo}`]
-  fs.writeFileSync(`artifact_${artifact.id}_inner/manifest.json`, JSON.stringify(manifest));
-  await runProcess(id, "tar", ["-cvf", `../archive_${artifact.id}.tar`, "."], `artifact_${artifact.id}_inner/`)
-  await runProcess(id, "docker", ["load", "-i", `archive_${artifact.id}.tar`])
-  progress[id].done = true
-  progress[id].output += `Done.\n`
 }
 
 export const importTrigger = (req, res) => {
