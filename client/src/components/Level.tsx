@@ -221,8 +221,8 @@ function PlayableLevel({worldId, levelId}) {
             </div>
           }
           {levelId >= gameInfo.data?.worldSize[worldId] ?
-          <Button to={`/game/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
-          <Button to={`/game/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+          <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+          <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
             Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
 
         </div>}
@@ -257,8 +257,8 @@ function Introduction({worldId}) {
       </div>
       <div className="conclusion">
         {0 == gameInfo.data?.worldSize[worldId] ?
-        <Button to={`/game/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
-        <Button to={`/game/${gameId}/world/${worldId}/level/1`}>
+        <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+        <Button to={`/${gameId}/world/${worldId}/level/1`}>
           Start&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>}
       </div>
@@ -272,7 +272,7 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
 
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
     <div>
-    <Button to={`/game/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button>
+    <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button>
       <span className="app-bar-title">
         {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
       </span>
@@ -282,10 +282,10 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
         {levelTitle}
       </span>
       <Button disabled={levelId <= 0} inverted={true}
-        to={`/game/${gameId}/world/${worldId}/level/${levelId - 1}`}
+        to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
         ><FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous</Button>
       <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted={true}
-        to={`/game/${gameId}/world/${worldId}/level/${levelId + 1}`}
+        to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}
         >Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>
     </div>
 

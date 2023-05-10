@@ -39,7 +39,7 @@ function LevelIcon({ worldId, levelId, position }) {
 
   // TODO: relative positioning?
   return (
-    <Link to={`/game/${gameId}/world/${worldId}/level/${levelId}`}>
+    <Link to={`/${gameId}/world/${worldId}/level/${levelId}`}>
       <circle fill={completed ? "green" :"#999"} cx={x} cy={y} r={r} />
     </Link>
   )
@@ -76,13 +76,13 @@ function Welcome() {
       for (let i = 1; i <= gameInfo.data.worldSize[id]; i++) {
         svgElements.push(
           <LevelIcon
-            key={`/game/${gameId}/world/${id}/level/${i}`}
+            key={`/${gameId}/world/${id}/level/${i}`}
             position={position} worldId={id} levelId={i} />
         )
       }
 
       svgElements.push(
-        <Link key={`world${id}`} to={`/game/${gameId}/world/${id}/level/0`}>
+        <Link key={`world${id}`} to={`/${gameId}/world/${id}/level/0`}>
           <circle className="world-circle" cx={s*position.x} cy={s*position.y} r={R}
               fill="#1976d2"/>
           <foreignObject className="world-title-wrapper" x={s*position.x} y={s*position.y}

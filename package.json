@@ -66,10 +66,10 @@
     "start": "concurrently -n server,client -c blue,green \"npm run start_server\" \"npm run start_client\"",
     "start_server": "cd server && lake build && NODE_ENV=development nodemon -e mjs --exec \"node ./index.mjs\"",
     "start_client": "NODE_ENV=development webpack-dev-server --hot",
-    "build": "npm run build_server && npm run build_client",
-    "build_server": "server/build.sh",
-    "build_client": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production webpack",
     "production": "NODE_ENV=production node server/index.mjs",
+    "build_robo": "rm -rf ./Robo && git clone https://github.com/hhu-adam/Robo && docker build ./Robo --file ./Robo/Dockerfile --tag github-hhu-adam:Robo && rm -rf ./Robo",
+    "build_nng": "rm -rf ./NNG4 && git clone https://github.com/hhu-adam/NNG4 && docker build ./NNG4 --file ./NNG4/Dockerfile --tag github-hhu-adam:NNG4 && rm -rf ./NNG4",
     "update_lean": "./UPDATE_LEAN.sh"
   },
   "eslintConfig": {

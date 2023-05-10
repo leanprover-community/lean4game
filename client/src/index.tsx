@@ -22,19 +22,18 @@ const router = createHashRouter([
   {
     path: "/",
     element: <LandingPage />,
-    // loader: () => redirect("/game/adam")
   },
   {
-    path: "/game/:gameId",
+    path: "/g/:owner/:repo",
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/game/:gameId",
+        path: "/g/:owner/:repo",
         element: <Welcome />,
       },
       {
-        path: "/game/:gameId/world/:worldId/level/:levelId",
+        path: "/g/:owner/:repo/world/:worldId/level/:levelId",
         element: <Level />,
       },
     ],
