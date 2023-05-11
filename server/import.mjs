@@ -55,6 +55,8 @@ async function download(id, url, dest) {
 }
 
 async function doImport (owner, repo, id) {
+  progress[id].output += `Import starting in a few seconds...\n`
+  await new Promise(resolve => setTimeout(resolve, 3000))
   let artifactId = null
   try {
     const artifacts = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
