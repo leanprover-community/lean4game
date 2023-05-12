@@ -275,7 +275,8 @@ Only the existing statement will be available in later levels:
       let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
       elabCommand thmStatement
     else
-      let thmStatement ← `(theorem $(mkIdent name.getId) $sig $val)
+      -- logInfo attr
+      let thmStatement ← `( theorem $(mkIdent name.getId) $sig $val)
       elabCommand thmStatement
   | none =>
     let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
@@ -417,6 +418,39 @@ elab "Branch" t:tacticSeq : tactic => do
   let msgs ← Core.getMessageLog
   b.restore
   Core.setMessageLog msgs
+
+
+
+/-- The tactic block inside `Template` will be copied into the users editor.
+Use `Hole` inside the template for a part of the proof that should be replaced
+with `sorry`. -/
+elab "Template" t:tacticSeq : tactic => do
+  --let b ← saveState
+  Tactic.evalTactic t
+
+  -- -- Not correct
+  -- let gs ← Tactic.getUnsolvedGoals
+  -- if ¬ gs.isEmpty then
+  --   logWarning "To work as intended, `Template` should contain the entire proof"
+
+
+  -- -- Show an info whether the branch proofs all remaining goals.
+  -- let gs ← Tactic.getUnsolvedGoals
+  -- if gs.isEmpty then
+  --   logInfo "This branch finishes the proof."
+  -- else
+  --   logInfo "This branch leaves open goals."
+
+  -- let msgs ← Core.getMessageLog
+  -- b.restore
+  -- Core.setMessageLog msgs
+
+
+/-- A hole inside a template proof that will be replaced by `sorry`. -/
+elab "Hole" t:tacticSeq : tactic => do
+  Tactic.evalTactic t
+
+
 
 
 

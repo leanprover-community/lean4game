@@ -118,7 +118,7 @@ wss.addListener("connection", function(ws, req) {
     });
 
     console.log(`[${new Date()}] Number of open sockets - ${socketCounter}`)
-    console.log(`[${new Date()}] Free RAM - ${Math.round(os.freemem() / 1024 / 1024)} / ${Math.round(os.totalmem() / 1024 / 1024)} GB`)
+    console.log(`[${new Date()}] Free RAM - ${Math.round(os.freemem() / 1024 / 1024)} / ${Math.round(os.totalmem() / 1024 / 1024)} MB`)
 
     ws.on('close', () => {
       console.log(`[${new Date()}] Socket closed - ${ip}`)
