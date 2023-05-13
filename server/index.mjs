@@ -7,15 +7,22 @@ import * as rpc from 'vscode-ws-jsonrpc';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 import os from 'os';
 import anonymize from 'ip-anonymize';
+import { importTrigger, importStatus } from './import.mjs'
 
+/** Preloaded games. The keys refer to the docker tags of the virtual machines.
+ * The number `queueLength` determines how many instances of the docker container
+ * get started before any user shows up to have them up and running immediately.
+ * The values `name`, `module`, and `dir` are just used for development where we
+ * use a project directory instead of a docker container.
+*/
 const games = {
-    adam: {
+    "github-hhu-adam:Robo": {
         name: "Adam",
         module: "Adam",
         dir: "../../../../Robo",
         queueLength: 5
     },
-    nng: {
+    "github-hhu-adam:NNG4": {
         name: "NNG",
         module: "NNG",
         dir: "../../../../NNG4",
@@ -30,8 +37,14 @@ const app = express()
 
 const PORT = process.env.PORT || 8080;
 
+var router = express.Router();
+
+router.get('/import/status/:owner/:repo', importStatus)
+router.get('/import/trigger/:owner/:repo', importTrigger)
+
 const server = app
   .use(express.static(path.join(__dirname, '../client/dist/')))
+  .use('/', router)
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 const wss = new WebSocketServer({ server })
@@ -43,17 +56,18 @@ const isDevelopment = environment === 'development'
 
 /** We keep queues of started Lean Server processes to be ready when a user arrives */
 const queue = {}
-const queueLength = 5
 
-function startServerProcess(gameId) {
-    const serverProcess = isDevelopment
-        ? cp.spawn("./gameserver",
-            ["--server", games[gameId].dir, games[gameId].module, games[gameId].name],
+function startServerProcess(tag) {
+    let serverProcess
+    if (isDevelopment && games[tag]?.dir) {
+        serverProcess = cp.spawn("./gameserver",
+            ["--server", games[tag].dir, games[tag].module, games[tag].name],
             { cwd: "./build/bin/" })
-        : cp.spawn("docker",
-            ["run", "--runtime=runsc", "--network=none", "--rm", "-i", `${gameId}:latest`,
-              "./gameserver", "--server", "/game/", games[gameId].module, games[gameId].name],
+    } else {
+        serverProcess =  cp.spawn("docker",
+            ["run", "--runtime=runsc", "--network=none", "--rm", "-i", `${tag}`],
             { cwd: "." })
+    }
     serverProcess.on('error', error =>
         console.error(`Launching Lean Server failed: ${error}`)
     );
@@ -66,32 +80,35 @@ function startServerProcess(gameId) {
 }
 
 /** start Lean Server processes to refill the queue */
-function fillQueue(gameId) {
-    while (queue[gameId].length < games[gameId].queueLength) {
-        const serverProcess = startServerProcess(gameId)
-        queue[gameId].push(serverProcess)
+function fillQueue(tag) {
+    while (queue[tag].length < games[tag].queueLength) {
+        const serverProcess = startServerProcess(tag)
+        queue[tag].push(serverProcess)
     }
 }
 
-for (let gameId in games) {
-    queue[gameId] = []
-    fillQueue(gameId)
+if (!isDevelopment) { // Don't use queue in development
+    for (let tag in games) {
+        queue[tag] = []
+        fillQueue(tag)
+    }
 }
 
-const urlRegEx = new RegExp("^/websocket/(.*)$")
+const urlRegEx = /^\/websocket\/g\/([\w.-]+)\/([\w.-]+)$/
 
 wss.addListener("connection", function(ws, req) {
     const reRes = urlRegEx.exec(req.url)
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
-    const gameId = reRes[1]
-    if (!games[gameId]) { console.error(`Unknown game: ${gameId}`); return; }
+    const owner = reRes[1]
+    const repo = reRes[2]
+    const tag = `github-${owner}:${repo}`
 
     let ps;
-    if (isDevelopment) { // Don't use queue in development
-        ps = startServerProcess(gameId)
+    if (!queue[tag] || queue[tag].length == 0) {
+        ps = startServerProcess(tag)
     } else {
-        ps = queue[gameId].shift() // Pick the first Lean process; it's likely to be ready immediately
-        fillQueue(gameId)
+        ps = queue[tag].shift() // Pick the first Lean process; it's likely to be ready immediately
+        fillQueue(tag)
     }
 
     socketCounter += 1;

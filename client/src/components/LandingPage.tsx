@@ -47,8 +47,7 @@ function GameTile({
 
   let navigate = useNavigate();
   const routeChange = () =>{
-    let path = `game/${gameId}`;
-    navigate(path);
+    navigate(gameId);
   }
 
   return <div className="game" onClick={routeChange}>
@@ -108,7 +107,7 @@ function LandingPage() {
 
       <GameTile
         title="Formaloversum"
-        gameId="adam"
+        gameId="g/hhu-adam/Robo"
         intro="Erkunde das Leansche Universum mit deinem Robo, welcher dir bei der Verständigung mit den Formalosophen zur Seite steht."
         description="
 Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet danach verschiedene Bereiche des Bachelorstudiums an.
@@ -120,7 +119,7 @@ Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet 
 
       <GameTile
         title="Natural Number Game"
-        gameId="nng"
+        gameId="g/hhu-adam/NNG4"
         intro="The classical introduction game for Lean."
         description="In this game you recreate the natural numbers $\mathbb{N}$ from the Peano axioms,
 learning the basics about theorem proving in Lean.
