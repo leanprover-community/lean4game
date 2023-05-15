@@ -78,11 +78,33 @@ in the first level and get enabled during the game.
 
 /-! ## Doc entries -/
 
-/-- Throw an error if inventory doc does not exist -/
-def checkInventoryDoc (type : InventoryType) (name : Syntax) : CommandElabM Unit := do
+/-- Throw a warning if inventory doc does not exist. If `(default := _)` is provided,
+it will create a new inverntory entry with the specified default description. -/
+def checkInventoryDoc (type : InventoryType) (name : Syntax)
+    (default : Option (String) := none) : CommandElabM Unit := do
   let some _ := (inventoryDocExt.getState (← getEnv)).find?
       (fun x => x.name == name.getId && x.type == type)
-    | logWarningAt name m!"Missing {type} Documentation: {name} (add `{type}Doc {name}` in your game's docs section)"
+    | match default with
+      | some _ =>
+        logInfoAt name (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
+        m!"statement description) instead. If you want to write your own description, add " ++
+        m!"`{type}Doc {name}` somewhere above this statement.")
+      | none =>
+        logWarningAt name (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
+        m!"somewhere above this statement.")
+
+      let default₀ := match default with
+      | some d => d
+      | none => "missing"
+
+      -- Create a default inventory entry
+      let n := name.getId
+      modifyEnv (inventoryDocExt.addEntry · {
+        name := n
+        type := type
+        displayName :=  s!"{n}" -- TODO: for lemmas, only take the last part of the name
+        category := if type == .Lemma then s!"{n.getPrefix}" else ""
+        content := default₀ })
 
 /-- Documentation entry of a tactic. Example:
 
@@ -230,12 +252,16 @@ syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
 elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
+  let descr := match descr with
+    | none => none
+    | some s => s.getString
+
   -- Save the messages before evaluation of the proof.
   let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
 
   -- Check that statement has a docs entry.
   match statementName with
-  | some name => checkInventoryDoc .Lemma name
+  | some name => checkInventoryDoc .Lemma name (default := descr)
   | none => pure ()
 
   -- The default name of the statement is `[Game].[World].level[no.]`, e.g. `NNG.Addition.level1`
@@ -317,9 +343,7 @@ Only the existing statement will be available in later levels:
     module := env.header.mainModule
     goal := sig,
     scope := scope,
-    descrText := match descr with
-    | none => ""
-    | some s => s.getString
+    descrText := descr
     statementName := match statementName with
     | none => default
     | some name => name.getId

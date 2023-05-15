@@ -18,13 +18,13 @@ import { importTrigger, importStatus } from './import.mjs'
 const games = {
     "g/hhu-adam/robo": {
         name: "Adam",
-        module: "Adam",
+        module: "Game",
         dir: "../../../../Robo",
         queueLength: 5
     },
     "g/hhu-adam/nng4": {
         name: "NNG",
-        module: "NNG",
+        module: "Game",
         dir: "../../../../NNG4",
         queueLength: 5
     }

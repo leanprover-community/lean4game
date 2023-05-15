@@ -183,7 +183,7 @@ structure GameLevel where
   goal : TSyntax `Lean.Parser.Command.declSig := default
   scope : Elab.Command.Scope := default
   /-- The mathematical statement in mathematician-readable form. (markdown) -/
-  descrText: String := default
+  descrText: Option String := none
   descrFormat : String := default
   /-- The `category` of lemmas to be open by default -/
   lemmaTab: Option String := none

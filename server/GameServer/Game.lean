@@ -45,7 +45,7 @@ structure LevelInfo where
   definitions : Array ComputedInventoryItem
   introduction : String
   conclusion : String
-  descrText : String := ""
+  descrText : Option String := none
   descrFormat : String := ""
   lemmaTab : Option String
   statementName : Option String
