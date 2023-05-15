@@ -87,7 +87,7 @@ async function doImport (owner, repo, id) {
     if (manifest.length !== 1) {
       throw `Unexpected manifest: ${JSON.stringify(manifest)}`
     }
-    manifest[0].RepoTags = [`g/${owner.toLowerCase()}/${repo.toLowerCase()}`]
+    manifest[0].RepoTags = [`g/${owner.toLowerCase()}/${repo.toLowerCase()}:latest`]
     fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
     await runProcess(id, "tar", ["-cvf", `../archive_${artifactId}.tar`, "."], `tmp/artifact_${artifactId}_inner/`)
     await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
