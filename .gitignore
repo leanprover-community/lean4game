@@ -1,6 +1,4 @@
 node_modules
 client/dist
 server/build
-server/nng
-server/adam
 **/lake-packages/
