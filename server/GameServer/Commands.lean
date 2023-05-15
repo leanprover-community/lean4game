@@ -79,10 +79,10 @@ in the first level and get enabled during the game.
 /-! ## Doc entries -/
 
 /-- Throw an error if inventory doc does not exist -/
-def checkInventoryDoc (type : InventoryType) (name : Name) : CommandElabM Unit := do
+def checkInventoryDoc (type : InventoryType) (name : Syntax) : CommandElabM Unit := do
   let some _ := (inventoryDocExt.getState (← getEnv)).find?
-      (fun x => x.name == name && x.type == type)
-    | throwError "Missing {type} Documentation: {name} (add `{type}Doc {name}` in your game's docs section)"
+      (fun x => x.name == name.getId && x.type == type)
+    | logWarningAt name m!"Missing {type} Documentation: {name} (add `{type}Doc {name}` in your game's docs section)"
 
 /-- Documentation entry of a tactic. Example:
 
@@ -144,60 +144,60 @@ elab "DefinitionDoc" name:ident "as" displayName:str content:str : command =>
 
 /-- Declare tactics that are introduced by this level. -/
 elab "NewTactic" args:ident* : command => do
-  let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Tactic name
-  modifyCurLevel fun level => pure {level with tactics := {level.tactics with new := names}}
+  for name in ↑args do checkInventoryDoc .Tactic name
+  modifyCurLevel fun level => pure {level with
+    tactics := {level.tactics with new := args.map (·.getId)}}
 
 /-- Declare lemmas that are introduced by this level. -/
 elab "NewLemma" args:ident* : command => do
-  let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Lemma name
-  modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with new := names}}
+  for name in ↑args do checkInventoryDoc .Lemma name
+  modifyCurLevel fun level => pure {level with
+    lemmas := {level.lemmas with new := args.map (·.getId)}}
 
 /-- Declare definitions that are introduced by this level. -/
 elab "NewDefinition" args:ident* : command => do
-  let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Definition name
-  modifyCurLevel fun level => pure {level with definitions := {level.definitions with new := names}}
+  for name in ↑args do checkInventoryDoc .Definition name
+  modifyCurLevel fun level => pure {level with
+    definitions := {level.definitions with new := args.map (·.getId)}}
 
 /-- Declare tactics that are temporarily disabled in this level.
 This is ignored if `OnlyTactic` is set. -/
 elab "DisabledTactic" args:ident* : command => do
-  let names := args.map (·.getId)
-  -- for name in names do checkInventoryDoc .Tactic name
-  modifyCurLevel fun level => pure {level with tactics := {level.tactics with disabled := names}}
+  for name in ↑args do checkInventoryDoc .Tactic name
+  modifyCurLevel fun level => pure {level with
+    tactics := {level.tactics with disabled := args.map (·.getId)}}
 
 /-- Declare lemmas that are temporarily disabled in this level.
 This is ignored if `OnlyLemma` is set. -/
 elab "DisabledLemma" args:ident* : command => do
-  let names := args.map (·.getId)
-  -- for name in names do checkInventoryDoc .Lemma name
-  modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with disabled := names}}
+  for name in ↑args  do checkInventoryDoc .Lemma name
+  modifyCurLevel fun level => pure {level with
+    lemmas := {level.lemmas with disabled := args.map (·.getId)}}
 
 /-- Declare definitions that are temporarily disabled in this level -/
 elab "DisabledDefinition" args:ident* : command => do
-  let names := args.map (·.getId)
-  -- for name in names do checkInventoryDoc .Definition name
-  modifyCurLevel fun level => pure {level with definitions := {level.definitions with disabled := names}}
+  for name in ↑args do checkInventoryDoc .Definition name
+  modifyCurLevel fun level => pure {level with
+    definitions := {level.definitions with disabled := args.map (·.getId)}}
 
 /-- Temporarily disable all tactics except the ones declared here -/
 elab "OnlyTactic" args:ident* : command => do
-  let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Tactic name
-  modifyCurLevel fun level => pure {level with tactics := {level.tactics with only := names}}
+  for name in ↑args do checkInventoryDoc .Tactic name
+  modifyCurLevel fun level => pure {level with
+    tactics := {level.tactics with only := args.map (·.getId)}}
 
 /-- Temporarily disable all lemmas except the ones declared here -/
 elab "OnlyLemma" args:ident* : command => do
-  let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Lemma name
-  modifyCurLevel fun level => pure {level with lemmas := {level.lemmas with only := names}}
+  for name in ↑args do checkInventoryDoc .Lemma name
+  modifyCurLevel fun level => pure {level with
+    lemmas := {level.lemmas with only := args.map (·.getId)}}
 
 /-- Temporarily disable all definitions except the ones declared here.
 This is ignored if `OnlyDefinition` is set. -/
 elab "OnlyDefinition" args:ident* : command => do
-  let names := args.map (·.getId)
-  for name in names do checkInventoryDoc .Definition name
-  modifyCurLevel fun level => pure {level with definitions := {level.definitions with only := names}}
+  for name in ↑args do checkInventoryDoc .Definition name
+  modifyCurLevel fun level => pure {level with
+    definitions := {level.definitions with only := args.map (·.getId)}}
 
 /-- Define which tab of Lemmas is opened by default. Usage: `LemmaTab "Nat"`.
 If omitted, the current tab will remain open. -/
@@ -235,7 +235,7 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
 
   -- Check that statement has a docs entry.
   match statementName with
-  | some name => checkInventoryDoc .Lemma name.getId
+  | some name => checkInventoryDoc .Lemma name
   | none => pure ()
 
   -- The default name of the statement is `[Game].[World].level[no.]`, e.g. `NNG.Addition.level1`
