@@ -188,3 +188,10 @@ Activate config:
   sudo nginx -t
   sudo nginx -s reload
 ```
+
+
+## Install `unzip` for Importing Docker Images
+
+```
+sudo apt-get install unzip
+```
