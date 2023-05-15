@@ -4,6 +4,12 @@ import request from 'request'
 import requestProgress from 'request-progress'
 import { Octokit } from 'octokit';
 
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const octokit = new Octokit({
   auth: TOKEN
