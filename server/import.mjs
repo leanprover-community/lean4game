@@ -76,7 +76,7 @@ async function doImport (owner, repo, id) {
     progress[id].output += `Download from ${url}\n`
     await download(id, url, `tmp/artifact_${artifactId}.zip`)
     progress[id].output += `Download finished.\n`
-    await runProcess(id, "/bin/bash", ["./unpack.sh", artifactId],".")
+    await runProcess(id, "/bin/bash", [`${__dirname}/unpack.sh`, artifactId],".")
     let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
     manifest = JSON.parse(manifest);
     if (manifest.length !== 1) {
