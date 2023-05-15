@@ -9,6 +9,14 @@ defined in this file.
 
 open Lean
 
+-- Note: When changing these, one also needs to change them in `index.mjs`
+
+/-! The default game name if `Game "MyGame"` is not used. -/
+def defaultGameName: String := "MyGame"
+
+/-! The default game module name. -/
+def defaultGameModule: String := "Game"
+
 /-! ## Hints -/
 
 /--
@@ -123,15 +131,15 @@ def setCurLevelIdx (level : Nat) : m Unit :=
 
 def getCurLayer [MonadError m] : m Layer := do
   match curGameExt.getState (← getEnv), curWorldExt.getState (← getEnv), curLevelExt.getState (← getEnv) with
-  | some _, some _, some _ => return Layer.Level
-  | some _, some _, none => return Layer.World
-  | some _, none, none => return Layer.Game
+  | _, some _, some _ => return Layer.Level
+  | _, some _, none => return Layer.World
+  | _, none, none => return Layer.Game
   | _, _, _ => throwError "Invalid Layer"
 
-def getCurGameId [MonadError m] : m Name := do
+def getCurGameId [Monad m] : m Name := do
   match curGameExt.getState (← getEnv) with
   | some game => return game
-  | none => throwError "Current game not set"
+  | none => return defaultGameName
 
 def getCurWorldId [MonadError m] : m Name := do
   match curWorldExt.getState (← getEnv) with
@@ -296,9 +304,11 @@ def getLevel? (levelId : LevelId) : m (Option GameLevel) := do
     | return none
   return level
 
-def getCurGame [MonadError m] : m Game := do
+def getCurGame [Monad m] : m Game := do
   let some game ← getGame? (← getCurGameId)
-    | throwError m!"Game {← getCurGameId} does not exist"
+    | let game := {name := defaultGameName}
+      insertGame defaultGameName game
+      return game
   return game
 
 def modifyCurGame (fn : Game → m Game) [MonadError m] : m Unit := do

@@ -17,18 +17,20 @@ import { importTrigger, importStatus } from './import.mjs'
 */
 const games = {
     "g/hhu-adam/robo": {
-        name: "Adam",
-        module: "Game",
+        // module: "Game",  // The lean module's name. Defaults to "Game"
+        // name: "Adam",    // For the `Game "Adam"` tag in the games. Defaults to "MyGame"
         dir: "../../../../Robo",
         queueLength: 5
     },
     "g/hhu-adam/nng4": {
-        name: "NNG",
-        module: "Game",
+        // module: "Game",
+        // name: "NNG",
         dir: "../../../../NNG4",
         queueLength: 5
     }
 }
+// Note: If `module` and `name` are uncommented, one also needs to add them as arguments to
+// the `--server` call below.
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -61,7 +63,7 @@ function startServerProcess(tag) {
     let serverProcess
     if (isDevelopment && games[tag]?.dir) {
         serverProcess = cp.spawn("./gameserver",
-            ["--server", games[tag].dir, games[tag].module, games[tag].name],
+            ["--server", games[tag].dir], // games[tag].module, games[tag].name
             { cwd: "./build/bin/" })
     } else {
         serverProcess =  cp.spawn("docker",

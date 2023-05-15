@@ -95,12 +95,12 @@ def createEnv (gameDir : String) (module : String) : IO Environment := do
   return env
 
 def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
-  if args.length < 4 then
-    throwServerError s!"Expected 3 command line arguments in addition to `--server`:
-      game directory, the name of the main module, and the name of the game"
+  if args.length < 2 then
+    throwServerError s!"Expected 1-3 command line arguments in addition to `--server`:
+      game directory, the name of the main module (optional), and the name of the game (optional)."
   let gameDir := args[1]!
-  let module := args[2]!
-  let gameName := args[3]!
+  let module := if args.length < 3 then defaultGameModule else args[2]!
+  let gameName := if args.length < 4 then defaultGameName else args[3]!
   let workerPath := "./gameserver"
   -- TODO: Do the following commands slow us down?
   let srcSearchPath ← initSrcSearchPath (← getBuildDir)
