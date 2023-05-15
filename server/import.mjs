@@ -1,7 +1,6 @@
 import { spawn } from 'child_process'
 import fs from 'fs';
 import request from 'request'
-import decompress from 'decompress'
 import requestProgress from 'request-progress'
 import { Octokit } from 'octokit';
 
@@ -77,11 +76,7 @@ async function doImport (owner, repo, id) {
     progress[id].output += `Download from ${url}\n`
     await download(id, url, `tmp/artifact_${artifactId}.zip`)
     progress[id].output += `Download finished.\n`
-    progress[id].output += `Unpacking ZIP.\n`
-    const files = await decompress(`tmp/artifact_${artifactId}.zip`, `tmp/artifact_${artifactId}`)
-    if (files.length != 1) { throw Error(`Unexpected number of files in ZIP: ${files.length}`) }
-    progress[id].output += `Unpacking TAR.\n`
-    const files_inner = await decompress(`tmp/artifact_${artifactId}/${files[0].path}`, `tmp/artifact_${artifactId}_inner`)
+    await runProcess(id, "/bin/bash", ["./unpack.sh", artifactId],".")
     let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
     manifest = JSON.parse(manifest);
     if (manifest.length !== 1) {
