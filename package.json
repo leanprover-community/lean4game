@@ -68,8 +68,8 @@
     "start_client": "NODE_ENV=development webpack-dev-server --hot",
     "build": "NODE_ENV=production webpack",
     "production": "NODE_ENV=production node server/index.mjs",
-    "build_robo": "rm -rf ./Robo && git clone https://github.com/hhu-adam/Robo && docker build ./Robo --file ./Robo/Dockerfile --tag github-hhu-adam:Robo && rm -rf ./Robo",
-    "build_nng": "rm -rf ./NNG4 && git clone https://github.com/hhu-adam/NNG4 && docker build ./NNG4 --file ./NNG4/Dockerfile --tag github-hhu-adam:NNG4 && rm -rf ./NNG4",
+    "build_robo": "rm -rf ./Robo && git clone https://github.com/hhu-adam/Robo && docker build ./Robo --file ./Robo/Dockerfile --tag g/hhu-adam/robo && rm -rf ./Robo",
+    "build_nng": "rm -rf ./NNG4 && git clone https://github.com/hhu-adam/NNG4 && docker build ./NNG4 --file ./NNG4/Dockerfile --tag g/hhu-adam/nng4 && rm -rf ./NNG4",
     "update_lean": "./UPDATE_LEAN.sh"
   },
   "eslintConfig": {

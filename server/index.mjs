@@ -16,13 +16,13 @@ import { importTrigger, importStatus } from './import.mjs'
  * use a project directory instead of a docker container.
 */
 const games = {
-    "github-hhu-adam:Robo": {
+    "g/hhu-adam/robo": {
         name: "Adam",
         module: "Adam",
         dir: "../../../../Robo",
         queueLength: 5
     },
-    "github-hhu-adam:NNG4": {
+    "g/hhu-adam/nng4": {
         name: "NNG",
         module: "NNG",
         dir: "../../../../NNG4",
@@ -101,7 +101,7 @@ wss.addListener("connection", function(ws, req) {
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
     const owner = reRes[1]
     const repo = reRes[2]
-    const tag = `github-${owner}:${repo}`
+    const tag = `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
 
     let ps;
     if (!queue[tag] || queue[tag].length == 0) {
