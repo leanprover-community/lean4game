@@ -11,17 +11,15 @@ open Lean
 
 -- Note: When changing these, one also needs to change them in `index.mjs`
 
-/-! The default game name if `Game "MyGame"` is not used. -/
+/-- The default game name if `Game "MyGame"` is not used. -/
 def defaultGameName: String := "MyGame"
 
-/-! The default game module name. -/
+/-- The default game module name. -/
 def defaultGameModule: String := "Game"
 
 /-! ## Hints -/
 
-/--
-A hint to help the user with a specific goal state
--/
+/-- A hint to help the user with a specific goal state -/
 structure GoalHintEntry where
   goal : AbstractCtxResult
   /-- Text of the hint as an expression of type `Array Expr → MessageData` -/
@@ -37,6 +35,7 @@ instance : Repr GoalHintEntry := {
 
 /-! ## Tactic/Definition/Lemma documentation -/
 
+/-- The game knows three different inventory types that contain slightly different information -/
 inductive InventoryType := | Tactic | Lemma | Definition
 deriving ToJson, FromJson, Repr, BEq, Hashable, Inhabited
 
@@ -66,6 +65,7 @@ structure InventoryDocEntry where
   content : String
   deriving ToJson, Repr, Inhabited
 
+/-- Another reduced version of `InventoryDocEntry` which is used for the tiles in the doc -/
 structure ComputedInventoryItem where
   /--
   The name of the item. The restrictions are:
@@ -115,20 +115,29 @@ initialize curWorldExt : EnvExtension (Option Name) ← registerEnvExtension (pu
 /-- Register a (non-persistent) environment extension to hold the current level -/
 initialize curLevelExt : EnvExtension (Option Nat) ← registerEnvExtension (pure none)
 
+/--
+A game has three layers: Game, World, Levels. These are set with the commands
+`Game`, `World`, and `Level`.
+Commands like `Introduction` depend on the current level.
+-/
 inductive Layer :=
 | Game | World | Level
 
 variable {m: Type → Type} [Monad m] [MonadEnv m]
 
+/-- Set the current game -/
 def setCurGameId (game : Name) : m Unit :=
   modifyEnv (curGameExt.setState · (some game))
 
+/-- Set the current world -/
 def setCurWorldId (world : Name) : m Unit :=
   modifyEnv (curWorldExt.setState · (some world))
 
+/-- Set the current level -/
 def setCurLevelIdx (level : Nat) : m Unit :=
   modifyEnv (curLevelExt.setState · (some level))
 
+/-- Get the current layer. -/
 def getCurLayer [MonadError m] : m Layer := do
   match curGameExt.getState (← getEnv), curWorldExt.getState (← getEnv), curLevelExt.getState (← getEnv) with
   | _, some _, some _ => return Layer.Level
@@ -136,16 +145,19 @@ def getCurLayer [MonadError m] : m Layer := do
   | _, none, none => return Layer.Game
   | _, _, _ => throwError "Invalid Layer"
 
+/-- Get the current game, or default if none is specified -/
 def getCurGameId [Monad m] : m Name := do
   match curGameExt.getState (← getEnv) with
   | some game => return game
   | none => return defaultGameName
 
+/-- Get the current world -/
 def getCurWorldId [MonadError m] : m Name := do
   match curWorldExt.getState (← getEnv) with
   | some world => return world
   | none => throwError "Current world not set"
 
+/-- Get the current level -/
 def getCurLevelIdx [MonadError m] : m Nat := do
   match curLevelExt.getState (← getEnv) with
   | some level => return level
@@ -160,13 +172,13 @@ structure LevelId where
 deriving Inhabited
 
 structure InventoryInfo where
-  -- new inventory items introduced by this level:
+  /-- new inventory items introduced by this level -/
   new : Array Name
-  -- inventory items exceptionally forbidden in this level:
+  /-- inventory items exceptionally forbidden in this level -/
   disabled : Array Name
-  -- only these inventory items are allowed in this level (ignored if empty):
+  /-- only these inventory items are allowed in this level (ignored if empty) -/
   only : Array Name
-  -- inventory items in this level (computed by `MakeGame`):
+  /-- inventory items in this level (computed by `MakeGame`) -/
   computed : Array ComputedInventoryItem
 deriving ToJson, FromJson, Repr, Inhabited
 
