@@ -65,6 +65,13 @@ structure InventoryDocEntry where
   content : String
   deriving ToJson, Repr, Inhabited
 
+/-- The reduced version of `InventoryDocEntry` which is sent to the client -/
+structure Doc where
+  name: String
+  displayName: String
+  text: String -- TODO: rename to `content`
+deriving ToJson
+
 /-- Another reduced version of `InventoryDocEntry` which is used for the tiles in the doc -/
 structure ComputedInventoryItem where
   /--

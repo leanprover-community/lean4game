@@ -65,12 +65,6 @@ structure DidOpenLevelParams where
   definitions : Array ComputedInventoryItem
   deriving ToJson, FromJson
 
-structure Doc where
-  name: String
-  displayName: String
-  text: String
-deriving ToJson
-
 structure LoadDocParams where
   name : Name
   type : InventoryType
