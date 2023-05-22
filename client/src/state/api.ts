@@ -10,7 +10,7 @@ interface GameInfo {
   conclusion: null|string,
 }
 
-export interface ComputedInventoryItem {
+export interface InventoryTile {
   name: string,
   displayName: string,
   category: string,
@@ -24,9 +24,9 @@ export interface LevelInfo {
   introduction: null|string,
   conclusion: null|string,
   index: number,
-  tactics: ComputedInventoryItem[],
-  lemmas: ComputedInventoryItem[],
-  definitions: ComputedInventoryItem[],
+  tactics: InventoryTile[],
+  lemmas: InventoryTile[],
+  definitions: InventoryTile[],
   descrText: null|string,
   descrFormat: null|string,
   lemmaTab: null|string,

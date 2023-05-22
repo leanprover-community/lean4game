@@ -40,9 +40,9 @@ Fields:
 structure LevelInfo where
   index : Nat
   title : String
-  tactics : Array ComputedInventoryItem
-  lemmas : Array ComputedInventoryItem
-  definitions : Array ComputedInventoryItem
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
   introduction : String
   conclusion : String
   descrText : Option String := none
@@ -60,9 +60,9 @@ structure DidOpenLevelParams where
   uri : String
   gameDir : String
   levelModule : Name
-  tactics : Array ComputedInventoryItem
-  lemmas : Array ComputedInventoryItem
-  definitions : Array ComputedInventoryItem
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
   deriving ToJson, FromJson
 
 structure LoadDocParams where
@@ -89,9 +89,9 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
       uri := m.uri
       gameDir := (← get).gameDir
       levelModule := lvl.module
-      tactics := lvl.tactics.computed
-      lemmas := lvl.lemmas.computed
-      definitions := lvl.definitions.computed
+      tactics := lvl.tactics.tiles
+      lemmas := lvl.lemmas.tiles
+      definitions := lvl.definitions.tiles
       : DidOpenLevelParams
     }
   }
@@ -120,9 +120,9 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let levelInfo : LevelInfo :=
           { index := lvl.index,
             title := lvl.title,
-            tactics := lvl.tactics.computed,
-            lemmas := lvl.lemmas.computed,
-            definitions := lvl.definitions.computed,
+            tactics := lvl.tactics.tiles,
+            lemmas := lvl.lemmas.tiles,
+            definitions := lvl.definitions.tiles,
             descrText := lvl.descrText,
             descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction

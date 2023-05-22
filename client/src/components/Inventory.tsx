@@ -4,7 +4,7 @@ import './inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import Markdown from './Markdown';
-import { useLoadDocQuery, ComputedInventoryItem, LevelInfo } from '../state/api';
+import { useLoadDocQuery, InventoryTile, LevelInfo } from '../state/api';
 import { GameIdContext } from '../App';
 
 export function Inventory({levelInfo, setInventoryDoc } :
@@ -37,7 +37,7 @@ export function Inventory({levelInfo, setInventoryDoc } :
 
 function InventoryList({items, docType, openDoc, defaultTab=null, level=undefined} :
   {
-    items: ComputedInventoryItem[],
+    items: InventoryTile[],
     docType: string,
     openDoc(name: string, type: string): void,
     defaultTab? : string,

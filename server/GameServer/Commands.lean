@@ -78,7 +78,7 @@ in the first level and get enabled during the game.
 
 /-! ## Doc entries -/
 
-/-- Checks if `inventoryKeyExt` contains an entry with `(type, name)` and yields
+/-- Checks if `inventoryTemplateExt` contains an entry with `(type, name)` and yields
 a warning otherwise. If `template` is provided, it will add such an entry instead of yielding a
 warning. -/
 def checkInventoryDoc (type : InventoryType) (name : Ident)
@@ -87,7 +87,7 @@ def checkInventoryDoc (type : InventoryType) (name : Ident)
   let env ← getEnv
   let n := name.getId
   -- Find a key with matching `(type, name)`.
-  match (inventoryKeyExt.getState env).findIdx?
+  match (inventoryTemplateExt.getState env).findIdx?
     (fun x => x.name == n && x.type == type) with
   -- Nothing to do if the entry exists
   | some _ => pure ()
@@ -96,7 +96,7 @@ def checkInventoryDoc (type : InventoryType) (name : Ident)
     -- Warn about missing documentation
     | none =>
       -- We just add a dummy entry
-      modifyEnv (inventoryKeyExt.addEntry · {
+      modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
         name := name.getId
         category := if type == .Lemma then s!"{n.getPrefix}" else "" })
@@ -104,7 +104,7 @@ def checkInventoryDoc (type : InventoryType) (name : Ident)
         m!"somewhere above this statement.")
     -- Add the default documentation
     | some s =>
-      modifyEnv (inventoryKeyExt.addEntry · {
+      modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
         name := name.getId
         category := if type == .Lemma then s!"{n.getPrefix}" else ""
@@ -123,7 +123,7 @@ TacticDoc rw "`rw` stands for rewrite, etc. "
 * The description is a string supporting Markdown.
  -/
 elab "TacticDoc" name:ident content:str : command =>
-  modifyEnv (inventoryKeyExt.addEntry · {
+  modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Tactic
     name := name.getId
     displayName := name.getId.toString
@@ -142,7 +142,7 @@ LemmaDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
 * The description is a string supporting Markdown.
  -/
 elab "LemmaDoc" name:ident "as" displayName:str "in" category:str content:str : command =>
-  modifyEnv (inventoryKeyExt.addEntry · {
+  modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Lemma
     name := name.getId
     category := category.getString
@@ -167,7 +167,7 @@ DefinitionDoc Function.Bijective as "Bijective" "defined as `Injective f ∧ Sur
 * The description is a string supporting Markdown.
  -/
 elab "DefinitionDoc" name:ident "as" displayName:str template:str : command =>
-  modifyEnv (inventoryKeyExt.addEntry · {
+  modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Definition
     name := name.getId,
     displayName := displayName.getString,
@@ -498,10 +498,10 @@ def GameLevel.getInventory (level : GameLevel) : InventoryType → InventoryInfo
 | .Lemma => level.lemmas
 
 def GameLevel.setComputedInventory (level : GameLevel) :
-    InventoryType → Array ComputedInventoryItem → GameLevel
-| .Tactic, v =>     {level with tactics     := {level.tactics     with computed := v}}
-| .Definition, v => {level with definitions := {level.definitions with computed := v}}
-| .Lemma, v =>      {level with lemmas      := {level.lemmas      with computed := v}}
+    InventoryType → Array InventoryTile → GameLevel
+| .Tactic, v =>     {level with tactics     := {level.tactics     with tiles := v}}
+| .Definition, v => {level with definitions := {level.definitions with tiles := v}}
+| .Lemma, v =>      {level with lemmas      := {level.lemmas      with tiles := v}}
 
 /-- Build the game. This command will precompute various things about the game, such as which
 tactics are available in each level etc. -/
@@ -513,7 +513,7 @@ elab "MakeGame" : command => do
     throwError "World graph must not contain loops! Check your `Path` declarations."
 
   -- Now create The doc entries from the templates
-  for item in inventoryKeyExt.getState (← getEnv) do
+  for item in inventoryTemplateExt.getState (← getEnv) do
     -- TODO: Add information about inventory items
     let name := item.name
     match item.type with
@@ -567,7 +567,7 @@ elab "MakeGame" : command => do
       newItemsInWorld := newItemsInWorld.insert worldId newItems
 
     -- Basic inventory item availability: all locked.
-    let Availability₀ : HashMap Name ComputedInventoryItem :=
+    let Availability₀ : HashMap Name InventoryTile :=
       HashMap.ofList $
         ← allItems.toList.mapM fun item => do
           let data := (← getInventoryItem? item inventoryType).get!
@@ -578,7 +578,7 @@ elab "MakeGame" : command => do
             category := data.category })
 
     -- Availability after a given world
-    let mut itemsInWorld : HashMap Name (HashMap Name ComputedInventoryItem) := {}
+    let mut itemsInWorld : HashMap Name (HashMap Name InventoryTile) := {}
     for (worldId, _) in game.worlds.nodes.toArray do
       -- Unlock all items from previous worlds
       let mut items := Availability₀

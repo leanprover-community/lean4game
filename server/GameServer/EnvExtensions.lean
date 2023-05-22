@@ -34,17 +34,18 @@ instance : Repr GoalHintEntry := {
   reprPrec := fun a n => reprPrec a.text n
 }
 
-/-! ## Tactic/Definition/Lemma documentation
+/-! ## Inventory (documentation)
 
+The inventory contains documentation that the user can access.
 There are three inventory types: Lemma, Tactic, Definition. They vary about in the information
 they carry.
 
 The commands `LemmaDoc`, `TacticDoc`, and `DefinitionDoc` add keys and templates to an
-env. extension called `InventoryKeyExt`. Commands like `NewLemma`, etc. as well as
+env. extension called `InventoryTemplateExt`. Commands like `NewLemma`, etc. as well as
 `Statement` check if there is a key registered in this extension and might add a default or
 print a warning if not.
 
-Then, `MakeGame` takes the templates from `InventoryKeyExt` and creates the documentation entries
+Then, `MakeGame` takes the templates from `InventoryTemplateExt` and creates the documentation entries
 that are sent to the client. This allows us to modify them like adding information from
 mathlib or from parsing the lemma in question.
 -/
@@ -59,8 +60,8 @@ instance : ToString InventoryType := ⟨fun t => match t with
 | .Lemma => "Lemma"
 | .Definition => "Definition"⟩
 
-/-- The keys/templates of the inventory items, stored in `InventoryKeyExt`. -/
-structure InventoryKey where
+/-- The keys/templates of the inventory items, stored in `InventoryTemplateExt`. -/
+structure InventoryTemplate where
   /-- Lemma, Tactic, or Definition -/
   type: InventoryType
   /-- Depends on the type:
@@ -77,81 +78,14 @@ structure InventoryKey where
   content: String := "(missing)"
   deriving ToJson, Repr, Inhabited
 
-/-- A inventory item as it gets sent to the client. The command `MakeGame` creates these
-from the `InventoryKey`s and modifies them. -/
-structure InventoryItem extends InventoryKey where -- TODO: can I remove the field `template`? Probably not...
+/-- A full inventory item including the processing by `MakeGame`, which creates these
+from the `InventoryTemplate`s and modifies them. -/
+structure InventoryItem extends InventoryTemplate where
   statement: String := ""
   deriving ToJson, Repr, Inhabited
 
-/-- The extension that stores the doc templates. Note that you can only add, but never modify
-entries! -/
-initialize inventoryKeyExt : SimplePersistentEnvExtension InventoryKey (Array InventoryKey) ←
-  registerSimplePersistentEnvExtension {
-    name := `inventory_keys
-    addEntryFn := Array.push
-    addImportedFn := Array.concatMap id }
-
-def getInventoryKey? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
-    m (Option InventoryKey) := do
-  return (inventoryKeyExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
-
-/-- The extension that contains the inventory content after it has been processed.
-`MakeGame` is the only command adding items here. -/
-initialize inventoryExt : SimplePersistentEnvExtension InventoryItem (Array InventoryItem) ←
-  registerSimplePersistentEnvExtension {
-    name := `inventory_doc
-    addEntryFn := Array.push
-    addImportedFn := Array.concatMap id }
-
-def getInventoryItem? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
-    m (Option InventoryItem) := do
-  return (inventoryExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
-
-
-
-
-
-
-
-
-
-
-
-/-- An inventory item represents the documentation of a tactic/lemma/definitions. -/
-structure InventoryDocEntry where
-  /--
-  The name of the item. The restrictions are:
-
-  * for Tactics: The name of the tactic.
-  * for Lemmas: *Fully qualified* lemma name.
-  * for Definitions: no restrictions.
-  -/
-  name : Name
-  /-- One of `Tactic`, `Lemma` and `Definition`. -/
-  type : InventoryType
-  /-- The display name shown in the inventory. This can be free-text. -/
-  displayName : String
-  /-- Category to group inventory items by. (currently only used for lemmas) -/
-  category : String
-  /-- The description (doc) of the item. (free-text) -/
-  content : String
-  /-- For definitions and statements this is the statement -/
-  statement : String := ""
-  /-- The docstring if one exists -/
-  docstring : String := ""
-  deriving ToJson, Repr, Inhabited
-
--- /-- The reduced version of `InventoryDocEntry` which is sent to the client -/
--- structure Doc where
---   name: String
---   displayName: String
---   content: String
---   statement : String
---   docstring : String
--- deriving ToJson
-
-/-- Another reduced version of `InventoryDocEntry` which is used for the tiles in the doc -/
-structure ComputedInventoryItem where
+/-- A reduced variant of `InventoryItem` which is used for the tiles in the doc -/
+structure InventoryTile where
   /--
   The name of the item. The restrictions are:
 
@@ -172,26 +106,36 @@ structure ComputedInventoryItem where
   new := false
 deriving ToJson, FromJson, Repr, Inhabited
 
--- /-- This extension only keeps track of all doc entries that will need to be gener. -/
--- initialize inventoryDocExt : SimplePersistentEnvExtension InventoryDocEntry (Array InventoryDocEntry) ←
---   registerSimplePersistentEnvExtension {
---     name := `inventory_doc_old
---     addEntryFn := Array.push
---     addImportedFn := Array.concatMap id
---   }
+/-- The extension that stores the doc templates. Note that you can only add, but never modify
+entries! -/
+initialize inventoryTemplateExt :
+    SimplePersistentEnvExtension InventoryTemplate (Array InventoryTemplate) ←
+  registerSimplePersistentEnvExtension {
+    name := `inventory_keys
+    addEntryFn := Array.push
+    addImportedFn := Array.concatMap id }
 
--- def getInventoryDoc? {m : Type → Type} [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
---     m (Option InventoryDocEntry) := do
---   return (inventoryDocExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
+/-- Receive the template with that matches `(name, type)` -/
+def getInventoryTemplate? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
+    m (Option InventoryTemplate) := do
+  return (inventoryTemplateExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
 
--- open Elab Command in
--- /-- Print a registered tactic doc for debugging purposes. -/
--- elab "#print_doc" : command => do
---   for entry in inventoryDocExt.getState (← getEnv) do
---     dbg_trace "[{entry.type}] {entry.name} : {entry.content}"
+/-- The extension that contains the inventory content after it has been processed.
+`MakeGame` is the only command adding items here. -/
+initialize inventoryExt : SimplePersistentEnvExtension InventoryItem (Array InventoryItem) ←
+  registerSimplePersistentEnvExtension {
+    name := `inventory_doc
+    addEntryFn := Array.push
+    addImportedFn := Array.concatMap id }
+
+/-- Receive the item with that matches `(name, type)` -/
+def getInventoryItem? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
+    m (Option InventoryItem) := do
+  return (inventoryExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
 
 
-/-! ## Environment extensions for game specification-/
+
+/-! ## Environment extensions for game specification -/
 
 /-- Register a (non-persistent) environment extension to hold the current level -/
 initialize curGameExt : EnvExtension (Option Name) ← registerEnvExtension (pure none)
@@ -202,8 +146,7 @@ initialize curLevelExt : EnvExtension (Option Nat) ← registerEnvExtension (pur
 
 /--
 A game has three layers: Game, World, Levels. These are set with the commands
-`Game`, `World`, and `Level`.
-Commands like `Introduction` depend on the current level.
+`Game`, `World`, and `Level`. Commands like `Introduction` depend on the current level.
 -/
 inductive Layer :=
 | Game | World | Level
@@ -266,7 +209,7 @@ structure InventoryInfo where
   /-- only these inventory items are allowed in this level (ignored if empty) -/
   only : Array Name
   /-- inventory items in this level (computed by `MakeGame`) -/
-  computed : Array ComputedInventoryItem
+  tiles : Array InventoryTile
 deriving ToJson, FromJson, Repr, Inhabited
 
 def getCurLevelId [MonadError m] : m LevelId := do
