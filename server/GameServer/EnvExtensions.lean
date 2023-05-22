@@ -1,6 +1,15 @@
 import GameServer.AbstractCtx
 import GameServer.Graph
 
+
+
+/-- The default game name if `Game "MyGame"` is not used. -/
+def defaultGameName: String := "MyGame"
+-- Note: When changing any of these default names, one also needs to change them in `index.mjs`
+
+/-- The default game module name. -/
+def defaultGameModule: String := "Game"
+
 /-! # Environment extensions
 
 The game framework stores almost all its game building data in environment extensions
@@ -8,14 +17,6 @@ defined in this file.
 -/
 
 open Lean
-
--- Note: When changing these, one also needs to change them in `index.mjs`
-
-/-- The default game name if `Game "MyGame"` is not used. -/
-def defaultGameName: String := "MyGame"
-
-/-- The default game module name. -/
-def defaultGameModule: String := "Game"
 
 /-! ## Hints -/
 
@@ -33,17 +34,88 @@ instance : Repr GoalHintEntry := {
   reprPrec := fun a n => reprPrec a.text n
 }
 
-/-! ## Tactic/Definition/Lemma documentation -/
+/-! ## Tactic/Definition/Lemma documentation
+
+There are three inventory types: Lemma, Tactic, Definition. They vary about in the information
+they carry.
+
+The commands `LemmaDoc`, `TacticDoc`, and `DefinitionDoc` add keys and templates to an
+env. extension called `InventoryKeyExt`. Commands like `NewLemma`, etc. as well as
+`Statement` check if there is a key registered in this extension and might add a default or
+print a warning if not.
+
+Then, `MakeGame` takes the templates from `InventoryKeyExt` and creates the documentation entries
+that are sent to the client. This allows us to modify them like adding information from
+mathlib or from parsing the lemma in question.
+-/
 
 /-- The game knows three different inventory types that contain slightly different information -/
 inductive InventoryType := | Tactic | Lemma | Definition
 deriving ToJson, FromJson, Repr, BEq, Hashable, Inhabited
 
+-- TODO: golf this?
 instance : ToString InventoryType := ⟨fun t => match t with
 | .Tactic => "Tactic"
 | .Lemma => "Lemma"
-| .Definition => "Definition"
-⟩
+| .Definition => "Definition"⟩
+
+/-- The keys/templates of the inventory items, stored in `InventoryKeyExt`. -/
+structure InventoryKey where
+  /-- Lemma, Tactic, or Definition -/
+  type: InventoryType
+  /-- Depends on the type:
+  * Tactic: the tactic's name
+  * Lemma: fully qualified lemma name
+  * Definition: no restrictions (preferrably the definions fully qualified name)
+  -/
+  name: Name
+  /-- Only for Lemmas. To sort them into tabs -/
+  category: String := default
+  /-- Free-text short name -/
+  displayName: String := name.toString
+  /-- Template documentation. Allows for special tags to insert mathlib info [TODO!] -/
+  content: String := "(missing)"
+  deriving ToJson, Repr, Inhabited
+
+/-- A inventory item as it gets sent to the client. The command `MakeGame` creates these
+from the `InventoryKey`s and modifies them. -/
+structure InventoryItem extends InventoryKey where -- TODO: can I remove the field `template`? Probably not...
+  statement: String := ""
+  deriving ToJson, Repr, Inhabited
+
+/-- The extension that stores the doc templates. Note that you can only add, but never modify
+entries! -/
+initialize inventoryKeyExt : SimplePersistentEnvExtension InventoryKey (Array InventoryKey) ←
+  registerSimplePersistentEnvExtension {
+    name := `inventory_keys
+    addEntryFn := Array.push
+    addImportedFn := Array.concatMap id }
+
+def getInventoryKey? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
+    m (Option InventoryKey) := do
+  return (inventoryKeyExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
+
+/-- The extension that contains the inventory content after it has been processed.
+`MakeGame` is the only command adding items here. -/
+initialize inventoryExt : SimplePersistentEnvExtension InventoryItem (Array InventoryItem) ←
+  registerSimplePersistentEnvExtension {
+    name := `inventory_doc
+    addEntryFn := Array.push
+    addImportedFn := Array.concatMap id }
+
+def getInventoryItem? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
+    m (Option InventoryItem) := do
+  return (inventoryExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
+
+
+
+
+
+
+
+
+
+
 
 /-- An inventory item represents the documentation of a tactic/lemma/definitions. -/
 structure InventoryDocEntry where
@@ -63,14 +135,20 @@ structure InventoryDocEntry where
   category : String
   /-- The description (doc) of the item. (free-text) -/
   content : String
+  /-- For definitions and statements this is the statement -/
+  statement : String := ""
+  /-- The docstring if one exists -/
+  docstring : String := ""
   deriving ToJson, Repr, Inhabited
 
-/-- The reduced version of `InventoryDocEntry` which is sent to the client -/
-structure Doc where
-  name: String
-  displayName: String
-  text: String -- TODO: rename to `content`
-deriving ToJson
+-- /-- The reduced version of `InventoryDocEntry` which is sent to the client -/
+-- structure Doc where
+--   name: String
+--   displayName: String
+--   content: String
+--   statement : String
+--   docstring : String
+-- deriving ToJson
 
 /-- Another reduced version of `InventoryDocEntry` which is used for the tiles in the doc -/
 structure ComputedInventoryItem where
@@ -94,23 +172,23 @@ structure ComputedInventoryItem where
   new := false
 deriving ToJson, FromJson, Repr, Inhabited
 
-/-- Environment extension for inventory documentation. -/
-initialize inventoryDocExt : SimplePersistentEnvExtension InventoryDocEntry (Array InventoryDocEntry) ←
-  registerSimplePersistentEnvExtension {
-    name := `inventory_doc
-    addEntryFn := Array.push
-    addImportedFn := Array.concatMap id
-  }
+-- /-- This extension only keeps track of all doc entries that will need to be gener. -/
+-- initialize inventoryDocExt : SimplePersistentEnvExtension InventoryDocEntry (Array InventoryDocEntry) ←
+--   registerSimplePersistentEnvExtension {
+--     name := `inventory_doc_old
+--     addEntryFn := Array.push
+--     addImportedFn := Array.concatMap id
+--   }
 
-def getInventoryDoc? {m : Type → Type} [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
-    m (Option InventoryDocEntry) := do
-  return (inventoryDocExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
+-- def getInventoryDoc? {m : Type → Type} [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
+--     m (Option InventoryDocEntry) := do
+--   return (inventoryDocExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
 
-open Elab Command in
-/-- Print a registered tactic doc for debugging purposes. -/
-elab "#print_doc" : command => do
-  for entry in inventoryDocExt.getState (← getEnv) do
-    dbg_trace "[{entry.type}] {entry.name} : {entry.content}"
+-- open Elab Command in
+-- /-- Print a registered tactic doc for debugging purposes. -/
+-- elab "#print_doc" : command => do
+--   for entry in inventoryDocExt.getState (← getEnv) do
+--     dbg_trace "[{entry.type}] {entry.name} : {entry.content}"
 
 
 /-! ## Environment extensions for game specification-/
@@ -134,23 +212,25 @@ variable {m: Type → Type} [Monad m] [MonadEnv m]
 
 /-- Set the current game -/
 def setCurGameId (game : Name) : m Unit :=
-  modifyEnv (curGameExt.setState · (some game))
+  modifyEnv (curGameExt.setState · game)
 
 /-- Set the current world -/
 def setCurWorldId (world : Name) : m Unit :=
-  modifyEnv (curWorldExt.setState · (some world))
+  modifyEnv (curWorldExt.setState · world)
 
 /-- Set the current level -/
 def setCurLevelIdx (level : Nat) : m Unit :=
-  modifyEnv (curLevelExt.setState · (some level))
+  modifyEnv (curLevelExt.setState · level)
 
 /-- Get the current layer. -/
 def getCurLayer [MonadError m] : m Layer := do
-  match curGameExt.getState (← getEnv), curWorldExt.getState (← getEnv), curLevelExt.getState (← getEnv) with
-  | _, some _, some _ => return Layer.Level
-  | _, some _, none => return Layer.World
-  | _, none, none => return Layer.Game
-  | _, _, _ => throwError "Invalid Layer"
+  -- previously, we also had `curGameExt.getState (← getEnv), ` in here, which got removed
+  -- when we made the `Game` command optional
+  match curWorldExt.getState (← getEnv), curLevelExt.getState (← getEnv) with
+  | some _, some _ => return Layer.Level
+  | some _, none => return Layer.World
+  | none, none => return Layer.Game
+  | _, _ => throwError "Invalid Layer"
 
 /-- Get the current game, or default if none is specified -/
 def getCurGameId [Monad m] : m Name := do

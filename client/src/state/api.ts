@@ -36,7 +36,10 @@ export interface LevelInfo {
 interface Doc {
   name: string,
   displayName: string,
-  text: string
+  content: string,
+  statement: string,
+  type: string, // TODO: can I remove these?
+  category: string,
 }
 
 

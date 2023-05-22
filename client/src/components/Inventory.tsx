@@ -13,6 +13,7 @@ export function Inventory({levelInfo, setInventoryDoc } :
     setInventoryDoc: (inventoryDoc: {name: string, type: string}) => void,
   }) {
 
+  // TODO: This seems like a useless wrapper to me
   function openDoc(name, type) {
     setInventoryDoc({name, type})
   }
@@ -103,6 +104,8 @@ export function Documentation({name, type}) {
 
   return <>
     <h2 className="doc">{doc.data?.displayName}</h2>
-    <Markdown>{doc.data?.text}</Markdown>
+    <p><code>{doc.data?.statement}</code></p>
+    {/* <code>docstring: {doc.data?.docstring}</code> */}
+    <Markdown>{doc.data?.content}</Markdown>
   </>
 }

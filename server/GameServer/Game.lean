@@ -130,7 +130,7 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             lemmaTab := lvl.lemmaTab
             statementName := match lvl.statementName with
               | .anonymous => none
-              | name => match (inventoryDocExt.getState env).find?
+              | name => match (inventoryExt.getState env).find?
                   (fun x => x.name == name && x.type == .Lemma) with
                 | some n => n.displayName
                 | none => name.toString
@@ -143,14 +143,15 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let p ← parseParams LoadDocParams (toJson params)
       -- let s ← get
       let c ← read
-      let some doc ← getInventoryDoc? p.name p.type
+      let some doc ← getInventoryItem? p.name p.type
         | do
-            c.hOut.writeLspResponseError ⟨id, .invalidParams, s!"Documentation not found: {p.name}", none⟩
+            c.hOut.writeLspResponseError ⟨id, .invalidParams,
+              s!"Documentation not found: {p.name}", none⟩
             return true
-      let doc : Doc :=
-          { name := doc.name.toString
-            displayName := doc.displayName
-            text := doc.content }
+      -- TODO: not necessary at all?
+      -- Here we only need to convert the fields that were not `String` in the `InventoryDocEntry`
+      -- let doc : InventoryItem := { doc with
+      --   name := doc.name.toString }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson doc⟩
       return true
     | _ => return false
