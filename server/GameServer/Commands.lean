@@ -140,6 +140,9 @@ LemmaDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
 * The string following `as` is the displayed name (in the Inventory).
 * The identifier after `in` is the category to group lemmas by (in the Inventory).
 * The description is a string supporting Markdown.
+
+Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requries
+The lemma/definition to have the same fully qualified name as in mathlib.
  -/
 elab "LemmaDoc" name:ident "as" displayName:str "in" category:str content:str : command =>
   modifyEnv (inventoryTemplateExt.addEntry · {
@@ -165,6 +168,9 @@ DefinitionDoc Function.Bijective as "Bijective" "defined as `Injective f ∧ Sur
   It is preferably the true name of the definition. However, this is not required.
 * The string following `as` is the displayed name (in the Inventory).
 * The description is a string supporting Markdown.
+
+Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requries
+The lemma/definition to have the same fully qualified name as in mathlib.
  -/
 elab "DefinitionDoc" name:ident "as" displayName:str template:str : command =>
   modifyEnv (inventoryTemplateExt.addEntry · {
@@ -487,8 +493,21 @@ elab "Hole" t:tacticSeq : tactic => do
   Tactic.evalTactic t
 
 
+-- TODO: Notes for testing if a declaration has the simp attribute
 
+-- -- Test: From zulip
+-- section test
 
+-- open Lean Meta Elab Command Tactic Simp
+
+-- def Lean.Meta.SimpTheorems.hasAttribute (d : SimpTheorems) (decl : Name) :=
+--   d.isLemma (.decl decl) || d.isDeclToUnfold decl
+
+-- def isInSimpset (simpAttr decl: Name) : CoreM Bool := do
+--   let .some simpDecl ←getSimpExtension? simpAttr | return false
+--   return (← simpDecl.getTheorems).hasAttribute decl
+
+-- end test
 
 /-! # Make Game -/
 
@@ -503,6 +522,64 @@ def GameLevel.setComputedInventory (level : GameLevel) :
 | .Definition, v => {level with definitions := {level.definitions with tiles := v}}
 | .Lemma, v =>      {level with lemmas      := {level.lemmas      with tiles := v}}
 
+/-- Copied from `Mathlib.Tactic.HelpCmd`.
+
+Gets the initial string token in a parser description. For example, for a declaration like
+`syntax "bla" "baz" term : tactic`, it returns `some "bla"`. Returns `none` for syntax declarations
+that don't start with a string constant. -/
+partial def getHeadTk (e : Expr) : Option String :=
+  match (Expr.withApp e λ e a => (e.constName?.getD Name.anonymous, a)) with
+  | (``ParserDescr.node, #[_, _, p]) => getHeadTk p
+  | (``ParserDescr.unary, #[.app _ (.lit (.strVal "withPosition")), p]) => getHeadTk p
+  | (``ParserDescr.unary, #[.app _ (.lit (.strVal "atomic")), p]) => getHeadTk p
+  | (``ParserDescr.binary, #[.app _ (.lit (.strVal "andthen")), p, _]) => getHeadTk p
+  | (``ParserDescr.nonReservedSymbol, #[.lit (.strVal tk), _]) => some tk
+  | (``ParserDescr.symbol, #[.lit (.strVal tk)]) => some tk
+  | (``Parser.withAntiquot, #[_, p]) => getHeadTk p
+  | (``Parser.leadingNode, #[_, _, p]) => getHeadTk p
+  | (``HAndThen.hAndThen, #[_, _, _, _, p, _]) => getHeadTk p
+  | (``Parser.nonReservedSymbol, #[.lit (.strVal tk), _]) => some tk
+  | (``Parser.symbol, #[.lit (.strVal tk)]) => some tk
+  | _ => none
+
+/-- Modified from `#help` in `Mathlib.Tactic.HelpCmd` -/
+def getTacticDocstring (env : Environment) (name: Name) : CommandElabM (Option String) := do
+  let name := name.toString (escape := false)
+  let mut decls : Lean.RBMap String (Array SyntaxNodeKind) compare := {}
+
+  let catName : Name := `tactic
+  let catStx : Ident := mkIdent catName -- TODO
+  let some cat := (Parser.parserExtension.getState env).categories.find? catName
+    | throwErrorAt catStx "{catStx} is not a syntax category"
+  liftTermElabM <| Term.addCategoryInfo catStx catName
+  for (k, _) in cat.kinds do
+    let mut used := false
+    if let some tk := do getHeadTk (← (← env.find? k).value?) then
+      let tk := tk.trim
+      if name ≠ tk then -- was `!name.isPrefixOf tk`
+        continue
+      used := true
+      decls := decls.insert tk ((decls.findD tk #[]).push k)
+  for (_name, ks) in decls do
+    for k in ks do
+      if let some doc ← findDocString? env k then
+        return doc
+
+  logWarning <| m!"Could not find a docstring for this tactic, consider adding one " ++
+    m!"using `TacticDoc {name} \"some doc\"`"
+  return none
+
+/-- Retrieve the docstring associated to an inventory item. For Tactics, this
+is not guaranteed to work. -/
+def getDocstring (env : Environment) (name : Name) (type : InventoryType) :
+    CommandElabM (Option String) :=
+  match type with
+  -- for tactics it's a lookup following mathlib's `#help`. not guaranteed to be the correct one.
+  | .Tactic => getTacticDocstring env name
+  | .Lemma => findDocString? env name
+  -- TODO: for definitions not implemented yet, does it work?
+  | .Definition => findDocString? env name
+
 /-- Build the game. This command will precompute various things about the game, such as which
 tactics are available in each level etc. -/
 elab "MakeGame" : command => do
@@ -512,19 +589,35 @@ elab "MakeGame" : command => do
   if game.worlds.hasLoops then
     throwError "World graph must not contain loops! Check your `Path` declarations."
 
+  let env ← getEnv
+
   -- Now create The doc entries from the templates
-  for item in inventoryTemplateExt.getState (← getEnv) do
-    -- TODO: Add information about inventory items
+  for item in inventoryTemplateExt.getState env do
     let name := item.name
+
+    let docstring ← getDocstring env name item.type
+    let content : String := match item.content with
+    | "" =>
+      -- If documentation is missing, try using the docstring instead.
+      match docstring with
+      | some ds => s!"*(lean docstring)*\\\n{ds}" -- TODO `\n` does not work in markdown
+      | none => "(missing)"
+    | template =>
+      -- TODO: Process content template.
+      -- TODO: Add information about inventory items
+      template.replace "[[mathlib_doc]]"
+        s!"[mathlib doc](https://leanprover-community.github.io/mathlib4_docs/find/?pattern={name}#doc)"
+
     match item.type with
     | .Lemma =>
       modifyEnv (inventoryExt.addEntry · { item with
-        -- Add the lemma statement to the doc.
+        content := content
+        -- Add the lemma statement to the doc
         statement := (← getStatementString name)
       })
     | _ =>
-      modifyEnv (inventoryExt.addEntry · {
-        item with
+      modifyEnv (inventoryExt.addEntry · { item with
+        content := content
       })
 
   -- Compute which inventory items are available in which level:

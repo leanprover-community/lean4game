@@ -75,7 +75,7 @@ structure InventoryTemplate where
   /-- Free-text short name -/
   displayName: String := name.toString
   /-- Template documentation. Allows for special tags to insert mathlib info [TODO!] -/
-  content: String := "(missing)"
+  content: String := ""
   deriving ToJson, Repr, Inhabited
 
 /-- A full inventory item including the processing by `MakeGame`, which creates these
