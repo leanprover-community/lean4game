@@ -24,6 +24,10 @@ const router = createHashRouter([
     element: <LandingPage />,
   },
   {
+    path: "/game/nng",
+    loader: () => redirect("/g/hhu-adam/NNG4")
+  },
+  {
     path: "/g/:owner/:repo",
     element: <App />,
     errorElement: <ErrorPage />,
