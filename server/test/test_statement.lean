@@ -14,6 +14,17 @@ Statement foo.bar "some text" : 5 ≤ 7 := by
 NewLemma foo.baz
 DisabledTactic tauto
 
+
+/- Namespace -/
+
+-- test that the command also works inside a namespace
+namespace myNamespace
+
+Statement anotherStatement "test" (n : Nat) : n + 0 = n := by
+  rfl
+
+end myNamespace
+
 /- Other tests -/
 
 LemmaDoc add_zero as "add_zero" in "Nat" "(nothing)"

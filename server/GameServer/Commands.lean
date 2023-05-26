@@ -302,11 +302,14 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
   match statementName with
   | some name =>
     let env ← getEnv
-    if env.contains name.getId then
-      let origType := (env.constants.map₁.find! name.getId).type
+
+    let fullName := (← getCurrNamespace) ++ name.getId
+
+    if env.contains fullName then
+      let origType := (env.constants.map₁.find! fullName).type
       -- TODO: Check if `origType` agrees with `sig` and output `logInfo` instead of `logWarning`
       -- in that case.
-      logWarningAt name (m!"Environment already contains {name.getId}! Only the existing " ++
+      logWarningAt name (m!"Environment already contains {fullName}! Only the existing " ++
       m!"statement will be available in later levels:\n\n{origType}")
       let thmStatement ← `(theorem $defaultDeclName $sig $val)
       elabCommand thmStatement
@@ -354,12 +357,16 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
   let scope ← getScope
   let env ← getEnv
 
+  -- TODO: Is this desired or would it be better to get `elabCommand` above to ignore
+  -- the namespace?
+  let currNamespace ← getCurrNamespace
+
   let st ← match statementName with
-  | some name => getStatementString name.getId
-  | none =>  getStatementString defaultDeclName.getId -- TODO: We dont want the internal lemma name here
+  | some name => getStatementString <| currNamespace ++ name.getId
+  | none =>  getStatementString <| currNamespace ++ (defaultDeclName).getId
 
   let head := match statementName with
-  | some name => Format.join ["theorem ", name.getId.toString]
+  | some name => Format.join ["theorem ", (currNamespace ++ name.getId).toString]
   | none => "example"
 
   modifyCurLevel fun level => pure { level with
@@ -369,7 +376,7 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
     descrText := descr
     statementName := match statementName with
     | none => default
-    | some name => name.getId
+    | some name => currNamespace ++ name.getId
     descrFormat := (Format.join [head, " ", st, " := by"]).pretty 10
     hints := hints }
 
