@@ -4,7 +4,7 @@ import './inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import Markdown from './Markdown';
-import { useLoadDocQuery, ComputedInventoryItem, LevelInfo } from '../state/api';
+import { useLoadDocQuery, InventoryTile, LevelInfo } from '../state/api';
 import { GameIdContext } from '../App';
 
 export function Inventory({levelInfo, setInventoryDoc } :
@@ -13,6 +13,7 @@ export function Inventory({levelInfo, setInventoryDoc } :
     setInventoryDoc: (inventoryDoc: {name: string, type: string}) => void,
   }) {
 
+  // TODO: This seems like a useless wrapper to me
   function openDoc(name, type) {
     setInventoryDoc({name, type})
   }
@@ -36,7 +37,7 @@ export function Inventory({levelInfo, setInventoryDoc } :
 
 function InventoryList({items, docType, openDoc, defaultTab=null, level=undefined} :
   {
-    items: ComputedInventoryItem[],
+    items: InventoryTile[],
     docType: string,
     openDoc(name: string, type: string): void,
     defaultTab? : string,
@@ -103,6 +104,8 @@ export function Documentation({name, type}) {
 
   return <>
     <h2 className="doc">{doc.data?.displayName}</h2>
-    <Markdown>{doc.data?.text}</Markdown>
+    <p><code>{doc.data?.statement}</code></p>
+    {/* <code>docstring: {doc.data?.docstring}</code> */}
+    <Markdown>{doc.data?.content}</Markdown>
   </>
 }

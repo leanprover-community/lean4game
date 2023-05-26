@@ -78,33 +78,40 @@ in the first level and get enabled during the game.
 
 /-! ## Doc entries -/
 
-/-- Throw a warning if inventory doc does not exist. If `(default := _)` is provided,
-it will create a new inverntory entry with the specified default description. -/
-def checkInventoryDoc (type : InventoryType) (name : Syntax)
-    (default : Option (String) := none) : CommandElabM Unit := do
-  let some _ := (inventoryDocExt.getState (← getEnv)).find?
-      (fun x => x.name == name.getId && x.type == type)
-    | match default with
-      | some _ =>
-        logInfoAt name (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
-        m!"statement description) instead. If you want to write your own description, add " ++
-        m!"`{type}Doc {name}` somewhere above this statement.")
-      | none =>
-        logWarningAt name (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
-        m!"somewhere above this statement.")
-
-      let default₀ := match default with
-      | some d => d
-      | none => "missing"
-
-      -- Create a default inventory entry
-      let n := name.getId
-      modifyEnv (inventoryDocExt.addEntry · {
-        name := n
+/-- Checks if `inventoryTemplateExt` contains an entry with `(type, name)` and yields
+a warning otherwise. If `template` is provided, it will add such an entry instead of yielding a
+warning. -/
+def checkInventoryDoc (type : InventoryType) (name : Ident)
+    (template : Option String := none) : CommandElabM Unit := do
+  -- note: `name` is an `Ident` (instead of `Name`) for the log messages.
+  let env ← getEnv
+  let n := name.getId
+  -- Find a key with matching `(type, name)`.
+  match (inventoryTemplateExt.getState env).findIdx?
+    (fun x => x.name == n && x.type == type) with
+  -- Nothing to do if the entry exists
+  | some _ => pure ()
+  | none =>
+    match template with
+    -- Warn about missing documentation
+    | none =>
+      -- We just add a dummy entry
+      modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
-        displayName :=  s!"{n}" -- TODO: for lemmas, only take the last part of the name
+        name := name.getId
+        category := if type == .Lemma then s!"{n.getPrefix}" else "" })
+      logWarningAt name (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
+        m!"somewhere above this statement.")
+    -- Add the default documentation
+    | some s =>
+      modifyEnv (inventoryTemplateExt.addEntry · {
+        type := type
+        name := name.getId
         category := if type == .Lemma then s!"{n.getPrefix}" else ""
-        content := default₀ })
+        content := s })
+      logInfoAt name (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
+      m!"statement description) instead. If you want to write your own description, add " ++
+      m!"`{type}Doc {name}` somewhere above this statement.")
 
 /-- Documentation entry of a tactic. Example:
 
@@ -116,8 +123,7 @@ TacticDoc rw "`rw` stands for rewrite, etc. "
 * The description is a string supporting Markdown.
  -/
 elab "TacticDoc" name:ident content:str : command =>
-  modifyEnv (inventoryDocExt.addEntry · {
-    category := default
+  modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Tactic
     name := name.getId
     displayName := name.getId.toString
@@ -134,14 +140,23 @@ LemmaDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
 * The string following `as` is the displayed name (in the Inventory).
 * The identifier after `in` is the category to group lemmas by (in the Inventory).
 * The description is a string supporting Markdown.
+
+Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requries
+The lemma/definition to have the same fully qualified name as in mathlib.
  -/
 elab "LemmaDoc" name:ident "as" displayName:str "in" category:str content:str : command =>
-  modifyEnv (inventoryDocExt.addEntry · {
-    name := name.getId,
+  modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Lemma
-    displayName := displayName.getString,
-    category := category.getString,
+    name := name.getId
+    category := category.getString
+    displayName := displayName.getString
     content := content.getString })
+-- TODO: Catch the following behaviour.
+-- 1. if `LemmaDoc` appears in the same file as `Statement`, it will silently use
+-- it but display the info that it wasn't found in `Statement`
+-- 2. if it appears in a later file, however, it will silently not do anything and keep
+-- the first one.
+
 
 /-- Documentation entry of a definition. Example:
 
@@ -153,32 +168,67 @@ DefinitionDoc Function.Bijective as "Bijective" "defined as `Injective f ∧ Sur
   It is preferably the true name of the definition. However, this is not required.
 * The string following `as` is the displayed name (in the Inventory).
 * The description is a string supporting Markdown.
+
+Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requries
+The lemma/definition to have the same fully qualified name as in mathlib.
  -/
-elab "DefinitionDoc" name:ident "as" displayName:str content:str : command =>
-  modifyEnv (inventoryDocExt.addEntry · {
-    category := default
+elab "DefinitionDoc" name:ident "as" displayName:str template:str : command =>
+  modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Definition
     name := name.getId,
     displayName := displayName.getString,
-    content := content.getString })
+    content := template.getString })
 
 /-! ## Add inventory items -/
 
+-- namespace Lean.PrettyPrinter
+-- def ppSignature' (c : Name) : MetaM String := do
+--   let decl ← getConstInfo c
+--   let e := .const c (decl.levelParams.map mkLevelParam)
+--   let (stx, _) ← delabCore e (delab := Delaborator.delabConstWithSignature)
+--   let f ← ppTerm stx
+--   return toString f
+-- end Lean.PrettyPrinter
+
+def getStatement (name : Name) : CommandElabM MessageData := do
+  -- let c := name.getId
+
+  let decl ← getConstInfo name
+  -- -- TODO: How to go between CommandElabM and MetaM
+
+  -- addCompletionInfo <| .id name c (danglingDot := false) {} none
+  return ← addMessageContextPartial (.ofPPFormat { pp := fun
+    | some ctx => ctx.runMetaM <| ppExpr decl.type
+    -- PrettyPrinter.ppSignature' c
+    -- PrettyPrinter.ppSignature c
+    | none     => return "that's a bug." })
+
+-- Note: We use `String` because we can't send `MessageData` as json, but
+-- `MessageData` might be better for interactive highlighting.
+/-- Get a string of the form `my_lemma (n : ℕ) : n + n = 2 * n`. -/
+def getStatementString (name : Name) : CommandElabM String := do
+  try
+    return ← (← getStatement name).toString
+  catch
+  | _ => throwError m!"Could not find {name} in context."
+  -- TODO: I think it would be nicer to unresolve Namespaces as much as possible.
+
 /-- Declare tactics that are introduced by this level. -/
 elab "NewTactic" args:ident* : command => do
-  for name in ↑args do checkInventoryDoc .Tactic name
+  for name in ↑args do checkInventoryDoc .Tactic name -- TODO: Add (template := "[docstring]")
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with new := args.map (·.getId)}}
 
 /-- Declare lemmas that are introduced by this level. -/
 elab "NewLemma" args:ident* : command => do
-  for name in ↑args do checkInventoryDoc .Lemma name
+  for name in ↑args do
+    checkInventoryDoc .Lemma name -- TODO: Add (template := "[mathlib]")
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with new := args.map (·.getId)}}
 
 /-- Declare definitions that are introduced by this level. -/
 elab "NewDefinition" args:ident* : command => do
-  for name in ↑args do checkInventoryDoc .Definition name
+  for name in ↑args do checkInventoryDoc .Definition name -- TODO: Add (template := "[mathlib]")
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with new := args.map (·.getId)}}
 
@@ -228,22 +278,6 @@ elab "LemmaTab"  category:str : command =>
 
 /-! # Exercise Statement -/
 
--- TODO: Instead of this, it would be nice to have a proper syntax parser that enables
--- us highlighting on the client side.
-partial def reprintCore : Syntax → Option Format
-  | Syntax.missing => none
-  | Syntax.atom _ val => val.trim
-  | Syntax.ident _ rawVal _ _ => rawVal.toString
-  | Syntax.node _ _ args =>
-    match args.toList.filterMap reprintCore with
-    | [] => none
-    | [arg] => arg
-    | args => Format.group <| Format.nest 2 <| Format.joinSep args " "
-
-/-- `reprint` is used to display the Lean-statement to the user-/
-def reprint (stx : Syntax) : Format :=
-  reprintCore stx |>.getD ""
-
 /-- A `attr := ...` option for `Statement`. Add attributes to the defined theorem. -/
 syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
 -- TODO
@@ -259,14 +293,9 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
   -- Save the messages before evaluation of the proof.
   let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
 
-  -- Check that statement has a docs entry.
-  match statementName with
-  | some name => checkInventoryDoc .Lemma name (default := descr)
-  | none => pure ()
-
   -- The default name of the statement is `[Game].[World].level[no.]`, e.g. `NNG.Addition.level1`
   -- However, this should not be used when designing the game.
-  let defaultDeclName : Name := (← getCurGame).name ++ (← getCurWorld).name ++
+  let defaultDeclName : Ident := mkIdent <| (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
 
   -- Add theorem to context.
@@ -277,35 +306,21 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
       let origType := (env.constants.map₁.find! name.getId).type
       -- TODO: Check if `origType` agrees with `sig` and output `logInfo` instead of `logWarning`
       -- in that case.
-      logWarningAt name m!"Environment already contains {name.getId}!
-Only the existing statement will be available in later levels:
-
-{origType}"
-      -- let (binders, typeStx) := expandDeclSig sig
-      -- --let type ← Term.elabType typeStx
-      -- runTermElabM (fun vars =>
-      --   Term.elabBinders binders.getArgs (fun xs => do
-      --   let type ← Term.elabType typeStx
-      --   --Term.synthesizeSyntheticMVarsNoPostponing
-      --   --let type ← instantiateMVars type
-      --   --let type ← mkForallFVars xs type
-      -- ))
-      --let newType := Term.elabTerm sig.raw
-      --dbg_trace newType
-      --logInfo origType
-      -- dbg_trace sig
-      -- dbg_trace origType
-      --dbg_trace (env.constants.map₁.find! name.getId).value! -- that's the proof
-      --let newType := Lean.Elab.Term.elabTerm sig none
-
-      let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
+      logWarningAt name (m!"Environment already contains {name.getId}! Only the existing " ++
+      m!"statement will be available in later levels:\n\n{origType}")
+      let thmStatement ← `(theorem $defaultDeclName $sig $val)
       elabCommand thmStatement
+      -- Check that statement has a docs entry.
+      checkInventoryDoc .Lemma name (template := descr)
+
     else
-      -- logInfo attr
-      let thmStatement ← `( theorem $(mkIdent name.getId) $sig $val)
+      let thmStatement ← `( theorem $name $sig $val)
       elabCommand thmStatement
+      -- Check that statement has a docs entry.
+      checkInventoryDoc .Lemma name (template := descr)
+
   | none =>
-    let thmStatement ← `(theorem $(mkIdent defaultDeclName) $sig $val)
+    let thmStatement ← `(theorem $defaultDeclName $sig $val)
     elabCommand thmStatement
 
   let msgs := (← get).messages
@@ -339,7 +354,15 @@ Only the existing statement will be available in later levels:
   let scope ← getScope
   let env ← getEnv
 
-  modifyCurLevel fun level => pure {level with
+  let st ← match statementName with
+  | some name => getStatementString name.getId
+  | none =>  getStatementString defaultDeclName.getId -- TODO: We dont want the internal lemma name here
+
+  let head := match statementName with
+  | some name => Format.join ["theorem ", name.getId.toString]
+  | none => "example"
+
+  modifyCurLevel fun level => pure { level with
     module := env.header.mainModule
     goal := sig,
     scope := scope,
@@ -347,13 +370,8 @@ Only the existing statement will be available in later levels:
     statementName := match statementName with
     | none => default
     | some name => name.getId
-    descrFormat := match statementName with
-    | none => "example " ++ (toString <| reprint sig.raw) ++ " := by"
-    | some name => (Format.join ["theorem ", reprint name.raw, " ", reprint sig.raw, " := by"]).pretty 10  -- "lemma "  ++ (toString <| reprint name.raw) ++ " " ++ (Format.pretty (reprint sig.raw) 40) ++ " := by"
-    hints := hints
-  } -- Format.pretty <| format thmStatement.raw }
-
-
+    descrFormat := (Format.join [head, " ", st, " := by"]).pretty 10
+    hints := hints }
 
 /-! # Hints -/
 
@@ -475,8 +493,21 @@ elab "Hole" t:tacticSeq : tactic => do
   Tactic.evalTactic t
 
 
+-- TODO: Notes for testing if a declaration has the simp attribute
 
+-- -- Test: From zulip
+-- section test
 
+-- open Lean Meta Elab Command Tactic Simp
+
+-- def Lean.Meta.SimpTheorems.hasAttribute (d : SimpTheorems) (decl : Name) :=
+--   d.isLemma (.decl decl) || d.isDeclToUnfold decl
+
+-- def isInSimpset (simpAttr decl: Name) : CoreM Bool := do
+--   let .some simpDecl ←getSimpExtension? simpAttr | return false
+--   return (← simpDecl.getTheorems).hasAttribute decl
+
+-- end test
 
 /-! # Make Game -/
 
@@ -486,10 +517,68 @@ def GameLevel.getInventory (level : GameLevel) : InventoryType → InventoryInfo
 | .Lemma => level.lemmas
 
 def GameLevel.setComputedInventory (level : GameLevel) :
-    InventoryType → Array ComputedInventoryItem → GameLevel
-| .Tactic, v =>     {level with tactics     := {level.tactics     with computed := v}}
-| .Definition, v => {level with definitions := {level.definitions with computed := v}}
-| .Lemma, v =>      {level with lemmas      := {level.lemmas      with computed := v}}
+    InventoryType → Array InventoryTile → GameLevel
+| .Tactic, v =>     {level with tactics     := {level.tactics     with tiles := v}}
+| .Definition, v => {level with definitions := {level.definitions with tiles := v}}
+| .Lemma, v =>      {level with lemmas      := {level.lemmas      with tiles := v}}
+
+/-- Copied from `Mathlib.Tactic.HelpCmd`.
+
+Gets the initial string token in a parser description. For example, for a declaration like
+`syntax "bla" "baz" term : tactic`, it returns `some "bla"`. Returns `none` for syntax declarations
+that don't start with a string constant. -/
+partial def getHeadTk (e : Expr) : Option String :=
+  match (Expr.withApp e λ e a => (e.constName?.getD Name.anonymous, a)) with
+  | (``ParserDescr.node, #[_, _, p]) => getHeadTk p
+  | (``ParserDescr.unary, #[.app _ (.lit (.strVal "withPosition")), p]) => getHeadTk p
+  | (``ParserDescr.unary, #[.app _ (.lit (.strVal "atomic")), p]) => getHeadTk p
+  | (``ParserDescr.binary, #[.app _ (.lit (.strVal "andthen")), p, _]) => getHeadTk p
+  | (``ParserDescr.nonReservedSymbol, #[.lit (.strVal tk), _]) => some tk
+  | (``ParserDescr.symbol, #[.lit (.strVal tk)]) => some tk
+  | (``Parser.withAntiquot, #[_, p]) => getHeadTk p
+  | (``Parser.leadingNode, #[_, _, p]) => getHeadTk p
+  | (``HAndThen.hAndThen, #[_, _, _, _, p, _]) => getHeadTk p
+  | (``Parser.nonReservedSymbol, #[.lit (.strVal tk), _]) => some tk
+  | (``Parser.symbol, #[.lit (.strVal tk)]) => some tk
+  | _ => none
+
+/-- Modified from `#help` in `Mathlib.Tactic.HelpCmd` -/
+def getTacticDocstring (env : Environment) (name: Name) : CommandElabM (Option String) := do
+  let name := name.toString (escape := false)
+  let mut decls : Lean.RBMap String (Array SyntaxNodeKind) compare := {}
+
+  let catName : Name := `tactic
+  let catStx : Ident := mkIdent catName -- TODO
+  let some cat := (Parser.parserExtension.getState env).categories.find? catName
+    | throwErrorAt catStx "{catStx} is not a syntax category"
+  liftTermElabM <| Term.addCategoryInfo catStx catName
+  for (k, _) in cat.kinds do
+    let mut used := false
+    if let some tk := do getHeadTk (← (← env.find? k).value?) then
+      let tk := tk.trim
+      if name ≠ tk then -- was `!name.isPrefixOf tk`
+        continue
+      used := true
+      decls := decls.insert tk ((decls.findD tk #[]).push k)
+  for (_name, ks) in decls do
+    for k in ks do
+      if let some doc ← findDocString? env k then
+        return doc
+
+  logWarning <| m!"Could not find a docstring for this tactic, consider adding one " ++
+    m!"using `TacticDoc {name} \"some doc\"`"
+  return none
+
+/-- Retrieve the docstring associated to an inventory item. For Tactics, this
+is not guaranteed to work. -/
+def getDocstring (env : Environment) (name : Name) (type : InventoryType) :
+    CommandElabM (Option String) :=
+  match type with
+  -- for tactics it's a lookup following mathlib's `#help`. not guaranteed to be the correct one.
+  | .Tactic => getTacticDocstring env name
+  | .Lemma => findDocString? env name
+  -- TODO: for definitions not implemented yet, does it work?
+  | .Definition => findDocString? env name
 
 /-- Build the game. This command will precompute various things about the game, such as which
 tactics are available in each level etc. -/
@@ -499,6 +588,37 @@ elab "MakeGame" : command => do
   -- Check for loops in world graph
   if game.worlds.hasLoops then
     throwError "World graph must not contain loops! Check your `Path` declarations."
+
+  let env ← getEnv
+
+  -- Now create The doc entries from the templates
+  for item in inventoryTemplateExt.getState env do
+    let name := item.name
+
+    let docstring ← getDocstring env name item.type
+    let content : String := match item.content with
+    | "" =>
+      -- If documentation is missing, try using the docstring instead.
+      match docstring with
+      | some ds => s!"*(lean docstring)*\\\n{ds}" -- TODO `\n` does not work in markdown
+      | none => "(missing)"
+    | template =>
+      -- TODO: Process content template.
+      -- TODO: Add information about inventory items
+      template.replace "[[mathlib_doc]]"
+        s!"[mathlib doc](https://leanprover-community.github.io/mathlib4_docs/find/?pattern={name}#doc)"
+
+    match item.type with
+    | .Lemma =>
+      modifyEnv (inventoryExt.addEntry · { item with
+        content := content
+        -- Add the lemma statement to the doc
+        statement := (← getStatementString name)
+      })
+    | _ =>
+      modifyEnv (inventoryExt.addEntry · { item with
+        content := content
+      })
 
   -- Compute which inventory items are available in which level:
   for inventoryType in #[.Tactic, .Definition, .Lemma] do
@@ -540,24 +660,25 @@ elab "MakeGame" : command => do
       newItemsInWorld := newItemsInWorld.insert worldId newItems
 
     -- Basic inventory item availability: all locked.
-    let Availability₀ : HashMap Name ComputedInventoryItem :=
+    let Availability₀ : HashMap Name InventoryTile :=
       HashMap.ofList $
         ← allItems.toList.mapM fun item => do
-          let data := (← getInventoryDoc? item inventoryType).get!
+          let data := (← getInventoryItem? item inventoryType).get!
+          -- TODO: BUG, panic at `get!` in vscode
           return (item, {
             name := item
             displayName := data.displayName
             category := data.category })
 
     -- Availability after a given world
-    let mut itemsInWorld : HashMap Name (HashMap Name ComputedInventoryItem) := {}
+    let mut itemsInWorld : HashMap Name (HashMap Name InventoryTile) := {}
     for (worldId, _) in game.worlds.nodes.toArray do
       -- Unlock all items from previous worlds
       let mut items := Availability₀
       let predecessors := game.worlds.predecessors worldId
       for predWorldId in predecessors do
         for item in newItemsInWorld.find! predWorldId do
-          let data := (← getInventoryDoc? item inventoryType).get!
+          let data := (← getInventoryItem? item inventoryType).get!
           items := items.insert item {
             name := item
             displayName := data.displayName
@@ -575,7 +696,7 @@ elab "MakeGame" : command => do
 
         -- unlock items that are unlocked in this level
         for item in levelInfo.new do
-          let data := (← getInventoryDoc? item inventoryType).get!
+          let data := (← getInventoryItem? item inventoryType).get!
           items := items.insert item {
             name := item
             displayName := data.displayName
@@ -588,7 +709,7 @@ elab "MakeGame" : command => do
           match lemmaStatements.find? (worldId, levelId) with
           | none => pure ()
           | some name =>
-            let data := (← getInventoryDoc? name inventoryType).get!
+            let data := (← getInventoryItem? name inventoryType).get!
             items := items.insert name {
               name := name
               displayName := data.displayName

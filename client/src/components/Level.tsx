@@ -171,6 +171,7 @@ function PlayableLevel({worldId, levelId}) {
     }
   }, [editor, commandLineMode])
 
+  // if this is set to a pair `(name, type)` then the according doc will be open.
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
 
   const levelTitle = <>{levelId && `Level ${levelId}`}{level?.data?.title && `: ${level?.data?.title}`}</>

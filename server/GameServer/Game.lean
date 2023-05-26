@@ -40,9 +40,9 @@ Fields:
 structure LevelInfo where
   index : Nat
   title : String
-  tactics : Array ComputedInventoryItem
-  lemmas : Array ComputedInventoryItem
-  definitions : Array ComputedInventoryItem
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
   introduction : String
   conclusion : String
   descrText : Option String := none
@@ -60,16 +60,10 @@ structure DidOpenLevelParams where
   uri : String
   gameDir : String
   levelModule : Name
-  tactics : Array ComputedInventoryItem
-  lemmas : Array ComputedInventoryItem
-  definitions : Array ComputedInventoryItem
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
   deriving ToJson, FromJson
-
-structure Doc where
-  name: String
-  displayName: String
-  text: String
-deriving ToJson
 
 structure LoadDocParams where
   name : Name
@@ -95,9 +89,9 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
       uri := m.uri
       gameDir := (← get).gameDir
       levelModule := lvl.module
-      tactics := lvl.tactics.computed
-      lemmas := lvl.lemmas.computed
-      definitions := lvl.definitions.computed
+      tactics := lvl.tactics.tiles
+      lemmas := lvl.lemmas.tiles
+      definitions := lvl.definitions.tiles
       : DidOpenLevelParams
     }
   }
@@ -126,9 +120,9 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let levelInfo : LevelInfo :=
           { index := lvl.index,
             title := lvl.title,
-            tactics := lvl.tactics.computed,
-            lemmas := lvl.lemmas.computed,
-            definitions := lvl.definitions.computed,
+            tactics := lvl.tactics.tiles,
+            lemmas := lvl.lemmas.tiles,
+            definitions := lvl.definitions.tiles,
             descrText := lvl.descrText,
             descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction
@@ -136,7 +130,7 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             lemmaTab := lvl.lemmaTab
             statementName := match lvl.statementName with
               | .anonymous => none
-              | name => match (inventoryDocExt.getState env).find?
+              | name => match (inventoryExt.getState env).find?
                   (fun x => x.name == name && x.type == .Lemma) with
                 | some n => n.displayName
                 | none => name.toString
@@ -149,14 +143,15 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let p ← parseParams LoadDocParams (toJson params)
       -- let s ← get
       let c ← read
-      let some doc ← getInventoryDoc? p.name p.type
+      let some doc ← getInventoryItem? p.name p.type
         | do
-            c.hOut.writeLspResponseError ⟨id, .invalidParams, s!"Documentation not found: {p.name}", none⟩
+            c.hOut.writeLspResponseError ⟨id, .invalidParams,
+              s!"Documentation not found: {p.name}", none⟩
             return true
-      let doc : Doc :=
-          { name := doc.name.toString
-            displayName := doc.displayName
-            text := doc.content }
+      -- TODO: not necessary at all?
+      -- Here we only need to convert the fields that were not `String` in the `InventoryDocEntry`
+      -- let doc : InventoryItem := { doc with
+      --   name := doc.name.toString }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson doc⟩
       return true
     | _ => return false
