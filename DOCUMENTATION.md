@@ -154,3 +154,64 @@ Moreover, the lemmas are in sorted in tabs (the `in "Pow`) part. In each level f
 can define which tab is open when the level is loaded by adding `LemmaTab "Pow"`.
 
 There will be features added to get automatic information from mathlib!
+
+# Running Games Locally
+
+Install `nvm`:
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+```
+then reopen bash and test with `command -v nvm` if it is available (Should print "nvm").
+
+Now install node:
+```
+nvm install node
+```
+
+Clone the game (e.g. `NNG4` here):
+```
+git clone git@github.com:hhu-adam/NNG4.git
+```
+
+Download dependencies and build the game:
+```
+cd NNG4
+lake update
+lake build
+```
+
+Clone the game repository into a directory next to the game:
+```
+cd ..
+git clone git@github.com:leanprover-community/lean4game.git
+```
+The folders `NNG4` and `lean4game` must be in the same directory!
+
+In `lean4game`, install dependencies:
+```
+cd lean4game
+npm install
+```
+
+If you are developing a game other than `Robo` or `NNG4`, adapt the
+code at the beginning of `lean4game/server/index.mjs`:
+```
+const games = {
+    "g/hhu-adam/robo": {
+        dir: "../../../../Robo",
+        queueLength: 5
+    },
+    "g/hhu-adam/nng4": {
+        dir: "../../../../NNG4",
+        queueLength: 5
+    }
+}
+```
+
+Run the game:
+```
+npm start
+```
+
+This takes a little time. Eventually, the server is available on http://localhost:3000/
+and the game is available on http://localhost:3000/#/g/hhu-adam/NNG4.

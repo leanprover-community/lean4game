@@ -5,11 +5,8 @@ This is a prototype for a Lean 4 game platform. The project is based on ideas fr
 of Kevin Buzzard and Mohammad Pedramfar.
 The project is based on Patrick Massot's prototype: [NNG4](https://github.com/PatrickMassot/NNG4).
 
-Building this requires a [npm](https://www.npmjs.com/) toolchain. After cloning the repository you should run
-`npm install` to pull in all dependencies. For development and experimentation, you can run `npm start` that will perform a non-optimized build and then run a local webserver on port 3000.
-
 ### Progress & Contributing
-Currently the interface is still undergoing bigger changes, contributions are of course welcome, but it might be better to wait with them for a bit until proper support for external games is implemented andthe existing games are separated from this repository. (ca. Sept. 2023)
+Currently the interface is still undergoing bigger changes, contributions are of course welcome, but it might be better to wait with them for a bit until proper support for external games is implemented and the existing games are separated from this repository. (ca. Sept. 2023)
 
 
 ### Documentation
@@ -17,7 +14,7 @@ Currently the interface is still undergoing bigger changes, contributions are of
 For game developers, there is a work-in-progress Documentation: [Create a Game](DOCUMENTATION.md).
 Best to talk with us directly.
 
-For the game engine itself, the documentations is missing currently.
+For the game engine itself, documentation is missing currently.
 
 ## NPM Scripts
 
@@ -34,21 +31,3 @@ On the server side, the command will set up a docker image containing the Lean s
 
 Providing the use access to a Lean instance running on the server is a severe security risk. That is why we start the Lean server in a Docker container
 secured by [gVisor](https://gvisor.dev/).
-
-
-## Detailed installation notes
-
-### Node.js
-
-Developed using `node v19.3.0 (npm v9.2.0)`.
-
-Install `nvm`
-```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-```
-then reopen bash and test with `command -v nvm` if it is available (Should print "nvm").
-
-Now install node:
-```
-nvm install node
-```
