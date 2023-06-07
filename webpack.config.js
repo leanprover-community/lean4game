@@ -36,7 +36,7 @@ module.exports = env => {
             loader: 'ts-loader',
             options: { allowTsInNodeModules: true }
           }],
-          exclude: /node_modules(?!\/(lean4web|lean4|lean4-infoview))/,
+          // exclude: /node_modules(?!\/(lean4web|lean4|lean4-infoview))/,
           // Allow .ts imports from node_modules/lean4web and node_modules/lean4
         },
         {
