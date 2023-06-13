@@ -27,10 +27,12 @@ const games = {
         // name: "NNG",
         dir: "../../../../NNG4",
         queueLength: 5
+    },
+    "g/local/game": {
+        dir: "../../../../game",
+        queueLength: 5
     }
 }
-// Note: If `module` and `name` are uncommented, one also needs to add them as arguments to
-// the `--server` call below.
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -62,8 +64,12 @@ const queue = {}
 function startServerProcess(tag) {
     let serverProcess
     if (isDevelopment && games[tag]?.dir) {
-        serverProcess = cp.spawn("./gameserver",
-            ["--server", games[tag].dir], // games[tag].module, games[tag].name
+        let args = ["--server", games[tag].dir]
+        if (games[tag].module) {
+            args.push(games[tag].module)
+            if (games[tag].name) { args.push(games[tag].name) }
+        }
+        serverProcess = cp.spawn("./gameserver", args,
             { cwd: "./build/bin/" })
     } else {
         serverProcess =  cp.spawn("docker",
