@@ -157,6 +157,22 @@ There will be features added to get automatic information from mathlib!
 
 # Running Games Locally
 
+## Using Dev Containers
+
+* Install Docker and Dev Containers:
+  https://code.visualstudio.com/docs/devcontainers/containers#_getting-started
+
+* Once you have the Dev Containers Extension installed,
+  (re)open the project folder of your game in VSCode.
+
+* A message appears: "Folder contains a Dev Container configuration file. Reopen folder to develop in a container." Click `Reopen in Container`.
+
+* The first start will take a while, but after a few minutes,
+go to your browser and open http://localhost:3000/#/g/local/game.
+
+* After you have done some changes to the game in VSCode, open VSCode's terminal (View > Terminal) and run `lake build`. Then go to your browser and reload to see the changes.
+
+## Without Dev Containers
 Install `nvm`:
 ```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
