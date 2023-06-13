@@ -28,8 +28,9 @@ const games = {
         dir: "../../../../NNG4",
         queueLength: 5
     },
-    "g/dev/container": {
+    "g/local/game": {
         dir: "../../../../game",
+        queueLength: 5
     }
 }
 
@@ -111,7 +112,7 @@ wss.addListener("connection", function(ws, req) {
     const tag = `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
 
     if (isDevelopment && process.env.DEV_CONTAINER) {
-        tag = `g/dev/container`
+        tag = `g/local/game`
     }
 
     let ps;
