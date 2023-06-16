@@ -7,16 +7,11 @@ import Markdown from './Markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo } from '../state/api';
 import { GameIdContext } from '../App';
 
-export function Inventory({levelInfo, setInventoryDoc } :
+export function Inventory({levelInfo, openDoc } :
   {
     levelInfo: LevelInfo,
-    setInventoryDoc: (inventoryDoc: {name: string, type: string}) => void,
+    openDoc: (name: string, type: string) => void,
   }) {
-
-  // TODO: This seems like a useless wrapper to me
-  function openDoc(name, type) {
-    setInventoryDoc({name, type})
-  }
 
   return (
     <div className="inventory">
@@ -98,14 +93,15 @@ function InventoryItem({name, displayName, locked, disabled, newly, showDoc}) {
   return <div className={`item ${className}`} onClick={handleClick} title={title}>{icon} {displayName}</div>
 }
 
-export function Documentation({name, type}) {
+export function Documentation({name, type, handleClose}) {
   const gameId = React.useContext(GameIdContext)
   const doc = useLoadDocQuery({game: gameId, type: type, name: name})
 
-  return <>
-    <h2 className="doc">{doc.data?.displayName}</h2>
+  return <div className="documentation">
+    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+    <h1 className="doc">{doc.data?.displayName}</h1>
     <p><code>{doc.data?.statement}</code></p>
     {/* <code>docstring: {doc.data?.docstring}</code> */}
     <Markdown>{doc.data?.content}</Markdown>
-  </>
+  </div>
 }

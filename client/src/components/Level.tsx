@@ -188,8 +188,17 @@ function PlayableLevel({worldId, levelId}) {
     }
   }, [editor, commandLineMode])
 
-  // if this is set to a pair `(name, type)` then the according doc will be open.
+  // When clicking on an inventory item, the inventory is overlayed by the item's doc.
+  // If this state is set to a pair `(name, type)` then the according doc will be open.
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
+
+  // TODO: This seems like a useless wrapper to me
+  function openInventoryDoc(name, type) {
+    setInventoryDoc({name, type})
+  }
+
+  // Set `inventoryDoc` to `null` to close the doc
+  const closeInventoryDoc = () => setInventoryDoc(null);
 
   const levelTitle = <>{levelId && `Level ${levelId}`}{level?.data?.title && `: ${level?.data?.title}`}</>
 
@@ -256,11 +265,13 @@ function PlayableLevel({worldId, levelId}) {
       </div>
       <div className="inventory-panel">
         {!level.isLoading &&
-          <Inventory levelInfo={level?.data} setInventoryDoc={setInventoryDoc} />}
+          <>{inventoryDoc ?
+            <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
+            :
+            <Inventory levelInfo={level?.data} openDoc={openInventoryDoc} />
+          }</>
+        }
       </div>
-      {/* <div className="doc-panel">
-        {inventoryDoc && <Documentation name={inventoryDoc.name} type={inventoryDoc.type} />}
-      </div> */}
     </Split>
   </>
 }
