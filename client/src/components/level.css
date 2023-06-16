@@ -29,7 +29,7 @@
   overflow: auto;
 }
 
-.introduction-panel, .infoview, .exercise {
+.chat-panel, .infoview, .exercise {
   padding-top: 1em;
   padding-left: 1em;
   padding-right: 1em;
@@ -93,12 +93,12 @@ mjx-container[jax="CHTML"][display="true"] {
 
 
 /* Styling tables for Markdown */
-.introduction-panel table, .introduction-panel th, .introduction-panel td {
+.chat-panel table, .chat-panel th, .chat-panel td {
   /* border: 1px solid rgb(0, 0, 0, 0.12); */
   border-collapse: collapse;
 }
 
-.introduction-panel th, .introduction-panel td {
+.chat-panel th, .chat-panel td {
   padding-left: .5em;
   padding-right: .5em;
 }
@@ -155,7 +155,7 @@ td code  {
   border: 1px solid rgb(230, 122, 0);
 }
 
-.introduction-panel {
+.chat-panel {
   border: 1px solid rgb(192, 18, 178);
 }
 

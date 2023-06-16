@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Alert, FormControlLabel, Switch } from '@mui/material';
 import Markdown from '../Markdown';
 
-function Hint({hint} : {hint: GameHint}) {
+export function Hint({hint} : {hint: GameHint}) {
   return <div className="message info"><Markdown>{hint.text}</Markdown></div>
 }
 

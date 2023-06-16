@@ -42,7 +42,19 @@ import Split from 'react-split'
 import { Alert } from '@mui/material';
 import { GameIdContext } from '../App';
 
+import { GameHint } from './infoview/rpcApi';
+
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
+
+// TODO: Not used yet
+export const HintContext = React.createContext<{
+  hints: Array<GameHint>,
+  setHints: React.Dispatch<React.SetStateAction<Array<GameHint>>>
+}>({
+  hints: [],
+  setHints: () => {},
+});
+
 
 export const InputModeContext = React.createContext<{
   commandLineMode: boolean,
@@ -74,7 +86,7 @@ function Level() {
 
 function PlayableLevel({worldId, levelId}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
-  const introductionPanelRef = useRef<HTMLDivElement>(null)
+  const chatPanelRef = useRef<HTMLDivElement>(null)
 
   const gameId = React.useContext(GameIdContext)
   const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
@@ -84,12 +96,17 @@ function PlayableLevel({worldId, levelId}) {
   const [commandLineInput, setCommandLineInput] = useState("")
   const [canUndo, setCanUndo] = useState(initialCode.trim() !== "")
 
+  // The array of all shown hints. This excludes introduction and conclusion
+  // TODO: Not used yet
+  const [hints, setHints] = useState(Array<GameHint>)
+
   const theme = useTheme();
 
 
   useEffect(() => {
     // Scroll to top when loading a new level
-    introductionPanelRef.current!.scrollTo(0,0)
+    // TODO: Thats the wrong behaviour probably
+    chatPanelRef.current!.scrollTo(0,0)
     // Reset command line input when loading a new level
     setCommandLineInput("")
   }, [levelId])
@@ -179,15 +196,35 @@ function PlayableLevel({worldId, levelId}) {
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
-    <Split minSize={0} snapOffset={200} sizes={[50, 25, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
-      <div className="exercise-panel">
-        <div ref={introductionPanelRef} className="introduction-panel">
-          {level?.data?.introduction &&
+    <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+      <div ref={chatPanelRef} className="chat-panel">
+        {level?.data?.introduction &&
+          <div className="message info">
+            <Markdown>{level?.data?.introduction}</Markdown>
+          </div>
+        }
+        {hints.map(hint =>
+          <div className="message info"><Markdown>{hint.text}</Markdown></div>)
+        }
+        {completed &&
+          <>
             <div className="message info">
-              <Markdown>{level?.data?.introduction}</Markdown>
+              Level completed! 🎉
             </div>
-          }
-        </div>
+            {level?.data?.conclusion?.trim() &&
+              <div className="message info">
+                <Markdown>{level?.data?.conclusion}</Markdown>
+              </div>
+            }
+            { hints.map(hint => <div className="message info"><Markdown>{hint.text}</Markdown></div>) }
+            {levelId >= gameInfo.data?.worldSize[worldId] ?
+            <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+            <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+              Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
+          </>
+        }
+      </div>
+      <div className="exercise-panel">
         <div className="exercise">
           <Markdown>
             {(level?.data?.statementName ?
@@ -207,34 +244,23 @@ function PlayableLevel({worldId, levelId}) {
           </FormGroup>
         </div>
 
+        <HintContext.Provider value={{hints, setHints}}>
         <EditorContext.Provider value={editorConnection}>
           <MonacoEditorContext.Provider value={editor}>
             <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
               {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
             </InputModeContext.Provider>
           </MonacoEditorContext.Provider>
-        </EditorContext.Provider>
-
-        {completed && <div className="conclusion">
-          {level?.data?.conclusion?.trim() &&
-            <div className="message info">
-              <Markdown>{level?.data?.conclusion}</Markdown>
-            </div>
-          }
-          {levelId >= gameInfo.data?.worldSize[worldId] ?
-          <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
-          <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-            Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
-
-        </div>}
+          </EditorContext.Provider>
+          </HintContext.Provider>
       </div>
       <div className="inventory-panel">
         {!level.isLoading &&
           <Inventory levelInfo={level?.data} setInventoryDoc={setInventoryDoc} />}
       </div>
-      <div className="doc-panel">
+      {/* <div className="doc-panel">
         {inventoryDoc && <Documentation name={inventoryDoc.name} type={inventoryDoc.type} />}
-      </div>
+      </div> */}
     </Split>
   </>
 }

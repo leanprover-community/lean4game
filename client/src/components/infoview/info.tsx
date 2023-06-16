@@ -17,7 +17,7 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-i
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { CircularProgress } from '@mui/material';
-import { InputModeContext, MonacoEditorContext } from '../Level'
+import { InputModeContext, MonacoEditorContext, HintContext } from '../Level'
 
 
 type InfoStatus = 'updating' | 'error' | 'ready';
