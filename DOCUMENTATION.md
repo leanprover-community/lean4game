@@ -157,20 +157,31 @@ There will be features added to get automatic information from mathlib!
 
 # Running Games Locally
 
+The installation instructions are not yet tested on Mac/Windows. Comments very welcome!
+
 ## Using Dev Containers
 
-* Install Docker and Dev Containers:
-  https://code.visualstudio.com/docs/devcontainers/containers#_getting-started
+1.  **Install Docker and Dev Containers** *(once)*:<br/>
+    See [official instructions](https://code.visualstudio.com/docs/devcontainers/containers#_getting-started).
+    Explicitely this means:
+    * Install docker engine if you have not yet: [Instructions](https://docs.docker.com/engine/install/).
+      I followed the "Server" instructions for linux.
+    * Note that on Linux you need to add your user to the `docker` group
+      ([see instructions](https://docs.docker.com/engine/install/linux-postinstall/)) and probably reboot.
+    * Open the games folder in VSCode: `cd NNG4 && code .` or "Open Folder" within VSCode
+    * a message appears prompting you to install the "Dev Containers" extension (by Microsoft).
 
-* Once you have the Dev Containers Extension installed,
-  (re)open the project folder of your game in VSCode.
+2.  **Open Project in Dev Container** **(everytime)**:<br/>
+    Once you have the Dev Containers Extension installed, (re)open the project folder of your game in VSCode.
+    A message appears asking you to "Reopen in Container".
 
-* A message appears: "Folder contains a Dev Container configuration file. Reopen folder to develop in a container." Click `Reopen in Container`.
+    * The first start will take a while, on a local testrun it was about 90 seconds. After the first
+      start this should be very quick.
+    * Afterwards, go to your browser and open http://localhost:3000/#/g/local/game.
 
-* The first start will take a while, but after a few minutes,
-go to your browser and open http://localhost:3000/#/g/local/game.
-
-* After you have done some changes to the game in VSCode, open VSCode's terminal (View > Terminal) and run `lake build`. Then go to your browser and reload to see the changes.
+3.  **Editing Files** *(everytime)*:<br/>
+    After editing some files in VSCode, open VSCode's terminal (View > Terminal) and run `lake build`.
+    Now you can reload your browser to see the changes.
 
 ## Without Dev Containers
 Install `nvm`:
@@ -231,3 +242,11 @@ npm start
 
 This takes a little time. Eventually, the server is available on http://localhost:3000/
 and the game is available on http://localhost:3000/#/g/hhu-adam/NNG4.
+
+
+
+Note: TODO
+To modify the game engine itself you should `export NODE_ENV=development` first before running
+`npm start`. That way the local games will take the current version of the gameserver and you see
+your changes life. Otherwise, each game uses the version of the gameserver it checked out
+from github.
