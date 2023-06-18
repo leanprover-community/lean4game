@@ -192,7 +192,6 @@ function PlayableLevel({worldId, levelId}) {
   // If this state is set to a pair `(name, type)` then the according doc will be open.
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
 
-  // TODO: This seems like a useless wrapper to me
   function openInventoryDoc(name, type) {
     setInventoryDoc({name, type})
   }
@@ -204,75 +203,75 @@ function PlayableLevel({worldId, levelId}) {
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
-    <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
-      <div ref={chatPanelRef} className="chat-panel">
-        {level?.data?.introduction &&
-          <div className="message info">
-            <Markdown>{level?.data?.introduction}</Markdown>
-          </div>
-        }
-        {hints.map(hint =>
-          <div className="message info"><Markdown>{hint.text}</Markdown></div>)
-        }
-        {completed &&
-          <>
+    <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
+      <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
+      <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+        <div ref={chatPanelRef} className="chat-panel">
+          {level?.data?.introduction &&
             <div className="message info">
-              Level completed! 🎉
+              <Markdown>{level?.data?.introduction}</Markdown>
             </div>
-            {level?.data?.conclusion?.trim() &&
+          }
+          {hints.map(hint =>
+            <div className="message info"><Markdown>{hint.text}</Markdown></div>)
+          }
+          {completed &&
+            <>
               <div className="message info">
-                <Markdown>{level?.data?.conclusion}</Markdown>
+                Level completed! 🎉
               </div>
-            }
-            { hints.map(hint => <div className="message info"><Markdown>{hint.text}</Markdown></div>) }
-            {levelId >= gameInfo.data?.worldSize[worldId] ?
-            <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
-            <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-              Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
-          </>
-        }
-      </div>
-      <div className="exercise-panel">
-        <div className="exercise">
-          <Markdown>
-            {(level?.data?.statementName ?
-              `**Theorem** \`${level?.data?.statementName}\`: `
-              :
-              level?.data?.descrText && "**Exercise**: ")
-              + `${level?.data?.descrText}`
-            }
-          </Markdown>
-          <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{level?.data?.descrFormat}</code></div>
-          <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div>
+              {level?.data?.conclusion?.trim() &&
+                <div className="message info">
+                  <Markdown>{level?.data?.conclusion}</Markdown>
+                </div>
+              }
+              { hints.map(hint => <div className="message info"><Markdown>{hint.text}</Markdown></div>) }
+              {levelId >= gameInfo.data?.worldSize[worldId] ?
+              <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+              <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+                Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
+            </>
+          }
         </div>
-        <div className="input-mode-switch">
-          {commandLineMode && <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
-          <FormGroup>
-            <FormControlLabel control={<Switch onChange={(ev) => { setCommandLineMode(!commandLineMode) }} />} label="Editor mode" />
-          </FormGroup>
-        </div>
+        <div className="exercise-panel">
+          <div className="exercise">
+            <Markdown>
+              {(level?.data?.statementName ?
+                `**Theorem** \`${level?.data?.statementName}\`: `
+                :
+                level?.data?.descrText && "**Exercise**: ")
+                + `${level?.data?.descrText}`
+              }
+            </Markdown>
+            <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{level?.data?.descrFormat}</code></div>
+            <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div>
+          </div>
+          <div className="input-mode-switch">
+            {commandLineMode && <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
+            <FormGroup>
+              <FormControlLabel control={<Switch onChange={(ev) => { setCommandLineMode(!commandLineMode) }} />} label="Editor mode" />
+            </FormGroup>
+          </div>
 
-        <HintContext.Provider value={{hints, setHints}}>
-        <EditorContext.Provider value={editorConnection}>
-          <MonacoEditorContext.Provider value={editor}>
-            <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
-              {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
-            </InputModeContext.Provider>
-          </MonacoEditorContext.Provider>
-          </EditorContext.Provider>
-          </HintContext.Provider>
-      </div>
-      <div className="inventory-panel">
-        {!level.isLoading &&
-          <>{inventoryDoc ?
-            <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
-            :
-            <Inventory levelInfo={level?.data} openDoc={openInventoryDoc} />
-          }</>
-        }
-      </div>
-    </Split>
+          <HintContext.Provider value={{hints, setHints}}>
+          <EditorContext.Provider value={editorConnection}>
+            <MonacoEditorContext.Provider value={editor}>
+                {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+            </MonacoEditorContext.Provider>
+            </EditorContext.Provider>
+            </HintContext.Provider>
+        </div>
+        <div className="inventory-panel">
+          {!level.isLoading &&
+            <>{inventoryDoc ?
+              <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
+              :
+              <Inventory levelInfo={level?.data} openDoc={openInventoryDoc} />
+            }</>
+          }
+        </div>
+      </Split>
+    </InputModeContext.Provider>
   </>
 }
 
