@@ -29,7 +29,7 @@
   overflow: auto;
 }
 
-.chat-panel, .infoview, .exercise {
+.chat-panel, .infoview, .exercise, .exercise-statement {
   padding-top: 1em;
   padding-left: 1em;
   padding-right: 1em;

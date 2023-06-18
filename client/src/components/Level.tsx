@@ -83,6 +83,37 @@ function Level() {
   }
 }
 
+// The mathematical formulation of the statement, supporting e.g. Latex
+// It takes three forms, depending on the precence of name and description:
+// - Theorem xyz: description
+// - Theorem xyz
+// - Exercises: description
+function ExerciseStatement({data}) {
+  return <div className="exercise-statement"><Markdown>
+    {(data?.statementName ? `**Theorem** \`${data?.statementName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}` }
+  </Markdown></div>
+}
+
+
+// ref: the codeViewRef. Used to edit the editor's content even if not visible
+function EditorInterface({data, codeviewRef, hidden, worldId, levelId, editorConnection}) {
+
+  const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
+
+  return <div className={hidden ? 'hidden' : ''}>
+    <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{data?.descrFormat}</code></div>
+    <div ref={codeviewRef} className={'codeview'}></div>
+    {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+
+  </div>
+}
+
+function ReducedInterface({worldId, levelId, editorConnection}) {
+  return <div>
+    {/* <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button> */}
+    {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+  </div>
+}
 
 function PlayableLevel({worldId, levelId}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
@@ -192,6 +223,7 @@ function PlayableLevel({worldId, levelId}) {
   // If this state is set to a pair `(name, type)` then the according doc will be open.
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
 
+  // Open the doc of the clicked inventory item
   function openInventoryDoc(name, type) {
     setInventoryDoc({name, type})
   }
@@ -234,29 +266,25 @@ function PlayableLevel({worldId, levelId}) {
           }
         </div>
         <div className="exercise-panel">
-          <div className="exercise">
-            <Markdown>
-              {(level?.data?.statementName ?
-                `**Theorem** \`${level?.data?.statementName}\`: `
-                :
-                level?.data?.descrText && "**Exercise**: ")
-                + `${level?.data?.descrText}`
-              }
-            </Markdown>
-            <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{level?.data?.descrFormat}</code></div>
-            <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div>
-          </div>
-          <div className="input-mode-switch">
-            {commandLineMode && <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
-          </div>
-
           <HintContext.Provider value={{hints, setHints}}>
           <EditorContext.Provider value={editorConnection}>
-            <MonacoEditorContext.Provider value={editor}>
-                {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
-            </MonacoEditorContext.Provider>
-            </EditorContext.Provider>
-            </HintContext.Provider>
+          <MonacoEditorContext.Provider value={editor}>
+          <ExerciseStatement data={level?.data} />
+          <div className="exercise">
+            {/* We need the editor to be hidden because the command line edits its content */}
+            <EditorInterface data={level?.data} codeviewRef={codeviewRef} hidden={commandLineMode}
+              worldId={worldId} levelId={levelId} editorConnection={editorConnection}/>
+            {commandLineMode && <ReducedInterface worldId={worldId} levelId={levelId} editorConnection={editorConnection}/>}
+            {/* <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{level?.data?.descrFormat}</code></div> */}
+            {/* <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div> */}
+          </div>
+          {/* <div className="input-mode-switch">
+            {commandLineMode && <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
+          </div> */}
+                {/* {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />} */}
+          </MonacoEditorContext.Provider>
+          </EditorContext.Provider>
+          </HintContext.Provider>
         </div>
         <div className="inventory-panel">
           {!level.isLoading &&
