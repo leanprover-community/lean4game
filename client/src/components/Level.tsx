@@ -248,9 +248,6 @@ function PlayableLevel({worldId, levelId}) {
           </div>
           <div className="input-mode-switch">
             {commandLineMode && <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
-            <FormGroup>
-              <FormControlLabel control={<Switch onChange={(ev) => { setCommandLineMode(!commandLineMode) }} />} label="Editor mode" />
-            </FormGroup>
           </div>
 
           <HintContext.Provider value={{hints, setHints}}>
@@ -307,17 +304,21 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
+  const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
+
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
     <div>
-    <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button>
-      <span className="app-bar-title">
-        {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
-      </span>
-    </div>
+      <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button>
+        <span className="app-bar-title">
+          {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
+        </span>
+      </div>
     <div>
       <span className="app-bar-title">
         {levelTitle}
       </span>
+        <Button disabled={levelId <= 0} inverted={true} to=""
+          onClick={(ev) => { setCommandLineMode(!commandLineMode) }}>Editor</Button>
       <Button disabled={levelId <= 0} inverted={true}
         to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
         ><FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous</Button>
