@@ -29,11 +29,14 @@
   overflow: auto;
 }
 
-.chat-panel, .infoview, .exercise, .exercise-statement {
+.chat-panel, .infoview, .exercise {
   padding-top: 1em;
+  padding-bottom: 0;
+}
+
+.chat-panel, .infoview, .exercise-statement {
   padding-left: 1em;
   padding-right: 1em;
-  padding-bottom: 0;
 }
 
 .conclusion {
@@ -172,6 +175,10 @@ td code  {
   margin: 1px;
 } */
 
+.exercise {
+  height: 100%;
+}
+
 .chat {
   height: calc(100% - 3.5em);
   overflow-y: scroll;
@@ -181,4 +188,25 @@ td code  {
   width:100%;
   height: 3.5em;
   border-top:  0.1em solid #aaa;
+}
+
+/* .exercise-panel {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+} */
+
+.commandline-interface {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.command-line {
+  flex: 0 1 auto;
+}
+
+.commandline-interface .content {
+  flex: 1 1 auto;
+  overflow-y: scroll;
 }

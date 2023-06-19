@@ -21,6 +21,20 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import { levelCompleted, selectCompleted } from '../../state/progress';
 import { GameIdContext } from '../../App';
 import { InputModeContext } from '../Level';
+import { CommandLine } from './CommandLine';
+import Markdown from '../Markdown';
+import { LevelInfo } from '../../state/api';
+
+// The mathematical formulation of the statement, supporting e.g. Latex
+// It takes three forms, depending on the precence of name and description:
+// - Theorem xyz: description
+// - Theorem xyz
+// - Exercises: description
+function ExerciseStatement({data}) {
+  return <div className="exercise-statement"><Markdown>
+    {(data?.statementName ? `**Theorem** \`${data?.statementName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}` }
+  </Markdown></div>
+}
 
 // TODO: This is only used in `EditorInterface`
 // while `CommandLineInterface` has this copy-pasted in.
@@ -110,6 +124,7 @@ export function EditorInterface({data, codeviewRef, hidden, worldId, levelId, ed
   const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
 
   return <div className={hidden ? 'hidden' : ''}>
+    <ExerciseStatement data={data} />
     <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{data?.descrFormat}</code></div>
     <div ref={codeviewRef} className={'codeview'}></div>
     {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
@@ -117,7 +132,7 @@ export function EditorInterface({data, codeviewRef, hidden, worldId, levelId, ed
   </div>
 }
 
-export function CommandLineInterface(props: {world: string, level: number}) {
+export function CommandLineInterface(props: {world: string, level: number, data: LevelInfo}) {
 
   const ec = React.useContext(EditorContext);
   const gameId = React.useContext(GameIdContext)
@@ -177,13 +192,18 @@ export function CommandLineInterface(props: {world: string, level: number}) {
   } else if (serverStoppedResult){
       ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
   } else {
-      ret = <div className="infoview vscode-light">
-          {completed && <div className="level-completed">Level completed! 🎉</div>}
-          <Infos />
+      //className="infoview vscode-light"
+      ret = <div className="commandline-interface">
+          {/* {completed && <div className="level-completed">Level completed! 🎉</div>} */}
+          <div className="content">
+            <ExerciseStatement data={props.data} />
+            <Infos />
+          </div>
+          <CommandLine />
       </div>
   }
 
-  return <div>
+  return <>
     {/* <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button> */}
     <ConfigContext.Provider value={config}>
       <VersionContext.Provider value={serverVersion}>
@@ -196,7 +216,7 @@ export function CommandLineInterface(props: {world: string, level: number}) {
         </WithRpcSessions>
       </VersionContext.Provider>
     </ConfigContext.Provider>
-  </div>
+  </>
 
 
 }

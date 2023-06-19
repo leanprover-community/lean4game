@@ -170,7 +170,7 @@ export const Goal = React.memo((props: GoalProps) => {
         {!commandLine && assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        {commandLine && commandLineMode && <CommandLine />}
+        {/* {commandLine && commandLineMode && <CommandLine />} */}
         {!filter.reverse && goalLi}
         {/* {showHints && hints} */}
     </div>

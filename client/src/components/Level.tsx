@@ -9,7 +9,6 @@ import { Link, useParams } from 'react-router-dom';
 import { Box, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import Grid from '@mui/material/Unstable_Grid2';
-import {Inventory, Documentation} from './Inventory';
 import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter';
 import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
 import 'lean4web/client/src/editor/vscode.css';
@@ -19,31 +18,29 @@ import { InfoProvider } from 'lean4web/client/src/editor/infoview';
 import 'lean4web/client/src/editor/infoview.css'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import './level.css'
-import { Button } from './Button'
-import { ConnectionContext, useLeanClient } from '../connection';
-import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
-import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
-import { useAppDispatch, useAppSelector } from '../hooks';
 import { useStore } from 'react-redux';
-
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection';
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
-import { EditorInterface, CommandLineInterface } from './infoview/main'
 import type { Location } from 'vscode-languageserver-protocol';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
-
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import Markdown from './Markdown';
-
 import Split from 'react-split'
 import { Alert } from '@mui/material';
-import { GameIdContext } from '../App';
 
-import { GameHint } from './infoview/rpcApi';
+import { Button } from './Button'
+import {Inventory, Documentation} from './Inventory';
+import Markdown from './Markdown';
+import { EditorInterface, CommandLineInterface } from './infoview/main'
 import { Hints } from './infoview/hints';
+import { GameHint } from './infoview/rpcApi';
+import { GameIdContext } from '../App';
+import { ConnectionContext, useLeanClient } from '../connection';
+import { useAppDispatch, useAppSelector } from '../hooks';
+import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
+import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
+
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
 
@@ -58,6 +55,7 @@ export const HintContext = React.createContext<{
   hints: [],
   setHints: () => {},
 });
+
 
 export const InputModeContext = React.createContext<{
   commandLineMode: boolean,
@@ -84,17 +82,6 @@ function Level() {
   } else {
     return <PlayableLevel worldId={worldId} levelId={levelId} />
   }
-}
-
-// The mathematical formulation of the statement, supporting e.g. Latex
-// It takes three forms, depending on the precence of name and description:
-// - Theorem xyz: description
-// - Theorem xyz
-// - Exercises: description
-function ExerciseStatement({data}) {
-  return <div className="exercise-statement"><Markdown>
-    {(data?.statementName ? `**Theorem** \`${data?.statementName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}` }
-  </Markdown></div>
 }
 
 function PlayableLevel({worldId, levelId}) {
@@ -271,7 +258,6 @@ function PlayableLevel({worldId, levelId}) {
         <div className="exercise-panel">
           <EditorContext.Provider value={editorConnection}>
           <MonacoEditorContext.Provider value={editor}>
-          <ExerciseStatement data={level?.data} />
           <div className="exercise">
             {/* We need the editor to always there and hidden because
               the command line edits its content */}
@@ -280,7 +266,7 @@ function PlayableLevel({worldId, levelId}) {
             { // TODO: Is there any possibility that the editor connection takes a while
               // and we should show a circular progress here?
               commandLineMode && editorConnection &&
-                <CommandLineInterface world={worldId} level={levelId}/>
+                <CommandLineInterface world={worldId} level={levelId} data={level?.data}/>
             }
           </div>
           </MonacoEditorContext.Provider>
