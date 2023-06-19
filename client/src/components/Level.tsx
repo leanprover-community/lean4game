@@ -226,44 +226,54 @@ function PlayableLevel({worldId, levelId}) {
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
+    <HintContext.Provider value={{showHiddenHints, setShowHiddenHints, hints, setHints}}>
       <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
       <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
         <div ref={chatPanelRef} className="chat-panel">
-          <HintContext.Provider value={{showHiddenHints, setShowHiddenHints, hints, setHints}}>
-          {level?.data?.introduction &&
-            <div className="message info">
-              <Markdown>{level?.data?.introduction}</Markdown>
-            </div>
-          }
-              {/* {openHints.map(hint => <Hint hint={hint} />)}
-    {hiddenHints.length > 0 &&
-        <FormControlLabel
-          control={<Switch checked={showHints} onChange={() => setShowHints((prev) => !prev)} />}
-          label="I need help!"
-        />}
-    {showHints && hiddenHints.map(hint => <Hint hint={hint} />)} */}
-          {hints.map(hint =>
-            <div className="message info"><Markdown>{hint.text}</Markdown></div>)
-          }
-          {completed &&
-            <>
+          <div className="chat">
+            {level?.data?.introduction &&
               <div className="message info">
-                Level completed! 🎉
+                <Markdown>{level?.data?.introduction}</Markdown>
               </div>
-              {level?.data?.conclusion?.trim() &&
+            }
+                {/* {openHints.map(hint => <Hint hint={hint} />)}
+      {hiddenHints.length > 0 &&
+          <FormControlLabel
+            control={<Switch checked={showHints} onChange={() => setShowHints((prev) => !prev)} />}
+            label="I need help!"
+          />}
+      {showHints && hiddenHints.map(hint => <Hint hint={hint} />)} */}
+            {hints.map(hint =>
+              <div className="message info"><Markdown>{hint.text}</Markdown></div>)
+            }
+            {completed &&
+              <>
                 <div className="message info">
-                  <Markdown>{level?.data?.conclusion}</Markdown>
+                  Level completed! 🎉
                 </div>
-              }
-              {/* { hints.map(hint => <div className="message info"><Markdown>{hint.text}</Markdown></div>) } */}
-              <Hints hints={hints} showHidden={showHiddenHints}/>
-              {levelId >= gameInfo.data?.worldSize[worldId] ?
-              <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
-              <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-                Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
-            </>
-          }
-          </HintContext.Provider>
+                {level?.data?.conclusion?.trim() &&
+                  <div className="message info">
+                    <Markdown>{level?.data?.conclusion}</Markdown>
+                  </div>
+                }
+                {levelId >= gameInfo.data?.worldSize[worldId] ?
+                <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+                <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+                  Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
+              </>
+            }
+
+            {/* { hints.map(hint => <div className="message info"><Markdown>{hint.text}</Markdown></div>) } */}
+            <Hints hints={hints} showHidden={showHiddenHints}/>
+            {/* TODO: Remove this debugging message: */}
+            {showHiddenHints && <p>Hidden Hints are displayed</p>}
+          </div>
+          <div className="toggle-hidden-hints">
+            <FormControlLabel
+              control={<Switch checked={showHiddenHints} onChange={() => setShowHiddenHints((prev) => !prev)} />}
+              label="Show more help!"
+            />
+          </div>
         </div>
         <div className="exercise-panel">
           <EditorContext.Provider value={editorConnection}>
@@ -294,6 +304,7 @@ function PlayableLevel({worldId, levelId}) {
           }
         </div>
       </Split>
+    </HintContext.Provider>
     </InputModeContext.Provider>
   </>
 }
