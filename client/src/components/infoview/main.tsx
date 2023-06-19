@@ -22,7 +22,8 @@ import { levelCompleted, selectCompleted } from '../../state/progress';
 import { GameIdContext } from '../../App';
 import { InputModeContext } from '../Level';
 
-
+// TODO: This is only used in `EditorInterface`
+// while `CommandLineInterface` has this copy-pasted in.
 export function Main(props: {world: string, level: number}) {
     const ec = React.useContext(EditorContext);
     const gameId = React.useContext(GameIdContext)
@@ -116,7 +117,7 @@ export function EditorInterface({data, codeviewRef, hidden, worldId, levelId, ed
   </div>
 }
 
-export function ReducedInterface(props: {world: string, level: number}) {
+export function CommandLineInterface(props: {world: string, level: number}) {
 
   const ec = React.useContext(EditorContext);
   const gameId = React.useContext(GameIdContext)

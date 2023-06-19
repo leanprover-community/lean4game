@@ -29,7 +29,7 @@ import { useStore } from 'react-redux';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection';
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
-import { EditorInterface, ReducedInterface } from './infoview/main'
+import { EditorInterface, CommandLineInterface } from './infoview/main'
 import type { Location } from 'vscode-languageserver-protocol';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -280,7 +280,7 @@ function PlayableLevel({worldId, levelId}) {
             { // TODO: Is there any possibility that the editor connection takes a while
               // and we should show a circular progress here?
               commandLineMode && editorConnection &&
-                <ReducedInterface world={worldId} level={levelId}/>
+                <CommandLineInterface world={worldId} level={levelId}/>
             }
           </div>
           </MonacoEditorContext.Provider>
