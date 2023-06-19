@@ -29,7 +29,7 @@ import { useStore } from 'react-redux';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection';
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
-import { Main, EditorInterface } from './infoview/main'
+import { EditorInterface, ReducedInterface } from './infoview/main'
 import type { Location } from 'vscode-languageserver-protocol';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -95,13 +95,6 @@ function ExerciseStatement({data}) {
   return <div className="exercise-statement"><Markdown>
     {(data?.statementName ? `**Theorem** \`${data?.statementName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}` }
   </Markdown></div>
-}
-
-function ReducedInterface({worldId, levelId, editorConnection}) {
-  return <div>
-    {/* <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button> */}
-    {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
-  </div>
 }
 
 function PlayableLevel({worldId, levelId}) {
@@ -280,17 +273,16 @@ function PlayableLevel({worldId, levelId}) {
           <MonacoEditorContext.Provider value={editor}>
           <ExerciseStatement data={level?.data} />
           <div className="exercise">
-            {/* We need the editor to be hidden because the command line edits its content */}
+            {/* We need the editor to always there and hidden because
+              the command line edits its content */}
             <EditorInterface data={level?.data} codeviewRef={codeviewRef} hidden={commandLineMode}
-              worldId={worldId} levelId={levelId} editorConnection={editorConnection}/>
-            {commandLineMode && <ReducedInterface worldId={worldId} levelId={levelId} editorConnection={editorConnection}/>}
-            {/* <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{level?.data?.descrFormat}</code></div> */}
-            {/* <div ref={codeviewRef} className={`codeview ${commandLineMode ? 'hidden' : ''}`}></div> */}
+                    worldId={worldId} levelId={levelId} editorConnection={editorConnection}/>
+            { // TODO: Is there any possibility that the editor connection takes a while
+              // and we should show a circular progress here?
+              commandLineMode && editorConnection &&
+                <ReducedInterface world={worldId} level={levelId}/>
+            }
           </div>
-          {/* <div className="input-mode-switch">
-            {commandLineMode && <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button>}
-          </div> */}
-                {/* {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />} */}
           </MonacoEditorContext.Provider>
           </EditorContext.Provider>
         </div>
