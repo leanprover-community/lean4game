@@ -18,6 +18,7 @@ import { GoalsLocation, Locations, LocationsContext } from '../../../../node_mod
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { CircularProgress } from '@mui/material';
 import { InputModeContext, MonacoEditorContext, HintContext } from '../Level'
+import { Hint } from './hints';
 
 
 type InfoStatus = 'updating' | 'error' | 'ready';
@@ -255,6 +256,10 @@ function useIsProcessingAt(p: DocumentPosition): boolean {
 }
 
 function InfoAux(props: InfoProps) {
+
+    // TODO
+    const hintContext = React.useContext(HintContext)
+
     const config = React.useContext(ConfigContext)
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -409,6 +414,11 @@ function InfoAux(props: InfoProps) {
             setDisplayProps(dp => ({ ...dp, status: 'updating' }))
         else if (state.state === 'resolved') {
             setDisplayProps({ ...state.value, triggerUpdate })
+            // if (state.value.goals) {
+            //   hintContext.setHints(state.value.goals[0]?.hints)
+            // }
+            // NOT Working
+
         } else if (state.state === 'rejected' && state.error !== 'retry') {
             // The code inside `useAsyncWithTrigger` may only ever reject with a `retry` exception.
             console.warn('Unreachable code reached with error: ', state.error)

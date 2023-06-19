@@ -29,7 +29,7 @@ import { useStore } from 'react-redux';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection';
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
-import { Main } from './infoview/main'
+import { Main, EditorInterface } from './infoview/main'
 import type { Location } from 'vscode-languageserver-protocol';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -43,18 +43,21 @@ import { Alert } from '@mui/material';
 import { GameIdContext } from '../App';
 
 import { GameHint } from './infoview/rpcApi';
+import { Hints } from './infoview/hints';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
 
-// TODO: Not used yet
 export const HintContext = React.createContext<{
+  showHiddenHints : boolean,
+  setShowHiddenHints: React.Dispatch<React.SetStateAction<boolean>>
   hints: Array<GameHint>,
   setHints: React.Dispatch<React.SetStateAction<Array<GameHint>>>
 }>({
+  showHiddenHints: true,
+  setShowHiddenHints: () => {},
   hints: [],
   setHints: () => {},
 });
-
 
 export const InputModeContext = React.createContext<{
   commandLineMode: boolean,
@@ -94,20 +97,6 @@ function ExerciseStatement({data}) {
   </Markdown></div>
 }
 
-
-// ref: the codeViewRef. Used to edit the editor's content even if not visible
-function EditorInterface({data, codeviewRef, hidden, worldId, levelId, editorConnection}) {
-
-  const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
-
-  return <div className={hidden ? 'hidden' : ''}>
-    <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{data?.descrFormat}</code></div>
-    <div ref={codeviewRef} className={'codeview'}></div>
-    {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
-
-  </div>
-}
-
 function ReducedInterface({worldId, levelId, editorConnection}) {
   return <div>
     {/* <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button> */}
@@ -130,6 +119,7 @@ function PlayableLevel({worldId, levelId}) {
   // The array of all shown hints. This excludes introduction and conclusion
   // TODO: Not used yet
   const [hints, setHints] = useState(Array<GameHint>)
+  const [showHiddenHints, setShowHiddenHints] = useState(false)
 
   const theme = useTheme();
 
@@ -239,11 +229,19 @@ function PlayableLevel({worldId, levelId}) {
       <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
       <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
         <div ref={chatPanelRef} className="chat-panel">
+          <HintContext.Provider value={{showHiddenHints, setShowHiddenHints, hints, setHints}}>
           {level?.data?.introduction &&
             <div className="message info">
               <Markdown>{level?.data?.introduction}</Markdown>
             </div>
           }
+              {/* {openHints.map(hint => <Hint hint={hint} />)}
+    {hiddenHints.length > 0 &&
+        <FormControlLabel
+          control={<Switch checked={showHints} onChange={() => setShowHints((prev) => !prev)} />}
+          label="I need help!"
+        />}
+    {showHints && hiddenHints.map(hint => <Hint hint={hint} />)} */}
           {hints.map(hint =>
             <div className="message info"><Markdown>{hint.text}</Markdown></div>)
           }
@@ -257,16 +255,17 @@ function PlayableLevel({worldId, levelId}) {
                   <Markdown>{level?.data?.conclusion}</Markdown>
                 </div>
               }
-              { hints.map(hint => <div className="message info"><Markdown>{hint.text}</Markdown></div>) }
+              {/* { hints.map(hint => <div className="message info"><Markdown>{hint.text}</Markdown></div>) } */}
+              <Hints hints={hints} showHidden={showHiddenHints}/>
               {levelId >= gameInfo.data?.worldSize[worldId] ?
               <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
               <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
                 Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
             </>
           }
+          </HintContext.Provider>
         </div>
         <div className="exercise-panel">
-          <HintContext.Provider value={{hints, setHints}}>
           <EditorContext.Provider value={editorConnection}>
           <MonacoEditorContext.Provider value={editor}>
           <ExerciseStatement data={level?.data} />
@@ -284,7 +283,6 @@ function PlayableLevel({worldId, levelId}) {
                 {/* {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />} */}
           </MonacoEditorContext.Provider>
           </EditorContext.Provider>
-          </HintContext.Provider>
         </div>
         <div className="inventory-panel">
           {!level.isLoading &&

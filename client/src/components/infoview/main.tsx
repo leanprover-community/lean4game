@@ -20,6 +20,7 @@ import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infov
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { levelCompleted, selectCompleted } from '../../state/progress';
 import { GameIdContext } from '../../App';
+import { InputModeContext } from '../Level';
 
 
 export function Main(props: {world: string, level: number}) {
@@ -100,4 +101,17 @@ export function Main(props: {world: string, level: number}) {
         </VersionContext.Provider>
     </ConfigContext.Provider>
     );
+}
+
+// `codeviewRef`: the codeViewRef. Used to edit the editor's content even if not visible
+export function EditorInterface({data, codeviewRef, hidden, worldId, levelId, editorConnection}) {
+
+  const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
+
+  return <div className={hidden ? 'hidden' : ''}>
+    <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{data?.descrFormat}</code></div>
+    <div ref={codeviewRef} className={'codeview'}></div>
+    {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+
+  </div>
 }
