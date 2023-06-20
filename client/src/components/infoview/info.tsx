@@ -17,11 +17,10 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-i
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { CircularProgress } from '@mui/material';
-import { InputModeContext, MonacoEditorContext, HintContext } from '../Level'
+import { InputModeContext, MonacoEditorContext, HintContext, ProofStateProps, InfoStatus, ProofStateContext } from '../Level'
 import { Hint } from './hints';
 
 
-type InfoStatus = 'updating' | 'error' | 'ready';
 type InfoKind = 'cursor' | 'pin';
 
 interface InfoPinnable {
@@ -169,18 +168,13 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
 
 interface InfoDisplayProps {
     pos: DocumentPosition;
-    status: InfoStatus;
-    messages: InteractiveDiagnostic[];
-    goals?: InteractiveGoals;
-    termGoal?: InteractiveTermGoal;
-    error?: string;
     userWidgets: UserWidgetInstance[];
     rpcSess: RpcSessionAtPos;
     triggerUpdate: () => Promise<void>;
 }
 
 /** Displays goal state and messages. Can be paused. */
-function InfoDisplay(props0: InfoDisplayProps & InfoPinnable) {
+function InfoDisplay(props0: ProofStateProps & InfoDisplayProps & InfoPinnable) {
     // Used to update the paused state *just once* if it is paused,
     // but a display update is triggered
     const [shouldRefresh, setShouldRefresh] = React.useState<boolean>(false);
@@ -218,7 +212,7 @@ function InfoDisplay(props0: InfoDisplayProps & InfoPinnable) {
     <RpcContext.Provider value={rpcSess}>
     {/* <details open> */}
         {/* <InfoStatusBar {...props} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} /> */}
-        <div>
+        <div className="vscode-light">
             <InfoDisplayContent {...props} proof={editor.getValue()} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} />
         </div>
     {/* </details> */}
@@ -257,8 +251,11 @@ function useIsProcessingAt(p: DocumentPosition): boolean {
 
 function InfoAux(props: InfoProps) {
 
-    // TODO
+    // TODO: proofStateContext is not quite implemented correctly yet.
+    // i.e. there is an asynchronous state in this file that seems to partally overlap
+    // search for `const [state, triggerUpdateCore]`
     const hintContext = React.useContext(HintContext)
+    const proofStateContext = React.useContext(ProofStateContext)
 
     const config = React.useContext(ConfigContext)
 
@@ -294,7 +291,7 @@ function InfoAux(props: InfoProps) {
     // Besides what the server replies with, we also include the inputs (deps) in this type so
     // that the displayed state cannot ever get out of sync by showing an old reply together
     // with e.g. a new `pos`.
-    type InfoRequestResult = Omit<InfoDisplayProps, 'triggerUpdate'>
+    type InfoRequestResult = Omit<ProofStateProps & InfoDisplayProps, 'triggerUpdate'>
     const [state, triggerUpdateCore] = useAsyncWithTrigger(() => new Promise<InfoRequestResult>((resolve, reject) => {
         const goalsReq = rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp(pos));
         const termGoalReq = getInteractiveTermGoal(rpcSess, DocumentPosition.toTdpp(pos))
@@ -393,11 +390,6 @@ function InfoAux(props: InfoProps) {
 
     const [displayProps, setDisplayProps] = React.useState<InfoDisplayProps>({
         pos,
-        status: 'updating',
-        messages: [],
-        goals: undefined,
-        termGoal: undefined,
-        error: undefined,
         userWidgets: [],
         rpcSess,
         triggerUpdate
@@ -410,20 +402,21 @@ function InfoAux(props: InfoProps) {
     React.useEffect(() => {
         if (state.state === 'notStarted')
             void triggerUpdate()
-        else if (state.state === 'loading')
-            setDisplayProps(dp => ({ ...dp, status: 'updating' }))
+        else if (state.state === 'loading') {
+          proofStateContext.setProofState(dp => ({ ...dp, status: 'updating' }))
+          setDisplayProps(dp => ({ ...dp, status: 'updating' }))
+        }
         else if (state.state === 'resolved') {
-            setDisplayProps({ ...state.value, triggerUpdate })
-            // if (state.value.goals) {
-            //   hintContext.setHints(state.value.goals[0]?.hints)
-            // }
-            // NOT Working
-
+          // if (state.value.goals?.goals?.length) {
+          //   hintContext.setHints(state.value.goals.goals[0].hints)
+          // }
+          proofStateContext.setProofState({ ...state.value })
+          setDisplayProps({ ...state.value, triggerUpdate })
         } else if (state.state === 'rejected' && state.error !== 'retry') {
             // The code inside `useAsyncWithTrigger` may only ever reject with a `retry` exception.
             console.warn('Unreachable code reached with error: ', state.error)
         }
     }, [state])
 
-    return <InfoDisplay kind={props.kind} onPin={props.onPin} {...displayProps} />
+    return <InfoDisplay kind={props.kind} onPin={props.onPin} {...proofStateContext.proofState} {...displayProps} />
 }

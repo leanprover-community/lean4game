@@ -31,6 +31,7 @@ import { LevelInfo } from '../../state/api';
 // - Theorem xyz
 // - Exercises: description
 function ExerciseStatement({data}) {
+  if (!data?.descrText) { return <></> }
   return <div className="exercise-statement"><Markdown>
     {(data?.statementName ? `**Theorem** \`${data?.statementName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}` }
   </Markdown></div>

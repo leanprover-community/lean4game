@@ -29,7 +29,7 @@
   overflow: auto;
 }
 
-.chat-panel, .infoview, .exercise {
+.chat-panel, .infoview {
   padding-top: 1em;
   padding-bottom: 0;
 }
@@ -209,4 +209,5 @@ td code  {
 .commandline-interface .content {
   flex: 1 1 auto;
   overflow-y: scroll;
+  padding: 1em;
 }

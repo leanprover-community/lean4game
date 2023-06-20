@@ -34,26 +34,52 @@ import {Inventory, Documentation} from './Inventory';
 import Markdown from './Markdown';
 import { EditorInterface, CommandLineInterface } from './infoview/main'
 import { Hints } from './infoview/hints';
-import { GameHint } from './infoview/rpcApi';
+import { GameHint, InteractiveGoals } from './infoview/rpcApi';
 import { GameIdContext } from '../App';
 import { ConnectionContext, useLeanClient } from '../connection';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
-
+import { DocumentPosition } from '../../../node_modules/lean4-infoview/src/infoview/util';
+import { getInteractiveTermGoal, InteractiveDiagnostic,
+  UserWidgetInstance, Widget_getWidgets, RpcSessionAtPos, isRpcError,
+  RpcErrorCode, getInteractiveDiagnostics, InteractiveTermGoal } from '@leanprover/infoview-api';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
 
 export const HintContext = React.createContext<{
   showHiddenHints : boolean,
   setShowHiddenHints: React.Dispatch<React.SetStateAction<boolean>>
-  hints: Array<GameHint>,
-  setHints: React.Dispatch<React.SetStateAction<Array<GameHint>>>
 }>({
   showHiddenHints: true,
   setShowHiddenHints: () => {},
-  hints: [],
-  setHints: () => {},
+});
+
+export type InfoStatus = 'updating' | 'error' | 'ready';
+
+export interface ProofStateProps {
+  // pos: DocumentPosition;
+  status: InfoStatus;
+  messages: InteractiveDiagnostic[];
+  goals?: InteractiveGoals;
+  termGoal?: InteractiveTermGoal;
+  error?: string;
+  // userWidgets: UserWidgetInstance[];
+  // rpcSess: RpcSessionAtPos;
+  // triggerUpdate: () => Promise<void>;
+}
+
+export const ProofStateContext = React.createContext<{
+  proofState : ProofStateProps,
+  setProofState: React.Dispatch<React.SetStateAction<ProofStateProps>>
+}>({
+  proofState : {
+    status: 'updating',
+    messages: [],
+    goals: undefined,
+    termGoal: undefined,
+    error: undefined},
+  setProofState: () => {},
 });
 
 
@@ -96,10 +122,15 @@ function PlayableLevel({worldId, levelId}) {
   const [commandLineInput, setCommandLineInput] = useState("")
   const [canUndo, setCanUndo] = useState(initialCode.trim() !== "")
 
-  // The array of all shown hints. This excludes introduction and conclusion
-  // TODO: Not used yet
-  const [hints, setHints] = useState(Array<GameHint>)
   const [showHiddenHints, setShowHiddenHints] = useState(false)
+
+  const [proofState, setProofState] = React.useState<ProofStateProps>({
+    status: 'updating',
+    messages: [],
+    goals: undefined,
+    termGoal: undefined,
+    error: undefined,
+})
 
   const theme = useTheme();
 
@@ -205,8 +236,9 @@ function PlayableLevel({worldId, levelId}) {
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
+    <ProofStateContext.Provider value={{proofState, setProofState}}>
     <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
-    <HintContext.Provider value={{showHiddenHints, setShowHiddenHints, hints, setHints}}>
+    <HintContext.Provider value={{showHiddenHints, setShowHiddenHints}}>
       <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
       <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
         <div ref={chatPanelRef} className="chat-panel">
@@ -216,15 +248,8 @@ function PlayableLevel({worldId, levelId}) {
                 <Markdown>{level?.data?.introduction}</Markdown>
               </div>
             }
-                {/* {openHints.map(hint => <Hint hint={hint} />)}
-      {hiddenHints.length > 0 &&
-          <FormControlLabel
-            control={<Switch checked={showHints} onChange={() => setShowHints((prev) => !prev)} />}
-            label="I need help!"
-          />}
-      {showHints && hiddenHints.map(hint => <Hint hint={hint} />)} */}
-            {hints.map(hint =>
-              <div className="message info"><Markdown>{hint.text}</Markdown></div>)
+            {proofState.goals?.goals.length &&
+              <Hints hints={proofState.goals?.goals[0].hints} showHidden={showHiddenHints}/>
             }
             {completed &&
               <>
@@ -244,7 +269,6 @@ function PlayableLevel({worldId, levelId}) {
             }
 
             {/* { hints.map(hint => <div className="message info"><Markdown>{hint.text}</Markdown></div>) } */}
-            <Hints hints={hints} showHidden={showHiddenHints}/>
             {/* TODO: Remove this debugging message: */}
             {showHiddenHints && <p>Hidden Hints are displayed</p>}
           </div>
@@ -284,6 +308,7 @@ function PlayableLevel({worldId, levelId}) {
       </Split>
     </HintContext.Provider>
     </InputModeContext.Provider>
+    </ProofStateContext.Provider>
   </>
 }
 
