@@ -86,7 +86,7 @@ function InventoryItem({name, displayName, locked, disabled, newly, showDoc}) {
                 disabled ? "Not available in this level" : ""
 
   const handleClick = () => {
-    if (!locked && !disabled) {
+    if (!locked) {
       showDoc()
     }
   }

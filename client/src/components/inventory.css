@@ -29,17 +29,20 @@
   padding: .1em .5em;
 }
 
-.inventory .item.locked,
-.inventory .item.disabled {
+.inventory .item.locked {
   border: solid 1px #ccc;
   color: #ccc;
+}
+
+.inventory .item.disabled {
+  color: #d92c2c;
 }
 
 .inventory .item.new {
   background-color: rgb(255, 242, 190);
 }
 
-.inventory .item:not(.locked):not(.disabled) {
+.inventory .item:not(.locked) {
   cursor: pointer;
 }
 
