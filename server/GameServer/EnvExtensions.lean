@@ -202,6 +202,8 @@ structure LevelId where
 deriving Inhabited
 
 structure InventoryInfo where
+  /-- inventory items used by the main sample solution of this level -/
+  used : Array Name
   /-- new inventory items introduced by this level -/
   new : Array Name
   /-- inventory items exceptionally forbidden in this level -/
@@ -217,6 +219,7 @@ def getCurLevelId [MonadError m] : m LevelId := do
 
 /-- Instance to make GameLevel Repr work -/
 instance : Repr Elab.Command.Scope := ⟨fun s _ => repr s.currNamespace⟩
+
 
 structure GameLevel where
   index: Nat

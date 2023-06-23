@@ -282,6 +282,38 @@ elab "LemmaTab"  category:str : command =>
 syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
 -- TODO
 
+-- TODO: Reuse the following code for checking available tactics in user code:
+structure UsedInventory where
+(tactics : HashSet Name := {})
+(definitions : HashSet Name := {})
+(lemmas : HashSet Name := {})
+
+partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : CommandElabM UsedInventory := do
+  match stx with
+  | .missing => return acc
+  | .node info kind args =>
+    if kind == `tacticHint__ || kind == `tacticBranch_ then return acc
+    return ← args.foldlM (fun acc arg => collectUsedInventory arg acc) acc
+  | .atom info val =>
+    -- ignore syntax elements that do not start with a letter
+    -- and ignore some standard keywords
+    let allowed := ["with", "fun", "at", "only", "by"]
+    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
+      let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
+      return {acc with tactics := acc.tactics.insert val}
+    else
+      return acc
+  | .ident info rawVal val preresolved =>
+      let ns ←
+        try resolveGlobalConst (mkIdent val)
+        catch | _ => pure [] -- catch "unknown constant" error
+      return ← ns.foldlM (fun acc n => do
+        if let some (.thmInfo ..) := (← getEnv).find? n then
+          return {acc with lemmas := acc.lemmas.insertMany ns}
+        else
+          return {acc with definitions := acc.definitions.insertMany ns}
+      ) acc
+
 /-- Define the statement of the current level. -/
 elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
@@ -297,6 +329,12 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
   -- However, this should not be used when designing the game.
   let defaultDeclName : Ident := mkIdent <| (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
+
+  -- Collect all used tactics/lemmas in the sample proof:
+  let usedInventory ← match val with
+  | `(Parser.Command.declVal| := $proof:term) => do
+    collectUsedInventory proof
+  | _ => throwError "expected `:=`"
 
   -- Add theorem to context.
   match statementName with
@@ -378,7 +416,10 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
     | none => default
     | some name => currNamespace ++ name.getId
     descrFormat := (Format.join [head, " ", st, " := by"]).pretty 10
-    hints := hints }
+    hints := hints
+    tactics := {level.tactics with used := usedInventory.tactics.toArray}
+    definitions := {level.definitions with used := usedInventory.definitions.toArray}
+    lemmas := {level.lemmas with used := usedInventory.lemmas.toArray} }
 
 /-! # Hints -/
 
@@ -629,7 +670,10 @@ elab "MakeGame" : command => do
 
   -- Compute which inventory items are available in which level:
   for inventoryType in #[.Tactic, .Definition, .Lemma] do
+
+    -- Which items are introduced in which world?
     let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
+    let mut worldsWithNewItem : HashMap Name (HashSet Name) := {}
     let mut lemmaStatements : HashMap (Name × Nat) Name := {}
     let mut allItems : HashSet Name := {}
     for (worldId, world) in game.worlds.nodes.toArray do
@@ -665,6 +709,27 @@ elab "MakeGame" : command => do
           newItems := newItems.insert name
           allItems := allItems.insert name
       newItemsInWorld := newItemsInWorld.insert worldId newItems
+      for newItem in newItems do
+        worldsWithNewItem := worldsWithNewItem.insert newItem $
+          (worldsWithNewItem.findD newItem {}).insert worldId
+
+    -- Which items are used in which world?
+    let mut usedItemsInWorld : HashMap Name (HashSet Name) := {}
+    for (worldId, world) in game.worlds.nodes.toArray do
+      let mut usedItems : HashSet Name := {}
+      for (levelId, level) in world.levels.toArray do
+          usedItems := usedItems.insertMany (level.getInventory inventoryType).used
+      usedItemsInWorld := usedItemsInWorld.insert worldId usedItems
+
+    let mut worldDependsOnWorlds : HashMap Name (HashSet Name) := {}
+    for (dependentWorldId, dependentWorld) in game.worlds.nodes.toArray do
+      let mut dependsOnWorlds : HashSet Name := {}
+      for usedItem in usedItemsInWorld.find! dependentWorldId do
+        match worldsWithNewItem.find? usedItem with
+        | some worldId => dependsOnWorlds := dependsOnWorlds.insertMany worldId
+        | none => logWarning m!"No world introducing {usedItem}, but required by {dependentWorldId}"
+      worldDependsOnWorlds := worldDependsOnWorlds.insert dependentWorldId dependsOnWorlds
+      logInfo m!"World {dependentWorldId} depends on {dependsOnWorlds.toArray}"
 
     -- Basic inventory item availability: all locked.
     let Availability₀ : HashMap Name InventoryTile :=
