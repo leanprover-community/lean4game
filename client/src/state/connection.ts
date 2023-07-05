@@ -1,9 +1,10 @@
+/**
+ *  @fileOverview todo
+ */
 
+import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { LeanClient } from 'lean4web/client/src/editor/leanclient';
-import * as React from 'react';
-import { useState } from 'react';
-
 
 export class Connection {
   private game: string = undefined // We only keep a connection to a single game at a time
@@ -54,7 +55,7 @@ export const ConnectionContext = React.createContext(null);
 
 export const useLeanClient = (gameId) => {
   const leanClient = connection.getLeanClient(gameId)
-  const [leanClientStarted, setLeanClientStarted] = useState(leanClient.isStarted())
+  const [leanClientStarted, setLeanClientStarted] = React.useState(leanClient.isStarted())
 
   React.useEffect(() => {
     const t1 = leanClient.restarted(() => { console.log("START"); setLeanClientStarted(true) })

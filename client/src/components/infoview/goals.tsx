@@ -6,10 +6,9 @@ import { InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_strip
 import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
 import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
-import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpcApi';
-import { Hints } from './hints';
-import { CommandLine } from './CommandLine';
-import { InputModeContext } from '../Level';
+import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpc_api';
+import { InputModeContext } from './context';
+
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -230,6 +229,7 @@ export const OtherGoals = React.memo((props: GoalProps2) => {
       </div>}
   </>
 })
+
 
 export const ProofDisplay = React.memo((props : ProofDisplayProps) => {
   const { proof } = props

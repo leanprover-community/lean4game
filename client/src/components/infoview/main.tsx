@@ -4,26 +4,28 @@ import * as React from 'react';
 import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location, DocumentUri } from 'vscode-languageserver-protocol';
 
 import 'tachyons/css/tachyons.css';
-// import '@vscode/codicons/dist/codicon.ttf';
 import '@vscode/codicons/dist/codicon.css';
 import '../../../../node_modules/lean4-infoview/src/infoview/index.css';
 import './infoview.css'
 
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
-
-import { Infos } from './infos';
-import { AllMessages, WithLspDiagnosticsContext } from './messages';
 import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { WithRpcSessions } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infoview/serverVersion';
-import { useAppDispatch, useAppSelector } from '../../hooks';
-import { levelCompleted, selectCompleted } from '../../state/progress';
-import { GameIdContext } from '../../App';
-import { InputModeContext } from '../Level';
-import { CommandLine } from './CommandLine';
-import Markdown from '../Markdown';
+
+import { GameIdContext } from './context';
+import { useAppDispatch, useAppSelector } from '../../state/hooks';
 import { LevelInfo } from '../../state/api';
+import { levelCompleted, selectCompleted } from '../../state/progress';
+import Markdown from '../markdown';
+
+import { Infos } from './infos';
+import { AllMessages, WithLspDiagnosticsContext } from './messages';
+import { Goal } from './goals';
+import { InputModeContext, ProofStateContext } from './context';
+import { CommandLine } from './command_line';
+
 
 // The mathematical formulation of the statement, supporting e.g. Latex
 // It takes three forms, depending on the precence of name and description:
@@ -138,6 +140,10 @@ export function CommandLineInterface(props: {world: string, level: number, data:
   const ec = React.useContext(EditorContext);
   const gameId = React.useContext(GameIdContext)
 
+  const proofStateContext = React.useContext(ProofStateContext)
+
+  const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
+
   const dispatch = useAppDispatch()
 
   // Mark level as completed when server gives notification
@@ -181,6 +187,8 @@ export function CommandLineInterface(props: {world: string, level: number, data:
       []
   );
 
+  const goalFilter = { reverse: false, showType: true, showInstance: true, showHiddenAssumption: true, showLetValue: true }
+
   const serverVersion =
       useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
   const serverStoppedResult = useEventResult(ec.events.serverStopped);
@@ -199,6 +207,19 @@ export function CommandLineInterface(props: {world: string, level: number, data:
           <div className="content">
             <ExerciseStatement data={props.data} />
             <Infos />
+            <div className="tmp-pusher"></div>
+            <div className="tab-bar">
+              {proofStateContext.proofState.goals?.goals.map((goal, i) =>
+                <div className={`tab ${i == (selectedGoal) ? "active": ""}`}
+                    onClick={() => { setSelectedGoal(i) }}>
+                  {i ? `Goal ${i+1}` : "Active Goal"}
+                </div>)}
+            </div>
+            <div className="goal-tab vscode-light">
+              {proofStateContext.proofState.goals?.goals?.length &&
+                <Goal commandLine={false} filter={goalFilter} goal={proofStateContext.proofState.goals.goals[selectedGoal]} />
+              }
+            </div>
           </div>
           <CommandLine />
       </div>

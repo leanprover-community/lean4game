@@ -1,28 +1,21 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import './welcome.css'
-import cytoscape, { LayoutOptions } from 'cytoscape'
-import klay from 'cytoscape-klay';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Split from 'react-split'
-
-import GameMenu from './GameMenu';
-import {PrivacyPolicy} from './PrivacyPolicy';
+import { Box, Typography, CircularProgress } from '@mui/material';
+import cytoscape, { LayoutOptions } from 'cytoscape'
+import klay from 'cytoscape-klay';
+import './welcome.css'
+import { GameIdContext } from './infoview/context';
+import { selectCompleted } from '../state/progress';
+import { useGetGameInfoQuery } from '../state/api';
+import Markdown from './markdown';
+import GameMenu from './game_menu';
+import {PrivacyPolicy} from './privacy_policy';
 
 cytoscape.use( klay );
-
-import { Box, Typography, CircularProgress } from '@mui/material';
-import { useGetGameInfoQuery } from '../state/api';
-import { Link } from 'react-router-dom';
-import Markdown from './Markdown';
-import { selectCompleted } from '../state/progress';
-import { GameIdContext } from '../App';
-import { Button } from './Button';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDownload, faUpload, faEraser } from '@fortawesome/free-solid-svg-icons'
-
 
 const N = 24          // max number of levels per world
 const R = 800         // radius of a world

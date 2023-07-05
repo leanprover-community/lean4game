@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 import { Outlet, useParams } from "react-router-dom";
 
 import '@fontsource/roboto/300.css';
@@ -9,8 +8,7 @@ import '@fontsource/roboto/700.css';
 
 import './reset.css';
 import './app.css';
-
-export const GameIdContext = React.createContext<string>(undefined);
+import { GameIdContext } from './components/infoview/context';
 
 function App() {
   const params = useParams();

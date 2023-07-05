@@ -1,10 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { connection } from '../connection'
-import thunkMiddleware from 'redux-thunk'
+import { debounce } from "debounce";
+
+import { connection } from './connection'
 import { apiSlice } from './api'
 import { progressSlice } from './progress'
-import { saveState } from "./localStorage";
-import { debounce } from "debounce";
+import { saveState } from "./local_storage";
+
 
 export const store = configureStore({
   reducer: {

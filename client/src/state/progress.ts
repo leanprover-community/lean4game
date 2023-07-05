@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { loadState } from "./localStorage";
+import { loadState } from "./local_storage";
 
 export interface GameProgressState {
   [world: string] : {[level: number]: LevelProgressState}

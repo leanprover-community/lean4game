@@ -1,18 +1,17 @@
 import * as React from 'react';
-import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
-import Markdown from './Markdown';
+import { useNavigate, Link } from "react-router-dom";
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import './LandingPage.css'
-import {PrivacyPolicyPopup} from './PrivacyPolicy'
-
+import './landing_page.css'
 import coverRobo from '../assets/covers/formaloversum.png'
 import bgImage from '../assets/bg.jpg'
+
+import Markdown from './markdown';
+import {PrivacyPolicyPopup} from './privacy_policy'
 
 const flag = {
   'Dutch': '🇳🇱',
