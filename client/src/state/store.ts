@@ -1,3 +1,6 @@
+/**
+ * @fileOverview configure the store and save the state periodically to the browser storage
+*/
 import { configureStore } from '@reduxjs/toolkit';
 import { debounce } from "debounce";
 
@@ -21,10 +24,11 @@ export const store = configureStore({
     }).concat(apiSlice.middleware),
 });
 
-// Save progress in local storage
+/**
+ * Save progress in local storage once each 800ms.
+ * This is for better performance when multiple changes occur in a short time
+ */
 store.subscribe(
-  // we use debounce to save the state once each 800ms
-  // for better performances in case multiple changes occur in a short time
   debounce(() => {
     saveState(store.getState()[progressSlice.name]);
   }, 800)

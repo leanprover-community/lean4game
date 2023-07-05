@@ -28,6 +28,7 @@ interface ProgressState {
 
 const initialProgressState: ProgressState = loadState() ?? { games: {} }
 
+// TODO: There was some weird unreproducible bug with removing `as LevelProgressState` here...
 const initalLevelProgressState: LevelProgressState = {code: "", completed: false, selections: []}
 
 /** Add an empty skeleton with progress for the current level */
