@@ -5,7 +5,7 @@ import { faDownload, faUpload, faEraser } from '@fortawesome/free-solid-svg-icon
 
 import { Button } from './button'
 import { GameIdContext } from './infoview/context';
-import { useAppDispatch, useAppSelector } from '../state/hooks';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { deleteProgress, selectProgress, loadProgress, GameProgressState } from '../state/progress';
 
 const downloadFile = ({ data, fileName, fileType }) => {

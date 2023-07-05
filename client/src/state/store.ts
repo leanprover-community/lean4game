@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { debounce } from "debounce";
 
-import { connection } from './connection'
+import { connection } from '../connection'
 import { apiSlice } from './api'
 import { progressSlice } from './progress'
 import { saveState } from "./local_storage";

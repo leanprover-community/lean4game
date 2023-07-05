@@ -31,8 +31,8 @@ import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import { DocumentPosition } from '../../../node_modules/lean4-infoview/src/infoview/util';
 
 import { GameIdContext } from './infoview/context';
-import { ConnectionContext, useLeanClient } from '../state/connection';
-import { useAppDispatch, useAppSelector } from '../state/hooks';
+import { ConnectionContext, useLeanClient } from '../connection';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { Button } from './button'
 import Markdown from './markdown';
 import {Inventory, Documentation} from './inventory';

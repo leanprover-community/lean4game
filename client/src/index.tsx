@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './app';
-import { ConnectionContext, connection } from './state/connection'
+import { ConnectionContext, connection } from './connection'
 import { store } from './state/store';
 import { Provider } from 'react-redux';
 import {
