@@ -30,7 +30,7 @@ import { faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/fr
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import { DocumentPosition } from '../../../node_modules/lean4-infoview/src/infoview/util';
 
-import { GameIdContext } from './infoview/context';
+import { GameIdContext } from '../app';
 import { ConnectionContext, useLeanClient } from '../connection';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { Button } from './button'

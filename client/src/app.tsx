@@ -8,7 +8,8 @@ import '@fontsource/roboto/700.css';
 
 import './reset.css';
 import './app.css';
-import { GameIdContext } from './components/infoview/context';
+
+export const GameIdContext = React.createContext<string>(undefined);
 
 function App() {
   const params = useParams();

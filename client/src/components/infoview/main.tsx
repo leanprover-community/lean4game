@@ -14,7 +14,7 @@ import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '.
 import { WithRpcSessions } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infoview/serverVersion';
 
-import { GameIdContext } from './context';
+import { GameIdContext } from '../../app';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { LevelInfo } from '../../state/api';
 import { levelCompleted, selectCompleted } from '../../state/progress';

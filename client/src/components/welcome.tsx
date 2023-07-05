@@ -8,7 +8,7 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay';
 import './welcome.css'
-import { GameIdContext } from './infoview/context';
+import { GameIdContext } from '../app';
 import { selectCompleted } from '../state/progress';
 import { useGetGameInfoQuery } from '../state/api';
 import Markdown from './markdown';

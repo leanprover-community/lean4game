@@ -6,8 +6,6 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic, InteractiveTermGoal } from '@leanprover/infoview-api';
 import { InteractiveGoals } from './rpc_api';
 
-export const GameIdContext = React.createContext<string>(undefined);
-
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)
 

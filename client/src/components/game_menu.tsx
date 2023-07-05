@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser } from '@fortawesome/free-solid-svg-icons'
 
 import { Button } from './button'
-import { GameIdContext } from './infoview/context';
+import { GameIdContext } from '../app';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { deleteProgress, selectProgress, loadProgress, GameProgressState } from '../state/progress';
 
