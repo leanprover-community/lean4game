@@ -1,24 +1,20 @@
 import * as React from 'react'
 import { useRef, useState, useEffect } from 'react'
-import { LspDiagnosticsContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { useServerNotificationEffect } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol';
-import { InputModeContext, MonacoEditorContext } from '../Level'
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
-import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
-import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
-
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { Registry } from 'monaco-textmate' // peer dependency
 import { wireTmGrammars } from 'monaco-editor-textmate'
-import * as lightPlusTheme from 'lean4web/client/src/lightPlus.json'
+import { DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol';
+import { useServerNotificationEffect } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
+import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
 import * as leanSyntax from 'lean4web/client/src/syntaxes/lean.json'
 import * as leanMarkdownSyntax from 'lean4web/client/src/syntaxes/lean-markdown.json'
 import * as codeblockSyntax from 'lean4web/client/src/syntaxes/codeblock.json'
 import languageConfig from 'lean4/language-configuration.json';
 
+import { InputModeContext, MonacoEditorContext } from './context'
 
 /* We register a new language `leancmd` that looks like lean4, but does not use the lsp server. */
 

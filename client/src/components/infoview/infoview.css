@@ -64,7 +64,7 @@
   flex-direction: column;
 }
 
-.command-line .command-line-input{
+.command-line .command-line-input {
   flex: 1;
 }
 
@@ -127,4 +127,15 @@
   background-color: #f0f0f0;
   border-radius: 1em;
   padding: 0.6em;
+}
+
+
+/* Push the goals to the bottom for now, until we insert the proof history above. */
+.commandline-interface .content {
+  display: flex;
+  flex-direction: column;
+}
+
+.commandline-interface .content .tmp-pusher {
+  flex: 1;
 }

@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react';
 import './inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
-import Markdown from './Markdown';
+import { GameIdContext } from '../app';
+import Markdown from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo } from '../state/api';
-import { GameIdContext } from '../App';
 
 export function Inventory({levelInfo, openDoc } :
   {

@@ -1,13 +1,11 @@
 import * as React from 'react'
-import { Button } from './Button'
-import { GameIdContext } from '../App';
-import { useStore } from 'react-redux';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { useSelector } from 'react-redux';
-
+import { useStore, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser } from '@fortawesome/free-solid-svg-icons'
 
+import { Button } from './button'
+import { GameIdContext } from '../app';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { deleteProgress, selectProgress, loadProgress, GameProgressState } from '../state/progress';
 
 const downloadFile = ({ data, fileName, fileType }) => {

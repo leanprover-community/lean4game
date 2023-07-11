@@ -1,16 +1,16 @@
-import * as React from 'react';
-import fastIsEqual from 'react-fast-compare';
-import { Location, DocumentUri, Diagnostic, DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol';
+import * as React from 'react'
+import fastIsEqual from 'react-fast-compare'
+import { Location, DocumentUri, Diagnostic, DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol'
 
-import { LeanDiagnostic, RpcErrorCode } from '@leanprover/infoview-api';
+import { LeanDiagnostic, RpcErrorCode, getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api'
 
-import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { ConfigContext, EditorContext, LspDiagnosticsContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/collapsing';
-import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer';
-import { getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api';
-import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { InputModeContext } from '../Level';
+import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util'
+import { ConfigContext, EditorContext, LspDiagnosticsContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts'
+import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/collapsing'
+import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer'
+import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions'
+
+import { InputModeContext } from './context'
 
 interface MessageViewProps {
     uri: DocumentUri;

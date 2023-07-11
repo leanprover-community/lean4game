@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
+import Split from 'react-split'
+import { Alert } from '@mui/material';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -26,74 +28,19 @@ import type { Location } from 'vscode-languageserver-protocol';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import Split from 'react-split'
-import { Alert } from '@mui/material';
+import { DocumentPosition } from '../../../node_modules/lean4-infoview/src/infoview/util';
 
-import { Button } from './Button'
-import {Inventory, Documentation} from './Inventory';
-import Markdown from './Markdown';
-import { EditorInterface, CommandLineInterface } from './infoview/main'
-import { Hints } from './infoview/hints';
-import { GameHint, InteractiveGoals } from './infoview/rpcApi';
-import { GameIdContext } from '../App';
+import { GameIdContext } from '../app';
 import { ConnectionContext, useLeanClient } from '../connection';
 import { useAppDispatch, useAppSelector } from '../hooks';
+import { Button } from './button'
+import Markdown from './markdown';
+import {Inventory, Documentation} from './inventory';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
-import { DocumentPosition } from '../../../node_modules/lean4-infoview/src/infoview/util';
-import { getInteractiveTermGoal, InteractiveDiagnostic,
-  UserWidgetInstance, Widget_getWidgets, RpcSessionAtPos, isRpcError,
-  RpcErrorCode, getInteractiveDiagnostics, InteractiveTermGoal } from '@leanprover/infoview-api';
-
-export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(null as any);
-
-export const HintContext = React.createContext<{
-  showHiddenHints : boolean,
-  setShowHiddenHints: React.Dispatch<React.SetStateAction<boolean>>
-}>({
-  showHiddenHints: true,
-  setShowHiddenHints: () => {},
-});
-
-export type InfoStatus = 'updating' | 'error' | 'ready';
-
-export interface ProofStateProps {
-  // pos: DocumentPosition;
-  status: InfoStatus;
-  messages: InteractiveDiagnostic[];
-  goals?: InteractiveGoals;
-  termGoal?: InteractiveTermGoal;
-  error?: string;
-  // userWidgets: UserWidgetInstance[];
-  // rpcSess: RpcSessionAtPos;
-  // triggerUpdate: () => Promise<void>;
-}
-
-export const ProofStateContext = React.createContext<{
-  proofState : ProofStateProps,
-  setProofState: React.Dispatch<React.SetStateAction<ProofStateProps>>
-}>({
-  proofState : {
-    status: 'updating',
-    messages: [],
-    goals: undefined,
-    termGoal: undefined,
-    error: undefined},
-  setProofState: () => {},
-});
-
-
-export const InputModeContext = React.createContext<{
-  commandLineMode: boolean,
-  setCommandLineMode: React.Dispatch<React.SetStateAction<boolean>>,
-  commandLineInput: string,
-  setCommandLineInput: React.Dispatch<React.SetStateAction<string>>
-}>({
-  commandLineMode: true,
-  setCommandLineMode: () => {},
-  commandLineInput: "",
-  setCommandLineInput: () => {},
-});
+import { EditorInterface, CommandLineInterface } from './infoview/main'
+import { Hints } from './hints';
+import { HintContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStateContext, ProofStateProps, ProofStep } from './infoview/context';
 
 function Level() {
 
@@ -123,6 +70,8 @@ function PlayableLevel({worldId, levelId}) {
   const [canUndo, setCanUndo] = useState(initialCode.trim() !== "")
 
   const [showHiddenHints, setShowHiddenHints] = useState(false)
+
+  const [proof, setProof] = useState<Array<ProofStep>>([])
 
   const [proofState, setProofState] = React.useState<ProofStateProps>({
     status: 'updating',
@@ -238,6 +187,7 @@ function PlayableLevel({worldId, levelId}) {
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <ProofStateContext.Provider value={{proofState, setProofState}}>
     <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
+    <ProofContext.Provider value={{proof, setProof}}>
     <HintContext.Provider value={{showHiddenHints, setShowHiddenHints}}>
       <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
       <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
@@ -307,6 +257,7 @@ function PlayableLevel({worldId, levelId}) {
         </div>
       </Split>
     </HintContext.Provider>
+    </ProofContext.Provider>
     </InputModeContext.Provider>
     </ProofStateContext.Provider>
   </>

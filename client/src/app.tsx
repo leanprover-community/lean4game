@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 import { Outlet, useParams } from "react-router-dom";
 
 import '@fontsource/roboto/300.css';

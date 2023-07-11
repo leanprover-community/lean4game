@@ -1,24 +1,25 @@
 /* Mostly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/info.tsx */
 
 import * as React from 'react';
+import { CircularProgress } from '@mui/material';
+
+
 import type { Location, Diagnostic } from 'vscode-languageserver-protocol';
 
-import { goalsToString, Goal, MainAssumptions, OtherGoals, FilteredGoals, ProofDisplay } from './goals'
-import { basename, DocumentPosition, RangeHelpers, useEvent, usePausableState, discardMethodNotFound,
-    mapRpcError, useAsyncWithTrigger, PausableProps } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { ConfigContext, EditorContext, LspDiagnosticsContext, ProgressContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { AllMessages, lspDiagToInteractive, MessagesList } from './messages';
 import { getInteractiveTermGoal, InteractiveDiagnostic,
     UserWidgetInstance, Widget_getWidgets, RpcSessionAtPos, isRpcError,
     RpcErrorCode, getInteractiveDiagnostics, InteractiveTermGoal } from '@leanprover/infoview-api';
-import { InteractiveGoal, InteractiveGoals } from './rpcApi';
+import { basename, DocumentPosition, RangeHelpers, useEvent, usePausableState, discardMethodNotFound,
+    mapRpcError, useAsyncWithTrigger, PausableProps } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { ConfigContext, EditorContext, LspDiagnosticsContext, ProgressContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { PanelWidgetDisplay } from '../../../../node_modules/lean4-infoview/src/infoview/userWidget'
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
-import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
-import { CircularProgress } from '@mui/material';
-import { InputModeContext, MonacoEditorContext, HintContext, ProofStateProps, InfoStatus, ProofStateContext } from '../Level'
-import { Hint } from './hints';
+
+import { AllMessages, lspDiagToInteractive, MessagesList } from './messages';
+import { goalsToString, Goal, MainAssumptions, OtherGoals, FilteredGoals, ProofDisplay } from './goals'
+import { InteractiveGoal, InteractiveGoals } from './rpc_api';
+import { InputModeContext, MonacoEditorContext, HintContext, ProofStateProps, InfoStatus, ProofStateContext } from './context'
 
 
 type InfoKind = 'cursor' | 'pin';
@@ -127,7 +128,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
           <div className="goals-section">
             { goals &&  goals.goals.length > 0 && <>
               <MainAssumptions filter={goalFilter} key='mainGoal' goals={goals.goals} />
-              {/* <ProofDisplay proof={proof}/> */}
+              <ProofDisplay proof={proof}/>
               <OtherGoals filter={goalFilter} goals={goals.goals} />
             </>}
           </div>

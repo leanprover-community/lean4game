@@ -1,3 +1,6 @@
+/**
+ * @fileOverview Define API of the server-client communication
+*/
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Connection } from '../connection'
 
