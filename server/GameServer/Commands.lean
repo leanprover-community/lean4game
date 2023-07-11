@@ -678,10 +678,6 @@ tactics are available in each level etc. -/
 elab "MakeGame" : command => do
   let game ← getCurGame
 
-  -- Check for loops in world graph
-  if game.worlds.hasLoops then
-    throwError "World graph must not contain loops! Check your `Path` declarations."
-
   let env ← getEnv
 
   -- Now create The doc entries from the templates
