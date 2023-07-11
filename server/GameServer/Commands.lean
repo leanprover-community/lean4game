@@ -49,26 +49,6 @@ elab "Conclusion" t:str : command => do
   | .World => modifyCurWorld  fun world => pure {world with conclusion := t.getString}
   | .Game => modifyCurGame  fun game => pure {game with conclusion := t.getString}
 
-/-! ## World Paths -/
-
-/-- The worlds of a game are joint by paths. These are defined with the syntax
-`Path World₁ → World₂ → World₃`. -/
-def Parser.path := Parser.sepBy1Indent Parser.ident "→"
-
-/-- The worlds of a game are joint by paths. These are defined with the syntax
-`Path World₁ → World₂ → World₃`. -/
-elab "Path" s:Parser.path : command => do
-  let mut last : Option Name := none
-  for stx in s.raw.getArgs.getEvenElems do
-    let some l := last
-      | do
-          last := some stx.getId
-          continue
-    modifyCurGame fun game =>
-      pure {game with worlds := {game.worlds with edges := game.worlds.edges.push (l, stx.getId)}}
-    last := some stx.getId
-
-
 
 /-! # Inventory
 
@@ -698,10 +678,6 @@ tactics are available in each level etc. -/
 elab "MakeGame" : command => do
   let game ← getCurGame
 
-  -- Check for loops in world graph
-  if game.worlds.hasLoops then
-    throwError "World graph must not contain loops! Check your `Path` declarations."
-
   let env ← getEnv
 
   -- Now create The doc entries from the templates
@@ -893,8 +869,10 @@ elab "MakeGame" : command => do
       logError m!"{w1} depends on {w2} because of {item}"
   else
     worldDependsOnWorlds ← removeTransitive worldDependsOnWorlds
-    logInfo m!"Dependencies: {worldDependsOnWorlds.toArray.map fun (a,b) => (a,b.toArray)}"
-
+    for (dependentWorldId, worldIds) in worldDependsOnWorlds.toArray do
+      modifyCurGame fun game =>
+        pure {game with worlds := {game.worlds with
+          edges := game.worlds.edges.append (worldIds.toArray.map fun wid => (wid, dependentWorldId))}}
 
 /-! # Debugging tools -/
 
