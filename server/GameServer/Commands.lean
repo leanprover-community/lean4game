@@ -893,8 +893,10 @@ elab "MakeGame" : command => do
       logError m!"{w1} depends on {w2} because of {item}"
   else
     worldDependsOnWorlds ← removeTransitive worldDependsOnWorlds
-    logInfo m!"Dependencies: {worldDependsOnWorlds.toArray.map fun (a,b) => (a,b.toArray)}"
-
+    for (dependentWorldId, worldIds) in worldDependsOnWorlds.toArray do
+      modifyCurGame fun game =>
+        pure {game with worlds := {game.worlds with
+          edges := game.worlds.edges.append (worldIds.toArray.map fun wid => (wid, dependentWorldId))}}
 
 /-! # Debugging tools -/
 
