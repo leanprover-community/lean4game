@@ -1,13 +1,17 @@
-/* Mostly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/goals.tsx */
+/**
+ * @fileOverview
+ *
+ * Mostly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/goals.tsx
+*/
 
 import * as React from 'react'
-import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_stripTags } from '@leanprover/infoview-api'
-import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
 import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
-import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpc_api';
+import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
+import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
 import { InputModeContext } from './context';
+import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpc_api';
 
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */

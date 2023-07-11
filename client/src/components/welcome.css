@@ -196,18 +196,6 @@ svg .world-title {
   width: 100%;
 }
 
-.game-menu {
-  padding: .5em;
-}
-
-.game-menu .btn {
-  min-width: 5em;
-  text-align: center;
-  margin-left: .4em;
-  margin-right: .4em;
-  margin-bottom: .2em;
-}
-
 .modal a.download-link {
   cursor: pointer;
   font-style: italic;

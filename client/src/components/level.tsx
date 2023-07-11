@@ -83,7 +83,6 @@ function PlayableLevel({worldId, levelId}) {
 
   const theme = useTheme();
 
-
   useEffect(() => {
     // Scroll to top when loading a new level
     // TODO: Thats the wrong behaviour probably
@@ -416,7 +415,9 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
       editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
       editor.setModel(model)
       if (initialSelections) {
-        editor.setSelections(initialSelections)
+        console.debug("Initial Selection: ", initialSelections)
+        // BUG: Somehow I get an `invalid arguments` bug here
+        // editor.setSelections(initialSelections)
       }
 
       infoviewApi.serverRestarted(leanClient.initializeResult)

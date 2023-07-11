@@ -1,0 +1,11 @@
+.world-selection-menu {
+  padding: .5em;
+}
+
+.world-selection-menu .btn {
+  min-width: 5em;
+  text-align: center;
+  margin-left: .4em;
+  margin-right: .4em;
+  margin-bottom: .2em;
+}

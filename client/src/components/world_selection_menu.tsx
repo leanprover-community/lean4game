@@ -1,14 +1,27 @@
+/**
+ * @fileOverview Define the menu displayed with the tree of worlds on the welcome page
+*/
 import * as React from 'react'
 import { useStore, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser } from '@fortawesome/free-solid-svg-icons'
+
+import './world_selection_menu.css'
 
 import { Button } from './button'
 import { GameIdContext } from '../app';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { deleteProgress, selectProgress, loadProgress, GameProgressState } from '../state/progress';
 
-const downloadFile = ({ data, fileName, fileType }) => {
+/** Only to specify the types for `downloadFile` */
+interface downloadFileParam {
+  data: string
+  fileName: string
+  fileType: string
+}
+
+/** Download a file containing `data` */
+const downloadFile = ({ data, fileName, fileType } : downloadFileParam) => {
   const blob = new Blob([data], { type: fileType })
   const a = document.createElement('a')
   a.download = fileName
@@ -22,25 +35,25 @@ const downloadFile = ({ data, fileName, fileType }) => {
   a.remove()
 }
 
-function GameMenu() {
-
+/** The menu that is shown next to the world selection graph */
+function WorldSelectionMenu() {
   const [file, setFile] = React.useState<File>();
 
   const gameId = React.useContext(GameIdContext)
   const store = useStore()
 
+  /* state variables to toggle the pop-up menus */
   const [eraseMenu, setEraseMenu] = React.useState(false);
   const openEraseMenu = () => setEraseMenu(true);
   const closeEraseMenu = () => setEraseMenu(false);
-
   const [uploadMenu, setUploadMenu] = React.useState(false);
   const openUploadMenu = () => setUploadMenu(true);
   const closeUploadMenu = () => setUploadMenu(false);
 
   const gameProgress = useSelector(selectProgress(gameId))
-
   const dispatch = useAppDispatch()
 
+  /** Download the current progress (i.e. what's saved in the browser store) */
   const downloadProgress = (e) => {
     e.preventDefault()
     downloadFile({
@@ -48,29 +61,24 @@ function GameMenu() {
       fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
       fileType: 'text/json',
     })
-  };
+  }
 
   const handleFileChange = (e) => {
     if (e.target.files) {
-      setFile(e.target.files[0]);
+      setFile(e.target.files[0])
     }
+  }
 
-  };
-
+  /** Upload progress from a  */
   const uploadProgress = (e) => {
-    if (!file) {
-      return;
-    }
-
-    const fileReader = new FileReader();
-    fileReader.readAsText(file, "UTF-8");
+    if (!file) {return}
+    const fileReader = new FileReader()
+    fileReader.readAsText(file, "UTF-8")
     fileReader.onload = (e) => {
-      const data = JSON.parse(e.target.result.toString()) as GameProgressState;
-      console.debug("Json Data", data);
-
+      const data = JSON.parse(e.target.result.toString()) as GameProgressState
+      console.debug("Json Data", data)
       dispatch(loadProgress({game: gameId, data: data}))
     }
-
     closeUploadMenu()
   }
 
@@ -84,46 +92,44 @@ function GameMenu() {
     eraseProgress()
   }
 
-  return <nav className="game-menu">
+  return <nav className="world-selection-menu">
     <Button onClick={downloadProgress} title="Download game progress" to=""><FontAwesomeIcon icon={faDownload} /></Button>
     <Button title="Load game progress from JSON" onClick={openUploadMenu} to=""><FontAwesomeIcon icon={faUpload} /></Button>
     <Button title="Clear game progress" to="" onClick={openEraseMenu}><FontAwesomeIcon icon={faEraser} /></Button>
-
     {eraseMenu?
       <div className="modal-wrapper">
-      <div className="modal-backdrop" onClick={closeEraseMenu} />
-      <div className="modal">
-        <div className="codicon codicon-close modal-close" onClick={closeEraseMenu}></div>
-        <h2>Delete Progress?</h2>
+        <div className="modal-backdrop" onClick={closeEraseMenu} />
+        <div className="modal">
+          <div className="codicon codicon-close modal-close" onClick={closeEraseMenu}></div>
+          <h2>Delete Progress?</h2>
 
-        <p>Do you want to delete your saved progress irreversibly?</p>
-        <p>(This only affects your saved proofs, no levels are ever locked.
-          Saves from other games are not deleted.)</p>
+          <p>Do you want to delete your saved progress irreversibly?</p>
+          <p>(This only affects your saved proofs, no levels are ever locked.
+            Saves from other games are not deleted.)</p>
 
-        <Button onClick={eraseProgress} to="">Delete</Button>
-        <Button onClick={downloadAndErase} to="">Download & Delete</Button>
-        <Button onClick={closeEraseMenu} to="">Cancel</Button>
-      </div>
-    </div> : null}
-
+          <Button onClick={eraseProgress} to="">Delete</Button>
+          <Button onClick={downloadAndErase} to="">Download & Delete</Button>
+          <Button onClick={closeEraseMenu} to="">Cancel</Button>
+        </div>
+      </div> : null}
     {uploadMenu ?
       <div className="modal-wrapper">
-      <div className="modal-backdrop" onClick={closeUploadMenu} />
-      <div className="modal">
-        <div className="codicon codicon-close modal-close" onClick={closeUploadMenu}></div>
-        <h2>Upload Saved Progress</h2>
+        <div className="modal-backdrop" onClick={closeUploadMenu} />
+        <div className="modal">
+          <div className="codicon codicon-close modal-close" onClick={closeUploadMenu}></div>
+          <h2>Upload Saved Progress</h2>
 
-        <p>Select a JSON file with the saved game progress to load your progress.</p>
+          <p>Select a JSON file with the saved game progress to load your progress.</p>
 
-        <p><b>Warning:</b> This will delete your current game progress!
-          Consider <a className="download-link" onClick={downloadProgress} >downloading your current progress</a> first!</p>
+          <p><b>Warning:</b> This will delete your current game progress!
+            Consider <a className="download-link" onClick={downloadProgress} >downloading your current progress</a> first!</p>
 
-        <input type="file" onChange={handleFileChange}/>
+          <input type="file" onChange={handleFileChange}/>
 
-        <Button to="" onClick={uploadProgress}>Load selected file</Button>
-      </div>
-    </div> : null}
+          <Button to="" onClick={uploadProgress}>Load selected file</Button>
+        </div>
+      </div> : null}
   </nav>
 }
 
-export default GameMenu
+export default WorldSelectionMenu

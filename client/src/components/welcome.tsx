@@ -12,7 +12,7 @@ import { GameIdContext } from '../app';
 import { selectCompleted } from '../state/progress';
 import { useGetGameInfoQuery } from '../state/api';
 import Markdown from './markdown';
-import GameMenu from './game_menu';
+import WorldSelectionMenu from './world_selection_menu';
 import {PrivacyPolicy} from './privacy_policy';
 
 cytoscape.use( klay );
@@ -104,7 +104,7 @@ function Welcome() {
         </Typography>
       </div>
       <div className="column">
-        <GameMenu />
+        <WorldSelectionMenu />
         <Box textAlign='center' sx={{ m: 5 }}>
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
               viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${s*bounds.x2 - s*bounds.x1 + 2 * padding} ${s*bounds.y2 - s*bounds.y1 + 2 * padding}` : ''}>
