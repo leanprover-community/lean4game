@@ -13,8 +13,13 @@ import * as leanSyntax from 'lean4web/client/src/syntaxes/lean.json'
 import * as leanMarkdownSyntax from 'lean4web/client/src/syntaxes/lean-markdown.json'
 import * as codeblockSyntax from 'lean4web/client/src/syntaxes/codeblock.json'
 import languageConfig from 'lean4/language-configuration.json';
+import { InteractiveDiagnostic, getInteractiveDiagnostics } from '@leanprover/infoview-api';
+import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 
-import { InputModeContext, MonacoEditorContext } from './context'
+import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './context'
+import { goalsToString } from './goals'
+import { InteractiveGoals } from './rpc_api'
 
 /* We register a new language `leancmd` that looks like lean4, but does not use the lsp server. */
 
@@ -58,10 +63,14 @@ config.autoClosingPairs = config.autoClosingPairs.map(
 )
 monaco.languages.setLanguageConfiguration('lean4cmd', config);
 
+/** The input field */
 export function CommandLine() {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
+  const model = editor.getModel()
+  const uri = model.uri.toString()
+
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
@@ -69,26 +78,108 @@ export function CommandLine() {
 
   const inputRef = useRef()
 
+  // The context storing all information about the current proof
+  const {proof, setProof} = React.useContext(ProofContext)
+
+  // TODO: does the position matter at all?
+  const rpcSess = useRpcSessionAtPos({uri: uri, line: 1, character: 1})
+
+  /** Load all goals an messages of the current proof (line-by-line) and save
+   * the retrieved information into context (`ProofContext`)
+   */
+  const loadAllGoals = React.useCallback(() => {
+    let goalCalls = []
+    let msgCalls = []
+
+    // For each line of code ask the server for the goals and the messages on this line
+    for (let i = 0; i < model.getLineCount(); i++) {
+      goalCalls.push(
+        rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp({line: i, character: 0, uri: uri}))
+      )
+      msgCalls.push(
+        getInteractiveDiagnostics(rpcSess, {start: i, end: i+1})
+      )
+    }
+
+    // Wait for all these requests to be processed before saving the results
+    Promise.all(goalCalls).then((steps : InteractiveGoals[]) => {
+      Promise.all(msgCalls).then((diagnostics : [InteractiveDiagnostic[]]) => {
+        let tmpProof : ProofStep[] = []
+
+        steps.map((goals, i) => {
+          // The first step has an empty command and therefore also no error messages
+          let messages = i ? diagnostics[i-1] : []
+
+          // Filter out the 'unsolved goals' message
+          messages = messages.filter((msg) => {
+            return !("append" in msg.message &&
+              "text" in msg.message.append[0] &&
+              msg.message.append[0].text === "unsolved goals")
+          })
+
+          // TODO: Check what happens if the code gets into a bad state and no goals are available
+          if (!goals) {
+            tmpProof.push({
+              command: i ? model.getLineContent(i) : '',
+              goals: [],
+              hints: [],
+              errors: messages
+            } as ProofStep)
+          } else {
+
+            console.debug(`Command (${i}): `, i ? model.getLineContent(i) : '')
+            console.debug(`Goals: (${i}): `, goalsToString(goals)) //
+            console.debug(`Hints: (${i}): `, goals.goals[0]?.hints)
+            console.debug(`Errors: (${i}): `, messages)
+
+            // with no goals there will be no hints
+            let hints = goals.goals.length ? goals.goals[0].hints : []
+
+            tmpProof.push({
+              // the command of the line above. Note that `getLineContent` starts counting
+              // at `1` instead of `zero`. The first ProofStep will have an empty command.
+              command: i ? model.getLineContent(i) : '',
+              // TODO: store correct data
+              goals: goals.goals || [],
+              // only need the hints of the active goals in chat
+              hints: hints,
+              // errors and messages from the server
+              errors: messages
+            } as ProofStep)
+          }
+        })
+        // Save the proof to the context
+        setProof(tmpProof)
+      })
+    })
+  }, [commandLineInput, editor])
+
   // Run the command
   const runCommand = React.useCallback(() => {
-    if (processing) return;
+    if (processing) {return}
     const pos = editor.getPosition()
-    editor.executeEdits("command-line", [{
-      range: monaco.Selection.fromPositions(
-        pos,
-        editor.getModel().getFullModelRange().getEndPosition()
-      ),
-      text: commandLineInput + "\n",
-      forceMoveMarkers: false
-    }]);
+    if (commandLineInput) {
+      setProcessing(true)
+      editor.executeEdits("command-line", [{
+        range: monaco.Selection.fromPositions(
+          pos,
+          editor.getModel().getFullModelRange().getEndPosition()
+        ),
+        text: commandLineInput + "\n",
+        forceMoveMarkers: false
+      }])
+    }
+
     editor.setPosition(pos)
-    setProcessing(true)
   }, [commandLineInput, editor])
 
   useEffect(() => {
     if (oneLineEditor && oneLineEditor.getValue() !== commandLineInput) {
       oneLineEditor.setValue(commandLineInput)
     }
+
+    // TODO: Is this the right place to load the goals once initially?
+    loadAllGoals()
   }, [commandLineInput])
 
   // React when answer from the server comes back
@@ -118,6 +209,7 @@ export function CommandLine() {
         enabled: false
       },
       lineNumbers: 'off',
+      tabSize: 2,
       glyphMargin: false,
       folding: false,
       lineDecorationsWidth: 0,
@@ -146,7 +238,7 @@ export function CommandLine() {
     // Ensure that our one-line editor can only have a single line
     const l = oneLineEditor.getModel().onDidChangeContent((e) => {
       const value = oneLineEditor.getValue()
-      setCommandLineInput(value)
+      setCommandLineInput(value.trim())
       const newValue = value.replace(/[\n\r]/g, '')
       if (value != newValue) {
         oneLineEditor.setValue(newValue)
@@ -161,14 +253,17 @@ export function CommandLine() {
     const l = oneLineEditor.onKeyUp((ev) => {
       if (ev.code === "Enter") {
         runCommand()
+        loadAllGoals() // TODO: instead of loading all goals every time, we could only load the last one
       }
     })
     return () => { l.dispose() }
   }, [oneLineEditor, runCommand])
 
+  /** Process the entered command */
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault()
     runCommand()
+    loadAllGoals() // TODO: instead of loading all goals every time, we could only load the last one
   }
 
   return <div className="command-line">
@@ -176,7 +271,9 @@ export function CommandLine() {
         <div className="command-line-input-wrapper">
           <div ref={inputRef} className="command-line-input" />
         </div>
-        <button type="submit" disabled={processing} className="btn btn-inverted"><FontAwesomeIcon icon={faWandMagicSparkles} /> Execute</button>
+        <button type="submit" disabled={processing} className="btn btn-inverted">
+          <FontAwesomeIcon icon={faWandMagicSparkles} /> Execute
+        </button>
       </form>
     </div>
 }

@@ -4,10 +4,44 @@
 import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic, InteractiveTermGoal } from '@leanprover/infoview-api';
-import { InteractiveGoals } from './rpc_api';
+import { InteractiveGoal, InteractiveGoals } from './rpc_api';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)
+
+export type InfoStatus = 'updating' | 'error' | 'ready';
+
+/** One step of the proof */
+export type ProofStep = {
+  /** The command in this step */
+  command : string
+  /** List of goals *after* this command */
+  goals: InteractiveGoal[]     // TODO: Add correct type
+  /** Story relevant messages */
+  hints: any        // TODO: Add correct type
+  /** Errors and warnings */
+  errors: any       // TODO: Add correct type
+}
+
+/** The context storing the proof step-by-step for the command line mode */
+export const ProofContext = React.createContext<{
+  /** The proof consists of multiple steps that are processed one after the other.
+   * In particular multi-line terms like `match`-statements will not be supported.
+   *
+   * Note that the first step will always have `null` as command
+   */
+  proof: ProofStep[],
+  setProof: React.Dispatch<React.SetStateAction<Array<ProofStep>>>
+}>({
+  proof: [],
+  setProof: () => {} // TODO: implement me
+})
+
+
+
+
+
+
 
 // TODO: Is this still used?
 export const HintContext = React.createContext<{
@@ -17,25 +51,6 @@ export const HintContext = React.createContext<{
   showHiddenHints: true,
   setShowHiddenHints: () => {},
 });
-
-export type InfoStatus = 'updating' | 'error' | 'ready';
-
-export type ProofStep = {
-  // TODO: Add correct types
-  command : string
-  goals: string
-  hints: string
-  errors: string
-}
-
-export const ProofContext = React.createContext<{
-  // The first entry will always have an empty/undefined command
-  proof: ProofStep[],
-  setProof: React.Dispatch<React.SetStateAction<Array<ProofStep>>>
-}>({
-  proof: [],
-  setProof: () => {}
-})
 
 export interface ProofStateProps {
   // pos: DocumentPosition;

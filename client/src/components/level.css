@@ -211,3 +211,15 @@ td code  {
   overflow-y: scroll;
   padding: 1em;
 }
+
+/* TODO: Create a nice style and move this to a better place */
+
+.exercise .command {
+  background-color: rgb(167, 167, 167);
+}
+
+.exercise .step {
+  background-color: #ffeb91;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}

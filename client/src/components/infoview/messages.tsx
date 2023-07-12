@@ -17,6 +17,44 @@ interface MessageViewProps {
     diag: InteractiveDiagnostic;
 }
 
+/** A list of messages (info/warning/error) that are produced after this command */
+function Error({error, commandLineMode} : {error : InteractiveDiagnostic, commandLineMode : boolean}) {
+  // The first step will always have an empty command
+
+  const severityClass = error.severity ? {
+    [DiagnosticSeverity.Error]: 'error',
+    [DiagnosticSeverity.Warning]: 'warning',
+    [DiagnosticSeverity.Information]: 'information',
+    [DiagnosticSeverity.Hint]: 'hint',
+  }[error.severity] : '';
+
+  const {line, character} = error.range.start;
+  const title = `Line ${line+1}, Character ${character}`;
+
+  // Hide "unsolved goals" messages
+  let message;
+  if ("append" in error.message && "text" in error.message.append[0] &&
+  error.message?.append[0].text === "unsolved goals") {
+      message = error.message.append[0]
+  } else {
+      message = error.message
+  }
+
+  return <div className={severityClass + ' ml1 message'}>
+    {!commandLineMode && <p className="mv2">{title}</p>}
+    <pre className="font-code pre-wrap">
+      <InteractiveMessage fmt={message} />
+    </pre>
+  </div>
+}
+
+/** A list of messages (info/warning/error) that are produced after this command */
+export function Errors ({errors, commandLineMode} : {errors : InteractiveDiagnostic[], commandLineMode : boolean}) {
+  return <div>
+    {errors.map((err) => (<Error error={err} commandLineMode={commandLineMode}/>))}
+  </div>
+}
+
 const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
     const ec = React.useContext(EditorContext);
     const fname = escapeHtml(basename(uri));

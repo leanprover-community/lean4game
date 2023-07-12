@@ -2,8 +2,7 @@
  * @fileOverview
  *
  * Mostly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/goals.tsx
-*/
-
+ */
 import * as React from 'react'
 import { InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_stripTags } from '@leanprover/infoview-api'
 import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
@@ -12,7 +11,6 @@ import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/inf
 import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
 import { InputModeContext } from './context';
 import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpc_api';
-
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -140,6 +138,9 @@ interface ProofDisplayProps {
 export const Goal = React.memo((props: GoalProps) => {
     const { goal, filter, showHints, commandLine } = props
 
+    // TODO: Apparently `goal` can be `undefined`
+    if (!goal) {return <></>}
+
     const filteredList = getFilteredHypotheses(goal.hyps, filter);
     const hyps = filter.reverse ? filteredList.slice().reverse() : filteredList;
     const locs = React.useContext(LocationsContext)
@@ -181,6 +182,8 @@ export const Goal = React.memo((props: GoalProps) => {
 
 export const MainAssumptions = React.memo((props: GoalProps2) => {
   const { goals, filter } = props
+
+
 
   const goal = goals[0]
   const filteredList = getFilteredHypotheses(goal.hyps, filter);

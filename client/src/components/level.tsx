@@ -6,7 +6,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { InfoviewApi } from '@leanprover/infoview'
+import { InfoviewApi, defaultInfoviewConfig } from '@leanprover/infoview'
 import { Link, useParams } from 'react-router-dom';
 import { Box, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
@@ -28,7 +28,6 @@ import type { Location } from 'vscode-languageserver-protocol';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import { DocumentPosition } from '../../../node_modules/lean4-infoview/src/infoview/util';
 
 import { GameIdContext } from '../app';
 import { ConnectionContext, useLeanClient } from '../connection';
@@ -38,7 +37,7 @@ import Markdown from './markdown';
 import {Inventory, Documentation} from './inventory';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
-import { EditorInterface, CommandLineInterface } from './infoview/main'
+import { DualEditor } from './infoview/main'
 import { Hints } from './hints';
 import { HintContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStateContext, ProofStateProps, ProofStep } from './infoview/context';
 
@@ -62,6 +61,10 @@ function PlayableLevel({worldId, levelId}) {
   const chatPanelRef = useRef<HTMLDivElement>(null)
 
   const gameId = React.useContext(GameIdContext)
+
+  // The state variables for the `ProofContext`
+  const [proof, setProof] = useState<Array<ProofStep>>([])
+
   const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
   const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
 
@@ -71,7 +74,6 @@ function PlayableLevel({worldId, levelId}) {
 
   const [showHiddenHints, setShowHiddenHints] = useState(false)
 
-  const [proof, setProof] = useState<Array<ProofStep>>([])
 
   const [proofState, setProofState] = React.useState<ProofStateProps>({
     status: 'updating',
@@ -79,7 +81,7 @@ function PlayableLevel({worldId, levelId}) {
     goals: undefined,
     termGoal: undefined,
     error: undefined,
-})
+  })
 
   const theme = useTheme();
 
@@ -182,6 +184,9 @@ function PlayableLevel({worldId, levelId}) {
 
   const levelTitle = <>{levelId && `Level ${levelId}`}{level?.data?.title && `: ${level?.data?.title}`}</>
 
+  // TODO: with the new design, there is no difference between the introduction and
+  // a hint at the beginning of the proof...
+
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <ProofStateContext.Provider value={{proofState, setProofState}}>
@@ -197,9 +202,9 @@ function PlayableLevel({worldId, levelId}) {
                 <Markdown>{level?.data?.introduction}</Markdown>
               </div>
             }
-            {proofState.goals?.goals.length &&
-              <Hints hints={proofState.goals?.goals[0].hints} showHidden={showHiddenHints}/>
-            }
+            {proof.map((step, i) => {
+              return <Hints hints={step.hints} showHidden={showHiddenHints}/>
+            })}
             {completed &&
               <>
                 <div className="message info">
@@ -216,10 +221,6 @@ function PlayableLevel({worldId, levelId}) {
                   Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
               </>
             }
-
-            {/* { hints.map(hint => <div className="message info"><Markdown>{hint.text}</Markdown></div>) } */}
-            {/* TODO: Remove this debugging message: */}
-            {showHiddenHints && <p>Hidden Hints are displayed</p>}
           </div>
           <div className="toggle-hidden-hints">
             <FormControlLabel
@@ -230,19 +231,11 @@ function PlayableLevel({worldId, levelId}) {
         </div>
         <div className="exercise-panel">
           <EditorContext.Provider value={editorConnection}>
-          <MonacoEditorContext.Provider value={editor}>
-          <div className="exercise">
-            {/* We need the editor to always there and hidden because
-              the command line edits its content */}
-            <EditorInterface data={level?.data} codeviewRef={codeviewRef} hidden={commandLineMode}
-                    worldId={worldId} levelId={levelId} editorConnection={editorConnection}/>
-            { // TODO: Is there any possibility that the editor connection takes a while
-              // and we should show a circular progress here?
-              commandLineMode && editorConnection &&
-                <CommandLineInterface world={worldId} level={levelId} data={level?.data}/>
-            }
-          </div>
-          </MonacoEditorContext.Provider>
+            <MonacoEditorContext.Provider value={editor}>
+              <div className="exercise">
+                <DualEditor level={level} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} commandLineMode={commandLineMode} />
+              </div>
+            </MonacoEditorContext.Provider>
           </EditorContext.Provider>
         </div>
         <div className="inventory-panel">

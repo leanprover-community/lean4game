@@ -21,11 +21,77 @@ import { levelCompleted, selectCompleted } from '../../state/progress';
 import Markdown from '../markdown';
 
 import { Infos } from './infos';
-import { AllMessages, WithLspDiagnosticsContext } from './messages';
+import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
-import { InputModeContext, ProofStateContext } from './context';
+import { InputModeContext, ProofContext, ProofStateContext, ProofStep } from './context';
 import { CommandLine } from './command_line';
+import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 
+/** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
+ * always present, or the monaco editor cannot start.
+ */
+export function DualEditor({level, codeviewRef, levelId, worldId, commandLineMode}) {
+  const ec = React.useContext(EditorContext)
+//   const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
+
+//   return <div className={hidden ? 'hidden' : ''}>
+//     <ExerciseStatement data={data} />
+//     <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{data?.descrFormat}</code></div>
+//     <div ref={codeviewRef} className={'codeview'}></div>
+//     {ec && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
+
+//   </div>
+// }
+
+  return <>
+    <div className={commandLineMode ? ' hidden' : ''}>
+      <ExerciseStatement data={level?.data} />
+      <div ref={codeviewRef} className={'codeview'}></div>
+    </div>
+    {ec && <DualEditorMain worldId={worldId} levelId={levelId} level={level} commandLineMode={commandLineMode}/>}
+  </>
+}
+
+/* The part of the two editors that can needs the editor connection first */
+function DualEditorMain({worldId, levelId, level, commandLineMode}) {
+  const ec = React.useContext(EditorContext)
+  const gameId = React.useContext(GameIdContext)
+
+  /* Set up updates to the global infoview state on editor events. */
+  const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
+
+  const [allProgress, _1] = useServerNotificationState(
+    '$/lean/fileProgress',
+    new Map<DocumentUri, LeanFileProgressProcessingInfo[]>(),
+    async (params: LeanFileProgressParams) => (allProgress) => {
+        const newProgress = new Map(allProgress);
+        return newProgress.set(params.textDocument.uri, params.processing);
+    }, [])
+  const serverVersion = useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
+
+  return <>
+  <ConfigContext.Provider value={config}>
+    <VersionContext.Provider value={serverVersion}>
+      <WithRpcSessions>
+        <WithLspDiagnosticsContext>
+          <ProgressContext.Provider value={allProgress}>
+            {/* We need the editor to always there and hidden because
+            the command line edits its content */}
+            { // TODO: Is there any possibility that the editor connection takes a while
+            // and we should show a circular progress here?
+            }
+            {commandLineMode ?
+              <CommandLineInterface world={worldId} level={levelId} data={level?.data}/>
+              :
+              <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />
+            }
+          </ProgressContext.Provider>
+        </WithLspDiagnosticsContext>
+      </WithRpcSessions>
+    </VersionContext.Provider>
+  </ConfigContext.Provider>
+</>
+}
 
 // The mathematical formulation of the statement, supporting e.g. Latex
 // It takes three forms, depending on the precence of name and description:
@@ -106,43 +172,101 @@ export function Main(props: {world: string, level: number}) {
         </div>
     }
 
-    return (
-    <ConfigContext.Provider value={config}>
-        <VersionContext.Provider value={serverVersion}>
-            <WithRpcSessions>
-                <WithLspDiagnosticsContext>
-                    <ProgressContext.Provider value={allProgress}>
-                        {ret}
-                    </ProgressContext.Provider>
-                </WithLspDiagnosticsContext>
-            </WithRpcSessions>
-        </VersionContext.Provider>
-    </ConfigContext.Provider>
-    );
+    return ret
 }
 
-// `codeviewRef`: the codeViewRef. Used to edit the editor's content even if not visible
-export function EditorInterface({data, codeviewRef, hidden, worldId, levelId, editorConnection}) {
+const goalFilter = {
+  reverse: false,
+  showType: true,
+  showInstance: true,
+  showHiddenAssumption: true,
+  showLetValue: true
+}
 
-  const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
-
-  return <div className={hidden ? 'hidden' : ''}>
-    <ExerciseStatement data={data} />
-    <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{data?.descrFormat}</code></div>
-    <div ref={codeviewRef} className={'codeview'}></div>
-    {editorConnection && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
-
+/** The display of a single entered lean command */
+function Command({command} : {command: string}) {
+  // The first step will always have an empty command
+  if (!command) {return <></>}
+  return <div className="command">
+    {command}
   </div>
 }
 
+// const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
+//   const ec = React.useContext(EditorContext);
+//   const fname = escapeHtml(basename(uri));
+//   const {line, character} = diag.range.start;
+//   const loc: Location = { uri, range: diag.range };
+//   const text = TaggedText_stripTags(diag.message);
+//   const severityClass = diag.severity ? {
+//       [DiagnosticSeverity.Error]: 'error',
+//       [DiagnosticSeverity.Warning]: 'warning',
+//       [DiagnosticSeverity.Information]: 'information',
+//       [DiagnosticSeverity.Hint]: 'hint',
+//   }[diag.severity] : '';
+//   const title = `Line ${line+1}, Character ${character}`;
+
+//   // Hide "unsolved goals" messages
+//   let message;
+//   if ("append" in diag.message && "text" in diag.message.append[0] &&
+//     diag.message?.append[0].text === "unsolved goals") {
+//       message = diag.message.append[0]
+//   } else {
+//       message = diag.message
+//   }
+
+//   const { commandLineMode } = React.useContext(InputModeContext)
+
+//   return (
+//   // <details open>
+//       // <summary className={severityClass + ' mv2 pointer'}>{title}
+//       //     <span className="fr">
+//       //         <a className="link pointer mh2 dim codicon codicon-go-to-file"
+//       //            onClick={e => { e.preventDefault(); void ec.revealLocation(loc); }}
+//       //            title="reveal file location"></a>
+//       //         <a className="link pointer mh2 dim codicon codicon-quote"
+//       //            data-id="copy-to-comment"
+//       //            onClick={e => {e.preventDefault(); void ec.copyToComment(text)}}
+//       //            title="copy message to comment"></a>
+//       //         <a className="link pointer mh2 dim codicon codicon-clippy"
+//       //            onClick={e => {e.preventDefault(); void ec.api.copyToClipboard(text)}}
+//       //            title="copy message to clipboard"></a>
+//       //     </span>
+//       // </summary>
+//       <div className={severityClass + ' ml1 message'}>
+//           {!commandLineMode && <p className="mv2">{title}</p>}
+//           <pre className="font-code pre-wrap">
+//               <InteractiveMessage fmt={message} />
+//           </pre>
+//       </div>
+//   // </details>
+//   )
+// }, fastIsEqual)
+
+/** The tabs of goals that lean ahs after the command of this step has been processed */
+function GoalsTab({proofStep} : {proofStep: ProofStep}) {
+  const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
+
+  return <div>
+    <div className="tab-bar">
+      {proofStep.goals.map((goal, i) => (
+        <div className={`tab ${i == (selectedGoal) ? "active": ""}`} onClick={() => { setSelectedGoal(i) }}>
+          {i ? `Goal ${i+1}` : "Active Goal"}
+        </div>
+      ))}
+    </div>
+    <div className="goal-tab vscode-light">
+      <Goal commandLine={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]} />
+    </div>
+  </div>
+}
+
+/** The interface in command line mode */
 export function CommandLineInterface(props: {world: string, level: number, data: LevelInfo}) {
 
-  const ec = React.useContext(EditorContext);
+  const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
-
-  const proofStateContext = React.useContext(ProofStateContext)
-
-  const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
+  const {proof} = React.useContext(ProofContext)
 
   const dispatch = useAppDispatch()
 
@@ -187,8 +311,6 @@ export function CommandLineInterface(props: {world: string, level: number, data:
       []
   );
 
-  const goalFilter = { reverse: false, showType: true, showInstance: true, showHiddenAssumption: true, showLetValue: true }
-
   const serverVersion =
       useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
   const serverStoppedResult = useEventResult(ec.events.serverStopped);
@@ -206,39 +328,28 @@ export function CommandLineInterface(props: {world: string, level: number, data:
           {/* {completed && <div className="level-completed">Level completed! 🎉</div>} */}
           <div className="content">
             <ExerciseStatement data={props.data} />
-            <Infos />
+            {/* <Infos /> */}
             <div className="tmp-pusher"></div>
-            <div className="tab-bar">
-              {proofStateContext.proofState.goals?.goals.map((goal, i) =>
-                <div className={`tab ${i == (selectedGoal) ? "active": ""}`}
-                    onClick={() => { setSelectedGoal(i) }}>
-                  {i ? `Goal ${i+1}` : "Active Goal"}
-                </div>)}
-            </div>
-            <div className="goal-tab vscode-light">
-              {proofStateContext.proofState.goals?.goals?.length &&
-                <Goal commandLine={false} filter={goalFilter} goal={proofStateContext.proofState.goals.goals[selectedGoal]} />
+            {proof.map((step, i) => {
+              if (i == proof.length - 1 && step.errors.length) {
+                // if the last command contains an error, we should not display it
+                // as it will be overwritten by the next entered command
+                return <div>
+                <Errors errors={step.errors} commandLineMode={true}/>
+                </div>
               }
-            </div>
+              else {
+                return <div className="step">
+                  <Command command={step.command} />
+                  <Errors errors={step.errors} commandLineMode={true}/>
+                  <GoalsTab proofStep={step} />
+                </div>
+              }
+            })}
           </div>
           <CommandLine />
       </div>
   }
 
-  return <>
-    {/* <button className="btn" onClick={handleUndo} disabled={!canUndo}><FontAwesomeIcon icon={faRotateLeft} /> Undo</button> */}
-    <ConfigContext.Provider value={config}>
-      <VersionContext.Provider value={serverVersion}>
-        <WithRpcSessions>
-          <WithLspDiagnosticsContext>
-            <ProgressContext.Provider value={allProgress}>
-              {ret}
-            </ProgressContext.Provider>
-          </WithLspDiagnosticsContext>
-        </WithRpcSessions>
-      </VersionContext.Provider>
-    </ConfigContext.Provider>
-  </>
-
-
+  return ret
 }
