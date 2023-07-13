@@ -91,7 +91,7 @@ div.image {
 .info {
   margin-top: 5px;
   margin-bottom: 15px;
-  width: calc(100% - 20px);
+  /* width: calc(100% - 20px); */
   border-collapse: collapse;
 }
 

@@ -215,11 +215,17 @@ td code  {
 /* TODO: Create a nice style and move this to a better place */
 
 .exercise .command {
-  background-color: rgb(167, 167, 167);
+  /* background-color: rgb(167, 167, 167); */
+  border: 1px solid #bbb;
+  background-color: #eee;
+  padding: .5rem;
+  border-radius: .5rem;
+  margin-top: 1rem;
 }
 
 .exercise .step {
-  background-color: #ffeb91;
+  /* background-color: #e6f0f4; */
   margin-top: 5px;
   margin-bottom: 5px;
+  /* border: 3px dotted rgb(88, 131, 24); */
 }

@@ -198,7 +198,7 @@ function PlayableLevel({worldId, levelId}) {
         <div ref={chatPanelRef} className="chat-panel">
           <div className="chat">
             {level?.data?.introduction &&
-              <div className="message info">
+              <div className="message information">
                 <Markdown>{level?.data?.introduction}</Markdown>
               </div>
             }
@@ -207,11 +207,11 @@ function PlayableLevel({worldId, levelId}) {
             })}
             {completed &&
               <>
-                <div className="message info">
+                <div className="message information">
                   Level completed! 🎉
                 </div>
                 {level?.data?.conclusion?.trim() &&
-                  <div className="message info">
+                  <div className="message information">
                     <Markdown>{level?.data?.conclusion}</Markdown>
                   </div>
                 }
@@ -266,7 +266,7 @@ function Introduction({worldId}) {
     <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Einführung" worldId={worldId} levelId={0} />
     <div style={gameInfo.isLoading ? {display: "none"} : null} className="exercise-panel">
       <div className="introduction-panel">
-        <div className="message info">
+        <div className="message information">
             <Markdown>
               {gameInfo.data?.worlds.nodes[worldId].introduction}
             </Markdown>

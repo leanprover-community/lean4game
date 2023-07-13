@@ -128,7 +128,6 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
           <div className="goals-section">
             { goals &&  goals.goals.length > 0 && <>
               <MainAssumptions filter={goalFilter} key='mainGoal' goals={goals.goals} />
-              <ProofDisplay proof={proof}/>
               <OtherGoals filter={goalFilter} goals={goals.goals} />
             </>}
           </div>

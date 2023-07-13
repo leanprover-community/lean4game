@@ -14,6 +14,10 @@ import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '.
 import { WithRpcSessions } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infoview/serverVersion';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faDeleteLeft, faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
+
 import { GameIdContext } from '../../app';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { LevelInfo } from '../../state/api';
@@ -23,9 +27,10 @@ import Markdown from '../markdown';
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
-import { InputModeContext, ProofContext, ProofStateContext, ProofStep } from './context';
-import { CommandLine } from './command_line';
+import { InputModeContext, MonacoEditorContext, ProofContext, ProofStateContext, ProofStep } from './context';
+import { CommandLine, hasErrors, hasInteractiveErrors } from './command_line';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
+import { Button } from '../button';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -184,11 +189,14 @@ const goalFilter = {
 }
 
 /** The display of a single entered lean command */
-function Command({command} : {command: string}) {
+function Command({command, deleteProof} : {command: string, deleteProof: any}) {
   // The first step will always have an empty command
   if (!command) {return <></>}
   return <div className="command">
     {command}
+    <div className="undo-button" title="Delete this and future commands" onClick={deleteProof}>
+      <FontAwesomeIcon icon={faDeleteLeft} />
+    </div>
   </div>
 }
 
@@ -247,6 +255,8 @@ function Command({command} : {command: string}) {
 function GoalsTab({proofStep} : {proofStep: ProofStep}) {
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
+  if (!proofStep.goals.length) {return <></>}
+
   return <div>
     <div className="tab-bar">
       {proofStep.goals.map((goal, i) => (
@@ -265,6 +275,8 @@ function GoalsTab({proofStep} : {proofStep: ProofStep}) {
 export function CommandLineInterface(props: {world: string, level: number, data: LevelInfo}) {
 
   const ec = React.useContext(EditorContext)
+  const editor = React.useContext(MonacoEditorContext)
+
   const gameId = React.useContext(GameIdContext)
   const {proof} = React.useContext(ProofContext)
 
@@ -283,33 +295,47 @@ export function CommandLineInterface(props: {world: string, level: number, data:
       []
   );
 
+  /** Delete all proof lines starting from a given line.
+   * Note that the first line (i.e. deleting everything) is `1`!
+   */
+  function deleteProof(line: number) {
+    return (ev) => {
+      editor.executeEdits("command-line", [{
+        range: monaco.Selection.fromPositions(
+          {lineNumber: line, column: 1},
+          editor.getModel().getFullModelRange().getEndPosition()
+        ),
+        text: '',
+        forceMoveMarkers: false
+      }])
+    }
+  }
+
   const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
 
-  /* Set up updates to the global infoview state on editor events. */
+  /* Set up updates to the global infoview seither you solved the level with warnings or your last command contains a syntax error Lean can't parseate on editor events. */
   const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
 
   const [allProgress, _1] = useServerNotificationState(
-      '$/lean/fileProgress',
-      new Map<DocumentUri, LeanFileProgressProcessingInfo[]>(),
-      async (params: LeanFileProgressParams) => (allProgress) => {
-          const newProgress = new Map(allProgress);
-          return newProgress.set(params.textDocument.uri, params.processing);
-      },
-      []
-  );
+    '$/lean/fileProgress',
+    new Map<DocumentUri, LeanFileProgressProcessingInfo[]>(),
+    async (params: LeanFileProgressParams) => (allProgress) => {
+      const newProgress = new Map(allProgress);
+      return newProgress.set(params.textDocument.uri, params.processing);
+    }, []
+  )
 
   const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
 
   useClientNotificationEffect(
-      'textDocument/didClose',
-      (params: DidCloseTextDocumentParams) => {
-          if (ec.events.changedCursorLocation.current &&
-              ec.events.changedCursorLocation.current.uri === params.textDocument.uri) {
-              ec.events.changedCursorLocation.fire(undefined)
-          }
-      },
-      []
-  );
+    'textDocument/didClose',
+    (params: DidCloseTextDocumentParams) => {
+      if (ec.events.changedCursorLocation.current &&
+        ec.events.changedCursorLocation.current.uri === params.textDocument.uri) {
+        ec.events.changedCursorLocation.fire(undefined)
+      }
+    }, []
+  )
 
   const serverVersion =
       useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
@@ -331,7 +357,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
             {/* <Infos /> */}
             <div className="tmp-pusher"></div>
             {proof.map((step, i) => {
-              if (i == proof.length - 1 && step.errors.length) {
+              if (i == proof.length - 1 && hasInteractiveErrors(step.errors)) {
                 // if the last command contains an error, we should not display it
                 // as it will be overwritten by the next entered command
                 return <div>
@@ -339,11 +365,25 @@ export function CommandLineInterface(props: {world: string, level: number, data:
                 </div>
               }
               else {
-                return <div className="step">
-                  <Command command={step.command} />
-                  <Errors errors={step.errors} commandLineMode={true}/>
-                  <GoalsTab proofStep={step} />
-                </div>
+                return <>
+                  <div className="step">
+                    <Command command={step.command} deleteProof={deleteProof(i)}/>
+                    <Errors errors={step.errors} commandLineMode={true}/>
+                    <GoalsTab proofStep={step}/>
+                  </div>
+                  {/* Show a message that there are no goals left */}
+                  {!step.goals.length && (
+                    <div className="message information">
+                      {completed ?
+                        <p>Level completed! 🎉</p> :
+                        <p>
+                          <b>no goals left</b><br />
+                          <i>This probably means you solved the level with warnings</i>
+                        </p>
+                      }
+                    </div>
+                  )}
+                </>
               }
             })}
           </div>

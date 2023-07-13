@@ -183,8 +183,6 @@ export const Goal = React.memo((props: GoalProps) => {
 export const MainAssumptions = React.memo((props: GoalProps2) => {
   const { goals, filter } = props
 
-
-
   const goal = goals[0]
   const filteredList = getFilteredHypotheses(goal.hyps, filter);
   const hyps = filter.reverse ? filteredList.slice().reverse() : filteredList;

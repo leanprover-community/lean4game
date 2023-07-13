@@ -75,12 +75,12 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
       match levelParams.tactics.find? (fun t => t.name.toString == val) with
-      | none => addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
+      | none => addWarningMessage info s!"You have not unlocked the tactic '{val}' yet!"
       | some tac =>
         if tac.locked then
-          addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
+          addWarningMessage info s!"You have not unlocked the tactic '{val}' yet!"
         else if tac.disabled then
-          addErrorMessage info s!"The tactic '{val}' is disabled in this level!"
+          addWarningMessage info s!"The tactic '{val}' is disabled in this level!"
   | .ident info rawVal val preresolved =>
       let ns ←
         try resolveGlobalConst (mkIdent val)
@@ -90,17 +90,17 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
           | return () -- not a theroem -> ignore
         let lemmasAndDefs := levelParams.lemmas ++ levelParams.definitions
         match lemmasAndDefs.find? (fun l => l.name == n) with
-        | none => addErrorMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
+        | none => addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
         | some lem =>
           if lem.locked then
-            addErrorMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
+            addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
           else if lem.disabled then
-            addErrorMessage info s!"The lemma/definition '{n}' is disabled in this level!"
-where addErrorMessage (info : SourceInfo) (s : MessageData) :=
+            addWarningMessage info s!"The lemma/definition '{n}' is disabled in this level!"
+where addWarningMessage (info : SourceInfo) (s : MessageData) :=
   modify fun st => { st with
     messages := st.messages.add {
       fileName := inputCtx.fileName
-      severity := MessageSeverity.error
+      severity := MessageSeverity.warning
       pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
       data     := s
     }

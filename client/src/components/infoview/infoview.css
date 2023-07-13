@@ -4,8 +4,9 @@
   padding: 5px 10px;
   border-radius: 3px 3px 3px 3px;
 }
-.message.info {
+.message.information, .message.info {
   /* color: #059; */
+  color: #000;
   background-color: #DDF6FF;
 }
 .message.warning {
@@ -138,4 +139,21 @@
 
 .commandline-interface .content .tmp-pusher {
   flex: 1;
+}
+
+.undo-button {
+  border: 1px solid #bbb;
+  display: block;
+  padding-left: .3rem;
+  padding-right: .5rem;
+  float: right;
+  border-radius: .5rem;
+  background-color: #fff;
+  color: #888;
+}
+
+.undo-button:hover {
+  border: 1px solid #888;
+  background-color: #ffdcc7;
+  cursor: pointer;
 }

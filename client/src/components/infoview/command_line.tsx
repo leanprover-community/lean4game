@@ -14,9 +14,9 @@ import * as leanMarkdownSyntax from 'lean4web/client/src/syntaxes/lean-markdown.
 import * as codeblockSyntax from 'lean4web/client/src/syntaxes/codeblock.json'
 import languageConfig from 'lean4/language-configuration.json';
 import { InteractiveDiagnostic, getInteractiveDiagnostics } from '@leanprover/infoview-api';
+import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-
 import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './context'
 import { goalsToString } from './goals'
 import { InteractiveGoals } from './rpc_api'
@@ -106,9 +106,13 @@ export function CommandLine() {
       Promise.all(msgCalls).then((diagnostics : [InteractiveDiagnostic[]]) => {
         let tmpProof : ProofStep[] = []
 
+        let goalCount = 0
+
         steps.map((goals, i) => {
           // The first step has an empty command and therefore also no error messages
-          let messages = i ? diagnostics[i-1] : []
+          // Usually there is a newline at the end of the editors content, so we need to
+          // display diagnostics from potentally two lines in the last step.
+          let messages = i ? (i == steps.length - 1 ? diagnostics.slice(i-1).flat() : diagnostics[i-1]) : []
 
           // Filter out the 'unsolved goals' message
           messages = messages.filter((msg) => {
@@ -116,6 +120,26 @@ export function CommandLine() {
               "text" in msg.message.append[0] &&
               msg.message.append[0].text === "unsolved goals")
           })
+
+          // If the number of goals reduce, show a message
+          if (goals.goals.length && goalCount > goals.goals.length) {
+            messages.unshift({
+              range: {
+                start: {
+                  line: i-1,
+                  character: 0,
+                },
+                end: {
+                  line: i-1,
+                  character: 0,
+                }},
+              severity: DiagnosticSeverity.Information,
+              message: {
+              text: 'intermediate goal solved 🎉'
+              }
+            })
+          }
+          goalCount = goals.goals.length
 
           // TODO: Check what happens if the code gets into a bad state and no goals are available
           if (!goals) {
@@ -177,20 +201,18 @@ export function CommandLine() {
     if (oneLineEditor && oneLineEditor.getValue() !== commandLineInput) {
       oneLineEditor.setValue(commandLineInput)
     }
-
-    // TODO: Is this the right place to load the goals once initially?
-    loadAllGoals()
   }, [commandLineInput])
 
   // React when answer from the server comes back
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
     if (params.uri == editor.getModel().uri.toString()) {
       setProcessing(false)
-      if (!hasErrorsOrWarnings(params.diagnostics)) {
+      if (!hasErrors(params.diagnostics)) {
         setCommandLineInput("")
         editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
       }
     }
+    loadAllGoals() // TODO: instead of loading all goals every time, we could only load the last one
   }, []);
 
   useEffect(() => {
@@ -253,7 +275,6 @@ export function CommandLine() {
     const l = oneLineEditor.onKeyUp((ev) => {
       if (ev.code === "Enter") {
         runCommand()
-        loadAllGoals() // TODO: instead of loading all goals every time, we could only load the last one
       }
     })
     return () => { l.dispose() }
@@ -263,7 +284,6 @@ export function CommandLine() {
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault()
     runCommand()
-    loadAllGoals() // TODO: instead of loading all goals every time, we could only load the last one
   }
 
   return <div className="command-line">
@@ -280,10 +300,17 @@ export function CommandLine() {
 
 /** Checks whether the diagnostics contain any errors or warnings to check whether the level has
    been completed.*/
-function hasErrorsOrWarnings(diags) {
+export function hasErrors(diags: Diagnostic[]) {
   return diags.some(
     (d) =>
       !d.message.startsWith("unsolved goals") &&
-      (d.severity == DiagnosticSeverity.Error || d.severity == DiagnosticSeverity.Warning)
+      (d.severity == DiagnosticSeverity.Error ) // || d.severity == DiagnosticSeverity.Warning
+  )
+}
+
+// TODO: Didn't manage to unify this with the one above
+export function hasInteractiveErrors (diags: InteractiveDiagnostic[]) {
+  return diags.some(
+    (d) => (d.severity == DiagnosticSeverity.Error ) // || d.severity == DiagnosticSeverity.Warning
   )
 }

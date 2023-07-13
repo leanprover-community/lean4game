@@ -3,7 +3,11 @@ import * as React from 'react';
 import Markdown from './markdown';
 
 export function Hint({hint} : {hint: GameHint}) {
-  return <div className="message info"><Markdown>{hint.text}</Markdown></div>
+  return <div className="message information"><Markdown>{hint.text}</Markdown></div>
+}
+
+export function AdditionalHint({hint} : {hint: GameHint}) {
+  return <div className="message warning"><Markdown>{hint.text}</Markdown></div>
 }
 
 export function Hints({hints, showHidden} : {hints: GameHint[], showHidden: boolean}) {
@@ -13,6 +17,6 @@ export function Hints({hints, showHidden} : {hints: GameHint[], showHidden: bool
 
   return <>
     {openHints.map(hint => <Hint hint={hint} />)}
-    {showHidden && hiddenHints.map(hint => <Hint hint={hint} />)}
+    {showHidden && hiddenHints.map(hint => <AdditionalHint hint={hint}/>)}
   </>
 }

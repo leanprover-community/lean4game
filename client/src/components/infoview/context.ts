@@ -20,7 +20,7 @@ export type ProofStep = {
   /** Story relevant messages */
   hints: any        // TODO: Add correct type
   /** Errors and warnings */
-  errors: any       // TODO: Add correct type
+  errors: InteractiveDiagnostic[]       // TODO: Add correct type
 }
 
 /** The context storing the proof step-by-step for the command line mode */
@@ -36,12 +36,6 @@ export const ProofContext = React.createContext<{
   proof: [],
   setProof: () => {} // TODO: implement me
 })
-
-
-
-
-
-
 
 // TODO: Is this still used?
 export const HintContext = React.createContext<{
