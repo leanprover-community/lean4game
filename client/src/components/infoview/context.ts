@@ -37,15 +37,6 @@ export const ProofContext = React.createContext<{
   setProof: () => {} // TODO: implement me
 })
 
-// TODO: Is this still used?
-export const HintContext = React.createContext<{
-  showHiddenHints : boolean,
-  setShowHiddenHints: React.Dispatch<React.SetStateAction<boolean>>
-}>({
-  showHiddenHints: true,
-  setShowHiddenHints: () => {},
-});
-
 export interface ProofStateProps {
   // pos: DocumentPosition;
   status: InfoStatus;

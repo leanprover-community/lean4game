@@ -27,7 +27,7 @@ import Markdown from '../markdown';
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
-import { InputModeContext, MonacoEditorContext, ProofContext, ProofStateContext, ProofStep } from './context';
+import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './context';
 import { CommandLine, hasErrors, hasInteractiveErrors } from './command_line';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';

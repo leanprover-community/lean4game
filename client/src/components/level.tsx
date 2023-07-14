@@ -39,7 +39,7 @@ import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
 import { DualEditor } from './infoview/main'
 import { Hints } from './hints';
-import { HintContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStateContext, ProofStateProps, ProofStep } from './infoview/context';
+import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './infoview/context';
 
 function Level() {
 
@@ -74,15 +74,6 @@ function PlayableLevel({worldId, levelId}) {
 
   const [showHiddenHints, setShowHiddenHints] = useState(false)
 
-
-  const [proofState, setProofState] = React.useState<ProofStateProps>({
-    status: 'updating',
-    messages: [],
-    goals: undefined,
-    termGoal: undefined,
-    error: undefined,
-  })
-
   const theme = useTheme();
 
   useEffect(() => {
@@ -105,6 +96,9 @@ function PlayableLevel({worldId, levelId}) {
     }
   }, [commandLineMode])
 
+  /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
+   * `CommandLineInterface`.
+   */
   const handleUndo = () => {
     const endPos = editor.getModel().getFullModelRange().getEndPosition()
     let range
@@ -189,10 +183,8 @@ function PlayableLevel({worldId, levelId}) {
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <ProofStateContext.Provider value={{proofState, setProofState}}>
     <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
     <ProofContext.Provider value={{proof, setProof}}>
-    <HintContext.Provider value={{showHiddenHints, setShowHiddenHints}}>
       <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
       <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
         <div ref={chatPanelRef} className="chat-panel">
@@ -248,10 +240,8 @@ function PlayableLevel({worldId, levelId}) {
           }
         </div>
       </Split>
-    </HintContext.Provider>
     </ProofContext.Provider>
     </InputModeContext.Provider>
-    </ProofStateContext.Provider>
   </>
 }
 
