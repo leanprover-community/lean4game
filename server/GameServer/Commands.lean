@@ -710,11 +710,60 @@ elab "MakeGame" : command => do
       })
 
 
+  -- Which items are used/new in which world?
+  let mut usedItemsInWorld : HashMap Name (HashSet Name) := {}
+  let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
+  for (worldId, world) in game.worlds.nodes.toArray do
+    let mut usedItems : HashSet Name := {}
+    let mut newItems : HashSet Name := {}
+    for inventoryType in #[.Tactic, .Definition, .Lemma] do
+      for (levelId, level) in world.levels.toArray do
+          usedItems := usedItems.insertMany (level.getInventory inventoryType).used
+          newItems := newItems.insertMany (level.getInventory inventoryType).new
+    usedItemsInWorld := usedItemsInWorld.insert worldId usedItems
+    newItemsInWorld := newItemsInWorld.insert worldId newItems
+
+  let mut worldsWithNewItem : HashMap Name (HashSet Name) := {}
+  for (worldId, world) in game.worlds.nodes.toArray do
+    for newItem in newItemsInWorld.find! worldId do
+      worldsWithNewItem := worldsWithNewItem.insert newItem $
+        (worldsWithNewItem.findD newItem {}).insert worldId
+
+  -- which world depends on which world?
+  let mut worldDependsOnWorlds : HashMap Name (HashSet Name) := {}
+  let mut dependencyReason : HashMap (Name × Name) Name := {}
+  for (dependentWorldId, dependentWorld) in game.worlds.nodes.toArray do
+    let mut dependsOnWorlds : HashSet Name := {}
+    for usedItem in usedItemsInWorld.find! dependentWorldId do
+      match worldsWithNewItem.find? usedItem with
+      | some worldIds =>
+        if !worldIds.contains dependentWorldId then
+          dependsOnWorlds := dependsOnWorlds.insertMany worldIds
+          for worldId in worldIds do
+            dependencyReason := dependencyReason.insert (dependentWorldId, worldId) usedItem
+      | none => logWarning m!"No world introducing {usedItem}, but required by {dependentWorldId}"
+    worldDependsOnWorlds := worldDependsOnWorlds.insert dependentWorldId dependsOnWorlds
+
+  let loop := findLoops worldDependsOnWorlds
+  if loop != [] then
+    logError m!"Loop: Dependency graph has a loop: {loop}"
+    for i in [:loop.length] do
+      let w1 := loop[i]!
+      let w2 := loop[if i == loop.length - 1 then 0 else i + 1]!
+      let item := dependencyReason.find! (w1, w2)
+      logError m!"{w1} depends on {w2} because of {item}"
+  else
+    worldDependsOnWorlds ← removeTransitive worldDependsOnWorlds
+    for (dependentWorldId, worldIds) in worldDependsOnWorlds.toArray do
+      modifyCurGame fun game =>
+        pure {game with worlds := {game.worlds with
+          edges := game.worlds.edges.append (worldIds.toArray.map fun wid => (wid, dependentWorldId))}}
+
   -- Compute which inventory items are available in which level:
   for inventoryType in #[.Tactic, .Definition, .Lemma] do
 
     -- Which items are introduced in which world?
-    let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
+    let mut newItemsInWorld' : HashMap Name (HashSet Name) := {}
     let mut lemmaStatements : HashMap (Name × Nat) Name := {}
     let mut allItems : HashSet Name := {}
     for (worldId, world) in game.worlds.nodes.toArray do
@@ -749,7 +798,7 @@ elab "MakeGame" : command => do
           let name := Name.str pre s
           newItems := newItems.insert name
           allItems := allItems.insert name
-      newItemsInWorld := newItemsInWorld.insert worldId newItems
+      newItemsInWorld' := newItemsInWorld'.insert worldId newItems
 
     -- Basic inventory item availability: all locked.
     let Availability₀ : HashMap Name InventoryTile :=
@@ -767,9 +816,9 @@ elab "MakeGame" : command => do
     for (worldId, _) in game.worlds.nodes.toArray do
       -- Unlock all items from previous worlds
       let mut items := Availability₀
-      let predecessors := game.worlds.predecessors worldId
+      let predecessors := worldDependsOnWorlds.find! worldId
       for predWorldId in predecessors do
-        for item in newItemsInWorld.find! predWorldId do
+        for item in newItemsInWorld'.find! predWorldId do
           let data := (← getInventoryItem? item inventoryType).get!
           items := items.insert item {
             name := item
@@ -824,55 +873,6 @@ elab "MakeGame" : command => do
         modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
           return level.setComputedInventory inventoryType itemsArray
 
-
-  -- Which items are used/new in which world?
-  let mut usedItemsInWorld : HashMap Name (HashSet Name) := {}
-  let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
-  for (worldId, world) in game.worlds.nodes.toArray do
-    let mut usedItems : HashSet Name := {}
-    let mut newItems : HashSet Name := {}
-    for inventoryType in #[.Tactic, .Definition, .Lemma] do
-      for (levelId, level) in world.levels.toArray do
-          usedItems := usedItems.insertMany (level.getInventory inventoryType).used
-          newItems := newItems.insertMany (level.getInventory inventoryType).new
-    usedItemsInWorld := usedItemsInWorld.insert worldId usedItems
-    newItemsInWorld := newItemsInWorld.insert worldId newItems
-
-  let mut worldsWithNewItem : HashMap Name (HashSet Name) := {}
-  for (worldId, world) in game.worlds.nodes.toArray do
-    for newItem in newItemsInWorld.find! worldId do
-      worldsWithNewItem := worldsWithNewItem.insert newItem $
-        (worldsWithNewItem.findD newItem {}).insert worldId
-
-  -- which world depends on which world?
-  let mut worldDependsOnWorlds : HashMap Name (HashSet Name) := {}
-  let mut dependencyReason : HashMap (Name × Name) Name := {}
-  for (dependentWorldId, dependentWorld) in game.worlds.nodes.toArray do
-    let mut dependsOnWorlds : HashSet Name := {}
-    for usedItem in usedItemsInWorld.find! dependentWorldId do
-      match worldsWithNewItem.find? usedItem with
-      | some worldIds =>
-        if !worldIds.contains dependentWorldId then
-          dependsOnWorlds := dependsOnWorlds.insertMany worldIds
-          for worldId in worldIds do
-            dependencyReason := dependencyReason.insert (dependentWorldId, worldId) usedItem
-      | none => logWarning m!"No world introducing {usedItem}, but required by {dependentWorldId}"
-    worldDependsOnWorlds := worldDependsOnWorlds.insert dependentWorldId dependsOnWorlds
-
-  let loop := findLoops worldDependsOnWorlds
-  if loop != [] then
-    logError m!"Loop: Dependency graph has a loop: {loop}"
-    for i in [:loop.length] do
-      let w1 := loop[i]!
-      let w2 := loop[if i == loop.length - 1 then 0 else i + 1]!
-      let item := dependencyReason.find! (w1, w2)
-      logError m!"{w1} depends on {w2} because of {item}"
-  else
-    worldDependsOnWorlds ← removeTransitive worldDependsOnWorlds
-    for (dependentWorldId, worldIds) in worldDependsOnWorlds.toArray do
-      modifyCurGame fun game =>
-        pure {game with worlds := {game.worlds with
-          edges := game.worlds.edges.append (worldIds.toArray.map fun wid => (wid, dependentWorldId))}}
 
 /-! # Debugging tools -/
 
