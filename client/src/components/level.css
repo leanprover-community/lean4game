@@ -35,8 +35,8 @@
 }
 
 .chat-panel, .infoview, .exercise-statement {
-  padding-left: 1em;
-  padding-right: 1em;
+  padding-left: .5em;
+  padding-right: .5em;
 }
 
 .conclusion {
@@ -209,7 +209,7 @@ td code  {
 .commandline-interface .content {
   flex: 1 1 auto;
   overflow-y: scroll;
-  padding: 1em;
+  padding: .5em;
 }
 
 /* TODO: Create a nice style and move this to a better place */
@@ -227,5 +227,17 @@ td code  {
   /* background-color: #e6f0f4; */
   margin-top: 5px;
   margin-bottom: 5px;
+  border-radius: 0.5em;
+  padding: 0.5em;
   /* border: 3px dotted rgb(88, 131, 24); */
+}
+
+.chat .message {
+  margin-left: .5em;
+  margin-right: .5em;
+}
+
+.exercise .step.selected, .chat .selected {
+  /* border: 3px solid #5191d1; */
+  box-shadow: .0em .0em .4em .1em var(--clr-primary);
 }

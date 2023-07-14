@@ -62,6 +62,16 @@ export const ProofStateContext = React.createContext<{
   setProofState: () => {},
 });
 
+/** Context to keep highlight selected proof step and corresponding chat messages. */
+export const SelectionContext = React.createContext<{
+  selectedStep : number,
+  setSelectedStep: React.Dispatch<React.SetStateAction<number>>
+}>({
+  selectedStep : undefined,
+  setSelectedStep: () => {}
+})
+
+
 export const InputModeContext = React.createContext<{
   commandLineMode: boolean,
   setCommandLineMode: React.Dispatch<React.SetStateAction<boolean>>,

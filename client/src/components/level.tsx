@@ -39,7 +39,7 @@ import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
 import { DualEditor } from './infoview/main'
 import { Hints } from './hints';
-import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './infoview/context';
+import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './infoview/context';
 
 function Level() {
 
@@ -58,6 +58,7 @@ function Level() {
 
 function PlayableLevel({worldId, levelId}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
+
   const chatRef = useRef<HTMLDivElement>(null)
 
   const gameId = React.useContext(GameIdContext)
@@ -73,6 +74,8 @@ function PlayableLevel({worldId, levelId}) {
   const [canUndo, setCanUndo] = useState(initialCode.trim() !== "")
 
   const [showHiddenHints, setShowHiddenHints] = useState(false)
+
+  const [selectedStep, setSelectedStep] = useState<number>()
 
   const theme = useTheme();
 
@@ -188,8 +191,20 @@ function PlayableLevel({worldId, levelId}) {
   // TODO: with the new design, there is no difference between the introduction and
   // a hint at the beginning of the proof...
 
+  function toggleSelection(line: number) {
+    return (ev) => {
+      console.debug('toggled selection')
+      if (selectedStep == line) {
+        setSelectedStep(undefined)
+      } else {
+        setSelectedStep(line)
+      }
+    }
+  }
+
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
+    <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
     <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
     <ProofContext.Provider value={{proof, setProof}}>
       <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
@@ -202,7 +217,7 @@ function PlayableLevel({worldId, levelId}) {
               </div>
             }
             {proof.map((step, i) => {
-              return <Hints hints={step.hints} showHidden={showHiddenHints}/>
+              return <Hints hints={step.hints} showHidden={showHiddenHints} selected={i == selectedStep} toggleSelection={toggleSelection(i)}/>
             })}
             {completed &&
               <>
@@ -249,6 +264,7 @@ function PlayableLevel({worldId, levelId}) {
       </Split>
     </ProofContext.Provider>
     </InputModeContext.Provider>
+    </SelectionContext.Provider>
   </>
 }
 

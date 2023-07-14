@@ -27,7 +27,7 @@ import Markdown from '../markdown';
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
-import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './context';
+import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './context';
 import { CommandLine, hasErrors, hasInteractiveErrors } from './command_line';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
@@ -255,7 +255,7 @@ function GoalsTab({proofStep} : {proofStep: ProofStep}) {
   return <div>
     <div className="tab-bar">
       {proofStep.goals.map((goal, i) => (
-        <div className={`tab ${i == (selectedGoal) ? "active": ""}`} onClick={() => { setSelectedGoal(i) }}>
+        <div className={`tab ${i == (selectedGoal) ? "active": ""}`} onClick={(ev) => { setSelectedGoal(i); ev.stopPropagation() }}>
           {i ? `Goal ${i+1}` : "Active Goal"}
         </div>
       ))}
@@ -273,6 +273,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
   const editor = React.useContext(MonacoEditorContext)
   const gameId = React.useContext(GameIdContext)
   const {proof} = React.useContext(ProofContext)
+  const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
 
@@ -308,6 +309,20 @@ export function CommandLineInterface(props: {world: string, level: number, data:
         text: '',
         forceMoveMarkers: false
       }])
+      setSelectedStep(undefined)
+      ev.stopPropagation()
+    }
+  }
+
+  function selectStep(line: number) {
+    return (ev) => {
+      if (selectedStep == line) {
+        setSelectedStep(undefined)
+        console.debug(`unselected step`)
+      } else {
+        setSelectedStep(line)
+        console.debug(`step ${line} selected`)
+      }
     }
   }
 
@@ -363,7 +378,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
           </div>
         } else {
           return <>
-            <div className="step">
+            <div className={'step' + (selectedStep == i ? ' selected' : '')} onClick={selectStep(i)}>
               <Command command={step.command} deleteProof={deleteProof(i)}/>
               <Errors errors={step.errors} commandLineMode={true}/>
               <GoalsTab proofStep={step}/>
