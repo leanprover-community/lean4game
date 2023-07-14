@@ -31,36 +31,35 @@ import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from '
 import { CommandLine, hasErrors, hasInteractiveErrors } from './command_line';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
+import { CircularProgress } from '@mui/material';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
  */
-export function DualEditor({level, codeviewRef, levelId, worldId, commandLineMode}) {
+export function DualEditor({level, codeviewRef, levelId, worldId}) {
   const ec = React.useContext(EditorContext)
-//   const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
-
-//   return <div className={hidden ? 'hidden' : ''}>
-//     <ExerciseStatement data={data} />
-//     <div className={`statement ${commandLineMode ? 'hidden' : ''}`}><code>{data?.descrFormat}</code></div>
-//     <div ref={codeviewRef} className={'codeview'}></div>
-//     {ec && <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />}
-
-//   </div>
-// }
-
+  const {commandLineMode} = React.useContext(InputModeContext)
   return <>
-    <div className={commandLineMode ? ' hidden' : ''}>
+    <div className={commandLineMode ? 'hidden' : ''}>
       <ExerciseStatement data={level?.data} />
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
-    {ec && <DualEditorMain worldId={worldId} levelId={levelId} level={level} commandLineMode={commandLineMode}/>}
+    {ec ?
+      <DualEditorMain worldId={worldId} levelId={levelId} level={level} /> :
+      // TODO: Style this if relevant.
+      <>
+        <p>Editor is starting up...</p>
+        <CircularProgress />
+      </>
+    }
   </>
 }
 
-/* The part of the two editors that can needs the editor connection first */
-function DualEditorMain({worldId, levelId, level, commandLineMode}) {
+/** The part of the two editors that needs the editor connection first */
+function DualEditorMain({worldId, levelId, level}) {
   const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
+  const {commandLineMode} = React.useContext(InputModeContext)
 
   /* Set up updates to the global infoview state on editor events. */
   const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
@@ -69,8 +68,8 @@ function DualEditorMain({worldId, levelId, level, commandLineMode}) {
     '$/lean/fileProgress',
     new Map<DocumentUri, LeanFileProgressProcessingInfo[]>(),
     async (params: LeanFileProgressParams) => (allProgress) => {
-        const newProgress = new Map(allProgress);
-        return newProgress.set(params.textDocument.uri, params.processing);
+      const newProgress = new Map(allProgress);
+      return newProgress.set(params.textDocument.uri, params.processing);
     }, [])
   const serverVersion = useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
 
@@ -80,11 +79,6 @@ function DualEditorMain({worldId, levelId, level, commandLineMode}) {
       <WithRpcSessions>
         <WithLspDiagnosticsContext>
           <ProgressContext.Provider value={allProgress}>
-            {/* We need the editor to always there and hidden because
-            the command line edits its content */}
-            { // TODO: Is there any possibility that the editor connection takes a while
-            // and we should show a circular progress here?
-            }
             {commandLineMode ?
               <CommandLineInterface world={worldId} level={levelId} data={level?.data}/>
               :
@@ -98,11 +92,12 @@ function DualEditorMain({worldId, levelId, level, commandLineMode}) {
 </>
 }
 
-// The mathematical formulation of the statement, supporting e.g. Latex
-// It takes three forms, depending on the precence of name and description:
-// - Theorem xyz: description
-// - Theorem xyz
-// - Exercises: description
+/** The mathematical formulation of the statement, supporting e.g. Latex
+ * It takes three forms, depending on the precence of name and description:
+ * - Theorem xyz: description
+ * - Theorem xyz
+ * - Exercises: description
+ */
 function ExerciseStatement({data}) {
   if (!data?.descrText) { return <></> }
   return <div className="exercise-statement"><Markdown>
@@ -276,24 +271,29 @@ export function CommandLineInterface(props: {world: string, level: number, data:
 
   const ec = React.useContext(EditorContext)
   const editor = React.useContext(MonacoEditorContext)
-
   const gameId = React.useContext(GameIdContext)
   const {proof} = React.useContext(ProofContext)
+
+  const proofPanelRef = React.useRef<HTMLDivElement>(null)
 
   const dispatch = useAppDispatch()
 
   // Mark level as completed when server gives notification
   useServerNotificationEffect(
-      '$/game/completed',
-      (params: any) => {
+    '$/game/completed',
+    (params: any) => {
 
-          if (ec.events.changedCursorLocation.current &&
-              ec.events.changedCursorLocation.current.uri === params.uri) {
-              dispatch(levelCompleted({game: gameId, world: props.world, level: props.level}))
-          }
-      },
-      []
-  );
+      if (ec.events.changedCursorLocation.current &&
+          ec.events.changedCursorLocation.current.uri === params.uri) {
+          dispatch(levelCompleted({game: gameId, world: props.world, level: props.level}))
+      }
+    }, []
+  )
+
+  // React.useEffect(() => {
+  //   console.debug('updated proof')
+  //   // proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
+  // }, [proof])
 
   /** Delete all proof lines starting from a given line.
    * Note that the first line (i.e. deleting everything) is `1`!
@@ -343,53 +343,47 @@ export function CommandLineInterface(props: {world: string, level: number, data:
   // NB: the cursor may temporarily become `undefined` when a file is closed. In this case
   // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
   // that we want to persist.
-  let ret
-  if (!serverVersion) {
-      ret = <p>Waiting for Lean server to start...</p>
-  } else if (serverStoppedResult){
-      ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
-  } else {
-      //className="infoview vscode-light"
-      ret = <div className="commandline-interface">
-          {/* {completed && <div className="level-completed">Level completed! 🎉</div>} */}
-          <div className="content">
-            <ExerciseStatement data={props.data} />
-            {/* <Infos /> */}
-            <div className="tmp-pusher"></div>
-            {proof.map((step, i) => {
-              if (i == proof.length - 1 && hasInteractiveErrors(step.errors)) {
-                // if the last command contains an error, we should not display it
-                // as it will be overwritten by the next entered command
-                return <div>
-                <Errors errors={step.errors} commandLineMode={true}/>
-                </div>
-              }
-              else {
-                return <>
-                  <div className="step">
-                    <Command command={step.command} deleteProof={deleteProof(i)}/>
-                    <Errors errors={step.errors} commandLineMode={true}/>
-                    <GoalsTab proofStep={step}/>
-                  </div>
-                  {/* Show a message that there are no goals left */}
-                  {!step.goals.length && (
-                    <div className="message information">
-                      {completed ?
-                        <p>Level completed! 🎉</p> :
-                        <p>
-                          <b>no goals left</b><br />
-                          <i>This probably means you solved the level with warnings</i>
-                        </p>
-                      }
-                    </div>
-                  )}
-                </>
-              }
-            })}
-          </div>
-          <CommandLine />
-      </div>
-  }
 
-  return ret
+  if (!serverVersion) {return <p>Waiting for Lean server to start...</p>}
+  if (serverStoppedResult) {return <div>
+    <p>{serverStoppedResult.message}</p>
+    <p className="error">{serverStoppedResult.reason}</p>
+  </div>}
+
+  return <div className="commandline-interface">
+    <div className="content" ref={proofPanelRef}>
+      <ExerciseStatement data={props.data} />
+      <div className="tmp-pusher"></div>
+      {proof.length ? proof.map((step, i) => {
+        if (i == proof.length - 1 && hasInteractiveErrors(step.errors)) {
+          // if the last command contains an error, we only display the errors but not the
+          // entered command as it is still present in the command line.
+          return <div>
+            <Errors errors={step.errors} commandLineMode={true}/>
+          </div>
+        } else {
+          return <>
+            <div className="step">
+              <Command command={step.command} deleteProof={deleteProof(i)}/>
+              <Errors errors={step.errors} commandLineMode={true}/>
+              <GoalsTab proofStep={step}/>
+            </div>
+            {/* Show a message that there are no goals left */}
+            {!step.goals.length && (
+              <div className="message information">
+                {completed ?
+                  <p>Level completed! 🎉</p> :
+                  <p>
+                    <b>no goals left</b><br />
+                    <i>This probably means you solved the level with warnings</i>
+                  </p>
+                }
+              </div>
+            )}
+          </>
+        }
+      }) : <CircularProgress />}
+    </div>
+    <CommandLine proofPanelRef={proofPanelRef}/>
+  </div>
 }

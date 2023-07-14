@@ -58,7 +58,7 @@ function Level() {
 
 function PlayableLevel({worldId, levelId}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
-  const chatPanelRef = useRef<HTMLDivElement>(null)
+  const chatRef = useRef<HTMLDivElement>(null)
 
   const gameId = React.useContext(GameIdContext)
 
@@ -77,12 +77,19 @@ function PlayableLevel({worldId, levelId}) {
   const theme = useTheme();
 
   useEffect(() => {
-    // Scroll to top when loading a new level
-    // TODO: Thats the wrong behaviour probably
-    chatPanelRef.current!.scrollTo(0,0)
+    // // Scroll to top when loading a new level
+    // // TODO: Thats the wrong behaviour probably
+    // chatRef.current!.scrollTo(0,0)
+
     // Reset command line input when loading a new level
     setCommandLineInput("")
   }, [levelId])
+
+  useEffect(() => {
+    // TODO: For some reason this is always called twice
+    console.debug('scroll chat')
+    chatRef.current!.lastElementChild?.scrollIntoView() //scrollTo(0,0)
+  }, [proof])
 
   React.useEffect(() => {
     if (!commandLineMode) {
@@ -187,8 +194,8 @@ function PlayableLevel({worldId, levelId}) {
     <ProofContext.Provider value={{proof, setProof}}>
       <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
       <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
-        <div ref={chatPanelRef} className="chat-panel">
-          <div className="chat">
+        <div className="chat-panel">
+          <div ref={chatRef} className="chat">
             {level?.data?.introduction &&
               <div className="message information">
                 <Markdown>{level?.data?.introduction}</Markdown>
@@ -225,7 +232,7 @@ function PlayableLevel({worldId, levelId}) {
           <EditorContext.Provider value={editorConnection}>
             <MonacoEditorContext.Provider value={editor}>
               <div className="exercise">
-                <DualEditor level={level} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} commandLineMode={commandLineMode} />
+                <DualEditor level={level} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} />
               </div>
             </MonacoEditorContext.Provider>
           </EditorContext.Provider>

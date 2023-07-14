@@ -64,7 +64,7 @@ config.autoClosingPairs = config.autoClosingPairs.map(
 monaco.languages.setLanguageConfiguration('lean4cmd', config);
 
 /** The input field */
-export function CommandLine() {
+export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObject<HTMLDivElement>}) {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
@@ -74,7 +74,7 @@ export function CommandLine() {
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
-  const { commandLineMode, commandLineInput, setCommandLineInput } = React.useContext(InputModeContext)
+  const {commandLineInput, setCommandLineInput} = React.useContext(InputModeContext)
 
   const inputRef = useRef()
 
@@ -87,7 +87,7 @@ export function CommandLine() {
   /** Load all goals an messages of the current proof (line-by-line) and save
    * the retrieved information into context (`ProofContext`)
    */
-  const loadAllGoals = React.useCallback(() => {
+  const loadAllGoals = React.useCallback((proofPanelRef) => {
     let goalCalls = []
     let msgCalls = []
 
@@ -174,6 +174,8 @@ export function CommandLine() {
         })
         // Save the proof to the context
         setProof(tmpProof)
+        console.debug('updated proof')
+        proofPanelRef.current?.lastElementChild?.scrollIntoView()
       })
     })
   }, [commandLineInput, editor])
@@ -207,12 +209,15 @@ export function CommandLine() {
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
     if (params.uri == editor.getModel().uri.toString()) {
       setProcessing(false)
+      loadAllGoals(proofPanelRef)
       if (!hasErrors(params.diagnostics)) {
         setCommandLineInput("")
         editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
       }
     }
-    loadAllGoals() // TODO: instead of loading all goals every time, we could only load the last one
+    // TODO: This is the wrong place apparently. Where do wee need to load them?
+    // TODO: instead of loading all goals every time, we could only load the last one
+    // loadAllGoals()
   }, []);
 
   useEffect(() => {

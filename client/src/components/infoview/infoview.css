@@ -135,6 +135,12 @@
 .commandline-interface .content {
   display: flex;
   flex-direction: column;
+  scroll-behavior: smooth;
+}
+
+/* TODO this is in the wrong file */
+.chat {
+  scroll-behavior: smooth;
 }
 
 .commandline-interface .content .tmp-pusher {
