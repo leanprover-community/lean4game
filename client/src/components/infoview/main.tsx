@@ -335,7 +335,6 @@ export function CommandLineInterface(props: {world: string, level: number, data:
     }
   }, [selectedStep])
 
-
   const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
 
   /* Set up updates to the global infoview seither you solved the level with warnings or your last command contains a syntax error Lean can't parseate on editor events. */

@@ -285,6 +285,12 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
     return () => { l.dispose() }
   }, [oneLineEditor, runCommand])
 
+  //TODO: Intention is to run once when loading, does that work?
+  useEffect(() => {
+    console.debug('time to update')
+    loadAllGoals(proofPanelRef)
+  }, [])
+
   /** Process the entered command */
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault()
