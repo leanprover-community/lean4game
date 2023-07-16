@@ -40,6 +40,7 @@ import { changedSelection, codeEdited, selectCode, selectSelections, progressSli
 import { DualEditor } from './infoview/main'
 import { Hints } from './hints';
 import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './infoview/context';
+import { hasInteractiveErrors } from './infoview/command_line';
 
 function Level() {
 
@@ -105,6 +106,15 @@ function PlayableLevel({worldId, levelId}) {
       editor.focus()
     }
   }, [commandLineMode])
+
+  // Scroll to element if selection changes
+  React.useEffect(() => {
+    if (selectedStep) {
+      Array.from(chatRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
+        elem.scrollIntoView({block: "center"})
+      })
+    }
+  }, [selectedStep])
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `CommandLineInterface`.
@@ -217,7 +227,12 @@ function PlayableLevel({worldId, levelId}) {
               </div>
             }
             {proof.map((step, i) => {
-              return <Hints hints={step.hints} showHidden={showHiddenHints} selected={i == selectedStep} toggleSelection={toggleSelection(i)}/>
+              // It the last step has errors, it will have the same hints
+              // as the second-to-last step. Therefore we should not display them.
+              if (!(i == proof.length - 1 && hasInteractiveErrors(step.errors))) {
+                return <Hints hints={step.hints} showHidden={showHiddenHints} step={i}
+                selected={selectedStep} toggleSelection={toggleSelection(i)}/>
+              }
             })}
             {completed &&
               <>

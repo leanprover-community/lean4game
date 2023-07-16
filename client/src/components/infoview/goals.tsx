@@ -235,7 +235,7 @@ export const OtherGoals = React.memo((props: GoalProps2) => {
   </>
 })
 
-
+// TODO: deprecated
 export const ProofDisplay = React.memo((props : ProofDisplayProps) => {
   const { proof } = props
   const steps = proof.match(/.+/g)

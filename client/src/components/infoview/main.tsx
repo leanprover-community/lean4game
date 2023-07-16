@@ -314,7 +314,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
     }
   }
 
-  function selectStep(line: number) {
+  function toggleSelectStep(line: number) {
     return (ev) => {
       if (selectedStep == line) {
         setSelectedStep(undefined)
@@ -325,6 +325,16 @@ export function CommandLineInterface(props: {world: string, level: number, data:
       }
     }
   }
+
+  // Scroll to element if selection changes
+  React.useEffect(() => {
+    if (selectedStep) {
+      Array.from(proofPanelRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
+        elem.scrollIntoView({block: "center"})
+      })
+    }
+  }, [selectedStep])
+
 
   const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
 
@@ -378,7 +388,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
           </div>
         } else {
           return <>
-            <div className={'step' + (selectedStep == i ? ' selected' : '')} onClick={selectStep(i)}>
+            <div className={`step step-${i}` + (selectedStep == i ? ' selected' : '')} onClick={toggleSelectStep(i)}>
               <Command command={step.command} deleteProof={deleteProof(i)}/>
               <Errors errors={step.errors} commandLineMode={true}/>
               <GoalsTab proofStep={step}/>
