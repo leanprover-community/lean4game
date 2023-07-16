@@ -17,7 +17,7 @@ import { InteractiveDiagnostic, getInteractiveDiagnostics } from '@leanprover/in
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './context'
+import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './context'
 import { goalsToString } from './goals'
 import { InteractiveGoals } from './rpc_api'
 
@@ -80,6 +80,9 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
 
   // The context storing all information about the current proof
   const {proof, setProof} = React.useContext(ProofContext)
+
+  // state to store the last batch of deleted messages
+  const {setDeletedChat} = React.useContext(DeletedChatContext)
 
   // TODO: does the position matter at all?
   const rpcSess = useRpcSessionAtPos({uri: uri, line: 1, character: 1})
@@ -184,6 +187,10 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
   // Run the command
   const runCommand = React.useCallback(() => {
     if (processing) {return}
+
+    // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
+    setDeletedChat([])
+
     const pos = editor.getPosition()
     if (commandLineInput) {
       setProcessing(true)

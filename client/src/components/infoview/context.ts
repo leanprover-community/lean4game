@@ -4,7 +4,7 @@
 import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic, InteractiveTermGoal } from '@leanprover/infoview-api';
-import { InteractiveGoal, InteractiveGoals } from './rpc_api';
+import { GameHint, InteractiveGoal, InteractiveGoals } from './rpc_api';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)
@@ -18,7 +18,7 @@ export type ProofStep = {
   /** List of goals *after* this command */
   goals: InteractiveGoal[]     // TODO: Add correct type
   /** Story relevant messages */
-  hints: any        // TODO: Add correct type
+  hints: GameHint[]        // TODO: Add correct type
   /** Errors and warnings */
   errors: InteractiveDiagnostic[]       // TODO: Add correct type
 }
@@ -71,6 +71,14 @@ export const SelectionContext = React.createContext<{
   setSelectedStep: () => {}
 })
 
+/** Context for deleted Hints that are visible just a bit after they've been deleted */
+export const DeletedChatContext = React.createContext<{
+  deletedChat : GameHint[],
+  setDeletedChat: React.Dispatch<React.SetStateAction<Array<GameHint>>>
+}>({
+  deletedChat: undefined,
+  setDeletedChat: () => {}
+})
 
 export const InputModeContext = React.createContext<{
   commandLineMode: boolean,

@@ -18,6 +18,12 @@
   background-color: #FFBABA;
 }
 
+.message.deleted-hint {
+  background-color: #eee;
+  color: #777;
+  box-shadow: .0em .0em .5em .2em #eee;
+ }
+
 .hyp-group {
   margin-bottom: 0.3em;
 }

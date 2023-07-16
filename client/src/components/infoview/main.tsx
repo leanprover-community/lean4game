@@ -27,11 +27,12 @@ import Markdown from '../markdown';
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
-import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './context';
+import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './context';
 import { CommandLine, hasErrors, hasInteractiveErrors } from './command_line';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
+import { GameHint } from './rpc_api';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -275,6 +276,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
   const gameId = React.useContext(GameIdContext)
   const {proof} = React.useContext(ProofContext)
   const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
+  const {setDeletedChat} = React.useContext(DeletedChatContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
 
@@ -302,6 +304,12 @@ export function CommandLineInterface(props: {world: string, level: number, data:
    */
   function deleteProof(line: number) {
     return (ev) => {
+      let deletedChat: Array<GameHint> = []
+      proof.slice(line).map(step => {
+        deletedChat = [...deletedChat, ...step.hints]
+      })
+      setDeletedChat(deletedChat)
+
       editor.executeEdits("command-line", [{
         range: monaco.Selection.fromPositions(
           {lineNumber: line, column: 1},

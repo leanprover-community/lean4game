@@ -25,3 +25,21 @@ export function Hints({hints, showHidden, step, selected, toggleSelection} : {hi
     {showHidden && hiddenHints.map((hint, j) => <HiddenHint key={`hidden-hint-${step}-${j}`} hint={hint} step={step} selected={selected} toggleSelection={toggleSelection}/>)}
   </>
 }
+
+export function DeletedHint({hint} : {hint: GameHint}) {
+  return <div className="message information deleted-hint">
+    <Markdown>{hint.text}</Markdown>
+  </div>
+}
+
+export function DeletedHints({hints, showHidden} : {hints: GameHint[], showHidden: boolean}) {
+
+  const openHints = hints.filter(hint => !hint.hidden)
+  const hiddenHints = hints.filter(hint => hint.hidden)
+
+  // TODO: Should not use index as key.
+  return <>
+    {openHints.map((hint, i) => <DeletedHint key={`deleted-hint-${i}`} hint={hint} />)}
+    {showHidden && hiddenHints.map((hint, i) => <DeletedHint key={`deleted-hidden-hint-${i}`} hint={hint}/>)}
+  </>
+}

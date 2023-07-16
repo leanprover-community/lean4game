@@ -38,9 +38,10 @@ import {Inventory, Documentation} from './inventory';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
 import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
 import { DualEditor } from './infoview/main'
-import { Hints } from './hints';
-import { InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './infoview/context';
+import { DeletedHint, DeletedHints, Hints } from './hints';
+import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './infoview/context';
 import { hasInteractiveErrors } from './infoview/command_line';
+import { GameHint } from './infoview/rpc_api';
 
 function Level() {
 
@@ -66,6 +67,10 @@ function PlayableLevel({worldId, levelId}) {
 
   // The state variables for the `ProofContext`
   const [proof, setProof] = useState<Array<ProofStep>>([])
+
+  // When deleting the proof, we want to keep to old messages around until
+  // a new proof has been entered. e.g. to consult messages coming from dead ends
+  const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
 
   const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
   const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
@@ -216,6 +221,7 @@ function PlayableLevel({worldId, levelId}) {
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
+    <DeletedChatContext.Provider value={{deletedChat, setDeletedChat}}>
     <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
     <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
     <ProofContext.Provider value={{proof, setProof}}>
@@ -238,6 +244,7 @@ function PlayableLevel({worldId, levelId}) {
                   selected={selectedStep} toggleSelection={toggleSelection(i)}/>
               }
             })}
+            <DeletedHints hints={deletedChat} showHidden={showHiddenHints}/>
             {completed &&
               <>
                 <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
@@ -284,6 +291,7 @@ function PlayableLevel({worldId, levelId}) {
     </ProofContext.Provider>
     </InputModeContext.Provider>
     </SelectionContext.Provider>
+    </DeletedChatContext.Provider>
   </>
 }
 
