@@ -8,7 +8,7 @@ export function Hint({hint, step, selected, toggleSelection} : {hint: GameHint, 
   </div>
 }
 
-export function AdditionalHint({hint, step, selected, toggleSelection} : {hint: GameHint, step: number, selected: number, toggleSelection: any}) {
+export function HiddenHint({hint, step, selected, toggleSelection} : {hint: GameHint, step: number, selected: number, toggleSelection: any}) {
   return <div className={`message warning step-${step}` + (step == selected ? ' selected' : '')} onClick={toggleSelection}>
     <Markdown>{hint.text}</Markdown>
   </div>
@@ -19,8 +19,9 @@ export function Hints({hints, showHidden, step, selected, toggleSelection} : {hi
   const openHints = hints.filter(hint => !hint.hidden)
   const hiddenHints = hints.filter(hint => hint.hidden)
 
+  // TODO: Should not use index as key.
   return <>
-    {openHints.map(hint => <Hint hint={hint} step={step} selected={selected} toggleSelection={toggleSelection}/>)}
-    {showHidden && hiddenHints.map(hint => <AdditionalHint hint={hint} step={step} selected={selected} toggleSelection={toggleSelection}/>)}
+    {openHints.map((hint, j) => <Hint key={`hint-${step}-${j}`} hint={hint} step={step} selected={selected} toggleSelection={toggleSelection}/>)}
+    {showHidden && hiddenHints.map((hint, j) => <HiddenHint key={`hidden-hint-${step}-${j}`} hint={hint} step={step} selected={selected} toggleSelection={toggleSelection}/>)}
   </>
 }

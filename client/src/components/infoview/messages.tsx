@@ -48,10 +48,11 @@ function Error({error, commandLineMode} : {error : InteractiveDiagnostic, comman
   </div>
 }
 
+// TODO: Should not use index as key.
 /** A list of messages (info/warning/error) that are produced after this command */
 export function Errors ({errors, commandLineMode} : {errors : InteractiveDiagnostic[], commandLineMode : boolean}) {
   return <div>
-    {errors.map((err) => (<Error error={err} commandLineMode={commandLineMode}/>))}
+    {errors.map((err, i) => (<Error key={`error-${i}`} error={err} commandLineMode={commandLineMode}/>))}
   </div>
 }
 

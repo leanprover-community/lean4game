@@ -230,8 +230,10 @@ function PlayableLevel({worldId, levelId}) {
               // It the last step has errors, it will have the same hints
               // as the second-to-last step. Therefore we should not display them.
               if (!(i == proof.length - 1 && hasInteractiveErrors(step.errors))) {
-                return <Hints hints={step.hints} showHidden={showHiddenHints} step={i}
-                selected={selectedStep} toggleSelection={toggleSelection(i)}/>
+                // TODO: Should not use index as key.
+                return <Hints key={`hints-${i}`}
+                  hints={step.hints} showHidden={showHiddenHints} step={i}
+                  selected={selectedStep} toggleSelection={toggleSelection(i)}/>
               }
             })}
             {completed &&

@@ -255,7 +255,8 @@ function GoalsTab({proofStep} : {proofStep: ProofStep}) {
   return <div>
     <div className="tab-bar">
       {proofStep.goals.map((goal, i) => (
-        <div className={`tab ${i == (selectedGoal) ? "active": ""}`} onClick={(ev) => { setSelectedGoal(i); ev.stopPropagation() }}>
+        // TODO: Should not use index as key.
+        <div key={`proof-goal-${i}`} className={`tab ${i == (selectedGoal) ? "active": ""}`} onClick={(ev) => { setSelectedGoal(i); ev.stopPropagation() }}>
           {i ? `Goal ${i+1}` : "Active Goal"}
         </div>
       ))}
@@ -382,16 +383,15 @@ export function CommandLineInterface(props: {world: string, level: number, data:
         if (i == proof.length - 1 && hasInteractiveErrors(step.errors)) {
           // if the last command contains an error, we only display the errors but not the
           // entered command as it is still present in the command line.
-          return <div>
+          // TODO: Should not use index as key.
+          return <div key={`proof-step-${i}`}>
             <Errors errors={step.errors} commandLineMode={true}/>
           </div>
         } else {
-          return <>
-            <div className={`step step-${i}` + (selectedStep == i ? ' selected' : '')} onClick={toggleSelectStep(i)}>
-              <Command command={step.command} deleteProof={deleteProof(i)}/>
-              <Errors errors={step.errors} commandLineMode={true}/>
-              <GoalsTab proofStep={step}/>
-            </div>
+          return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')} onClick={toggleSelectStep(i)}>
+            <Command command={step.command} deleteProof={deleteProof(i)}/>
+            <Errors errors={step.errors} commandLineMode={true}/>
+            <GoalsTab proofStep={step}/>
             {/* Show a message that there are no goals left */}
             {!step.goals.length && (
               <div className="message information">
@@ -404,7 +404,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
                 }
               </div>
             )}
-          </>
+          </div>
         }
       }) : <CircularProgress />}
     </div>

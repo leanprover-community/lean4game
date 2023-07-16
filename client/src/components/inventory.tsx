@@ -60,20 +60,21 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
     {categories.length > 1 &&
       <div className="tab-bar">
         {categories.map((cat) =>
-          <div className={`tab ${cat == (tab ?? categories[0]) ? "active": ""}`} onClick={() => { setTab(cat) }}>{cat}</div>)}
+          <div key={`category-${cat}`} className={`tab ${cat == (tab ?? categories[0]) ? "active": ""}`}
+            onClick={() => { setTab(cat) }}>{cat}</div>)}
       </div>}
     <div className="inventory-list">
-    { [...items].sort(
-      // For lemas, sort entries `available > disabled > locked`
-      // otherwise alphabetically
-      (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled)
-    ).map(item => {
-        if ((tab ?? categories[0]) == item.category) {
-          return <InventoryItem key={item.name} showDoc={() => {openDoc(item.name, docType)}}
+    {[...items].sort(
+        // For lemas, sort entries `available > disabled > locked`
+        // otherwise alphabetically
+        (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled)
+      ).filter(item => ((tab ?? categories[0]) == item.category)).map((item, i) => {
+          return <InventoryItem key={`${item.category}-${item.name}`}
+            showDoc={() => {openDoc(item.name, docType)}}
             name={item.name} displayName={item.displayName} locked={item.locked}
             disabled={item.disabled} newly={item.new}/>
-        }
-      }) }
+      })
+    }
     </div>
     </>
 }
