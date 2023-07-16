@@ -757,6 +757,10 @@ elab "MakeGame" : command => do
         pure {game with worlds := {game.worlds with
           edges := game.worlds.edges.append (worldIds.toArray.map fun wid => (wid, dependentWorldId))}}
 
+  -- logInfo m!"Dependencies: {worldDependsOnWorlds.toArray.map fun (a,b) => (a,b.toArray)}"
+
+  -- Apparently we need to reload `game` to get the changes to `game.worlds` we just made
+  let game ← getCurGame
 
   -- Which items are used/new in which world?
   let mut usedItemsInWorld : HashMap Name (HashSet Name) := {}
@@ -811,8 +815,9 @@ elab "MakeGame" : command => do
   for inventoryType in #[.Tactic, .Definition, .Lemma] do
 
     -- Which items are introduced in which world?
-    let mut newItemsInWorld' : HashMap Name (HashSet Name) := {}
     let mut lemmaStatements : HashMap (Name × Nat) Name := {}
+    -- TODO: I believe `newItemsInWorld` has way to many elements in it which we iterate over
+    -- e.g. we iterate over `ring` for `Lemma`s as well, but so far that seems to cause no problems
     let mut allItems : HashSet Name := {}
     for (worldId, world) in game.worlds.nodes.toArray do
       let mut newItems : HashSet Name := {}
@@ -846,7 +851,7 @@ elab "MakeGame" : command => do
           let name := Name.str pre s
           newItems := newItems.insert name
           allItems := allItems.insert name
-      newItemsInWorld' := newItemsInWorld'.insert worldId newItems
+      newItemsInWorld := newItemsInWorld.insert worldId newItems
 
     -- Basic inventory item availability: all locked.
     let Availability₀ : HashMap Name InventoryTile :=
@@ -864,9 +869,10 @@ elab "MakeGame" : command => do
     for (worldId, _) in game.worlds.nodes.toArray do
       -- Unlock all items from previous worlds
       let mut items := Availability₀
-      let predecessors := worldDependsOnWorlds.find! worldId
+      let predecessors := game.worlds.predecessors worldId
+      -- logInfo m!"Predecessors: {predecessors.toArray.map fun (a) => (a)}"
       for predWorldId in predecessors do
-        for item in newItemsInWorld'.find! predWorldId do
+        for item in newItemsInWorld.find! predWorldId do
           let data := (← getInventoryItem? item inventoryType).get!
           items := items.insert item {
             name := item
