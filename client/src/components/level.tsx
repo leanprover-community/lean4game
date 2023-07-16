@@ -328,12 +328,12 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
       <span className="app-bar-title">
         {levelTitle}
       </span>
-        <Button disabled={levelId <= 0} inverted={true} to=""
+        <Button disabled={levelId <= 0} inverted="true" to=""
           onClick={(ev) => { setCommandLineMode(!commandLineMode) }}>Editor</Button>
-      <Button disabled={levelId <= 0} inverted={true}
+      <Button disabled={levelId <= 0} inverted="true"
         to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
         ><FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous</Button>
-      <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted={true}
+      <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted="true"
         to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}
         >Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>
     </div>
