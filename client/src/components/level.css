@@ -29,12 +29,12 @@
   overflow: auto;
 }
 
-.chat-panel, .infoview {
+.infoview {
   padding-top: 1em;
   padding-bottom: 0;
 }
 
-.chat-panel, .infoview, .exercise-statement {
+.infoview, .exercise-statement {
   padding-left: .5em;
   padding-right: .5em;
 }
@@ -182,10 +182,20 @@ td code  {
 .chat {
   height: calc(100% - 3.5em);
   overflow-y: scroll;
+  margin-left: .5em;
+  margin-right: .5em;
+}
+
+.chat-panel {
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden;
 }
 
 .toggle-hidden-hints {
-  width:100%;
+  /* width:100%; */
+  margin-left: .5em;
+  margin-right: .5em;
   height: 3.5em;
   border-top:  0.1em solid #aaa;
 }
