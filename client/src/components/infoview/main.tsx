@@ -329,7 +329,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
 
   // Scroll to element if selection changes
   React.useEffect(() => {
-    if (selectedStep) {
+    if (typeof selectedStep !== 'undefined') {
       Array.from(proofPanelRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
         elem.scrollIntoView({block: "center"})
       })

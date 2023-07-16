@@ -109,7 +109,7 @@ function PlayableLevel({worldId, levelId}) {
 
   // Scroll to element if selection changes
   React.useEffect(() => {
-    if (selectedStep) {
+    if (typeof selectedStep !== 'undefined') {
       Array.from(chatRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
         elem.scrollIntoView({block: "center"})
       })
@@ -222,7 +222,7 @@ function PlayableLevel({worldId, levelId}) {
         <div className="chat-panel">
           <div ref={chatRef} className="chat">
             {level?.data?.introduction &&
-              <div className="message information">
+              <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelection(0)}>
                 <Markdown>{level?.data?.introduction}</Markdown>
               </div>
             }
