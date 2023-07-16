@@ -121,6 +121,17 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
               msg.message.append[0].text === "unsolved goals")
           })
 
+          if (typeof goals == 'undefined') {
+            tmpProof.push({
+              command: i ? model.getLineContent(i) : '',
+              goals: [],
+              hints: [],
+              errors: messages
+            } as ProofStep)
+            console.debug('goals is undefined')
+            return
+          }
+
           // If the number of goals reduce, show a message
           if (goals.goals.length && goalCount > goals.goals.length) {
             messages.unshift({
@@ -141,36 +152,26 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
           }
           goalCount = goals.goals.length
 
-          // TODO: Check what happens if the code gets into a bad state and no goals are available
-          if (!goals) {
-            tmpProof.push({
-              command: i ? model.getLineContent(i) : '',
-              goals: [],
-              hints: [],
-              errors: messages
-            } as ProofStep)
-          } else {
+          console.debug(`Command (${i}): `, i ? model.getLineContent(i) : '')
+          console.debug(`Goals: (${i}): `, goalsToString(goals)) //
+          console.debug(`Hints: (${i}): `, goals.goals[0]?.hints)
+          console.debug(`Errors: (${i}): `, messages)
 
-            console.debug(`Command (${i}): `, i ? model.getLineContent(i) : '')
-            console.debug(`Goals: (${i}): `, goalsToString(goals)) //
-            console.debug(`Hints: (${i}): `, goals.goals[0]?.hints)
-            console.debug(`Errors: (${i}): `, messages)
+          // with no goals there will be no hints
+          let hints = goals.goals.length ? goals.goals[0].hints : []
 
-            // with no goals there will be no hints
-            let hints = goals.goals.length ? goals.goals[0].hints : []
+          tmpProof.push({
+            // the command of the line above. Note that `getLineContent` starts counting
+            // at `1` instead of `zero`. The first ProofStep will have an empty command.
+            command: i ? model.getLineContent(i) : '',
+            // TODO: store correct data
+            goals: goals.goals,
+            // only need the hints of the active goals in chat
+            hints: hints,
+            // errors and messages from the server
+            errors: messages
+          } as ProofStep)
 
-            tmpProof.push({
-              // the command of the line above. Note that `getLineContent` starts counting
-              // at `1` instead of `zero`. The first ProofStep will have an empty command.
-              command: i ? model.getLineContent(i) : '',
-              // TODO: store correct data
-              goals: goals.goals || [],
-              // only need the hints of the active goals in chat
-              hints: hints,
-              // errors and messages from the server
-              errors: messages
-            } as ProofStep)
-          }
         })
         // Save the proof to the context
         setProof(tmpProof)

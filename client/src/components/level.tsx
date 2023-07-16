@@ -212,6 +212,8 @@ function PlayableLevel({worldId, levelId}) {
     }
   }
 
+  let k = proof.length - 1
+
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
@@ -238,11 +240,11 @@ function PlayableLevel({worldId, levelId}) {
             })}
             {completed &&
               <>
-                <div className="message information">
+                <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
                   Level completed! 🎉
                 </div>
                 {level?.data?.conclusion?.trim() &&
-                  <div className="message information">
+                  <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
                     <Markdown>{level?.data?.conclusion}</Markdown>
                   </div>
                 }

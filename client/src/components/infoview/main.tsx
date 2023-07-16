@@ -338,7 +338,6 @@ export function CommandLineInterface(props: {world: string, level: number, data:
 
   const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
 
-  /* Set up updates to the global infoview seither you solved the level with warnings or your last command contains a syntax error Lean can't parseate on editor events. */
   const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
 
   const [allProgress, _1] = useServerNotificationState(
@@ -399,7 +398,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
                   <p>Level completed! 🎉</p> :
                   <p>
                     <b>no goals left</b><br />
-                    <i>This probably means you solved the level with warnings</i>
+                    <i>This probably means you solved the level with warnings or Lean encountered a parsing error.</i>
                   </p>
                 }
               </div>
