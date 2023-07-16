@@ -93,7 +93,7 @@ function PlayableLevel({worldId, levelId}) {
     // TODO: For some reason this is always called twice
     console.debug('scroll chat')
     chatRef.current!.lastElementChild?.scrollIntoView() //scrollTo(0,0)
-  }, [proof])
+  }, [proof, showHiddenHints])
 
   React.useEffect(() => {
     if (!commandLineMode) {
