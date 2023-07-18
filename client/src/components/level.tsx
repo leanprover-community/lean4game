@@ -240,7 +240,9 @@ function PlayableLevel({worldId, levelId}) {
     }
   }
 
+  // If the last step has errors, we want to treat it as if it is part of the second-to-last step
   let k = proof.length - 1
+  let withErr = hasInteractiveErrors(proof[k]?.errors) ? 1 : 0
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
@@ -260,7 +262,7 @@ function PlayableLevel({worldId, levelId}) {
             {proof.map((step, i) => {
               // It the last step has errors, it will have the same hints
               // as the second-to-last step. Therefore we should not display them.
-              if (!(i == proof.length - 1 && hasInteractiveErrors(step.errors))) {
+              if (!(i == proof.length - 1 && withErr)) {
                 // TODO: Should not use index as key.
                 return <Hints key={`hints-${i}`}
                   hints={step.hints} showHidden={showHelp.has(i)} step={i}
@@ -287,17 +289,17 @@ function PlayableLevel({worldId, levelId}) {
           </div>
           <div className="toggle-hidden-hints">
             <FormControlLabel
-              control={<Switch checked={showHelp.has(proof.length - 1)} onChange={(ev) => {
-                console.debug(proof.length)
+              control={<Switch checked={showHelp.has(k - withErr)} onChange={(ev) => {
+                // If the last step (`k`) has errors, we want the hidden hints from the
+                // second-to-last step to be affected
                 if (!(proof.length)) {return}
 
-                let k = proof.length - 1
                 // state must not be mutated, therefore we need to clone the set
                 let tmp = new Set(showHelp)
-                if (tmp.has(k)) {
-                  tmp.delete(k)
+                if (tmp.has(k - withErr)) {
+                  tmp.delete(k - withErr)
                 } else {
-                  tmp.add(k)
+                  tmp.add(k - withErr)
                 }
                 setShowHelp(tmp)
                 console.debug(`help: ${Array.from(tmp.values())}`)

@@ -335,7 +335,7 @@ export function hasErrors(diags: Diagnostic[]) {
 
 // TODO: Didn't manage to unify this with the one above
 export function hasInteractiveErrors (diags: InteractiveDiagnostic[]) {
-  return diags.some(
+  return (typeof diags !== 'undefined') && diags.some(
     (d) => (d.severity == DiagnosticSeverity.Error ) // || d.severity == DiagnosticSeverity.Warning
   )
 }
