@@ -336,28 +336,24 @@ function PlayableLevel({worldId, levelId}) {
 
 export default Level
 
+/** The site with the introduction text of a world */
 function Introduction({worldId}) {
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
   return <>
     <div style={gameInfo.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Einführung" worldId={worldId} levelId={0} />
-    <div style={gameInfo.isLoading ? {display: "none"} : null} className="exercise-panel">
-      <div className="introduction-panel">
-        <div className="message information">
-            <Markdown>
-              {gameInfo.data?.worlds.nodes[worldId].introduction}
-            </Markdown>
-          </div>
-      </div>
-      <div className="conclusion">
-        {0 == gameInfo.data?.worldSize[worldId] ?
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" worldId={worldId} levelId={0} />
+    <div style={gameInfo.isLoading ? {display: "none"} : null} className="introduction-panel">
+      <Markdown>
+        {gameInfo.data?.worlds.nodes[worldId].introduction}
+      </Markdown>
+      {gameInfo.data?.worldSize[worldId] == 0 ?
         <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
         <Button to={`/${gameId}/world/${worldId}/level/1`}>
           Start&nbsp;<FontAwesomeIcon icon={faArrowRight} />
-        </Button>}
-      </div>
+        </Button>
+      }
     </div>
   </>
 }
