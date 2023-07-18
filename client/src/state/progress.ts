@@ -67,6 +67,7 @@ export const progressSlice = createSlice({
     },
     /** Set the list of rows where help is displayed */
     helpEdited(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number, help: number[]}>) {
+      console.debug(`!setting help to: ${action.payload.help}`)
       state.games[action.payload.game][action.payload.world][action.payload.level].help = action.payload.help
     },
     /** delete all progress for this game */
@@ -103,6 +104,13 @@ export function selectCode(game: string, world: string, level: number) {
   }
 }
 
+/** return the code of the current level */
+export function selectHelp(game: string, world: string, level: number) {
+  return (state) => {
+    return selectLevel(game, world, level)(state).help
+  }
+}
+
 /** return the selections made in the current level */
 export function selectSelections(game: string, world: string, level: number) {
   return (state) => {
@@ -126,4 +134,4 @@ export function selectProgress(game: string) {
 
 /** Export actions to modify the progress */
 export const { changedSelection, codeEdited, levelCompleted, deleteProgress,
-  deleteLevelProgress, loadProgress } = progressSlice.actions
+  deleteLevelProgress, loadProgress, helpEdited } = progressSlice.actions

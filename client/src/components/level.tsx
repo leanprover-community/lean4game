@@ -36,7 +36,7 @@ import { Button } from './button'
 import Markdown from './markdown';
 import {Inventory, Documentation} from './inventory';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
-import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted } from '../state/progress';
+import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted, helpEdited, selectHelp } from '../state/progress';
 import { DualEditor } from './infoview/main'
 import { DeletedHint, DeletedHints, Hints } from './hints';
 import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './infoview/context';
@@ -72,6 +72,8 @@ function PlayableLevel({worldId, levelId}) {
   // a new proof has been entered. e.g. to consult messages coming from dead ends
   const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
 
+  const store = useStore()
+
   // A set of row numbers where help is displayed
   const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
 
@@ -81,8 +83,6 @@ function PlayableLevel({worldId, levelId}) {
   const [commandLineMode, setCommandLineMode] = useState(true)
   const [commandLineInput, setCommandLineInput] = useState("")
   const [canUndo, setCanUndo] = useState(initialCode.trim() !== "")
-
-  const [showHiddenHints, setShowHiddenHints] = useState(false)
 
   const [selectedStep, setSelectedStep] = useState<number>()
 
@@ -96,6 +96,11 @@ function PlayableLevel({worldId, levelId}) {
     // Reset command line input when loading a new level
     setCommandLineInput("")
   }, [levelId])
+
+  // Load the selected help steps from the store
+  useEffect(() => {
+    setShowHelp(new Set(selectHelp(gameId, worldId, levelId)(store.getState())))
+  }, [])
 
   useEffect(() => {
     // TODO: For some reason this is always called twice
@@ -126,7 +131,10 @@ function PlayableLevel({worldId, levelId}) {
 
   React.useEffect(() => {
     // Forget whether hidden hints are displayed for steps that don't exist yet
-    setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof.length))))
+    if (proof.length) {
+      console.debug(Array.from(showHelp))
+      setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof.length))))
+    }
   }, [proof])
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
@@ -164,6 +172,14 @@ function PlayableLevel({worldId, levelId}) {
 
     setCanUndo(code.trim() !== "")
   }
+
+  // save showed help in store
+  useEffect(() => {
+    if (proof.length) {
+      console.debug(`showHelp:\n ${showHelp}`)
+      dispatch(helpEdited({game: gameId, world: worldId, level: levelId, help: Array.from(showHelp)}))
+    }
+  }, [showHelp])
 
   const onDidChangeSelection = (monacoSelections) => {
     const selections = monacoSelections.map(
