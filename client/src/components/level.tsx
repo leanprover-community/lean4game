@@ -93,14 +93,13 @@ function PlayableLevel({worldId, levelId}) {
     // // TODO: Thats the wrong behaviour probably
     // chatRef.current!.scrollTo(0,0)
 
+    // TODO: That's a problem if the saved proof contains an error
     // Reset command line input when loading a new level
     setCommandLineInput("")
-  }, [levelId])
 
-  // Load the selected help steps from the store
-  useEffect(() => {
+    // Load the selected help steps from the store
     setShowHelp(new Set(selectHelp(gameId, worldId, levelId)(store.getState())))
-  }, [])
+  }, [gameId, worldId, levelId])
 
   useEffect(() => {
     // TODO: For some reason this is always called twice
