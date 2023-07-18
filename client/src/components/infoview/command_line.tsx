@@ -90,7 +90,8 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
   /** Load all goals an messages of the current proof (line-by-line) and save
    * the retrieved information into context (`ProofContext`)
    */
-  const loadAllGoals = React.useCallback((proofPanelRef) => {
+  const loadAllGoals = React.useCallback(() => {
+
     let goalCalls = []
     let msgCalls = []
 
@@ -182,7 +183,7 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
         proofPanelRef.current?.lastElementChild?.scrollIntoView()
       })
     })
-  }, [commandLineInput, editor])
+  }, [commandLineInput, editor, rpcSess, uri, model, proofPanelRef])
 
   // Run the command
   const runCommand = React.useCallback(() => {
@@ -215,18 +216,21 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
 
   // React when answer from the server comes back
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
-    if (params.uri == editor.getModel().uri.toString()) {
+    if (params.uri == uri) {
       setProcessing(false)
-      loadAllGoals(proofPanelRef)
+      loadAllGoals()
       if (!hasErrors(params.diagnostics)) {
         setCommandLineInput("")
         editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
       }
+    } else {
+      // console.debug(`expected uri: ${uri}, got: ${params.uri}`)
+      // console.debug(params)
     }
     // TODO: This is the wrong place apparently. Where do wee need to load them?
     // TODO: instead of loading all goals every time, we could only load the last one
     // loadAllGoals()
-  }, []);
+  }, [uri]);
 
   useEffect(() => {
     const myEditor = monaco.editor.create(inputRef.current!, {
@@ -293,11 +297,13 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
     return () => { l.dispose() }
   }, [oneLineEditor, runCommand])
 
+  // BUG: Causes `file closed` error
   //TODO: Intention is to run once when loading, does that work?
   useEffect(() => {
-    console.debug('time to update')
-    loadAllGoals(proofPanelRef)
-  }, [])
+    console.debug(`time to update: ${uri} \n ${rpcSess}`)
+    console.debug(rpcSess)
+    loadAllGoals()
+  }, [rpcSess])
 
   /** Process the entered command */
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {
