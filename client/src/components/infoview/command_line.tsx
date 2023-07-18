@@ -19,7 +19,7 @@ import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/in
 import { useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './context'
 import { goalsToString } from './goals'
-import { InteractiveGoals } from './rpc_api'
+import { GameHint, InteractiveGoals } from './rpc_api'
 
 /* We register a new language `leancmd` that looks like lean4, but does not use the lsp server. */
 
@@ -155,13 +155,13 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
           }
           goalCount = goals.goals.length
 
+          // with no goals there will be no hints.
+          let hints : GameHint[] = goals.goals.length ? goals.goals[0].hints : []
+
           console.debug(`Command (${i}): `, i ? model.getLineContent(i) : '')
           console.debug(`Goals: (${i}): `, goalsToString(goals)) //
-          console.debug(`Hints: (${i}): `, goals.goals[0]?.hints)
+          console.debug(`Hints: (${i}): `, hints)
           console.debug(`Errors: (${i}): `, messages)
-
-          // with no goals there will be no hints
-          let hints = goals.goals.length ? goals.goals[0].hints : []
 
           tmpProof.push({
             // the command of the line above. Note that `getLineContent` starts counting

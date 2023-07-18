@@ -276,7 +276,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
   const gameId = React.useContext(GameIdContext)
   const {proof} = React.useContext(ProofContext)
   const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
-  const {setDeletedChat} = React.useContext(DeletedChatContext)
+  const {setDeletedChat, showHelp} = React.useContext(DeletedChatContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
 
@@ -305,8 +305,9 @@ export function CommandLineInterface(props: {world: string, level: number, data:
   function deleteProof(line: number) {
     return (ev) => {
       let deletedChat: Array<GameHint> = []
-      proof.slice(line).map(step => {
-        deletedChat = [...deletedChat, ...step.hints]
+      proof.slice(line).map((step, i) => {
+        // Only add these hidden hints to the deletion stack which were visible
+        deletedChat = [...deletedChat, ...step.hints.filter(hint => (!hint.hidden || showHelp.has(line+i)))]
       })
       setDeletedChat(deletedChat)
 

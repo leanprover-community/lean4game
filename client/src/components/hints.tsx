@@ -32,7 +32,7 @@ export function DeletedHint({hint} : {hint: GameHint}) {
   </div>
 }
 
-export function DeletedHints({hints, showHidden} : {hints: GameHint[], showHidden: boolean}) {
+export function DeletedHints({hints} : {hints: GameHint[]}) {
 
   const openHints = hints.filter(hint => !hint.hidden)
   const hiddenHints = hints.filter(hint => hint.hidden)
@@ -40,6 +40,6 @@ export function DeletedHints({hints, showHidden} : {hints: GameHint[], showHidde
   // TODO: Should not use index as key.
   return <>
     {openHints.map((hint, i) => <DeletedHint key={`deleted-hint-${i}`} hint={hint} />)}
-    {showHidden && hiddenHints.map((hint, i) => <DeletedHint key={`deleted-hidden-hint-${i}`} hint={hint}/>)}
+    {hiddenHints.map((hint, i) => <DeletedHint key={`deleted-hidden-hint-${i}`} hint={hint}/>)}
   </>
 }

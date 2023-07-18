@@ -14,7 +14,8 @@ interface Selection {
 interface LevelProgressState {
   code: string,
   selections: Selection[],
-  completed: boolean
+  completed: boolean,
+  help: number[], // A set of rows where hidden hints have been displayed
 }
 
 export interface GameProgressState {
@@ -29,7 +30,7 @@ interface ProgressState {
 const initialProgressState: ProgressState = loadState() ?? { games: {} }
 
 // TODO: There was some weird unreproducible bug with removing `as LevelProgressState` here...
-const initalLevelProgressState: LevelProgressState = {code: "", completed: false, selections: []}
+const initalLevelProgressState: LevelProgressState = {code: "", completed: false, selections: [], help: []}
 
 /** Add an empty skeleton with progress for the current level */
 function addLevelProgress(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
@@ -54,7 +55,7 @@ export const progressSlice = createSlice({
       state.games[action.payload.game][action.payload.world][action.payload.level].code = action.payload.code
       state.games[action.payload.game][action.payload.world][action.payload.level].completed = false
     },
-    /** TODO: ? */
+    /** TODO: docstring */
     changedSelection(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number, selections: Selection[]}>) {
       addLevelProgress(state, action)
       state.games[action.payload.game][action.payload.world][action.payload.level].selections = action.payload.selections
@@ -63,6 +64,10 @@ export const progressSlice = createSlice({
     levelCompleted(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
       addLevelProgress(state, action)
       state.games[action.payload.game][action.payload.world][action.payload.level].completed = true
+    },
+    /** Set the list of rows where help is displayed */
+    helpEdited(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number, help: number[]}>) {
+      state.games[action.payload.game][action.payload.world][action.payload.level].help = action.payload.help
     },
     /** delete all progress for this game */
     deleteProgress(state: ProgressState, action: PayloadAction<{game: string}>) {

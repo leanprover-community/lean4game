@@ -72,6 +72,9 @@ function PlayableLevel({worldId, levelId}) {
   // a new proof has been entered. e.g. to consult messages coming from dead ends
   const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
 
+  // A set of row numbers where help is displayed
+  const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
+
   const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
   const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
 
@@ -98,7 +101,7 @@ function PlayableLevel({worldId, levelId}) {
     // TODO: For some reason this is always called twice
     console.debug('scroll chat')
     chatRef.current!.lastElementChild?.scrollIntoView() //scrollTo(0,0)
-  }, [proof, showHiddenHints])
+  }, [proof, showHelp])
 
   React.useEffect(() => {
     if (!commandLineMode) {
@@ -120,6 +123,11 @@ function PlayableLevel({worldId, levelId}) {
       })
     }
   }, [selectedStep])
+
+  React.useEffect(() => {
+    // Forget whether hidden hints are displayed for steps that don't exist yet
+    setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof.length))))
+  }, [proof])
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `CommandLineInterface`.
@@ -221,7 +229,7 @@ function PlayableLevel({worldId, levelId}) {
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <DeletedChatContext.Provider value={{deletedChat, setDeletedChat}}>
+    <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
     <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
     <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
     <ProofContext.Provider value={{proof, setProof}}>
@@ -240,11 +248,11 @@ function PlayableLevel({worldId, levelId}) {
               if (!(i == proof.length - 1 && hasInteractiveErrors(step.errors))) {
                 // TODO: Should not use index as key.
                 return <Hints key={`hints-${i}`}
-                  hints={step.hints} showHidden={showHiddenHints} step={i}
+                  hints={step.hints} showHidden={showHelp.has(i)} step={i}
                   selected={selectedStep} toggleSelection={toggleSelection(i)}/>
               }
             })}
-            <DeletedHints hints={deletedChat} showHidden={showHiddenHints}/>
+            <DeletedHints hints={deletedChat}/>
             {completed &&
               <>
                 <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
@@ -264,7 +272,21 @@ function PlayableLevel({worldId, levelId}) {
           </div>
           <div className="toggle-hidden-hints">
             <FormControlLabel
-              control={<Switch checked={showHiddenHints} onChange={() => setShowHiddenHints((prev) => !prev)} />}
+              control={<Switch checked={showHelp.has(proof.length - 1)} onChange={(ev) => {
+                console.debug(proof.length)
+                if (!(proof.length)) {return}
+
+                let k = proof.length - 1
+                // state must not be mutated, therefore we need to clone the set
+                let tmp = new Set(showHelp)
+                if (tmp.has(k)) {
+                  tmp.delete(k)
+                } else {
+                  tmp.add(k)
+                }
+                setShowHelp(tmp)
+                console.debug(`help: ${Array.from(tmp.values())}`)
+              }} />}
               label="Show more help!"
             />
           </div>

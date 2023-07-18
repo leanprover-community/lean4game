@@ -75,9 +75,13 @@ export const SelectionContext = React.createContext<{
 export const DeletedChatContext = React.createContext<{
   deletedChat : GameHint[],
   setDeletedChat: React.Dispatch<React.SetStateAction<Array<GameHint>>>
+  showHelp : Set<number>,
+  setShowHelp: React.Dispatch<React.SetStateAction<Set<number>>>
 }>({
   deletedChat: undefined,
-  setDeletedChat: () => {}
+  setDeletedChat: () => {},
+  showHelp: undefined,
+  setShowHelp: () => {}
 })
 
 export const InputModeContext = React.createContext<{
