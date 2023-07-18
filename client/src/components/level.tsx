@@ -473,11 +473,12 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
 
   const {leanClient, leanClientStarted} = useLeanClient(gameId)
 
+  const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
+
   // Create model when level changes
   useEffect(() => {
     if (editor && leanClientStarted) {
 
-      const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
       let model = monaco.editor.getModel(uri)
       if (!model) {
         model = monaco.editor.createModel(initialCode, 'lean4', uri)
@@ -490,8 +491,16 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
         // BUG: Somehow I get an `invalid arguments` bug here
         // editor.setSelections(initialSelections)
       }
+    }
+  }, [editor, levelId, connection, leanClientStarted])
 
+
+  useEffect(() => {
+    if (editor && leanClientStarted) {
+
+      let model = monaco.editor.getModel(uri)
       infoviewApi.serverRestarted(leanClient.initializeResult)
+
       infoProvider.openPreview(editor, infoviewApi)
 
       const taskGutter = new LeanTaskGutter(infoProvider.client, editor)
@@ -499,7 +508,7 @@ function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCo
 
       return () => { abbrevRewriter.dispose(); taskGutter.dispose(); }
     }
-  }, [editor, levelId, connection, leanClientStarted])
+  }, [editor, connection, leanClientStarted])
 
   return {editor, infoProvider, editorConnection}
 }
