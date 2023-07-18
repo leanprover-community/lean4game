@@ -67,6 +67,7 @@ export const progressSlice = createSlice({
     },
     /** Set the list of rows where help is displayed */
     helpEdited(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number, help: number[]}>) {
+      addLevelProgress(state, action)
       console.debug(`!setting help to: ${action.payload.help}`)
       state.games[action.payload.game][action.payload.world][action.payload.level].help = action.payload.help
     },
