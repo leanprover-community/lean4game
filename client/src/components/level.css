@@ -24,9 +24,10 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
 }
 
-.inventory-panel, .exercise-panel, .doc-panel {
+.inventory-panel, .exercise-panel, .doc-panel, .introduction-panel {
   height: 100%;
   overflow: auto;
+  position: relative;
 }
 
 .infoview {
@@ -257,4 +258,14 @@ td code  {
   width: 80%;
   margin-left: auto;
   margin-right: auto;
+}
+
+.impressum {
+  background-color: #fff;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  padding: .5rem;
 }

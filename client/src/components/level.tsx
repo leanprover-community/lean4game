@@ -26,7 +26,7 @@ import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-info
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
 import type { Location } from 'vscode-languageserver-protocol';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 
 import { GameIdContext } from '../app';
@@ -42,6 +42,7 @@ import { DeletedHint, DeletedHints, Hints } from './hints';
 import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './infoview/context';
 import { hasInteractiveErrors } from './infoview/command_line';
 import { GameHint } from './infoview/rpc_api';
+import { Impressum } from './privacy_policy';
 
 function Level() {
 
@@ -87,6 +88,16 @@ function PlayableLevel({worldId, levelId}) {
   const [selectedStep, setSelectedStep] = useState<number>()
 
   const theme = useTheme();
+
+  const [impressum, setImpressum] = React.useState(false)
+
+  function closeImpressum() {
+    setImpressum(false)
+  }
+
+  function toggleImpressum() {
+    setImpressum(!impressum)
+  }
 
   useEffect(() => {
     // // Scroll to top when loading a new level
@@ -250,7 +261,7 @@ function PlayableLevel({worldId, levelId}) {
     <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
     <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
     <ProofContext.Provider value={{proof, setProof}}>
-      <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} />
+      <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} toggleImpressum={toggleImpressum}/>
       <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
         <div className="chat-panel">
           <div ref={chatRef} className="chat">
@@ -316,6 +327,7 @@ function PlayableLevel({worldId, levelId}) {
               </div>
             </MonacoEditorContext.Provider>
           </EditorContext.Provider>
+          {impressum ? <Impressum handleClose={closeImpressum} /> : null}
         </div>
         <div className="inventory-panel">
           {!level.isLoading &&
@@ -341,13 +353,26 @@ function Introduction({worldId}) {
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
+  const [impressum, setImpressum] = React.useState(false)
+
+  const closeImpressum = () => {
+    setImpressum(false)
+  }
+
+  const toggleImpressum = () => {
+    setImpressum(!impressum)
+  }
+
   return <>
     <div style={gameInfo.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" worldId={worldId} levelId={0} />
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" worldId={worldId} levelId={0} toggleImpressum={toggleImpressum}/>
     <div style={gameInfo.isLoading ? {display: "none"} : null} className="introduction-panel">
-      <Markdown>
-        {gameInfo.data?.worlds.nodes[worldId].introduction}
-      </Markdown>
+      <div className="content-wrapper">
+        <Markdown>
+          {gameInfo.data?.worlds.nodes[worldId].introduction}
+        </Markdown>
+        {impressum ? <Impressum handleClose={closeImpressum} /> : null}
+      </div>
       {gameInfo.data?.worldSize[worldId] == 0 ?
         <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
         <Button to={`/${gameId}/world/${worldId}/level/1`}>
@@ -358,7 +383,8 @@ function Introduction({worldId}) {
   </>
 }
 
-function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
+/** The top-navigation bar */
+function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum}) {
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
@@ -375,14 +401,18 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle}) {
       <span className="app-bar-title">
         {levelTitle}
       </span>
-        <Button disabled={levelId <= 0} inverted="true" to=""
-          onClick={(ev) => { setCommandLineMode(!commandLineMode) }}>Editor</Button>
-      <Button disabled={levelId <= 0} inverted="true"
-        to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
-        ><FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous</Button>
-      <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted="true"
-        to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}
-        >Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>
+        <Button disabled={levelId <= 0} inverted="true" to="" onClick={(ev) => { setCommandLineMode(!commandLineMode) }}>
+          Editor
+        </Button>
+        <Button disabled={levelId <= 0} inverted="true" to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}>
+          <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
+        </Button>
+        <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted="true" to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+          Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+        </Button>
+        <Button title="Information, Impressum, Privacy Policy" inverted="true" to="" onClick={toggleImpressum}>
+          <FontAwesomeIcon icon={faCircleInfo} />
+        </Button>
     </div>
 
   </div>
