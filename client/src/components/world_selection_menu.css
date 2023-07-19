@@ -2,7 +2,7 @@
   padding: .5em;
 }
 
-.world-selection-menu .btn {
+.world-selection-menu .btn, .welcome .btn {
   min-width: 5em;
   text-align: center;
   margin-left: .4em;

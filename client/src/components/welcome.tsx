@@ -8,12 +8,15 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay';
 import './welcome.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGlobe, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
 import { selectCompleted } from '../state/progress';
 import { useGetGameInfoQuery } from '../state/api';
 import Markdown from './markdown';
 import WorldSelectionMenu from './world_selection_menu';
 import {PrivacyPolicy} from './privacy_policy';
+import { Button } from './button';
 
 cytoscape.use( klay );
 
@@ -100,6 +103,9 @@ function Welcome() {
     <Split className="welcome" minSize={200} sizes={[70, 30]}>
       <div className="column">
         <Typography variant="body1" component="div" className="welcome-text">
+          <Button inverted="false" title="back to games selection" to="/">
+            <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
+          </Button>
           <Markdown>{gameInfo.data?.introduction}</Markdown>
         </Typography>
       </div>
