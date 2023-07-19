@@ -60,12 +60,17 @@ in the first level and get enabled during the game.
 
 /-- Checks if `inventoryTemplateExt` contains an entry with `(type, name)` and yields
 a warning otherwise. If `template` is provided, it will add such an entry instead of yielding a
-warning. -/
-def checkInventoryDoc (type : InventoryType) (name : Ident)
+warning.
+
+`ident` is the syntax piece. If `name` is not provided, it will use `ident.getId`.
+I used this workaround, because I needed a new name (with correct namespace etc)
+to be used, and I don't know how to create a new ident with same position but different name.
+-/
+def checkInventoryDoc (type : InventoryType) (ident : Ident) (name : Name := ident.getId)
     (template : Option String := none) : CommandElabM Unit := do
   -- note: `name` is an `Ident` (instead of `Name`) for the log messages.
   let env ← getEnv
-  let n := name.getId
+  let n := name
   -- Find a key with matching `(type, name)`.
   match (inventoryTemplateExt.getState env).findIdx?
     (fun x => x.name == n && x.type == type) with
@@ -78,18 +83,18 @@ def checkInventoryDoc (type : InventoryType) (name : Ident)
       -- We just add a dummy entry
       modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
-        name := name.getId
+        name := name
         category := if type == .Lemma then s!"{n.getPrefix}" else "" })
-      logWarningAt name (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
+      logWarningAt ident (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
         m!"somewhere above this statement.")
     -- Add the default documentation
     | some s =>
       modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
-        name := name.getId
+        name := name
         category := if type == .Lemma then s!"{n.getPrefix}" else ""
         content := s })
-      logInfoAt name (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
+      logInfoAt ident (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
       m!"statement description) instead. If you want to write your own description, add " ++
       m!"`{type}Doc {name}` somewhere above this statement.")
 
@@ -332,13 +337,13 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
       let thmStatement ← `(theorem $defaultDeclName $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (template := descr)
+      checkInventoryDoc .Lemma name (name := fullName) (template := descr)
 
     else
       let thmStatement ← `( theorem $name $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (template := descr)
+      checkInventoryDoc .Lemma name (name := fullName) (template := descr)
 
   | none =>
     let thmStatement ← `(theorem $defaultDeclName $sig $val)
@@ -593,7 +598,7 @@ def getTacticDocstring (env : Environment) (name: Name) : CommandElabM (Option S
       if let some doc ← findDocString? env k then
         return doc
 
-  logWarning <| m!"Could not find a docstring for this tactic, consider adding one " ++
+  logWarning <| m!"Could not find a docstring for tactic {name}, consider adding one " ++
     m!"using `TacticDoc {name} \"some doc\"`"
   return none
 
@@ -833,12 +838,20 @@ elab "MakeGame" : command => do
     let Availability₀ : HashMap Name InventoryTile :=
       HashMap.ofList $
         ← allItems.toList.mapM fun item => do
-          let data := (← getInventoryItem? item inventoryType).get!
-          -- TODO: BUG, panic at `get!` in vscode
-          return (item, {
-            name := item
-            displayName := data.displayName
-            category := data.category })
+          -- Using a match statement because the error message of `Option.get!` is not helpful.
+          match (← getInventoryItem? item inventoryType) with
+          | none =>
+            -- Note: we did have a panic here before because lemma statement and doc entry
+            -- had mismatching namespaces
+            logError m!"There is no inventory item ({inventoryType}) for: {item}."
+            panic s!"Inventory item {item} not found!"
+          | some data =>
+            return (item, {
+              name := item
+              displayName := data.displayName
+              category := data.category })
+
+
 
     -- Availability after a given world
     let mut itemsInWorld : HashMap Name (HashMap Name InventoryTile) := {}
