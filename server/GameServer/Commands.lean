@@ -717,8 +717,33 @@ elab "MakeGame" : command => do
     let mut newItems : HashSet Name := {}
     for inventoryType in #[.Tactic, .Definition, .Lemma] do
       for (levelId, level) in world.levels.toArray do
-          usedItems := usedItems.insertMany (level.getInventory inventoryType).used
-          newItems := newItems.insertMany (level.getInventory inventoryType).new
+        usedItems := usedItems.insertMany (level.getInventory inventoryType).used
+        newItems := newItems.insertMany (level.getInventory inventoryType).new
+
+        -- if the previous level was named, we need to add it as a new lemma
+        if inventoryType == .Lemma then
+          match levelId with
+          | 0 => pure ()
+          | 1 => pure () -- level ids start with 1, so we need to skip 1, too
+          | i₀ + 1 =>
+            match (world.levels.find! (i₀)).statementName with
+            | .anonymous => pure ()
+            | .num _ _ => panic "Did not expect to get a numerical statement name!"
+            | .str pre s =>
+              let name := Name.str pre s
+              newItems := newItems.insert name
+
+          if inventoryType == .Lemma then
+
+      -- if the last level was named, we need to add it as a new lemma
+      let i₀ := world.levels.size
+        match (world.levels.find! (i₀)).statementName with
+        | .anonymous => pure ()
+        | .num _ _ => panic "Did not expect to get a numerical statement name!"
+        | .str pre s =>
+          let name := Name.str pre s
+          newItems := newItems.insert name
+
     usedItemsInWorld := usedItemsInWorld.insert worldId usedItems
     newItemsInWorld := newItemsInWorld.insert worldId newItems
 
