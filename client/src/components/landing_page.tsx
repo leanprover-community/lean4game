@@ -105,18 +105,6 @@ function LandingPage() {
     <div className="game-list">
 
       <GameTile
-        title="Formaloversum"
-        gameId="g/hhu-adam/Robo"
-        intro="Erkunde das Leansche Universum mit deinem Robo, welcher dir bei der Verständigung mit den Formalosophen zur Seite steht."
-        description="
-Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet danach verschiedene Bereiche des Bachelorstudiums an.
-
-(Das Spiel befindet sich noch in der Entstehungsphase.)"
-        image={coverRobo}
-        language="German"
-        />
-
-      <GameTile
         title="Natural Number Game"
         gameId="g/hhu-adam/NNG4"
         intro="The classical introduction game for Lean."
@@ -127,6 +115,18 @@ This is a good first introduction to Lean!"
         worlds="9"
         levels="72"
         language="English"
+        />
+
+      <GameTile
+        title="Formaloversum"
+        gameId="g/hhu-adam/Robo"
+        intro="Erkunde das Leansche Universum mit deinem Robo, welcher dir bei der Verständigung mit den Formalosophen zur Seite steht."
+        description="
+Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet danach verschiedene Bereiche des Bachelorstudiums an.
+
+(Das Spiel befindet sich noch in der Entstehungsphase.)"
+        image={coverRobo}
+        language="German"
         />
 
     </div>
@@ -154,11 +154,13 @@ This is a good first introduction to Lean!"
           a template.
         </p>
         <p>
-          There will be an option to load and run games through the server
-          directly by specifying a URL, but this is still in development.
+          There is an option to load and run your own games direclty on the server,
+          instructions are in the NNG repo. Since this is still in development we'd like to
+          encourage you to contact us for support creating your own game. The documentation is
+          not polished yet.
         </p>
         <p>
-          To add games to this page, you should get in contact as
+          To add games to this main page, you should get in contact as
           games will need to be added manually.
         </p>
       </div>
