@@ -821,11 +821,9 @@ elab "MakeGame" : command => do
   -- Calculate world dependency graph `game.worlds`
   for (dependentWorldId, _dependentWorld) in game.worlds.nodes.toArray do
     let mut dependsOnWorlds : HashSet Name := {}
+    -- Adding manual paths that were specified via the `Path` command.
     for (sourceId, targetId) in game.worlds.edges do
-
-      -- Adding manual paths that were specified via the `Path` command.
       if targetId = dependentWorldId then
-        logInfo m!"Adding manual path: {sourceId} → {targetId}"
         dependsOnWorlds := dependsOnWorlds.insert sourceId
 
     for usedItem in usedItemsInWorld.find! dependentWorldId do
@@ -853,7 +851,7 @@ elab "MakeGame" : command => do
         for dep in dependencies do
           match dependencyReasons.find? (world, dep) with
           | none =>
-            msg := msg ++ m!"\n· '{dep}': no reason found"
+            msg := msg ++ m!"\n· '{dep}': no reason found (manually added?)"
           | some items =>
             msg := msg ++ m!"\n· '{dep}' because of:\n  {items.toList}"
         logInfo msg
@@ -876,8 +874,6 @@ elab "MakeGame" : command => do
       modifyCurGame fun game =>
         pure {game with worlds := {game.worlds with
           edges := game.worlds.edges.append (worldIds.toArray.map fun wid => (wid, dependentWorldId))}}
-
-  -- logInfo m!"Dependencies: {worldDependsOnWorlds.toArray.map fun (a,b) => (a,b.toArray)}"
 
   -- Apparently we need to reload `game` to get the changes to `game.worlds` we just made
   let game ← getCurGame
