@@ -62,11 +62,11 @@ in the first level and get enabled during the game.
 a warning otherwise. If `template` is provided, it will add such an entry instead of yielding a
 warning.
 
-`ident` is the syntax piece. If `name` is not provided, it will use `ident.getId`.
+`ref` is the syntax piece. If `name` is not provided, it will use `ident.getId`.
 I used this workaround, because I needed a new name (with correct namespace etc)
 to be used, and I don't know how to create a new ident with same position but different name.
 -/
-def checkInventoryDoc (type : InventoryType) (ident : Ident) (name : Name := ident.getId)
+def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.getId)
     (template : Option String := none) : CommandElabM Unit := do
   -- note: `name` is an `Ident` (instead of `Name`) for the log messages.
   let env ← getEnv
@@ -85,7 +85,7 @@ def checkInventoryDoc (type : InventoryType) (ident : Ident) (name : Name := ide
         type := type
         name := name
         category := if type == .Lemma then s!"{n.getPrefix}" else "" })
-      logWarningAt ident (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
+      logWarningAt ref (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
         m!"somewhere above this statement.")
     -- Add the default documentation
     | some s =>
@@ -94,7 +94,7 @@ def checkInventoryDoc (type : InventoryType) (ident : Ident) (name : Name := ide
         name := name
         category := if type == .Lemma then s!"{n.getPrefix}" else ""
         content := s })
-      logInfoAt ident (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
+      logInfoAt ref (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
       m!"statement description) instead. If you want to write your own description, add " ++
       m!"`{type}Doc {name}` somewhere above this statement.")
 
@@ -642,41 +642,58 @@ def removeTransitive (arrows : HashMap Name (HashSet Name)) : CommandElabM (Hash
   let mut desc := {}
   for id in arrows.toArray.map Prod.fst do
     (newArr, desc) := removeTransitiveAux id arrows newArr desc
-    if (desc.find! id).contains id then logWarning m!"Loop at {id}"
+    if (desc.find! id).contains id then
+      logError <| m!"Loop at {id}. " ++
+        m!"This should not happen and probably means that `findLoops` has a bug."
+      -- DEBUG:
+      -- for ⟨x, hx⟩ in desc.toList do
+      --   m := m ++ m!"{x}: {hx.toList}\n"
+      -- logError m
+
   return newArr
 
+/-- The recursive part of `findLoops`. Finds loops that appear as successors of `node`.
 
-/-- Check if graph contains loops -/
-partial def findLoops (arrows : HashMap Name (HashSet Name)) (visited0 : HashSet Name := {}): List Name := Id.run do
-  let mut visited : HashSet Name := visited0
-  let all : Array Name := arrows.toArray.map (·.1)
+For performance reason it returns a HashSet of visited
+nodes as well. This is filled with all nodes ever looked at as they cannot be
+part of a loop anymore. -/
+partial def findLoopsAux (arrows : HashMap Name (HashSet Name)) (node : Name)
+    (path : Array Name := #[]) (visited : HashSet Name := {}) :
+    Array Name × HashSet Name := Id.run do
+  let mut visited := visited
+  match path.getIdx? node with
+  | some i =>
+    -- Found a loop: `node` is already the iᵗʰ element of the path
+    return (path.extract i path.size, visited.insert node)
+  | none =>
+    for successor in arrows.findD node {} do
+      -- If we already visited the successor, it cannot be part of a loop anymore
+      if visited.contains successor then
+        continue
+      -- Find any loop involving `successor`
+      let (loop, _) := findLoopsAux arrows successor (path.push node) visited
+      visited := visited.insert successor
+      -- No loop found in the dependants of `successor`
+      if loop.isEmpty then
+        continue
+      -- Found a loop, return it
+      return (loop, visited)
+  return (#[], visited.insert node)
 
-  -- find some node that we haven't visited
-  let some x := all.find? fun x => ¬ visited.contains x
-    | return [] -- We have visted all nodes and found no loops
-  visited := visited.insert x
-
-  match visitSuccessors x x visited with -- visit all recursive successors of x
-  | .inl visited' => visited := visited'
-  | .inr l => return l -- a loop has been found
-
-  findLoops arrows visited -- continue looking for unvisited nodes
-where
-  visitSuccessors (x : Name) (x0 : Name) (visited0 : HashSet Name) : Sum (HashSet Name) (List Name) := Id.run do
-    let mut visited : HashSet Name := visited0
-
-    let directSuccessors := arrows.findD x {}
-    for y in directSuccessors do
-      if y == x0 then
-        return .inr [x] -- loop found
-      if visited.contains y then
-        continue -- no loop possible here because the visited nodes do not lead to x0
-      visited := visited.insert y
-      match visitSuccessors y x0 visited with
-      | .inl visited' => visited := visited'
-      | .inr l => return .inr (x :: l)
-
-    return .inl visited
+/-- Find a loop in the graph and return it. Returns `[]` if there are no loops. -/
+partial def findLoops (arrows : HashMap Name (HashSet Name)) : List Name := Id.run do
+  let mut visited : HashSet Name := {}
+  for node in arrows.toArray.map (·.1) do
+    -- Skip a node if it was already visited
+    if visited.contains node then
+      continue
+    -- `findLoopsAux` returns a loop or `[]` together with a set of nodes it visited on its
+    -- search starting from `node`
+    let (loop, moreVisited) := (findLoopsAux arrows node)
+    visited := visited.insertMany moreVisited
+    if !loop.isEmpty then
+      return loop.toList
+  return []
 
 /-- Build the game. This command will precompute various things about the game, such as which
 tactics are available in each level etc. -/
@@ -714,9 +731,13 @@ elab "MakeGame" : command => do
         content := content
       })
 
-  -- Calculate which items are used/new in which world
+  -- For each `worldId` this contains a set of items used in this world
   let mut usedItemsInWorld : HashMap Name (HashSet Name) := {}
+
+  -- For each `worldId` this contains a set of items newly defined in this world
   let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
+
+  -- Calculate which "items" are used/new in which world
   for (worldId, world) in game.worlds.nodes.toArray do
     let mut usedItems : HashSet Name := {}
     let mut newItems : HashSet Name := {}
@@ -751,35 +772,56 @@ elab "MakeGame" : command => do
 
     usedItemsInWorld := usedItemsInWorld.insert worldId usedItems
     newItemsInWorld := newItemsInWorld.insert worldId newItems
+    -- DEBUG: print new/used items
+    -- logInfo m!"{worldId} uses: {usedItems.toList}"
+    -- logInfo m!"{worldId} introduces: {newItems.toList}"
 
+  /- for each "item" this is a HashSet of `worldId`s that introduce this item -/
   let mut worldsWithNewItem : HashMap Name (HashSet Name) := {}
   for (worldId, world) in game.worlds.nodes.toArray do
     for newItem in newItemsInWorld.find! worldId do
       worldsWithNewItem := worldsWithNewItem.insert newItem $
         (worldsWithNewItem.findD newItem {}).insert worldId
 
-  -- Calculate world dependency graph `game.worlds`
+  -- For each `worldId` this is a HashSet of `worldId`s that this world depends on.
   let mut worldDependsOnWorlds : HashMap Name (HashSet Name) := {}
-  let mut dependencyReason : HashMap (Name × Name) Name := {}
-  for (dependentWorldId, dependentWorld) in game.worlds.nodes.toArray do
+
+  -- For a pair of `worldId`s `(id₁, id₂)` this is a HasSet of "items" why `id₁` depends on `id₂`.
+  let mut dependencyReasons : HashMap (Name × Name) (HashSet Name) := {}
+
+  -- Calculate world dependency graph `game.worlds`
+  for (dependentWorldId, _dependentWorld) in game.worlds.nodes.toArray do
     let mut dependsOnWorlds : HashSet Name := {}
     for usedItem in usedItemsInWorld.find! dependentWorldId do
       match worldsWithNewItem.find? usedItem with
-      | some worldIds =>
-        if !worldIds.contains dependentWorldId then
-          dependsOnWorlds := dependsOnWorlds.insertMany worldIds
-          for worldId in worldIds do
-            dependencyReason := dependencyReason.insert (dependentWorldId, worldId) usedItem
       | none => logWarning m!"No world introducing {usedItem}, but required by {dependentWorldId}"
+      | some worldIds =>
+        -- Only need a new dependency if the world does not introduce an item itself
+        if !worldIds.contains dependentWorldId then
+          -- Add all worlds as dependencies which introduce this item
+          -- TODO: Could do something more clever here.
+          dependsOnWorlds := dependsOnWorlds.insertMany worldIds
+          -- Store the dependency reasons for debugging
+          for worldId in worldIds do
+            let tmp := (dependencyReasons.findD (dependentWorldId, worldId) {}).insert usedItem
+            dependencyReasons := dependencyReasons.insert (dependentWorldId, worldId) tmp
     worldDependsOnWorlds := worldDependsOnWorlds.insert dependentWorldId dependsOnWorlds
+  -- DEBUG: print dependencies
+  -- for (world, dependencies) in worldDependsOnWorlds.toArray do
+  --   logWarning m!"{world}: {dependencies.toList}"
+
+  -- Check graph for loops and remove transitive edges
   let loop := findLoops worldDependsOnWorlds
   if loop != [] then
     logError m!"Loop: Dependency graph has a loop: {loop}"
     for i in [:loop.length] do
       let w1 := loop[i]!
       let w2 := loop[if i == loop.length - 1 then 0 else i + 1]!
-      let item := dependencyReason.find! (w1, w2)
-      logError m!"{w1} depends on {w2} because of {item}"
+      match dependencyReasons.find? (w1, w2) with
+      -- This should not happen. Could use `find!` again...
+      | none => logError m!"Did not find a reason why {w1} depends on {w2}."
+      | some items =>
+        logError m!"{w1} depends on {w2} because of {items.toList}."
   else
     worldDependsOnWorlds ← removeTransitive worldDependsOnWorlds
     for (dependentWorldId, worldIds) in worldDependsOnWorlds.toArray do
