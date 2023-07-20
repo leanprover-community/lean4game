@@ -689,8 +689,8 @@ partial def findLoops (arrows : HashMap Name (HashSet Name)) : List Name := Id.r
       continue
     -- `findLoopsAux` returns a loop or `[]` together with a set of nodes it visited on its
     -- search starting from `node`
-    let (loop, moreVisited) := (findLoopsAux arrows node)
-    visited := visited.insertMany moreVisited
+    let (loop, moreVisited) := (findLoopsAux arrows node (visited := visited))
+    visited := moreVisited
     if !loop.isEmpty then
       return loop.toList
   return []
