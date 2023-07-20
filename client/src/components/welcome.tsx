@@ -12,11 +12,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGlobe, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
 import { selectCompleted } from '../state/progress';
-import { useGetGameInfoQuery } from '../state/api';
+import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api';
 import Markdown from './markdown';
 import WorldSelectionMenu from './world_selection_menu';
 import {PrivacyPolicy} from './privacy_policy';
 import { Button } from './button';
+import { Documentation, Inventory } from './inventory';
 
 cytoscape.use( klay );
 
@@ -46,6 +47,20 @@ function Welcome() {
 
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
+
+  const inventory = useLoadInventoryOverviewQuery({game: gameId})
+
+  // When clicking on an inventory item, the inventory is overlayed by the item's doc.
+  // If this state is set to a pair `(name, type)` then the according doc will be open.
+  const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
+
+  // Open the doc of the clicked inventory item
+  function openInventoryDoc(name, type) {
+    setInventoryDoc({name, type})
+  }
+
+  // Set `inventoryDoc` to `null` to close the doc
+  const closeInventoryDoc = () => setInventoryDoc(null);
 
   const { nodes, bounds }: any = gameInfo.data ? computeWorldLayout(gameInfo.data?.worlds) : {nodes: []}
 
@@ -100,7 +115,7 @@ function Welcome() {
       <CircularProgress />
     </Box>
     :
-    <Split className="welcome" minSize={200} sizes={[70, 30]}>
+    <Split className="welcome" minSize={200} sizes={[40, 35, 25]}>
       <div className="column">
         <Typography variant="body1" component="div" className="welcome-text">
           <Button inverted="false" title="back to games selection" to="/">
@@ -117,6 +132,15 @@ function Welcome() {
             {svgElements}
           </svg>
         </Box>
+      </div>
+      <div className="inventory-panel">
+        {<>
+          {inventoryDoc ?
+            <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
+            :
+            <Inventory levelInfo={inventory.data} openDoc={openInventoryDoc} />
+          }
+        </>}
       </div>
     </Split>
   }

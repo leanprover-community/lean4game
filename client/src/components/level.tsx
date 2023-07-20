@@ -26,7 +26,7 @@ import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-info
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
 import type { Location } from 'vscode-languageserver-protocol';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import { faBars, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 
 import { GameIdContext } from '../app';
@@ -235,7 +235,8 @@ function PlayableLevel({worldId, levelId}) {
   // Set `inventoryDoc` to `null` to close the doc
   const closeInventoryDoc = () => setInventoryDoc(null);
 
-  const levelTitle = <>{levelId && `Level ${levelId}`}{level?.data?.title && `: ${level?.data?.title}`}</>
+  const levelTitle = <>
+    {levelId && `Level ${levelId} / ${gameInfo.data?.worldSize[worldId]}`}{level?.data?.title && `: ${level?.data?.title}`}</>
 
   // TODO: with the new design, there is no difference between the introduction and
   // a hint at the beginning of the proof...
@@ -261,7 +262,7 @@ function PlayableLevel({worldId, levelId}) {
     <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
     <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
     <ProofContext.Provider value={{proof, setProof}}>
-      <LevelAppBar isLoading={level.isLoading} levelTitle={levelTitle} worldId={worldId} levelId={levelId} toggleImpressum={toggleImpressum}/>
+      <LevelAppBar isLoading={level.isLoading} levelTitle={`Level ${levelId} / ${gameInfo.data?.worldSize[worldId]}` + (level?.data?.title && ` : ${level?.data?.title}`)} worldId={worldId} levelId={levelId} toggleImpressum={toggleImpressum}/>
       <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
         <div className="chat-panel">
           <div ref={chatRef} className="chat">
@@ -292,7 +293,7 @@ function PlayableLevel({worldId, levelId}) {
                   </div>
                 }
                 {levelId >= gameInfo.data?.worldSize[worldId] ?
-                <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+                <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /> Leave World</Button> :
                 <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
                   Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
               </>
@@ -392,26 +393,40 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum})
 
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
     <div>
-      <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button>
-        <span className="app-bar-title">
-          {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
-        </span>
-      </div>
+      <span className="app-bar-title">
+        {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
+      </span>
+    </div>
     <div>
       <span className="app-bar-title">
         {levelTitle}
       </span>
-        <Button disabled={levelId <= 0} inverted="true" to="" onClick={(ev) => { setCommandLineMode(!commandLineMode) }}>
-          Editor
+        {levelId > 0 && <>
+          <Button disabled={levelId <= 0} inverted="true" to=""
+              onClick={(ev) => { setCommandLineMode(!commandLineMode) }}
+              title="toggle Editor mode">
+            Editor
+          </Button>
+          <Button disabled={levelId <= 0} inverted="true"
+              to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
+              title="previous level">
+            <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
+          </Button>
+        </>}
+        {levelId < gameInfo.data?.worldSize[worldId] &&
+          <Button inverted="true" to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level">
+            Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+          </Button>
+        }
+
+        <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={toggleImpressum}>
+          <FontAwesomeIcon icon={faCircleInfo} /> Info &amp; Impressum
         </Button>
-        <Button disabled={levelId <= 0} inverted="true" to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}>
-          <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
+        <Button to={`/${gameId}`} inverted="true" title="back to world selection">
+          <FontAwesomeIcon icon={faHome} /> Home
         </Button>
-        <Button disabled={levelId >= gameInfo.data?.worldSize[worldId]} inverted="true" to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-          Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
-        </Button>
-        <Button title="Information, Impressum, Privacy Policy" inverted="true" to="" onClick={toggleImpressum}>
-          <FontAwesomeIcon icon={faCircleInfo} />
+        <Button to="" inverted="true">
+          <FontAwesomeIcon icon={faBars} />
         </Button>
     </div>
 

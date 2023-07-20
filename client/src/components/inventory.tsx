@@ -5,11 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
 import Markdown from './markdown';
-import { useLoadDocQuery, InventoryTile, LevelInfo } from '../state/api';
+import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview } from '../state/api';
 
 export function Inventory({levelInfo, openDoc } :
   {
-    levelInfo: LevelInfo,
+    levelInfo: LevelInfo|InventoryOverview,
     openDoc: (name: string, type: string) => void,
   }) {
 
@@ -18,14 +18,17 @@ export function Inventory({levelInfo, openDoc } :
     {/* TODO: Click on Tactic: show info
       TODO: click on paste icon -> paste into command line */}
       <h2>Tactics</h2>
-      <InventoryList items={levelInfo?.tactics} docType="Tactic" openDoc={openDoc} />
-
+      {levelInfo?.tactics &&
+        <InventoryList items={levelInfo?.tactics} docType="Tactic" openDoc={openDoc} />
+      }
       <h2>Definitions</h2>
-      <InventoryList items={levelInfo?.definitions} docType="Definition" openDoc={openDoc} />
-
+      {levelInfo?.definitions &&
+        <InventoryList items={levelInfo?.definitions} docType="Definition" openDoc={openDoc} />
+      }
       <h2>Lemmas</h2>
-      <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc}
-        defaultTab={levelInfo?.lemmaTab} level={levelInfo}/>
+      {levelInfo?.lemmas &&
+        <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc} defaultTab={levelInfo?.lemmaTab} level={levelInfo}/>
+      }
     </div>
   )
 }
@@ -36,7 +39,7 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
     docType: string,
     openDoc(name: string, type: string): void,
     defaultTab? : string,
-    level? : LevelInfo,
+    level? : LevelInfo|InventoryOverview,
   }) {
   // TODO: `level` is only used in the `useEffect` below to check if a new level has
   // been loaded. Is there a better way to observe this?

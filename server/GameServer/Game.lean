@@ -51,6 +51,13 @@ structure LevelInfo where
   statementName : Option String
 deriving ToJson, FromJson
 
+structure InventoryOverview where
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
+  lemmaTab : Option String
+deriving ToJson, FromJson
+
 structure LoadLevelParams where
   world : Name
   level : Nat
@@ -141,7 +148,7 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       return true
     | Message.request id "loadDoc" params =>
       let p ← parseParams LoadDocParams (toJson params)
-      -- let s ← get
+      let s ← get
       let c ← read
       let some doc ← getInventoryItem? p.name p.type
         | do
@@ -154,6 +161,29 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       --   name := doc.name.toString }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson doc⟩
       return true
+    | Message.request id "loadInventoryOverview" _ =>
+      let s ← get
+      let some game ← getGame? s.game
+        | return false
+      -- All Levels have the same tiles, so we just load them from level 1 of an arbitrary world
+      -- and reset `new`, `disabled` and `unlocked`
+      match game.worlds.nodes.toList with
+      | [] => return false
+      | ⟨worldId, _⟩ :: _ =>
+        let some lvl ← getLevel? {game := s.game, world := worldId, level := 1}
+          | do return false
+        let inventory : InventoryOverview := {
+          tactics := lvl.tactics.tiles.map
+            ({ · with locked := true, disabled := false, new := false }),
+          lemmas := lvl.lemmas.tiles.map
+            ({ · with locked := true, disabled := false, new := false }),
+          definitions := lvl.definitions.tiles.map
+            ({ · with locked := true, disabled := false, new := false }),
+          lemmaTab := none
+        }
+        let c ← read
+        c.hOut.writeLspResponse ⟨id, ToJson.toJson inventory⟩
+        return true
     | _ => return false
   | _ => return false
 
