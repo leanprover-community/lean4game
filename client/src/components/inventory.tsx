@@ -7,10 +7,11 @@ import { GameIdContext } from '../app';
 import Markdown from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview } from '../state/api';
 
-export function Inventory({levelInfo, openDoc } :
+export function Inventory({levelInfo, openDoc, enableAll=false} :
   {
     levelInfo: LevelInfo|InventoryOverview,
     openDoc: (name: string, type: string) => void,
+    enableAll?: boolean,
   }) {
 
   return (
@@ -19,27 +20,28 @@ export function Inventory({levelInfo, openDoc } :
       TODO: click on paste icon -> paste into command line */}
       <h2>Tactics</h2>
       {levelInfo?.tactics &&
-        <InventoryList items={levelInfo?.tactics} docType="Tactic" openDoc={openDoc} />
+        <InventoryList items={levelInfo?.tactics} docType="Tactic" openDoc={openDoc} enableAll={enableAll}/>
       }
       <h2>Definitions</h2>
       {levelInfo?.definitions &&
-        <InventoryList items={levelInfo?.definitions} docType="Definition" openDoc={openDoc} />
+        <InventoryList items={levelInfo?.definitions} docType="Definition" openDoc={openDoc} enableAll={enableAll}/>
       }
       <h2>Lemmas</h2>
       {levelInfo?.lemmas &&
-        <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc} defaultTab={levelInfo?.lemmaTab} level={levelInfo}/>
+        <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc} defaultTab={levelInfo?.lemmaTab} level={levelInfo} enableAll={enableAll}/>
       }
     </div>
   )
 }
 
-function InventoryList({items, docType, openDoc, defaultTab=null, level=undefined} :
+function InventoryList({items, docType, openDoc, defaultTab=null, level=undefined, enableAll=false} :
   {
     items: InventoryTile[],
     docType: string,
     openDoc(name: string, type: string): void,
     defaultTab? : string,
     level? : LevelInfo|InventoryOverview,
+    enableAll?: boolean,
   }) {
   // TODO: `level` is only used in the `useEffect` below to check if a new level has
   // been loaded. Is there a better way to observe this?
@@ -67,22 +69,22 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
             onClick={() => { setTab(cat) }}>{cat}</div>)}
       </div>}
     <div className="inventory-list">
-    {[...items].sort(
-        // For lemas, sort entries `available > disabled > locked`
-        // otherwise alphabetically
-        (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled)
-      ).filter(item => ((tab ?? categories[0]) == item.category)).map((item, i) => {
-          return <InventoryItem key={`${item.category}-${item.name}`}
-            showDoc={() => {openDoc(item.name, docType)}}
-            name={item.name} displayName={item.displayName} locked={item.locked}
-            disabled={item.disabled} newly={item.new}/>
-      })
-    }
+      {[...items].sort(
+          // For lemas, sort entries `available > disabled > locked`
+          // otherwise alphabetically
+          (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled)
+        ).filter(item => ((tab ?? categories[0]) == item.category)).map((item, i) => {
+            return <InventoryItem key={`${item.category}-${item.name}`}
+              showDoc={() => {openDoc(item.name, docType)}}
+              name={item.name} displayName={item.displayName} locked={item.locked}
+              disabled={item.disabled} newly={item.new} enableAll={enableAll}/>
+        })
+      }
     </div>
     </>
 }
 
-function InventoryItem({name, displayName, locked, disabled, newly, showDoc}) {
+function InventoryItem({name, displayName, locked, disabled, newly, showDoc, enableAll=false}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : ""
   const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
@@ -90,12 +92,12 @@ function InventoryItem({name, displayName, locked, disabled, newly, showDoc}) {
                 disabled ? "Not available in this level" : ""
 
   const handleClick = () => {
-    if (!locked) {
+    if (enableAll || !locked) {
       showDoc()
     }
   }
 
-  return <div className={`item ${className}`} onClick={handleClick} title={title}>{icon} {displayName}</div>
+  return <div className={`item ${className}${enableAll ? ' enabled' : ''}`} onClick={handleClick} title={title}>{icon} {displayName}</div>
 }
 
 export function Documentation({name, type, handleClose}) {

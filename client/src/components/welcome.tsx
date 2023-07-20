@@ -138,7 +138,7 @@ function Welcome() {
           {inventoryDoc ?
             <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
             :
-            <Inventory levelInfo={inventory.data} openDoc={openInventoryDoc} />
+            <Inventory levelInfo={inventory.data} openDoc={openInventoryDoc} enableAll={true}/>
           }
         </>}
       </div>
