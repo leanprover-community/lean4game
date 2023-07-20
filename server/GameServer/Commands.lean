@@ -4,6 +4,12 @@ open Lean Meta Elab Command
 
 set_option autoImplicit false
 
+/-- Let `MakeGame` print the reasons why the worlds depend on each other. -/
+register_option lean4game.showDependencyReasons : Bool := {
+  defValue := false
+  descr := "show reasons for calculated world dependencies."
+}
+
 /-! # Game metadata -/
 
 /-- Switch to the specified `Game` (and create it if non-existent). Example: `Game "NNG"` -/
@@ -836,9 +842,21 @@ elab "MakeGame" : command => do
             let tmp := (dependencyReasons.findD (dependentWorldId, worldId) {}).insert usedItem
             dependencyReasons := dependencyReasons.insert (dependentWorldId, worldId) tmp
     worldDependsOnWorlds := worldDependsOnWorlds.insert dependentWorldId dependsOnWorlds
-  -- DEBUG: print dependencies
-  -- for (world, dependencies) in worldDependsOnWorlds.toArray do
-  --   logWarning m!"{world}: {dependencies.toList}"
+
+  -- Debugging: show all dependency reasons if the option `lean4game.showDependencyReasons` is set
+  if lean4game.showDependencyReasons.get (← getOptions) then
+    for (world, dependencies) in worldDependsOnWorlds.toArray do
+      if dependencies.isEmpty then
+        logInfo m!"Dependencies of '{world}': none"
+      else
+        let mut msg := m!"Dependencies of '{world}':"
+        for dep in dependencies do
+          match dependencyReasons.find? (world, dep) with
+          | none =>
+            msg := msg ++ m!"\n· '{dep}': no reason found"
+          | some items =>
+            msg := msg ++ m!"\n· '{dep}' because of:\n  {items.toList}"
+        logInfo msg
 
   -- Check graph for loops and remove transitive edges
   let loop := findLoops worldDependsOnWorlds
