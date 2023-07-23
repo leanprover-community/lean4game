@@ -6,6 +6,8 @@ import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-s
 import { GameIdContext } from '../app';
 import Markdown from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview } from '../state/api';
+import { selectInventory } from '../state/progress';
+import { store } from '../state/store';
 
 export function Inventory({levelInfo, openDoc, enableAll=false} :
   {
@@ -46,13 +48,22 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
   // TODO: `level` is only used in the `useEffect` below to check if a new level has
   // been loaded. Is there a better way to observe this?
 
+  const gameId = React.useContext(GameIdContext)
+
   const categorySet = new Set<string>()
   for (let item of items) {
     categorySet.add(item.category)
   }
   const categories = Array.from(categorySet).sort()
 
-  const [tab, setTab] = useState(defaultTab);
+  const [tab, setTab] = useState(defaultTab)
+
+  // Add inventory items from local store as unlocked.
+  // Items are unlocked if they are in the local store, or if the server says they should be
+  // given the dependency graph. (OR-connection) (TODO: maybe add different logic for different
+  // modi)
+  let inv: string[] = selectInventory(gameId)(store.getState())
+  let modifiedItems : InventoryTile[] = items.map(tile => inv.includes(tile.name) ? {...tile, locked: false} : tile)
 
   useEffect(() => {
     // If the level specifies `LemmaTab "Nat"`, we switch to this tab on loading.
@@ -69,7 +80,7 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
             onClick={() => { setTab(cat) }}>{cat}</div>)}
       </div>}
     <div className="inventory-list">
-      {[...items].sort(
+      {[...modifiedItems].sort(
           // For lemas, sort entries `available > disabled > locked`
           // otherwise alphabetically
           (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled)

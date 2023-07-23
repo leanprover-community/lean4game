@@ -4,6 +4,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { loadState } from "./local_storage";
+import { WorkDoneProgressBegin } from 'vscode-languageserver-protocol';
 
 interface Selection {
   selectionStartLineNumber: number,
@@ -17,9 +18,13 @@ interface LevelProgressState {
   completed: boolean,
   help: number[], // A set of rows where hidden hints have been displayed
 }
+interface WorldProgressState {
+  [world: string] : {[level: number]: LevelProgressState},
+}
 
 export interface GameProgressState {
-  [world: string] : {[level: number]: LevelProgressState}
+  inventory: string[],
+  data: WorldProgressState
 }
 
 /** The progress made on all lean4-games */
@@ -32,16 +37,21 @@ const initialProgressState: ProgressState = loadState() ?? { games: {} }
 // TODO: There was some weird unreproducible bug with removing `as LevelProgressState` here...
 const initalLevelProgressState: LevelProgressState = {code: "", completed: false, selections: [], help: []}
 
+/** Add an empty skeleton with progress for the current game */
+function addGameProgress (state: ProgressState, action: PayloadAction<{game: string}>) {
+  if (!state.games[action.payload.game]) {
+    state.games[action.payload.game] = {inventory: [], data: {}}
+  }
+}
+
 /** Add an empty skeleton with progress for the current level */
 function addLevelProgress(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
-  if (!state.games[action.payload.game]) {
-    state.games[action.payload.game] = {}
+  addGameProgress(state, action)
+  if (!state.games[action.payload.game].data[action.payload.world]) {
+    state.games[action.payload.game].data[action.payload.world] = {}
   }
-  if (!state.games[action.payload.game][action.payload.world]) {
-    state.games[action.payload.game][action.payload.world] = {}
-  }
-  if (!state.games[action.payload.game][action.payload.world][action.payload.level]) {
-    state.games[action.payload.game][action.payload.world][action.payload.level] = {...initalLevelProgressState}
+  if (!state.games[action.payload.game].data[action.payload.world][action.payload.level]) {
+    state.games[action.payload.game].data[action.payload.world][action.payload.level] = {...initalLevelProgressState}
   }
 }
 
@@ -52,38 +62,43 @@ export const progressSlice = createSlice({
     /** put edited code in the state and set completed to false */
     codeEdited(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number, code: string}>) {
       addLevelProgress(state, action)
-      state.games[action.payload.game][action.payload.world][action.payload.level].code = action.payload.code
-      state.games[action.payload.game][action.payload.world][action.payload.level].completed = false
+      state.games[action.payload.game].data[action.payload.world][action.payload.level].code = action.payload.code
+      state.games[action.payload.game].data[action.payload.world][action.payload.level].completed = false
     },
     /** TODO: docstring */
     changedSelection(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number, selections: Selection[]}>) {
       addLevelProgress(state, action)
-      state.games[action.payload.game][action.payload.world][action.payload.level].selections = action.payload.selections
+      state.games[action.payload.game].data[action.payload.world][action.payload.level].selections = action.payload.selections
     },
     /** mark level as completed */
     levelCompleted(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
       addLevelProgress(state, action)
-      state.games[action.payload.game][action.payload.world][action.payload.level].completed = true
+      state.games[action.payload.game].data[action.payload.world][action.payload.level].completed = true
     },
     /** Set the list of rows where help is displayed */
     helpEdited(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number, help: number[]}>) {
       addLevelProgress(state, action)
       console.debug(`!setting help to: ${action.payload.help}`)
-      state.games[action.payload.game][action.payload.world][action.payload.level].help = action.payload.help
+      state.games[action.payload.game].data[action.payload.world][action.payload.level].help = action.payload.help
     },
     /** delete all progress for this game */
     deleteProgress(state: ProgressState, action: PayloadAction<{game: string}>) {
-      state.games[action.payload.game] = {}
+      state.games[action.payload.game] = {inventory: [], data: {}}
     },
     /** delete progress for this level */
     deleteLevelProgress(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
       addLevelProgress(state, action)
-      state.games[action.payload.game][action.payload.world][action.payload.level] = initalLevelProgressState
+      state.games[action.payload.game].data[action.payload.world][action.payload.level] = initalLevelProgressState
     },
     /** load progress, e.g. from external import */
     loadProgress(state: ProgressState, action: PayloadAction<{game: string, data:GameProgressState}>) {
       console.debug(`setting data to:\n ${action.payload.data}`)
       state.games[action.payload.game] = action.payload.data
+    },
+    /** set the current inventory */
+    changedInventory(state: ProgressState, action: PayloadAction<{game: string, inventory: string[]}>) {
+      addGameProgress(state, action)
+      state.games[action.payload.game].inventory = action.payload.inventory
     },
   }
 })
@@ -92,9 +107,9 @@ export const progressSlice = createSlice({
 export function selectLevel(game: string, world: string, level: number) {
   return (state) =>{
     if (!state.progress.games[game]) { return initalLevelProgressState }
-    if (!state.progress.games[game][world]) { return initalLevelProgressState }
-    if (!state.progress.games[game][world][level]) { return initalLevelProgressState }
-    return state.progress.games[game][world][level]
+    if (!state.progress.games[game].data[world]) { return initalLevelProgressState }
+    if (!state.progress.games[game].data[world][level]) { return initalLevelProgressState }
+    return state.progress.games[game].data[world][level]
   }
 }
 
@@ -102,6 +117,14 @@ export function selectLevel(game: string, world: string, level: number) {
 export function selectCode(game: string, world: string, level: number) {
   return (state) => {
     return selectLevel(game, world, level)(state).code
+  }
+}
+
+/** return the current inventory */
+export function selectInventory(game: string) {
+  return (state) => {
+    if (!state.progress.games[game]) { return [] }
+    return state.progress.games[game].inventory
   }
 }
 
@@ -135,4 +158,4 @@ export function selectProgress(game: string) {
 
 /** Export actions to modify the progress */
 export const { changedSelection, codeEdited, levelCompleted, deleteProgress,
-  deleteLevelProgress, loadProgress, helpEdited } = progressSlice.actions
+  deleteLevelProgress, loadProgress, helpEdited, changedInventory } = progressSlice.actions

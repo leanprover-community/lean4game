@@ -21,7 +21,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { GameIdContext } from '../../app';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { LevelInfo } from '../../state/api';
-import { levelCompleted, selectCompleted } from '../../state/progress';
+import { changedInventory, levelCompleted, selectCompleted, selectInventory } from '../../state/progress';
 import Markdown from '../markdown';
 
 import { Infos } from './infos';
@@ -33,16 +33,17 @@ import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint } from './rpc_api';
+import { store } from '../../state/store';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
  */
-export function DualEditor({level, codeviewRef, levelId, worldId}) {
+export function DualEditor({ level, codeviewRef, levelId, worldId }) {
   const ec = React.useContext(EditorContext)
-  const {commandLineMode} = React.useContext(InputModeContext)
+  const { commandLineMode } = React.useContext(InputModeContext)
   return <>
     <div className={commandLineMode ? 'hidden' : ''}>
-      <ExerciseStatement data={level?.data} />
+      <ExerciseStatement data={level} />
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
     {ec ?
@@ -57,10 +58,36 @@ export function DualEditor({level, codeviewRef, levelId, worldId}) {
 }
 
 /** The part of the two editors that needs the editor connection first */
-function DualEditorMain({worldId, levelId, level}) {
+function DualEditorMain({ worldId, levelId, level }: { worldId: string, levelId: number, level: LevelInfo }) {
   const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
-  const {commandLineMode} = React.useContext(InputModeContext)
+  const { commandLineMode } = React.useContext(InputModeContext)
+
+  // Mark level as completed when server gives notification
+  const dispatch = useAppDispatch()
+  useServerNotificationEffect(
+    '$/game/completed',
+    (params: any) => {
+      if (ec.events.changedCursorLocation.current &&
+        ec.events.changedCursorLocation.current.uri === params.uri) {
+        dispatch(levelCompleted({ game: gameId, world: worldId, level: levelId }))
+
+        // On completion, add the names of all new items to the local storage
+        let newTiles = [
+          ...level?.tactics,
+          ...level?.lemmas,
+          ...level?.definitions
+        ].filter((tile) => tile.new).map((tile) => tile.name)
+
+        let inv: string[] = selectInventory(gameId)(store.getState())
+
+        // add new items and remove duplicates
+        let newInv = [...inv, ...newTiles].filter((item, i, array) => array.indexOf(item) == i)
+
+        dispatch(changedInventory({ game: gameId, inventory: newInv }))
+      }
+    }, [level]
+  )
 
   /* Set up updates to the global infoview state on editor events. */
   const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
@@ -75,22 +102,22 @@ function DualEditorMain({worldId, levelId, level}) {
   const serverVersion = useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
 
   return <>
-  <ConfigContext.Provider value={config}>
-    <VersionContext.Provider value={serverVersion}>
-      <WithRpcSessions>
-        <WithLspDiagnosticsContext>
-          <ProgressContext.Provider value={allProgress}>
-            {commandLineMode ?
-              <CommandLineInterface world={worldId} level={levelId} data={level?.data}/>
-              :
-              <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />
-            }
-          </ProgressContext.Provider>
-        </WithLspDiagnosticsContext>
-      </WithRpcSessions>
-    </VersionContext.Provider>
-  </ConfigContext.Provider>
-</>
+    <ConfigContext.Provider value={config}>
+      <VersionContext.Provider value={serverVersion}>
+        <WithRpcSessions>
+          <WithLspDiagnosticsContext>
+            <ProgressContext.Provider value={allProgress}>
+              {commandLineMode ?
+                <CommandLineInterface world={worldId} level={levelId} data={level} />
+                :
+                <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />
+              }
+            </ProgressContext.Provider>
+          </WithLspDiagnosticsContext>
+        </WithRpcSessions>
+      </VersionContext.Provider>
+    </ConfigContext.Provider>
+  </>
 }
 
 /** The mathematical formulation of the statement, supporting e.g. Latex
@@ -99,81 +126,66 @@ function DualEditorMain({worldId, levelId, level}) {
  * - Theorem xyz
  * - Exercises: description
  */
-function ExerciseStatement({data}) {
+function ExerciseStatement({ data }) {
   if (!data?.descrText) { return <></> }
   return <div className="exercise-statement"><Markdown>
-    {(data?.statementName ? `**Theorem** \`${data?.statementName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}` }
+    {(data?.statementName ? `**Theorem** \`${data?.statementName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}`}
   </Markdown></div>
 }
 
 // TODO: This is only used in `EditorInterface`
 // while `CommandLineInterface` has this copy-pasted in.
-export function Main(props: {world: string, level: number}) {
-    const ec = React.useContext(EditorContext);
-    const gameId = React.useContext(GameIdContext)
+export function Main(props: { world: string, level: number }) {
+  const ec = React.useContext(EditorContext);
+  const gameId = React.useContext(GameIdContext)
 
-    const dispatch = useAppDispatch()
+  const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
 
-    // Mark level as completed when server gives notification
-    useServerNotificationEffect(
-        '$/game/completed',
-        (params: any) => {
+  /* Set up updates to the global infoview state on editor events. */
+  const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
 
-            if (ec.events.changedCursorLocation.current &&
-                ec.events.changedCursorLocation.current.uri === params.uri) {
-                dispatch(levelCompleted({game: gameId, world: props.world, level: props.level}))
-            }
-        },
-        []
-    );
+  const [allProgress, _1] = useServerNotificationState(
+    '$/lean/fileProgress',
+    new Map<DocumentUri, LeanFileProgressProcessingInfo[]>(),
+    async (params: LeanFileProgressParams) => (allProgress) => {
+      const newProgress = new Map(allProgress);
+      return newProgress.set(params.textDocument.uri, params.processing);
+    },
+    []
+  );
 
-    const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
+  const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
 
-    /* Set up updates to the global infoview state on editor events. */
-    const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
+  useClientNotificationEffect(
+    'textDocument/didClose',
+    (params: DidCloseTextDocumentParams) => {
+      if (ec.events.changedCursorLocation.current &&
+        ec.events.changedCursorLocation.current.uri === params.textDocument.uri) {
+        ec.events.changedCursorLocation.fire(undefined)
+      }
+    },
+    []
+  );
 
-    const [allProgress, _1] = useServerNotificationState(
-        '$/lean/fileProgress',
-        new Map<DocumentUri, LeanFileProgressProcessingInfo[]>(),
-        async (params: LeanFileProgressParams) => (allProgress) => {
-            const newProgress = new Map(allProgress);
-            return newProgress.set(params.textDocument.uri, params.processing);
-        },
-        []
-    );
+  const serverVersion =
+    useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
+  const serverStoppedResult = useEventResult(ec.events.serverStopped);
+  // NB: the cursor may temporarily become `undefined` when a file is closed. In this case
+  // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
+  // that we want to persist.
+  let ret
+  if (!serverVersion) {
+    ret = <p>Waiting for Lean server to start...</p>
+  } else if (serverStoppedResult) {
+    ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
+  } else {
+    ret = <div className="infoview vscode-light">
+      {completed && <div className="level-completed">Level completed! 🎉</div>}
+      <Infos />
+    </div>
+  }
 
-    const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
-
-    useClientNotificationEffect(
-        'textDocument/didClose',
-        (params: DidCloseTextDocumentParams) => {
-            if (ec.events.changedCursorLocation.current &&
-                ec.events.changedCursorLocation.current.uri === params.textDocument.uri) {
-                ec.events.changedCursorLocation.fire(undefined)
-            }
-        },
-        []
-    );
-
-    const serverVersion =
-        useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
-    const serverStoppedResult = useEventResult(ec.events.serverStopped);
-    // NB: the cursor may temporarily become `undefined` when a file is closed. In this case
-    // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
-    // that we want to persist.
-    let ret
-    if (!serverVersion) {
-        ret = <p>Waiting for Lean server to start...</p>
-    } else if (serverStoppedResult){
-        ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
-    } else {
-        ret = <div className="infoview vscode-light">
-            {completed && <div className="level-completed">Level completed! 🎉</div>}
-            <Infos />
-        </div>
-    }
-
-    return ret
+  return ret
 }
 
 const goalFilter = {
@@ -185,9 +197,9 @@ const goalFilter = {
 }
 
 /** The display of a single entered lean command */
-function Command({command, deleteProof} : {command: string, deleteProof: any}) {
+function Command({ command, deleteProof }: { command: string, deleteProof: any }) {
   // The first step will always have an empty command
-  if (!command) {return <></>}
+  if (!command) { return <></> }
   return <div className="command">
     {command}
     <div className="undo-button" title="Delete this and future commands" onClick={deleteProof}>
@@ -248,17 +260,17 @@ function Command({command, deleteProof} : {command: string, deleteProof: any}) {
 // }, fastIsEqual)
 
 /** The tabs of goals that lean ahs after the command of this step has been processed */
-function GoalsTab({proofStep} : {proofStep: ProofStep}) {
+function GoalsTab({ proofStep }: { proofStep: ProofStep }) {
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
-  if (!proofStep.goals.length) {return <></>}
+  if (!proofStep.goals.length) { return <></> }
 
   return <div>
     <div className="tab-bar">
       {proofStep.goals.map((goal, i) => (
         // TODO: Should not use index as key.
-        <div key={`proof-goal-${i}`} className={`tab ${i == (selectedGoal) ? "active": ""}`} onClick={(ev) => { setSelectedGoal(i); ev.stopPropagation() }}>
-          {i ? `Goal ${i+1}` : "Active Goal"}
+        <div key={`proof-goal-${i}`} className={`tab ${i == (selectedGoal) ? "active" : ""}`} onClick={(ev) => { setSelectedGoal(i); ev.stopPropagation() }}>
+          {i ? `Goal ${i + 1}` : "Active Goal"}
         </div>
       ))}
     </div>
@@ -269,30 +281,16 @@ function GoalsTab({proofStep} : {proofStep: ProofStep}) {
 }
 
 /** The interface in command line mode */
-export function CommandLineInterface(props: {world: string, level: number, data: LevelInfo}) {
+export function CommandLineInterface(props: { world: string, level: number, data: LevelInfo }) {
 
   const ec = React.useContext(EditorContext)
   const editor = React.useContext(MonacoEditorContext)
   const gameId = React.useContext(GameIdContext)
-  const {proof} = React.useContext(ProofContext)
-  const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
-  const {setDeletedChat, showHelp} = React.useContext(DeletedChatContext)
+  const { proof } = React.useContext(ProofContext)
+  const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
+  const { setDeletedChat, showHelp } = React.useContext(DeletedChatContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
-
-  const dispatch = useAppDispatch()
-
-  // Mark level as completed when server gives notification
-  useServerNotificationEffect(
-    '$/game/completed',
-    (params: any) => {
-
-      if (ec.events.changedCursorLocation.current &&
-          ec.events.changedCursorLocation.current.uri === params.uri) {
-          dispatch(levelCompleted({game: gameId, world: props.world, level: props.level}))
-      }
-    }, []
-  )
 
   // React.useEffect(() => {
   //   console.debug('updated proof')
@@ -307,13 +305,13 @@ export function CommandLineInterface(props: {world: string, level: number, data:
       let deletedChat: Array<GameHint> = []
       proof.slice(line).map((step, i) => {
         // Only add these hidden hints to the deletion stack which were visible
-        deletedChat = [...deletedChat, ...step.hints.filter(hint => (!hint.hidden || showHelp.has(line+i)))]
+        deletedChat = [...deletedChat, ...step.hints.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
       })
       setDeletedChat(deletedChat)
 
       editor.executeEdits("command-line", [{
         range: monaco.Selection.fromPositions(
-          {lineNumber: line, column: 1},
+          { lineNumber: line, column: 1 },
           editor.getModel().getFullModelRange().getEndPosition()
         ),
         text: '',
@@ -340,7 +338,7 @@ export function CommandLineInterface(props: {world: string, level: number, data:
   React.useEffect(() => {
     if (typeof selectedStep !== 'undefined') {
       Array.from(proofPanelRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
-        elem.scrollIntoView({block: "center"})
+        elem.scrollIntoView({ block: "center" })
       })
     }
   }, [selectedStep])
@@ -348,15 +346,6 @@ export function CommandLineInterface(props: {world: string, level: number, data:
   const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
 
   const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
-
-  const [allProgress, _1] = useServerNotificationState(
-    '$/lean/fileProgress',
-    new Map<DocumentUri, LeanFileProgressProcessingInfo[]>(),
-    async (params: LeanFileProgressParams) => (allProgress) => {
-      const newProgress = new Map(allProgress);
-      return newProgress.set(params.textDocument.uri, params.processing);
-    }, []
-  )
 
   const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
 
@@ -371,17 +360,19 @@ export function CommandLineInterface(props: {world: string, level: number, data:
   )
 
   const serverVersion =
-      useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
+    useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
   const serverStoppedResult = useEventResult(ec.events.serverStopped);
   // NB: the cursor may temporarily become `undefined` when a file is closed. In this case
   // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
   // that we want to persist.
 
-  if (!serverVersion) {return <p>Waiting for Lean server to start...</p>}
-  if (serverStoppedResult) {return <div>
-    <p>{serverStoppedResult.message}</p>
-    <p className="error">{serverStoppedResult.reason}</p>
-  </div>}
+  if (!serverVersion) { return <p>Waiting for Lean server to start...</p> }
+  if (serverStoppedResult) {
+    return <div>
+      <p>{serverStoppedResult.message}</p>
+      <p className="error">{serverStoppedResult.reason}</p>
+    </div>
+  }
 
   return <div className="commandline-interface">
     <div className="content" ref={proofPanelRef}>
@@ -393,13 +384,13 @@ export function CommandLineInterface(props: {world: string, level: number, data:
           // entered command as it is still present in the command line.
           // TODO: Should not use index as key.
           return <div key={`proof-step-${i}`}>
-            <Errors errors={step.errors} commandLineMode={true}/>
+            <Errors errors={step.errors} commandLineMode={true} />
           </div>
         } else {
           return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')} onClick={toggleSelectStep(i)}>
-            <Command command={step.command} deleteProof={deleteProof(i)}/>
-            <Errors errors={step.errors} commandLineMode={true}/>
-            <GoalsTab proofStep={step}/>
+            <Command command={step.command} deleteProof={deleteProof(i)} />
+            <Errors errors={step.errors} commandLineMode={true} />
+            <GoalsTab proofStep={step} />
             {/* Show a message that there are no goals left */}
             {!step.goals.length && (
               <div className="message information">
@@ -416,6 +407,6 @@ export function CommandLineInterface(props: {world: string, level: number, data:
         }
       }) : <CircularProgress />}
     </div>
-    <CommandLine proofPanelRef={proofPanelRef}/>
+    <CommandLine proofPanelRef={proofPanelRef} />
   </div>
 }

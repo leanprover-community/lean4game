@@ -324,7 +324,7 @@ function PlayableLevel({worldId, levelId}) {
           <EditorContext.Provider value={editorConnection}>
             <MonacoEditorContext.Provider value={editor}>
               <div className="exercise">
-                <DualEditor level={level} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} />
+                <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} />
               </div>
             </MonacoEditorContext.Provider>
           </EditorContext.Provider>
