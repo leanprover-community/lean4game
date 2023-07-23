@@ -4,17 +4,17 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Split from 'react-split'
-import { Box, Typography, CircularProgress } from '@mui/material';
+import { Box, Typography, CircularProgress, Slider } from '@mui/material';
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay';
 import './welcome.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGlobe, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
-import { selectCompleted } from '../state/progress';
+import { selectCompleted, selectDifficulty } from '../state/progress';
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api';
 import Markdown from './markdown';
-import WorldSelectionMenu from './world_selection_menu';
+import WorldSelectionMenu, { WelcomeMenu } from './world_selection_menu';
 import {PrivacyPolicy} from './privacy_policy';
 import { Button } from './button';
 import { Documentation, Inventory } from './inventory';
@@ -31,12 +31,17 @@ const padding = 2000  // padding of the graphic (on a different scale)
 function LevelIcon({ worldId, levelId, position, completed, available }) {
   const gameId = React.useContext(GameIdContext)
 
+  const difficulty = useSelector(selectDifficulty(gameId))
+
   const x = s * position.x + Math.sin(levelId * 2 * Math.PI / N) * (R + 1.2*r + 2.4*r*Math.floor((levelId - 1)/N))
   const y = s * position.y - Math.cos(levelId * 2 * Math.PI / N) * (R + 1.2*r + 2.4*r*Math.floor((levelId - 1)/N))
 
+  let levelDisabled = (difficulty >= 2 && !(available || completed))
+
   // TODO: relative positioning?
   return (
-    <Link to={`/${gameId}/world/${worldId}/level/${levelId}`} className="level">
+    <Link to={levelDisabled ? '' : `/${gameId}/world/${worldId}/level/${levelId}`}
+        className={`level${levelDisabled ? ' disabled' : ''}`}>
       <circle fill={completed ? "#139e13" : available? "#1976d2" : "#999"} cx={x} cy={y} r={r} />
       <foreignObject className="level-title-wrapper" x={x} y={y}
               width={1.42*r} height={1.42*r} transform={"translate("+ -.71*r +","+ -.71*r +")"}>
@@ -57,6 +62,8 @@ function Welcome() {
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
+
+  const difficulty = useSelector(selectDifficulty(gameId))
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
   // If this state is set to a pair `(name, type)` then the according doc will be open.
@@ -137,9 +144,13 @@ function Welcome() {
         nextLevel = 0
       }
 
+      let worldDisabled = (difficulty >= 2 && !(worldUnlocked || worldCompleted))
+
       // Draw the worlds
       svgElements.push(
-        <Link key={`world${worldId}`} to={`/${gameId}/world/${worldId}/level/${nextLevel}`}>
+        <Link key={`world${worldId}`}
+            to={worldDisabled ? '' : `/${gameId}/world/${worldId}/level/${nextLevel}`}
+            className={worldDisabled ? 'disabled' : ''}>
           <circle className="world-circle" cx={s*position.x} cy={s*position.y} r={R}
               fill={worldCompleted ? "green" : worldUnlocked ? "#1976d2": "#999"}/>
           <foreignObject className="world-title-wrapper" x={s*position.x} y={s*position.y}
@@ -164,9 +175,7 @@ function Welcome() {
     <Split className="welcome" minSize={200} sizes={[40, 35, 25]}>
       <div className="column">
         <Typography variant="body1" component="div" className="welcome-text">
-          <Button inverted="false" title="back to games selection" to="/">
-            <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
-          </Button>
+          <WelcomeMenu />
           <Markdown>{gameInfo.data?.introduction}</Markdown>
         </Typography>
       </div>

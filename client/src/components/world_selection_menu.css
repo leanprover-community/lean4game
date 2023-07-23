@@ -9,3 +9,34 @@
   margin-right: .4em;
   margin-bottom: .2em;
 }
+
+
+.world-selection-menu .slider-wrap {
+  display: inline-block;
+  width: 100%;
+  /* min-width: 16em; */
+  padding-left: 3em;
+  padding-right: 3em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* Test for mobile `title`s */
+@media (pointer: coarse), (hover: none) {
+  [title] {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+  }
+  [title]:focus::after {
+    content: attr(title);
+    position: absolute;
+    top: 90%;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid;
+    width: fit-content;
+    padding: 3px;
+  }
+}

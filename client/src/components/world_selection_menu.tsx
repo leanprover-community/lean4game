@@ -4,14 +4,15 @@
 import * as React from 'react'
 import { useStore, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDownload, faUpload, faEraser } from '@fortawesome/free-solid-svg-icons'
+import { faDownload, faUpload, faEraser, faGlobe, faHome, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 import './world_selection_menu.css'
 
 import { Button } from './button'
 import { GameIdContext } from '../app';
 import { useAppDispatch, useAppSelector } from '../hooks';
-import { deleteProgress, selectProgress, loadProgress, GameProgressState } from '../state/progress';
+import { deleteProgress, selectProgress, loadProgress, GameProgressState, selectDifficulty, changedDifficulty } from '../state/progress';
+import { Slider } from '@mui/material';
 
 /** Only to specify the types for `downloadFile` */
 interface downloadFileParam {
@@ -35,12 +36,35 @@ const downloadFile = ({ data, fileName, fileType } : downloadFileParam) => {
   a.remove()
 }
 
+// <div><Button inverted="false" title="back to games selection" to="/">
+// <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
+// </Button>
+// <Slider min={0} max={2}></Slider>
+
 /** The menu that is shown next to the world selection graph */
-function WorldSelectionMenu() {
+export function WelcomeMenu() {
+
+  function label(x : number) {
+    return x == 0 ? 'Easy' : x == 1 ? 'Explorer' : 'Strict'
+  }
+
+
+  return <nav className="world-selection-menu">
+    <Button inverted="false" title="back to games selection" to="/">
+      <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
+    </Button>
+
+  </nav>
+}
+
+/** The menu that is shown next to the world selection graph */
+export function WorldSelectionMenu() {
   const [file, setFile] = React.useState<File>();
 
   const gameId = React.useContext(GameIdContext)
   const store = useStore()
+  const difficulty = useSelector(selectDifficulty(gameId))
+
 
   /* state variables to toggle the pop-up menus */
   const [eraseMenu, setEraseMenu] = React.useState(false);
@@ -92,10 +116,34 @@ function WorldSelectionMenu() {
     eraseProgress()
   }
 
+  function label(x : number) {
+    return x == 0 ? 'Playground' : x == 1 ? 'Explorer' : 'Strict'
+  }
+
   return <nav className="world-selection-menu">
     <Button onClick={downloadProgress} title="Download game progress" to=""><FontAwesomeIcon icon={faDownload} /></Button>
     <Button title="Load game progress from JSON" onClick={openUploadMenu} to=""><FontAwesomeIcon icon={faUpload} /></Button>
     <Button title="Clear game progress" to="" onClick={openEraseMenu}><FontAwesomeIcon icon={faEraser} /></Button>
+    <div className="slider-wrap">
+      <Slider
+        title="Difficulties:&#10;- strict: 🔐 levels, 🔐 tactics&#10;- explorer: 🔓 levels, 🔐 tactics&#10;- playground: 🔓 levels, 🔓 tactics"
+        min={0} max={2}
+        aria-label="Mode"
+        defaultValue={difficulty}
+        marks={[
+          {value: 0, label: 'playground'},
+          {value: 1, label: 'explorer'},
+          {value: 2, label: 'strict'}
+        ]}
+        valueLabelFormat={label}
+        getAriaValueText={label}
+        valueLabelDisplay="auto"
+        onChange={(ev, val: number) => {
+          dispatch(changedDifficulty({game: gameId, difficulty: val}))
+        }}
+        ></Slider>
+
+    </div>
     {eraseMenu?
       <div className="modal-wrapper">
         <div className="modal-backdrop" onClick={closeEraseMenu} />

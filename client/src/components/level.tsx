@@ -20,7 +20,7 @@ import { InfoProvider } from 'lean4web/client/src/editor/infoview';
 import 'lean4web/client/src/editor/infoview.css'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import './level.css'
-import { useStore } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection';
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
@@ -36,7 +36,7 @@ import { Button } from './button'
 import Markdown from './markdown';
 import {Inventory, Documentation} from './inventory';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
-import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted, helpEdited, selectHelp } from '../state/progress';
+import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted, helpEdited, selectHelp, selectDifficulty } from '../state/progress';
 import { DualEditor } from './infoview/main'
 import { DeletedHint, DeletedHints, Hints } from './hints';
 import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './infoview/context';
@@ -389,6 +389,9 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum})
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
+  const difficulty = useSelector(selectDifficulty(gameId))
+  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
+
   const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
 
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
@@ -414,7 +417,8 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum})
           </Button>
         </>}
         {levelId < gameInfo.data?.worldSize[worldId] &&
-          <Button inverted="true" to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level">
+          <Button inverted="true" to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
+          disabled={difficulty >= 2 && !completed}>
             Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
           </Button>
         }

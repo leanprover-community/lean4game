@@ -24,8 +24,12 @@ interface WorldProgressState {
 
 export interface GameProgressState {
   inventory: string[],
+  // Difficulty: the default is 2.
+  difficulty: number,
   data: WorldProgressState
 }
+
+const DEFAULT_DIFFICULTY = 2
 
 /** The progress made on all lean4-games */
 interface ProgressState {
@@ -40,7 +44,7 @@ const initalLevelProgressState: LevelProgressState = {code: "", completed: false
 /** Add an empty skeleton with progress for the current game */
 function addGameProgress (state: ProgressState, action: PayloadAction<{game: string}>) {
   if (!state.games[action.payload.game]) {
-    state.games[action.payload.game] = {inventory: [], data: {}}
+    state.games[action.payload.game] = {inventory: [], data: {}, difficulty: DEFAULT_DIFFICULTY}
   }
 }
 
@@ -83,7 +87,7 @@ export const progressSlice = createSlice({
     },
     /** delete all progress for this game */
     deleteProgress(state: ProgressState, action: PayloadAction<{game: string}>) {
-      state.games[action.payload.game] = {inventory: [], data: {}}
+      state.games[action.payload.game] = {inventory: [], data: {}, difficulty: DEFAULT_DIFFICULTY}
     },
     /** delete progress for this level */
     deleteLevelProgress(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
@@ -99,6 +103,11 @@ export const progressSlice = createSlice({
     changedInventory(state: ProgressState, action: PayloadAction<{game: string, inventory: string[]}>) {
       addGameProgress(state, action)
       state.games[action.payload.game].inventory = action.payload.inventory
+    },
+    /** set the difficulty */
+    changedDifficulty(state: ProgressState, action: PayloadAction<{game: string, difficulty: number}>) {
+      addGameProgress(state, action)
+      state.games[action.payload.game].difficulty = action.payload.difficulty
     },
   }
 })
@@ -156,6 +165,14 @@ export function selectProgress(game: string) {
   }
 }
 
+/** return progress for the current game if it exists */
+export function selectDifficulty(game: string) {
+  return (state) => {
+    return state.progress.games[game].difficulty ?? DEFAULT_DIFFICULTY
+  }
+}
+
 /** Export actions to modify the progress */
 export const { changedSelection, codeEdited, levelCompleted, deleteProgress,
-  deleteLevelProgress, loadProgress, helpEdited, changedInventory } = progressSlice.actions
+  deleteLevelProgress, loadProgress, helpEdited, changedInventory,
+  changedDifficulty } = progressSlice.actions

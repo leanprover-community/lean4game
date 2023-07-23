@@ -6,8 +6,9 @@ import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-s
 import { GameIdContext } from '../app';
 import Markdown from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview } from '../state/api';
-import { selectInventory } from '../state/progress';
+import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
+import { useSelector } from 'react-redux';
 
 export function Inventory({levelInfo, openDoc, enableAll=false} :
   {
@@ -50,6 +51,8 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
 
   const gameId = React.useContext(GameIdContext)
 
+  const difficulty = useSelector(selectDifficulty(gameId))
+
   const categorySet = new Set<string>()
   for (let item of items) {
     categorySet.add(item.category)
@@ -87,7 +90,7 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
         ).filter(item => ((tab ?? categories[0]) == item.category)).map((item, i) => {
             return <InventoryItem key={`${item.category}-${item.name}`}
               showDoc={() => {openDoc(item.name, docType)}}
-              name={item.name} displayName={item.displayName} locked={item.locked}
+              name={item.name} displayName={item.displayName} locked={difficulty > 0 ? item.locked : false}
               disabled={item.disabled} newly={item.new} enableAll={enableAll}/>
         })
       }
