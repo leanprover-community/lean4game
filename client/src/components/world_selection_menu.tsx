@@ -117,7 +117,7 @@ export function WorldSelectionMenu() {
   }
 
   function label(x : number) {
-    return x == 0 ? 'Playground' : x == 1 ? 'Explorer' : 'Strict'
+    return x == 0 ? 'Playground' : x == 1 ? 'Explorer' : 'Regular'
   }
 
   return <nav className="world-selection-menu">
@@ -126,14 +126,14 @@ export function WorldSelectionMenu() {
     <Button title="Clear game progress" to="" onClick={openEraseMenu}><FontAwesomeIcon icon={faEraser} /></Button>
     <div className="slider-wrap">
       <Slider
-        title="Difficulties:&#10;- strict: 🔐 levels, 🔐 tactics&#10;- explorer: 🔓 levels, 🔐 tactics&#10;- playground: 🔓 levels, 🔓 tactics"
+        title="Difficulties:&#10;- regular: 🔐 levels, 🔐 tactics&#10;- explorer: 🔓 levels, 🔐 tactics&#10;- playground: 🔓 levels, 🔓 tactics"
         min={0} max={2}
         aria-label="Mode"
         defaultValue={difficulty}
         marks={[
           {value: 0, label: 'playground'},
           {value: 1, label: 'explorer'},
-          {value: 2, label: 'strict'}
+          {value: 2, label: 'regular'}
         ]}
         valueLabelFormat={label}
         getAriaValueText={label}
