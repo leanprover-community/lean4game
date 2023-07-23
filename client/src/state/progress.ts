@@ -168,7 +168,7 @@ export function selectProgress(game: string) {
 /** return progress for the current game if it exists */
 export function selectDifficulty(game: string) {
   return (state) => {
-    return state.progress.games[game].difficulty ?? DEFAULT_DIFFICULTY
+    return state.progress.games[game]?.difficulty ?? DEFAULT_DIFFICULTY
   }
 }
 
