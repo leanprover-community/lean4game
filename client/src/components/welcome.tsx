@@ -36,8 +36,16 @@ function LevelIcon({ worldId, levelId, position, completed, available }) {
 
   // TODO: relative positioning?
   return (
-    <Link to={`/${gameId}/world/${worldId}/level/${levelId}`}>
+    <Link to={`/${gameId}/world/${worldId}/level/${levelId}`} className="level">
       <circle fill={completed ? "#139e13" : available? "#1976d2" : "#999"} cx={x} cy={y} r={r} />
+      <foreignObject className="level-title-wrapper" x={x} y={y}
+              width={1.42*r} height={1.42*r} transform={"translate("+ -.71*r +","+ -.71*r +")"}>
+            <div>
+              <p className="level-title" style={{fontSize: Math.floor(r) + "px"}}>
+               {levelId}
+              </p>
+            </div>
+          </foreignObject>
     </Link>
   )
 }
@@ -118,11 +126,20 @@ function Welcome() {
         )
       }
 
-      // Draw the worlds
       let worldUnlocked = completed[worldId][0]
       let worldCompleted = completed[worldId].slice(1).every(Boolean)
+
+      // This selects the first uncompleted level
+      let nextLevel: number = completed[worldId].findIndex(c => !c)
+      if (nextLevel <= 1) {
+        // This uses the fact that `findIndex` returns `-1` if it does not find an uncompleted entry
+        // so `-1, 0, 1` are all the indices where we want to show the introduction.
+        nextLevel = 0
+      }
+
+      // Draw the worlds
       svgElements.push(
-        <Link key={`world${worldId}`} to={`/${gameId}/world/${worldId}/level/0`}>
+        <Link key={`world${worldId}`} to={`/${gameId}/world/${worldId}/level/${nextLevel}`}>
           <circle className="world-circle" cx={s*position.x} cy={s*position.y} r={R}
               fill={worldCompleted ? "green" : worldUnlocked ? "#1976d2": "#999"}/>
           <foreignObject className="world-title-wrapper" x={s*position.x} y={s*position.y}

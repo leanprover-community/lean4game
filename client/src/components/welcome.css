@@ -54,16 +54,16 @@ h5, h6 {
 /* SVG Graphic */
 /***************/
 
-svg .world-title-wrapper {
+svg .world-title-wrapper, svg .level-title-wrapper div {
   overflow: auto;
 }
 
-svg .world-title-wrapper div {
+svg .world-title-wrapper div, svg .level-title-wrapper div {
   width: 100%;
   height: 100%;
 }
 
-svg .world-title-wrapper div {
+svg .world-title-wrapper div, svg .level-title-wrapper div {
   display: flex;
   align-items:center;
   justify-content:center;
@@ -71,11 +71,24 @@ svg .world-title-wrapper div {
 
 }
 
-svg .world-title {
-  font-weight: 500;
+svg .world-title, svg .level-title {
   color: white;
   margin: 0;
   padding: 0;
+}
+
+svg .world-title {
+  font-weight: 700;
+}
+
+svg .level-title {
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+svg .level:hover .level-title {
+  opacity: 1;
 }
 
 /******************/
