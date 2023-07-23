@@ -701,19 +701,20 @@ partial def findLoops (arrows : HashMap Name (HashSet Name)) : List Name := Id.r
       return loop.toList
   return []
 
-/-- The worlds of a game are joint by paths. These are defined with the syntax
-`Path World₁ → World₂ → World₃`. -/
-def Parser.path := Parser.sepBy1Indent Parser.ident "→"
+/-- The worlds of a game are joint by dependencies. These are
+automatically computed but can also be defined with the syntax
+`Dependency World₁ → World₂ → World₃`. -/
+def Parser.dependency := Parser.sepBy1Indent Parser.ident "→"
 
-/-- Manually add a path between two worlds.
+/-- Manually add a dependency between two worlds.
 
-Normally, the paths are computed automatically by the
+Normally, the dependencies are computed automatically by the
 tactics & lemmas used in the example
 proof and the ones introduced by `NewLemma`/`NewTactic`.
-Use the command `Path World₁ → World₂` to add a manual edge to the graph,
+Use the command `Dependency World₁ → World₂` to add a manual edge to the graph,
 for example if the only dependency between the worlds is given by
 the narrative. -/
-elab "Path" s:Parser.path : command => do
+elab "Dependency" s:Parser.dependency : command => do
   let mut last : Option Name := none
   for stx in s.raw.getArgs.getEvenElems do
     let some l := last
@@ -821,7 +822,7 @@ elab "MakeGame" : command => do
   -- Calculate world dependency graph `game.worlds`
   for (dependentWorldId, _dependentWorld) in game.worlds.nodes.toArray do
     let mut dependsOnWorlds : HashSet Name := {}
-    -- Adding manual paths that were specified via the `Path` command.
+    -- Adding manual dependencies that were specified via the `Dependency` command.
     for (sourceId, targetId) in game.worlds.edges do
       if targetId = dependentWorldId then
         dependsOnWorlds := dependsOnWorlds.insert sourceId
