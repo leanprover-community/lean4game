@@ -81,7 +81,7 @@ export function WorldSelectionMenu() {
   const downloadProgress = (e) => {
     e.preventDefault()
     downloadFile({
-      data: JSON.stringify(gameProgress),
+      data: JSON.stringify(gameProgress, null, 2),
       fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
       fileType: 'text/json',
     })
