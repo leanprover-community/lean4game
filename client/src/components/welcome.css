@@ -17,6 +17,7 @@
 .welcome .column {
   height: 100%;
   overflow: auto;
+  scroll-behavior: smooth;
 }
 
 .welcome-text {

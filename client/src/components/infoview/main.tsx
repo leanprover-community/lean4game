@@ -201,10 +201,10 @@ function Command({ command, deleteProof }: { command: string, deleteProof: any }
   // The first step will always have an empty command
   if (!command) { return <></> }
   return <div className="command">
-    {command}
-    <div className="undo-button" title="Delete this and future commands" onClick={deleteProof}>
-      <FontAwesomeIcon icon={faDeleteLeft} />
-    </div>
+    <div className="command-text">{command}</div>
+    <Button to="" className="undo-button btn btn-inverted" title="Delete this and future commands" onClick={deleteProof}>
+      <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;Delete
+    </Button>
   </div>
 }
 

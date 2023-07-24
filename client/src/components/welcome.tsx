@@ -91,7 +91,9 @@ function Welcome() {
     let elems = Array.from(document.getElementsByClassName("playable-world"))
     if (elems.length) {
       // It seems that the last element is the one furthest up in the tree
-      let elem = elems.pop()
+      // TODO: I think they appear in random order. Check there position and select the lowest one
+      // of these positions to scroll to.
+      let elem = elems[0]
       console.debug(`scrolling to ${elem.textContent}`)
       elem.scrollIntoView({block: "center"})
     }
