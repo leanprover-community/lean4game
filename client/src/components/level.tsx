@@ -252,9 +252,34 @@ function PlayableLevel({worldId, levelId}) {
     }
   }
 
+  function hasHiddenHints(i : number): boolean {
+    let step = proof[i]
+
+    // For example if the proof isn't loaded yet
+    if(!step) {return false}
+
+    return step.hints.some((hint) => hint.hidden)
+  }
+
   // If the last step has errors, we want to treat it as if it is part of the second-to-last step
   let k = proof.length - 1
   let withErr = hasInteractiveErrors(proof[k]?.errors) ? 1 : 0
+
+  const activateHiddenHints = (ev) => {
+    // If the last step (`k`) has errors, we want the hidden hints from the
+    // second-to-last step to be affected
+    if (!(proof.length)) {return}
+
+    // state must not be mutated, therefore we need to clone the set
+    let tmp = new Set(showHelp)
+    if (tmp.has(k - withErr)) {
+      tmp.delete(k - withErr)
+    } else {
+      tmp.add(k - withErr)
+    }
+    setShowHelp(tmp)
+    console.debug(`help: ${Array.from(tmp.values())}`)
+  }
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
@@ -292,32 +317,23 @@ function PlayableLevel({worldId, levelId}) {
                     <Markdown>{level?.data?.conclusion}</Markdown>
                   </div>
                 }
-                {levelId >= gameInfo.data?.worldSize[worldId] ?
-                <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /> Leave World</Button> :
-                <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-                  Next&nbsp;<FontAwesomeIcon icon={faArrowRight} /></Button>}
               </>
             }
           </div>
-          <div className="toggle-hidden-hints">
-            <FormControlLabel
-              control={<Switch checked={showHelp.has(k - withErr)} onChange={(ev) => {
-                // If the last step (`k`) has errors, we want the hidden hints from the
-                // second-to-last step to be affected
-                if (!(proof.length)) {return}
-
-                // state must not be mutated, therefore we need to clone the set
-                let tmp = new Set(showHelp)
-                if (tmp.has(k - withErr)) {
-                  tmp.delete(k - withErr)
-                } else {
-                  tmp.add(k - withErr)
-                }
-                setShowHelp(tmp)
-                console.debug(`help: ${Array.from(tmp.values())}`)
-              }} />}
-              label="Show more help!"
-            />
+          <div className="button-row">
+            {completed && (levelId >= gameInfo.data?.worldSize[worldId] ?
+              <Button to={`/${gameId}`}>
+                <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
+              </Button> :
+              <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+                Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+              </Button>)
+              }
+            {hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
+              <Button to="" onClick={activateHiddenHints}>
+                Show more help!
+              </Button>
+            }
           </div>
         </div>
         <div className="exercise-panel">

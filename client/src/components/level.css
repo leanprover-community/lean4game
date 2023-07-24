@@ -181,7 +181,7 @@ td code  {
 }
 
 .chat {
-  height: calc(100% - 3.5em);
+  flex: 1;
   overflow-y: scroll;
   margin-left: .5em;
   margin-right: .5em;
@@ -191,14 +191,24 @@ td code  {
   padding-top: 0;
   padding-bottom: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
 }
 
-.toggle-hidden-hints {
+.chat-panel .button-row {
   /* width:100%; */
   margin-left: .5em;
   margin-right: .5em;
-  height: 3.5em;
+  min-height: 2.5em;
   border-top:  0.1em solid #aaa;
+}
+
+.chat-panel .btn {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-left: .5rem;
+  margin-right: .5rem;
 }
 
 /* .exercise-panel {
