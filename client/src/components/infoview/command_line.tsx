@@ -183,7 +183,7 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
         proofPanelRef.current?.lastElementChild?.scrollIntoView()
       })
     })
-  }, [commandLineInput, editor, rpcSess, uri, model, proofPanelRef])
+  }, [editor, rpcSess, uri, model, proofPanelRef])
 
   // Run the command
   const runCommand = React.useCallback(() => {
@@ -200,7 +200,7 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
           pos,
           editor.getModel().getFullModelRange().getEndPosition()
         ),
-        text: commandLineInput + "\n",
+        text: commandLineInput.trim() + "\n",
         forceMoveMarkers: false
       }])
     }
@@ -277,7 +277,7 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
     // Ensure that our one-line editor can only have a single line
     const l = oneLineEditor.getModel().onDidChangeContent((e) => {
       const value = oneLineEditor.getValue()
-      setCommandLineInput(value.trim())
+      setCommandLineInput(value)
       const newValue = value.replace(/[\n\r]/g, '')
       if (value != newValue) {
         oneLineEditor.setValue(newValue)
