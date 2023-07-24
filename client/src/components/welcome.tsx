@@ -22,11 +22,12 @@ import { store } from '../state/store';
 
 cytoscape.use( klay );
 
-const N = 18          // max number of levels per world
-const R = 800         // radius of a world
-const r = 160          // radius of a level
-const s = 120         // global scale
-const padding = 2000  // padding of the graphic (on a different scale)
+const N = 18              // max number of levels per world
+const R = 64              // radius of a world
+const r = 12              // radius of a level
+const s = 10              // global scale
+const padding = R + 2*r   // padding of the graphic (on a different scale)
+const ds = .75            // scale the resulting svg image
 
 function LevelIcon({ worldId, levelId, position, completed, available }) {
   const gameId = React.useContext(GameIdContext)
@@ -84,6 +85,17 @@ function Welcome() {
       window.document.title = gameInfo.data.title
     }
   }, [gameInfo.data?.title])
+
+  // Scroll to playable world
+  useEffect(() => {
+    let elems = Array.from(document.getElementsByClassName("playable-world"))
+    if (elems.length) {
+      // It seems that the last element is the one furthest up in the tree
+      let elem = elems.pop()
+      console.debug(`scrolling to ${elem.textContent}`)
+      elem.scrollIntoView({block: "center"})
+    }
+  }, [gameInfo])
 
   const svgElements = []
 
@@ -155,7 +167,7 @@ function Welcome() {
               fill={worldCompleted ? "green" : worldUnlocked ? "#1976d2": "#999"}/>
           <foreignObject className="world-title-wrapper" x={s*position.x} y={s*position.y}
               width={1.42*R} height={1.42*R} transform={"translate("+ -.71*R +","+ -.71*R +")"}>
-            <div>
+            <div className={worldUnlocked && !worldCompleted ? "playable-world" : ''}>
               <p className="world-title" style={{fontSize: Math.floor(R/4) + "px"}}>
                 {nodes[worldId].data.title ? nodes[worldId].data.title : worldId}
               </p>
@@ -166,13 +178,15 @@ function Welcome() {
     }
   }
 
+  let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : null
+
   return <div className="app-content ">
   { gameInfo.isLoading?
     <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}>
       <CircularProgress />
     </Box>
     :
-    <Split className="welcome" minSize={200} sizes={[40, 35, 25]}>
+    <Split className="welcome" minSize={0} snapOffset={200}  sizes={[40, 35, 25]}>
       <div className="column">
         <Typography variant="body1" component="div" className="welcome-text">
           <WelcomeMenu />
@@ -181,12 +195,13 @@ function Welcome() {
       </div>
       <div className="column">
         <WorldSelectionMenu />
-        <Box textAlign='center' sx={{ m: 5 }}>
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
-              viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${s*bounds.x2 - s*bounds.x1 + 2 * padding} ${s*bounds.y2 - s*bounds.y1 + 2 * padding}` : ''}>
+            width={bounds ? `${ds * dx}` : ''}
+              viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
+              className="world-selection"
+            >
             {svgElements}
           </svg>
-        </Box>
       </div>
       <div className="inventory-panel">
         {<>
