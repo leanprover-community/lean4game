@@ -108,7 +108,8 @@ where addWarningMessage (info : SourceInfo) (s : MessageData) :=
 
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool)
-    (couldBeEndSnap : Bool) (levelParams : Game.DidOpenLevelParams) (initParams : Lsp.InitializeParams): IO Snapshot := do
+    (couldBeEndSnap : Bool) (levelParams : Game.DidOpenLevelParams) (initParams : Lsp.InitializeParams)
+    (checkForbiddenTactics := true) : IO Snapshot := do
   -- Recognize end snap
   if inputCtx.input.atEnd snap.mpState.pos ∧ couldBeEndSnap then
     let endSnap : Snapshot := {
@@ -161,7 +162,8 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           parseResultRef.set (tacticStx, cmdParserState)
 
           -- Check for forbidden tactics
-          findForbiddenTactics inputCtx levelParams tacticStx
+          if checkForbiddenTactics then
+            findForbiddenTactics inputCtx levelParams tacticStx
 
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
