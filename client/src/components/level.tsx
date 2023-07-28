@@ -30,19 +30,20 @@ import { faBars, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRo
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 
 import { GameIdContext } from '../app';
-import { ConnectionContext, useLeanClient } from '../connection';
+import { ConnectionContext, connection, useLeanClient } from '../connection';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { Button } from './button'
 import Markdown from './markdown';
 import {Inventory, Documentation} from './inventory';
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
-import { changedSelection, codeEdited, selectCode, selectSelections, progressSlice, selectCompleted, helpEdited, selectHelp, selectDifficulty } from '../state/progress';
+import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited, selectHelp, selectDifficulty, selectInventory } from '../state/progress';
 import { DualEditor } from './infoview/main'
 import { DeletedHint, DeletedHints, Hints } from './hints';
 import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './infoview/context';
 import { hasInteractiveErrors } from './infoview/command_line';
 import { GameHint } from './infoview/rpc_api';
 import { Impressum } from './privacy_policy';
+import { store } from '../state/store';
 
 function Level() {
 
@@ -73,8 +74,6 @@ function PlayableLevel({worldId, levelId}) {
   // a new proof has been entered. e.g. to consult messages coming from dead ends
   const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
 
-  const store = useStore()
-
   // A set of row numbers where help is displayed
   const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
 
@@ -91,6 +90,8 @@ function PlayableLevel({worldId, levelId}) {
 
   const [impressum, setImpressum] = React.useState(false)
 
+  const difficulty = useSelector(selectDifficulty(gameId))
+
   function closeImpressum() {
     setImpressum(false)
   }
@@ -98,6 +99,13 @@ function PlayableLevel({worldId, levelId}) {
   function toggleImpressum() {
     setImpressum(!impressum)
   }
+
+  const inventory: Array<String> = useSelector(selectInventory(gameId))
+
+  React.useEffect(() => {
+    let leanClient = connection.getLeanClient(gameId)
+    leanClient.sendNotification('$/game/setInventory', {inventory: inventory, checkEnabled: difficulty > 0})
+  }, [inventory])
 
   useEffect(() => {
     // // Scroll to top when loading a new level

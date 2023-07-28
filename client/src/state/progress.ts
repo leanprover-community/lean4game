@@ -24,11 +24,19 @@ interface WorldProgressState {
 
 export interface GameProgressState {
   inventory: string[],
-  // Difficulty: the default is 2.
   difficulty: number,
   data: WorldProgressState
 }
 
+/**
+ * Currently we have three difficulties:
+ *
+ *   | lock tactics | lock levels |
+ * --|--------------|-------------|
+ * 0 |      no      |      no     |
+ * 1 |     yes      |      no     |
+ * 2 |     yes      |     yes     |
+ */
 const DEFAULT_DIFFICULTY = 2
 
 /** The progress made on all lean4-games */

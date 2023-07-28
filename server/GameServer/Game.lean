@@ -6,6 +6,8 @@ structure GameServerState :=
 (env : Lean.Environment)
 (game : Name)
 (gameDir : String)
+(inventory : Array String)
+(checkEnabled : Bool)
 
 abbrev GameServerM := StateT GameServerState Server.Watchdog.ServerM
 
@@ -70,11 +72,19 @@ structure DidOpenLevelParams where
   tactics : Array InventoryTile
   lemmas : Array InventoryTile
   definitions : Array InventoryTile
+  inventory : Array String
+  /-- if true the server gives warnings for used tactics/lemmas that are not unlocked. -/
+  checkEnabled : Bool
   deriving ToJson, FromJson
 
 structure LoadDocParams where
   name : Name
   type : InventoryType
+deriving ToJson, FromJson
+
+structure SetInventoryParams where
+  inventory : Array String
+  checkEnabled : Bool
 deriving ToJson, FromJson
 
 def handleDidOpenLevel (params : Json) : GameServerM Unit := do
@@ -90,15 +100,18 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
       c.hLog.putStr s!"Level not found: {m.uri} {c.initParams.rootUri?}"
       c.hLog.flush
   -- Send an extra notification to the file worker to inform it about the level data
+  let s ← get
   fw.stdin.writeLspNotification {
     method := "$/game/didOpenLevel"
     param  := {
       uri := m.uri
-      gameDir := (← get).gameDir
+      gameDir := s.gameDir
       levelModule := lvl.module
       tactics := lvl.tactics.tiles
       lemmas := lvl.lemmas.tiles
       definitions := lvl.definitions.tiles
+      inventory := s.inventory
+      checkEnabled := s.checkEnabled
       : DidOpenLevelParams
     }
   }
@@ -160,6 +173,16 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       -- let doc : InventoryItem := { doc with
       --   name := doc.name.toString }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson doc⟩
+      return true
+    | Message.notification "$/game/setInventory" params =>
+      let p := (← parseParams SetInventoryParams (toJson params))
+      let s ← get
+      set {s with inventory := p.inventory, checkEnabled := p.checkEnabled}
+      let st ← read
+      let workers ← st.fileWorkersRef.get
+      for (_, fw) in workers do
+        fw.stdin.writeLspMessage msg
+
       return true
     | Message.request id "loadInventoryOverview" _ =>
       let s ← get
