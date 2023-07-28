@@ -2,6 +2,7 @@
 
 :root {
   --clr-primary: #1976d2;
+  --clr-primary-dark: #104a83;
   --clr-light-gray: #ddd;
   --clr-dark-gray: #aaa;
   --clr-darker-gray: #555;
@@ -71,6 +72,10 @@ body {
 .btn-inverted {
   color: var(--clr-primary);
   background: white;
+}
+
+.btn-inverted:hover {
+  color: var(--clr-primary-dark);
 }
 
 .btn-disabled, .btn[disabled] {

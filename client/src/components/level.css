@@ -268,3 +268,29 @@ td code  {
   z-index: 1;
   padding: .5rem;
 }
+
+.menu.dropdown {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  top: 100%;
+  background-color: #fff;
+  z-index: 1;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: -.1rem .3rem .3rem 0 rgba(0, 0, 0, 0.1);
+}
+
+.menu.dropdown.hidden {
+  display: none;
+}
+
+#menu-btn {
+  padding: 0;
+  font-size: 1.3rem;
+}
+
+.menu.dropdown .svg-inline--fa {
+  width: 1.8rem;
+}

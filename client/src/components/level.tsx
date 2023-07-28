@@ -26,7 +26,7 @@ import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-info
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
 import type { Location } from 'vscode-languageserver-protocol';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import { faBars, faCode, faPencilSquare, faXmark, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 
 import { GameIdContext } from '../app';
@@ -418,6 +418,8 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum})
 
   const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
 
+  const [navOpen, setNavOpen] = React.useState(false)
+
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
     <div>
       <span className="app-bar-title">
@@ -428,37 +430,41 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum})
       <span className="app-bar-title">
         {levelTitle}
       </span>
-        {levelId > 0 && <>
-          <Button disabled={levelId <= 0} inverted="true" to=""
-              onClick={(ev) => { setCommandLineMode(!commandLineMode) }}
-              title="toggle Editor mode">
-            Editor
-          </Button>
+      <Button to="" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}} >
+        {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
+      </Button>
+    </div>
+    <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
+    {levelId < gameInfo.data?.worldSize[worldId] &&
+      <Button inverted="true"
+          to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
+          disabled={difficulty >= 2 && !(completed || levelId == 0)}
+          onClick={() => setNavOpen(false)}>
+        <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
+      </Button>
+    }
+    {levelId > 0 && <>
           <Button disabled={levelId <= 0} inverted="true"
               to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
-              title="previous level">
+              title="previous level"
+              onClick={() => setNavOpen(false)}>
             <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
           </Button>
         </>}
-        {levelId < gameInfo.data?.worldSize[worldId] &&
-          <Button inverted="true" to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
-          disabled={difficulty >= 2 && !completed}>
-            Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
-          </Button>
-        }
-
-        <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={toggleImpressum}>
-          <FontAwesomeIcon icon={faCircleInfo} /> Info &amp; Impressum
-        </Button>
-        <Button to={`/${gameId}`} inverted="true" title="back to world selection">
-          <FontAwesomeIcon icon={faHome} /> Home
-        </Button>
-        <Button to="" inverted="true">
-          <FontAwesomeIcon icon={faBars} />
-        </Button>
-    </div>
-
+    <Button to={`/${gameId}`} inverted="true" title="back to world selection">
+      <FontAwesomeIcon icon={faHome} />&nbsp;Home
+    </Button>
+    <Button disabled={levelId <= 0} inverted="true" to=""
+        onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
+        title="toggle Editor mode">
+      <FontAwesomeIcon icon={faCode} />&nbsp;Toggle Editor
+    </Button>
+    <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
+      <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Info &amp; Impressum
+    </Button>
   </div>
+</div>
+
 }
 
 function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
