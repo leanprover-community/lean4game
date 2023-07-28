@@ -12,10 +12,11 @@ import './app.css';
 export const GameIdContext = React.createContext<string>(undefined);
 
 function App() {
-  const params = useParams();
+  const params = useParams()
+  const gameId = "g/" + params.owner + "/" + params.repo
   return (
     <div className="app">
-      <GameIdContext.Provider value={"g/" + params.owner + "/" + params.repo}>
+      <GameIdContext.Provider value={gameId}>
         <Outlet />
       </GameIdContext.Provider>
     </div>
