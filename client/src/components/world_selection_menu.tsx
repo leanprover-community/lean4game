@@ -44,11 +44,6 @@ const downloadFile = ({ data, fileName, fileType } : downloadFileParam) => {
 /** The menu that is shown next to the world selection graph */
 export function WelcomeMenu() {
 
-  function label(x : number) {
-    return x == 0 ? 'Easy' : x == 1 ? 'Explorer' : 'Strict'
-  }
-
-
   return <nav className="world-selection-menu">
     <Button inverted="false" title="back to games selection" to="/">
       <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
@@ -117,7 +112,7 @@ export function WorldSelectionMenu() {
   }
 
   function label(x : number) {
-    return x == 0 ? 'Playground' : x == 1 ? 'Explorer' : 'Regular'
+    return x == 0 ? 'playground' : x == 1 ? 'explorer' : 'regular'
   }
 
   return <nav className="world-selection-menu">
@@ -125,15 +120,16 @@ export function WorldSelectionMenu() {
     <Button title="Load game progress from JSON" onClick={openUploadMenu} to=""><FontAwesomeIcon icon={faUpload} /></Button>
     <Button title="Clear game progress" to="" onClick={openEraseMenu}><FontAwesomeIcon icon={faEraser} /></Button>
     <div className="slider-wrap">
+      <span className="difficulty-label">difficulty:</span>
       <Slider
         title="Difficulties:&#10;- regular: 🔐 levels, 🔐 tactics&#10;- explorer: 🔓 levels, 🔐 tactics&#10;- playground: 🔓 levels, 🔓 tactics"
         min={0} max={2}
         aria-label="Mode"
         defaultValue={difficulty}
         marks={[
-          {value: 0, label: 'playground'},
-          {value: 1, label: 'explorer'},
-          {value: 2, label: 'regular'}
+          {value: 0, label: label(0)},
+          {value: 1, label: label(1)},
+          {value: 2, label: label(2)}
         ]}
         valueLabelFormat={label}
         getAriaValueText={label}

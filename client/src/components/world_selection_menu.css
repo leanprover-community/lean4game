@@ -10,17 +10,22 @@
   margin-bottom: .2em;
 }
 
-
 .world-selection-menu .slider-wrap {
-  display: inline-block;
+  display: flex;
+  flex-direction: row;
   width: 100%;
   /* min-width: 16em; */
-  padding-left: 3em;
+  padding-left: 0.5em;
   padding-right: 3em;
   margin-left: auto;
   margin-right: auto;
 }
 
+.difficulty-label {
+  font-size: 0.875em;
+  padding-top: 4px;
+  padding-right: 1em;
+}
 
 /* Test for mobile `title`s */
 @media (pointer: coarse), (hover: none) {
