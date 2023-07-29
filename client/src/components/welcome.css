@@ -115,7 +115,7 @@ svg .disabled {
   height: 40px;
   font-size: 25px;
   border-radius: 20px;
-  position: absolute;
+  position: fixed;
   right: 10px;
   bottom: 10px;
   display: flex;
@@ -229,4 +229,28 @@ svg .disabled {
   font-style: italic;
   text-decoration: underline dotted;
 
+}
+
+.mobile-nav {
+  padding-top: .5em;
+  padding-bottom: .5em;
+  position:relative;
+  height: 3em;
+}
+
+.mobile-nav .btn-next, .mobile-nav .btn-previous {
+  position: absolute;
+  margin: 0;
+}
+
+.mobile-nav .btn-previous {
+  left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.mobile-nav .btn-next {
+  right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }

@@ -9,7 +9,7 @@ import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay';
 import './welcome.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGlobe, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import { faGlobe, faBook, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
 import { selectCompleted, selectDifficulty } from '../state/progress';
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api';
@@ -19,6 +19,7 @@ import {PrivacyPolicy} from './privacy_policy';
 import { Button } from './button';
 import { Documentation, Inventory } from './inventory';
 import { store } from '../state/store';
+import { useWindowDimensions } from '../window_width';
 
 cytoscape.use( klay );
 
@@ -59,7 +60,14 @@ function LevelIcon({ worldId, levelId, position, completed, available }) {
 function Welcome() {
   const navigate = useNavigate();
 
-  const [mobileLayout, setModileLayout] = useState(false)
+
+  // TODO: Make mobileLayout be changeable in settings
+  // TODO: Handle resize Events
+  const {width, height} = useWindowDimensions()
+  const [mobileLayout, setModileLayout] = useState(width < 800)
+
+  /** Only for mobile layout */
+  const [pageNumber, setPageNumber] = useState(0)
 
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
@@ -184,13 +192,67 @@ function Welcome() {
 
   let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : null
 
-  return <div className="app-content ">
+  // TODO: Pack the three columns into components, so we dont need to
+  // copy them for mobile layout
+  return <div className="app-content">
   { gameInfo.isLoading?
     <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}>
       <CircularProgress />
     </Box>
     : mobileLayout ?
-      <></>
+      (pageNumber == 0 ?
+        <div className="column">
+          <div className="mobile-nav">
+            <Button className="btn btn-previous" to="/" title="back to games selection">
+              <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
+            </Button>
+            <Button className="btn btn-next" to=""
+                title="show inventory" onClick={() => {setPageNumber(1)}}>
+              Game&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
+            </Button>
+          </div>
+          <Typography variant="body1" component="div" className="welcome-text">
+            <Markdown>{gameInfo.data?.introduction}</Markdown>
+          </Typography>
+        </div>
+        : pageNumber == 1 ?
+        <div className="column">
+          <div className="mobile-nav">
+            <Button className="btn btn-previous" to=""
+                title="back to introduction" onClick={() => {setPageNumber(0)}}>
+              <FontAwesomeIcon icon={faArrowLeft}/>&nbsp;Intro
+            </Button>
+            <Button className="btn btn-next" to=""
+                title="show inventory" onClick={() => {setPageNumber(2)}}>
+              <FontAwesomeIcon icon={faBook}/>&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
+            </Button>
+          </div>
+          <WorldSelectionMenu />
+            <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
+              width={bounds ? `${ds * dx}` : ''}
+                viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
+                className="world-selection"
+              >
+              {svgElements}
+            </svg>
+        </div>
+        :
+        <div className="inventory-panel">
+          <div className="mobile-nav">
+            <Button className="btn btn-previous" to=""
+                title="back to introduction" onClick={() => {setPageNumber(1)}}>
+              <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Game
+            </Button>
+          </div>
+          {<>
+            {inventoryDoc ?
+              <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
+              :
+              <Inventory levelInfo={inventory.data} openDoc={openInventoryDoc} enableAll={true}/>
+            }
+          </>}
+        </div>
+      )
       :
       <Split className="welcome" minSize={0} snapOffset={200}  sizes={[40, 35, 25]}>
         <div className="column">
@@ -220,7 +282,7 @@ function Welcome() {
         </div>
       </Split>
   }
-    <PrivacyPolicy />
+  <PrivacyPolicy />
   </div>
 }
 

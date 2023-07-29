@@ -28,7 +28,7 @@
 }
 
 /* Test for mobile `title`s */
-@media (pointer: coarse), (hover: none) {
+/* @media (pointer: coarse), (hover: none) {
   [title] {
     position: relative;
     display: inline-flex;
@@ -44,4 +44,4 @@
     width: fit-content;
     padding: 3px;
   }
-}
+} */

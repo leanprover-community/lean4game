@@ -48,14 +48,14 @@ export const PrivacyPolicy: React.FC = () => {
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
   return (
-    <span>
+    <>
       <div className="privacy" onClick={handleOpen} title="Privacy Policy &amp; Impressum">
         <FontAwesomeIcon icon={faShield} />
         <p className="p1">legal</p>
         <p className="p2">notes</p>
       </div>
       {open ? <PrivacyPolicyPopup handleClose={handleClose} /> : null}
-    </span>
+    </>
   )
 }
 
