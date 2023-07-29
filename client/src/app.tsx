@@ -8,16 +8,26 @@ import '@fontsource/roboto/700.css';
 
 import './reset.css';
 import './app.css';
+import { MobileContext } from './components/infoview/context';
+import { useWindowDimensions } from './window_width';
 
 export const GameIdContext = React.createContext<string>(undefined);
 
 function App() {
   const params = useParams()
   const gameId = "g/" + params.owner + "/" + params.repo
+
+  // TODO: Make mobileLayout be changeable in settings
+  // TODO: Handle resize Events
+  const {width, height} = useWindowDimensions()
+  const [mobile, setMobile] = React.useState(width < 800)
+
   return (
     <div className="app">
       <GameIdContext.Provider value={gameId}>
-        <Outlet />
+        <MobileContext.Provider value={{mobile, setMobile}}>
+          <Outlet />
+        </MobileContext.Provider>
       </GameIdContext.Provider>
     </div>
   )

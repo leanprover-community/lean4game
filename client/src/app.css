@@ -120,7 +120,8 @@ em {
   font-weight: 500;
   font-size: 1.3rem;
   display: inline-block;
-  margin: 0 1em;
+  margin: 0;
+  /* margin: 0 1em; */
 }
 
 .app-content {

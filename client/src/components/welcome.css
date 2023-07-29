@@ -58,7 +58,7 @@ h5, h6 {
 /***************/
 
 svg .world-title-wrapper, svg .level-title-wrapper div {
-  overflow: auto;
+  overflow: visible;
 }
 
 svg .world-title-wrapper div, svg .level-title-wrapper div {

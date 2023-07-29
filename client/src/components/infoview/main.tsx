@@ -27,7 +27,7 @@ import Markdown from '../markdown';
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
-import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './context';
+import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './context';
 import { CommandLine, hasErrors, hasInteractiveErrors } from './command_line';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
@@ -38,7 +38,7 @@ import { store } from '../../state/store';
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
  */
-export function DualEditor({ level, codeviewRef, levelId, worldId }) {
+export function DualEditor({ level, codeviewRef, levelId, worldId, lastLevel = false }) {
   const ec = React.useContext(EditorContext)
   const { commandLineMode } = React.useContext(InputModeContext)
   return <>
@@ -47,7 +47,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId }) {
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
     {ec ?
-      <DualEditorMain worldId={worldId} levelId={levelId} level={level} /> :
+      <DualEditorMain worldId={worldId} levelId={levelId} level={level} lastLevel={lastLevel} /> :
       // TODO: Style this if relevant.
       <>
         <p>Editor is starting up...</p>
@@ -58,7 +58,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId }) {
 }
 
 /** The part of the two editors that needs the editor connection first */
-function DualEditorMain({ worldId, levelId, level }: { worldId: string, levelId: number, level: LevelInfo }) {
+function DualEditorMain({ worldId, levelId, level, lastLevel }: { worldId: string, levelId: number, level: LevelInfo, lastLevel: boolean }) {
   const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
   const { commandLineMode } = React.useContext(InputModeContext)
@@ -108,7 +108,7 @@ function DualEditorMain({ worldId, levelId, level }: { worldId: string, levelId:
           <WithLspDiagnosticsContext>
             <ProgressContext.Provider value={allProgress}>
               {commandLineMode ?
-                <CommandLineInterface world={worldId} level={levelId} data={level} />
+                <CommandLineInterface world={worldId} level={levelId} data={level} lastLevel={lastLevel}/>
                 :
                 <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />
               }
@@ -281,7 +281,7 @@ function GoalsTab({ proofStep }: { proofStep: ProofStep }) {
 }
 
 /** The interface in command line mode */
-export function CommandLineInterface(props: { world: string, level: number, data: LevelInfo }) {
+export function CommandLineInterface(props: { world: string, level: number, data: LevelInfo, lastLevel: boolean }) {
 
   const ec = React.useContext(EditorContext)
   const editor = React.useContext(MonacoEditorContext)
@@ -289,6 +289,8 @@ export function CommandLineInterface(props: { world: string, level: number, data
   const { proof } = React.useContext(ProofContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
   const { setDeletedChat, showHelp } = React.useContext(DeletedChatContext)
+
+  const {mobile} = React.useContext(MobileContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
 
@@ -324,6 +326,7 @@ export function CommandLineInterface(props: { world: string, level: number, data
 
   function toggleSelectStep(line: number) {
     return (ev) => {
+      if (mobile) {return}
       if (selectedStep == line) {
         setSelectedStep(undefined)
         console.debug(`unselected step`)

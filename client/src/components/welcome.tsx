@@ -20,6 +20,7 @@ import { Button } from './button';
 import { Documentation, Inventory } from './inventory';
 import { store } from '../state/store';
 import { useWindowDimensions } from '../window_width';
+import { MobileContext } from './infoview/context';
 
 cytoscape.use( klay );
 
@@ -60,17 +61,13 @@ function LevelIcon({ worldId, levelId, position, completed, available }) {
 function Welcome() {
   const navigate = useNavigate();
 
-
-  // TODO: Make mobileLayout be changeable in settings
-  // TODO: Handle resize Events
-  const {width, height} = useWindowDimensions()
-  const [mobileLayout, setModileLayout] = useState(width < 800)
-
   /** Only for mobile layout */
   const [pageNumber, setPageNumber] = useState(0)
 
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
+
+  const {mobile} = React.useContext(MobileContext)
 
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
@@ -199,7 +196,7 @@ function Welcome() {
     <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}>
       <CircularProgress />
     </Box>
-    : mobileLayout ?
+    : mobile ?
       (pageNumber == 0 ?
         <div className="column">
           <div className="mobile-nav">

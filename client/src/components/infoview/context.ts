@@ -60,7 +60,15 @@ export const ProofStateContext = React.createContext<{
     termGoal: undefined,
     error: undefined},
   setProofState: () => {},
-});
+})
+
+export const MobileContext = React.createContext<{
+  mobile : boolean,
+  setMobile: React.Dispatch<React.SetStateAction<Boolean>>
+}>({
+  mobile : false,
+  setMobile: () => {},
+})
 
 /** Context to keep highlight selected proof step and corresponding chat messages. */
 export const SelectionContext = React.createContext<{
