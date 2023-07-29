@@ -249,6 +249,10 @@ td code  {
   /* border: 3px dotted rgb(88, 131, 24); */
 }
 
+.exercise .step .btn-help {
+  margin-top: 10px;
+}
+
 .chat .message {
   margin-left: .5em;
   margin-right: .5em;

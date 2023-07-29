@@ -34,6 +34,7 @@ import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint } from './rpc_api';
 import { store } from '../../state/store';
+import { Hints } from '../hints';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -288,7 +289,7 @@ export function CommandLineInterface(props: { world: string, level: number, data
   const gameId = React.useContext(GameIdContext)
   const { proof } = React.useContext(ProofContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
-  const { setDeletedChat, showHelp } = React.useContext(DeletedChatContext)
+  const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
 
   const {mobile} = React.useContext(MobileContext)
 
@@ -377,6 +378,37 @@ export function CommandLineInterface(props: { world: string, level: number, data
     </div>
   }
 
+  // TODO: This about hidden hints is all copied from `level.tsx`. Can we move that into `hints.tsx`?
+
+  // If the last step has errors, we want to treat it as if it is part of the second-to-last step
+  let k = proof.length - 1
+  let withErr = hasInteractiveErrors(proof[k]?.errors) ? 1 : 0
+
+  const activateHiddenHints = (ev) => {
+    // If the last step (`k`) has errors, we want the hidden hints from the
+    // second-to-last step to be affected
+    if (!(proof.length)) {return}
+
+    // state must not be mutated, therefore we need to clone the set
+    let tmp = new Set(showHelp)
+    if (tmp.has(k - withErr)) {
+      tmp.delete(k - withErr)
+    } else {
+      tmp.add(k - withErr)
+    }
+    setShowHelp(tmp)
+    console.debug(`help: ${Array.from(tmp.values())}`)
+  }
+
+  function hasHiddenHints(i : number): boolean {
+    let step = proof[i]
+
+    // For example if the proof isn't loaded yet
+    if(!step) {return false}
+
+    return step.hints.some((hint) => hint.hidden)
+  }
+
   return <div className="commandline-interface">
     <div className="content" ref={proofPanelRef}>
       <ExerciseStatement data={props.data} />
@@ -393,6 +425,22 @@ export function CommandLineInterface(props: { world: string, level: number, data
           return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')} onClick={toggleSelectStep(i)}>
             <Command command={step.command} deleteProof={deleteProof(i)} />
             <Errors errors={step.errors} commandLineMode={true} />
+            {mobile && i == 0 && props.data?.introduction &&
+              <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelectStep(0)}>
+                <Markdown>{props.data?.introduction}</Markdown>
+              </div>
+            }
+            {mobile && <>
+              <Hints key={`hints-${i}`}
+                hints={step.hints} showHidden={showHelp.has(i)} step={i}
+                selected={selectedStep} toggleSelection={toggleSelectStep(i)}/>
+              {i == proof.length - 1 && hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
+                <Button className="btn btn-help" to="" onClick={activateHiddenHints}>
+                  Show more help!
+                </Button>
+              }
+            </>
+            }
             <GoalsTab proofStep={step} />
             {/* Show a message that there are no goals left */}
             {!step.goals.length && (
@@ -406,6 +454,19 @@ export function CommandLineInterface(props: { world: string, level: number, data
                 }
               </div>
             )}
+            {completed && i == proof.length - 1 &&
+              <div className="button-row">
+                {props.lastLevel ?
+                  <Button to={`/${gameId}`}>
+                    <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
+                  </Button>
+                :
+                  <Button to={`/${gameId}/world/${props.world}/level/${props.level + 1}`}>
+                    Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+                  </Button>
+                }
+              </div>
+            }
           </div>
         }
       }) : <CircularProgress />}
