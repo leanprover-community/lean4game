@@ -26,7 +26,7 @@ import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-info
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
 import type { Location } from 'vscode-languageserver-protocol';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faCode, faPencilSquare, faXmark, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import { faBars, faBook, faCode, faPencilSquare, faXmark, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 
 import { GameIdContext } from '../app';
@@ -45,6 +45,7 @@ import { GameHint } from './infoview/rpc_api';
 import { Impressum } from './privacy_policy';
 import { store } from '../state/store';
 import { useWindowDimensions } from '../window_width';
+import { ArrowLeft } from '@mui/icons-material';
 
 function Level() {
 
@@ -307,20 +308,33 @@ function PlayableLevel({worldId, levelId}) {
       <LevelAppBar isLoading={level.isLoading}
         levelTitle={`${mobile ? '' : 'Level '}${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
           (level?.data?.title && ` : ${level?.data?.title}`)}
-        worldId={worldId} levelId={levelId} toggleImpressum={toggleImpressum}/>
+        worldId={worldId} levelId={levelId} toggleImpressum={toggleImpressum}
+        pageNumber={pageNumber} setPageNumber={setPageNumber}/>
       {mobile?
-        <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
-          <div className={`exercise-panel ${pageNumber == 0 ? '' : 'hidden'}`}>
-          <EditorContext.Provider value={editorConnection}>
-            <MonacoEditorContext.Provider value={editor}>
-              <div className="exercise">
-                <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} />
-              </div>
-            </MonacoEditorContext.Provider>
-          </EditorContext.Provider>
-          {impressum ? <Impressum handleClose={closeImpressum} /> : null}
+        // TODO: This is copied from the `Split` component below...
+        <>
+          <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
+            <div className={`exercise-panel ${pageNumber == 0 ? '' : 'hidden'}`}>
+              <EditorContext.Provider value={editorConnection}>
+                <MonacoEditorContext.Provider value={editor}>
+                  <div className="exercise">
+                    <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} />
+                  </div>
+                </MonacoEditorContext.Provider>
+              </EditorContext.Provider>
+              {impressum ? <Impressum handleClose={closeImpressum} /> : null}
+            </div>
           </div>
-        </div>
+          <div className={`inventory-panel ${pageNumber == 1 ? '' : 'hidden'}`}>
+            {!level.isLoading &&
+              <>{inventoryDoc ?
+                <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
+                :
+                <Inventory levelInfo={level?.data} openDoc={openInventoryDoc} />
+              }</>
+            }
+          </div>
+        </>
       :
         <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
           <div className="chat-panel">
@@ -436,7 +450,7 @@ function Introduction({worldId}) {
 }
 
 /** The top-navigation bar */
-function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum}) {
+function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum, pageNumber = undefined, setPageNumber = undefined}) {
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
@@ -462,9 +476,22 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum})
         {levelTitle}
       </span>
     </div>
-    <Button to="" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}} >
-      {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
-    </Button>
+    <div className="nav-btns">
+      {pageNumber == 0 ?
+        <Button to=""
+            title="show inventory" inverted="true" onClick={() => {setPageNumber(1)}}>
+          <FontAwesomeIcon icon={faBook}/>
+        </Button>
+      : pageNumber == 1 &&
+        <Button to=""
+            title="show inventory" inverted="true" onClick={() => {setPageNumber(0)}}>
+          <FontAwesomeIcon icon={faArrowLeft}/>
+        </Button>
+      }
+      <Button to="" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}} >
+        {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
+      </Button>
+    </div>
     <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
     {levelId < gameInfo.data?.worldSize[worldId] &&
       <Button inverted="true"

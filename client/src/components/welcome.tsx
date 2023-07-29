@@ -204,7 +204,7 @@ function Welcome() {
               <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
             </Button>
             <Button className="btn btn-next" to=""
-                title="show inventory" onClick={() => {setPageNumber(1)}}>
+                title="world tree" onClick={() => {setPageNumber(1)}}>
               Game&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
             </Button>
           </div>
@@ -237,7 +237,7 @@ function Welcome() {
         <div className="inventory-panel">
           <div className="mobile-nav">
             <Button className="btn btn-previous" to=""
-                title="back to introduction" onClick={() => {setPageNumber(1)}}>
+                title="world tree" onClick={() => {setPageNumber(1)}}>
               <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Game
             </Button>
           </div>

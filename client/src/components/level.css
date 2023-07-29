@@ -301,3 +301,7 @@ td code  {
 .menu.dropdown .svg-inline--fa {
   width: 1.8rem;
 }
+
+.nav-btns .btn {
+ margin-left: .5em;
+}

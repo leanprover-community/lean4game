@@ -236,6 +236,7 @@ svg .disabled {
   padding-bottom: .5em;
   position:relative;
   height: 3em;
+  width: 100%;
 }
 
 .mobile-nav .btn-next, .mobile-nav .btn-previous {
