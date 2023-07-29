@@ -11,7 +11,7 @@ import './welcome.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGlobe, faBook, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
-import { selectCompleted, selectDifficulty } from '../state/progress';
+import { changedDifficulty, changedOpenedIntro, selectCompleted, selectDifficulty, selectOpenedIntro } from '../state/progress';
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api';
 import Markdown from './markdown';
 import WorldSelectionMenu, { WelcomeMenu } from './world_selection_menu';
@@ -21,6 +21,7 @@ import { Documentation, Inventory } from './inventory';
 import { store } from '../state/store';
 import { useWindowDimensions } from '../window_width';
 import { MobileContext } from './infoview/context';
+import { useAppDispatch } from '../hooks';
 
 cytoscape.use( klay );
 
@@ -61,10 +62,15 @@ function LevelIcon({ worldId, levelId, position, completed, available }) {
 function Welcome() {
   const navigate = useNavigate();
 
-  /** Only for mobile layout */
-  const [pageNumber, setPageNumber] = useState(0)
-
   const gameId = React.useContext(GameIdContext)
+
+  const openedIntro = useSelector(selectOpenedIntro(gameId))
+
+  /** Only for mobile layout */
+  const [pageNumber, setPageNumber] = useState(openedIntro ? 1 : 0)
+
+  const dispatch = useAppDispatch()
+
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
   const {mobile} = React.useContext(MobileContext)
@@ -204,7 +210,9 @@ function Welcome() {
               <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
             </Button>
             <Button className="btn btn-next" to=""
-                title="world tree" onClick={() => {setPageNumber(1)}}>
+                title="world tree" onClick={() => {
+                  setPageNumber(1);
+                  dispatch(changedOpenedIntro({game: gameId, openedIntro: true}))}}>
               Game&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
             </Button>
           </div>
