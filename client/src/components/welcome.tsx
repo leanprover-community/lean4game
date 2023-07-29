@@ -59,6 +59,8 @@ function LevelIcon({ worldId, levelId, position, completed, available }) {
 function Welcome() {
   const navigate = useNavigate();
 
+  const [mobileLayout, setModileLayout] = useState(false)
+
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
@@ -187,34 +189,36 @@ function Welcome() {
     <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}>
       <CircularProgress />
     </Box>
-    :
-    <Split className="welcome" minSize={0} snapOffset={200}  sizes={[40, 35, 25]}>
-      <div className="column">
-        <Typography variant="body1" component="div" className="welcome-text">
-          <WelcomeMenu />
-          <Markdown>{gameInfo.data?.introduction}</Markdown>
-        </Typography>
-      </div>
-      <div className="column">
-        <WorldSelectionMenu />
-          <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
-            width={bounds ? `${ds * dx}` : ''}
-              viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
-              className="world-selection"
-            >
-            {svgElements}
-          </svg>
-      </div>
-      <div className="inventory-panel">
-        {<>
-          {inventoryDoc ?
-            <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
-            :
-            <Inventory levelInfo={inventory.data} openDoc={openInventoryDoc} enableAll={true}/>
-          }
-        </>}
-      </div>
-    </Split>
+    : mobileLayout ?
+      <></>
+      :
+      <Split className="welcome" minSize={0} snapOffset={200}  sizes={[40, 35, 25]}>
+        <div className="column">
+          <Typography variant="body1" component="div" className="welcome-text">
+            <WelcomeMenu />
+            <Markdown>{gameInfo.data?.introduction}</Markdown>
+          </Typography>
+        </div>
+        <div className="column">
+          <WorldSelectionMenu />
+            <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
+              width={bounds ? `${ds * dx}` : ''}
+                viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
+                className="world-selection"
+              >
+              {svgElements}
+            </svg>
+        </div>
+        <div className="inventory-panel">
+          {<>
+            {inventoryDoc ?
+              <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
+              :
+              <Inventory levelInfo={inventory.data} openDoc={openInventoryDoc} enableAll={true}/>
+            }
+          </>}
+        </div>
+      </Split>
   }
     <PrivacyPolicy />
   </div>
