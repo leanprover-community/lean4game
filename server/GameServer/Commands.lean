@@ -741,7 +741,7 @@ elab "MakeGame" : command => do
     | "" =>
       -- If documentation is missing, try using the docstring instead.
       match docstring with
-      | some ds => s!"*(lean docstring)*\\\n{ds}" -- TODO `\n` does not work in markdown
+      | some ds => s!"*(lean docstring)*\\\n{ds}"
       | none => "(missing)"
     | template =>
       -- TODO: Process content template.
