@@ -148,8 +148,10 @@ export function WorldSelectionMenu() {
           <h2>Delete Progress?</h2>
 
           <p>Do you want to delete your saved progress irreversibly?</p>
-          <p>(This only affects your saved proofs, no levels are ever locked.
-            Saves from other games are not deleted.)</p>
+          <p>
+            (This deletes your proofs and your collected inventory.
+            Saves from other games are not deleted.)
+          </p>
 
           <Button onClick={eraseProgress} to="">Delete</Button>
           <Button onClick={downloadAndErase} to="">Download & Delete</Button>

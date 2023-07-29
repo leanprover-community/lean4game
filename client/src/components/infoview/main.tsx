@@ -39,7 +39,7 @@ import { Hints } from '../hints';
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
  */
-export function DualEditor({ level, codeviewRef, levelId, worldId, lastLevel = false }) {
+export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) {
   const ec = React.useContext(EditorContext)
   const { commandLineMode } = React.useContext(InputModeContext)
   return <>
@@ -48,7 +48,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, lastLevel = f
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
     {ec ?
-      <DualEditorMain worldId={worldId} levelId={levelId} level={level} lastLevel={lastLevel} /> :
+      <DualEditorMain worldId={worldId} levelId={levelId} level={level} worldSize={worldSize} /> :
       // TODO: Style this if relevant.
       <>
         <p>Editor is starting up...</p>
@@ -59,7 +59,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, lastLevel = f
 }
 
 /** The part of the two editors that needs the editor connection first */
-function DualEditorMain({ worldId, levelId, level, lastLevel }: { worldId: string, levelId: number, level: LevelInfo, lastLevel: boolean }) {
+function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: string, levelId: number, level: LevelInfo, worldSize: number }) {
   const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
   const { commandLineMode } = React.useContext(InputModeContext)
@@ -109,7 +109,7 @@ function DualEditorMain({ worldId, levelId, level, lastLevel }: { worldId: strin
           <WithLspDiagnosticsContext>
             <ProgressContext.Provider value={allProgress}>
               {commandLineMode ?
-                <CommandLineInterface world={worldId} level={levelId} data={level} lastLevel={lastLevel}/>
+                <CommandLineInterface world={worldId} level={levelId} data={level} worldSize={worldSize}/>
                 :
                 <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />
               }
@@ -282,7 +282,7 @@ function GoalsTab({ proofStep }: { proofStep: ProofStep }) {
 }
 
 /** The interface in command line mode */
-export function CommandLineInterface(props: { world: string, level: number, data: LevelInfo, lastLevel: boolean }) {
+export function CommandLineInterface(props: { world: string, level: number, data: LevelInfo, worldSize: number }) {
 
   const ec = React.useContext(EditorContext)
   const editor = React.useContext(MonacoEditorContext)
@@ -456,7 +456,7 @@ export function CommandLineInterface(props: { world: string, level: number, data
             )}
             {completed && i == proof.length - 1 &&
               <div className="button-row">
-                {props.lastLevel ?
+                {props.level >= props.worldSize ?
                   <Button to={`/${gameId}`}>
                     <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
                   </Button>
