@@ -300,12 +300,15 @@ td code  {
 #menu-btn {
   padding: 0;
   font-size: 1.3rem;
+  margin-left: .5em;
+  margin-right: 0;
+}
+
+#home-btn {
+  margin-right: .5em;
+  margin-left: 0;
 }
 
 .menu.dropdown .svg-inline--fa {
   width: 1.8rem;
-}
-
-.nav-btns .btn {
- margin-left: .5em;
 }

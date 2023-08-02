@@ -464,65 +464,103 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum, 
   const [navOpen, setNavOpen] = React.useState(false)
 
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
-    {!mobile &&
-      <div>
-        <span className="app-bar-title">
-          {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
-        </span>
-      </div>
-    }
-    <div>
-      <span className="app-bar-title">
-        {levelTitle}
-      </span>
-    </div>
-    <div className="nav-btns">
-      {pageNumber == 0 ?
-        <Button to=""
-            title="show inventory" inverted="true" onClick={() => {setPageNumber(1)}}>
-          <FontAwesomeIcon icon={faBook}/>
-        </Button>
-      : pageNumber == 1 &&
-        <Button to=""
-            title="show inventory" inverted="true" onClick={() => {setPageNumber(0)}}>
-          <FontAwesomeIcon icon={faArrowLeft}/>
-        </Button>
-      }
-      <Button to="" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}} >
-        {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
-      </Button>
-    </div>
-    <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
-    {levelId < gameInfo.data?.worldSize[worldId] &&
-      <Button inverted="true"
-          to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
-          disabled={difficulty >= 2 && !(completed || levelId == 0)}
-          onClick={() => setNavOpen(false)}>
-        <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
-      </Button>
-    }
-    {levelId > 0 && <>
-          <Button disabled={levelId <= 0} inverted="true"
-              to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
-              title="previous level"
-              onClick={() => setNavOpen(false)}>
-            <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
+    {mobile ?
+      <>
+        <div>
+          <span className="app-bar-title">
+            {levelTitle}
+          </span>
+        </div>
+        <div className="nav-btns">
+          {mobile && pageNumber == 0 ?
+            <Button to=""
+                title="show inventory" inverted="true" onClick={() => {setPageNumber(1)}}>
+              <FontAwesomeIcon icon={faBook}/>
+            </Button>
+          : pageNumber == 1 &&
+            <Button to=""
+                title="show inventory" inverted="true" onClick={() => {setPageNumber(0)}}>
+              <FontAwesomeIcon icon={faArrowLeft}/>
+            </Button>
+          }
+          <Button to="" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}} >
+            {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
           </Button>
-        </>}
-    <Button to={`/${gameId}`} inverted="true" title="back to world selection">
-      <FontAwesomeIcon icon={faHome} />&nbsp;Home
-    </Button>
-    <Button disabled={levelId <= 0} inverted="true" to=""
-        onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
-        title="toggle Editor mode">
-      <FontAwesomeIcon icon={faCode} />&nbsp;Toggle Editor
-    </Button>
-    <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
-      <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Info &amp; Impressum
-    </Button>
+        </div>
+        <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
+          {levelId < gameInfo.data?.worldSize[worldId] &&
+            <Button inverted="true"
+                to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
+                disabled={difficulty >= 2 && !(completed || levelId == 0)}
+                onClick={() => setNavOpen(false)}>
+              <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
+            </Button>
+          }
+          {levelId > 0 && <>
+                <Button disabled={levelId <= 0} inverted="true"
+                    to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
+                    title="previous level"
+                    onClick={() => setNavOpen(false)}>
+                  <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
+                </Button>
+              </>}
+          <Button to={`/${gameId}`} inverted="true" title="back to world selection">
+            <FontAwesomeIcon icon={faHome} />&nbsp;Home
+          </Button>
+          <Button disabled={levelId <= 0} inverted="true" to=""
+              onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
+              title="toggle Editor mode">
+            <FontAwesomeIcon icon={faCode} />&nbsp;Toggle Editor
+          </Button>
+          <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
+            <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Info &amp; Impressum
+          </Button>
+        </div>
+      </>
+    :
+      <>
+        <div>
+          <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
+            <FontAwesomeIcon icon={faHome} />
+          </Button>
+          <span className="app-bar-title">
+            {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
+          </span>
+        </div>
+        <div>
+          <span className="app-bar-title">
+            {levelTitle}
+          </span>
+        </div>
+        <div className="nav-btns">
+          {levelId > 0 && <>
+            <Button disabled={levelId <= 0} inverted="true"
+                to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
+                title="previous level"
+                onClick={() => setNavOpen(false)}>
+              <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
+            </Button>
+          </>}
+          {levelId < gameInfo.data?.worldSize[worldId] &&
+            <Button inverted="true"
+                to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
+                disabled={difficulty >= 2 && !(completed || levelId == 0)}
+                onClick={() => setNavOpen(false)}>
+              <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
+            </Button>
+          }
+          <Button disabled={levelId <= 0} inverted="true" to=""
+              onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
+              title="toggle Editor mode">
+            <FontAwesomeIcon icon={faCode} />
+          </Button>
+          <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
+            <FontAwesomeIcon icon={faCircleInfo} />
+          </Button>
+        </div>
+      </>
+    }
   </div>
-</div>
-
 }
 
 function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
