@@ -2,21 +2,22 @@
  * @fileOverview Define the menu displayed with the tree of worlds on the welcome page
 */
 import * as React from 'react'
-import { Link } from 'react-router-dom';
-import { useStore, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom'
+import { useStore, useSelector } from 'react-redux'
+import { Slider } from '@mui/material'
+import cytoscape, { LayoutOptions } from 'cytoscape'
+import klay from 'cytoscape-klay'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faGlobe, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
-import { store } from '../state/store';
+
+import { GameIdContext } from '../app'
+import { useAppDispatch } from '../hooks'
+import { deleteProgress, selectProgress, loadProgress, GameProgressState,
+  selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
+import { store } from '../state/store'
+import { Button } from './button'
 
 import './world_tree.css'
-
-import { Button } from './button'
-import { GameIdContext } from '../app';
-import { useAppDispatch } from '../hooks';
-import { deleteProgress, selectProgress, loadProgress, GameProgressState, selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress';
-import { Slider } from '@mui/material';
-import cytoscape, { LayoutOptions } from 'cytoscape'
-import klay from 'cytoscape-klay';
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -127,7 +128,8 @@ const downloadFile = ({ data, fileName, fileType } :
   a.remove()
 }
 
-/** The menu that is shown next to the world selection graph */
+// TODO: I think this should be removed and that single button incorporated differently
+/** Menu on desktop to go back to game server */
 export function WelcomeMenu() {
 
   return <nav className="world-selection-menu">
@@ -265,7 +267,6 @@ function WorldSelectionMenu() {
 }
 
 export function computeWorldLayout(worlds) {
-
   let elements = []
   for (let id in worlds.nodes) {
     elements.push({ data: { id: id, title: worlds.nodes[id].title } })
@@ -279,14 +280,12 @@ export function computeWorldLayout(worlds) {
       }
     })
   }
-
   const cy = cytoscape({
     container: null,
     elements,
     headless: true,
     styleEnabled: false
   })
-
   const layout = cy.layout({name: "klay", klay: {direction: "DOWN", nodePlacement: "LINEAR_SEGMENTS"}} as LayoutOptions).run()
   let nodes = {}
   cy.nodes().forEach((node, id) => {
@@ -305,7 +304,6 @@ export function WorldTreePanel({worlds, worldSize}:
     worldSize: any}) {
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
-
   const {nodes, bounds}: any = worlds ? computeWorldLayout(worlds) : {nodes: []}
 
   // scroll to playable world
@@ -320,7 +318,6 @@ export function WorldTreePanel({worlds, worldSize}:
       elem.scrollIntoView({block: "center"})
     }
   }, [worlds, worldSize])
-
 
   let svgElements = []
 
@@ -385,4 +382,4 @@ export function WorldTreePanel({worlds, worldSize}:
         {svgElements}
       </svg>
   </div>
-  }
+}
