@@ -248,10 +248,17 @@ svg .disabled {
   left: 0;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+  padding-left: 0.3rem;
 }
 
 .mobile-nav .btn-next {
   right: 0;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  padding-right: .3rem;
+}
+
+.mobile-nav .svg-inline--fa {
+  margin-left: 0.3rem;
+  margin-right: 0.3rem;
 }

@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faBook, faHammer, faBan } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
 import Markdown from './markdown';
-import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview } from '../state/api';
+import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery } from '../state/api';
 import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
 import { useSelector } from 'react-redux';
@@ -124,5 +124,28 @@ export function Documentation({name, type, handleClose}) {
     <p><code>{doc.data?.statement}</code></p>
     {/* <code>docstring: {doc.data?.docstring}</code> */}
     <Markdown>{doc.data?.content}</Markdown>
+  </div>
+}
+
+/** The panel (on the welcome page) showing the user's inventory with tactics, definitions, and lemmas */
+export function InventoryPanel() {
+  const gameId = React.useContext(GameIdContext)
+  const inventory = useLoadInventoryOverviewQuery({game: gameId})
+  // The inventory is overlayed by the doc entry of a clicked item
+  const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
+
+  // Open the doc of the clicked inventory item
+  function openInventoryDoc(name: string, type: string) {
+    setInventoryDoc({name, type})
+  }
+  // Set `inventoryDoc` to `null` to close the doc
+  function closeInventoryDoc() {setInventoryDoc(null)}
+
+  return <div className="column inventory-panel">
+    {inventoryDoc ?
+      <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
+      :
+      <Inventory levelInfo={inventory.data} openDoc={openInventoryDoc} enableAll={true}/>
+    }
   </div>
 }
