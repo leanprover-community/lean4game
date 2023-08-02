@@ -15,7 +15,7 @@ import { MobileContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
 import Markdown from './markdown'
 import {PrivacyPolicy} from './privacy_policy'
-import { WelcomeMenu, WorldTreePanel } from './world_selection_menu'
+import { WelcomeMenu, WorldTreePanel } from './world_tree'
 
 import './welcome.css'
 

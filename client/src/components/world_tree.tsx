@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faGlobe, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { store } from '../state/store';
 
-import './world_selection_menu.css'
+import './world_tree.css'
 
 import { Button } from './button'
 import { GameIdContext } from '../app';
