@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 export function Inventory({levelInfo, openDoc, enableAll=false} :
   {
     levelInfo: LevelInfo|InventoryOverview,
-    openDoc: (name: string, type: string) => void,
+    openDoc: (props: {name: string, type: string}) => void,
     enableAll?: boolean,
   }) {
 
@@ -41,7 +41,7 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
   {
     items: InventoryTile[],
     docType: string,
-    openDoc(name: string, type: string): void,
+    openDoc(props: {name: string, type: string}): void,
     defaultTab? : string,
     level? : LevelInfo|InventoryOverview,
     enableAll?: boolean,
@@ -89,7 +89,7 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
           (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled)
         ).filter(item => ((tab ?? categories[0]) == item.category)).map((item, i) => {
             return <InventoryItem key={`${item.category}-${item.name}`}
-              showDoc={() => {openDoc(item.name, docType)}}
+              showDoc={() => {openDoc({name: item.name, type: docType})}}
               name={item.name} displayName={item.displayName} locked={difficulty > 0 ? item.locked : false}
               disabled={item.disabled} newly={item.new} enableAll={enableAll}/>
         })
@@ -128,24 +128,20 @@ export function Documentation({name, type, handleClose}) {
 }
 
 /** The panel (on the welcome page) showing the user's inventory with tactics, definitions, and lemmas */
-export function InventoryPanel() {
+export function InventoryPanel({visible = true}) {
   const gameId = React.useContext(GameIdContext)
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
+
   // The inventory is overlayed by the doc entry of a clicked item
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
-
-  // Open the doc of the clicked inventory item
-  function openInventoryDoc(name: string, type: string) {
-    setInventoryDoc({name, type})
-  }
   // Set `inventoryDoc` to `null` to close the doc
   function closeInventoryDoc() {setInventoryDoc(null)}
 
-  return <div className="column inventory-panel">
+  return <div className={`column inventory-panel ${visible ? '' : 'hidden'}`}>
     {inventoryDoc ?
       <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
       :
-      <Inventory levelInfo={inventory.data} openDoc={openInventoryDoc} enableAll={true}/>
+      <Inventory levelInfo={inventory.data} openDoc={setInventoryDoc} enableAll={true}/>
     }
   </div>
 }

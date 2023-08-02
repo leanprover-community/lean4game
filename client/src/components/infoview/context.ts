@@ -70,6 +70,14 @@ export const MobileContext = React.createContext<{
   setMobile: () => {},
 })
 
+export const WorldLevelIdContext = React.createContext<{
+  worldId : string,
+  levelId: number
+}>({
+  worldId : null,
+  levelId: 0,
+})
+
 /** Context to keep highlight selected proof step and corresponding chat messages. */
 export const SelectionContext = React.createContext<{
   selectedStep : number,

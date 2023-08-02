@@ -1,130 +1,110 @@
-import * as React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import * as React from 'react'
+import { useEffect, useState, useRef, useContext } from 'react'
+import { useSelector, useStore } from 'react-redux'
 import Split from 'react-split'
-import { Alert } from '@mui/material';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-import { InfoviewApi, defaultInfoviewConfig } from '@leanprover/infoview'
-import { Link, useParams } from 'react-router-dom';
-import { Box, CircularProgress, FormControlLabel, FormGroup, Switch, IconButton } from '@mui/material';
-import MuiDrawer from '@mui/material/Drawer';
-import Grid from '@mui/material/Unstable_Grid2';
-import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter';
-import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
-import 'lean4web/client/src/editor/vscode.css';
-import 'lean4web/client/src/editor/infoview.css';
-import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
-import { InfoProvider } from 'lean4web/client/src/editor/infoview';
-import 'lean4web/client/src/editor/infoview.css'
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
-import './level.css'
-import { useSelector, useStore } from 'react-redux';
-import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection';
-import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event';
-import type { Location } from 'vscode-languageserver-protocol';
+import { useParams } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faBook, faCode, faPencilSquare, faXmark, faHome, faCircleInfo, faArrowRight, faArrowLeft, faShield, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
-import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
+import { faBars, faBook, faCode, faXmark, faHome, faCircleInfo, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { CircularProgress } from '@mui/material'
+import type { Location } from 'vscode-languageserver-protocol'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
+import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider'
+import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter'
+import { InfoProvider } from 'lean4web/client/src/editor/infoview'
+import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter'
+import { InfoviewApi } from '@leanprover/infoview'
+import { EditorContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts'
+import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection'
+import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event'
 
-import { GameIdContext } from '../app';
-import { ConnectionContext, connection, useLeanClient } from '../connection';
-import { useAppDispatch, useAppSelector } from '../hooks';
+import { GameIdContext } from '../app'
+import { ConnectionContext, connection, useLeanClient } from '../connection'
+import { useAppDispatch, useAppSelector } from '../hooks'
+import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api'
+import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited,
+  selectHelp, selectDifficulty, selectInventory } from '../state/progress'
+import { store } from '../state/store'
 import { Button } from './button'
-import Markdown from './markdown';
-import {Inventory, Documentation} from './inventory';
-import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api';
-import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited, selectHelp, selectDifficulty, selectInventory } from '../state/progress';
+import Markdown from './markdown'
+import {InventoryPanel} from './inventory'
+import { hasInteractiveErrors } from './infoview/command_line'
+import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext,
+  ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
-import { DeletedHint, DeletedHints, Hints } from './hints';
-import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './infoview/context';
-import { hasInteractiveErrors } from './infoview/command_line';
-import { GameHint } from './infoview/rpc_api';
-import { Impressum } from './privacy_policy';
-import { store } from '../state/store';
-import { useWindowDimensions } from '../window_width';
-import { ArrowLeft } from '@mui/icons-material';
+import { GameHint } from './infoview/rpc_api'
+import { DeletedHints, Hints } from './hints'
+import { Impressum } from './privacy_policy'
+
+import '@fontsource/roboto/300.css'
+import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/500.css'
+import '@fontsource/roboto/700.css'
+import 'lean4web/client/src/editor/infoview.css'
+import 'lean4web/client/src/editor/vscode.css'
+import './level.css'
 
 function Level() {
-
-  const params = useParams();
+  const params = useParams()
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
 
   useLoadWorldFiles(worldId)
 
-  if (levelId == 0) {
-    return <Introduction worldId={worldId} />
-  } else {
-    return <PlayableLevel worldId={worldId} levelId={levelId} />
-  }
+  return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
+    {levelId == 0 ? <Introduction /> : <PlayableLevel />}
+  </WorldLevelIdContext.Provider>
+
 }
 
-function PlayableLevel({worldId, levelId}) {
-  const codeviewRef = useRef<HTMLDivElement>(null)
-
+function ChatPanel({lastLevel}) {
   const chatRef = useRef<HTMLDivElement>(null)
+  const {mobile} = useContext(MobileContext)
+  const gameId = useContext(GameIdContext)
+  const {worldId, levelId} = useContext(WorldLevelIdContext)
+  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  const {proof, setProof} = useContext(ProofContext)
+  const {deletedChat, setDeletedChat, showHelp, setShowHelp} = useContext(DeletedChatContext)
+  const {selectedStep, setSelectedStep} = useContext(SelectionContext)
+  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
-  const gameId = React.useContext(GameIdContext)
+  // If the last step has errors, we want to treat it as if it is part of the second-to-last step
+  let k = proof.length - 1
+  let withErr = hasInteractiveErrors(proof[k]?.errors) ? 1 : 0
 
-  // The state variables for the `ProofContext`
-  const [proof, setProof] = useState<Array<ProofStep>>([])
-
-  // When deleting the proof, we want to keep to old messages around until
-  // a new proof has been entered. e.g. to consult messages coming from dead ends
-  const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
-
-  // A set of row numbers where help is displayed
-  const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
-
-  const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
-  const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
-
-  /** Only for mobile layout */
-  const [pageNumber, setPageNumber] = useState(0)
-  const {mobile} = React.useContext(MobileContext)
-
-  const [commandLineMode, setCommandLineMode] = useState(true)
-  const [commandLineInput, setCommandLineInput] = useState("")
-  const [canUndo, setCanUndo] = useState(initialCode.trim() !== "")
-
-  const [selectedStep, setSelectedStep] = useState<number>()
-
-  const theme = useTheme();
-
-  const [impressum, setImpressum] = React.useState(false)
-
-  const difficulty = useSelector(selectDifficulty(gameId))
-
-  function closeImpressum() {
-    setImpressum(false)
+  function toggleSelection(line: number) {
+    return (ev) => {
+      console.debug('toggled selection')
+      if (selectedStep == line) {
+        setSelectedStep(undefined)
+      } else {
+        setSelectedStep(line)
+      }
+    }
   }
 
-  function toggleImpressum() {
-    setImpressum(!impressum)
+  function hasHiddenHints(i : number): boolean {
+    let step = proof[i]
+    // For example if the proof isn't loaded yet
+    if(!step) {return false}
+    return step.hints.some((hint) => hint.hidden)
   }
 
-  const inventory: Array<String> = useSelector(selectInventory(gameId))
+  const activateHiddenHints = (ev) => {
+    // If the last step (`k`) has errors, we want the hidden hints from the
+    // second-to-last step to be affected
+    if (!(proof.length)) {return}
 
-  React.useEffect(() => {
-    let leanClient = connection.getLeanClient(gameId)
-    leanClient.sendNotification('$/game/setInventory', {inventory: inventory, checkEnabled: difficulty > 0})
-  }, [inventory])
+    // state must not be mutated, therefore we need to clone the set
+    let tmp = new Set(showHelp)
+    if (tmp.has(k - withErr)) {
+      tmp.delete(k - withErr)
+    } else {
+      tmp.add(k - withErr)
+    }
+    setShowHelp(tmp)
+    console.debug(`help: ${Array.from(tmp.values())}`)
+  }
 
-  useEffect(() => {
-    // // Scroll to top when loading a new level
-    // // TODO: Thats the wrong behaviour probably
-    // chatRef.current!.scrollTo(0,0)
-
-    // TODO: That's a problem if the saved proof contains an error
-    // Reset command line input when loading a new level
-    setCommandLineInput("")
-
-    // Load the selected help steps from the store
-    setShowHelp(new Set(selectHelp(gameId, worldId, levelId)(store.getState())))
-  }, [gameId, worldId, levelId])
 
   useEffect(() => {
     // TODO: For some reason this is always called twice
@@ -134,20 +114,8 @@ function PlayableLevel({worldId, levelId}) {
     }
   }, [proof, showHelp])
 
-  React.useEffect(() => {
-    if (!commandLineMode) {
-      // Delete last input attempt from command line
-      editor.executeEdits("command-line", [{
-        range: editor.getSelection(),
-        text: "",
-        forceMoveMarkers: false
-      }]);
-      editor.focus()
-    }
-  }, [commandLineMode])
-
   // Scroll to element if selection changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof selectedStep !== 'undefined') {
       Array.from(chatRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
         elem.scrollIntoView({block: "center"})
@@ -155,13 +123,128 @@ function PlayableLevel({worldId, levelId}) {
     }
   }, [selectedStep])
 
-  React.useEffect(() => {
-    // Forget whether hidden hints are displayed for steps that don't exist yet
-    if (proof.length) {
-      console.debug(Array.from(showHelp))
-      setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof.length))))
-    }
-  }, [proof])
+  // useEffect(() => {
+  //   // // Scroll to top when loading a new level
+  //   // // TODO: Thats the wrong behaviour probably
+  //   // chatRef.current!.scrollTo(0,0)
+  // }, [gameId, worldId, levelId])
+
+
+  return <div className="chat-panel">
+    <div ref={chatRef} className="chat">
+      {level?.data?.introduction &&
+        <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelection(0)}>
+          <Markdown>{level?.data?.introduction}</Markdown>
+        </div>
+      }
+      {proof.map((step, i) => {
+        // It the last step has errors, it will have the same hints
+        // as the second-to-last step. Therefore we should not display them.
+        if (!(i == proof.length - 1 && withErr)) {
+          // TODO: Should not use index as key.
+          return <Hints key={`hints-${i}`}
+            hints={step.hints} showHidden={showHelp.has(i)} step={i}
+            selected={selectedStep} toggleSelection={toggleSelection(i)}/>
+        }
+      })}
+      <DeletedHints hints={deletedChat}/>
+      {completed &&
+        <>
+          <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
+            Level completed! 🎉
+          </div>
+          {level?.data?.conclusion?.trim() &&
+            <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
+              <Markdown>{level?.data?.conclusion}</Markdown>
+            </div>
+          }
+        </>
+      }
+    </div>
+    <div className="button-row">
+      {completed && (lastLevel ?
+        <Button to={`/${gameId}`}>
+          <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
+        </Button> :
+        <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+          Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+        </Button>)
+        }
+      {hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
+        <Button to="" onClick={activateHiddenHints}>
+          Show more help!
+        </Button>
+      }
+    </div>
+  </div>
+}
+
+function ExercisePanel({codeviewRef, impressum, closeImpressum, visible=true}) {
+  const gameId = React.useContext(GameIdContext)
+  const {worldId, levelId} = useContext(WorldLevelIdContext)
+  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  const gameInfo = useGetGameInfoQuery({game: gameId})
+  return <div className={`exercise-panel ${visible ? '' : 'hidden'}`}>
+    <div className="exercise">
+      <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} worldSize={gameInfo.data?.worldSize[worldId]}/>
+    </div>
+    {impressum ? <Impressum handleClose={closeImpressum} /> : null}
+  </div>
+}
+
+function PlayableLevel() {
+  const codeviewRef = useRef<HTMLDivElement>(null)
+  const gameId = React.useContext(GameIdContext)
+  const {worldId, levelId} = useContext(WorldLevelIdContext)
+
+  // The state variables for the `ProofContext`
+  const [proof, setProof] = useState<Array<ProofStep>>([])
+  // When deleting the proof, we want to keep to old messages around until
+  // a new proof has been entered. e.g. to consult messages coming from dead ends
+  const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
+  // A set of row numbers where help is displayed
+  const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
+  const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
+  const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
+  /** Only for mobile layout */
+  const [pageNumber, setPageNumber] = useState(0)
+  const {mobile} = React.useContext(MobileContext)
+  const [commandLineMode, setCommandLineMode] = useState(true)
+  const [commandLineInput, setCommandLineInput] = useState("")
+  const difficulty = useSelector(selectDifficulty(gameId))
+  const inventory: Array<String> = useSelector(selectInventory(gameId))
+  const gameInfo = useGetGameInfoQuery({game: gameId})
+  const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
+  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  const dispatch = useAppDispatch()
+
+  // impressum pop-up
+  const [impressum, setImpressum] = React.useState(false)
+  function closeImpressum() {setImpressum(false)}
+  function toggleImpressum() {setImpressum(!impressum)}
+
+  // When clicking on an inventory item, the inventory is overlayed by the item's doc.
+  // If this state is set to a pair `(name, type)` then the according doc will be open.
+  // Set `inventoryDoc` to `null` to close the doc
+  const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
+  function closeInventoryDoc () {setInventoryDoc(null)}
+
+
+
+  const onDidChangeContent = (code) => {
+    dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code}))
+  }
+
+  const onDidChangeSelection = (monacoSelections) => {
+    const selections = monacoSelections.map(
+      ({selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}) =>
+      {return {selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}})
+    dispatch(changedSelection({game: gameId, world: worldId, level: levelId, selections}))
+  }
+
+
+  const {editor, infoProvider, editorConnection} =
+    useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `CommandLineInterface`.
@@ -188,18 +271,45 @@ function PlayableLevel({worldId, levelId}) {
     }]);
   }
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
-  const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
+  // Select and highlight proof steps and corresponding hints
+  // TODO: with the new design, there is no difference between the introduction and
+  // a hint at the beginning of the proof...
+  const [selectedStep, setSelectedStep] = useState<number>()
 
-  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  // if the user inventory changes, notify the server
+  useEffect(() => {
+    let leanClient = connection.getLeanClient(gameId)
+    leanClient.sendNotification('$/game/setInventory', {inventory: inventory, checkEnabled: difficulty > 0})
+  }, [inventory])
 
-  const dispatch = useAppDispatch()
+  useEffect(() => {
+    // TODO: That's a problem if the saved proof contains an error
+    // Reset command line input when loading a new level
+    setCommandLineInput("")
 
-  const onDidChangeContent = (code) => {
-    dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code}))
+    // Load the selected help steps from the store
+    setShowHelp(new Set(selectHelp(gameId, worldId, levelId)(store.getState())))
+  }, [gameId, worldId, levelId])
 
-    setCanUndo(code.trim() !== "")
-  }
+  useEffect(() => {
+    if (!commandLineMode) {
+      // Delete last input attempt from command line
+      editor.executeEdits("command-line", [{
+        range: editor.getSelection(),
+        text: "",
+        forceMoveMarkers: false
+      }]);
+      editor.focus()
+    }
+  }, [commandLineMode])
+
+  useEffect(() => {
+    // Forget whether hidden hints are displayed for steps that don't exist yet
+    if (proof.length) {
+      console.debug(Array.from(showHelp))
+      setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof.length))))
+    }
+  }, [proof])
 
   // save showed help in store
   useEffect(() => {
@@ -208,18 +318,6 @@ function PlayableLevel({worldId, levelId}) {
       dispatch(helpEdited({game: gameId, world: worldId, level: levelId, help: Array.from(showHelp)}))
     }
   }, [showHelp])
-
-  const onDidChangeSelection = (monacoSelections) => {
-    const selections = monacoSelections.map(
-      ({selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}) =>
-      {return {selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}})
-    dispatch(changedSelection({game: gameId, world: worldId, level: levelId, selections}))
-  }
-
-  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
-
-  const {editor, infoProvider, editorConnection} =
-    useLevelEditor(worldId, levelId, codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
 
   // Effect when command line mode gets enabled
   useEffect(() => {
@@ -241,173 +339,47 @@ function PlayableLevel({worldId, levelId}) {
     }
   }, [editor, commandLineMode])
 
-  // When clicking on an inventory item, the inventory is overlayed by the item's doc.
-  // If this state is set to a pair `(name, type)` then the according doc will be open.
-  const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
-
-  // Open the doc of the clicked inventory item
-  function openInventoryDoc(name, type) {
-    setInventoryDoc({name, type})
-  }
-
-  // Set `inventoryDoc` to `null` to close the doc
-  const closeInventoryDoc = () => setInventoryDoc(null);
-
-  const levelTitle = <>
-    {levelId && `Level ${levelId} / ${gameInfo.data?.worldSize[worldId]}`}{level?.data?.title && `: ${level?.data?.title}`}</>
-
-  // TODO: with the new design, there is no difference between the introduction and
-  // a hint at the beginning of the proof...
-
-  function toggleSelection(line: number) {
-    return (ev) => {
-      console.debug('toggled selection')
-      if (selectedStep == line) {
-        setSelectedStep(undefined)
-      } else {
-        setSelectedStep(line)
-      }
-    }
-  }
-
-  function hasHiddenHints(i : number): boolean {
-    let step = proof[i]
-
-    // For example if the proof isn't loaded yet
-    if(!step) {return false}
-
-    return step.hints.some((hint) => hint.hidden)
-  }
-
-  // If the last step has errors, we want to treat it as if it is part of the second-to-last step
-  let k = proof.length - 1
-  let withErr = hasInteractiveErrors(proof[k]?.errors) ? 1 : 0
-
-  const activateHiddenHints = (ev) => {
-    // If the last step (`k`) has errors, we want the hidden hints from the
-    // second-to-last step to be affected
-    if (!(proof.length)) {return}
-
-    // state must not be mutated, therefore we need to clone the set
-    let tmp = new Set(showHelp)
-    if (tmp.has(k - withErr)) {
-      tmp.delete(k - withErr)
-    } else {
-      tmp.add(k - withErr)
-    }
-    setShowHelp(tmp)
-    console.debug(`help: ${Array.from(tmp.values())}`)
-  }
-
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
-    <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
-    <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
-    <ProofContext.Provider value={{proof, setProof}}>
-      <LevelAppBar isLoading={level.isLoading}
-        levelTitle={`${mobile ? '' : 'Level '}${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
-          (level?.data?.title && ` : ${level?.data?.title}`)}
-        worldId={worldId} levelId={levelId} toggleImpressum={toggleImpressum}
-        pageNumber={pageNumber} setPageNumber={setPageNumber}/>
-      {mobile?
-        // TODO: This is copied from the `Split` component below...
-        <>
-          <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
-            <div className={`exercise-panel ${pageNumber == 0 ? '' : 'hidden'}`}>
-              <EditorContext.Provider value={editorConnection}>
-                <MonacoEditorContext.Provider value={editor}>
-                  <div className="exercise">
-                    <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} worldSize={gameInfo.data?.worldSize[worldId]}/>
-                  </div>
-                </MonacoEditorContext.Provider>
-              </EditorContext.Provider>
-              {impressum ? <Impressum handleClose={closeImpressum} /> : null}
-            </div>
-          </div>
-          <div className={`inventory-panel ${pageNumber == 1 ? '' : 'hidden'}`}>
-            {!level.isLoading &&
-              <>{inventoryDoc ?
-                <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
-                :
-                <Inventory levelInfo={level?.data} openDoc={openInventoryDoc} />
-              }</>
-            }
-          </div>
-        </>
-      :
-        <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
-          <div className="chat-panel">
-            <div ref={chatRef} className="chat">
-              {level?.data?.introduction &&
-                <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelection(0)}>
-                  <Markdown>{level?.data?.introduction}</Markdown>
-                </div>
-              }
-              {proof.map((step, i) => {
-                // It the last step has errors, it will have the same hints
-                // as the second-to-last step. Therefore we should not display them.
-                if (!(i == proof.length - 1 && withErr)) {
-                  // TODO: Should not use index as key.
-                  return <Hints key={`hints-${i}`}
-                    hints={step.hints} showHidden={showHelp.has(i)} step={i}
-                    selected={selectedStep} toggleSelection={toggleSelection(i)}/>
-                }
-              })}
-              <DeletedHints hints={deletedChat}/>
-              {completed &&
-                <>
-                  <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
-                    Level completed! 🎉
-                  </div>
-                  {level?.data?.conclusion?.trim() &&
-                    <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
-                      <Markdown>{level?.data?.conclusion}</Markdown>
-                    </div>
-                  }
-                </>
-              }
-            </div>
-            <div className="button-row">
-              {completed && (lastLevel ?
-                <Button to={`/${gameId}`}>
-                  <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
-                </Button> :
-                <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-                  Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
-                </Button>)
-                }
-              {hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
-                <Button to="" onClick={activateHiddenHints}>
-                  Show more help!
-                </Button>
-              }
-            </div>
-          </div>
-          <div className="exercise-panel">
+      <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
+        <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
+          <ProofContext.Provider value={{proof, setProof}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={editor}>
-                <div className="exercise">
-                  <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} worldSize={gameInfo.data?.worldSize[worldId]}/>
-                </div>
+                <LevelAppBar
+                  isLoading={level.isLoading}
+                  levelTitle={`${mobile ? '' : 'Level '}${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
+                    (level?.data?.title && ` : ${level?.data?.title}`)}
+                  toggleImpressum={toggleImpressum}
+                  pageNumber={pageNumber} setPageNumber={setPageNumber} />
+                {mobile?
+                  // TODO: This is copied from the `Split` component below...
+                  <>
+                    <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
+                      <ExercisePanel
+                        impressum={impressum}
+                        closeImpressum={closeImpressum}
+                        codeviewRef={codeviewRef}
+                        visible={pageNumber == 0} />
+                      <InventoryPanel visible={pageNumber == 1} />
+                    </div>
+                  </>
+                :
+                  <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+                    <ChatPanel lastLevel={lastLevel}/>
+                    <ExercisePanel
+                      impressum={impressum}
+                      closeImpressum={closeImpressum}
+                      codeviewRef={codeviewRef} />
+                    <InventoryPanel />
+                  </Split>
+                }
               </MonacoEditorContext.Provider>
             </EditorContext.Provider>
-            {impressum ? <Impressum handleClose={closeImpressum} /> : null}
-          </div>
-          <div className="inventory-panel">
-            {!level.isLoading &&
-              <>{inventoryDoc ?
-                <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
-                :
-                <Inventory levelInfo={level?.data} openDoc={openInventoryDoc} />
-              }</>
-            }
-          </div>
-        </Split>
-      }
-    </ProofContext.Provider>
-    </InputModeContext.Provider>
-    </SelectionContext.Provider>
+          </ProofContext.Provider>
+        </InputModeContext.Provider>
+      </SelectionContext.Provider>
     </DeletedChatContext.Provider>
   </>
 }
@@ -415,8 +387,10 @@ function PlayableLevel({worldId, levelId}) {
 export default Level
 
 /** The site with the introduction text of a world */
-function Introduction({worldId}) {
+function Introduction() {
   const gameId = React.useContext(GameIdContext)
+  const {worldId} = useContext(WorldLevelIdContext)
+
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
   const [impressum, setImpressum] = React.useState(false)
@@ -431,7 +405,7 @@ function Introduction({worldId}) {
 
   return <>
     <div style={gameInfo.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" worldId={worldId} levelId={0} toggleImpressum={toggleImpressum}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" toggleImpressum={toggleImpressum}/>
     <div style={gameInfo.isLoading ? {display: "none"} : null} className="introduction-panel">
       <div className="content-wrapper">
         <Markdown>
@@ -450,8 +424,9 @@ function Introduction({worldId}) {
 }
 
 /** The top-navigation bar */
-function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum, pageNumber = undefined, setPageNumber = undefined}) {
+function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undefined, setPageNumber = undefined}) {
   const gameId = React.useContext(GameIdContext)
+  const {worldId, levelId} = useContext(WorldLevelIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
   const {mobile} = React.useContext(MobileContext)
@@ -563,10 +538,12 @@ function LevelAppBar({isLoading, levelId, worldId, levelTitle, toggleImpressum, 
   </div>
 }
 
-function useLevelEditor(worldId: string, levelId: number, codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
+function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
 
   const connection = React.useContext(ConnectionContext)
   const gameId = React.useContext(GameIdContext)
+  const {worldId, levelId} = useContext(WorldLevelIdContext)
+
 
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
