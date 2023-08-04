@@ -183,6 +183,16 @@ The installation instructions are not yet tested on Mac/Windows. Comments very w
     After editing some files in VSCode, open VSCode's terminal (View > Terminal) and run `lake build`.
     Now you can reload your browser to see the changes.
 
+### Errors
+
+* If you don't get the pop-up, you might have disabled them and you can reenable it by
+  running the `remote-containers.showReopenInContainerNotificationReset` command in vscode.
+* If the starting the container fails, in particular with a message `Error: network xyz not found`,
+  you might have deleted stuff from docker via your shell. Try deleting the container and image
+  explicitely in VSCode (left side, "Docker" icon). Then reopen vscode and let it rebuild the
+  container. (this will again take some time)
+
+
 ## Without Dev Containers
 Install `nvm`:
 ```
