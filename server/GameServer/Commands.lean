@@ -283,7 +283,7 @@ syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
 -- TODO
 
 /-- Define the statement of the current level. -/
-elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
+elab attrs:Lean.Parser.Term.attributes ? "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
   let descr := match descr with
@@ -298,6 +298,7 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
   let defaultDeclName : Ident := mkIdent <| (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
 
+  let doc? : Option (TSyntax ``Parser.Command.docComment) := none
   -- Add theorem to context.
   match statementName with
   | some name =>
@@ -311,19 +312,19 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
       -- in that case.
       logWarningAt name (m!"Environment already contains {fullName}! Only the existing " ++
       m!"statement will be available in later levels:\n\n{origType}")
-      let thmStatement ← `(theorem $defaultDeclName $sig $val)
+      let thmStatement ← `(command| $[$doc?]? $[$attrs]? theorem $defaultDeclName $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Lemma name (template := descr)
 
     else
-      let thmStatement ← `( theorem $name $sig $val)
+      let thmStatement ← `(command| $[$doc?]? $[$attrs]? theorem $name $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Lemma name (template := descr)
 
   | none =>
-    let thmStatement ← `(theorem $defaultDeclName $sig $val)
+    let thmStatement ← `(command| $[$doc?]? $[$attrs]? theorem $defaultDeclName $sig $val)
     elabCommand thmStatement
 
   let msgs := (← get).messages
