@@ -1,3 +1,6 @@
+/**
+ * @fileOverview Define API of the server-client communication
+*/
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Connection } from '../connection'
 
@@ -31,6 +34,14 @@ export interface LevelInfo {
   descrFormat: null|string,
   lemmaTab: null|string,
   statementName: null|string
+}
+
+/** Used to display the inventory on the welcome page */
+export interface InventoryOverview {
+  tactics: InventoryTile[],
+  lemmas: InventoryTile[],
+  definitions: InventoryTile[],
+  lemmaTab: null,
 }
 
 interface Doc {
@@ -71,6 +82,9 @@ export const apiSlice = createApi({
     loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
       query: ({game, world, level}) => {return {game, method: "loadLevel", params: {world, level}}},
     }),
+    loadInventoryOverview: builder.query<InventoryOverview, {game: string}>({
+      query: ({game}) => {return {game, method: "loadInventoryOverview", params: {}}},
+    }),
     loadDoc: builder.query<Doc, {game: string, name: string, type: "lemma"|"tactic"}>({
       query: ({game, name, type}) => {return {game, method: "loadDoc", params: {name, type}}},
     }),
@@ -79,4 +93,4 @@ export const apiSlice = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetGameInfoQuery, useLoadLevelQuery, useLoadDocQuery } = apiSlice
+export const { useGetGameInfoQuery, useLoadLevelQuery, useLoadDocQuery, useLoadInventoryOverviewQuery } = apiSlice

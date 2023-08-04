@@ -6,6 +6,8 @@ structure GameServerState :=
 (env : Lean.Environment)
 (game : Name)
 (gameDir : String)
+(inventory : Array String)
+(checkEnabled : Bool)
 
 abbrev GameServerM := StateT GameServerState Server.Watchdog.ServerM
 
@@ -51,6 +53,13 @@ structure LevelInfo where
   statementName : Option String
 deriving ToJson, FromJson
 
+structure InventoryOverview where
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
+  lemmaTab : Option String
+deriving ToJson, FromJson
+
 structure LoadLevelParams where
   world : Name
   level : Nat
@@ -63,11 +72,19 @@ structure DidOpenLevelParams where
   tactics : Array InventoryTile
   lemmas : Array InventoryTile
   definitions : Array InventoryTile
+  inventory : Array String
+  /-- if true the server gives warnings for used tactics/lemmas that are not unlocked. -/
+  checkEnabled : Bool
   deriving ToJson, FromJson
 
 structure LoadDocParams where
   name : Name
   type : InventoryType
+deriving ToJson, FromJson
+
+structure SetInventoryParams where
+  inventory : Array String
+  checkEnabled : Bool
 deriving ToJson, FromJson
 
 def handleDidOpenLevel (params : Json) : GameServerM Unit := do
@@ -83,15 +100,18 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
       c.hLog.putStr s!"Level not found: {m.uri} {c.initParams.rootUri?}"
       c.hLog.flush
   -- Send an extra notification to the file worker to inform it about the level data
+  let s ← get
   fw.stdin.writeLspNotification {
     method := "$/game/didOpenLevel"
     param  := {
       uri := m.uri
-      gameDir := (← get).gameDir
+      gameDir := s.gameDir
       levelModule := lvl.module
       tactics := lvl.tactics.tiles
       lemmas := lvl.lemmas.tiles
       definitions := lvl.definitions.tiles
+      inventory := s.inventory
+      checkEnabled := s.checkEnabled
       : DidOpenLevelParams
     }
   }
@@ -141,7 +161,7 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       return true
     | Message.request id "loadDoc" params =>
       let p ← parseParams LoadDocParams (toJson params)
-      -- let s ← get
+      let s ← get
       let c ← read
       let some doc ← getInventoryItem? p.name p.type
         | do
@@ -154,6 +174,39 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       --   name := doc.name.toString }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson doc⟩
       return true
+    | Message.notification "$/game/setInventory" params =>
+      let p := (← parseParams SetInventoryParams (toJson params))
+      let s ← get
+      set {s with inventory := p.inventory, checkEnabled := p.checkEnabled}
+      let st ← read
+      let workers ← st.fileWorkersRef.get
+      for (_, fw) in workers do
+        fw.stdin.writeLspMessage msg
+
+      return true
+    | Message.request id "loadInventoryOverview" _ =>
+      let s ← get
+      let some game ← getGame? s.game
+        | return false
+      -- All Levels have the same tiles, so we just load them from level 1 of an arbitrary world
+      -- and reset `new`, `disabled` and `unlocked`
+      match game.worlds.nodes.toList with
+      | [] => return false
+      | ⟨worldId, _⟩ :: _ =>
+        let some lvl ← getLevel? {game := s.game, world := worldId, level := 1}
+          | do return false
+        let inventory : InventoryOverview := {
+          tactics := lvl.tactics.tiles.map
+            ({ · with locked := true, disabled := false, new := false }),
+          lemmas := lvl.lemmas.tiles.map
+            ({ · with locked := true, disabled := false, new := false }),
+          definitions := lvl.definitions.tiles.map
+            ({ · with locked := true, disabled := false, new := false }),
+          lemmaTab := none
+        }
+        let c ← read
+        c.hOut.writeLspResponse ⟨id, ToJson.toJson inventory⟩
+        return true
     | _ => return false
   | _ => return false
 

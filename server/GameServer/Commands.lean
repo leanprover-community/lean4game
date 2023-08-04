@@ -4,6 +4,12 @@ open Lean Meta Elab Command
 
 set_option autoImplicit false
 
+/-- Let `MakeGame` print the reasons why the worlds depend on each other. -/
+register_option lean4game.showDependencyReasons : Bool := {
+  defValue := false
+  descr := "show reasons for calculated world dependencies."
+}
+
 /-! # Game metadata -/
 
 /-- Switch to the specified `Game` (and create it if non-existent). Example: `Game "NNG"` -/
@@ -49,26 +55,6 @@ elab "Conclusion" t:str : command => do
   | .World => modifyCurWorld  fun world => pure {world with conclusion := t.getString}
   | .Game => modifyCurGame  fun game => pure {game with conclusion := t.getString}
 
-/-! ## World Paths -/
-
-/-- The worlds of a game are joint by paths. These are defined with the syntax
-`Path World₁ → World₂ → World₃`. -/
-def Parser.path := Parser.sepBy1Indent Parser.ident "→"
-
-/-- The worlds of a game are joint by paths. These are defined with the syntax
-`Path World₁ → World₂ → World₃`. -/
-elab "Path" s:Parser.path : command => do
-  let mut last : Option Name := none
-  for stx in s.raw.getArgs.getEvenElems do
-    let some l := last
-      | do
-          last := some stx.getId
-          continue
-    modifyCurGame fun game =>
-      pure {game with worlds := {game.worlds with edges := game.worlds.edges.push (l, stx.getId)}}
-    last := some stx.getId
-
-
 
 /-! # Inventory
 
@@ -80,12 +66,17 @@ in the first level and get enabled during the game.
 
 /-- Checks if `inventoryTemplateExt` contains an entry with `(type, name)` and yields
 a warning otherwise. If `template` is provided, it will add such an entry instead of yielding a
-warning. -/
-def checkInventoryDoc (type : InventoryType) (name : Ident)
+warning.
+
+`ref` is the syntax piece. If `name` is not provided, it will use `ident.getId`.
+I used this workaround, because I needed a new name (with correct namespace etc)
+to be used, and I don't know how to create a new ident with same position but different name.
+-/
+def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.getId)
     (template : Option String := none) : CommandElabM Unit := do
   -- note: `name` is an `Ident` (instead of `Name`) for the log messages.
   let env ← getEnv
-  let n := name.getId
+  let n := name
   -- Find a key with matching `(type, name)`.
   match (inventoryTemplateExt.getState env).findIdx?
     (fun x => x.name == n && x.type == type) with
@@ -98,18 +89,18 @@ def checkInventoryDoc (type : InventoryType) (name : Ident)
       -- We just add a dummy entry
       modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
-        name := name.getId
+        name := name
         category := if type == .Lemma then s!"{n.getPrefix}" else "" })
-      logWarningAt name (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
+      logWarningAt ref (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
         m!"somewhere above this statement.")
     -- Add the default documentation
     | some s =>
       modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
-        name := name.getId
+        name := name
         category := if type == .Lemma then s!"{n.getPrefix}" else ""
         content := s })
-      logInfoAt name (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
+      logInfoAt ref (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
       m!"statement description) instead. If you want to write your own description, add " ++
       m!"`{type}Doc {name}` somewhere above this statement.")
 
@@ -282,6 +273,38 @@ elab "LemmaTab"  category:str : command =>
 syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
 -- TODO
 
+-- TODO: Reuse the following code for checking available tactics in user code:
+structure UsedInventory where
+(tactics : HashSet Name := {})
+(definitions : HashSet Name := {})
+(lemmas : HashSet Name := {})
+
+partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : CommandElabM UsedInventory := do
+  match stx with
+  | .missing => return acc
+  | .node info kind args =>
+    if kind == `tacticHint__ || kind == `tacticBranch_ then return acc
+    return ← args.foldlM (fun acc arg => collectUsedInventory arg acc) acc
+  | .atom info val =>
+    -- ignore syntax elements that do not start with a letter
+    -- and ignore some standard keywords
+    let allowed := ["with", "fun", "at", "only", "by"]
+    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
+      let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
+      return {acc with tactics := acc.tactics.insert val}
+    else
+      return acc
+  | .ident info rawVal val preresolved =>
+      let ns ←
+        try resolveGlobalConst (mkIdent val)
+        catch | _ => pure [] -- catch "unknown constant" error
+      return ← ns.foldlM (fun acc n => do
+        if let some (.thmInfo ..) := (← getEnv).find? n then
+          return {acc with lemmas := acc.lemmas.insertMany ns}
+        else
+          return {acc with definitions := acc.definitions.insertMany ns}
+      ) acc
+
 /-- Define the statement of the current level. -/
 elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
@@ -297,6 +320,12 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
   -- However, this should not be used when designing the game.
   let defaultDeclName : Ident := mkIdent <| (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
+
+  -- Collect all used tactics/lemmas in the sample proof:
+  let usedInventory ← match val with
+  | `(Parser.Command.declVal| := $proof:term) => do
+    collectUsedInventory proof
+  | _ => throwError "expected `:=`"
 
   -- Add theorem to context.
   match statementName with
@@ -314,13 +343,13 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
       let thmStatement ← `(theorem $defaultDeclName $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (template := descr)
+      checkInventoryDoc .Lemma name (name := fullName) (template := descr)
 
     else
       let thmStatement ← `( theorem $name $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (template := descr)
+      checkInventoryDoc .Lemma name (name := fullName) (template := descr)
 
   | none =>
     let thmStatement ← `(theorem $defaultDeclName $sig $val)
@@ -378,7 +407,10 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
     | none => default
     | some name => currNamespace ++ name.getId
     descrFormat := (Format.join [head, " ", st, " := by"]).pretty 10
-    hints := hints }
+    hints := hints
+    tactics := {level.tactics with used := usedInventory.tactics.toArray}
+    definitions := {level.definitions with used := usedInventory.definitions.toArray}
+    lemmas := {level.lemmas with used := usedInventory.lemmas.toArray} }
 
 /-! # Hints -/
 
@@ -572,7 +604,7 @@ def getTacticDocstring (env : Environment) (name: Name) : CommandElabM (Option S
       if let some doc ← findDocString? env k then
         return doc
 
-  logWarning <| m!"Could not find a docstring for this tactic, consider adding one " ++
+  logWarning <| m!"Could not find a docstring for tactic {name}, consider adding one " ++
     m!"using `TacticDoc {name} \"some doc\"`"
   return none
 
@@ -587,14 +619,116 @@ def getDocstring (env : Environment) (name : Name) (type : InventoryType) :
   -- TODO: for definitions not implemented yet, does it work?
   | .Definition => findDocString? env name
 
+
+partial def removeTransitiveAux (id : Name) (arrows : HashMap Name (HashSet Name))
+      (newArrows : HashMap Name (HashSet Name)) (decendants : HashMap Name (HashSet Name)) :
+    HashMap Name (HashSet Name) × HashMap Name (HashSet Name) := Id.run do
+  match (newArrows.find? id, decendants.find? id) with
+  | (some _, some _) => return (newArrows, decendants)
+  | _ =>
+    let mut newArr := newArrows
+    let mut desc := decendants
+    desc := desc.insert id {} -- mark as worked in case of loops
+    newArr := newArr.insert id {} -- mark as worked in case of loops
+    let children := arrows.find! id
+    let mut trimmedChildren := children
+    let mut theseDescs := children
+    for child in children do
+      (newArr, desc) := removeTransitiveAux child arrows newArr desc
+      let childDescs := desc.find! child
+      theseDescs := theseDescs.insertMany childDescs
+      for d in childDescs do
+        trimmedChildren := trimmedChildren.erase d
+    desc := desc.insert id theseDescs
+    newArr := newArr.insert id trimmedChildren
+    return (newArr, desc)
+
+def removeTransitive (arrows : HashMap Name (HashSet Name)) : CommandElabM (HashMap Name (HashSet Name)) := do
+  let mut newArr := {}
+  let mut desc := {}
+  for id in arrows.toArray.map Prod.fst do
+    (newArr, desc) := removeTransitiveAux id arrows newArr desc
+    if (desc.find! id).contains id then
+      logError <| m!"Loop at {id}. " ++
+        m!"This should not happen and probably means that `findLoops` has a bug."
+      -- DEBUG:
+      -- for ⟨x, hx⟩ in desc.toList do
+      --   m := m ++ m!"{x}: {hx.toList}\n"
+      -- logError m
+
+  return newArr
+
+/-- The recursive part of `findLoops`. Finds loops that appear as successors of `node`.
+
+For performance reason it returns a HashSet of visited
+nodes as well. This is filled with all nodes ever looked at as they cannot be
+part of a loop anymore. -/
+partial def findLoopsAux (arrows : HashMap Name (HashSet Name)) (node : Name)
+    (path : Array Name := #[]) (visited : HashSet Name := {}) :
+    Array Name × HashSet Name := Id.run do
+  let mut visited := visited
+  match path.getIdx? node with
+  | some i =>
+    -- Found a loop: `node` is already the iᵗʰ element of the path
+    return (path.extract i path.size, visited.insert node)
+  | none =>
+    for successor in arrows.findD node {} do
+      -- If we already visited the successor, it cannot be part of a loop anymore
+      if visited.contains successor then
+        continue
+      -- Find any loop involving `successor`
+      let (loop, _) := findLoopsAux arrows successor (path.push node) visited
+      visited := visited.insert successor
+      -- No loop found in the dependants of `successor`
+      if loop.isEmpty then
+        continue
+      -- Found a loop, return it
+      return (loop, visited)
+  return (#[], visited.insert node)
+
+/-- Find a loop in the graph and return it. Returns `[]` if there are no loops. -/
+partial def findLoops (arrows : HashMap Name (HashSet Name)) : List Name := Id.run do
+  let mut visited : HashSet Name := {}
+  for node in arrows.toArray.map (·.1) do
+    -- Skip a node if it was already visited
+    if visited.contains node then
+      continue
+    -- `findLoopsAux` returns a loop or `[]` together with a set of nodes it visited on its
+    -- search starting from `node`
+    let (loop, moreVisited) := (findLoopsAux arrows node (visited := visited))
+    visited := moreVisited
+    if !loop.isEmpty then
+      return loop.toList
+  return []
+
+/-- The worlds of a game are joint by dependencies. These are
+automatically computed but can also be defined with the syntax
+`Dependency World₁ → World₂ → World₃`. -/
+def Parser.dependency := Parser.sepBy1Indent Parser.ident "→"
+
+/-- Manually add a dependency between two worlds.
+
+Normally, the dependencies are computed automatically by the
+tactics & lemmas used in the example
+proof and the ones introduced by `NewLemma`/`NewTactic`.
+Use the command `Dependency World₁ → World₂` to add a manual edge to the graph,
+for example if the only dependency between the worlds is given by
+the narrative. -/
+elab "Dependency" s:Parser.dependency : command => do
+  let mut last : Option Name := none
+  for stx in s.raw.getArgs.getEvenElems do
+    let some l := last
+      | do
+          last := some stx.getId
+          continue
+    modifyCurGame fun game =>
+      pure {game with worlds := {game.worlds with edges := game.worlds.edges.push (l, stx.getId)}}
+    last := some stx.getId
+
 /-- Build the game. This command will precompute various things about the game, such as which
 tactics are available in each level etc. -/
 elab "MakeGame" : command => do
   let game ← getCurGame
-
-  -- Check for loops in world graph
-  if game.worlds.hasLoops then
-    throwError "World graph must not contain loops! Check your `Path` declarations."
 
   let env ← getEnv
 
@@ -607,7 +741,7 @@ elab "MakeGame" : command => do
     | "" =>
       -- If documentation is missing, try using the docstring instead.
       match docstring with
-      | some ds => s!"*(lean docstring)*\\\n{ds}" -- TODO `\n` does not work in markdown
+      | some ds => s!"*(lean docstring)*\\\n{ds}"
       | none => "(missing)"
     | template =>
       -- TODO: Process content template.
@@ -627,10 +761,131 @@ elab "MakeGame" : command => do
         content := content
       })
 
+  -- For each `worldId` this contains a set of items used in this world
+  let mut usedItemsInWorld : HashMap Name (HashSet Name) := {}
+
+  -- For each `worldId` this contains a set of items newly defined in this world
+  let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
+
+  -- Calculate which "items" are used/new in which world
+  for (worldId, world) in game.worlds.nodes.toArray do
+    let mut usedItems : HashSet Name := {}
+    let mut newItems : HashSet Name := {}
+    for inventoryType in #[.Tactic, .Definition, .Lemma] do
+      for (levelId, level) in world.levels.toArray do
+        usedItems := usedItems.insertMany (level.getInventory inventoryType).used
+        newItems := newItems.insertMany (level.getInventory inventoryType).new
+
+        -- if the previous level was named, we need to add it as a new lemma
+        if inventoryType == .Lemma then
+          match levelId with
+          | 0 => pure ()
+          | 1 => pure () -- level ids start with 1, so we need to skip 1, too
+          | i₀ + 1 =>
+            match (world.levels.find! (i₀)).statementName with
+            | .anonymous => pure ()
+            | .num _ _ => panic "Did not expect to get a numerical statement name!"
+            | .str pre s =>
+              let name := Name.str pre s
+              newItems := newItems.insert name
+
+          if inventoryType == .Lemma then
+
+      -- if the last level was named, we need to add it as a new lemma
+      let i₀ := world.levels.size
+        match (world.levels.find! (i₀)).statementName with
+        | .anonymous => pure ()
+        | .num _ _ => panic "Did not expect to get a numerical statement name!"
+        | .str pre s =>
+          let name := Name.str pre s
+          newItems := newItems.insert name
+
+    usedItemsInWorld := usedItemsInWorld.insert worldId usedItems
+    newItemsInWorld := newItemsInWorld.insert worldId newItems
+    -- DEBUG: print new/used items
+    -- logInfo m!"{worldId} uses: {usedItems.toList}"
+    -- logInfo m!"{worldId} introduces: {newItems.toList}"
+
+  /- for each "item" this is a HashSet of `worldId`s that introduce this item -/
+  let mut worldsWithNewItem : HashMap Name (HashSet Name) := {}
+  for (worldId, world) in game.worlds.nodes.toArray do
+    for newItem in newItemsInWorld.find! worldId do
+      worldsWithNewItem := worldsWithNewItem.insert newItem $
+        (worldsWithNewItem.findD newItem {}).insert worldId
+
+  -- For each `worldId` this is a HashSet of `worldId`s that this world depends on.
+  let mut worldDependsOnWorlds : HashMap Name (HashSet Name) := {}
+
+  -- For a pair of `worldId`s `(id₁, id₂)` this is a HasSet of "items" why `id₁` depends on `id₂`.
+  let mut dependencyReasons : HashMap (Name × Name) (HashSet Name) := {}
+
+  -- Calculate world dependency graph `game.worlds`
+  for (dependentWorldId, _dependentWorld) in game.worlds.nodes.toArray do
+    let mut dependsOnWorlds : HashSet Name := {}
+    -- Adding manual dependencies that were specified via the `Dependency` command.
+    for (sourceId, targetId) in game.worlds.edges do
+      if targetId = dependentWorldId then
+        dependsOnWorlds := dependsOnWorlds.insert sourceId
+
+    for usedItem in usedItemsInWorld.find! dependentWorldId do
+      match worldsWithNewItem.find? usedItem with
+      | none => logWarning m!"No world introducing {usedItem}, but required by {dependentWorldId}"
+      | some worldIds =>
+        -- Only need a new dependency if the world does not introduce an item itself
+        if !worldIds.contains dependentWorldId then
+          -- Add all worlds as dependencies which introduce this item
+          -- TODO: Could do something more clever here.
+          dependsOnWorlds := dependsOnWorlds.insertMany worldIds
+          -- Store the dependency reasons for debugging
+          for worldId in worldIds do
+            let tmp := (dependencyReasons.findD (dependentWorldId, worldId) {}).insert usedItem
+            dependencyReasons := dependencyReasons.insert (dependentWorldId, worldId) tmp
+    worldDependsOnWorlds := worldDependsOnWorlds.insert dependentWorldId dependsOnWorlds
+
+  -- Debugging: show all dependency reasons if the option `lean4game.showDependencyReasons` is set
+  if lean4game.showDependencyReasons.get (← getOptions) then
+    for (world, dependencies) in worldDependsOnWorlds.toArray do
+      if dependencies.isEmpty then
+        logInfo m!"Dependencies of '{world}': none"
+      else
+        let mut msg := m!"Dependencies of '{world}':"
+        for dep in dependencies do
+          match dependencyReasons.find? (world, dep) with
+          | none =>
+            msg := msg ++ m!"\n· '{dep}': no reason found (manually added?)"
+          | some items =>
+            msg := msg ++ m!"\n· '{dep}' because of:\n  {items.toList}"
+        logInfo msg
+
+  -- Check graph for loops and remove transitive edges
+  let loop := findLoops worldDependsOnWorlds
+  if loop != [] then
+    logError m!"Loop: Dependency graph has a loop: {loop}"
+    for i in [:loop.length] do
+      let w1 := loop[i]!
+      let w2 := loop[if i == loop.length - 1 then 0 else i + 1]!
+      match dependencyReasons.find? (w1, w2) with
+      -- This should not happen. Could use `find!` again...
+      | none => logError m!"Did not find a reason why {w1} depends on {w2}."
+      | some items =>
+        logError m!"{w1} depends on {w2} because of {items.toList}."
+  else
+    worldDependsOnWorlds ← removeTransitive worldDependsOnWorlds
+    for (dependentWorldId, worldIds) in worldDependsOnWorlds.toArray do
+      modifyCurGame fun game =>
+        pure {game with worlds := {game.worlds with
+          edges := game.worlds.edges.append (worldIds.toArray.map fun wid => (wid, dependentWorldId))}}
+
+  -- Apparently we need to reload `game` to get the changes to `game.worlds` we just made
+  let game ← getCurGame
+
   -- Compute which inventory items are available in which level:
   for inventoryType in #[.Tactic, .Definition, .Lemma] do
-    let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
+
+    -- Which items are introduced in which world?
     let mut lemmaStatements : HashMap (Name × Nat) Name := {}
+    -- TODO: I believe `newItemsInWorld` has way to many elements in it which we iterate over
+    -- e.g. we iterate over `ring` for `Lemma`s as well, but so far that seems to cause no problems
     let mut allItems : HashSet Name := {}
     for (worldId, world) in game.worlds.nodes.toArray do
       let mut newItems : HashSet Name := {}
@@ -670,12 +925,20 @@ elab "MakeGame" : command => do
     let Availability₀ : HashMap Name InventoryTile :=
       HashMap.ofList $
         ← allItems.toList.mapM fun item => do
-          let data := (← getInventoryItem? item inventoryType).get!
-          -- TODO: BUG, panic at `get!` in vscode
-          return (item, {
-            name := item
-            displayName := data.displayName
-            category := data.category })
+          -- Using a match statement because the error message of `Option.get!` is not helpful.
+          match (← getInventoryItem? item inventoryType) with
+          | none =>
+            -- Note: we did have a panic here before because lemma statement and doc entry
+            -- had mismatching namespaces
+            logError m!"There is no inventory item ({inventoryType}) for: {item}."
+            panic s!"Inventory item {item} not found!"
+          | some data =>
+            return (item, {
+              name := item
+              displayName := data.displayName
+              category := data.category })
+
+
 
     -- Availability after a given world
     let mut itemsInWorld : HashMap Name (HashMap Name InventoryTile) := {}
@@ -683,6 +946,7 @@ elab "MakeGame" : command => do
       -- Unlock all items from previous worlds
       let mut items := Availability₀
       let predecessors := game.worlds.predecessors worldId
+      -- logInfo m!"Predecessors: {predecessors.toArray.map fun (a) => (a)}"
       for predWorldId in predecessors do
         for item in newItemsInWorld.find! predWorldId do
           let data := (← getInventoryItem? item inventoryType).get!
@@ -738,7 +1002,6 @@ elab "MakeGame" : command => do
 
         modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
           return level.setComputedInventory inventoryType itemsArray
-
 
 
 /-! # Debugging tools -/

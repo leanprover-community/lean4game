@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
+import App from './app';
 import { ConnectionContext, connection } from './connection'
 import { store } from './state/store';
 import { Provider } from 'react-redux';
@@ -9,10 +9,10 @@ import {
   RouterProvider,
   Route,
 } from "react-router-dom";
-import ErrorPage from './ErrorPage';
-import Welcome from './components/Welcome';
-import LandingPage from './components/LandingPage';
-import Level from './components/Level';
+import ErrorPage from './components/error_page';
+import Welcome from './components/welcome';
+import LandingPage from './components/landing_page';
+import Level from './components/level';
 import { monacoSetup } from 'lean4web/client/src/monacoSetup';
 import { redirect } from 'react-router-dom';
 

@@ -1,11 +1,20 @@
-.inventory {
+.inventory, .documentation {
   padding: 0 1em 1em 1em;
 }
 
-.inventory h2 {
+.inventory h2, .documentation h2, .documentation h1 {
   font-size: 1.5em;
   margin-top: 1em;
   margin-bottom: .2em;
+}
+
+.documentation h1 {
+  font-weight: 900;
+}
+
+.documentation.hidden {
+  display: none;
+  transition: display 2s;
 }
 
 .inventory-list {
@@ -20,17 +29,20 @@
   padding: .1em .5em;
 }
 
-.inventory .item.locked,
-.inventory .item.disabled {
+.inventory .item.locked {
   border: solid 1px #ccc;
   color: #ccc;
+}
+
+.inventory .item.disabled {
+  color: #d92c2c;
 }
 
 .inventory .item.new {
   background-color: rgb(255, 242, 190);
 }
 
-.inventory .item:not(.locked):not(.disabled) {
+.inventory .item:not(.locked), .inventory .item.enabled {
   cursor: pointer;
 }
 
@@ -54,16 +66,4 @@
 .tab.active {
   color: black;
   border-bottom: 0.3em solid var(--clr-primary);
-}
-
-
-.doc-panel {
-  padding: 0 1em;
-}
-
-.doc-panel h2 {
-  font-size: 1.5em;
-  margin-top: 1em;
-  margin-bottom: .2em;
-  font-weight: 900;
 }

@@ -109,7 +109,13 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
   let i ← maybeTee "wdIn.txt" false i
   let o ← maybeTee "wdOut.txt" true o
   let e ← maybeTee "wdErr.txt" true e
-  let state := {env := ← createEnv gameDir module, game := gameName, gameDir := gameDir}
+  let state := {
+    env := ← createEnv gameDir module,
+    game := gameName,
+    gameDir := gameDir,
+    inventory := #[]
+    checkEnabled := false
+    }
   let initRequest ← i.readLspRequestAs "initialize" InitializeParams
   -- We misuse the `rootUri` field to the gameName
   let rootUri? := gameName

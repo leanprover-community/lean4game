@@ -4,8 +4,9 @@
   padding: 5px 10px;
   border-radius: 3px 3px 3px 3px;
 }
-.message.info {
+.message.information, .message.info {
   /* color: #059; */
+  color: #000;
   background-color: #DDF6FF;
 }
 .message.warning {
@@ -16,6 +17,12 @@
   color: #D8000C;
   background-color: #FFBABA;
 }
+
+.message.deleted-hint {
+  background-color: #eee;
+  color: #777;
+  box-shadow: .0em .0em .5em .2em #eee;
+ }
 
 .hyp-group {
   margin-bottom: 0.3em;
@@ -41,14 +48,14 @@
   padding: 0.5em;
   font-family: var(--ff-primary);
   border-radius: 0.2em;
-  margin: 0.2em 0;
+  /* margin: 0.2em 0 0; */
 }
 
 .command-line form {
   display: flex;
 }
 
-.command-line button {
+.command-line button, .undo-button {
   display: block;
   white-space: nowrap;
   flex: 0;
@@ -64,7 +71,7 @@
   flex-direction: column;
 }
 
-.command-line .command-line-input{
+.command-line .command-line-input {
   flex: 1;
 }
 
@@ -127,4 +134,42 @@
   background-color: #f0f0f0;
   border-radius: 1em;
   padding: 0.6em;
+}
+
+
+/* Push the goals to the bottom for now, until we insert the proof history above. */
+.commandline-interface .content {
+  display: flex;
+  flex-direction: column;
+  scroll-behavior: smooth;
+}
+
+/* TODO this is in the wrong file */
+.chat {
+  scroll-behavior: smooth;
+}
+
+.commandline-interface .content .tmp-pusher {
+  flex: 1;
+}
+
+.exercise .command {
+  background-color: #bbb;
+  padding: .5em;
+  border-radius: .2em;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.exercise .command-text {
+  flex: 1;
+  background-color: #fff;
+  font-family: "Droid Sans Mono", "monospace", monospace;
+  font-size: 14px;
+  padding: 0.4em .6em 0;
+}
+
+.undo-button {
+  color: #888;
 }

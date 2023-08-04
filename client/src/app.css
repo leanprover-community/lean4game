@@ -2,6 +2,7 @@
 
 :root {
   --clr-primary: #1976d2;
+  --clr-primary-dark: #104a83;
   --clr-light-gray: #ddd;
   --clr-dark-gray: #aaa;
   --clr-darker-gray: #555;
@@ -73,6 +74,10 @@ body {
   background: white;
 }
 
+.btn-inverted:hover {
+  color: var(--clr-primary-dark);
+}
+
 .btn-disabled, .btn[disabled] {
   color: var(--clr-dark-gray);
   background: var(--clr-light-gray);
@@ -106,7 +111,8 @@ em {
   flex-direction: row;
   justify-content: space-between;
   padding: 1.1em;
-  filter: drop-shadow(0 0 5px rgba(0,0,0,0.5))
+  filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+  z-index: 2;
 }
 
 .app-bar-title, .app-bar-subtitle {
@@ -114,7 +120,8 @@ em {
   font-weight: 500;
   font-size: 1.3rem;
   display: inline-block;
-  margin: 0 1em;
+  margin: 0;
+  /* margin: 0 1em; */
 }
 
 .app-content {

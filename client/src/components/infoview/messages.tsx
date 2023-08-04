@@ -1,20 +1,59 @@
-import * as React from 'react';
-import fastIsEqual from 'react-fast-compare';
-import { Location, DocumentUri, Diagnostic, DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol';
+import * as React from 'react'
+import fastIsEqual from 'react-fast-compare'
+import { Location, DocumentUri, Diagnostic, DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol'
 
-import { LeanDiagnostic, RpcErrorCode } from '@leanprover/infoview-api';
+import { LeanDiagnostic, RpcErrorCode, getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api'
 
-import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { ConfigContext, EditorContext, LspDiagnosticsContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/collapsing';
-import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer';
-import { getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api';
-import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { InputModeContext } from '../Level';
+import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util'
+import { ConfigContext, EditorContext, LspDiagnosticsContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts'
+import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/collapsing'
+import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer'
+import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions'
+
+import { InputModeContext } from './context'
 
 interface MessageViewProps {
     uri: DocumentUri;
     diag: InteractiveDiagnostic;
+}
+
+/** A list of messages (info/warning/error) that are produced after this command */
+function Error({error, commandLineMode} : {error : InteractiveDiagnostic, commandLineMode : boolean}) {
+  // The first step will always have an empty command
+
+  const severityClass = error.severity ? {
+    [DiagnosticSeverity.Error]: 'error',
+    [DiagnosticSeverity.Warning]: 'warning',
+    [DiagnosticSeverity.Information]: 'information',
+    [DiagnosticSeverity.Hint]: 'hint',
+  }[error.severity] : '';
+
+  const {line, character} = error.range.start;
+  const title = `Line ${line+1}, Character ${character}`;
+
+  // Hide "unsolved goals" messages
+  let message;
+  if ("append" in error.message && "text" in error.message.append[0] &&
+  error.message?.append[0].text === "unsolved goals") {
+      message = error.message.append[0]
+  } else {
+      message = error.message
+  }
+
+  return <div className={severityClass + ' ml1 message'}>
+    {!commandLineMode && <p className="mv2">{title}</p>}
+    <pre className="font-code pre-wrap">
+      <InteractiveMessage fmt={message} />
+    </pre>
+  </div>
+}
+
+// TODO: Should not use index as key.
+/** A list of messages (info/warning/error) that are produced after this command */
+export function Errors ({errors, commandLineMode} : {errors : InteractiveDiagnostic[], commandLineMode : boolean}) {
+  return <div>
+    {errors.map((err, i) => (<Error key={`error-${i}`} error={err} commandLineMode={commandLineMode}/>))}
+  </div>
 }
 
 const MessageView = React.memo(({uri, diag}: MessageViewProps) => {

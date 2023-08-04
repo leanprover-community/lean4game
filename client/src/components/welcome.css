@@ -17,10 +17,13 @@
 .welcome .column {
   height: 100%;
   overflow: auto;
+  scroll-behavior: smooth;
 }
 
 .welcome-text {
-  padding: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
 }
 
 i {
@@ -54,16 +57,16 @@ h5, h6 {
 /* SVG Graphic */
 /***************/
 
-svg .world-title-wrapper {
-  overflow: auto;
+svg .world-title-wrapper, svg .level-title-wrapper div {
+  overflow: visible;
 }
 
-svg .world-title-wrapper div {
+svg .world-title-wrapper div, svg .level-title-wrapper div {
   width: 100%;
   height: 100%;
 }
 
-svg .world-title-wrapper div {
+svg .world-title-wrapper div, svg .level-title-wrapper div {
   display: flex;
   align-items:center;
   justify-content:center;
@@ -71,11 +74,36 @@ svg .world-title-wrapper div {
 
 }
 
-svg .world-title {
-  font-weight: 500;
+svg .world-title, svg .level-title {
   color: white;
   margin: 0;
   padding: 0;
+  text-align: center;
+}
+
+svg .world-title {
+  font-weight: 700;
+}
+
+svg .level-title {
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+svg .level:hover .level-title {
+  opacity: 1;
+}
+
+svg .disabled {
+  cursor: default;
+}
+
+.world-selection {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2em;
 }
 
 /******************/
@@ -87,7 +115,7 @@ svg .world-title {
   height: 40px;
   font-size: 25px;
   border-radius: 20px;
-  position: absolute;
+  position: fixed;
   right: 10px;
   bottom: 10px;
   display: flex;
@@ -196,21 +224,41 @@ svg .world-title {
   width: 100%;
 }
 
-.game-menu {
-  padding: .5em;
-}
-
-.game-menu .btn {
-  min-width: 5em;
-  text-align: center;
-  margin-left: .4em;
-  margin-right: .4em;
-  margin-bottom: .2em;
-}
-
 .modal a.download-link {
   cursor: pointer;
   font-style: italic;
   text-decoration: underline dotted;
 
+}
+
+.mobile-nav {
+  padding-top: .5em;
+  padding-bottom: .5em;
+  position:relative;
+  height: 3em;
+  width: 100%;
+}
+
+.mobile-nav .btn-next, .mobile-nav .btn-previous {
+  position: absolute;
+  margin: 0;
+}
+
+.mobile-nav .btn-previous {
+  left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding-left: 0.3rem;
+}
+
+.mobile-nav .btn-next {
+  right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  padding-right: .3rem;
+}
+
+.mobile-nav .svg-inline--fa {
+  margin-left: 0.3rem;
+  margin-right: 0.3rem;
 }

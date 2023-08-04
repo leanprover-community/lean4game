@@ -1,53 +1,50 @@
 /* Mostly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/info.tsx */
 
-import * as React from 'react';
-import type { Location, Diagnostic } from 'vscode-languageserver-protocol';
-
-import { goalsToString, Goal, MainAssumptions, OtherGoals, FilteredGoals, ProofDisplay } from './goals'
+import * as React from 'react'
+import { CircularProgress } from '@mui/material'
+import type { Location, Diagnostic } from 'vscode-languageserver-protocol'
+import { getInteractiveTermGoal, InteractiveDiagnostic, UserWidgetInstance, Widget_getWidgets, RpcSessionAtPos, isRpcError,
+  RpcErrorCode, getInteractiveDiagnostics, InteractiveTermGoal } from '@leanprover/infoview-api'
 import { basename, DocumentPosition, RangeHelpers, useEvent, usePausableState, discardMethodNotFound,
-    mapRpcError, useAsyncWithTrigger, PausableProps } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { ConfigContext, EditorContext, LspDiagnosticsContext, ProgressContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { AllMessages, lspDiagToInteractive, MessagesList } from './messages';
-import { getInteractiveTermGoal, InteractiveDiagnostic,
-    UserWidgetInstance, Widget_getWidgets, RpcSessionAtPos, isRpcError,
-    RpcErrorCode, getInteractiveDiagnostics, InteractiveTermGoal } from '@leanprover/infoview-api';
-import { InteractiveGoal, InteractiveGoals } from './rpcApi';
+  mapRpcError, useAsyncWithTrigger, PausableProps } from '../../../../node_modules/lean4-infoview/src/infoview/util'
+import { ConfigContext, EditorContext, LspDiagnosticsContext, ProgressContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts'
 import { PanelWidgetDisplay } from '../../../../node_modules/lean4-infoview/src/infoview/userWidget'
-import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
-import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
-import { CircularProgress } from '@mui/material';
-import { InputModeContext, MonacoEditorContext } from '../Level'
+import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions'
+import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation'
 
+import { AllMessages, lspDiagToInteractive } from './messages'
+import { goalsToString, Goal, MainAssumptions, OtherGoals, ProofDisplay } from './goals'
+import { InteractiveGoals } from './rpc_api'
+import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext } from './context'
 
-type InfoStatus = 'updating' | 'error' | 'ready';
-type InfoKind = 'cursor' | 'pin';
+// TODO: All about pinning could probably be removed
+type InfoKind = 'cursor' | 'pin'
 
 interface InfoPinnable {
-    kind: InfoKind;
+    kind: InfoKind
     /** Takes an argument for caching reasons, but should only ever (un)pin itself. */
-    onPin: (pos: DocumentPosition) => void;
+    onPin: (pos: DocumentPosition) => void
 }
 
 interface InfoStatusBarProps extends InfoPinnable, PausableProps {
-    pos: DocumentPosition;
-    status: InfoStatus;
-    triggerUpdate: () => Promise<void>;
+    pos: DocumentPosition
+    status: InfoStatus
+    triggerUpdate: () => Promise<void>
 }
 
 const InfoStatusBar = React.memo((props: InfoStatusBarProps) => {
-    const { kind, onPin, status, pos, isPaused, setPaused, triggerUpdate } = props;
+    const { kind, onPin, status, pos, isPaused, setPaused, triggerUpdate } = props
 
-    const ec = React.useContext(EditorContext);
+    const ec = React.useContext(EditorContext)
 
     const statusColTable: {[T in InfoStatus]: string} = {
         'updating': 'gold ',
         'error': 'dark-red ',
         'ready': '',
     }
-    const statusColor = statusColTable[status];
-    const locationString = `${basename(pos.uri)}:${pos.line+1}:${pos.character}`;
-    const isPinned = kind === 'pin';
+    const statusColor = statusColTable[status]
+    const locationString = `${basename(pos.uri)}:${pos.line+1}:${pos.character}`
+    const isPinned = kind === 'pin'
 
     return (
     <summary style={{transition: 'color 0.5s ease'}} className={'mv2 pointer ' + statusColor}>
@@ -67,36 +64,36 @@ const InfoStatusBar = React.memo((props: InfoStatusBarProps) => {
                 title={isPinned ? 'unpin' : 'pin'} />
             <a className={'link pointer mh2 dim codicon ' + (isPaused ? 'codicon-debug-continue ' : 'codicon-debug-pause ')}
                data-id='toggle-paused'
-               onClick={e => { e.preventDefault(); setPaused(!isPaused); }}
+               onClick={e => { e.preventDefault(); setPaused(!isPaused) }}
                title={isPaused ? 'continue updating' : 'pause updating'} />
             <a className='link pointer mh2 dim codicon codicon-refresh'
                data-id='update'
-               onClick={e => { e.preventDefault(); void triggerUpdate(); }}
+               onClick={e => { e.preventDefault(); void triggerUpdate() }}
                title='update'/>
         </span>
     </summary>
-    );
+    )
 })
 
 interface InfoDisplayContentProps extends PausableProps {
-    pos: DocumentPosition;
-    messages: InteractiveDiagnostic[];
-    goals?: InteractiveGoals;
-    termGoal?: InteractiveTermGoal;
-    error?: string;
-    userWidgets: UserWidgetInstance[];
-    triggerUpdate: () => Promise<void>;
-    proof? : string;
+  pos: DocumentPosition
+  messages: InteractiveDiagnostic[]
+  goals?: InteractiveGoals
+  termGoal?: InteractiveTermGoal
+  error?: string
+  userWidgets: UserWidgetInstance[]
+  triggerUpdate: () => Promise<void>
+  proof? : string
 }
 
 const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
-    const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused, proof} = props;
+    const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused, proof} = props
 
-    const hasWidget = userWidgets.length > 0;
-    const hasError = !!error;
-    const hasMessages = messages.length !== 0;
+    const hasWidget = userWidgets.length > 0
+    const hasError = !!error
+    const hasMessages = messages.length !== 0
 
-    const nothingToShow = !hasError && !goals && !termGoal && !hasMessages && !hasWidget;
+    const nothingToShow = !hasError && !goals && !termGoal && !hasMessages && !hasWidget
 
     const [selectedLocs, setSelectedLocs] = React.useState<GoalsLocation[]>([])
     React.useEffect(() => setSelectedLocs([]), [pos.uri, pos.line, pos.character])
@@ -121,13 +118,12 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
         {hasError &&
             <div className='error' key='errors'>
                 Error updating:{' '}{error}.
-                <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate(); }}>{' '}Try again.</a>
+                <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate() }}>{' '}Try again.</a>
             </div>}
         <LocationsContext.Provider value={locs}>
           <div className="goals-section">
             { goals &&  goals.goals.length > 0 && <>
               <MainAssumptions filter={goalFilter} key='mainGoal' goals={goals.goals} />
-              <ProofDisplay proof={proof}/>
               <OtherGoals filter={goalFilter} goals={goals.goals} />
             </>}
           </div>
@@ -149,8 +145,8 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
             isPaused ?
                 /* Adding {' '} to manage string literals properly: https://reactjs.org/docs/jsx-in-depth.html#string-literals-1 */
                 <span>Updating is paused.{' '}
-                    <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate(); }}>Refresh</a>
-                    {' '}or <a className='link pointer dim' onClick={e => { e.preventDefault(); setPaused(false); }}>resume updating</a>
+                    <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate() }}>Refresh</a>
+                    {' '}or <a className='link pointer dim' onClick={e => { e.preventDefault(); setPaused(false) }}>resume updating</a>
                     {' '}to see information.
                 </span> :
                 <><CircularProgress /><div>Loading goal...</div></>)}
@@ -167,49 +163,49 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
 })
 
 interface InfoDisplayProps {
-    pos: DocumentPosition;
-    status: InfoStatus;
-    messages: InteractiveDiagnostic[];
-    goals?: InteractiveGoals;
-    termGoal?: InteractiveTermGoal;
-    error?: string;
-    userWidgets: UserWidgetInstance[];
-    rpcSess: RpcSessionAtPos;
-    triggerUpdate: () => Promise<void>;
+  pos: DocumentPosition,
+  status: InfoStatus,
+  messages: InteractiveDiagnostic[],
+  goals?: InteractiveGoals,
+  termGoal?: InteractiveTermGoal,
+  error?: string,
+  userWidgets: UserWidgetInstance[],
+  rpcSess: RpcSessionAtPos,
+  triggerUpdate: () => Promise<void>,
 }
 
 /** Displays goal state and messages. Can be paused. */
-function InfoDisplay(props0: InfoDisplayProps & InfoPinnable) {
+function InfoDisplay(props0: ProofStateProps & InfoDisplayProps & InfoPinnable) {
     // Used to update the paused state *just once* if it is paused,
     // but a display update is triggered
-    const [shouldRefresh, setShouldRefresh] = React.useState<boolean>(false);
-    const [{ isPaused, setPaused }, props, propsRef] = usePausableState(false, props0);
+    const [shouldRefresh, setShouldRefresh] = React.useState<boolean>(false)
+    const [{ isPaused, setPaused }, props, propsRef] = usePausableState(false, props0)
     if (shouldRefresh) {
-        propsRef.current = props0;
-        setShouldRefresh(false);
+        propsRef.current = props0
+        setShouldRefresh(false)
     }
     const triggerDisplayUpdate = async () => {
-        await props0.triggerUpdate();
-        setShouldRefresh(true);
-    };
+        await props0.triggerUpdate()
+        setShouldRefresh(true)
+    }
 
-    const {kind, goals, rpcSess} = props;
+    const {kind, goals, rpcSess} = props
 
-    const ec = React.useContext(EditorContext);
+    const ec = React.useContext(EditorContext)
 
     // If we are the cursor infoview, then we should subscribe to
     // some commands from the editor extension
-    const isCursor = kind === 'cursor';
+    const isCursor = kind === 'cursor'
     useEvent(ec.events.requestedAction, act => {
-        if (!isCursor) return;
-        if (act.kind !== 'copyToComment') return;
-        if (goals) void ec.copyToComment(goalsToString(goals));
-    }, [goals]);
+        if (!isCursor) return
+        if (act.kind !== 'copyToComment') return
+        if (goals) void ec.copyToComment(goalsToString(goals))
+    }, [goals])
     useEvent(ec.events.requestedAction, act => {
-        if (!isCursor) return;
-        if (act.kind !== 'togglePaused') return;
-        setPaused(isPaused => !isPaused);
-    });
+        if (!isCursor) return
+        if (act.kind !== 'togglePaused') return
+        setPaused(isPaused => !isPaused)
+    })
 
     const editor = React.useContext(MonacoEditorContext)
 
@@ -217,12 +213,12 @@ function InfoDisplay(props0: InfoDisplayProps & InfoPinnable) {
     <RpcContext.Provider value={rpcSess}>
     {/* <details open> */}
         {/* <InfoStatusBar {...props} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} /> */}
-        <div>
+        <div className="vscode-light">
             <InfoDisplayContent {...props} proof={editor.getValue()} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} />
         </div>
     {/* </details> */}
     </RpcContext.Provider>
-    );
+    )
 }
 
 /**
@@ -230,7 +226,7 @@ function InfoDisplay(props0: InfoDisplayProps & InfoPinnable) {
  * to avoid flickering when the cursor moved. Otherwise, the component is re-initialised and the
  * goal states reset to `undefined` on cursor moves.
  */
-export type InfoProps = InfoPinnable & { pos?: DocumentPosition };
+export type InfoProps = InfoPinnable & { pos?: DocumentPosition }
 
 /** Fetches info from the server and renders an {@link InfoDisplay}. */
 export function Info(props: InfoProps) {
@@ -239,22 +235,25 @@ export function Info(props: InfoProps) {
 }
 
 function InfoAtCursor(props: InfoProps) {
-    const ec = React.useContext(EditorContext);
+    const ec = React.useContext(EditorContext)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const [curLoc, setCurLoc] = React.useState<Location>(ec.events.changedCursorLocation.current!);
-    useEvent(ec.events.changedCursorLocation, loc => loc && setCurLoc(loc), []);
-    const pos = { uri: curLoc.uri, ...curLoc.range.start };
+    const [curLoc, setCurLoc] = React.useState<Location>(ec.events.changedCursorLocation.current!)
+    useEvent(ec.events.changedCursorLocation, loc => loc && setCurLoc(loc), [])
+    const pos = { uri: curLoc.uri, ...curLoc.range.start }
     return <InfoAux {...props} pos={pos} />
 }
 
 function useIsProcessingAt(p: DocumentPosition): boolean {
-    const allProgress = React.useContext(ProgressContext);
-    const processing = allProgress.get(p.uri);
-    if (!processing) return false;
-    return processing.some(i => RangeHelpers.contains(i.range, p));
+    const allProgress = React.useContext(ProgressContext)
+    const processing = allProgress.get(p.uri)
+    if (!processing) return false
+    return processing.some(i => RangeHelpers.contains(i.range, p))
 }
 
 function InfoAux(props: InfoProps) {
+
+    const proofContext = React.useContext(ProofContext)
+
     const config = React.useContext(ConfigContext)
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -291,7 +290,7 @@ function InfoAux(props: InfoProps) {
     // with e.g. a new `pos`.
     type InfoRequestResult = Omit<InfoDisplayProps, 'triggerUpdate'>
     const [state, triggerUpdateCore] = useAsyncWithTrigger(() => new Promise<InfoRequestResult>((resolve, reject) => {
-        const goalsReq = rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp(pos));
+        const goalsReq = rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp(pos))
         const termGoalReq = getInteractiveTermGoal(rpcSess, DocumentPosition.toTdpp(pos))
         const widgetsReq = Widget_getWidgets(rpcSess, pos).catch(discardMethodNotFound)
         const messagesReq = getInteractiveDiagnostics(rpcSess, {start: pos.line, end: pos.line+1})
@@ -405,10 +404,14 @@ function InfoAux(props: InfoProps) {
     React.useEffect(() => {
         if (state.state === 'notStarted')
             void triggerUpdate()
-        else if (state.state === 'loading')
-            setDisplayProps(dp => ({ ...dp, status: 'updating' }))
+        else if (state.state === 'loading') {
+          setDisplayProps(dp => ({ ...dp, status: 'updating' }))
+        }
         else if (state.state === 'resolved') {
-            setDisplayProps({ ...state.value, triggerUpdate })
+          // if (state.value.goals?.goals?.length) {
+          //   hintContext.setHints(state.value.goals.goals[0].hints)
+          // }
+          setDisplayProps({ ...state.value, triggerUpdate })
         } else if (state.state === 'rejected' && state.error !== 'retry') {
             // The code inside `useAsyncWithTrigger` may only ever reject with a `retry` exception.
             console.warn('Unreachable code reached with error: ', state.error)

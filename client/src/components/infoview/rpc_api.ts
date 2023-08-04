@@ -1,5 +1,8 @@
-/* This file is based on `vscode-lean4/vscode-lean4/src/rpcApi.ts ` */
-
+/**
+ *  @fileOverview Defines the interface for the communication with the server.
+ *
+ * This file is based on `vscode-lean4/vscode-lean4/src/rpcApi.ts`
+ */
 import { ContextInfo, FVarId, CodeWithInfos, MVarId } from '@leanprover/infoview-api';
 
 export interface GameHint {

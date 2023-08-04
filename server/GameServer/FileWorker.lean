@@ -74,13 +74,21 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
     let allowed := ["with", "fun", "at", "only"]
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
-      match levelParams.tactics.find? (fun t => t.name.toString == val) with
-      | none => addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
+      match levelParams.tactics.find? (·.name.toString == val) with
+      | none =>
+        -- Note: This case means that the tactic will never be introduced in the game.
+        match levelParams.inventory.find? (· == val) with
+        | none =>
+          addWarningMessage info s!"You have not unlocked the tactic '{val}' yet!"
+        | some _ => pure () -- tactic is in the inventory, allow it.
       | some tac =>
         if tac.locked then
-          addErrorMessage info s!"You have not unlocked the tactic '{val}' yet!"
+          match levelParams.inventory.find? (· == val) with
+          | none =>
+            addWarningMessage info s!"You have not unlocked the tactic '{val}' yet!"
+          | some _ => pure () -- tactic is in the inventory, allow it.
         else if tac.disabled then
-          addErrorMessage info s!"The tactic '{val}' is disabled in this level!"
+          addWarningMessage info s!"The tactic '{val}' is disabled in this level!"
   | .ident info rawVal val preresolved =>
       let ns ←
         try resolveGlobalConst (mkIdent val)
@@ -90,17 +98,17 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
           | return () -- not a theroem -> ignore
         let lemmasAndDefs := levelParams.lemmas ++ levelParams.definitions
         match lemmasAndDefs.find? (fun l => l.name == n) with
-        | none => addErrorMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
+        | none => addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
         | some lem =>
           if lem.locked then
-            addErrorMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
+            addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
           else if lem.disabled then
-            addErrorMessage info s!"The lemma/definition '{n}' is disabled in this level!"
-where addErrorMessage (info : SourceInfo) (s : MessageData) :=
+            addWarningMessage info s!"The lemma/definition '{n}' is disabled in this level!"
+where addWarningMessage (info : SourceInfo) (s : MessageData) :=
   modify fun st => { st with
     messages := st.messages.add {
       fileName := inputCtx.fileName
-      severity := MessageSeverity.error
+      severity := MessageSeverity.warning
       pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
       data     := s
     }
@@ -108,7 +116,8 @@ where addErrorMessage (info : SourceInfo) (s : MessageData) :=
 
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool)
-    (couldBeEndSnap : Bool) (levelParams : Game.DidOpenLevelParams) (initParams : Lsp.InitializeParams): IO Snapshot := do
+    (couldBeEndSnap : Bool) (levelParams : Game.DidOpenLevelParams)
+    (initParams : Lsp.InitializeParams) : IO Snapshot := do
   -- Recognize end snap
   if inputCtx.input.atEnd snap.mpState.pos ∧ couldBeEndSnap then
     let endSnap : Snapshot := {
@@ -161,7 +170,8 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           parseResultRef.set (tacticStx, cmdParserState)
 
           -- Check for forbidden tactics
-          findForbiddenTactics inputCtx levelParams tacticStx
+          if levelParams.checkEnabled then
+            findForbiddenTactics inputCtx levelParams tacticStx
 
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
@@ -300,14 +310,21 @@ where
 
 end Elab
 
+structure GameWorkerState :=
+(levelParams : Game.DidOpenLevelParams)
+
+abbrev GameWorkerM := StateT GameWorkerState Server.FileWorker.WorkerM
+
 section Updates
 
 /-- Given the new document, updates editable doc state. -/
-  def updateDocument (newMeta : DocumentMeta) (levelParams : Game.DidOpenLevelParams) : WorkerM Unit := do
+  def updateDocument (newMeta : DocumentMeta) : GameWorkerM Unit := do
+    let s ← get
+    let levelParams := s.levelParams
     let ctx ← read
-    let oldDoc := (←get).doc
+    let oldDoc := (← StateT.lift get).doc
     oldDoc.cancelTk.set
-    let initHeaderStx := (← get).initHeaderStx
+    let initHeaderStx := (← StateT.lift get).initHeaderStx
     let (newHeaderStx, newMpState, _) ← Parser.parseHeader newMeta.mkInputContext
     let cancelTk ← CancelToken.new
     let headSnapTask := oldDoc.cmdSnaps.waitHead?
@@ -347,7 +364,8 @@ section Updates
       -- before kicking off any expensive elaboration (TODO: make expensive elaboration cancelable)
       unfoldSnaps newMeta validSnaps.toArray cancelTk levelParams ctx
         (startAfterMs := ctx.initParams.editDelay.toUInt32)
-    modify fun st => { st with doc := { meta := newMeta, cmdSnaps := AsyncList.delayed newSnaps, cancelTk } }
+    StateT.lift <| modify fun st => { st with
+      doc := { meta := newMeta, cmdSnaps := AsyncList.delayed newSnaps, cancelTk }}
 
 end Updates
 
@@ -359,7 +377,8 @@ section Initialization
     fileMap  := default
 
   def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
-    (levelParams : Game.DidOpenLevelParams) (initParams : InitializeParams): IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
+      (levelParams : Game.DidOpenLevelParams) (initParams : InitializeParams) :
+      IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
     -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
     let out ← IO.Process.output
       { cwd := levelParams.gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
@@ -447,10 +466,10 @@ end Initialization
 
 section NotificationHandling
 
-  def handleDidChange (levelParams : Game.DidOpenLevelParams) (p : DidChangeTextDocumentParams) : WorkerM Unit := do
+  def handleDidChange (p : DidChangeTextDocumentParams) : GameWorkerM Unit := do
     let docId := p.textDocument
     let changes := p.contentChanges
-    let oldDoc := (←get).doc
+    let oldDoc := (← StateT.lift get).doc
     let some newVersion ← pure docId.version?
       | throwServerError "Expected version number"
     if newVersion ≤ oldDoc.meta.version then
@@ -458,28 +477,28 @@ section NotificationHandling
       IO.eprintln s!"Got outdated version number: {newVersion} ≤ {oldDoc.meta.version}"
     else if ¬ changes.isEmpty then
       let newDocText := foldDocumentChanges changes oldDoc.meta.text
-      updateDocument ⟨docId.uri, newVersion, newDocText⟩ levelParams
+      updateDocument ⟨docId.uri, newVersion, newDocText⟩
 
 end NotificationHandling
 
 section MessageHandling
 
-  def handleNotification (method : String) (params : Json) (levelParams : Game.DidOpenLevelParams) : WorkerM Unit := do
-    let handle := fun paramType [FromJson paramType] (handler : paramType → WorkerM Unit) =>
-      parseParams paramType params >>= handler
+  def handleNotification (method : String) (params : Json) : GameWorkerM Unit := do
+    let handle := fun paramType [FromJson paramType] (handler : paramType → GameWorkerM Unit) =>
+      (StateT.lift <| parseParams paramType params) >>= handler
     match method with
-    | "textDocument/didChange" => handle DidChangeTextDocumentParams (handleDidChange levelParams)
-    | "$/cancelRequest"        => handle CancelParams handleCancelRequest
-    | "$/lean/rpc/release"     => handle RpcReleaseParams handleRpcRelease
-    | "$/lean/rpc/keepAlive"   => handle RpcKeepAliveParams handleRpcKeepAlive
+    | "textDocument/didChange" => handle DidChangeTextDocumentParams (handleDidChange)
+    | "$/cancelRequest"        => handle CancelParams (handleCancelRequest ·)
+    | "$/lean/rpc/release"     => handle RpcReleaseParams (handleRpcRelease ·)
+    | "$/lean/rpc/keepAlive"   => handle RpcKeepAliveParams (handleRpcKeepAlive ·)
     | _                        => throwServerError s!"Got unsupported notification method: {method}"
 
 end MessageHandling
 
 section MainLoop
-  partial def mainLoop (levelParams : Game.DidOpenLevelParams) : WorkerM Unit := do
+  partial def mainLoop : GameWorkerM Unit := do
     let ctx ← read
-    let mut st ← get
+    let mut st ← StateT.lift get
     let msg ← ctx.hIn.readLspMessage
     let filterFinishedTasks (acc : PendingRequestMap) (id : RequestID) (task : Task (Except IO.Error Unit))
         : IO PendingRequestMap := do
@@ -502,16 +521,25 @@ section MainLoop
     set st
     match msg with
     | Message.request id method (some params) =>
+      -- TODO: What's this error message?
       if method == "Game.getInteractiveGoals" then throwServerError "HELLO"
       handleRequest id method (toJson params)
-      mainLoop levelParams
+      mainLoop
     | Message.notification "exit" none =>
       let doc := st.doc
       doc.cancelTk.set
       return ()
+    | Message.notification "$/game/setInventory" params =>
+      let p := (← parseParams Game.SetInventoryParams (toJson params))
+      let s ← get
+
+      set {s with levelParams := {s.levelParams with
+        inventory := p.inventory,
+        checkEnabled := p.checkEnabled}}
+      mainLoop
     | Message.notification method (some params) =>
-      handleNotification method (toJson params) levelParams
-      mainLoop levelParams
+      handleNotification method (toJson params)
+      mainLoop
     | _ => throwServerError "Got invalid JSON-RPC message"
 end MainLoop
 
@@ -533,11 +561,15 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do
   let _ ← IO.setStderr e
   try
     let (ctx, st) ← initializeWorker meta i o e initParams.param opts levelParams
-    let _ ← StateRefT'.run (s := st) <| ReaderT.run (r := ctx) (mainLoop levelParams)
+    let _ ← StateRefT'.run (s := st) <| ReaderT.run (r := ctx) <|
+      StateT.run (s := {levelParams := levelParams}) <| (mainLoop)
     return (0 : UInt32)
   catch e =>
     IO.eprintln e
-    publishDiagnostics meta #[{ range := ⟨⟨0, 0⟩, ⟨0, 0⟩⟩, severity? := DiagnosticSeverity.error, message := e.toString }] o
+    publishDiagnostics meta #[{
+      range := ⟨⟨0, 0⟩, ⟨0, 0⟩⟩,
+      severity? := DiagnosticSeverity.error,
+      message := e.toString }] o
     return (1 : UInt32)
 
 def workerMain (opts : Options) : IO UInt32 := do

@@ -1,15 +1,16 @@
-/* Mostly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/goals.tsx */
-
+/**
+ * @fileOverview
+ *
+ * Mostly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/goals.tsx
+ */
 import * as React from 'react'
-import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_stripTags } from '@leanprover/infoview-api'
-import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
 import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
-import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpcApi';
-import { Hints } from './hints';
-import { CommandLine } from './CommandLine';
-import { InputModeContext } from '../Level';
+import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
+import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
+import { InputModeContext } from './context';
+import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpc_api';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -137,6 +138,9 @@ interface ProofDisplayProps {
 export const Goal = React.memo((props: GoalProps) => {
     const { goal, filter, showHints, commandLine } = props
 
+    // TODO: Apparently `goal` can be `undefined`
+    if (!goal) {return <></>}
+
     const filteredList = getFilteredHypotheses(goal.hyps, filter);
     const hyps = filter.reverse ? filteredList.slice().reverse() : filteredList;
     const locs = React.useContext(LocationsContext)
@@ -156,7 +160,7 @@ export const Goal = React.memo((props: GoalProps) => {
     // if (props.goal.isInserted) cn += 'b--inserted '
     // if (props.goal.isRemoved) cn += 'b--removed '
 
-    const hints = <Hints hints={goal.hints} key={goal.mvarId} />
+    // const hints = <Hints hints={goal.hints} key={goal.mvarId} />
     const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
     const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
     const {commandLineMode} = React.useContext(InputModeContext)
@@ -170,9 +174,9 @@ export const Goal = React.memo((props: GoalProps) => {
         {!commandLine && assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        {commandLine && commandLineMode && <CommandLine />}
+        {/* {commandLine && commandLineMode && <CommandLine />} */}
         {!filter.reverse && goalLi}
-        {showHints && hints}
+        {/* {showHints && hints} */}
     </div>
 })
 
@@ -231,6 +235,7 @@ export const OtherGoals = React.memo((props: GoalProps2) => {
   </>
 })
 
+// TODO: deprecated
 export const ProofDisplay = React.memo((props : ProofDisplayProps) => {
   const { proof } = props
   const steps = proof.match(/.+/g)
