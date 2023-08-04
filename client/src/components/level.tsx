@@ -47,13 +47,11 @@ function Level() {
   const params = useParams()
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
-
   useLoadWorldFiles(worldId)
 
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
     {levelId == 0 ? <Introduction /> : <PlayableLevel />}
   </WorldLevelIdContext.Provider>
-
 }
 
 function ChatPanel({lastLevel}) {
@@ -105,7 +103,6 @@ function ChatPanel({lastLevel}) {
     console.debug(`help: ${Array.from(tmp.values())}`)
   }
 
-
   useEffect(() => {
     // TODO: For some reason this is always called twice
     console.debug('scroll chat')
@@ -128,7 +125,6 @@ function ChatPanel({lastLevel}) {
   //   // // TODO: Thats the wrong behaviour probably
   //   // chatRef.current!.scrollTo(0,0)
   // }, [gameId, worldId, levelId])
-
 
   return <div className="chat-panel">
     <div ref={chatRef} className="chat">
@@ -196,6 +192,15 @@ function PlayableLevel() {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
+  const {mobile} = React.useContext(MobileContext)
+
+  const difficulty = useSelector(selectDifficulty(gameId))
+  const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
+  const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
+  const inventory: Array<String> = useSelector(selectInventory(gameId))
+
+  const gameInfo = useGetGameInfoQuery({game: gameId})
+  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
 
   // The state variables for the `ProofContext`
   const [proof, setProof] = useState<Array<ProofStep>>([])
@@ -204,18 +209,11 @@ function PlayableLevel() {
   const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
   // A set of row numbers where help is displayed
   const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
-  const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
-  const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
-  /** Only for mobile layout */
+  // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
-  const {mobile} = React.useContext(MobileContext)
   const [commandLineMode, setCommandLineMode] = useState(true)
   const [commandLineInput, setCommandLineInput] = useState("")
-  const difficulty = useSelector(selectDifficulty(gameId))
-  const inventory: Array<String> = useSelector(selectInventory(gameId))
-  const gameInfo = useGetGameInfoQuery({game: gameId})
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
-  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
   const dispatch = useAppDispatch()
 
   // impressum pop-up
