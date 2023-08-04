@@ -128,9 +128,8 @@ export function Documentation({name, type, handleClose}) {
 }
 
 /** The panel (on the welcome page) showing the user's inventory with tactics, definitions, and lemmas */
-export function InventoryPanel({visible = true}) {
+export function InventoryPanel({levelInfo, visible = true}) {
   const gameId = React.useContext(GameIdContext)
-  const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   // The inventory is overlayed by the doc entry of a clicked item
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
@@ -141,7 +140,7 @@ export function InventoryPanel({visible = true}) {
     {inventoryDoc ?
       <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
       :
-      <Inventory levelInfo={inventory.data} openDoc={setInventoryDoc} enableAll={true}/>
+      <Inventory levelInfo={levelInfo} openDoc={setInventoryDoc} enableAll={true}/>
     }
   </div>
 }

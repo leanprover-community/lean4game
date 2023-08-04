@@ -9,7 +9,7 @@ import { faGlobe, faBook, faArrowRight, faArrowLeft } from '@fortawesome/free-so
 import { GameIdContext } from '../app'
 import { useAppDispatch } from '../hooks'
 import { changedOpenedIntro, selectOpenedIntro } from '../state/progress'
-import { useGetGameInfoQuery } from '../state/api'
+import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { MobileContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
@@ -83,6 +83,7 @@ function Welcome() {
   const openedIntro = useSelector(selectOpenedIntro(gameId))
   // On mobile, there are multiple pages to switch between
   const [pageNumber, setPageNumber] = useState(openedIntro ? 1 : 0)
+  const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   // set the window title
   useEffect(() => {
@@ -104,14 +105,14 @@ function Welcome() {
         : pageNumber == 1 ?
           <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
         :
-          <InventoryPanel />
+          <InventoryPanel levelInfo={inventory?.data} />
         )}
       </>
     :
       <Split className="welcome" minSize={0} snapOffset={200}  sizes={[40, 35, 25]}>
         <IntroductionPanel introduction={gameInfo.data?.introduction} />
         <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
-        <InventoryPanel />
+        <InventoryPanel levelInfo={inventory?.data} />
       </Split>
   }
   <PrivacyPolicy />

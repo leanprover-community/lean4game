@@ -360,7 +360,7 @@ function PlayableLevel() {
                         closeImpressum={closeImpressum}
                         codeviewRef={codeviewRef}
                         visible={pageNumber == 0} />
-                      <InventoryPanel visible={pageNumber == 1} />
+                      <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
                     </div>
                   </>
                 :
@@ -370,7 +370,7 @@ function PlayableLevel() {
                       impressum={impressum}
                       closeImpressum={closeImpressum}
                       codeviewRef={codeviewRef} />
-                    <InventoryPanel />
+                    <InventoryPanel levelInfo={level?.data} />
                   </Split>
                 }
               </MonacoEditorContext.Provider>
