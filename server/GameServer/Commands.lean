@@ -306,7 +306,7 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
       ) acc
 
 /-- Define the statement of the current level. -/
-elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
+elab attrs:Lean.Parser.Term.attributes ? "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
   let descr := match descr with
@@ -340,19 +340,19 @@ elab "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : com
       -- in that case.
       logWarningAt name (m!"Environment already contains {fullName}! Only the existing " ++
       m!"statement will be available in later levels:\n\n{origType}")
-      let thmStatement ← `(theorem $defaultDeclName $sig $val)
+      let thmStatement ← `(command| $[$attrs:attributes]? theorem $defaultDeclName $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Lemma name (name := fullName) (template := descr)
 
     else
-      let thmStatement ← `( theorem $name $sig $val)
+      let thmStatement ← `(command| $[$attrs:attributes]? theorem $name $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Lemma name (name := fullName) (template := descr)
 
   | none =>
-    let thmStatement ← `(theorem $defaultDeclName $sig $val)
+    let thmStatement ← `(command| $[$attrs:attributes]? theorem $defaultDeclName $sig $val)
     elabCommand thmStatement
 
   let msgs := (← get).messages
