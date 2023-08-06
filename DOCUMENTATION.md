@@ -175,8 +175,8 @@ The installation instructions are not yet tested on Mac/Windows. Comments very w
     Once you have the Dev Containers Extension installed, (re)open the project folder of your game in VSCode.
     A message appears asking you to "Reopen in Container".
 
-    * The first start will take a while, on a local testrun it was about 90 seconds. After the first
-      start this should be very quick.
+    * The first start will take a while, ca. 1-5 minutes. After the first
+      start this should be very quickly.
     * Afterwards, go to your browser and open http://localhost:3000/#/g/local/game.
 
 3.  **Editing Files** *(everytime)*:<br/>
@@ -214,6 +214,7 @@ Download dependencies and build the game:
 ```
 cd NNG4
 lake update
+lake exe cache get   # if your game depends on mathlib
 lake build
 ```
 
@@ -253,10 +254,15 @@ npm start
 This takes a little time. Eventually, the server is available on http://localhost:3000/
 and the game is available on http://localhost:3000/#/g/hhu-adam/NNG4.
 
+### Modifying the GameServer
 
+When modifying the game engine itself (in particular the content in `lean4game/server`) you can test it live with this
+setup by setting `export NODE_ENV=development` inside your local game before building it:
 
-Note: TODO
-To modify the game engine itself you should `export NODE_ENV=development` first before running
-`npm start`. That way the local games will take the current version of the gameserver and you see
-your changes life. Otherwise, each game uses the version of the gameserver it checked out
-from github.
+```
+cd NNG4
+export NODE_ENV=development
+lake update
+lake build
+```
+This causes lake to search locally for the `GameServer` lake package instead of using the version from github.
