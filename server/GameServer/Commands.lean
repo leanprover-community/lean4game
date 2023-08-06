@@ -100,8 +100,8 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
         name := name
         category := if type == .Lemma then s!"{n.getPrefix}" else ""
         content := s })
-      logInfoAt ref (m!"Missing {type} Documentation: {name}, used provided default (e.g. " ++
-      m!"statement description) instead. If you want to write your own description, add " ++
+      logInfoAt ref (m!"Missing {type} Documentation: {name}, used default (e.g. provided " ++
+      m!"docstring) instead. If you want to write a different description, add " ++
       m!"`{type}Doc {name}` somewhere above this statement.")
 
 /-- Documentation entry of a tactic. Example:
@@ -305,13 +305,18 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
           return {acc with definitions := acc.definitions.insertMany ns}
       ) acc
 
+#check expandOptDocComment?
+
 /-- Define the statement of the current level. -/
-elab attrs:Lean.Parser.Term.attributes ? "Statement" statementName:ident ? descr:str ? sig:declSig val:declVal : command => do
+elab doc:docComment ? attrs:Parser.Term.attributes ?
+    "Statement" statementName:ident ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
-  let descr := match descr with
-    | none => none
-    | some s => s.getString
+  let docContent : Option String := match doc with
+  | none => none
+  | some s => match s.raw[1] with
+    | .atom _ val => val.dropRight 2 |>.trim -- some (val.extract 0 (val.endPos - ⟨2⟩))
+    | _           => none --panic "not implemented error message" --throwErrorAt s "unexpected doc string{indentD s.raw[1]}"
 
   -- Save the messages before evaluation of the proof.
   let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
@@ -340,19 +345,19 @@ elab attrs:Lean.Parser.Term.attributes ? "Statement" statementName:ident ? descr
       -- in that case.
       logWarningAt name (m!"Environment already contains {fullName}! Only the existing " ++
       m!"statement will be available in later levels:\n\n{origType}")
-      let thmStatement ← `(command| $[$attrs:attributes]? theorem $defaultDeclName $sig $val)
+      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (name := fullName) (template := descr)
+      checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
 
     else
-      let thmStatement ← `(command| $[$attrs:attributes]? theorem $name $sig $val)
+      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig $val)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (name := fullName) (template := descr)
+      checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
 
   | none =>
-    let thmStatement ← `(command| $[$attrs:attributes]? theorem $defaultDeclName $sig $val)
+    let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig $val)
     elabCommand thmStatement
 
   let msgs := (← get).messages
@@ -402,7 +407,7 @@ elab attrs:Lean.Parser.Term.attributes ? "Statement" statementName:ident ? descr
     module := env.header.mainModule
     goal := sig,
     scope := scope,
-    descrText := descr
+    descrText := docContent
     statementName := match statementName with
     | none => default
     | some name => currNamespace ++ name.getId

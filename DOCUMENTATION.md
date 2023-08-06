@@ -27,8 +27,9 @@ and `World` strings can be anything.
 The core of a level is the `Statement`, which is the exercise that should be proven:
 
 ```lean
+/-- For all natural numbers $n$, we have $0 + n = n$. -/
+@[simp]
 Statement MyNat.zero_add
-"For all natural numbers $n$, we have $0 + n = n$."
     (n : ℕ) : 0 + n = n := by
   Hint "You can start a proof by `induction n`."
   induction n with n hn
@@ -44,17 +45,47 @@ Statement MyNat.zero_add
     rfl
 ```
 
-The first two arguments (name, attributes, and description) are optional. Thereafter you have a statement and a proof.
+##### Proof
 
-- The proof should always be a tactic proof, i.e. the `:= by` is mandatory.
-- In the proof you can use `Hint "text"` to display text if the goal state in-game matches the one where `Hint` is placed. For more options about hints, see below.
-- In the proof you can add a `Branch` that runs an alternativ tactic sequence, which helps setting `Hints` in different places. The `Branch` does not affect the main proof and does not need to finish any goals.
-- If you specify a name (`MyNat.zero_add`), this lemma will be available in future levels. (Note that a future level must also import this level, so that Lean knows about the added statement). The name must be *fully qualified*.
-- If you add a description (i.e. non-Lean exercise statement), it will be shown above the exercise. It supports Markdown (including katex).
+The proof must always be a tactic proof, i.e. `:= by` is a mandatory part of the syntax.
+
+There are a few extra tactics that help you structuring the proof:
+
+- `Hint`: You can use `Hint "text"` to display text if the goal state in-game matches
+  the one where `Hint` is placed. For more options about hints, see below.
+- `Branch`: In the proof you can add a `Branch` that runs an alternativ tactic sequence, which
+  helps setting `Hints` in different   places. The `Branch` does not affect the main
+  proof and does not need to finish any goals.
+- `Template`/`Hole`: not implemented yet, but used to provide a sample proof template.
+
+##### Statement Name (optional)
+
+If you specify a name (`MyNat.zero_add`), this lemma will be available in future levels.
+(Note that a future level must also import this level,
+so that Lean knows about the added statement).
+
+The name must be *fully qualified*. (TODO: is that still true? Did we implement namespaces?)
+
+##### Doc Comment (optional)
+
+There are three places where the documentation comment appears:
+
+1. as doc comment when hovering over the theorem
+2. as exercise description at the top of the level: ``Theorem `zero_add`: yada yada.``
+3. in the inventory. This can be overwritten by using
+  `LemmaDoc MyNat.zero_add "different yada yada"` as one might want to add a more detailed
+  description there including examples etc.
+
+Both latter points support Markdown (including katex).
+##### Attributes (optional)
+
+the `@[ attributes ]` prefix should work just like you know it from the `theorem` keyword.
 
 #### Introduction/Conclusion
 
-Optionally, you can add a `Introduction "some text"` and `Conclusion "some text"` to your level. the introduction will always be visible on top, the conclusion is displayed once the level is solved.
+Optionally, you can add a `Introduction "some text"` and `Conclusion "some text"` to your level.
+The introduction will be shown at the beginning, the conclusion is displayed once the level
+is solved.
 
 #### Lemmas/Tactics/Definitions
 
@@ -68,7 +99,8 @@ NewLemma MyNat.add_zero
 NewDefinition Nat
 ```
 
-Once added, items will be available in all future levels/worlds, unless you disable them for a particular level with
+Once added, items will be available in all future levels/worlds,
+unless you disable them for a particular level with
 
 ```lean
 DisabledTactic tauto
@@ -82,7 +114,8 @@ OnlyTactic rw rfl apply
 OnlyLemma MyNat.add_zero
 ```
 
-Lastly, all items need documentation entries (which are imported in the level), see more about that below. There is also explains the `LemmaTab`
+Lastly, all items need documentation entries (which are imported in the level),
+see more about that below. There is also explains the `LemmaTab` keyword.
 
 ### World
 
