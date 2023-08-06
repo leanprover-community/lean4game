@@ -71,7 +71,7 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore "with" keyword
-    let allowed := ["with", "fun", "at", "only"]
+    let allowed := ["with", "fun", "at", "only", "by", "to"]
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
       match levelParams.tactics.find? (·.name.toString == val) with
