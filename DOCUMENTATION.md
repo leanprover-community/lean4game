@@ -188,6 +188,27 @@ can define which tab is open when the level is loaded by adding `LemmaTab "Pow"`
 
 There will be features added to get automatic information from mathlib!
 
+## Escaping
+(TODO: Move)
+
+
+Inside the doc comment you don't need to escape the backslashes:
+
+```
+/-- $\operatorname{succ}(n)$. notation for naturals is `\N`. -/
+Statement ...
+```
+
+However, inside interpolated strings (e.g. in `Hint`, `Introduction` and `Conclusion`)
+you do need to escape backslashes
+with `\\` and `{` with `\{`:
+
+```
+Hint "This code has some $\\operatorname\{succ}(n)$ math. The value of `h` is {h}.
+Notation for naturals is `\\N`."
+```
+
+
 # Running Games Locally
 
 The installation instructions are not yet tested on Mac/Windows. Comments very welcome!
