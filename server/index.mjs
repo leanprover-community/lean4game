@@ -19,18 +19,18 @@ const games = {
     "g/hhu-adam/robo": {
         // module: "Game",  // The lean module's name. Defaults to "Game"
         // name: "Adam",    // For the `Game "Adam"` tag in the games. Defaults to "MyGame"
-        dir: "../../../../Robo",
+        dir: "Robo",
         queueLength: 5
     },
     "g/hhu-adam/nng4": {
         // module: "Game",
         // name: "NNG",
-        dir: "../../../../NNG4",
+        dir: "NNG4",
         queueLength: 5
     },
     "g/local/game": {
-        dir: "../../../../game",
-        queueLength: 5
+        dir: "game",
+        queueLength: 0
     }
 }
 
@@ -62,19 +62,24 @@ const isDevelopment = environment === 'development'
 const queue = {}
 
 function startServerProcess(tag) {
+    if (! games[tag]?.dir) {
+        console.error(`Unknown game: ${tag}`)
+        return
+    }
+
     let serverProcess
-    if (isDevelopment && games[tag]?.dir) {
-        let args = ["--server", games[tag].dir]
+    if (isDevelopment) {
+        let args = ["--server", path.join("../../../../", games[tag].dir)]
         if (games[tag].module) {
             args.push(games[tag].module)
             if (games[tag].name) { args.push(games[tag].name) }
         }
         serverProcess = cp.spawn("./gameserver", args,
-            { cwd: "./build/bin/" })
+            { cwd: path.join(__dirname, "./build/bin/") })
     } else {
-        serverProcess =  cp.spawn("docker",
-            ["run", "--runtime=runsc", "--network=none", "--rm", "-i", `${tag}`],
-            { cwd: "." })
+        serverProcess =  cp.spawn("./bubblewrap.sh",
+            [games[tag].dir],
+            { cwd: __dirname })
     }
     serverProcess.on('error', error =>
         console.error(`Launching Lean Server failed: ${error}`)
