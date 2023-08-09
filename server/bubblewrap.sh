@@ -1,9 +1,11 @@
 #/bin/bash
 
+ELAN_HOME=$(lake env printenv ELAN_HOME)
+
 (exec bwrap\
   --ro-bind ../../lean4game /lean4game \
   --ro-bind ../../$1 /game \
-  --ro-bind ~/.elan /elan \
+  --ro-bind $ELAN_HOME /elan \
   --ro-bind /usr /usr \
   --dev /dev \
   --proc /proc \

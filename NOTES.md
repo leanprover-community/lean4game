@@ -195,3 +195,8 @@ Activate config:
 ```
 sudo apt-get install unzip
 ```
+
+## Install bubblewrap (bwrap)
+```
+sudo apt-get install bubblewrap
+```
