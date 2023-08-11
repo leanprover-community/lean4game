@@ -64,7 +64,7 @@ config.autoClosingPairs = config.autoClosingPairs.map(
 monaco.languages.setLanguageConfiguration('lean4cmd', config);
 
 /** The input field */
-export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObject<HTMLDivElement>}) {
+export function CommandLine({proofPanelRef, hidden}: {proofPanelRef: React.MutableRefObject<HTMLDivElement>, hidden?: boolean}) {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
@@ -311,7 +311,7 @@ export function CommandLine({proofPanelRef}: {proofPanelRef: React.MutableRefObj
     runCommand()
   }
 
-  return <div className="command-line">
+  return <div className={`command-line${hidden ? ' hidden' : ''}`}>
       <form onSubmit={handleSubmit}>
         <div className="command-line-input-wrapper">
           <div ref={inputRef} className="command-line-input" />

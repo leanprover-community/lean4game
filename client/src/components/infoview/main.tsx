@@ -475,6 +475,6 @@ export function CommandLineInterface(props: { world: string, level: number, data
         </>
       : <CircularProgress />}
     </div>
-    <CommandLine proofPanelRef={proofPanelRef} />
+    <CommandLine proofPanelRef={proofPanelRef} hidden={proof[proof.length - 1]?.goals.length == 0}/>
   </div>
 }

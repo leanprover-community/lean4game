@@ -140,17 +140,17 @@ function ChatPanel({lastLevel}) {
           // TODO: Should not use index as key.
           return <Hints key={`hints-${i}`}
             hints={step.hints} showHidden={showHelp.has(i)} step={i}
-            selected={selectedStep} toggleSelection={toggleSelection(i)}/>
+            selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof.length - 1}/>
         }
       })}
       <DeletedHints hints={deletedChat}/>
       {completed &&
         <>
-          <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
+          <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
             Level completed! 🎉
           </div>
           {level?.data?.conclusion?.trim() &&
-            <div className={`message information step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
+            <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
               <Markdown>{level?.data?.conclusion}</Markdown>
             </div>
           }
@@ -439,6 +439,7 @@ function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undef
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
     {mobile ?
       <>
+        {/* MOBILE VERSION */}
         <div>
           <span className="app-bar-title">
             {levelTitle}
@@ -492,6 +493,7 @@ function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undef
       </>
     :
       <>
+        {/* DESKTOP VERSION */}
         <div>
           <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
             <FontAwesomeIcon icon={faHome} />
@@ -514,12 +516,16 @@ function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undef
               <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
             </Button>
           </>}
-          {levelId < gameInfo.data?.worldSize[worldId] &&
+          {levelId < gameInfo.data?.worldSize[worldId] ?
             <Button inverted="true"
                 to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
                 disabled={difficulty >= 2 && !(completed || levelId == 0)}
                 onClick={() => setNavOpen(false)}>
               <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
+            </Button>
+            :
+            <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
+              <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
             </Button>
           }
           <Button disabled={levelId <= 0} inverted="true" to=""
