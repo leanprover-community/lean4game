@@ -189,12 +189,12 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
       let some game ← getGame? s.game
         | return false
       -- All Levels have the same tiles, so we just load them from level 1 of an arbitrary world
-      -- and reset `new`, `disabled` and `unlocked`
-      match game.worlds.nodes.toList with
-      | [] => return false
-      | ⟨worldId, _⟩ :: _ =>
+      -- and reset `new`, `disabled` and `unlocked`.
+      -- Note: as we allow worlds without any levels (for developing), we might need
+      -- to try until we find the first world with levels.
+      for ⟨worldId, _⟩ in game.worlds.nodes.toList do
         let some lvl ← getLevel? {game := s.game, world := worldId, level := 1}
-          | do return false
+          | do continue
         let inventory : InventoryOverview := {
           tactics := lvl.tactics.tiles.map
             ({ · with locked := true, disabled := false, new := false }),
@@ -207,6 +207,7 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
         let c ← read
         c.hOut.writeLspResponse ⟨id, ToJson.toJson inventory⟩
         return true
+      return false
     | _ => return false
   | _ => return false
 
