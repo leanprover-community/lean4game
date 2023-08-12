@@ -282,10 +282,10 @@ structure UsedInventory where
 partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : CommandElabM UsedInventory := do
   match stx with
   | .missing => return acc
-  | .node info kind args =>
+  | .node _info kind args =>
     if kind == `tacticHint__ || kind == `tacticBranch_ then return acc
     return ← args.foldlM (fun acc arg => collectUsedInventory arg acc) acc
-  | .atom info val =>
+  | .atom _info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore some standard keywords
     let allowed := ["with", "fun", "at", "only", "by"]
@@ -294,7 +294,7 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
       return {acc with tactics := acc.tactics.insert val}
     else
       return acc
-  | .ident info rawVal val preresolved =>
+  | .ident _info _rawVal val _preresolved =>
       let ns ←
         try resolveGlobalConst (mkIdent val)
         catch | _ => pure [] -- catch "unknown constant" error
@@ -510,10 +510,13 @@ elab "Branch" t:tacticSeq : tactic => do
 /-- The tactic block inside `Template` will be copied into the users editor.
 Use `Hole` inside the template for a part of the proof that should be replaced
 with `sorry`. -/
-elab "Template" t:tacticSeq : tactic => do
+elab "Template" tacs:tacticSeq : tactic => do
   --let b ← saveState
-  Tactic.evalTactic t
+  Tactic.evalTactic tacs
 
+  logInfo m!"{tacs.raw.getArgs}"
+
+  pure ()
   -- -- Not correct
   -- let gs ← Tactic.getUnsolvedGoals
   -- if ¬ gs.isEmpty then
@@ -635,12 +638,12 @@ partial def removeTransitiveAux (id : Name) (arrows : HashMap Name (HashSet Name
     let mut desc := decendants
     desc := desc.insert id {} -- mark as worked in case of loops
     newArr := newArr.insert id {} -- mark as worked in case of loops
-    let children := arrows.find! id
+    let children := arrows.findD id {}
     let mut trimmedChildren := children
     let mut theseDescs := children
     for child in children do
       (newArr, desc) := removeTransitiveAux child arrows newArr desc
-      let childDescs := desc.find! child
+      let childDescs := desc.findD child {}
       theseDescs := theseDescs.insertMany childDescs
       for d in childDescs do
         trimmedChildren := trimmedChildren.erase d
@@ -653,7 +656,7 @@ def removeTransitive (arrows : HashMap Name (HashSet Name)) : CommandElabM (Hash
   let mut desc := {}
   for id in arrows.toArray.map Prod.fst do
     (newArr, desc) := removeTransitiveAux id arrows newArr desc
-    if (desc.find! id).contains id then
+    if (desc.findD id {}).contains id then
       logError <| m!"Loop at {id}. " ++
         m!"This should not happen and probably means that `findLoops` has a bug."
       -- DEBUG:
@@ -720,15 +723,20 @@ Use the command `Dependency World₁ → World₂` to add a manual edge to the g
 for example if the only dependency between the worlds is given by
 the narrative. -/
 elab "Dependency" s:Parser.dependency : command => do
-  let mut last : Option Name := none
+  let mut source? : Option Name := none
   for stx in s.raw.getArgs.getEvenElems do
-    let some l := last
+    let some source := source?
       | do
-          last := some stx.getId
+          source? := some stx.getId
           continue
+    let target := stx.getId
+    match (← getCurGame).worlds.nodes.find? target with
+    | some _ => pure ()
+    | none => logErrorAt stx m!"World `{target}` seems not to exist"
+
     modifyCurGame fun game =>
-      pure {game with worlds := {game.worlds with edges := game.worlds.edges.push (l, stx.getId)}}
-    last := some stx.getId
+      pure {game with worlds := {game.worlds with edges := game.worlds.edges.push (source, target)}}
+    source? := some target
 
 /-- Build the game. This command will precompute various things about the game, such as which
 tactics are available in each level etc. -/
@@ -813,8 +821,8 @@ elab "MakeGame" : command => do
 
   /- for each "item" this is a HashSet of `worldId`s that introduce this item -/
   let mut worldsWithNewItem : HashMap Name (HashSet Name) := {}
-  for (worldId, world) in game.worlds.nodes.toArray do
-    for newItem in newItemsInWorld.find! worldId do
+  for (worldId, _world) in game.worlds.nodes.toArray do
+    for newItem in newItemsInWorld.findD worldId {} do
       worldsWithNewItem := worldsWithNewItem.insert newItem $
         (worldsWithNewItem.findD newItem {}).insert worldId
 
@@ -832,7 +840,7 @@ elab "MakeGame" : command => do
       if targetId = dependentWorldId then
         dependsOnWorlds := dependsOnWorlds.insert sourceId
 
-    for usedItem in usedItemsInWorld.find! dependentWorldId do
+    for usedItem in usedItemsInWorld.findD dependentWorldId {} do
       match worldsWithNewItem.find? usedItem with
       | none => logWarning m!"No world introducing {usedItem}, but required by {dependentWorldId}"
       | some worldIds =>
@@ -917,13 +925,16 @@ elab "MakeGame" : command => do
       if inventoryType == .Lemma then
         -- if named, add the lemma from the last level of the world to the inventory
         let i₀ := world.levels.size
-        match (world.levels.find! (i₀)).statementName with
-        | .anonymous => pure ()
-        | .num _ _ => panic "Did not expect to get a numerical statement name!"
-        | .str pre s =>
-          let name := Name.str pre s
-          newItems := newItems.insert name
-          allItems := allItems.insert name
+        match i₀ with
+        | 0 => logWarning m!"World `{worldId}` contains no levels."
+        | i₀ =>
+          match (world.levels.find! (i₀)).statementName with
+          | .anonymous => pure ()
+          | .num _ _ => panic "Did not expect to get a numerical statement name!"
+          | .str pre s =>
+            let name := Name.str pre s
+            newItems := newItems.insert name
+            allItems := allItems.insert name
       newItemsInWorld := newItemsInWorld.insert worldId newItems
 
     -- Basic inventory item availability: all locked.
@@ -953,7 +964,7 @@ elab "MakeGame" : command => do
       let predecessors := game.worlds.predecessors worldId
       -- logInfo m!"Predecessors: {predecessors.toArray.map fun (a) => (a)}"
       for predWorldId in predecessors do
-        for item in newItemsInWorld.find! predWorldId do
+        for item in newItemsInWorld.findD predWorldId {} do
           let data := (← getInventoryItem? item inventoryType).get!
           items := items.insert item {
             name := item
@@ -963,7 +974,7 @@ elab "MakeGame" : command => do
       itemsInWorld := itemsInWorld.insert worldId items
 
     for (worldId, world) in game.worlds.nodes.toArray do
-      let mut items := itemsInWorld.find! worldId
+      let mut items := itemsInWorld.findD worldId {}
 
       let levels := world.levels.toArray.insertionSort fun a b => a.1 < b.1
 
