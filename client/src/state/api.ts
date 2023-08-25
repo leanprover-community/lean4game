@@ -33,7 +33,8 @@ export interface LevelInfo {
   descrText: null|string,
   descrFormat: null|string,
   lemmaTab: null|string,
-  statementName: null|string
+  statementName: null|string,
+  template: null|string
 }
 
 /** Used to display the inventory on the welcome page */
