@@ -45,9 +45,15 @@ Statement add_zero (n : Nat) : n + 0 = n := by
 Statement (n : Nat) : 0 + n = n := by
   Template
     induction n
+    Hint ""
     Hole
       simp
-    simp
+    Branch
+      skip
+      Hint ""
+    Hint ""
+  simp
+
 
 NewLemma add_zero
 

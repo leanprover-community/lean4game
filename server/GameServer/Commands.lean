@@ -283,7 +283,7 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
   match stx with
   | .missing => return acc
   | .node _info kind args =>
-    if kind == `tacticHint__ || kind == `tacticBranch_ then return acc
+    if kind == `GameServer.Tactic.Hint || kind == `GameServer.Tactic.Branch then return acc
     return ← args.foldlM (fun acc arg => collectUsedInventory arg acc) acc
   | .atom _info val =>
     -- ignore syntax elements that do not start with a letter
@@ -439,7 +439,7 @@ partial def removeIndentation (s : String) : String :=
 /-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
 see hints. The tactic does not affect the goal state.
 -/
-elab "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
+elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
   let mut strict := false
   let mut hidden := false
 
@@ -490,7 +490,7 @@ elab "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
 
 /-- This tactic allows us to execute an alternative sequence of tactics, but without affecting the
 proof state. We use it to define Hints for alternative proof methods or dead ends. -/
-elab "Branch" t:tacticSeq : tactic => do
+elab (name := GameServer.Tactic.Branch) "Branch" t:tacticSeq : tactic => do
   let b ← saveState
   Tactic.evalTactic t
 
@@ -505,40 +505,48 @@ elab "Branch" t:tacticSeq : tactic => do
   b.restore
   Core.setMessageLog msgs
 
+/-- A hole inside a template proof that will be replaced by `sorry`. -/
+elab (name := GameServer.Tactic.Hole) "Hole" t:tacticSeq : tactic => do
+  Tactic.evalTactic t
 
+/--
+Iterate recursively through the Syntax, replace `Hole` with `sorry` and remove all
+`Hint`/`Branch` occurences.
+-/
+def replaceHoles (tacs : Syntax) : Syntax :=
+  match tacs with
+  | Syntax.node info kind ⟨args⟩ =>
+    let newArgs := filterArgs args
+    Syntax.node info kind ⟨newArgs⟩
+  | other => other
+where filterArgs (args : List Syntax) : List Syntax :=
+  match args with
+    | [] => []
+    -- replace `Hole` with `sorry`.
+    | Syntax.node info `GameServer.Tactic.Hole _ :: r =>
+      Syntax.node info `Lean.Parser.Tactic.tacticSorry #[Syntax.atom info "sorry"] :: filterArgs r
+    -- delete all `Hint` and `Branch` occurences in the middle.
+    | Syntax.node _ `GameServer.Tactic.Hint _ :: _ :: r
+    | Syntax.node _ `GameServer.Tactic.Branch _ :: _ :: r =>
+      filterArgs r
+    -- delete `Hint` and `Branch` occurence at the end of the tactic sequence.
+    | Syntax.node _ `GameServer.Tactic.Hint _ :: []
+    | Syntax.node _ `GameServer.Tactic.Branch _ :: [] =>
+        []
+    -- Recurse on all other Syntax.
+    | a :: rest =>
+      replaceHoles a :: filterArgs rest
 
 /-- The tactic block inside `Template` will be copied into the users editor.
 Use `Hole` inside the template for a part of the proof that should be replaced
 with `sorry`. -/
 elab "Template" tacs:tacticSeq : tactic => do
-  --let b ← saveState
   Tactic.evalTactic tacs
-
-  logInfo m!"{tacs.raw.getArgs}"
-
-  pure ()
-  -- -- Not correct
-  -- let gs ← Tactic.getUnsolvedGoals
-  -- if ¬ gs.isEmpty then
-  --   logWarning "To work as intended, `Template` should contain the entire proof"
-
-
-  -- -- Show an info whether the branch proofs all remaining goals.
-  -- let gs ← Tactic.getUnsolvedGoals
-  -- if gs.isEmpty then
-  --   logInfo "This branch finishes the proof."
-  -- else
-  --   logInfo "This branch leaves open goals."
-
-  -- let msgs ← Core.getMessageLog
-  -- b.restore
-  -- Core.setMessageLog msgs
-
-
-/-- A hole inside a template proof that will be replaced by `sorry`. -/
-elab "Hole" t:tacticSeq : tactic => do
-  Tactic.evalTactic t
-
+  let newTacs : TSyntax `Lean.Parser.Tactic.tacticSeq := ⟨replaceHoles tacs.raw⟩
+  let template ← PrettyPrinter.ppCategory `Lean.Parser.Tactic.tacticSeq newTacs
+  logInfo s!"Template:\n{template}"
+  modifyLevel (←getCurLevelId) fun level => do
+    return {level with template := s!"{template}"}
 
 -- TODO: Notes for testing if a declaration has the simp attribute
 

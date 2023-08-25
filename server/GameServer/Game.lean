@@ -51,6 +51,7 @@ structure LevelInfo where
   descrFormat : String := ""
   lemmaTab : Option String
   statementName : Option String
+  template : Option String
 deriving ToJson, FromJson
 
 structure InventoryOverview where
@@ -64,6 +65,11 @@ structure LoadLevelParams where
   world : Name
   level : Nat
   deriving ToJson, FromJson
+
+-- structure LoadTemplateParams where
+--   world : Name
+--   level : Nat
+--   deriving ToJson, FromJson
 
 structure DidOpenLevelParams where
   uri : String
@@ -156,9 +162,25 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
                 | none => name.toString
                 -- Note: we could call `.find!` because we check in `Statement` that the
                 -- lemma doc must exist.
+            template := lvl.template
             }
       c.hOut.writeLspResponse ⟨id, ToJson.toJson levelInfo⟩
       return true
+    -- | Message.request id "loadTemplate" params =>
+    --   let p ← parseParams LoadTemplateParams (toJson params)
+    --   let s ← get
+    --   let c ← read
+
+    --   let some game ← getGame? s.game
+    --     | throwServerError "Game not found"
+    --   let some world := game.worlds.nodes.find? p.world
+    --     | throwServerError "World not found"
+
+    --   let mut templates : Array <| Option String := #[]
+    --   for (_, level) in world.levels.toArray do
+    --     templates := templates.push level.template
+    --   c.hOut.writeLspResponse ⟨id, ToJson.toJson templates⟩
+    --   return true
     | Message.request id "loadDoc" params =>
       let p ← parseParams LoadDocParams (toJson params)
       let s ← get

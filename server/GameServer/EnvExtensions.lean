@@ -201,6 +201,9 @@ structure LevelId where
   level : Nat
 deriving Inhabited
 
+instance : ToString LevelId := ⟨fun id =>
+  s!"{id.game}:{id.world}:{id.level}"⟩
+
 structure InventoryInfo where
   /-- inventory items used by the main sample solution of this level -/
   used : Array Name
@@ -245,6 +248,8 @@ structure GameLevel where
   tactics: InventoryInfo := default
   definitions: InventoryInfo := default
   lemmas: InventoryInfo := default
+  /-- A proof template that is printed in an empty editor. -/
+  template: Option String := none
   deriving Inhabited, Repr
 
 
