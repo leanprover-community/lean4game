@@ -63,7 +63,12 @@
   display: inline-block;
 }
 
-.tab.active {
+.tab-bar.current .tab.active {
   color: black;
   border-bottom: 0.3em solid var(--clr-primary);
+}
+
+.tab.active {
+  color: black;
+  border-bottom: 0.3em solid #999;
 }

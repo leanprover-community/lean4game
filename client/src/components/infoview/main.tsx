@@ -261,13 +261,13 @@ function Command({ command, deleteProof }: { command: string, deleteProof: any }
 // }, fastIsEqual)
 
 /** The tabs of goals that lean ahs after the command of this step has been processed */
-function GoalsTab({ proofStep }: { proofStep: ProofStep }) {
+function GoalsTab({ proofStep, last}: { proofStep: ProofStep, last : boolean }) {
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
   if (!proofStep.goals.length) { return <></> }
 
   return <div>
-    <div className="tab-bar">
+    <div className={`tab-bar ${last ? 'current' : ''}`}>
       {proofStep.goals.map((goal, i) => (
         // TODO: Should not use index as key.
         <div key={`proof-goal-${i}`} className={`tab ${i == (selectedGoal) ? "active" : ""}`} onClick={(ev) => { setSelectedGoal(i); ev.stopPropagation() }}>
@@ -409,6 +409,8 @@ export function CommandLineInterface(props: { world: string, level: number, data
     return step.hints.some((hint) => hint.hidden)
   }
 
+  let lastStepErrors = proof.length ? hasInteractiveErrors(proof[proof.length - 1].errors) : false
+
   return <div className="commandline-interface">
     <div className="content" ref={proofPanelRef}>
       <div className="tmp-pusher"></div>
@@ -416,7 +418,7 @@ export function CommandLineInterface(props: { world: string, level: number, data
       {proof.length ?
         <>
           {proof.map((step, i) => {
-            if (i == proof.length - 1 && hasInteractiveErrors(step.errors)) {
+            if (i == proof.length - 1 && lastStepErrors) {
               // if the last command contains an error, we only display the errors but not the
               // entered command as it is still present in the command line.
               // TODO: Should not use index as key.
@@ -443,7 +445,7 @@ export function CommandLineInterface(props: { world: string, level: number, data
                   }
                 </>
                 }
-                <GoalsTab proofStep={step} />
+                <GoalsTab proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} />
                 {/* Show a message that there are no goals left */}
                 {!step.goals.length && (
                   <div className="message information">
