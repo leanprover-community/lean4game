@@ -242,13 +242,14 @@ td code  {
 
 .exercise .step {
   /* background-color: #e6f0f4; */
-  margin-top: 5px;
-  margin-bottom: 5px;
-  border-radius: 0.5em;
-  padding: 0.5em;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
   /* border: 3px dotted rgb(88, 131, 24); */
 }
 
+/* TODO: Is this still used anywhere? */
 .exercise .step .btn-help {
   margin-top: 10px;
 }
