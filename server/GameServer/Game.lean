@@ -153,7 +153,13 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
             descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
             introduction := lvl.introduction
             conclusion := lvl.conclusion
-            lemmaTab := lvl.lemmaTab
+            lemmaTab := match lvl.lemmaTab with
+            | some tab => tab
+            | none =>
+              -- Try to set the lemma tab to the category of the first added lemma
+              match lvl.lemmas.tiles.find? (·.new) with
+              | some tile => tile.category
+              | none => none
             statementName := match lvl.statementName with
               | .anonymous => none
               | name => match (inventoryExt.getState env).find?
