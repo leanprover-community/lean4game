@@ -227,8 +227,6 @@ function PlayableLevel() {
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
   function closeInventoryDoc () {setInventoryDoc(null)}
 
-
-
   const onDidChangeContent = (code) => {
     dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code}))
   }
@@ -243,6 +241,39 @@ function PlayableLevel() {
 
   const {editor, infoProvider, editorConnection} =
     useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
+
+//   const editor = React.useContext(MonacoEditorContext)
+//   // let code = selectCode(gameId, worldId, levelId)(store.getState())
+// // if (commandLineMode && !code?.length) {
+// //   console.debug(`inserting template: ${template}`)
+// //   editor.executeEdits("command-line", [{
+// //     range: editor.getModel().getFullModelRange(),
+// //     text: "hallo"
+// //   }])
+// //   console.debug('inserted template')
+// //   //dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code: template}))
+// // }
+
+  useEffect (() => {
+    // Lock editor mode
+    if (level?.data?.template) {
+      setCommandLineMode(false)
+      console.debug(`inserting template: ${level.data.template}`)
+
+      // TODO: This does not work! HERE
+      // Probably overwritten by a query to the server
+      editor.executeEdits("command-line", [{
+        range: editor.getModel().getFullModelRange(),
+        text: level.data.template,
+        forceMoveMarkers: false
+      }])
+
+    } else {
+      setCommandLineMode(true)
+    }
+
+
+  }, [level, levelId, worldId, gameId])
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `CommandLineInterface`.
@@ -347,6 +378,7 @@ function PlayableLevel() {
               <MonacoEditorContext.Provider value={editor}>
                 <LevelAppBar
                   isLoading={level.isLoading}
+                  lockEditorMode={level.data?.template !== null}
                   levelTitle={`${mobile ? '' : 'Level '}${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${level?.data?.title}`)}
                   toggleImpressum={toggleImpressum}
@@ -422,7 +454,7 @@ function Introduction() {
 }
 
 /** The top-navigation bar */
-function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undefined, setPageNumber = undefined}) {
+function LevelAppBar({isLoading, levelTitle, toggleImpressum, lockEditorMode=false, pageNumber = undefined, setPageNumber = undefined}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
@@ -435,6 +467,13 @@ function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undef
   const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
 
   const [navOpen, setNavOpen] = React.useState(false)
+
+  function toggleEditor(ev) {
+    if (!lockEditorMode){
+      setCommandLineMode(!commandLineMode)
+      setNavOpen(false)
+    }
+  }
 
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
     {mobile ?
@@ -481,9 +520,9 @@ function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undef
           <Button to={`/${gameId}`} inverted="true" title="back to world selection">
             <FontAwesomeIcon icon={faHome} />&nbsp;Home
           </Button>
-          <Button disabled={levelId <= 0} inverted="true" to=""
-              onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
-              title="toggle Editor mode">
+          <Button disabled={levelId <= 0 || lockEditorMode} inverted="true" to=""
+              onClick={(ev) => {toggleEditor(ev)}}
+              title={lockEditorMode ? "Editor mode is enforced!" : "toggle Editor mode"}>
             <FontAwesomeIcon icon={faCode} />&nbsp;Toggle Editor
           </Button>
           <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
@@ -528,9 +567,9 @@ function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undef
               <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
             </Button>
           }
-          <Button disabled={levelId <= 0} inverted="true" to=""
-              onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
-              title="toggle Editor mode">
+          <Button disabled={levelId <= 0 || lockEditorMode} inverted="true" to=""
+              onClick={(ev) => { toggleEditor(ev) }}
+              title={lockEditorMode ? "Editor mode is enforced!" : "toggle Editor mode"}>
             <FontAwesomeIcon icon={faCode} />
           </Button>
           <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
@@ -670,6 +709,7 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
 function useLoadWorldFiles(worldId) {
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
+  // const templates = useGetTemplateQuery({game: gameId, world: worldId})
   const store = useStore()
 
   useEffect(() => {
@@ -681,8 +721,17 @@ function useLoadWorldFiles(worldId) {
         if (model) {
           models.push(model)
         } else {
-          const code = selectCode(gameId, worldId, levelId)(store.getState())
-          models.push(monaco.editor.createModel(code, 'lean4', uri))
+          // let code: string = selectCode(gameId, worldId, levelId)(store.getState())
+          // if (!code.length) {
+          //   console.debug("template: yaay")
+          //   // const template = templates.data[levelId-1]
+          //   if (template) {
+          //     code = templates.data[levelId-1]
+          //   }
+          // } else {
+          //   console.debug(`template? naah: ${code}`)
+          // }
+          // models.push(monaco.editor.createModel(code, 'lean4', uri))
         }
       }
       return () => { for (let model of models) { model.dispose() } }
