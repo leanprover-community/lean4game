@@ -411,8 +411,8 @@ export function CommandLineInterface(props: { world: string, level: number, data
 
   return <div className="commandline-interface">
     <div className="content" ref={proofPanelRef}>
-      <ExerciseStatement data={props.data} />
       <div className="tmp-pusher"></div>
+      <ExerciseStatement data={props.data} />
       {proof.length ?
         <>
           {proof.map((step, i) => {

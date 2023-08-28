@@ -316,3 +316,10 @@ td code  {
 .menu.dropdown .svg-inline--fa {
   width: 1.8rem;
 }
+
+.tmp-pusher {
+  background-color: #eee;
+  margin-left: -0.5em;
+  margin-right: -0.5em;
+  margin-top: -0.5em;
+}
