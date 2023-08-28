@@ -200,7 +200,7 @@ function WorldSelectionMenu() {
   }
 
   function label(x : number) {
-    return x == 0 ? 'playground' : x == 1 ? 'explorer' : 'regular'
+    return x == 0 ? 'none' : x == 1 ? 'lax' : 'regular'
   }
 
   return <nav className="world-selection-menu">
@@ -208,11 +208,11 @@ function WorldSelectionMenu() {
     <Button title="Load game progress from JSON" onClick={openUploadMenu} to=""><FontAwesomeIcon icon={faUpload} /></Button>
     <Button title="Clear game progress" to="" onClick={openEraseMenu}><FontAwesomeIcon icon={faEraser} /></Button>
     <div className="slider-wrap">
-      <span className="difficulty-label">difficulty:</span>
+      <span className="difficulty-label">Game Rules:</span>
       <Slider
-        title="Difficulties:&#10;- regular: 🔐 levels, 🔐 tactics&#10;- explorer: 🔓 levels, 🔐 tactics&#10;- playground: 🔓 levels, 🔓 tactics"
+        title="Game Rules:&#10;- regular: 🔐 levels, 🔐 tactics&#10;- lax: 🔓 levels, 🔐 tactics&#10;- none: 🔓 levels, 🔓 tactics"
         min={0} max={2}
-        aria-label="Mode"
+        aria-label="Game Rules"
         defaultValue={difficulty}
         marks={[
           {value: 0, label: label(0)},
