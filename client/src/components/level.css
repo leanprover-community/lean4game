@@ -324,3 +324,8 @@ td code  {
   margin-right: -0.5em;
   margin-top: -0.5em;
 }
+
+.toggle-width {
+  width: 40px;
+  text-align: center;
+}

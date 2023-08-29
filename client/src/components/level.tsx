@@ -4,7 +4,7 @@ import { useSelector, useStore } from 'react-redux'
 import Split from 'react-split'
 import { useParams } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faBook, faCode, faXmark, faHome, faCircleInfo, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faBars, faBook, faCode, faXmark, faHome, faCircleInfo, faArrowRight, faArrowLeft, faTerminal } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgress } from '@mui/material'
 import type { Location } from 'vscode-languageserver-protocol'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
@@ -349,7 +349,8 @@ function PlayableLevel() {
                   isLoading={level.isLoading}
                   levelTitle={`${mobile ? '' : 'Level '}${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${level?.data?.title}`)}
-                  toggleImpressum={toggleImpressum}
+                  impressum={impressum}
+                    toggleImpressum={toggleImpressum}
                   pageNumber={pageNumber} setPageNumber={setPageNumber} />
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
@@ -403,7 +404,7 @@ function Introduction() {
 
   return <>
     <div style={gameInfo.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" toggleImpressum={toggleImpressum}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" impressum={impressum} toggleImpressum={toggleImpressum}/>
     <div style={gameInfo.isLoading ? {display: "none"} : null} className="introduction-panel">
       <div className="content-wrapper">
         <Markdown>
@@ -422,7 +423,7 @@ function Introduction() {
 }
 
 /** The top-navigation bar */
-function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undefined, setPageNumber = undefined}) {
+function LevelAppBar({isLoading, levelTitle, impressum, toggleImpressum, pageNumber = undefined, setPageNumber = undefined}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
@@ -447,17 +448,17 @@ function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undef
         </div>
         <div className="nav-btns">
           {mobile && pageNumber == 0 ?
-            <Button to=""
+            <Button to="" className="btn btn-inverted toggle-width"
                 title="show inventory" inverted="true" onClick={() => {setPageNumber(1)}}>
               <FontAwesomeIcon icon={faBook}/>
             </Button>
           : pageNumber == 1 &&
-            <Button to=""
+            <Button className="btn btn-inverted toggle-width" to=""
                 title="show inventory" inverted="true" onClick={() => {setPageNumber(0)}}>
-              <FontAwesomeIcon icon={faArrowLeft}/>
+              <FontAwesomeIcon icon={faXmark}/>
             </Button>
           }
-          <Button to="" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}} >
+          <Button to="" className="btn toggle-width" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}} >
             {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
           </Button>
         </div>
@@ -528,13 +529,13 @@ function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber = undef
               <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
             </Button>
           }
-          <Button disabled={levelId <= 0} inverted="true" to=""
+          <Button className="btn btn-inverted toggle-width" disabled={levelId <= 0} inverted="true" to=""
               onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
               title="toggle Editor mode">
-            <FontAwesomeIcon icon={faCode} />
+            <FontAwesomeIcon icon={commandLineMode ? faCode : faTerminal} />
           </Button>
-          <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
-            <FontAwesomeIcon icon={faCircleInfo} />
+          <Button className="btn btn-inverted toggle-width" title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
+            <FontAwesomeIcon icon={impressum ? faXmark : faCircleInfo} />
           </Button>
         </div>
       </>
