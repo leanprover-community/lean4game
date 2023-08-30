@@ -45,3 +45,9 @@
     padding: 3px;
   }
 } */
+
+.world-label {
+  /* border: 2px solid purple; */
+  padding: .2em;
+  border-radius: .5em;
+}
