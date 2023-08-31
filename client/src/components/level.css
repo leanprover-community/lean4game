@@ -237,7 +237,7 @@ td code  {
 .commandline-interface .content {
   flex: 1 1 auto;
   overflow-y: scroll;
-  padding: .5em;
+  padding: 0;
 }
 
 .exercise .step {
@@ -319,10 +319,17 @@ td code  {
 }
 
 .tmp-pusher {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.commandline-interface .content {
   background-color: #eee;
-  margin-left: -0.5em;
-  margin-right: -0.5em;
-  margin-top: -0.5em;
+}
+
+.commandline-interface .proof {
+  background-color: #fff;
 }
 
 .toggle-width {

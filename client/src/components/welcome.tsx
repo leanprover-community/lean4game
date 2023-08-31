@@ -109,6 +109,7 @@ function Welcome() {
         )}
       </>
     :
+      
       <Split className="welcome" minSize={0} snapOffset={200}  sizes={[40, 35, 25]}>
         <IntroductionPanel introduction={gameInfo.data?.introduction} />
         <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />

@@ -413,10 +413,14 @@ export function CommandLineInterface(props: { world: string, level: number, data
 
   return <div className="commandline-interface">
     <div className="content" ref={proofPanelRef}>
-      <div className="tmp-pusher"></div>
+      <div className="tmp-pusher">
+        {!proof.length &&
+          <CircularProgress />
+        }
+      </div>
       <ExerciseStatement data={props.data} />
       {proof.length ?
-        <>
+        <div className='proof'>
           {proof.map((step, i) => {
             if (i == proof.length - 1 && lastStepErrors) {
               // if the last command contains an error, we only display the errors but not the
@@ -474,8 +478,8 @@ export function CommandLineInterface(props: { world: string, level: number, data
               }
             </div>
           }
-        </>
-      : <CircularProgress />}
+        </div> : <></>
+      }
     </div>
     <CommandLine proofPanelRef={proofPanelRef} hidden={!withErr && proof[proof.length - 1]?.goals.length == 0}/>
   </div>
