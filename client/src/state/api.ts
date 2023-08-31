@@ -4,7 +4,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Connection } from '../connection'
 
-interface GameInfo {
+export interface GameInfo {
   title: null|string,
   introduction: null|string,
   worlds: null|{nodes: {[id:string]: {id: string, title: string, introduction: string}}, edges: string[][]},

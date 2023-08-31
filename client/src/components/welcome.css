@@ -10,6 +10,10 @@
   display: flex;
 }
 
+.welcome.mobile .column {
+  width: 100%;
+}
+
 .app-content {
   height: 100%
 }
@@ -17,6 +21,7 @@
 .welcome .column {
   height: 100%;
   overflow: auto;
+  position: relative;
   scroll-behavior: smooth;
 }
 
@@ -229,33 +234,6 @@ svg .disabled {
   font-style: italic;
   text-decoration: underline dotted;
 
-}
-
-.mobile-nav {
-  padding-top: .5em;
-  padding-bottom: .5em;
-  position:relative;
-  height: 3em;
-  width: 100%;
-}
-
-.mobile-nav .btn-next, .mobile-nav .btn-previous {
-  position: absolute;
-  margin: 0;
-}
-
-.mobile-nav .btn-previous {
-  left: 0;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  padding-left: 0.3rem;
-}
-
-.mobile-nav .btn-next {
-  right: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  padding-right: .3rem;
 }
 
 .mobile-nav .svg-inline--fa {

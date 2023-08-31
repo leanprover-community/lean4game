@@ -42,6 +42,7 @@ import '@fontsource/roboto/700.css'
 import 'lean4web/client/src/editor/infoview.css'
 import 'lean4web/client/src/editor/vscode.css'
 import './level.css'
+import { LevelAppBar } from './app_bar'
 
 function Level() {
   const params = useParams()
@@ -420,127 +421,6 @@ function Introduction() {
       }
     </div>
   </>
-}
-
-/** The top-navigation bar */
-function LevelAppBar({isLoading, levelTitle, impressum, toggleImpressum, pageNumber = undefined, setPageNumber = undefined}) {
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = useContext(WorldLevelIdContext)
-  const gameInfo = useGetGameInfoQuery({game: gameId})
-
-  const {mobile} = React.useContext(MobileContext)
-
-  const difficulty = useSelector(selectDifficulty(gameId))
-  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
-
-  const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
-
-  const [navOpen, setNavOpen] = React.useState(false)
-
-  return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
-    {mobile ?
-      <>
-        {/* MOBILE VERSION */}
-        <div>
-          <span className="app-bar-title">
-            {levelTitle}
-          </span>
-        </div>
-        <div className="nav-btns">
-          {mobile && pageNumber == 0 ?
-            <Button to="" className="btn btn-inverted toggle-width"
-                title="show inventory" inverted="true" onClick={() => {setPageNumber(1)}}>
-              <FontAwesomeIcon icon={faBook}/>
-            </Button>
-          : pageNumber == 1 &&
-            <Button className="btn btn-inverted toggle-width" to=""
-                title="show inventory" inverted="true" onClick={() => {setPageNumber(0)}}>
-              <FontAwesomeIcon icon={faXmark}/>
-            </Button>
-          }
-          <Button to="" className="btn toggle-width" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}} >
-            {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
-          </Button>
-        </div>
-        <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
-          {levelId < gameInfo.data?.worldSize[worldId] &&
-            <Button inverted="true"
-                to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
-                disabled={difficulty >= 2 && !(completed || levelId == 0)}
-                onClick={() => setNavOpen(false)}>
-              <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
-            </Button>
-          }
-          {levelId > 0 && <>
-                <Button disabled={levelId <= 0} inverted="true"
-                    to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
-                    title="previous level"
-                    onClick={() => setNavOpen(false)}>
-                  <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
-                </Button>
-              </>}
-          <Button to={`/${gameId}`} inverted="true" title="back to world selection">
-            <FontAwesomeIcon icon={faHome} />&nbsp;Home
-          </Button>
-          <Button disabled={levelId <= 0} inverted="true" to=""
-              onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
-              title="toggle Editor mode">
-            <FontAwesomeIcon icon={faCode} />&nbsp;Toggle Editor
-          </Button>
-          <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
-            <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Info &amp; Impressum
-          </Button>
-        </div>
-      </>
-    :
-      <>
-        {/* DESKTOP VERSION */}
-        <div>
-          <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
-            <FontAwesomeIcon icon={faHome} />
-          </Button>
-          <span className="app-bar-title">
-            {gameInfo.data?.worlds.nodes[worldId].title && `World: ${gameInfo.data?.worlds.nodes[worldId].title}`}
-          </span>
-        </div>
-        <div>
-          <span className="app-bar-title">
-            {levelTitle}
-          </span>
-        </div>
-        <div className="nav-btns">
-          {levelId > 0 && <>
-            <Button disabled={levelId <= 0} inverted="true"
-                to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
-                title="previous level"
-                onClick={() => setNavOpen(false)}>
-              <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
-            </Button>
-          </>}
-          {levelId < gameInfo.data?.worldSize[worldId] ?
-            <Button inverted="true"
-                to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
-                disabled={difficulty >= 2 && !(completed || levelId == 0)}
-                onClick={() => setNavOpen(false)}>
-              <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
-            </Button>
-            :
-            <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
-              <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
-            </Button>
-          }
-          <Button className="btn btn-inverted toggle-width" disabled={levelId <= 0} inverted="true" to=""
-              onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
-              title="toggle Editor mode">
-            <FontAwesomeIcon icon={commandLineMode ? faCode : faTerminal} />
-          </Button>
-          <Button className="btn btn-inverted toggle-width" title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
-            <FontAwesomeIcon icon={impressum ? faXmark : faCircleInfo} />
-          </Button>
-        </div>
-      </>
-    }
-  </div>
 }
 
 function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {

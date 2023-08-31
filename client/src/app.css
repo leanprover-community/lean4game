@@ -125,8 +125,12 @@ em {
 }
 
 .app-content {
+  height: 100%;
   flex: 1;
+  min-height: 0;
+  display: flex;
 }
+
 
 .markdown li ul, .markdown li ol {
 	margin:0 1.5em;

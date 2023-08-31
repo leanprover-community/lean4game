@@ -64,10 +64,14 @@ export const ProofStateContext = React.createContext<{
 
 export const MobileContext = React.createContext<{
   mobile : boolean,
-  setMobile: React.Dispatch<React.SetStateAction<Boolean>>
+  setMobile: React.Dispatch<React.SetStateAction<Boolean>>,
+  pageNumber: number,
+  setPageNumber: React.Dispatch<React.SetStateAction<Number>>
 }>({
   mobile : false,
   setMobile: () => {},
+  pageNumber: 0,
+  setPageNumber: () => {}
 })
 
 export const WorldLevelIdContext = React.createContext<{

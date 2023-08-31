@@ -418,68 +418,70 @@ export function CommandLineInterface(props: { world: string, level: number, data
           <CircularProgress />
         }
       </div>
-      <ExerciseStatement data={props.data} />
-      {proof.length ?
-        <div className='proof'>
-          {proof.map((step, i) => {
-            if (i == proof.length - 1 && lastStepErrors) {
-              // if the last command contains an error, we only display the errors but not the
-              // entered command as it is still present in the command line.
-              // TODO: Should not use index as key.
-              return <div key={`proof-step-${i}`}>
-                <Errors errors={step.errors} commandLineMode={true} />
-              </div>
-            } else {
-              return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')} onClick={toggleSelectStep(i)}>
-                <Command command={step.command} deleteProof={deleteProof(i)} />
-                <Errors errors={step.errors} commandLineMode={true} />
-                {mobile && i == 0 && props.data?.introduction &&
-                  <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelectStep(0)}>
-                    <Markdown>{props.data?.introduction}</Markdown>
-                  </div>
-                }
-                {mobile && <>
-                  <Hints key={`hints-${i}`}
-                    hints={step.hints} showHidden={showHelp.has(i)} step={i}
-                    selected={selectedStep} toggleSelection={toggleSelectStep(i)}/>
-                  {i == proof.length - 1 && hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
-                    <Button className="btn btn-help" to="" onClick={activateHiddenHints}>
-                      Show more help!
-                    </Button>
+      <div className='proof'>
+        <ExerciseStatement data={props.data} />
+        {proof.length ?
+          <>
+            {proof.map((step, i) => {
+              if (i == proof.length - 1 && lastStepErrors) {
+                // if the last command contains an error, we only display the errors but not the
+                // entered command as it is still present in the command line.
+                // TODO: Should not use index as key.
+                return <div key={`proof-step-${i}`}>
+                  <Errors errors={step.errors} commandLineMode={true} />
+                </div>
+              } else {
+                return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')} onClick={toggleSelectStep(i)}>
+                  <Command command={step.command} deleteProof={deleteProof(i)} />
+                  <Errors errors={step.errors} commandLineMode={true} />
+                  {mobile && i == 0 && props.data?.introduction &&
+                    <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelectStep(0)}>
+                      <Markdown>{props.data?.introduction}</Markdown>
+                    </div>
                   }
-                </>
-                }
-                <GoalsTab proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} />
-                {/* Show a message that there are no goals left */}
-                {!step.goals.length && (
-                  <div className="message information">
-                    {completed ?
-                      <p>Level completed! 🎉</p> :
-                      <p>
-                        <b>no goals left</b><br />
-                        <i>This probably means you solved the level with warnings or Lean encountered a parsing error.</i>
-                      </p>
+                  {mobile && <>
+                    <Hints key={`hints-${i}`}
+                      hints={step.hints} showHidden={showHelp.has(i)} step={i}
+                      selected={selectedStep} toggleSelection={toggleSelectStep(i)}/>
+                    {i == proof.length - 1 && hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
+                      <Button className="btn btn-help" to="" onClick={activateHiddenHints}>
+                        Show more help!
+                      </Button>
                     }
-                  </div>
-                )}
+                  </>
+                  }
+                  <GoalsTab proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} />
+                  {/* Show a message that there are no goals left */}
+                  {!step.goals.length && (
+                    <div className="message information">
+                      {completed ?
+                        <p>Level completed! 🎉</p> :
+                        <p>
+                          <b>no goals left</b><br />
+                          <i>This probably means you solved the level with warnings or Lean encountered a parsing error.</i>
+                        </p>
+                      }
+                    </div>
+                  )}
+                </div>
+              }
+            })}
+            {mobile && completed &&
+              <div className="button-row">
+                {props.level >= props.worldSize ?
+                  <Button to={`/${gameId}`}>
+                    <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
+                  </Button>
+                :
+                  <Button to={`/${gameId}/world/${props.world}/level/${props.level + 1}`}>
+                    Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+                  </Button>
+                }
               </div>
             }
-          })}
-          {mobile && completed &&
-            <div className="button-row">
-              {props.level >= props.worldSize ?
-                <Button to={`/${gameId}`}>
-                  <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
-                </Button>
-              :
-                <Button to={`/${gameId}/world/${props.world}/level/${props.level + 1}`}>
-                  Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
-                </Button>
-              }
-            </div>
-          }
-        </div> : <></>
-      }
+          </> : <></>
+        }
+      </div>
     </div>
     <CommandLine proofPanelRef={proofPanelRef} hidden={!withErr && proof[proof.length - 1]?.goals.length == 0}/>
   </div>
