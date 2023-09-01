@@ -19,6 +19,7 @@ import { WorldTreePanel, downloadFile } from './world_tree'
 
 import './welcome.css'
 import { WelcomeAppBar } from './app_bar'
+import { Hint } from './hints'
 
 /** The panel showing the game's introduction text */
 function IntroductionPanel({introduction}: {introduction: string}) {
@@ -26,11 +27,25 @@ function IntroductionPanel({introduction}: {introduction: string}) {
   const gameId = React.useContext(GameIdContext)
   const dispatch = useAppDispatch()
 
+  // TODO: I left the setup for splitting up the introduction in place, but if it's not needed
+  // then this can be simplified.
+
+  // let text: Array<string> = introduction.split(/\n(\s*\n)+/)
+  let text: Array<string> = [introduction]
+
   return <div className="column chat-panel">
-    <Typography variant="body1" component="div" className="welcome-text">
-      {/* <h1>{title}</h1> */}
-      <Markdown>{introduction}</Markdown>
-    </Typography>
+    <div className="chat">
+      {text?.map((t =>
+        t.trim() ?
+          <Hint hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
+        : <></>
+      ))}
+    </div>
+    {/* <Typography variant="body1" component="div" className="welcome-text">
+          <h1>{title}</h1>
+          <Markdown>{introduction}</Markdown>
+        </Typography>
+    */}
     {mobile &&
       <div className="button-row">
         <Button className="btn" to=""

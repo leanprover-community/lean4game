@@ -32,7 +32,7 @@ import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContex
   ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint } from './infoview/rpc_api'
-import { DeletedHints, Hints } from './hints'
+import { DeletedHints, Hint, Hints } from './hints'
 import { Impressum } from './privacy_policy'
 
 import '@fontsource/roboto/300.css'
@@ -388,11 +388,15 @@ function IntroductionPanel({gameInfo, impressum, closeImpressum}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId} = useContext(WorldLevelIdContext)
 
-  return <div style={gameInfo.isLoading ? {display: "none"} : null} className="chat-panel">
+  let text: Array<string> = gameInfo.data?.worlds.nodes[worldId].introduction.split(/\n(\s*\n)+/)
+
+  return <div className="chat-panel">
     <div className="chat">
-      <Markdown>
-        {gameInfo.data?.worlds.nodes[worldId].introduction}
-      </Markdown>
+      {text?.map((t =>
+        t.trim() ?
+          <Hint hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
+        : <></>
+      ))}
       {impressum ? <Impressum handleClose={closeImpressum} /> : null}
     </div>
     <div className="button-row">
@@ -428,9 +432,10 @@ function Introduction() {
   }
 
   return <>
-    <div style={gameInfo.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" impressum={impressum} toggleImpressum={toggleImpressum}/>
-      {mobile ?
+    {gameInfo.isLoading ?
+      <div className="app-content loading"><CircularProgress /></div>
+    : mobile ?
         <IntroductionPanel gameInfo={gameInfo} impressum={impressum} closeImpressum={closeImpressum} />
       :
         <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
