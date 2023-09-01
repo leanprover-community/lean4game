@@ -20,7 +20,7 @@ import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/
 import { GameIdContext } from '../app'
 import { ConnectionContext, connection, useLeanClient } from '../connection'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api'
+import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
 import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited,
   selectHelp, selectDifficulty, selectInventory } from '../state/progress'
 import { store } from '../state/store'
@@ -384,12 +384,36 @@ function PlayableLevel() {
   </>
 }
 
+function IntroductionPanel({gameInfo, impressum, closeImpressum}) {
+  const gameId = React.useContext(GameIdContext)
+  const {worldId} = useContext(WorldLevelIdContext)
+
+  return <div style={gameInfo.isLoading ? {display: "none"} : null} className="chat-panel">
+    <div className="chat">
+      <Markdown>
+        {gameInfo.data?.worlds.nodes[worldId].introduction}
+      </Markdown>
+      {impressum ? <Impressum handleClose={closeImpressum} /> : null}
+    </div>
+    <div className="button-row">
+      {gameInfo.data?.worldSize[worldId] == 0 ?
+        <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+        <Button to={`/${gameId}/world/${worldId}/level/1`}>
+          Start&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+        </Button>
+      }
+    </div>
+  </div>
+}
+
 export default Level
 
 /** The site with the introduction text of a world */
 function Introduction() {
   const gameId = React.useContext(GameIdContext)
-  const {worldId} = useContext(WorldLevelIdContext)
+  const {mobile} = useContext(MobileContext)
+
+  const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
@@ -406,22 +430,41 @@ function Introduction() {
   return <>
     <div style={gameInfo.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" impressum={impressum} toggleImpressum={toggleImpressum}/>
-    <div style={gameInfo.isLoading ? {display: "none"} : null} className="introduction-panel">
-      <div className="content-wrapper">
-        <Markdown>
-          {gameInfo.data?.worlds.nodes[worldId].introduction}
-        </Markdown>
-        {impressum ? <Impressum handleClose={closeImpressum} /> : null}
-      </div>
-      {gameInfo.data?.worldSize[worldId] == 0 ?
-        <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
-        <Button to={`/${gameId}/world/${worldId}/level/1`}>
-          Start&nbsp;<FontAwesomeIcon icon={faArrowRight} />
-        </Button>
+      {mobile ?
+        <IntroductionPanel gameInfo={gameInfo} impressum={impressum} closeImpressum={closeImpressum} />
+      :
+        <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
+          <IntroductionPanel gameInfo={gameInfo} impressum={impressum} closeImpressum={closeImpressum} />
+          <div className="world-image-container empty"></div>
+          <InventoryPanel levelInfo={inventory?.data} />
+        </Split>
       }
-    </div>
+
   </>
 }
+
+// {mobile?
+//   // TODO: This is copied from the `Split` component below...
+//   <>
+//     <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
+//       <ExercisePanel
+//         impressum={impressum}
+//         closeImpressum={closeImpressum}
+//         codeviewRef={codeviewRef}
+//         visible={pageNumber == 0} />
+//       <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
+//     </div>
+//   </>
+// :
+//   <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+//     <ChatPanel lastLevel={lastLevel}/>
+//     <ExercisePanel
+//       impressum={impressum}
+//       closeImpressum={closeImpressum}
+//       codeviewRef={codeviewRef} />
+//     <InventoryPanel levelInfo={level?.data} />
+//   </Split>
+// }
 
 function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
 

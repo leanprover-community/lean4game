@@ -317,7 +317,7 @@ td code  {
   justify-content: center;
 }
 
-.commandline-interface .content {
+.commandline-interface .content, .world-image-container.empty {
   background-color: #eee;
 }
 
