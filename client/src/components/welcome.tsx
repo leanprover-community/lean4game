@@ -31,7 +31,7 @@ function IntroductionPanel({introduction}: {introduction: string}) {
   // then this can be simplified.
 
   // let text: Array<string> = introduction.split(/\n(\s*\n)+/)
-  let text: Array<string> = [introduction]
+  let text: Array<string> = introduction ? [introduction] : []
 
   return <div className="column chat-panel">
     <div className="chat">

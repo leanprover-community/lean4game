@@ -89,7 +89,7 @@ export function WelcomeAppBar({gameInfo, toggleImpressum, openEraseMenu, openUpl
       </div>
       <div>
         <span className="app-bar-title">
-          {gameInfo.title}
+          {gameInfo?.title}
         </span>
       </div>
       <div className="nav-btns">
