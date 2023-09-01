@@ -268,7 +268,7 @@ export function WorldTreePanel({worlds, worldSize}:
     let elems = Array.from(document.getElementsByClassName("playable-world"))
     if (elems.length) {
       // it seems that the last element is the one furthest up in the tree
-      // TODO: I think they appear in random order. Check there position and select the lowest one
+      // TODO: I think they appear in random order. Check their position and select the lowest one
       // of these positions to scroll to.
       let elem = elems[0]
       console.debug(`scrolling to ${elem.textContent}`)
@@ -299,7 +299,8 @@ export function WorldTreePanel({worlds, worldSize}:
       // if the origin world is not completed, mark the target world as non-playable
       if (!sourceCompleted) {completed[edge[1]][0] = false}
       svgElements.push(
-        <WorldPath source={nodes[edge[0]]} target={nodes[edge[1]]} unlocked={sourceCompleted}/>
+        <WorldPath key={`path_${edge[0]}-->${edge[1]}`}
+          source={nodes[edge[0]]} target={nodes[edge[1]]} unlocked={sourceCompleted}/>
       )
     }
 
@@ -343,10 +344,9 @@ export function WorldTreePanel({worlds, worldSize}:
   return <div className="column">
       <WorldSelectionMenu />
       <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
-        width={bounds ? `${ds * dx}` : ''}
+          width={bounds ? `${ds * dx}` : ''}
           viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
-          className="world-selection"
-        >
+          className="world-selection" >
         {svgElements}
       </svg>
   </div>

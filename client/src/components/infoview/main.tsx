@@ -295,11 +295,6 @@ export function CommandLineInterface(props: { world: string, level: number, data
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
 
-  // React.useEffect(() => {
-  //   console.debug('updated proof')
-  //   // proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
-  // }, [proof])
-
   /** Delete all proof lines starting from a given line.
    * Note that the first line (i.e. deleting everything) is `1`!
    */
@@ -337,6 +332,11 @@ export function CommandLineInterface(props: { world: string, level: number, data
       }
     }
   }
+
+  // Scroll to the end of the proof if it is updated.
+  React.useEffect(() => {
+    proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
+  }, [proof])
 
   // Scroll to element if selection changes
   React.useEffect(() => {
@@ -412,13 +412,13 @@ export function CommandLineInterface(props: { world: string, level: number, data
   let lastStepErrors = proof.length ? hasInteractiveErrors(proof[proof.length - 1].errors) : false
 
   return <div className="commandline-interface">
-    <div className="content" ref={proofPanelRef}>
+    <div className="content">
       <div className="tmp-pusher">
         {!proof.length &&
           <CircularProgress />
         }
       </div>
-      <div className='proof'>
+      <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement data={props.data} />
         {proof.length ?
           <>
@@ -483,6 +483,6 @@ export function CommandLineInterface(props: { world: string, level: number, data
         }
       </div>
     </div>
-    <CommandLine proofPanelRef={proofPanelRef} hidden={!withErr && proof[proof.length - 1]?.goals.length == 0}/>
+    <CommandLine hidden={!withErr && proof[proof.length - 1]?.goals.length == 0}/>
   </div>
 }

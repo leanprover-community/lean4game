@@ -83,13 +83,11 @@ export function WelcomeAppBar({gameInfo, toggleImpressum, openEraseMenu, openUpl
         <Button inverted="false" title="back to games selection" to="/">
           <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
         </Button>
-        <span className="app-bar-title">
-          {}
-        </span>
+        <span className="app-bar-title"></span>
       </div>
       <div>
         <span className="app-bar-title">
-          {gameInfo?.title}
+          {mobile ? '' : gameInfo?.title}
         </span>
       </div>
       <div className="nav-btns">

@@ -26,6 +26,7 @@
 
 .inventory-panel, .exercise-panel, .doc-panel, .introduction-panel {
   height: 100%;
+  width: 100%;
   overflow: auto;
   position: relative;
 }

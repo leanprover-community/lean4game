@@ -64,7 +64,7 @@ config.autoClosingPairs = config.autoClosingPairs.map(
 monaco.languages.setLanguageConfiguration('lean4cmd', config);
 
 /** The input field */
-export function CommandLine({proofPanelRef, hidden}: {proofPanelRef: React.MutableRefObject<HTMLDivElement>, hidden?: boolean}) {
+export function CommandLine({hidden}: {hidden?: boolean}) {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
@@ -179,11 +179,9 @@ export function CommandLine({proofPanelRef, hidden}: {proofPanelRef: React.Mutab
         })
         // Save the proof to the context
         setProof(tmpProof)
-        console.debug('updated proof')
-        proofPanelRef.current?.lastElementChild?.scrollIntoView()
       })
     })
-  }, [editor, rpcSess, uri, model, proofPanelRef])
+  }, [editor, rpcSess, uri, model])
 
   // Run the command
   const runCommand = React.useCallback(() => {

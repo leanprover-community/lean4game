@@ -392,10 +392,9 @@ function IntroductionPanel({gameInfo, impressum, closeImpressum}) {
 
   return <div className="chat-panel">
     <div className="chat">
-      {text?.map((t =>
-        t.trim() ?
-          <Hint hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
-        : <></>
+      {text?.filter(t => t.trim()).map(((t, i) =>
+        <Hint key={`intro-p-${i}`}
+          hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
       ))}
       {impressum ? <Impressum handleClose={closeImpressum} /> : null}
     </div>

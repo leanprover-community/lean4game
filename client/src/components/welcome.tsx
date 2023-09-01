@@ -35,9 +35,11 @@ function IntroductionPanel({introduction}: {introduction: string}) {
 
   return <div className="column chat-panel">
     <div className="chat">
-      {text?.map((t =>
+      {text?.map(((t, i) =>
         t.trim() ?
-          <Hint hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
+          <Hint key={`intro-p-${i}`}
+            hint={{text: t, hidden: false}}
+            step={0} selected={null} toggleSelection={undefined} />
         : <></>
       ))}
     </div>
