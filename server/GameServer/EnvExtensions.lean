@@ -303,7 +303,7 @@ new.fold (fun acc a b =>
   then acc.insert a (merge bOld b)
   else acc.insert a b) old
 
-def GameLevel.merge (old : GameLevel) (new : GameLevel) : GameLevel :=
+def GameLevel.merge (_old : GameLevel) (new : GameLevel) : GameLevel :=
   new -- simply override old level
 
 def World.merge (old : World) (new : World) : World :=
