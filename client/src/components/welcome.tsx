@@ -21,14 +21,14 @@ import './welcome.css'
 import { WelcomeAppBar } from './app_bar'
 
 /** The panel showing the game's introduction text */
-function IntroductionPanel({introduction, title}: { introduction: string, title?: string}) {
+function IntroductionPanel({introduction}: {introduction: string}) {
   const {mobile, setPageNumber} = React.useContext(MobileContext)
   const gameId = React.useContext(GameIdContext)
   const dispatch = useAppDispatch()
 
   return <div className="column chat-panel">
     <Typography variant="body1" component="div" className="welcome-text">
-      {mobile && <h1>{title}</h1>}
+      {/* <h1>{title}</h1> */}
       <Markdown>{introduction}</Markdown>
     </Typography>
     {mobile &&
@@ -44,6 +44,19 @@ function IntroductionPanel({introduction, title}: { introduction: string, title?
     }
   </div>
 }
+
+export function InfoPopup ({info, handleClose}: {info: string, handleClose: () => void}) {
+  return <div className="modal-wrapper">
+  <div className="modal-backdrop" onClick={handleClose} />
+  <div className="modal">
+    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+    <Typography variant="body1" component="div" className="welcome-text">
+      <Markdown>{info}</Markdown>
+    </Typography>
+  </div>
+</div>
+}
+
 
 function ErasePopup ({handleClose}) {
   const gameId = React.useContext(GameIdContext)
@@ -155,6 +168,11 @@ function Welcome() {
   function closeImpressum() {setImpressum(false)}
   function toggleImpressum() {setImpressum(!impressum)}
 
+  const [info, setInfo] = React.useState(false)
+  function closeInfo() {setInfo(false)}
+  function toggleInfo() {setInfo(!impressum)}
+
+
   /* state variables to toggle the pop-up menus */
   const [eraseMenu, setEraseMenu] = React.useState(false);
   const openEraseMenu = () => setEraseMenu(true);
@@ -177,12 +195,12 @@ function Welcome() {
     </Box>
   : <>
     <WelcomeAppBar gameInfo={gameInfo.data} toggleImpressum={toggleImpressum} openEraseMenu={openEraseMenu}
-      openUploadMenu={openUploadMenu} />
+      openUploadMenu={openUploadMenu} toggleInfo={toggleInfo} />
     <div className="app-content">
       { mobile ?
           <div className="welcome mobile">
             {(pageNumber == 0 ?
-              <IntroductionPanel introduction={gameInfo.data?.introduction} title={gameInfo.data?.title}/>
+              <IntroductionPanel introduction={gameInfo.data?.introduction} />
             : pageNumber == 1 ?
               <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
             :
@@ -200,6 +218,7 @@ function Welcome() {
     {impressum ? <PrivacyPolicyPopup handleClose={closeImpressum} /> : null}
     {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
     {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
+    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
   </>
 }
 

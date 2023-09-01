@@ -285,6 +285,8 @@ structure Game where
   title : String := default
   /-- Text displayed on the main landing page of the game. -/
   introduction : String := default
+  /-- Text displayed on the main landing page of the game. -/
+  info : String := default
   /-- TODO: currently unused. -/
   conclusion : String := default
   /-- TODO: currently unused. -/

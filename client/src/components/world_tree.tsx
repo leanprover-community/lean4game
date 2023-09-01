@@ -23,7 +23,7 @@ import './world_tree.css'
 cytoscape.use( klay )
 
 const r = 16              // radius of a level
-const s = 12              // global scale
+const s = 10              // global scale
 const lineWidth = 10      //
 const ds = .75  // scale the resulting svg image
 

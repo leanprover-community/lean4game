@@ -7,6 +7,7 @@ import { Connection } from '../connection'
 export interface GameInfo {
   title: null|string,
   introduction: null|string,
+  info: null|string,
   worlds: null|{nodes: {[id:string]: {id: string, title: string, introduction: string}}, edges: string[][]},
   worldSize: null|{[key: string]: number},
   authors: null|string[],

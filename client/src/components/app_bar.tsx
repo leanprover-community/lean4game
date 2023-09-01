@@ -52,11 +52,12 @@ function MobileNav({pageNumber, setPageNumber}:
   </>
 }
 
-export function WelcomeAppBar({gameInfo, toggleImpressum, openEraseMenu, openUploadMenu} : {
+export function WelcomeAppBar({gameInfo, toggleImpressum, openEraseMenu, openUploadMenu, toggleInfo} : {
   gameInfo: GameInfo,
   toggleImpressum: any,
   openEraseMenu: any,
   openUploadMenu: any,
+  toggleInfo: any
 }) {
   const gameId = React.useContext(GameIdContext)
   const {mobile, pageNumber, setPageNumber} = React.useContext(MobileContext)
@@ -88,7 +89,7 @@ export function WelcomeAppBar({gameInfo, toggleImpressum, openEraseMenu, openUpl
       </div>
       <div>
         <span className="app-bar-title">
-          {mobile ? '' : gameInfo.title}
+          {gameInfo.title}
         </span>
       </div>
       <div className="nav-btns">
@@ -129,6 +130,9 @@ export function WelcomeAppBar({gameInfo, toggleImpressum, openEraseMenu, openUpl
           <FontAwesomeIcon icon={faCode} />&nbsp;Toggle Editor
         </Button> */}
 
+        <Button title="Game Info & Credits" inverted="true" to="" onClick={(ev) => {toggleInfo(); setNavOpen(false)}}>
+          <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Game Info
+        </Button>
         <Button title="Clear Progress" inverted="true" to="" onClick={(ev) => {openEraseMenu(); setNavOpen(false)}}>
           <FontAwesomeIcon icon={faEraser} />&nbsp;Erase
         </Button>
@@ -137,9 +141,6 @@ export function WelcomeAppBar({gameInfo, toggleImpressum, openEraseMenu, openUpl
         </Button>
         <Button title="Load Progress from JSON" inverted="true" to="" onClick={(ev) => {openUploadMenu(); setNavOpen(false)}}>
           <FontAwesomeIcon icon={faUpload} />&nbsp;Upload
-        </Button>
-        <Button title="Credits" inverted="true" to="" onClick={(ev) => {setNavOpen(false)}}>
-          <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Info & Credits
         </Button>
         <Button title="Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(); setNavOpen(false)}}>
           <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Impressum

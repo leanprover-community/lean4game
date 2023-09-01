@@ -47,6 +47,14 @@ elab "Introduction" t:str : command => do
   | .World => modifyCurWorld  fun world => pure {world with introduction := t.getString}
   | .Game => modifyCurGame  fun game => pure {game with introduction := t.getString}
 
+/-- Define the info of the current game. Used for e.g. credits -/
+elab "Info" t:str : command => do
+  match ← getCurLayer with
+  | .Level => pure ()
+  | .World => pure ()
+  | .Game => modifyCurGame  fun game => pure {game with info := t.getString}
+
+
 /-- Define the conclusion of the current game or current level if some
 building a level. -/
 elab "Conclusion" t:str : command => do
