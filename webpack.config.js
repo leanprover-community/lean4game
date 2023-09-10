@@ -4,6 +4,10 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 
 module.exports = env => {
+
+  const single_game = process.env.LOCAL_GAME
+
+
   const environment = process.env.NODE_ENV
   const isDevelopment = environment === 'development'
 
@@ -18,7 +22,7 @@ module.exports = env => {
   global.$RefreshSig$ = () => () => {};
 
   return {
-    entry: ["./client/src/index.tsx"],
+    entry: [single_game ? "./client/src/index_local.tsx" : "./client/src/index.tsx"],
     mode: isDevelopment ? 'development' : 'production',
     module: {
       rules: [
