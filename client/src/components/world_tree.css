@@ -51,15 +51,13 @@ svg .disabled {
 .world-selection-menu {
   padding: .5em 1em;
   position: absolute;
-  right: 0;
+  right: 1em;
   top: 1em;
   /* margin: 1em; */
   /* border: 1px solid var(--clr-primary); */
-  border-bottom: 1px solid var(--clr-primary);
-  border-left: 1px solid var(--clr-primary);
-  border-top: 1px solid var(--clr-primary);
+  border: 1px solid var(--clr-primary);
   background-color: #fff;
-  border-radius: .5em 0 0 .5em;
+  border-radius: .5em;
   filter: drop-shadow(4px 4px 5px rgba(0,0,0,0.5));
 }
 

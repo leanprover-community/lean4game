@@ -193,7 +193,7 @@ export function WorldSelectionMenu() {
   const dispatch = useAppDispatch()
 
   function label(x : number) {
-    return x == 0 ? 'none' : x == 1 ? 'lax' : 'regular'
+    return x == 0 ? 'none' : x == 1 ? 'relaxed' : 'regular'
   }
 
   return <nav className="world-selection-menu">
@@ -201,7 +201,7 @@ export function WorldSelectionMenu() {
       <span className="difficulty-label">Game Rules</span>
       <Slider
         orientation="vertical"
-        title="Game Rules:&#10;- regular: 🔐 levels, 🔐 tactics&#10;- lax: 🔓 levels, 🔐 tactics&#10;- none: 🔓 levels, 🔓 tactics"
+        title="Game Rules:&#10;- regular: 🔐 levels, 🔐 tactics&#10;- relaxed: 🔓 levels, 🔐 tactics&#10;- none: 🔓 levels, 🔓 tactics"
         min={0} max={2}
         aria-label="Game Rules"
         defaultValue={difficulty}

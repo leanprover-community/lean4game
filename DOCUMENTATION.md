@@ -213,7 +213,7 @@ Notation for naturals is `\\N`."
 
 The installation instructions are not yet tested on Mac/Windows. Comments very welcome!
 
-## Using Dev Containers
+## VSCode Dev Containers
 
 1.  **Install Docker and Dev Containers** *(once)*:<br/>
     See [official instructions](https://code.visualstudio.com/docs/devcontainers/containers#_getting-started).
@@ -225,13 +225,14 @@ The installation instructions are not yet tested on Mac/Windows. Comments very w
     * Open the games folder in VSCode: `cd NNG4 && code .` or "Open Folder" within VSCode
     * a message appears prompting you to install the "Dev Containers" extension (by Microsoft).
 
-2.  **Open Project in Dev Container** **(everytime)**:<br/>
+2.  **Open Project in Dev Container** *(everytime)*:<br/>
     Once you have the Dev Containers Extension installed, (re)open the project folder of your game in VSCode.
     A message appears asking you to "Reopen in Container".
 
-    * The first start will take a while, ca. 1-5 minutes. After the first
+    * The first start will take a while, ca. 2-10 minutes. After the first
       start this should be very quickly.
-    * Afterwards, go to your browser and open http://localhost:3000/#/g/local/game.
+    * Once built, it should open a tab "Simple Browser" inside VSCode displaying
+      the game. (Alternatively, open http://localhost:3000 in your browser).
 
 3.  **Editing Files** *(everytime)*:<br/>
     After editing some files in VSCode, open VSCode's terminal (View > Terminal) and run `lake build`.

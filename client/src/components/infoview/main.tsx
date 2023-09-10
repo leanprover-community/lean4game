@@ -335,7 +335,11 @@ export function CommandLineInterface(props: { world: string, level: number, data
 
   // Scroll to the end of the proof if it is updated.
   React.useEffect(() => {
-    proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
+    if (proof?.length > 1) {
+      proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
+    } else {
+      proofPanelRef.current?.scrollTo(0,0)
+    }
   }, [proof])
 
   // Scroll to element if selection changes

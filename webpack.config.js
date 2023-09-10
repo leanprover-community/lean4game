@@ -5,7 +5,7 @@ const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 
 module.exports = env => {
 
-  const single_game = process.env.LOCAL_GAME
+  const single_game = process.env.LEAN4GAME_SINGLE_GAME
 
 
   const environment = process.env.NODE_ENV
