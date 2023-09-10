@@ -313,7 +313,7 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
           return {acc with definitions := acc.definitions.insertMany ns}
       ) acc
 
-#check expandOptDocComment?
+-- #check expandOptDocComment?
 
 /-- Define the statement of the current level. -/
 elab doc:docComment ? attrs:Parser.Term.attributes ?
