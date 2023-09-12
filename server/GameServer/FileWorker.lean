@@ -521,8 +521,6 @@ section MainLoop
     set st
     match msg with
     | Message.request id method (some params) =>
-      -- TODO: What's this error message?
-      if method == "Game.getInteractiveGoals" then throwServerError "HELLO"
       handleRequest id method (toJson params)
       mainLoop
     | Message.notification "exit" none =>
