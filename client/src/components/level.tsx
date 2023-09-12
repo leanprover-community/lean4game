@@ -48,10 +48,10 @@ function Level() {
   const params = useParams()
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
-  useLoadWorldFiles(worldId)
+  // useLoadWorldFiles(worldId)
 
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
-    {levelId == 0 ? <Introduction /> : <PlayableLevel />}
+    {levelId == 0 ? <Introduction /> : <PlayableLevel key={`${worldId}/${levelId}`}/>}
   </WorldLevelIdContext.Provider>
 }
 
@@ -553,8 +553,8 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
   }, [])
 
   const {leanClient, leanClientStarted} = useLeanClient(gameId)
-
-  const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
+  const uriStr = `file:///${worldId}/${levelId}`
+  const uri = monaco.Uri.parse(uriStr)
 
   // Create model when level changes
   useEffect(() => {
@@ -572,6 +572,10 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
         // BUG: Somehow I get an `invalid arguments` bug here
         // editor.setSelections(initialSelections)
       }
+
+      return () => {
+        editorConnection.api.sendClientNotification(uriStr, "textDocument/didClose", {textDocument: {uri: uriStr}})
+        model.dispose(); }
     }
   }, [editor, levelId, connection, leanClientStarted])
 
