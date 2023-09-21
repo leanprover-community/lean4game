@@ -85,7 +85,7 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
     s * position.y - Math.cos(level * betaSpiral(level)) * (R + 2*r*(level-1)/(NMAX+1))
 
   return (
-    <Link to={levelDisabled ? '' : `/${gameId}/world/${world}/level/${level}`}
+    <Link to={levelDisabled ? '' : `/${gameId}/world/${world}/level/${level == 1 ? 0 : level}`}
         className={`level${levelDisabled ? ' disabled' : ''}`}>
       <circle fill={completed ? lightgreen : unlocked? blue : lightgrey} cx={x} cy={y} r={r} />
       <foreignObject className="level-title-wrapper" x={x} y={y}
