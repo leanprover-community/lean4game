@@ -765,17 +765,17 @@ elab "MakeGame" : command => do
   for item in inventoryTemplateExt.getState env do
     let name := item.name
 
-    let docstring ← getDocstring env name item.type
-    let content : String := match item.content with
+    let content : String ← match item.content with
     | "" =>
       -- If documentation is missing, try using the docstring instead.
+      let docstring ← getDocstring env name item.type
       match docstring with
-      | some ds => s!"*(lean docstring)*\\\n{ds}"
-      | none => "(missing)"
+      | some ds => pure s!"*(lean docstring)*\\\n{ds}"
+      | none => pure "(missing)"
     | template =>
       -- TODO: Process content template.
       -- TODO: Add information about inventory items
-      template.replace "[[mathlib_doc]]"
+      pure $ template.replace "[[mathlib_doc]]"
         s!"[mathlib doc](https://leanprover-community.github.io/mathlib4_docs/find/?pattern={name}#doc)"
 
     match item.type with
