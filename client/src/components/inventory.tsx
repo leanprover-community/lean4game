@@ -87,7 +87,7 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
           // For lemas, sort entries `available > disabled > locked`
           // otherwise alphabetically
           (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled)
-        ).filter(item => ((tab ?? categories[0]) == item.category)).map((item, i) => {
+        ).filter(item => !item.hidden && ((tab ?? categories[0]) == item.category)).map((item, i) => {
             return <InventoryItem key={`${item.category}-${item.name}`}
               showDoc={() => {openDoc({name: item.name, type: docType})}}
               name={item.name} displayName={item.displayName} locked={difficulty > 0 ? item.locked : false}

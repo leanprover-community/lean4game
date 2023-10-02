@@ -216,7 +216,13 @@ def getStatementString (name : Name) : CommandElabM String := do
 elab "NewTactic" args:ident* : command => do
   for name in ↑args do checkInventoryDoc .Tactic name -- TODO: Add (template := "[docstring]")
   modifyCurLevel fun level => pure {level with
-    tactics := {level.tactics with new := args.map (·.getId)}}
+    tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId)}}
+
+/-- Declare tactics that are introduced by this level. -/
+elab "NewHiddenTactic" args:ident* : command => do
+  modifyCurLevel fun level => pure {level with
+    tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId),
+                                   hidden := level.tactics.hidden ++ args.map (·.getId)}}
 
 /-- Declare lemmas that are introduced by this level. -/
 elab "NewLemma" args:ident* : command => do
@@ -796,14 +802,19 @@ elab "MakeGame" : command => do
   -- For each `worldId` this contains a set of items newly defined in this world
   let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
 
+  -- For each `worldId` this contains a set of items hidden in this world
+  let mut hiddenItemsInWorld : HashMap Name (HashSet Name) := {}
+
   -- Calculate which "items" are used/new in which world
   for (worldId, world) in game.worlds.nodes.toArray do
     let mut usedItems : HashSet Name := {}
     let mut newItems : HashSet Name := {}
+    let mut hiddenItems : HashSet Name := {}
     for inventoryType in #[.Tactic, .Definition, .Lemma] do
       for (levelId, level) in world.levels.toArray do
         usedItems := usedItems.insertMany (level.getInventory inventoryType).used
         newItems := newItems.insertMany (level.getInventory inventoryType).new
+        hiddenItems := newItems.insertMany (level.getInventory inventoryType).hidden
 
         -- if the previous level was named, we need to add it as a new lemma
         if inventoryType == .Lemma then
@@ -831,6 +842,7 @@ elab "MakeGame" : command => do
 
     usedItemsInWorld := usedItemsInWorld.insert worldId usedItems
     newItemsInWorld := newItemsInWorld.insert worldId newItems
+    hiddenItemsInWorld := newItemsInWorld.insert worldId hiddenItems
     -- DEBUG: print new/used items
     -- logInfo m!"{worldId} uses: {usedItems.toList}"
     -- logInfo m!"{worldId} introduces: {newItems.toList}"
@@ -986,7 +998,8 @@ elab "MakeGame" : command => do
             name := item
             displayName := data.displayName
             category := data.category
-            locked := false }
+            locked := false
+            hidden := (hiddenItemsInWorld.findD predWorldId {}).contains item }
       itemsInWorld := itemsInWorld.insert worldId items
 
     for (worldId, world) in game.worlds.nodes.toArray do
@@ -1004,7 +1017,8 @@ elab "MakeGame" : command => do
             name := item
             displayName := data.displayName
             category := data.category
-            locked := false }
+            locked := false
+            hidden := levelInfo.hidden.contains item }
 
         -- add the exercise statement from the previous level
         -- if it was named

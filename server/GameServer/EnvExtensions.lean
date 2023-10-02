@@ -104,6 +104,8 @@ structure InventoryTile where
   disabled := false
   /-- To mark an item that has been added freshly in this level. -/
   new := false
+  /-- hide the item in the inventory display -/
+  hidden := false
 deriving ToJson, FromJson, Repr, Inhabited
 
 /-- The extension that stores the doc templates. Note that you can only add, but never modify
@@ -209,6 +211,8 @@ structure InventoryInfo where
   used : Array Name
   /-- new inventory items introduced by this level -/
   new : Array Name
+  /-- inventory items that shall not be displayed in the inventory -/
+  hidden : Array Name
   /-- inventory items exceptionally forbidden in this level -/
   disabled : Array Name
   /-- only these inventory items are allowed in this level (ignored if empty) -/

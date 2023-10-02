@@ -20,7 +20,8 @@ export interface InventoryTile {
   category: string,
   disabled: boolean,
   locked: boolean,
-  new: boolean
+  new: boolean,
+  hidden: boolean
 }
 
 export interface LevelInfo {
