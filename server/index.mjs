@@ -7,7 +7,7 @@ import * as rpc from 'vscode-ws-jsonrpc';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 import os from 'os';
 import anonymize from 'ip-anonymize';
-import { importTrigger, importStatus } from './import.mjs'
+// import { importTrigger, importStatus } from './import.mjs'
 
 /** Preloaded games. The keys refer to the docker tags of the virtual machines.
  * The number `queueLength` determines how many instances of the docker container
@@ -43,8 +43,8 @@ const PORT = process.env.PORT || 8080;
 
 var router = express.Router();
 
-router.get('/import/status/:owner/:repo', importStatus)
-router.get('/import/trigger/:owner/:repo', importTrigger)
+// router.get('/import/status/:owner/:repo', importStatus)
+// router.get('/import/trigger/:owner/:repo', importTrigger)
 
 const server = app
   .use(express.static(path.join(__dirname, '../client/dist/')))

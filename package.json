@@ -34,7 +34,6 @@
     "rehype-katex": "^6.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "request": "^2.88.2",
     "request-progress": "^3.0.0",
     "vscode-ws-jsonrpc": "^2.0.1",
     "web-worker": "^1.2.0",
