@@ -55,6 +55,9 @@ function addGameProgress (state: ProgressState, action: PayloadAction<{game: str
   if (!state.games[action.payload.game]) {
     state.games[action.payload.game] = {inventory: [], openedIntro: true, data: {}, difficulty: DEFAULT_DIFFICULTY}
   }
+  if (!state.games[action.payload.game].data) {
+    state.games[action.payload.game].data = {}
+  }
 }
 
 /** Add an empty skeleton with progress for the current level */
