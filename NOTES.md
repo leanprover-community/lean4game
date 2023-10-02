@@ -1,36 +1,6 @@
 
-# Install docker
-```
-sudo apt-get update
-sudo apt-get install ca-certificates curl gnupg lsb-release -y
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-
-sudo groupadd docker
-sudo usermod -aG docker ${USER}
-newgrp docker
-```
-
-# Install gVisor
-```
-sudo apt-get update && \
-sudo apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg
-curl -fsSL https://gvisor.dev/archive.key | sudo gpg --dearmor -o /usr/share/keyrings/gvisor-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gvisor-archive-keyring.gpg] https://storage.googleapis.com/gvisor/releases release main" | sudo tee /etc/apt/sources.list.d/gvisor.list > /dev/null
-sudo apt-get update && sudo apt-get install -y runsc
-
-sudo runsc install
-sudo systemctl reload docker
-```
+# Install Lean
+wget -q https://raw.githubusercontent.com/leanprover-community/mathlib4/master/scripts/install_debian.sh && bash install_debian.sh ; rm -f install_debian.sh && source ~/.profile
 
 # Install NPM
 ```
@@ -42,49 +12,12 @@ npm install -g http-server
 ```
 
 # Clone NNG interface
-```
-(
-  git clone https://github.com/hhu-adam/nng4-interface.git
-  cd nng4-interface
-  rm package-lock.json
-  npm install
-  npm run build
-)
-```
 
 ```
 git clone https://github.com/hhu-adam/NNG4.git
 cd NNG4
 docker rmi nng4:latest
 docker build --pull --rm -f "Dockerfile" -t nng4:latest "."
-```
-
-
-# Start HTTP server
-```
-http-server ./nng4-interface/build
-```
-
-# Start WebSocket server
-```
-cd NNG4 && python3 ./gameserver.py
-```
-
-# Test docker
-```
-docker run --runtime=runsc --network=none --rm -it nng4:latest
-```
-
-# Running on port 80
-
-## Set environment variable
-```
-export PORT=80
-```
-## Enable running on port 80:
-```
-sudo apt-get install libcap2-bin
-sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
 ```
 
 
@@ -117,6 +50,7 @@ sudo vim reverse-proxy.conf
 ```
 
 ```
+
 # Anonymize IP addresses
 map $remote_addr $remote_addr_anon {
     ~(?P<ip>\d+\.\d+\.\d+)\.    $ip.0;
@@ -131,29 +65,29 @@ log_format  main  '$remote_addr_anon - $remote_user [$time_local] "$request" '
     '"$http_user_agent" "$http_x_forwarded_for"';
 
 server {
-        server_name lean.math.uni-duesseldorf.de;
+        server_name lean.math.hhu.de;
         location / {
                 proxy_pass      http://localhost:8001;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection "upgrade";
-
         }
         client_max_body_size 0;
 
-        listen 443 ssl;
-        ssl_certificate /home/adam/adam_math_uni-duesseldorf_de_cert.cer;
-        ssl_certificate_key /home/adam/private_ssl_key.pem;
-
         access_log /var/log/nginx/access.log main;
         error_log /dev/null crit;
+
+        listen 443 ssl;
+        ssl_certificate /home/adam/adam_math_hhu_de_cert.cer;
+        ssl_certificate_key /etc/ssl/private/private.pem;
 }
 
 server {
-        server_name adam.math.uni-duesseldorf.de;
+        server_name adam.math.hhu.de;
         location / {
                 proxy_pass      http://localhost:8002;
                 proxy_set_header Host $host;
@@ -167,8 +101,30 @@ server {
         client_max_body_size 0;
 
         listen 443 ssl;
-        ssl_certificate /home/adam/adam_math_uni-duesseldorf_de_cert.cer;
-        ssl_certificate_key /home/adam/private_ssl_key.pem;
+        ssl_certificate /home/adam/adam_math_hhu_de_cert.cer;
+        ssl_certificate_key /etc/ssl/private/private.pem;
+
+        access_log /var/log/nginx/access.log main;
+        error_log /dev/null crit;
+}
+
+server {
+        server_name adam-dev.math.hhu.de;
+        location / {
+                proxy_pass      http://localhost:8003;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+
+        }
+        client_max_body_size 0;
+
+        listen 443 ssl;
+        ssl_certificate /home/adam/adam_math_hhu_de_cert.cer;
+        ssl_certificate_key /etc/ssl/private/private.pem;
 
         access_log /var/log/nginx/access.log main;
         error_log /dev/null crit;
