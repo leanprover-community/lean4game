@@ -814,7 +814,7 @@ elab "MakeGame" : command => do
       for (levelId, level) in world.levels.toArray do
         usedItems := usedItems.insertMany (level.getInventory inventoryType).used
         newItems := newItems.insertMany (level.getInventory inventoryType).new
-        hiddenItems := newItems.insertMany (level.getInventory inventoryType).hidden
+        hiddenItems := hiddenItems.insertMany (level.getInventory inventoryType).hidden
 
         -- if the previous level was named, we need to add it as a new lemma
         if inventoryType == .Lemma then
@@ -842,7 +842,7 @@ elab "MakeGame" : command => do
 
     usedItemsInWorld := usedItemsInWorld.insert worldId usedItems
     newItemsInWorld := newItemsInWorld.insert worldId newItems
-    hiddenItemsInWorld := newItemsInWorld.insert worldId hiddenItems
+    hiddenItemsInWorld := hiddenItemsInWorld.insert worldId hiddenItems
     -- DEBUG: print new/used items
     -- logInfo m!"{worldId} uses: {usedItems.toList}"
     -- logInfo m!"{worldId} introduces: {newItems.toList}"
