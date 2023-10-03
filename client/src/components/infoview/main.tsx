@@ -11,7 +11,7 @@ import './infoview.css'
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
 import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { WithRpcSessions } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
+import { RpcContext, WithRpcSessions, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infoview/serverVersion';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -286,6 +286,8 @@ export function CommandLineInterface(props: { world: string, level: number, data
 
   const ec = React.useContext(EditorContext)
   const editor = React.useContext(MonacoEditorContext)
+  const model = editor.getModel()
+  const uri = model.uri.toString()
   const gameId = React.useContext(GameIdContext)
   const { proof } = React.useContext(ProofContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
@@ -415,7 +417,11 @@ export function CommandLineInterface(props: { world: string, level: number, data
 
   let lastStepErrors = proof.length ? hasInteractiveErrors(proof[proof.length - 1].errors) : false
 
+  // TODO: does the position matter at all?
+  const rpcSess = useRpcSessionAtPos({uri: uri, line: 0, character: 0})
+
   return <div className="commandline-interface">
+    <RpcContext.Provider value={rpcSess}>
     <div className="content">
       <div className="tmp-pusher">
         {!proof.length &&
@@ -488,5 +494,6 @@ export function CommandLineInterface(props: { world: string, level: number, data
       </div>
     </div>
     <CommandLine hidden={!withErr && proof[proof.length - 1]?.goals.length == 0}/>
+    </RpcContext.Provider>
   </div>
 }

@@ -16,7 +16,7 @@ import languageConfig from 'lean4/language-configuration.json';
 import { InteractiveDiagnostic, getInteractiveDiagnostics } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
+import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, ProofStep } from './context'
 import { goalsToString } from './goals'
 import { GameHint, InteractiveGoals } from './rpc_api'
@@ -84,8 +84,7 @@ export function CommandLine({hidden}: {hidden?: boolean}) {
   // state to store the last batch of deleted messages
   const {setDeletedChat} = React.useContext(DeletedChatContext)
 
-  // TODO: does the position matter at all?
-  const rpcSess = useRpcSessionAtPos({uri: uri, line: 1, character: 1})
+  const rpcSess = React.useContext(RpcContext)
 
   /** Load all goals an messages of the current proof (line-by-line) and save
    * the retrieved information into context (`ProofContext`)
