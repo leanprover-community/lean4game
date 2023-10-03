@@ -802,14 +802,13 @@ elab "MakeGame" : command => do
   -- For each `worldId` this contains a set of items newly defined in this world
   let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
 
-  -- For each `worldId` this contains a set of items hidden in this world
-  let mut hiddenItemsInWorld : HashMap Name (HashSet Name) := {}
+  -- Items that should not be displayed in inventory
+  let mut hiddenItems : HashSet Name := {}
 
   -- Calculate which "items" are used/new in which world
   for (worldId, world) in game.worlds.nodes.toArray do
     let mut usedItems : HashSet Name := {}
     let mut newItems : HashSet Name := {}
-    let mut hiddenItems : HashSet Name := {}
     for inventoryType in #[.Tactic, .Definition, .Lemma] do
       for (levelId, level) in world.levels.toArray do
         usedItems := usedItems.insertMany (level.getInventory inventoryType).used
@@ -842,7 +841,6 @@ elab "MakeGame" : command => do
 
     usedItemsInWorld := usedItemsInWorld.insert worldId usedItems
     newItemsInWorld := newItemsInWorld.insert worldId newItems
-    hiddenItemsInWorld := hiddenItemsInWorld.insert worldId hiddenItems
     -- DEBUG: print new/used items
     -- logInfo m!"{worldId} uses: {usedItems.toList}"
     -- logInfo m!"{worldId} introduces: {newItems.toList}"
@@ -980,7 +978,8 @@ elab "MakeGame" : command => do
             return (item, {
               name := item
               displayName := data.displayName
-              category := data.category })
+              category := data.category
+              hidden := hiddenItems.contains item })
 
 
 
@@ -999,7 +998,7 @@ elab "MakeGame" : command => do
             displayName := data.displayName
             category := data.category
             locked := false
-            hidden := (hiddenItemsInWorld.findD predWorldId {}).contains item }
+            hidden := hiddenItems.contains item }
       itemsInWorld := itemsInWorld.insert worldId items
 
     for (worldId, world) in game.worlds.nodes.toArray do
