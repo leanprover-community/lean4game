@@ -10,11 +10,16 @@ export function loadState() {
     const serializedState = localStorage.getItem(KEY);
     if (!serializedState) return undefined;
     let x = JSON.parse(serializedState);
-    // Complatibilty because `state.level` has been renamed to `x.games`.
-    // TODO: Does this work?
+    // Compatibility: `state.level` has been renamed to `x.games`.
     if (x.level) {
       x.games = x.level
       x.level = undefined
+    }
+    // Compatibility: code has been moved to `data` and inventory has been added.
+    for (var gameState in x.games) {
+      if (!x.games[gameState].data) {
+        x.games[gameState] = null
+      }
     }
     return x
   } catch (e) {
