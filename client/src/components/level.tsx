@@ -33,7 +33,7 @@ import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContex
 import { DualEditor } from './infoview/main'
 import { GameHint } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints } from './hints'
-import { Impressum } from './privacy_policy'
+import { PrivacyPolicyPopup } from './privacy_policy'
 
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
@@ -50,8 +50,17 @@ function Level() {
   const worldId = params.worldId
   // useLoadWorldFiles(worldId)
 
+  const [impressum, setImpressum] = React.useState(false)
+
+  const closeImpressum = () => {
+    setImpressum(false)
+  }
+
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
-    {levelId == 0 ? <Introduction /> : <PlayableLevel key={`${worldId}/${levelId}`}/>}
+    {levelId == 0 ?
+      <Introduction impressum={impressum} setImpressum={setImpressum} /> :
+      <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} />}
+    {impressum ? <PrivacyPolicyPopup handleClose={closeImpressum} /> : null}
   </WorldLevelIdContext.Provider>
 }
 
@@ -176,7 +185,7 @@ function ChatPanel({lastLevel}) {
   </div>
 }
 
-function ExercisePanel({codeviewRef, impressum, closeImpressum, visible=true}) {
+function ExercisePanel({codeviewRef, visible=true}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
@@ -185,11 +194,10 @@ function ExercisePanel({codeviewRef, impressum, closeImpressum, visible=true}) {
     <div className="exercise">
       <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} worldSize={gameInfo.data?.worldSize[worldId]}/>
     </div>
-    {impressum ? <Impressum handleClose={closeImpressum} /> : null}
   </div>
 }
 
-function PlayableLevel() {
+function PlayableLevel({impressum, setImpressum}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
@@ -218,8 +226,6 @@ function PlayableLevel() {
   const dispatch = useAppDispatch()
 
   // impressum pop-up
-  const [impressum, setImpressum] = React.useState(false)
-  function closeImpressum() {setImpressum(false)}
   function toggleImpressum() {setImpressum(!impressum)}
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
@@ -358,8 +364,6 @@ function PlayableLevel() {
                   <>
                     <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
                       <ExercisePanel
-                        impressum={impressum}
-                        closeImpressum={closeImpressum}
                         codeviewRef={codeviewRef}
                         visible={pageNumber == 0} />
                       <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
@@ -369,8 +373,6 @@ function PlayableLevel() {
                   <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
                     <ChatPanel lastLevel={lastLevel}/>
                     <ExercisePanel
-                      impressum={impressum}
-                      closeImpressum={closeImpressum}
                       codeviewRef={codeviewRef} />
                     <InventoryPanel levelInfo={level?.data} />
                   </Split>
@@ -384,7 +386,7 @@ function PlayableLevel() {
   </>
 }
 
-function IntroductionPanel({gameInfo, impressum, closeImpressum}) {
+function IntroductionPanel({gameInfo}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId} = useContext(WorldLevelIdContext)
 
@@ -396,7 +398,6 @@ function IntroductionPanel({gameInfo, impressum, closeImpressum}) {
         <Hint key={`intro-p-${i}`}
           hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
       ))}
-      {impressum ? <Impressum handleClose={closeImpressum} /> : null}
     </div>
     <div className="button-row">
       {gameInfo.data?.worldSize[worldId] == 0 ?
@@ -412,15 +413,13 @@ function IntroductionPanel({gameInfo, impressum, closeImpressum}) {
 export default Level
 
 /** The site with the introduction text of a world */
-function Introduction() {
+function Introduction({impressum, setImpressum}) {
   const gameId = React.useContext(GameIdContext)
   const {mobile} = useContext(MobileContext)
 
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
-
-  const [impressum, setImpressum] = React.useState(false)
 
   const closeImpressum = () => {
     setImpressum(false)
@@ -435,10 +434,10 @@ function Introduction() {
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?
-        <IntroductionPanel gameInfo={gameInfo} impressum={impressum} closeImpressum={closeImpressum} />
+        <IntroductionPanel gameInfo={gameInfo} />
       :
         <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
-          <IntroductionPanel gameInfo={gameInfo} impressum={impressum} closeImpressum={closeImpressum} />
+          <IntroductionPanel gameInfo={gameInfo} />
           <div className="world-image-container empty"></div>
           <InventoryPanel levelInfo={inventory?.data} />
         </Split>

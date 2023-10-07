@@ -139,3 +139,7 @@ em {
 .markdown ul, .markdown ol {
 	margin:0 1.5em 1.5em 1.5em;
 }
+
+.privacy-policy {
+  z-index: 10;
+}
