@@ -218,17 +218,17 @@ td code  {
   height: 100%;
 } */
 
-.commandline-interface {
+.typewriter-interface {
   display: flex;
   flex-flow: column;
   height: 100%;
 }
 
-.command-line {
+.typewriter {
   flex: 0 1 auto;
 }
 
-.commandline-interface .content {
+.typewriter-interface .content {
   flex: 1 1 auto;
   overflow-y: scroll;
   padding: 0;
@@ -318,11 +318,11 @@ td code  {
   justify-content: center;
 }
 
-.commandline-interface .content, .world-image-container.empty {
+.typewriter-interface .content, .world-image-container.empty {
   background-color: #eee;
 }
 
-.commandline-interface .proof {
+.typewriter-interface .proof {
   background-color: #fff;
 }
 

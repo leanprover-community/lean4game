@@ -129,7 +129,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
           </div>
           <div>
             { goals && (goals.goals.length > 0
-              ? <Goal commandLine={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />
+              ? <Goal typewriter={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />
               : <div className="goals-section-title">No Goals</div>
             )}
           </div>
@@ -156,7 +156,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                     <div className="goals-section-title">Weitere Goals</div>
 
                     {goals.goals.slice(1).map((goal, i) =>
-                        <details key={i}><summary><InteractiveCode fmt={goal.type} /></summary> <Goal commandLine={false} filter={goalFilter} goal={goal} /></details>)}
+                        <details key={i}><summary><InteractiveCode fmt={goal.type} /></summary> <Goal typewriter={false} filter={goalFilter} goal={goal} /></details>)}
                 </div>}
         </LocationsContext.Provider> */}
     </>

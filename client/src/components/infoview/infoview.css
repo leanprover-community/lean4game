@@ -43,7 +43,7 @@
   font-weight: 500;
 }
 
-.command-line {
+.typewriter {
   background: var(--clr-primary);
   padding: 0.5em;
   font-family: var(--ff-primary);
@@ -51,17 +51,17 @@
   /* margin: 0.2em 0 0; */
 }
 
-.command-line form {
+.typewriter form {
   display: flex;
 }
 
-.command-line button, .undo-button {
+.typewriter button, .undo-button {
   display: block;
   white-space: nowrap;
   flex: 0;
 }
 
-.command-line .command-line-input-wrapper{
+.typewriter .typewriter-input-wrapper{
   min-width: 0;
   flex: 1;
   padding: 0.4em .6em 0;
@@ -71,15 +71,15 @@
   flex-direction: column;
 }
 
-.command-line .command-line-input {
+.typewriter .typewriter-input {
   flex: 1;
 }
 
 /* Turn off some monaco decorations: */
-.command-line-input .monaco-editor .view-overlays .current-line {
+.typewriter-input .monaco-editor .view-overlays .current-line {
   border: 0;
 }
-.command-line-input .monaco-editor .scroll-decoration {
+.typewriter-input .monaco-editor .scroll-decoration {
   box-shadow: none;
 }
 
@@ -138,7 +138,7 @@
 
 
 /* Push the goals to the bottom for now, until we insert the proof history above. */
-.commandline-interface .content {
+.typewriter-interface .content {
   display: flex;
   flex-direction: column;
   scroll-behavior: smooth;
@@ -149,7 +149,7 @@
   scroll-behavior: smooth;
 }
 
-.commandline-interface .content .tmp-pusher {
+.typewriter-interface .content .tmp-pusher {
   flex: 1;
 }
 

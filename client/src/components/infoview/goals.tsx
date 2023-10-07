@@ -124,7 +124,7 @@ interface GoalProps {
     goal: InteractiveGoal
     filter: GoalFilterState
     showHints?: boolean
-    commandLine: boolean
+    typewriter: boolean
 }
 
 interface ProofDisplayProps {
@@ -136,7 +136,7 @@ interface ProofDisplayProps {
  * Displays the hypotheses, target type and optional case label of a goal according to the
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
-    const { goal, filter, showHints, commandLine } = props
+    const { goal, filter, showHints, typewriter } = props
 
     // TODO: Apparently `goal` can be `undefined`
     if (!goal) {return <></>}
@@ -163,18 +163,18 @@ export const Goal = React.memo((props: GoalProps) => {
     // const hints = <Hints hints={goal.hints} key={goal.mvarId} />
     const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
     const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
-    const {commandLineMode} = React.useContext(InputModeContext)
+    const {typewriterMode} = React.useContext(InputModeContext)
 
     return <div>
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
         {filter.reverse && goalLi}
-        {! commandLine && objectHyps.length > 0 &&
+        {! typewriter && objectHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Objects:</div>
             {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        {!commandLine && assumptionHyps.length > 0 &&
+        {!typewriter && assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        {/* {commandLine && commandLineMode && <CommandLine />} */}
+        {/* {typewriter && typewriterMode && <Typewriter />} */}
         {!filter.reverse && goalLi}
         {/* {showHints && hints} */}
     </div>
@@ -229,7 +229,7 @@ export const OtherGoals = React.memo((props: GoalProps2) => {
             <summary>
               <InteractiveCode fmt={goal.type} />
             </summary>
-            <Goal commandLine={false} filter={filter} goal={goal} />
+            <Goal typewriter={false} filter={filter} goal={goal} />
           </details>)}
       </div>}
   </>
@@ -264,7 +264,7 @@ export function Goals({ goals, filter }: GoalsProps) {
         return <>No goals</>
     } else {
         return <>
-          {goals.goals.map((g, i) => <Goal commandLine={false} key={i} goal={g} filter={filter} />)}
+          {goals.goals.map((g, i) => <Goal typewriter={false} key={i} goal={g} filter={filter} />)}
         </>
     }
 }

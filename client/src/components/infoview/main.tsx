@@ -28,7 +28,7 @@ import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
 import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './context';
-import { CommandLine, hasErrors, hasInteractiveErrors } from './command_line';
+import { Typewriter, hasErrors, hasInteractiveErrors } from './command_line';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
@@ -41,9 +41,9 @@ import { Hints } from '../hints';
  */
 export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) {
   const ec = React.useContext(EditorContext)
-  const { commandLineMode } = React.useContext(InputModeContext)
+  const { typewriterMode } = React.useContext(InputModeContext)
   return <>
-    <div className={commandLineMode ? 'hidden' : ''}>
+    <div className={typewriterMode ? 'hidden' : ''}>
       <ExerciseStatement data={level} />
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
@@ -62,7 +62,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
 function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: string, levelId: number, level: LevelInfo, worldSize: number }) {
   const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
-  const { commandLineMode } = React.useContext(InputModeContext)
+  const { typewriterMode } = React.useContext(InputModeContext)
 
   // Mark level as completed when server gives notification
   const dispatch = useAppDispatch()
@@ -108,8 +108,8 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
         <WithRpcSessions>
           <WithLspDiagnosticsContext>
             <ProgressContext.Provider value={allProgress}>
-              {commandLineMode ?
-                <CommandLineInterface world={worldId} level={levelId} data={level} worldSize={worldSize}/>
+              {typewriterMode ?
+                <TypewriterInterface world={worldId} level={levelId} data={level} worldSize={worldSize}/>
                 :
                 <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />
               }
@@ -135,7 +135,7 @@ function ExerciseStatement({ data }) {
 }
 
 // TODO: This is only used in `EditorInterface`
-// while `CommandLineInterface` has this copy-pasted in.
+// while `TypewriterInterface` has this copy-pasted in.
 export function Main(props: { world: string, level: number }) {
   const ec = React.useContext(EditorContext);
   const gameId = React.useContext(GameIdContext)
@@ -232,7 +232,7 @@ function Command({ command, deleteProof }: { command: string, deleteProof: any }
 //       message = diag.message
 //   }
 
-//   const { commandLineMode } = React.useContext(InputModeContext)
+//   const { typewriterMode } = React.useContext(InputModeContext)
 
 //   return (
 //   // <details open>
@@ -251,7 +251,7 @@ function Command({ command, deleteProof }: { command: string, deleteProof: any }
 //       //     </span>
 //       // </summary>
 //       <div className={severityClass + ' ml1 message'}>
-//           {!commandLineMode && <p className="mv2">{title}</p>}
+//           {!typewriterMode && <p className="mv2">{title}</p>}
 //           <pre className="font-code pre-wrap">
 //               <InteractiveMessage fmt={message} />
 //           </pre>
@@ -276,13 +276,13 @@ function GoalsTab({ proofStep, last}: { proofStep: ProofStep, last : boolean }) 
       ))}
     </div>
     <div className="goal-tab vscode-light">
-      <Goal commandLine={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]} />
+      <Goal typewriter={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]} />
     </div>
   </div>
 }
 
 /** The interface in command line mode */
-export function CommandLineInterface(props: { world: string, level: number, data: LevelInfo, worldSize: number }) {
+export function TypewriterInterface(props: { world: string, level: number, data: LevelInfo, worldSize: number }) {
 
   const ec = React.useContext(EditorContext)
   const editor = React.useContext(MonacoEditorContext)
@@ -309,7 +309,7 @@ export function CommandLineInterface(props: { world: string, level: number, data
       })
       setDeletedChat(deletedChat)
 
-      editor.executeEdits("command-line", [{
+      editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           { lineNumber: line, column: 1 },
           editor.getModel().getFullModelRange().getEndPosition()
@@ -420,7 +420,7 @@ export function CommandLineInterface(props: { world: string, level: number, data
   // TODO: does the position matter at all?
   const rpcSess = useRpcSessionAtPos({uri: uri, line: 0, character: 0})
 
-  return <div className="commandline-interface">
+  return <div className="typewriter-interface">
     <RpcContext.Provider value={rpcSess}>
     <div className="content">
       <div className="tmp-pusher">
@@ -438,12 +438,12 @@ export function CommandLineInterface(props: { world: string, level: number, data
                 // entered command as it is still present in the command line.
                 // TODO: Should not use index as key.
                 return <div key={`proof-step-${i}`}>
-                  <Errors errors={step.errors} commandLineMode={true} />
+                  <Errors errors={step.errors} typewriterMode={true} />
                 </div>
               } else {
                 return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')} onClick={toggleSelectStep(i)}>
                   <Command command={step.command} deleteProof={deleteProof(i)} />
-                  <Errors errors={step.errors} commandLineMode={true} />
+                  <Errors errors={step.errors} typewriterMode={true} />
                   {mobile && i == 0 && props.data?.introduction &&
                     <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelectStep(0)}>
                       <Markdown>{props.data?.introduction}</Markdown>
@@ -493,7 +493,7 @@ export function CommandLineInterface(props: { world: string, level: number, data
         }
       </div>
     </div>
-    <CommandLine hidden={!withErr && proof[proof.length - 1]?.goals.length == 0}/>
+    <Typewriter hidden={!withErr && proof[proof.length - 1]?.goals.length == 0}/>
     </RpcContext.Provider>
   </div>
 }

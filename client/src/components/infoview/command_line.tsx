@@ -64,7 +64,7 @@ config.autoClosingPairs = config.autoClosingPairs.map(
 monaco.languages.setLanguageConfiguration('lean4cmd', config);
 
 /** The input field */
-export function CommandLine({hidden}: {hidden?: boolean}) {
+export function Typewriter({hidden}: {hidden?: boolean}) {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
@@ -74,7 +74,7 @@ export function CommandLine({hidden}: {hidden?: boolean}) {
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
-  const {commandLineInput, setCommandLineInput} = React.useContext(InputModeContext)
+  const {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
 
   const inputRef = useRef()
 
@@ -190,26 +190,26 @@ export function CommandLine({hidden}: {hidden?: boolean}) {
     setDeletedChat([])
 
     const pos = editor.getPosition()
-    if (commandLineInput) {
+    if (typewriterInput) {
       setProcessing(true)
-      editor.executeEdits("command-line", [{
+      editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           pos,
           editor.getModel().getFullModelRange().getEndPosition()
         ),
-        text: commandLineInput.trim() + "\n",
+        text: typewriterInput.trim() + "\n",
         forceMoveMarkers: false
       }])
     }
 
     editor.setPosition(pos)
-  }, [commandLineInput, editor])
+  }, [typewriterInput, editor])
 
   useEffect(() => {
-    if (oneLineEditor && oneLineEditor.getValue() !== commandLineInput) {
-      oneLineEditor.setValue(commandLineInput)
+    if (oneLineEditor && oneLineEditor.getValue() !== typewriterInput) {
+      oneLineEditor.setValue(typewriterInput)
     }
-  }, [commandLineInput])
+  }, [typewriterInput])
 
   // React when answer from the server comes back
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
@@ -217,7 +217,7 @@ export function CommandLine({hidden}: {hidden?: boolean}) {
       setProcessing(false)
       loadAllGoals()
       if (!hasErrors(params.diagnostics)) {
-        setCommandLineInput("")
+        setTypewriterInput("")
         editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
       }
     } else {
@@ -231,7 +231,7 @@ export function CommandLine({hidden}: {hidden?: boolean}) {
 
   useEffect(() => {
     const myEditor = monaco.editor.create(inputRef.current!, {
-      value: commandLineInput,
+      value: typewriterInput,
       language: "lean4cmd",
       quickSuggestions: false,
       lightbulb: {
@@ -274,14 +274,14 @@ export function CommandLine({hidden}: {hidden?: boolean}) {
     // Ensure that our one-line editor can only have a single line
     const l = oneLineEditor.getModel().onDidChangeContent((e) => {
       const value = oneLineEditor.getValue()
-      setCommandLineInput(value)
+      setTypewriterInput(value)
       const newValue = value.replace(/[\n\r]/g, '')
       if (value != newValue) {
         oneLineEditor.setValue(newValue)
       }
     })
     return () => { l.dispose() }
-  }, [oneLineEditor, setCommandLineInput])
+  }, [oneLineEditor, setTypewriterInput])
 
   useEffect(() => {
     if (!oneLineEditor) return
@@ -308,10 +308,10 @@ export function CommandLine({hidden}: {hidden?: boolean}) {
     runCommand()
   }
 
-  return <div className={`command-line${hidden ? ' hidden' : ''}`}>
+  return <div className={`typewriter${hidden ? ' hidden' : ''}`}>
       <form onSubmit={handleSubmit}>
-        <div className="command-line-input-wrapper">
-          <div ref={inputRef} className="command-line-input" />
+        <div className="typewriter-input-wrapper">
+          <div ref={inputRef} className="typewriter-input" />
         </div>
         <button type="submit" disabled={processing} className="btn btn-inverted">
           <FontAwesomeIcon icon={faWandMagicSparkles} /> Execute

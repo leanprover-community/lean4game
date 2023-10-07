@@ -18,7 +18,7 @@ interface MessageViewProps {
 }
 
 /** A list of messages (info/warning/error) that are produced after this command */
-function Error({error, commandLineMode} : {error : InteractiveDiagnostic, commandLineMode : boolean}) {
+function Error({error, typewriterMode} : {error : InteractiveDiagnostic, typewriterMode : boolean}) {
   // The first step will always have an empty command
 
   const severityClass = error.severity ? {
@@ -41,7 +41,7 @@ function Error({error, commandLineMode} : {error : InteractiveDiagnostic, comman
   }
 
   return <div className={severityClass + ' ml1 message'}>
-    {!commandLineMode && <p className="mv2">{title}</p>}
+    {!typewriterMode && <p className="mv2">{title}</p>}
     <pre className="font-code pre-wrap">
       <InteractiveMessage fmt={message} />
     </pre>
@@ -50,9 +50,9 @@ function Error({error, commandLineMode} : {error : InteractiveDiagnostic, comman
 
 // TODO: Should not use index as key.
 /** A list of messages (info/warning/error) that are produced after this command */
-export function Errors ({errors, commandLineMode} : {errors : InteractiveDiagnostic[], commandLineMode : boolean}) {
+export function Errors ({errors, typewriterMode} : {errors : InteractiveDiagnostic[], typewriterMode : boolean}) {
   return <div>
-    {errors.map((err, i) => (<Error key={`error-${i}`} error={err} commandLineMode={commandLineMode}/>))}
+    {errors.map((err, i) => (<Error key={`error-${i}`} error={err} typewriterMode={typewriterMode}/>))}
   </div>
 }
 
@@ -79,7 +79,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         message = diag.message
     }
 
-    const { commandLineMode } = React.useContext(InputModeContext)
+    const { typewriterMode } = React.useContext(InputModeContext)
 
     return (
     // <details open>
@@ -98,7 +98,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         //     </span>
         // </summary>
         <div className={severityClass + ' ml1 message'}>
-            {!commandLineMode && <p className="mv2">{title}</p>}
+            {!typewriterMode && <p className="mv2">{title}</p>}
             <pre className="font-code pre-wrap">
                 <InteractiveMessage fmt={message} />
             </pre>

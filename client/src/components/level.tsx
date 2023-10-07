@@ -212,8 +212,8 @@ function PlayableLevel() {
   const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
-  const [commandLineMode, setCommandLineMode] = useState(true)
-  const [commandLineInput, setCommandLineInput] = useState("")
+  const [typewriterMode, setTypewriterMode] = useState(true)
+  const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
   const dispatch = useAppDispatch()
 
@@ -246,7 +246,7 @@ function PlayableLevel() {
     useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
-   * `CommandLineInterface`.
+   * `TypewriterInterface`.
    */
   const handleUndo = () => {
     const endPos = editor.getModel().getFullModelRange().getEndPosition()
@@ -284,23 +284,23 @@ function PlayableLevel() {
   useEffect(() => {
     // TODO: That's a problem if the saved proof contains an error
     // Reset command line input when loading a new level
-    setCommandLineInput("")
+    setTypewriterInput("")
 
     // Load the selected help steps from the store
     setShowHelp(new Set(selectHelp(gameId, worldId, levelId)(store.getState())))
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    if (!commandLineMode) {
+    if (!typewriterMode) {
       // Delete last input attempt from command line
-      editor.executeEdits("command-line", [{
+      editor.executeEdits("typewriter", [{
         range: editor.getSelection(),
         text: "",
         forceMoveMarkers: false
       }]);
       editor.focus()
     }
-  }, [commandLineMode])
+  }, [typewriterMode])
 
   useEffect(() => {
     // Forget whether hidden hints are displayed for steps that don't exist yet
@@ -320,10 +320,10 @@ function PlayableLevel() {
 
   // Effect when command line mode gets enabled
   useEffect(() => {
-    if (editor && commandLineMode) {
+    if (editor && typewriterMode) {
       let endPos = editor.getModel().getFullModelRange().getEndPosition()
       if (editor.getModel().getLineContent(endPos.lineNumber).trim() !== "") {
-        editor.executeEdits("command-line", [{
+        editor.executeEdits("typewriter", [{
           range: monaco.Selection.fromPositions(endPos, endPos),
           text: "\n",
           forceMoveMarkers: true
@@ -332,17 +332,17 @@ function PlayableLevel() {
       endPos = editor.getModel().getFullModelRange().getEndPosition()
       let currPos = editor.getPosition()
       if (currPos.column != 1 || (currPos.lineNumber != endPos.lineNumber && currPos.lineNumber != endPos.lineNumber - 1)) {
-        // This is not a position that would naturally occur from CommandLine, reset:
+        // This is not a position that would naturally occur from Typewriter, reset:
         editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
       }
     }
-  }, [editor, commandLineMode])
+  }, [editor, typewriterMode])
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
-        <InputModeContext.Provider value={{commandLineMode, setCommandLineMode, commandLineInput, setCommandLineInput}}>
+        <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput}}>
           <ProofContext.Provider value={{proof, setProof}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={editor}>

@@ -123,7 +123,7 @@ export function WelcomeAppBar({gameInfo, toggleImpressum, openEraseMenu, openUpl
           <FontAwesomeIcon icon={faHome} />&nbsp;Home
         </Button>
         <Button disabled={levelId <= 0} inverted="true" to=""
-            onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
+            onClick={(ev) => { setTypewriterMode(!typewriterMode); setNavOpen(false) }}
             title="toggle Editor mode">
           <FontAwesomeIcon icon={faCode} />&nbsp;Toggle Editor
         </Button> */}
@@ -291,7 +291,7 @@ export function LevelAppBar({
   const difficulty = useSelector(selectDifficulty(gameId))
   const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
-  const { commandLineMode, setCommandLineMode } = React.useContext(InputModeContext)
+  const { typewriterMode, setTypewriterMode } = React.useContext(InputModeContext)
 
   const [navOpen, setNavOpen] = React.useState(false)
 
@@ -341,9 +341,10 @@ export function LevelAppBar({
             <FontAwesomeIcon icon={faHome} />&nbsp;Home
           </Button>
           <Button disabled={levelId <= 0} inverted="true" to=""
-              onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
-              title="toggle Editor mode">
-            <FontAwesomeIcon icon={faCode} />&nbsp;Toggle Editor
+              onClick={(ev) => { setTypewriterMode(!typewriterMode); setNavOpen(false) }}
+              title={typewriterMode ? "Editor mode" : "Typewriter mode"}>
+            <FontAwesomeIcon icon={typewriterMode ? faCode : faTerminal} />
+            &nbsp;{typewriterMode ? "Editor mode" : "Typewriter mode"}
           </Button>
           <Button title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
             <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Info &amp; Impressum
@@ -388,9 +389,9 @@ export function LevelAppBar({
             </Button>
           }
           <Button className="btn btn-inverted toggle-width" disabled={levelId <= 0} inverted="true" to=""
-              onClick={(ev) => { setCommandLineMode(!commandLineMode); setNavOpen(false) }}
-              title="toggle Editor mode">
-            <FontAwesomeIcon icon={commandLineMode ? faCode : faTerminal} />
+              onClick={(ev) => { setTypewriterMode(!typewriterMode); setNavOpen(false) }}
+              title={typewriterMode ? "Editor mode" : "Typewriter mode"}>
+            <FontAwesomeIcon icon={typewriterMode ? faCode : faTerminal} />
           </Button>
           <Button className="btn btn-inverted toggle-width" title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
             <FontAwesomeIcon icon={impressum ? faXmark : faCircleInfo} />

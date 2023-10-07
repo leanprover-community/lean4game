@@ -105,13 +105,13 @@ export const DeletedChatContext = React.createContext<{
 })
 
 export const InputModeContext = React.createContext<{
-  commandLineMode: boolean,
-  setCommandLineMode: React.Dispatch<React.SetStateAction<boolean>>,
-  commandLineInput: string,
-  setCommandLineInput: React.Dispatch<React.SetStateAction<string>>
+  typewriterMode: boolean,
+  setTypewriterMode: React.Dispatch<React.SetStateAction<boolean>>,
+  typewriterInput: string,
+  setTypewriterInput: React.Dispatch<React.SetStateAction<string>>
 }>({
-  commandLineMode: true,
-  setCommandLineMode: () => {},
-  commandLineInput: "",
-  setCommandLineInput: () => {},
+  typewriterMode: true,
+  setTypewriterMode: () => {},
+  typewriterInput: "",
+  setTypewriterInput: () => {},
 });
