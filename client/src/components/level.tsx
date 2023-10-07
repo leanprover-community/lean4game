@@ -142,7 +142,7 @@ function ChatPanel({lastLevel}) {
     <div ref={chatRef} className="chat">
       {introText?.filter(t => t.trim()).map(((t, i) =>
         <Hint key={`intro-p-${i}`}
-          hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
+          hint={{text: t, hidden: false}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
       ))}
       {proof.map((step, i) => {
         // It the last step has errors, it will have the same hints

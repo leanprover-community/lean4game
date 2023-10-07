@@ -64,7 +64,7 @@ config.autoClosingPairs = config.autoClosingPairs.map(
 monaco.languages.setLanguageConfiguration('lean4cmd', config);
 
 /** The input field */
-export function Typewriter({hidden}: {hidden?: boolean}) {
+export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boolean}) {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
@@ -308,7 +308,7 @@ export function Typewriter({hidden}: {hidden?: boolean}) {
     runCommand()
   }
 
-  return <div className={`typewriter${hidden ? ' hidden' : ''}`}>
+  return <div className={`typewriter${hidden ? ' hidden' : ''}${disabled ? ' disabled' : ''}`}>
       <form onSubmit={handleSubmit}>
         <div className="typewriter-input-wrapper">
           <div ref={inputRef} className="typewriter-input" />

@@ -51,6 +51,22 @@
   /* margin: 0.2em 0 0; */
 }
 
+.typewriter.disabled{
+  background: #bbb;
+}
+
+.typewriter.disabled .btn-inverted,
+.typewriter.disabled .mtk1 {
+  color: #777;
+}
+
+.typewriter.disabled .typewriter-input-wrapper,
+.typewriter.disabled .monaco-editor,
+.typewriter.disabled .monaco-editor-background,
+.typewriter.disabled .btn-inverted {
+  background-color: #eee;
+}
+
 .typewriter form {
   display: flex;
 }

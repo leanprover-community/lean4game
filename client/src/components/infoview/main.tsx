@@ -261,16 +261,15 @@ function Command({ command, deleteProof }: { command: string, deleteProof: any }
 // }, fastIsEqual)
 
 /** The tabs of goals that lean ahs after the command of this step has been processed */
-function GoalsTabs({ proofStep, last, onClick}: { proofStep: ProofStep, last : boolean, onClick? : any }) {
-  const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
+function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: ProofStep, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
 
-  if (!proofStep.goals.length) { return <></> }
+  const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
   return <div className="goal-tabs" onClick={onClick}>
     <div className={`tab-bar ${last ? 'current' : ''}`}>
       {proofStep.goals.map((goal, i) => (
         // TODO: Should not use index as key.
-        <div key={`proof-goal-${i}`} className={`tab ${i == (selectedGoal) ? "active" : ""}`} onClick={(ev) => { setSelectedGoal(i); ev.stopPropagation() }}>
+        <div key={`proof-goal-${i}`} className={`tab ${i == (selectedGoal) ? "active" : ""}`} onClick={(ev) => { onGoalChange(i); setSelectedGoal(i); ev.stopPropagation() }}>
           {i ? `Goal ${i + 1}` : "Active Goal"}
         </div>
       ))}
@@ -296,6 +295,8 @@ export function TypewriterInterface(props: { world: string, level: number, data:
   const {mobile} = React.useContext(MobileContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
+
+  const [disableInput, setDisableInput] = React.useState<boolean>(false)
 
   /** Delete all proof lines starting from a given line.
    * Note that the first line (i.e. deleting everything) is `1`!
@@ -342,6 +343,11 @@ export function TypewriterInterface(props: { world: string, level: number, data:
     } else {
       proofPanelRef.current?.scrollTo(0,0)
     }
+    // also reenable the commandline when the proof changes
+
+    // BUG: If selecting 2nd goal on a intermediate proofstep and then delete proof to there,
+    // the commandline is not displaying disabled even though it should.
+    setDisableInput(false)
   }, [proof])
 
   // Scroll to element if selection changes
@@ -460,7 +466,7 @@ export function TypewriterInterface(props: { world: string, level: number, data:
                     }
                   </>
                   }
-                  <GoalsTabs proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)}/>
+                  <GoalsTabs proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/>
                   {/* Show a message that there are no goals left */}
                   {!step.goals.length && (
                     <div className="message information">
@@ -493,7 +499,7 @@ export function TypewriterInterface(props: { world: string, level: number, data:
         }
       </div>
     </div>
-    <Typewriter hidden={!withErr && proof[proof.length - 1]?.goals.length == 0}/>
+    <Typewriter hidden={!withErr && proof[proof.length - 1]?.goals.length == 0} disabled={disableInput}/>
     </RpcContext.Provider>
   </div>
 }
