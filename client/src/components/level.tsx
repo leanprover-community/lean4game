@@ -136,13 +136,14 @@ function ChatPanel({lastLevel}) {
   //   // chatRef.current!.scrollTo(0,0)
   // }, [gameId, worldId, levelId])
 
+  let introText: Array<string> = level?.data?.introduction.split(/\n(\s*\n)+/)
+
   return <div className="chat-panel">
     <div ref={chatRef} className="chat">
-      {level?.data?.introduction &&
-        <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelection(0)}>
-          <Markdown>{level?.data?.introduction}</Markdown>
-        </div>
-      }
+      {introText?.filter(t => t.trim()).map(((t, i) =>
+        <Hint key={`intro-p-${i}`}
+          hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
+      ))}
       {proof.map((step, i) => {
         // It the last step has errors, it will have the same hints
         // as the second-to-last step. Therefore we should not display them.
@@ -420,10 +421,6 @@ function Introduction({impressum, setImpressum}) {
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
-
-  const closeImpressum = () => {
-    setImpressum(false)
-  }
 
   const toggleImpressum = () => {
     setImpressum(!impressum)
