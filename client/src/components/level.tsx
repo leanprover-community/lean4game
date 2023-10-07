@@ -284,7 +284,7 @@ function PlayableLevel({impressum, setImpressum}) {
   // if the user inventory changes, notify the server
   useEffect(() => {
     let leanClient = connection.getLeanClient(gameId)
-    leanClient.sendNotification('$/game/setInventory', {inventory: inventory, checkEnabled: difficulty > 0})
+    leanClient.sendNotification('$/game/setInventory', {inventory: inventory, difficulty: difficulty})
   }, [inventory])
 
   useEffect(() => {

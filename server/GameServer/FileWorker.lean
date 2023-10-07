@@ -61,13 +61,13 @@ section Elab
 /-- Find all tactics in syntax object that are forbidden according to a
 set `allowed` of allowed tactics. -/
 partial def findForbiddenTactics (inputCtx : Parser.InputContext)
-    (levelParams : Game.DidOpenLevelParams) (stx : Syntax) :
+    (levelParams : Game.DidOpenLevelParams) (stx : Syntax) (asError : Bool) :
     Elab.Command.CommandElabM Unit := do
   match stx with
   | .missing => return ()
   | .node info kind args =>
     for arg in args do
-      findForbiddenTactics inputCtx levelParams arg
+      findForbiddenTactics inputCtx levelParams arg asError
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore "with" keyword
@@ -108,7 +108,7 @@ where addWarningMessage (info : SourceInfo) (s : MessageData) :=
   modify fun st => { st with
     messages := st.messages.add {
       fileName := inputCtx.fileName
-      severity := MessageSeverity.warning
+      severity := if asError then MessageSeverity.error else MessageSeverity.warning
       pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
       data     := s
     }
@@ -170,8 +170,9 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           parseResultRef.set (tacticStx, cmdParserState)
 
           -- Check for forbidden tactics
-          if levelParams.checkEnabled then
+          if levelParams.difficulty > 0 then
             findForbiddenTactics inputCtx levelParams tacticStx
+              (asError := levelParams.difficulty > 1)
 
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
@@ -533,7 +534,7 @@ section MainLoop
 
       set {s with levelParams := {s.levelParams with
         inventory := p.inventory,
-        checkEnabled := p.checkEnabled}}
+        difficulty := p.difficulty}}
       mainLoop
     | Message.notification method (some params) =>
       handleNotification method (toJson params)

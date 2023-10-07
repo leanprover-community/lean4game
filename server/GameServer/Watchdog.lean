@@ -114,7 +114,7 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
     game := gameName,
     gameDir := gameDir,
     inventory := #[]
-    checkEnabled := false
+    difficulty := 0
     }
   let initRequest ← i.readLspRequestAs "initialize" InitializeParams
   -- We misuse the `rootUri` field to the gameName

@@ -7,7 +7,7 @@ structure GameServerState :=
 (game : Name)
 (gameDir : String)
 (inventory : Array String)
-(checkEnabled : Bool)
+(difficulty : Nat)
 
 abbrev GameServerM := StateT GameServerState Server.Watchdog.ServerM
 
@@ -79,8 +79,13 @@ structure DidOpenLevelParams where
   lemmas : Array InventoryTile
   definitions : Array InventoryTile
   inventory : Array String
-  /-- if true the server gives warnings for used tactics/lemmas that are not unlocked. -/
-  checkEnabled : Bool
+  /--
+  Check for tactics/theorems that are not unlocked.
+  0: no check
+  1: give warnings
+  2: give errors
+  -/
+  difficulty : Nat
   deriving ToJson, FromJson
 
 structure LoadDocParams where
@@ -90,7 +95,7 @@ deriving ToJson, FromJson
 
 structure SetInventoryParams where
   inventory : Array String
-  checkEnabled : Bool
+  difficulty : Nat
 deriving ToJson, FromJson
 
 def handleDidOpenLevel (params : Json) : GameServerM Unit := do
@@ -117,7 +122,7 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
       lemmas := lvl.lemmas.tiles
       definitions := lvl.definitions.tiles
       inventory := s.inventory
-      checkEnabled := s.checkEnabled
+      difficulty := s.difficulty
       : DidOpenLevelParams
     }
   }
@@ -205,7 +210,7 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
     | Message.notification "$/game/setInventory" params =>
       let p := (← parseParams SetInventoryParams (toJson params))
       let s ← get
-      set {s with inventory := p.inventory, checkEnabled := p.checkEnabled}
+      set {s with inventory := p.inventory, difficulty := p.difficulty}
       let st ← read
       let workers ← st.fileWorkersRef.get
       for (_, fw) in workers do
