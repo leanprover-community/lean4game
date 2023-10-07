@@ -29,7 +29,7 @@ export function Inventory({levelInfo, openDoc, enableAll=false} :
       {levelInfo?.definitions &&
         <InventoryList items={levelInfo?.definitions} docType="Definition" openDoc={openDoc} enableAll={enableAll}/>
       }
-      <h2>Lemmas</h2>
+      <h2>Theorems</h2>
       {levelInfo?.lemmas &&
         <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc} defaultTab={levelInfo?.lemmaTab} level={levelInfo} enableAll={enableAll}/>
       }

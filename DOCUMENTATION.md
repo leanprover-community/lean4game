@@ -87,9 +87,9 @@ Optionally, you can add a `Introduction "some text"` and `Conclusion "some text"
 The introduction will be shown at the beginning, the conclusion is displayed once the level
 is solved.
 
-#### Lemmas/Tactics/Definitions
+#### Theorems/Tactics/Definitions
 
-Only enabled lemmas/tactics/definitions (called "items" here) are available in a level.
+Only enabled theorems/tactics/definitions (called "items" here) are available in a level.
 
 To add a new item in a level, you can add
 
