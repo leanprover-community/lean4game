@@ -261,12 +261,12 @@ function Command({ command, deleteProof }: { command: string, deleteProof: any }
 // }, fastIsEqual)
 
 /** The tabs of goals that lean ahs after the command of this step has been processed */
-function GoalsTab({ proofStep, last}: { proofStep: ProofStep, last : boolean }) {
+function GoalsTabs({ proofStep, last, onClick}: { proofStep: ProofStep, last : boolean, onClick? : any }) {
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
   if (!proofStep.goals.length) { return <></> }
 
-  return <div>
+  return <div className="goal-tabs" onClick={onClick}>
     <div className={`tab-bar ${last ? 'current' : ''}`}>
       {proofStep.goals.map((goal, i) => (
         // TODO: Should not use index as key.
@@ -441,7 +441,7 @@ export function TypewriterInterface(props: { world: string, level: number, data:
                   <Errors errors={step.errors} typewriterMode={true} />
                 </div>
               } else {
-                return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')} onClick={toggleSelectStep(i)}>
+                return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')}>
                   <Command command={step.command} deleteProof={deleteProof(i)} />
                   <Errors errors={step.errors} typewriterMode={true} />
                   {mobile && i == 0 && props.data?.introduction &&
@@ -460,7 +460,7 @@ export function TypewriterInterface(props: { world: string, level: number, data:
                     }
                   </>
                   }
-                  <GoalsTab proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} />
+                  <GoalsTabs proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)}/>
                   {/* Show a message that there are no goals left */}
                   {!step.goals.length && (
                     <div className="message information">
