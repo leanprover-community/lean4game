@@ -28,7 +28,7 @@ import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
 import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './context';
-import { Typewriter, hasErrors, hasInteractiveErrors } from './command_line';
+import { Typewriter, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
