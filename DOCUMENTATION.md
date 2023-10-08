@@ -194,7 +194,7 @@ There will be features added to get automatic information from mathlib!
 
 Inside the doc comment you don't need to escape the backslashes:
 
-```
+```lean
 /-- $\operatorname{succ}(n)$. notation for naturals is `\N`. -/
 Statement ...
 ```
@@ -203,7 +203,7 @@ However, inside interpolated strings (e.g. in `Hint`, `Introduction` and `Conclu
 you do need to escape backslashes
 with `\\` and `{` with `\{`:
 
-```
+```lean
 Hint "This code has some $\\operatorname\{succ}(n)$ math. The value of `h` is {h}.
 Notation for naturals is `\\N`."
 ```
@@ -250,23 +250,24 @@ The installation instructions are not yet tested on Mac/Windows. Comments very w
 
 ## Without Dev Containers
 Install `nvm`:
-```
+```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
 ```
 then reopen bash and test with `command -v nvm` if it is available (Should print "nvm").
 
 Now install node:
-```
+```bash
 nvm install node
 ```
 
 Clone the game (e.g. `NNG4` here):
-```
-git clone git@github.com:hhu-adam/NNG4.git
+```bash
+git clone https://github.com/hhu-adam/NNG4.git
+# or: git clone git@github.com:hhu-adam/NNG4.git
 ```
 
 Download dependencies and build the game:
-```
+```bash
 cd NNG4
 lake update
 lake exe cache get   # if your game depends on mathlib
@@ -274,21 +275,22 @@ lake build
 ```
 
 Clone the game repository into a directory next to the game:
-```
+```bash
 cd ..
-git clone git@github.com:leanprover-community/lean4game.git
+git clone hhttps://github.com/leanprover-community/lean4game.git
+# or: git clone git@github.com:leanprover-community/lean4game.git
 ```
 The folders `NNG4` and `lean4game` must be in the same directory!
 
 In `lean4game`, install dependencies:
-```
+```bash
 cd lean4game
 npm install
 ```
 
 If you are developing a game other than `Robo` or `NNG4`, adapt the
 code at the beginning of `lean4game/server/index.mjs`:
-```
+```typescript
 const games = {
     "g/hhu-adam/robo": {
         dir: "../../../../Robo",
@@ -302,7 +304,7 @@ const games = {
 ```
 
 Run the game:
-```
+```bash
 npm start
 ```
 
@@ -314,7 +316,7 @@ and the game is available on http://localhost:3000/#/g/hhu-adam/NNG4.
 When modifying the game engine itself (in particular the content in `lean4game/server`) you can test it live with this
 setup by setting `export NODE_ENV=development` inside your local game before building it:
 
-```
+```bash
 cd NNG4
 export NODE_ENV=development
 lake update
