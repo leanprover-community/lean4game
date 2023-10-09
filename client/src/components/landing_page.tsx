@@ -130,7 +130,7 @@ Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet 
 
       <GameTile
         title="NNG (OLD)"
-        gameId="g/hhu-adam/nng-old"
+        gameId="g/hhu-adam/nng4-old"
         intro="The old version of the NNG copied from lean3."
         description="This version is not maintained and might break at any point. You should play the new version instead"
         worlds="9"
