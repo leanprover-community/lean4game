@@ -28,7 +28,7 @@ const lineWidth = 10      //
 const ds = .75  // scale the resulting svg image
 
 const NMIN = 5   // min. worldsize
-const NLABEL = 9 // max. world size to display label below the world
+const NLABEL = 8 // max. world size to display label below the world
 const NMAX = 16  // max. world size. Level icons start spiraling out if the world has more levels.
 
 // colours
