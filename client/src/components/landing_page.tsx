@@ -111,8 +111,8 @@ function LandingPage() {
 learning the basics about theorem proving in Lean.
 
 This is a good first introduction to Lean!"
-        worlds="9"
-        levels="72"
+        worlds="4"
+        levels="30"
         language="English"
         />
 
@@ -128,6 +128,15 @@ Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet 
         language="German"
         />
 
+      <GameTile
+        title="NNG (OLD)"
+        gameId="g/hhu-adam/nng-old"
+        intro="The old version of the NNG copied from lean3."
+        description="This version is not maintained and might break at any point. You should play the new version instead"
+        worlds="9"
+        levels="72"
+        language="English"
+        />
     </div>
     <section>
       <div className="wrapper">
