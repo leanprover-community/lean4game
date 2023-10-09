@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDownload, faUpload, faEraser, faBook, faGlobe, faHome, faArrowRight, faArrowLeft, faXmark, faBars, faCode, faCircleInfo, faTerminal } from '@fortawesome/free-solid-svg-icons'
+import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome, faArrowRight, faArrowLeft, faXmark, faBars, faCode, faCircleInfo, faTerminal } from '@fortawesome/free-solid-svg-icons'
 import { PrivacyPolicyPopup } from './privacy_policy'
 import { WorldSelectionMenu, downloadFile } from './world_tree'
 
@@ -19,7 +19,7 @@ function MobileNav({pageNumber, setPageNumber}:
   const dispatch = useAppDispatch()
 
   let prevText = {0 : null, 1: "Intro", 2: null}[pageNumber]
-  let prevIcon = {0 : null, 1: null, 2: faXmark}[pageNumber]
+  let prevIcon = {0 : null, 1: null, 2: faBookOpen}[pageNumber]
   let prevTitle = {
     0: null,
     1: "Game Introduction",
@@ -312,8 +312,8 @@ export function LevelAppBar({
             </Button>
           : pageNumber == 1 &&
             <Button className="btn btn-inverted toggle-width" to=""
-                title="show inventory" inverted="true" onClick={() => {setPageNumber(0)}}>
-              <FontAwesomeIcon icon={faXmark}/>
+                title="close inventory" inverted="true" onClick={() => {setPageNumber(0)}}>
+              <FontAwesomeIcon icon={faBookOpen}/>
             </Button>
           }
           <Button to="" className="btn toggle-width" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}} >

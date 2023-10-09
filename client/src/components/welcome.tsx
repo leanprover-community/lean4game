@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import Split from 'react-split'
 import { Box, Typography, CircularProgress } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGlobe, faBook, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faGlobe, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
 import { useAppDispatch } from '../hooks'
