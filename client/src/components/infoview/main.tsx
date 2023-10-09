@@ -80,6 +80,11 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
           ...level?.definitions
         ].filter((tile) => tile.new).map((tile) => tile.name)
 
+        // Add the proven statement to the local storage as well.
+        if (level?.statementName != null) {
+          newTiles.push(level?.statementName)
+        }
+
         let inv: string[] = selectInventory(gameId)(store.getState())
 
         // add new items and remove duplicates
@@ -130,7 +135,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
 function ExerciseStatement({ data }) {
   if (!data?.descrText) { return <></> }
   return <div className="exercise-statement"><Markdown>
-    {(data?.statementName ? `**Theorem** \`${data?.statementName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}`}
+    {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}`}
   </Markdown></div>
 }
 

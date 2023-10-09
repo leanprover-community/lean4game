@@ -50,6 +50,7 @@ structure LevelInfo where
   descrText : Option String := none
   descrFormat : String := ""
   lemmaTab : Option String
+  displayName : Option String
   statementName : Option String
   template : Option String
 deriving ToJson, FromJson
@@ -165,7 +166,8 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
               match lvl.lemmas.tiles.find? (·.new) with
               | some tile => tile.category
               | none => none
-            statementName := match lvl.statementName with
+            statementName := lvl.statementName.toString
+            displayName := match lvl.statementName with
               | .anonymous => none
               | name => match (inventoryExt.getState env).find?
                   (fun x => x.name == name && x.type == .Lemma) with
@@ -194,7 +196,6 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
     --   return true
     | Message.request id "loadDoc" params =>
       let p ← parseParams LoadDocParams (toJson params)
-      let s ← get
       let c ← read
       let some doc ← getInventoryItem? p.name p.type
         | do

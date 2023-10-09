@@ -36,6 +36,7 @@ export interface LevelInfo {
   descrFormat: null|string,
   lemmaTab: null|string,
   statementName: null|string,
+  displayName: null|string,
   template: null|string
 }
 
