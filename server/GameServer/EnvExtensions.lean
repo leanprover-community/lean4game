@@ -386,8 +386,13 @@ def modifyCurWorld (fn : World → m World) [MonadError m] : m Unit := do
     return {game with worlds := {game.worlds with nodes := game.worlds.nodes.insert world.name (← fn world) }}
 
 def addLevel (level : GameLevel) [MonadError m] : m Unit := do
-  modifyCurWorld fun world => do
-    return {world with levels := world.levels.insert level.index level}
+  let worldId ← getCurWorldId
+  match ← getLevel? ⟨← getCurGameId, worldId, level.index⟩ with
+  | some _existingLevel =>
+    throwError m!"Level {level.index} already exists for world {worldId}!"
+  | none =>
+    modifyCurWorld fun world => do
+      return {world with levels := world.levels.insert level.index level}
 
 def getCurLevel [MonadError m] : m GameLevel := do
   let some level := (← getCurWorld).levels.find? (← getCurLevelIdx)

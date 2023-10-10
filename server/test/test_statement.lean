@@ -13,8 +13,11 @@ Level 1
 Statement foo.bar : 5 ≤ 7 := by
   simp
 
--- Shows warning on `foo.bar₂`:
+Game "Test"
+World "TestW"
+Level 2 -- should warn if set to `1`
 
+-- Shows warning on `foo.bar₂`:
 Statement foo.bar2 : 3 ≤ 7 := by
   simp
 
