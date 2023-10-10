@@ -21,13 +21,13 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { GameIdContext } from '../../app';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { LevelInfo } from '../../state/api';
-import { changedInventory, levelCompleted, selectCompleted, selectInventory } from '../../state/progress';
+import { changedInventory, levelCompleted, selectCode, selectCompleted, selectInventory } from '../../state/progress';
 import Markdown from '../markdown';
 
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
-import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext } from './context';
+import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './context';
 import { Typewriter, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
@@ -70,7 +70,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
     '$/game/completed',
     (params: any) => {
       if (ec.events.changedCursorLocation.current &&
-        ec.events.changedCursorLocation.current.uri === params.uri) {
+          ec.events.changedCursorLocation.current.uri === params.uri) {
         dispatch(levelCompleted({ game: gameId, world: worldId, level: levelId }))
 
         // On completion, add the names of all new items to the local storage
@@ -116,7 +116,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
               {typewriterMode ?
                 <TypewriterInterface world={worldId} level={levelId} data={level} worldSize={worldSize}/>
                 :
-                <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} />
+                <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} data={level} />
               }
             </ProgressContext.Provider>
           </WithLspDiagnosticsContext>
@@ -141,11 +141,23 @@ function ExerciseStatement({ data }) {
 
 // TODO: This is only used in `EditorInterface`
 // while `TypewriterInterface` has this copy-pasted in.
-export function Main(props: { world: string, level: number }) {
+export function Main(props: { world: string, level: number, data: LevelInfo}) {
   const ec = React.useContext(EditorContext);
   const gameId = React.useContext(GameIdContext)
+  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
 
   const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
+
+  console.debug(`template: ${props.data.template}`)
+
+  // React.useEffect (() => {
+  //   if (props.data.template) {
+  //     let code: string = selectCode(gameId, worldId, levelId)(store.getState())
+  //     if (!code.length) {
+  //       //models.push(monaco.editor.createModel(code, 'lean4', uri))
+  //     }
+  //   }
+  // }, [props.data.template])
 
   /* Set up updates to the global infoview state on editor events. */
   const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;

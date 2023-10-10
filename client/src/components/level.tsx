@@ -252,6 +252,25 @@ function PlayableLevel({impressum, setImpressum}) {
   const {editor, infoProvider, editorConnection} =
     useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
 
+  useEffect (() => {
+    // Lock editor mode
+    if (level?.data?.template) {
+      setTypewriterMode(false)
+
+      console.debug(`inserting template: ${level.data.template}`)
+
+      // // TODO: This does not work! HERE
+      // // Probably overwritten by a query to the server
+      // editor.executeEdits("command-line", [{
+      //   range: editor.getModel().getFullModelRange(),
+      //   text: level.data.template,
+      //   forceMoveMarkers: false
+      // }])
+    } else {
+      setTypewriterMode(true)
+    }
+  }, [level, levelId, worldId, gameId])
+
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `TypewriterInterface`.
    */
@@ -355,6 +374,7 @@ function PlayableLevel({impressum, setImpressum}) {
               <MonacoEditorContext.Provider value={editor}>
                 <LevelAppBar
                   isLoading={level.isLoading}
+                  lockEditorMode={level.data?.template !== null}
                   levelTitle={`${mobile ? '' : 'Level '}${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${level?.data?.title}`)}
                   impressum={impressum}

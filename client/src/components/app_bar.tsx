@@ -281,7 +281,7 @@ export function WelcomeAppBar({gameInfo, toggleImpressum, openEraseMenu, openUpl
 /** The top-navigation bar */
 export function LevelAppBar({
     isLoading, levelTitle, impressum, toggleImpressum,
-    pageNumber = undefined, setPageNumber = undefined}) {
+    pageNumber = undefined, setPageNumber = undefined, lockEditorMode=false}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
@@ -294,6 +294,13 @@ export function LevelAppBar({
   const { typewriterMode, setTypewriterMode } = React.useContext(InputModeContext)
 
   const [navOpen, setNavOpen] = React.useState(false)
+
+  function toggleEditor(ev) {
+    if (!lockEditorMode){
+      setTypewriterMode(!typewriterMode)
+      setNavOpen(false)
+    }
+  }
 
   return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
     {mobile ?
@@ -388,9 +395,9 @@ export function LevelAppBar({
               <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
             </Button>
           }
-          <Button className="btn btn-inverted toggle-width" disabled={levelId <= 0} inverted="true" to=""
-              onClick={(ev) => { setTypewriterMode(!typewriterMode); setNavOpen(false) }}
-              title={typewriterMode ? "Editor mode" : "Typewriter mode"}>
+          <Button className="btn btn-inverted toggle-width" disabled={levelId <= 0 || lockEditorMode} inverted="true" to=""
+              onClick={(ev) => toggleEditor(ev)}
+              title={lockEditorMode ? "Editor mode is enforced!" : typewriterMode ? "Editor mode" : "Typewriter mode"}>
             <FontAwesomeIcon icon={typewriterMode ? faCode : faTerminal} />
           </Button>
           <Button className="btn btn-inverted toggle-width" title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>

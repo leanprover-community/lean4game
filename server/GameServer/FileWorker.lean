@@ -96,6 +96,7 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
       for n in ns do
         let some (.thmInfo ..) := (← getEnv).find? n
           | return () -- not a theroem -> ignore
+        -- TODO: Filter thhe theorem we want to proof to avoid structural recursion!
         let lemmasAndDefs := levelParams.lemmas ++ levelParams.definitions
         match lemmasAndDefs.find? (fun l => l.name == n) with
         | none => addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
