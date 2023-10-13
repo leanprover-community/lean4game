@@ -30,6 +30,9 @@ const ds = .75  // scale the resulting svg image
 const NMIN = 5   // min. worldsize
 const NLABEL = 8 // max. world size to display label below the world
 const NMAX = 16  // max. world size. Level icons start spiraling out if the world has more levels.
+const NSPIRAL = 12 // world size if NMAX has been passed and need to spiral.
+
+const MINFONT = 12
 
 // colours
 const grey = '#999'
@@ -54,8 +57,9 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
 
   const N = Math.max(worldSize, NMIN)
 
-  // divide circle into `N+2` equal pieces
-  const beta = 2 * Math.PI / Math.min(N+2, (NMAX+1))
+  // divide circle into `N+2` equal pieces.
+  // only for non-spiraling case
+  const beta = 2 * Math.PI / Math.min(N+2, ((N < (NMAX+1) ? NMAX : NSPIRAL)+1))
 
   // We want distance between two level icons to be `2.2*r`, therefore:
   // Sinus-Satz: (1.1*r) / sin(β/2) = R / sin(π/2)
@@ -70,19 +74,19 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
    * works fine in tests up to `N=30`.
    */
   function betaSpiral(level) {
-    return 2 * Math.PI / ((NMAX+1) + Math.max(0, (level-2)) / (NMAX+1))
+    return 2 * Math.PI / ((NSPIRAL+1) + 2 * Math.max(0, (level-2)) / (NSPIRAL+1))
   }
 
   const x = N < (NMAX+1) ?
     // normal case
     s * position.x + Math.sin(level * beta) * R :
     // spiraling case
-    s * position.x + Math.sin(level * betaSpiral(level)) * (R + 2*r*(level-1)/(NMAX+1))
+    s * position.x + Math.sin(level * betaSpiral(level)) * (R + 2*r*(level-1)/(NSPIRAL+1))
   const y = N < (NMAX+1) ?
     // normal case
     s * position.y - Math.cos(level * beta) * R :
     // spiraling case
-    s * position.y - Math.cos(level * betaSpiral(level)) * (R + 2*r*(level-1)/(NMAX+1))
+    s * position.y - Math.cos(level * betaSpiral(level)) * (R + 2*r*(level-1)/(NSPIRAL+1))
 
   return (
     <Link to={levelDisabled ? '' : `/${gameId}/world/${world}/level/${level == 1 ? 0 : level}`}
@@ -112,8 +116,10 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
 
   // See level icons. Match radius computed there minus `1.2*r`
   const N = Math.max(worldSize, NMIN)
-  const betaHalf = Math.PI / Math.min(N+2, (NMAX + 1))
+  const betaHalf = Math.PI / Math.min(N+2, ((N < (NMAX+1) ? NMAX : NSPIRAL) + 1))
   let R = 1.1 * r / Math.sin(betaHalf) - 1.2 * r
+
+  let fontSize = Math.floor(R/4)
 
   // Offset for the labels for small worlds
   let labelOffset = R + 2.5 * r
@@ -137,12 +143,14 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
       className={playable ? '' : 'disabled'}>
     <circle className="world-circle" cx={s*position.x} cy={s*position.y} r={R}
         fill={completed ? green : unlocked ? blue : grey}/>
-    {worldSize > NLABEL ?
+    { false ? // fontSize >= MINFONT ?
+      // NOTE: This code would display the world names inside the bubble, but currently
+      //       it isn't used.
       // Label for large worlds
       <foreignObject className="world-title-wrapper" x={s*position.x} y={s*position.y}
           width={1.42*R} height={1.42*R} transform={"translate("+ -.71*R +","+ -.71*R +")"}>
         <div className={unlocked && !completed ? "playable-world" : ''}>
-          <p className="world-title" style={{fontSize: Math.floor(R/4) + "px"}}>
+          <p className="world-title" style={{fontSize: fontSize + "px"}}>
             {title ? title : world}
           </p>
         </div>
@@ -153,7 +161,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
           width='150px' height='2em' style={{overflow: 'visible'}}
           >
         <div className='world-label' style={{backgroundColor: completed ? darkgreen : unlocked ? darkblue : darkgrey}}>
-          <p className='world-title'>
+          <p className='world-title' style={{fontSize: MINFONT + "px"}}>
             {title ? title : world}
           </p>
         </div>
