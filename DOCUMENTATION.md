@@ -8,9 +8,7 @@ A game consist of worlds which have multiple levels each. In the following we de
 
 ### Level
 
-#### Preample
-
-A level file is a lean file that imports at least `GameServer.Commands` and starts with the four lean commands
+A level file is a lean file that imports at least `import GameServer.Commands` and starts with the following Lean commands.
 
 ```lean
 Game "NNG"
@@ -20,11 +18,11 @@ Title "The rfl tactic"
 ```
 
 Note that the levels inside a world must have consequtive numbering starting with `1`. The `Game`
-and `World` strings can be anything.
+and `World` strings can be anything, see below.
 
 #### Statement
 
-The core of a level is the `Statement`, which is the exercise that should be proven:
+The core of a level is the `Statement`, which is the exercise that should be proven.
 
 ```lean
 /-- For all natural numbers $n$, we have $0 + n = n$. -/
@@ -56,7 +54,9 @@ There are a few extra tactics that help you structuring the proof:
 - `Branch`: In the proof you can add a `Branch` that runs an alternativ tactic sequence, which
   helps setting `Hints` in different   places. The `Branch` does not affect the main
   proof and does not need to finish any goals.
-- `Template`/`Hole`: not implemented yet, but used to provide a sample proof template.
+- `Template`/`Hole`: Used to provide a sample proof template. Anything inside `Template`
+  will be copied into the editor with all `Hole`s replaced with `sorry`. Note that
+  having a `Template` will force the user to use Editor-mode for this level.
 
 ##### Statement Name (optional)
 
@@ -77,13 +77,14 @@ There are three places where the documentation comment appears:
   description there including examples etc.
 
 Both latter points support Markdown (including katex).
+
 ##### Attributes (optional)
 
 the `@[ attributes ]` prefix should work just like you know it from the `theorem` keyword.
 
 #### Introduction/Conclusion
 
-Optionally, you can add a `Introduction "some text"` and `Conclusion "some text"` to your level.
+Optionally, you can add an `Introduction "some text"` and `Conclusion "some text"` to your level.
 The introduction will be shown at the beginning, the conclusion is displayed once the level
 is solved.
 
@@ -95,8 +96,8 @@ To add a new item in a level, you can add
 
 ```lean
 NewTactic rfl simp
-NewLemma MyNat.add_zero
-NewDefinition Nat
+NewLemma MyNat.add_zero MyNat.add_succ
+NewDefinition Nat Pow Mul
 ```
 
 Once added, items will be available in all future levels/worlds,
@@ -134,10 +135,9 @@ Introduction "some text"
 ```
 
 The `Title` is the world's display title. The `Introduction` is displayed before loading level 1.
-Note that all levels of a world should be imported by the world file and they **must not** be
-imported in another world's levels. (bug?)
+Note that all levels of a world should be imported by the world file.
 
-However, you can import an entire world in a different world's level: `import NNG.Levels.Addition`
+BUG: A level **must not** be imported in a different world's level. Instead, you have to import an entire world there: `import NNG.Levels.Addition`
 
 ### Game
 
@@ -152,17 +152,18 @@ Game "NNG"
 Title "Natural Number Game"
 Introduction "some text"
 
-Path Addition → Multiplication → Power
-
 MakeGame
 ```
 
-There can be several `Path` statements to define the relation between the worlds. The worlds
-must form a directed acyclic graph, i.e. have no loops. The order of worlds influences which tactics and lemmas will be unlocked in a given level.
+The game will automatically compute the order of the worlds depending on the sample proofs of the Levels (ignoring anything inside a `Branch`). You can add additional dependencies manually by adding `Dependency PowerWorld → ImpossibleWorld` before `MakeGame`.
+The order of worlds influences which tactics and lemmas will be unlocked in a given level.
+
+`MakeGame` will display warnings about things in the game that need to be fixed, like missing
+documentation or if a tactic is never introduced.
 
 ### Documentation
 
-Each tactic, lemma, or definition (all called items here) that is introduced in the game
+Each tactic, theorem, or definition (all called items here) that is introduced in the game
 needs a documentation entry. These are statements of the following form:
 
 ```lean
@@ -208,6 +209,12 @@ Hint "This code has some $\\operatorname\{succ}(n)$ math. The value of `h` is {h
 Notation for naturals is `\\N`."
 ```
 
+## Game design
+Here are some things you should consider designing a new game:
+
+* A world with more than 16 levels will be displayed with the levels spiraling outwards,
+  it might be desirable to stay below that bound. Above 22 levels the spiral start getting out
+  of control.
 
 # Running Games Locally
 
