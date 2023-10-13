@@ -347,20 +347,27 @@ function PlayableLevel({impressum, setImpressum}) {
   // Effect when command line mode gets enabled
   useEffect(() => {
     if (editor && typewriterMode) {
-      let endPos = editor.getModel().getFullModelRange().getEndPosition()
-      if (editor.getModel().getLineContent(endPos.lineNumber).trim() !== "") {
-        editor.executeEdits("typewriter", [{
-          range: monaco.Selection.fromPositions(endPos, endPos),
-          text: "\n",
-          forceMoveMarkers: true
-        }]);
-      }
-      endPos = editor.getModel().getFullModelRange().getEndPosition()
-      let currPos = editor.getPosition()
-      if (currPos.column != 1 || (currPos.lineNumber != endPos.lineNumber && currPos.lineNumber != endPos.lineNumber - 1)) {
-        // This is not a position that would naturally occur from Typewriter, reset:
-        editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
-      }
+      let code = editor.getModel().getLinesContent().filter(line => line.trim())
+      editor.executeEdits("typewriter", [{
+        range: editor.getModel().getFullModelRange(),
+        text: code.join('\n')+'\n',
+        forceMoveMarkers: true
+      }]);
+
+      // let endPos = editor.getModel().getFullModelRange().getEndPosition()
+      // if (editor.getModel().getLineContent(endPos.lineNumber).trim() !== "") {
+      //   editor.executeEdits("typewriter", [{
+      //     range: monaco.Selection.fromPositions(endPos, endPos),
+      //     text: "\n",
+      //     forceMoveMarkers: true
+      //   }]);
+      // }
+      // let endPos = editor.getModel().getFullModelRange().getEndPosition()
+      // let currPos = editor.getPosition()
+      // if (currPos.column != 1 || (currPos.lineNumber != endPos.lineNumber && currPos.lineNumber != endPos.lineNumber - 1)) {
+      //   // This is not a position that would naturally occur from Typewriter, reset:
+      //   editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
+      // }
     }
   }, [editor, typewriterMode])
 
