@@ -252,25 +252,6 @@ function PlayableLevel({impressum, setImpressum}) {
   const {editor, infoProvider, editorConnection} =
     useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
 
-  useEffect (() => {
-    // Lock editor mode
-    if (level?.data?.template) {
-      setTypewriterMode(false)
-
-      console.debug(`inserting template: ${level.data.template}`)
-
-      // // TODO: This does not work! HERE
-      // // Probably overwritten by a query to the server
-      // editor.executeEdits("command-line", [{
-      //   range: editor.getModel().getFullModelRange(),
-      //   text: level.data.template,
-      //   forceMoveMarkers: false
-      // }])
-    } else {
-      setTypewriterMode(true)
-    }
-  }, [level, levelId, worldId, gameId])
-
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `TypewriterInterface`.
    */
@@ -306,6 +287,42 @@ function PlayableLevel({impressum, setImpressum}) {
     let leanClient = connection.getLeanClient(gameId)
     leanClient.sendNotification('$/game/setInventory', {inventory: inventory, difficulty: difficulty})
   }, [inventory])
+
+  useEffect (() => {
+    // Lock editor mode
+    if (level?.data?.template) {
+      setTypewriterMode(false)
+
+      if (editor) {
+        let code = editor.getModel().getLinesContent()
+
+        // console.log(`insert. code: ${code}`)
+        // console.log(`insert. join: ${code.join('')}`)
+        // console.log(`insert. trim: ${code.join('').trim()}`)
+        // console.log(`insert. length: ${code.join('').trim().length}`)
+        // console.log(`insert. range: ${editor.getModel().getFullModelRange()}`)
+
+
+        // TODO: It does seem that the template is always indented by spaces.
+        // This is a hack, assuming there are exactly two.
+        if (!code.join('').trim().length) {
+          console.debug(`inserting template:\n${level.data.template}`)
+          // TODO: This does not work! HERE
+          // Probably overwritten by a query to the server
+          editor.executeEdits("template-writer", [{
+            range: editor.getModel().getFullModelRange(),
+            text: level.data.template + `\n`,
+            forceMoveMarkers: true
+          }])
+        } else {
+          console.debug(`not inserting template.`)
+        }
+      }
+    } else {
+      setTypewriterMode(true)
+    }
+  }, [level, levelId, worldId, gameId, editor])
+
 
   useEffect(() => {
     // TODO: That's a problem if the saved proof contains an error
