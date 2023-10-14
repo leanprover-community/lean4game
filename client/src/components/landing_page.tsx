@@ -57,6 +57,7 @@ function GameTile({
       <div className="long description"><Markdown>{description}</Markdown></div>
     </div>
     <table className="info">
+      <tbody>
       <tr>
         <td title="consider playing these games first.">Prerequisites</td>
         <td><Markdown>{prereq}</Markdown></td>
@@ -73,6 +74,7 @@ function GameTile({
         <td>Language</td>
         <td title={`in ${language}`}>{flag[language]}</td>
       </tr>
+      </tbody>
     </table>
   </div>
 
