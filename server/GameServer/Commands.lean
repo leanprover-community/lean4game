@@ -10,6 +10,13 @@ register_option lean4game.showDependencyReasons : Bool := {
   descr := "show reasons for calculated world dependencies."
 }
 
+/-- Let `MakeGame` print the reasons why the worlds depend on each other. -/
+register_option lean4game.verbose : Bool := {
+  defValue := false
+  descr := "display more info messages to help developing the game."
+}
+
+
 /-! # Game metadata -/
 
 /-- Switch to the specified `Game` (and create it if non-existent). Example: `Game "NNG"` -/
@@ -108,9 +115,10 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
         name := name
         category := if type == .Lemma then s!"{n.getPrefix}" else ""
         content := s })
-      logInfoAt ref (m!"Missing {type} Documentation: {name}, used default (e.g. provided " ++
-      m!"docstring) instead. If you want to write a different description, add " ++
-      m!"`{type}Doc {name}` somewhere above this statement.")
+      if lean4game.verbose.get (← getOptions) then
+        logInfoAt ref (m!"Missing {type} Documentation: {name}, used default (e.g. provided " ++
+        m!"docstring) instead. If you want to write a different description, add " ++
+        m!"`{type}Doc {name}` somewhere above this statement.")
 
 /-- Documentation entry of a tactic. Example:
 
@@ -220,6 +228,7 @@ elab "NewTactic" args:ident* : command => do
 
 /-- Declare tactics that are introduced by this level. -/
 elab "NewHiddenTactic" args:ident* : command => do
+  for name in ↑args do checkInventoryDoc .Tactic name (template := "")
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId),
                                    hidden := level.tactics.hidden ++ args.map (·.getId)}}
@@ -509,11 +518,12 @@ elab (name := GameServer.Tactic.Branch) "Branch" t:tacticSeq : tactic => do
   Tactic.evalTactic t
 
   -- Show an info whether the branch proofs all remaining goals.
-  let gs ← Tactic.getUnsolvedGoals
-  if gs.isEmpty then
-    logInfo "This branch finishes the proof."
-  else
-    logInfo "This branch leaves open goals."
+  if lean4game.verbose.get (← getOptions) then
+    let gs ← Tactic.getUnsolvedGoals
+    if gs.isEmpty then
+      logInfo "This branch finishes the proof."
+    else
+      logInfo "This branch leaves open goals."
 
   let msgs ← Core.getMessageLog
   b.restore
@@ -558,7 +568,8 @@ elab "Template" tacs:tacticSeq : tactic => do
   Tactic.evalTactic tacs
   let newTacs : TSyntax `Lean.Parser.Tactic.tacticSeq := ⟨replaceHoles tacs.raw⟩
   let template ← PrettyPrinter.ppCategory `Lean.Parser.Tactic.tacticSeq newTacs
-  logInfo s!"Template:\n{template}"
+  if lean4game.verbose.get (← getOptions) then
+    logInfo s!"Template:\n{template}"
   modifyLevel (←getCurLevelId) fun level => do
     return {level with template := s!"{template}"}
 
