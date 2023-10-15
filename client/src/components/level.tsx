@@ -367,7 +367,7 @@ function PlayableLevel({impressum, setImpressum}) {
       let code = editor.getModel().getLinesContent().filter(line => line.trim())
       editor.executeEdits("typewriter", [{
         range: editor.getModel().getFullModelRange(),
-        text: code.join('\n')+'\n',
+        text: code.length ? code.join('\n') + '\n' : '',
         forceMoveMarkers: true
       }]);
 
