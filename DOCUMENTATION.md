@@ -284,7 +284,7 @@ lake build
 Clone the game repository into a directory next to the game:
 ```bash
 cd ..
-git clone hhttps://github.com/leanprover-community/lean4game.git
+git clone https://github.com/leanprover-community/lean4game.git
 # or: git clone git@github.com:leanprover-community/lean4game.git
 ```
 The folders `NNG4` and `lean4game` must be in the same directory!
