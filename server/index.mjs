@@ -8,36 +8,25 @@ import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 import os from 'os';
 import anonymize from 'ip-anonymize';
 // import { importTrigger, importStatus } from './import.mjs'
+// import fs from 'fs'
 
-/** Preloaded games. The keys refer to the docker tags of the virtual machines.
- * The number `queueLength` determines how many instances of the docker container
- * get started before any user shows up to have them up and running immediately.
- * The values `name`, `module`, and `dir` are just used for development where we
- * use a project directory instead of a docker container.
+/**
 */
 const games = {
     "g/hhu-adam/robo": {
-        // module: "Game",  // The lean module's name. Defaults to "Game"
-        // name: "Adam",    // For the `Game "Adam"` tag in the games. Defaults to "MyGame"
         dir: "Robo",
         queueLength: 5
     },
     "g/hhu-adam/nng4": {
-        // module: "Game",
-        // name: "NNG",
         dir: "NNG4",
         queueLength: 5
     },
     "g/hhu-adam/nng4-old": {
         dir: "NNG4-OLD",
         queueLength: 0
-    },
-    "g/local/game": {
-        dir: "game",
-        queueLength: 0
     }
 }
-// bd91db15ea40af33155abb7be486fed1b8110c58
+
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -65,51 +54,66 @@ const isDevelopment = environment === 'development'
 /** We keep queues of started Lean Server processes to be ready when a user arrives */
 const queue = {}
 
-function startServerProcess(tag) {
-    if (! games[tag]?.dir) {
-        console.error(`Unknown game: ${tag}`)
-        return
-    }
+function tag(owner, repo) {
+  return `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
+}
 
-    let serverProcess
-    if (isDevelopment) {
-        let args = ["--server", path.join("../../../../", games[tag].dir)]
-        if (games[tag].module) {
-            args.push(games[tag].module)
-            if (games[tag].name) { args.push(games[tag].name) }
-        }
-        serverProcess = cp.spawn("./gameserver", args,
-            { cwd: path.join(__dirname, "./build/bin/") })
-    } else {
-        serverProcess =  cp.spawn("./bubblewrap.sh",
-            [games[tag].dir],
-            { cwd: __dirname })
+function startServerProcess(owner, repo) {
+  let game_dir = (owner == 'local') ?
+    repo : games[tag(owner, repo)]?.dir
+
+  if (owner == 'local') {
+    if(!isDevelopment) {
+      console.error(`No local games in production mode.`)
+      return
     }
-    serverProcess.on('error', error =>
-        console.error(`Launching Lean Server failed: ${error}`)
-    );
-    if (serverProcess.stderr !== null) {
-        serverProcess.stderr.on('data', data =>
-            console.error(`Lean Server: ${data}`)
-        );
-    }
-    return serverProcess
+    // TODO: This test does not work
+    // if (!fs.existsSync(path.join("../", game_dir))) {
+    //   console.error(`Game folder does not exists: ${game_dir}`)
+    //   return
+    // }
+  }
+
+  if (!game_dir) {
+    console.error(`Unknown game: ${tag(owner, repo)}`)
+    return
+  }
+
+  let serverProcess
+  if (isDevelopment) {
+    let args = ["--server", path.join("../../../../", game_dir)]
+    serverProcess = cp.spawn("./gameserver", args,
+        { cwd: path.join(__dirname, "./build/bin/") })
+  } else {
+    serverProcess =  cp.spawn("./bubblewrap.sh",
+      [game_dir],
+      { cwd: __dirname })
+  }
+  serverProcess.on('error', error =>
+    console.error(`Launching Lean Server failed: ${error}`)
+  )
+  if (serverProcess.stderr !== null) {
+    serverProcess.stderr.on('data', data =>
+      console.error(`Lean Server: ${data}`)
+    )
+  }
+  return serverProcess
 }
 
 /** start Lean Server processes to refill the queue */
-function fillQueue(tag) {
-    while (queue[tag].length < games[tag].queueLength) {
-        const serverProcess = startServerProcess(tag)
-        queue[tag].push(serverProcess)
+function fillQueue(owner, repo) {
+    while (queue[tag(owner, repo)].length < games[tag(owner, repo)].queueLength) {
+      const serverProcess = startServerProcess(tag(owner, repo))
+      queue[tag(owner, repo)].push(serverProcess)
     }
 }
 
-if (!isDevelopment) { // Don't use queue in development
-    for (let tag in games) {
-        queue[tag] = []
-        fillQueue(tag)
-    }
-}
+// if (!isDevelopment) { // Don't use queue in development
+//   for (let tag in games) {
+//     queue[tag] = []
+//     fillQueue(tag)
+//   }
+// }
 
 const urlRegEx = /^\/websocket\/g\/([\w.-]+)\/([\w.-]+)$/
 
@@ -118,18 +122,19 @@ wss.addListener("connection", function(ws, req) {
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
     const owner = reRes[1]
     const repo = reRes[2]
-    const tag = `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
+    // const tag = `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
 
-    if (isDevelopment && process.env.DEV_CONTAINER) {
-        tag = `g/local/game`
-    }
+    // // TODO
+    // if (isDevelopment && process.env.DEV_CONTAINER) {
+    //     tag = `g/local/game`
+    // }
 
     let ps;
-    if (!queue[tag] || queue[tag].length == 0) {
-        ps = startServerProcess(tag)
+    if (!queue[tag(owner, repo)] || queue[tag(owner, repo)].length == 0) {
+        ps = startServerProcess(owner, repo)
     } else {
-        ps = queue[tag].shift() // Pick the first Lean process; it's likely to be ready immediately
-        fillQueue(tag)
+        ps = queue[tag(owner, repo)].shift() // Pick the first Lean process; it's likely to be ready immediately
+        fillQueue(owner, repo)
     }
 
     socketCounter += 1;
