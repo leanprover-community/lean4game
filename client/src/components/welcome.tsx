@@ -14,7 +14,8 @@ import { Button } from './button'
 import { MobileContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
 import Markdown from './markdown'
-import {PrivacyPolicyPopup} from './privacy_policy'
+import { PrivacyPolicyPopup } from './privacy_policy'
+import { RulesHelpPopup } from './popup/rules_help'
 import { WorldTreePanel, downloadFile } from './world_tree'
 
 import './welcome.css'
@@ -182,8 +183,11 @@ function Welcome() {
 
   // impressum pop-up
   const [impressum, setImpressum] = React.useState(false)
+  const [rulesHelp, setRulesHelp] = React.useState(false)
+
   function closeImpressum() {setImpressum(false)}
   function toggleImpressum() {setImpressum(!impressum)}
+  function closeRulesHelp() {setRulesHelp(false)}
 
   const [info, setInfo] = React.useState(false)
   function closeInfo() {setInfo(false)}
@@ -219,7 +223,7 @@ function Welcome() {
             {(pageNumber == 0 ?
               <IntroductionPanel introduction={gameInfo.data?.introduction} />
             : pageNumber == 1 ?
-              <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
+              <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
             :
               <InventoryPanel levelInfo={inventory?.data} />
             )}
@@ -227,12 +231,13 @@ function Welcome() {
         :
           <Split className="welcome" minSize={0} snapOffset={200}  sizes={[25, 50, 25]}>
             <IntroductionPanel introduction={gameInfo.data?.introduction} />
-            <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
+            <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
             <InventoryPanel levelInfo={inventory?.data} />
           </Split>
       }
     </div>
     {impressum ? <PrivacyPolicyPopup handleClose={closeImpressum} /> : null}
+    {rulesHelp ? <RulesHelpPopup handleClose={closeRulesHelp} /> : null}
     {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
     {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
     {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}

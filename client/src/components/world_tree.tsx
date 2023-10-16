@@ -8,7 +8,7 @@ import { Slider } from '@mui/material'
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDownload, faUpload, faEraser, faGlobe, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faDownload, faUpload, faEraser, faGlobe, faArrowLeft, faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
 import { useAppDispatch } from '../hooks'
@@ -195,7 +195,7 @@ export const downloadFile = ({ data, fileName, fileType } :
 }
 
 /** The menu that is shown next to the world selection graph */
-export function WorldSelectionMenu() {
+export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const dispatch = useAppDispatch()
@@ -204,12 +204,15 @@ export function WorldSelectionMenu() {
     return x == 0 ? 'none' : x == 1 ? 'relaxed' : 'regular'
   }
 
+
   return <nav className="world-selection-menu">
     <div className="slider-wrap">
-      <span className="difficulty-label">Game Rules</span>
+      <span className="difficulty-label">Rules
+        <FontAwesomeIcon icon={rulesHelp ? faXmark : faCircleQuestion} className='helpButton' onClick={() => (setRulesHelp(!rulesHelp))}/>
+      </span>
       <Slider
         orientation="vertical"
-        title="Game Rules:&#10;- regular: 🔐 levels, 🔐 tactics&#10;- relaxed: 🔓 levels, 🔐 tactics&#10;- none: 🔓 levels, 🔓 tactics"
+        title="Game Rules"
         min={0} max={2}
         aria-label="Game Rules"
         defaultValue={difficulty}
@@ -264,9 +267,12 @@ export function computeWorldLayout(worlds) {
 }
 
 
-export function WorldTreePanel({worlds, worldSize}:
+export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
   { worlds: any,
-    worldSize: any}) {
+    worldSize: any,
+    rulesHelp: boolean,
+    setRulesHelp: any,
+  }) {
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const {nodes, bounds}: any = worlds ? computeWorldLayout(worlds) : {nodes: []}
@@ -350,7 +356,7 @@ export function WorldTreePanel({worlds, worldSize}:
   let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : null
 
   return <div className="column">
-      <WorldSelectionMenu />
+      <WorldSelectionMenu rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
       <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
           width={bounds ? `${ds * dx}` : ''}
           viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}

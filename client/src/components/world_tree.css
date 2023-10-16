@@ -49,7 +49,6 @@ svg .disabled {
 }
 
 .world-selection-menu {
-  padding: .5em 1em;
   position: absolute;
   right: 1em;
   top: 1em;
@@ -75,7 +74,7 @@ svg .disabled {
   /* width: 100%; */
   height: 7em;
   /* min-width: 16em; */
-  padding-bottom: .8em;
+  padding: .5em 1em 1.3em 1em;
   margin-left: auto;
   margin-right: auto;
 }
@@ -108,4 +107,11 @@ svg .disabled {
   /* border: 2px solid purple; */
   padding: .2em;
   border-radius: .5em;
+}
+
+.world-selection-menu .helpButton {
+  position: absolute;
+  right: .5em;
+  top: .5em;
+  color: var(--clr-primary);
 }
