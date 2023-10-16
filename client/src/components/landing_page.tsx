@@ -11,7 +11,7 @@ import coverRobo from '../assets/covers/formaloversum.png'
 import bgImage from '../assets/bg.jpg'
 
 import Markdown from './markdown';
-import {PrivacyPolicyPopup} from './privacy_policy'
+import {PrivacyPolicyPopup} from './popup/privacy_policy'
 
 const flag = {
   'Dutch': '🇳🇱',

@@ -33,7 +33,7 @@ import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContex
 import { DualEditor } from './infoview/main'
 import { GameHint } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints } from './hints'
-import { PrivacyPolicyPopup } from './privacy_policy'
+import { PrivacyPolicyPopup } from './popup/privacy_policy'
 
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'

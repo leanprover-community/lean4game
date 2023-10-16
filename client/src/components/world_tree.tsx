@@ -8,14 +8,12 @@ import { Slider } from '@mui/material'
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDownload, faUpload, faEraser, faGlobe, faArrowLeft, faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
 import { useAppDispatch } from '../hooks'
-import { deleteProgress, selectProgress, loadProgress, GameProgressState,
-  selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
+import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
 import { store } from '../state/store'
-import { Button } from './button'
 
 import './world_tree.css'
 

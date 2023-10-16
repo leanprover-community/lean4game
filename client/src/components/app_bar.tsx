@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome, faArrowRight, faArrowLeft, faXmark, faBars, faCode, faCircleInfo, faTerminal } from '@fortawesome/free-solid-svg-icons'
-import { PrivacyPolicyPopup } from './privacy_policy'
+import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import { WorldSelectionMenu, downloadFile } from './world_tree'
 
 /** navigation to switch between pages on mobile */

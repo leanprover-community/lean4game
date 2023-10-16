@@ -1,26 +1,28 @@
 import * as React from 'react'
 import { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import Split from 'react-split'
-import { Box, Typography, CircularProgress } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGlobe, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
 import { useAppDispatch } from '../hooks'
-import { GameProgressState, changedOpenedIntro, deleteProgress, loadProgress, selectOpenedIntro, selectProgress } from '../state/progress'
+import { changedOpenedIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { MobileContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
-import Markdown from './markdown'
-import { PrivacyPolicyPopup } from './privacy_policy'
+import { ErasePopup } from './popup/erase'
+import { InfoPopup } from './popup/game_info'
+import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import { RulesHelpPopup } from './popup/rules_help'
-import { WorldTreePanel, downloadFile } from './world_tree'
+import { UploadPopup } from './popup/upload'
+import { WorldTreePanel } from './world_tree'
 
 import './welcome.css'
 import { WelcomeAppBar } from './app_bar'
 import { Hint } from './hints'
+
 
 /** The panel showing the game's introduction text */
 function IntroductionPanel({introduction}: {introduction: string}) {
@@ -61,117 +63,6 @@ function IntroductionPanel({introduction}: {introduction: string}) {
       </div>
     }
   </div>
-}
-
-export function InfoPopup ({info, handleClose}: {info: string, handleClose: () => void}) {
-  return <div className="modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
-    <Typography variant="body1" component="div" className="welcome-text">
-      <Markdown>{info}</Markdown>
-    </Typography>
-  </div>
-</div>
-}
-
-
-function ErasePopup ({handleClose}) {
-  const gameId = React.useContext(GameIdContext)
-  const gameProgress = useSelector(selectProgress(gameId))
-  const dispatch = useAppDispatch()
-
-  /** Download the current progress (i.e. what's saved in the browser store) */
-  const downloadProgress = (e) => {
-    e.preventDefault()
-    downloadFile({
-      data: JSON.stringify(gameProgress, null, 2),
-      fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
-      fileType: 'text/json',
-    })
-  }
-
-  const eraseProgress = () => {
-    dispatch(deleteProgress({game: gameId}))
-    handleClose()
-  }
-
-  const downloadAndErase = (e) => {
-    downloadProgress(e)
-    eraseProgress()
-  }
-
-  return <div className="modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
-    <h2>Delete Progress?</h2>
-
-    <p>Do you want to delete your saved progress irreversibly?</p>
-    <p>
-      (This deletes your proofs and your collected inventory.
-      Saves from other games are not deleted.)
-    </p>
-
-    <Button onClick={eraseProgress} to="">Delete</Button>
-    <Button onClick={downloadAndErase} to="">Download & Delete</Button>
-    <Button onClick={handleClose} to="">Cancel</Button>
-  </div>
-</div>
-}
-
-function UploadPopup ({handleClose}) {
-  const [file, setFile] = React.useState<File>();
-  const gameId = React.useContext(GameIdContext)
-  const gameProgress = useSelector(selectProgress(gameId))
-  const dispatch = useAppDispatch()
-
-  const handleFileChange = (e) => {
-    if (e.target.files) {
-      setFile(e.target.files[0])
-    }
-  }
-
-  /** Upload progress from a  */
-  const uploadProgress = (e) => {
-    if (!file) {return}
-    const fileReader = new FileReader()
-    fileReader.readAsText(file, "UTF-8")
-    fileReader.onload = (e) => {
-      const data = JSON.parse(e.target.result.toString()) as GameProgressState
-      console.debug("Json Data", data)
-      dispatch(loadProgress({game: gameId, data: data}))
-    }
-    handleClose()
-  }
-
-  /** Download the current progress (i.e. what's saved in the browser store) */
-  const downloadProgress = (e) => {
-    e.preventDefault()
-    downloadFile({
-      data: JSON.stringify(gameProgress, null, 2),
-      fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
-      fileType: 'text/json',
-    })
-  }
-
-
-  return <div className="modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
-    <h2>Upload Saved Progress</h2>
-
-    <p>Select a JSON file with the saved game progress to load your progress.</p>
-
-    <p><b>Warning:</b> This will delete your current game progress!
-      Consider <a className="download-link" onClick={downloadProgress} >downloading your current progress</a> first!</p>
-
-    <input type="file" onChange={handleFileChange}/>
-
-    <Button to="" onClick={uploadProgress}>Load selected file</Button>
-  </div>
-</div>
 }
 
 /** main page of the game showing amoung others the tree of worlds/levels */
