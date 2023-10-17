@@ -79,6 +79,64 @@ in the first level and get enabled during the game.
 
 /-! ## Doc entries -/
 
+/-- Copied from `Mathlib.Tactic.HelpCmd`.
+
+Gets the initial string token in a parser description. For example, for a declaration like
+`syntax "bla" "baz" term : tactic`, it returns `some "bla"`. Returns `none` for syntax declarations
+that don't start with a string constant. -/
+partial def getHeadTk (e : Expr) : Option String :=
+  match (Expr.withApp e λ e a => (e.constName?.getD Name.anonymous, a)) with
+  | (``ParserDescr.node, #[_, _, p]) => getHeadTk p
+  | (``ParserDescr.unary, #[.app _ (.lit (.strVal "withPosition")), p]) => getHeadTk p
+  | (``ParserDescr.unary, #[.app _ (.lit (.strVal "atomic")), p]) => getHeadTk p
+  | (``ParserDescr.binary, #[.app _ (.lit (.strVal "andthen")), p, _]) => getHeadTk p
+  | (``ParserDescr.nonReservedSymbol, #[.lit (.strVal tk), _]) => some tk
+  | (``ParserDescr.symbol, #[.lit (.strVal tk)]) => some tk
+  | (``Parser.withAntiquot, #[_, p]) => getHeadTk p
+  | (``Parser.leadingNode, #[_, _, p]) => getHeadTk p
+  | (``HAndThen.hAndThen, #[_, _, _, _, p, _]) => getHeadTk p
+  | (``Parser.nonReservedSymbol, #[.lit (.strVal tk), _]) => some tk
+  | (``Parser.symbol, #[.lit (.strVal tk)]) => some tk
+  | _ => none
+
+/-- Modified from `#help` in `Mathlib.Tactic.HelpCmd` -/
+def getTacticDocstring (env : Environment) (name: Name) : CommandElabM (Option String) := do
+  let name := name.toString (escape := false)
+  let mut decls : Lean.RBMap String (Array SyntaxNodeKind) compare := {}
+
+  let catName : Name := `tactic
+  let catStx : Ident := mkIdent catName -- TODO
+  let some cat := (Parser.parserExtension.getState env).categories.find? catName
+    | throwErrorAt catStx "{catStx} is not a syntax category"
+  liftTermElabM <| Term.addCategoryInfo catStx catName
+  for (k, _) in cat.kinds do
+    let mut used := false
+    if let some tk := do getHeadTk (← (← env.find? k).value?) then
+      let tk := tk.trim
+      if name ≠ tk then -- was `!name.isPrefixOf tk`
+        continue
+      used := true
+      decls := decls.insert tk ((decls.findD tk #[]).push k)
+  for (_name, ks) in decls do
+    for k in ks do
+      if let some doc ← findDocString? env k then
+        return doc
+
+  logWarning <| m!"Could not find a docstring for tactic {name}, consider adding one " ++
+    m!"using `TacticDoc {name} \"some doc\"`"
+  return none
+
+/-- Retrieve the docstring associated to an inventory item. For Tactics, this
+is not guaranteed to work. -/
+def getDocstring (env : Environment) (name : Name) (type : InventoryType) :
+    CommandElabM (Option String) :=
+  match type with
+  -- for tactics it's a lookup following mathlib's `#help`. not guaranteed to be the correct one.
+  | .Tactic => getTacticDocstring env name
+  | .Lemma => findDocString? env name
+  -- TODO: for definitions not implemented yet, does it work?
+  | .Definition => findDocString? env name
+
 /-- Checks if `inventoryTemplateExt` contains an entry with `(type, name)` and yields
 a warning otherwise. If `template` is provided, it will add such an entry instead of yielding a
 warning.
@@ -101,13 +159,22 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
     match template with
     -- Warn about missing documentation
     | none =>
+      let docstring ← match (← getDocstring env name type) with
+      | some ds =>
+        logInfoAt ref (m!"Missing {type} Documentation. Using existing docstring. " ++
+        m!"Add {name}\nAdd `{type}Doc {name}` somewhere above this statement.")
+        pure s!"*(lean docstring)*\\\n{ds}"
+      | none =>
+        logWarningAt ref (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
+        m!"somewhere above this statement.")
+        pure "(missing)"
+
       -- We just add a dummy entry
       modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
         name := name
-        category := if type == .Lemma then s!"{n.getPrefix}" else "" })
-      logWarningAt ref (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
-        m!"somewhere above this statement.")
+        category := if type == .Lemma then s!"{n.getPrefix}" else ""
+        content := docstring})
     -- Add the default documentation
     | some s =>
       modifyEnv (inventoryTemplateExt.addEntry · {
@@ -222,13 +289,15 @@ def getStatementString (name : Name) : CommandElabM String := do
 
 /-- Declare tactics that are introduced by this level. -/
 elab "NewTactic" args:ident* : command => do
-  for name in ↑args do checkInventoryDoc .Tactic name -- TODO: Add (template := "[docstring]")
+  for name in ↑args do
+    checkInventoryDoc .Tactic name -- TODO: Add (template := "[docstring]")
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId)}}
 
-/-- Declare tactics that are introduced by this level. -/
+/-- Declare tactics that are introduced by this level but do not show up in inventory. -/
 elab "NewHiddenTactic" args:ident* : command => do
-  for name in ↑args do checkInventoryDoc .Tactic name (template := "")
+  for name in ↑args do
+    checkInventoryDoc .Tactic name (template := "")
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId),
                                    hidden := level.tactics.hidden ++ args.map (·.getId)}}
@@ -236,6 +305,8 @@ elab "NewHiddenTactic" args:ident* : command => do
 /-- Declare lemmas that are introduced by this level. -/
 elab "NewLemma" args:ident* : command => do
   for name in ↑args do
+    try let _decl ← getConstInfo name.getId catch
+      | _ => logErrorAt name m!"unknown identifier '{name}'."
     checkInventoryDoc .Lemma name -- TODO: Add (template := "[mathlib]")
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with new := args.map (·.getId)}}
@@ -601,65 +672,6 @@ def GameLevel.setComputedInventory (level : GameLevel) :
 | .Tactic, v =>     {level with tactics     := {level.tactics     with tiles := v}}
 | .Definition, v => {level with definitions := {level.definitions with tiles := v}}
 | .Lemma, v =>      {level with lemmas      := {level.lemmas      with tiles := v}}
-
-/-- Copied from `Mathlib.Tactic.HelpCmd`.
-
-Gets the initial string token in a parser description. For example, for a declaration like
-`syntax "bla" "baz" term : tactic`, it returns `some "bla"`. Returns `none` for syntax declarations
-that don't start with a string constant. -/
-partial def getHeadTk (e : Expr) : Option String :=
-  match (Expr.withApp e λ e a => (e.constName?.getD Name.anonymous, a)) with
-  | (``ParserDescr.node, #[_, _, p]) => getHeadTk p
-  | (``ParserDescr.unary, #[.app _ (.lit (.strVal "withPosition")), p]) => getHeadTk p
-  | (``ParserDescr.unary, #[.app _ (.lit (.strVal "atomic")), p]) => getHeadTk p
-  | (``ParserDescr.binary, #[.app _ (.lit (.strVal "andthen")), p, _]) => getHeadTk p
-  | (``ParserDescr.nonReservedSymbol, #[.lit (.strVal tk), _]) => some tk
-  | (``ParserDescr.symbol, #[.lit (.strVal tk)]) => some tk
-  | (``Parser.withAntiquot, #[_, p]) => getHeadTk p
-  | (``Parser.leadingNode, #[_, _, p]) => getHeadTk p
-  | (``HAndThen.hAndThen, #[_, _, _, _, p, _]) => getHeadTk p
-  | (``Parser.nonReservedSymbol, #[.lit (.strVal tk), _]) => some tk
-  | (``Parser.symbol, #[.lit (.strVal tk)]) => some tk
-  | _ => none
-
-/-- Modified from `#help` in `Mathlib.Tactic.HelpCmd` -/
-def getTacticDocstring (env : Environment) (name: Name) : CommandElabM (Option String) := do
-  let name := name.toString (escape := false)
-  let mut decls : Lean.RBMap String (Array SyntaxNodeKind) compare := {}
-
-  let catName : Name := `tactic
-  let catStx : Ident := mkIdent catName -- TODO
-  let some cat := (Parser.parserExtension.getState env).categories.find? catName
-    | throwErrorAt catStx "{catStx} is not a syntax category"
-  liftTermElabM <| Term.addCategoryInfo catStx catName
-  for (k, _) in cat.kinds do
-    let mut used := false
-    if let some tk := do getHeadTk (← (← env.find? k).value?) then
-      let tk := tk.trim
-      if name ≠ tk then -- was `!name.isPrefixOf tk`
-        continue
-      used := true
-      decls := decls.insert tk ((decls.findD tk #[]).push k)
-  for (_name, ks) in decls do
-    for k in ks do
-      if let some doc ← findDocString? env k then
-        return doc
-
-  logWarning <| m!"Could not find a docstring for tactic {name}, consider adding one " ++
-    m!"using `TacticDoc {name} \"some doc\"`"
-  return none
-
-/-- Retrieve the docstring associated to an inventory item. For Tactics, this
-is not guaranteed to work. -/
-def getDocstring (env : Environment) (name : Name) (type : InventoryType) :
-    CommandElabM (Option String) :=
-  match type with
-  -- for tactics it's a lookup following mathlib's `#help`. not guaranteed to be the correct one.
-  | .Tactic => getTacticDocstring env name
-  | .Lemma => findDocString? env name
-  -- TODO: for definitions not implemented yet, does it work?
-  | .Definition => findDocString? env name
-
 
 partial def removeTransitiveAux (id : Name) (arrows : HashMap Name (HashSet Name))
       (newArrows : HashMap Name (HashSet Name)) (decendants : HashMap Name (HashSet Name)) :
