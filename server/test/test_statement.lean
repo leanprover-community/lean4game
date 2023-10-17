@@ -22,7 +22,7 @@ Statement foo.bar2 : 3 ≤ 7 := by
   simp
 
 
-NewLemma foo.baz
+NewLemma foo.bar
 DisabledTactic tauto
 
 
