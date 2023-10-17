@@ -1,33 +1,36 @@
 # Lean 4 Game
 
-This is a prototype for a Lean 4 game platform. The project is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
+This is the source code for a Lean 4 game platform hosted at [adam.math.hhu.de](https://adam.math.hhu.de).
+
+The project is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
 (NNG)](https://www.ma.imperial.ac.uk/~buzzard/xena/natural_number_game/)
 of Kevin Buzzard and Mohammad Pedramfar.
 The project is based on Patrick Massot's prototype: [NNG4](https://github.com/PatrickMassot/NNG4).
 
-### Progress & Contributing
-Currently the interface is still undergoing bigger changes, contributions are of course welcome, but it might be better to wait with them for a bit until proper support for external games is implemented and the existing games are separated from this repository. (ca. Sept. 2023)
+## Creating a Game
 
+Please follow the tutorial [Creating a Game](doc/create_game.md).
+In particular step 5 thereof explains [How to Run Games Locally](doc/running_locally.md).
 
-### Documentation
+### Publishing a Game
 
-For game developers, there is a work-in-progress Documentation: [Create a Game](DOCUMENTATION.md).
-Best to talk with us directly.
+We encourage anybody to have games hosted on our [Lean Game Server](https://adam.math.hhu.de) for anybody to play. For that you simply need to contact us with the link to your game repo. We are also happy to add work-in-progress games and games in any language.
 
-For the game engine itself, documentation is missing currently.
+For example, you can [Contact Jon on Zulip](https://leanprover.zulipchat.com/#narrow/dm/385895-Jon-Eugster). Or [via Email](https://www.math.hhu.de/en/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/jon-eugster).
 
-## NPM Scripts
+## Documentation
 
-* `npm start`: Start the project in development mode. The browser will automatically reload when client files get changed. The Lean server will get recompiled and restarted when lean files get changed. The Lean server will be started without a container. The client and server can be started separately using the scripts `npm run start_client` and `npm run start_server`. The project can be accessed via `http://localhost:3000`.
-Internally, websocket requests to `ws://localhost:3000/websockets` will be forwarded to a Lean server running on port `8080`.
+The documentation for the game engine itself is still missing, but there is [Creating a Game](doc/create_game.md) explaining the API to create a game.
 
-* `npm run build`: Build the project in production mode. All assets of the client will be compiled into `client/dist`.
-On the server side, the command will set up a docker image containing the Lean server. The two parts can be built separately using `npm run build_client` and `npm run build_server`.
+Some documentation:
 
-* `npm run production`: Start the project in production mode. This requires that the build script has been run. It will start a server on the port specified in the `PORT` environment variable or by default on `8080`. You can run on a specifiv port by running `PORT=80 npm run production`. The server will serve the files in `client/dist` via http and give access to the docker-contained Lean server via the web socket protocol.
+- [NPM Scripts](doc/npm_scripts.md)
+- [Old documentation](doc/DOCUMENTATION.md)
 
+## Contributing
+
+Contributions to `lean4game` are always welcome!
 
 ## Security
 
-Providing the use access to a Lean instance running on the server is a severe security risk. That is why we start the Lean server in a Docker container
-secured by [gVisor](https://gvisor.dev/).
+Providing the use access to a Lean instance running on the server is a severe security risk. That is why we start the Lean server with bubblewrap.
