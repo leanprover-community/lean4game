@@ -16,7 +16,7 @@ In particular step 5 thereof explains [How to Run Games Locally](doc/running_loc
 
 We encourage anybody to have games hosted on our [Lean Game Server](https://adam.math.hhu.de) for anybody to play. For that you simply need to contact us with the link to your game repo. We are also happy to add work-in-progress games and games in any language.
 
-For example, you can [Contact Jon on Zulip](https://leanprover.zulipchat.com/#narrow/dm/385895-Jon-Eugster). Or [via Email](https://www.math.hhu.de/en/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/jon-eugster).
+For example, you can [contact Jon on Zulip](https://leanprover.zulipchat.com/#narrow/dm/385895-Jon-Eugster). Or [via Email](https://www.math.hhu.de/en/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/jon-eugster).
 
 ## Documentation
 
