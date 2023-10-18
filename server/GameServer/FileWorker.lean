@@ -65,7 +65,7 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
     Elab.Command.CommandElabM Unit := do
   match stx with
   | .missing => return ()
-  | .node info kind args =>
+  | .node _info _kind args =>
     for arg in args do
       findForbiddenTactics inputCtx levelParams arg asError
   | .atom info val =>
@@ -89,7 +89,7 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
           | some _ => pure () -- tactic is in the inventory, allow it.
         else if tac.disabled then
           addWarningMessage info s!"The tactic '{val}' is disabled in this level!"
-  | .ident info rawVal val preresolved =>
+  | .ident info _rawVal val _preresolved =>
       let ns ←
         try resolveGlobalConst (mkIdent val)
         catch | _ => pure [] -- catch "unknown constant" error
@@ -395,7 +395,7 @@ section Initialization
     -- Set the search path
     Lean.searchPathRef.set paths
 
-    let env ← importModules [{ module := `Init : Import }, { module := levelParams.levelModule : Import }] {} 0
+    let env ← importModules #[{ module := `Init : Import }, { module := levelParams.levelModule : Import }] {} 0
     -- return (env, paths)
 
     -- use empty header
