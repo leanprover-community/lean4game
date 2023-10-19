@@ -57,17 +57,28 @@ open JsonRpc
 
 section Elab
 
+def addErrorMessage (info : SourceInfo) (inputCtx : Parser.InputContext) (s : MessageData) :
+    Elab.Command.CommandElabM Unit := do
+  modify fun st => { st with
+      messages := st.messages.add {
+        fileName := inputCtx.fileName
+        severity := MessageSeverity.error
+        pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
+        data     := s
+      }
+    }
+
 -- TODO: use HashSet for allowed tactics?
 /-- Find all tactics in syntax object that are forbidden according to a
 set `allowed` of allowed tactics. -/
 partial def findForbiddenTactics (inputCtx : Parser.InputContext)
-    (levelParams : Game.DidOpenLevelParams) (stx : Syntax) (asError : Bool) :
+    (levelParams : Game.DidOpenLevelParams) (stx : Syntax) :
     Elab.Command.CommandElabM Unit := do
   match stx with
   | .missing => return ()
   | .node _info _kind args =>
     for arg in args do
-      findForbiddenTactics inputCtx levelParams arg asError
+      findForbiddenTactics inputCtx levelParams arg
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore "with" keyword
@@ -95,8 +106,11 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
         catch | _ => pure [] -- catch "unknown constant" error
       for n in ns do
         let some (.thmInfo ..) := (← getEnv).find? n
-          | return () -- not a theroem -> ignore
-        -- TODO: Filter thhe theorem we want to proof to avoid structural recursion!
+          | return () -- not a theorem -> ignore
+        -- Forbid the theorem we are proving currently
+        if n = levelParams.statementName then
+          addErrorMessage info inputCtx s!"Structural recursion: you can't use '{n}' to proof itself!"
+
         let lemmasAndDefs := levelParams.lemmas ++ levelParams.definitions
         match lemmasAndDefs.find? (fun l => l.name == n) with
         | none => addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
@@ -106,14 +120,19 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
           else if lem.disabled then
             addWarningMessage info s!"The lemma/definition '{n}' is disabled in this level!"
 where addWarningMessage (info : SourceInfo) (s : MessageData) :=
-  modify fun st => { st with
-    messages := st.messages.add {
-      fileName := inputCtx.fileName
-      severity := if asError then MessageSeverity.error else MessageSeverity.warning
-      pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
-      data     := s
+  let difficulty := levelParams.difficulty
+  if difficulty > 0 then
+    modify fun st => { st with
+      messages := st.messages.add {
+        fileName := inputCtx.fileName
+        severity := if difficulty > 1 then MessageSeverity.error else MessageSeverity.warning
+        pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
+        data     := s
+      }
     }
-  }
+  else pure ()
+-- where addErrorMessage (info : SourceInfo) (s : MessageData) :=
+--   pure ()
 
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool)
@@ -171,9 +190,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           parseResultRef.set (tacticStx, cmdParserState)
 
           -- Check for forbidden tactics
-          if levelParams.difficulty > 0 then
-            findForbiddenTactics inputCtx levelParams tacticStx
-              (asError := levelParams.difficulty > 1)
+          findForbiddenTactics inputCtx levelParams tacticStx
 
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]

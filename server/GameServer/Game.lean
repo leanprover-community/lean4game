@@ -87,6 +87,8 @@ structure DidOpenLevelParams where
   2: give errors
   -/
   difficulty : Nat
+  /-- The name of the theorem to be proven in this level. -/
+  statementName : Name
   deriving ToJson, FromJson
 
 structure LoadDocParams where
@@ -124,6 +126,7 @@ def handleDidOpenLevel (params : Json) : GameServerM Unit := do
       definitions := lvl.definitions.tiles
       inventory := s.inventory
       difficulty := s.difficulty
+      statementName := lvl.statementName
       : DidOpenLevelParams
     }
   }
