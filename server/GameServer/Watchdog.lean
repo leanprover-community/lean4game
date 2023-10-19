@@ -91,7 +91,7 @@ def createEnv (gameDir : String) (module : String) : IO Environment := do
   -- Set the search path
   Lean.searchPathRef.set paths
 
-  let env ← importModules [{ module := `Init : Import }, { module := module : Import }] {} 0
+  let env ← importModules #[{ module := `Init : Import }, { module := module : Import }] {} 0
   return env
 
 def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
