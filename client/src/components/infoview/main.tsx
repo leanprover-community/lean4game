@@ -44,7 +44,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
   const { typewriterMode } = React.useContext(InputModeContext)
   return <>
     <div className={typewriterMode ? 'hidden' : ''}>
-      <ExerciseStatement data={level} />
+      <ExerciseStatement data={level} showLeanStatement={true} />
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
     {ec ?
@@ -131,12 +131,23 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
  * - Theorem xyz: description
  * - Theorem xyz
  * - Exercises: description
+ *
+ * If `showLeanStatement` is true, it will additionally display the lean code.
  */
-function ExerciseStatement({ data }) {
-  if (!data?.descrText) { return <></> }
-  return <div className="exercise-statement"><Markdown>
-    {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : data?.descrText && "**Exercise**: ") + `${data?.descrText}`}
-  </Markdown></div>
+function ExerciseStatement({ data, showLeanStatement = false }) {
+  if (!(data?.descrText || data?.descrFormat)) { return <></> }
+  return <>
+    <div className="exercise-statement">
+      {data?.descrText &&
+        <Markdown>
+          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : data?.descrText && "**Exercise**: ") + data?.descrText}
+        </Markdown>
+      }
+      {data?.descrFormat && showLeanStatement &&
+        <p><code className="lean-code">{data?.descrFormat}</code></p>
+      }
+    </div>
+  </>
 }
 
 // TODO: This is only used in `EditorInterface`

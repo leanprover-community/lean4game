@@ -255,31 +255,17 @@ elab "DefinitionDoc" name:ident "as" displayName:str template:str : command =>
 
 /-! ## Add inventory items -/
 
--- namespace Lean.PrettyPrinter
--- def ppSignature' (c : Name) : MetaM String := do
---   let decl ← getConstInfo c
---   let e := .const c (decl.levelParams.map mkLevelParam)
---   let (stx, _) ← delabCore e (delab := Delaborator.delabConstWithSignature)
---   let f ← ppTerm stx
---   return toString f
--- end Lean.PrettyPrinter
-
 def getStatement (name : Name) : CommandElabM MessageData := do
-  -- let c := name.getId
-
-  let decl ← getConstInfo name
-  -- -- TODO: How to go between CommandElabM and MetaM
-
-  -- addCompletionInfo <| .id name c (danglingDot := false) {} none
   return ← addMessageContextPartial (.ofPPFormat { pp := fun
-    | some ctx => ctx.runMetaM <| ppExpr decl.type
-    -- PrettyPrinter.ppSignature' c
-    -- PrettyPrinter.ppSignature c
+    | some ctx => ctx.runMetaM <| PrettyPrinter.ppSignature name
     | none     => return "that's a bug." })
 
 -- Note: We use `String` because we can't send `MessageData` as json, but
 -- `MessageData` might be better for interactive highlighting.
-/-- Get a string of the form `my_lemma (n : ℕ) : n + n = 2 * n`. -/
+/-- Get a string of the form `my_lemma (n : ℕ) : n + n = 2 * n`.
+
+Note: A statement like `theorem abc : ∀ x : Nat, x ≥ 0` would be turned into
+`theorem abc (x : Nat) : x ≥ 0` by `PrettyPrinter.ppSignature`. -/
 def getStatementString (name : Name) : CommandElabM String := do
   try
     return ← (← getStatement name).toString
@@ -489,13 +475,11 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   -- the namespace?
   let currNamespace ← getCurrNamespace
 
-  let st ← match statementName with
-  | some name => getStatementString <| currNamespace ++ name.getId
-  | none =>  getStatementString <| currNamespace ++ (defaultDeclName).getId
-
-  let head := match statementName with
-  | some name => Format.join ["theorem ", (currNamespace ++ name.getId).toString]
-  | none => "example"
+  -- Format theorem statement for displaying
+  let sigString := sig.raw.reprint.getD ""
+  let descrFormat : String := match statementName with
+  | some name =>  s!"theorem {name.getId} {sigString} := by"
+  | none => s!"example {sigString} := by"
 
   modifyCurLevel fun level => pure { level with
     module := env.header.mainModule
@@ -505,7 +489,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     statementName := match statementName with
     | none => default
     | some name => currNamespace ++ name.getId
-    descrFormat := (Format.join [head, " ", st, " := by"]).pretty 10
+    descrFormat := descrFormat
     hints := hints
     tactics := {level.tactics with used := usedInventory.tactics.toArray}
     definitions := {level.definitions with used := usedInventory.definitions.toArray}
