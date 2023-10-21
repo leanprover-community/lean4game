@@ -100,7 +100,7 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
         rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp({line: i, character: 0, uri: uri}))
       )
       msgCalls.push(
-        getInteractiveDiagnostics(rpcSess, {start: i, end: i+1})
+        getInteractiveDiagnostics(rpcSess, {start: i, end: i+1}).catch((error) => {console.debug("promise broken")})
       )
     }
 
@@ -178,8 +178,8 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
         })
         // Save the proof to the context
         setProof(tmpProof)
-      })
-    })
+      }).catch((error) => {console.debug("promise broken")})
+    }).catch((error) => {console.debug("promise broken")})
   }, [editor, rpcSess, uri, model])
 
   // Run the command

@@ -50,10 +50,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
     {ec ?
       <DualEditorMain worldId={worldId} levelId={levelId} level={level} worldSize={worldSize} /> :
       // TODO: Style this if relevant.
-      <>
-        <p>Editor is starting up...</p>
-        <CircularProgress />
-      </>
+      <></>
     }
   </>
 }
@@ -114,7 +111,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
           <WithLspDiagnosticsContext>
             <ProgressContext.Provider value={allProgress}>
               {typewriterMode ?
-                <TypewriterInterface world={worldId} level={levelId} data={level} worldSize={worldSize}/>
+                <TypewriterInterfaceWrapper world={worldId} level={levelId} data={level} worldSize={worldSize}/>
                 :
                 <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} data={level} />
               }
@@ -310,28 +307,64 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
   </div>
 }
 
-/** The interface in command line mode */
-export function TypewriterInterface(props: { world: string, level: number, data: LevelInfo, worldSize: number }) {
-
+// Splitting up Typewriter into two parts is a HACK
+export function TypewriterInterfaceWrapper(props: { world: string, level: number, data: LevelInfo, worldSize: number }) {
   const ec = React.useContext(EditorContext)
+  const gameId = React.useContext(GameIdContext)
+
+  useClientNotificationEffect(
+    'textDocument/didClose',
+    (params: DidCloseTextDocumentParams) => {
+      if (ec.events.changedCursorLocation.current &&
+        ec.events.changedCursorLocation.current.uri === params.textDocument.uri) {
+        ec.events.changedCursorLocation.fire(undefined)
+      }
+    }, []
+  )
+
+  const serverVersion =
+    useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
+  const serverStoppedResult = useEventResult(ec.events.serverStopped);
+  // NB: the cursor may temporarily become `undefined` when a file is closed. In this case
+  // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
+  // that we want to persist.
+
+  if (!serverVersion) { return <></> }
+  if (serverStoppedResult) {
+    return <div>
+      <p>{serverStoppedResult.message}</p>
+      <p className="error">{serverStoppedResult.reason}</p>
+    </div>
+  }
+
+  return <TypewriterInterface props={props} />
+}
+
+/** The interface in command line mode */
+export function TypewriterInterface({props}) {
+  const ec = React.useContext(EditorContext)
+  const gameId = React.useContext(GameIdContext)
   const editor = React.useContext(MonacoEditorContext)
   const model = editor.getModel()
   const uri = model.uri.toString()
-  const gameId = React.useContext(GameIdContext)
+
+  const [disableInput, setDisableInput] = React.useState<boolean>(false)
+  const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
+  const {mobile} = React.useContext(MobileContext)
   const { proof } = React.useContext(ProofContext)
   const { setTypewriterInput } = React.useContext(InputModeContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
-  const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
-
-  const {mobile} = React.useContext(MobileContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
+  const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
+  // const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
+  // const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
 
-  const [disableInput, setDisableInput] = React.useState<boolean>(false)
+  const rpcSess = useRpcSessionAtPos({uri: uri, line: 0, character: 0})
 
   /** Delete all proof lines starting from a given line.
-   * Note that the first line (i.e. deleting everything) is `1`!
-   */
+  * Note that the first line (i.e. deleting everything) is `1`!
+  */
   function deleteProof(line: number) {
     return (ev) => {
       let deletedChat: Array<GameHint> = []
@@ -368,8 +401,8 @@ export function TypewriterInterface(props: { world: string, level: number, data:
     }
   }
 
-  // Scroll to the end of the proof if it is updated.
-  React.useEffect(() => {
+   // Scroll to the end of the proof if it is updated.
+   React.useEffect(() => {
     if (proof?.length > 1) {
       proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
     } else {
@@ -390,37 +423,6 @@ export function TypewriterInterface(props: { world: string, level: number, data:
       })
     }
   }, [selectedStep])
-
-  const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
-
-  const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
-
-  const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
-
-  useClientNotificationEffect(
-    'textDocument/didClose',
-    (params: DidCloseTextDocumentParams) => {
-      if (ec.events.changedCursorLocation.current &&
-        ec.events.changedCursorLocation.current.uri === params.textDocument.uri) {
-        ec.events.changedCursorLocation.fire(undefined)
-      }
-    }, []
-  )
-
-  const serverVersion =
-    useEventResult(ec.events.serverRestarted, result => new ServerVersion(result.serverInfo?.version ?? ''))
-  const serverStoppedResult = useEventResult(ec.events.serverStopped);
-  // NB: the cursor may temporarily become `undefined` when a file is closed. In this case
-  // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
-  // that we want to persist.
-
-  if (!serverVersion) { return <p>Waiting for Lean server to start...</p> }
-  if (serverStoppedResult) {
-    return <div>
-      <p>{serverStoppedResult.message}</p>
-      <p className="error">{serverStoppedResult.reason}</p>
-    </div>
-  }
 
   // TODO: This about hidden hints is all copied from `level.tsx`. Can we move that into `hints.tsx`?
 
@@ -454,13 +456,6 @@ export function TypewriterInterface(props: { world: string, level: number, data:
   }
 
   let lastStepErrors = proof.length ? hasInteractiveErrors(proof[proof.length - 1].errors) : false
-
-  // BUG: Triggers this:
-  // > React has detected a change in the order of Hooks called by TypewriterInterface.
-  // > This will lead to bugs and errors if not fixed. For more information, read the
-  // > Rules of Hooks: https://reactjs.org/link/rules-of-hooks
-  // maybe because `uri` is initially undefined?
-  const rpcSess = useRpcSessionAtPos({uri: uri, line: 0, character: 0})
 
   return <div className="typewriter-interface">
     <RpcContext.Provider value={rpcSess}>
