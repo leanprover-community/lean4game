@@ -455,7 +455,11 @@ export function TypewriterInterface(props: { world: string, level: number, data:
 
   let lastStepErrors = proof.length ? hasInteractiveErrors(proof[proof.length - 1].errors) : false
 
-  // TODO: does the position matter at all?
+  // BUG: Triggers this:
+  // > React has detected a change in the order of Hooks called by TypewriterInterface.
+  // > This will lead to bugs and errors if not fixed. For more information, read the
+  // > Rules of Hooks: https://reactjs.org/link/rules-of-hooks
+  // maybe because `uri` is initially undefined?
   const rpcSess = useRpcSessionAtPos({uri: uri, line: 0, character: 0})
 
   return <div className="typewriter-interface">
