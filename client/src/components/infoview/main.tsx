@@ -233,8 +233,8 @@ function Command({ command, deleteProof }: { command: string, deleteProof: any }
   if (!command) { return <></> }
   return <div className="command">
     <div className="command-text">{command}</div>
-    <Button to="" className="undo-button btn btn-inverted" title="Delete this and future commands" onClick={deleteProof}>
-      <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;Delete
+    <Button to="" className="undo-button btn btn-inverted" title="Retry proof from here" onClick={deleteProof}>
+      <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;Retry
     </Button>
   </div>
 }
@@ -319,6 +319,7 @@ export function TypewriterInterface(props: { world: string, level: number, data:
   const uri = model.uri.toString()
   const gameId = React.useContext(GameIdContext)
   const { proof } = React.useContext(ProofContext)
+  const { setTypewriterInput } = React.useContext(InputModeContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
 
@@ -349,6 +350,7 @@ export function TypewriterInterface(props: { world: string, level: number, data:
         forceMoveMarkers: false
       }])
       setSelectedStep(undefined)
+      setTypewriterInput(proof[line].command)
       ev.stopPropagation()
     }
   }

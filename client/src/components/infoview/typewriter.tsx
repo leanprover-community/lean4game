@@ -200,6 +200,7 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
         text: typewriterInput.trim() + "\n",
         forceMoveMarkers: false
       }])
+      setTypewriterInput('')
     }
 
     editor.setPosition(pos)
@@ -211,13 +212,19 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
     }
   }, [typewriterInput])
 
+  useEffect(() => {
+    if (proof.length && hasInteractiveErrors(proof[proof.length - 1].errors)) {
+      setTypewriterInput(proof[proof.length - 1].command)
+    }
+  }, [proof])
+
   // React when answer from the server comes back
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
     if (params.uri == uri) {
       setProcessing(false)
       loadAllGoals()
       if (!hasErrors(params.diagnostics)) {
-        setTypewriterInput("")
+        //setTypewriterInput("")
         editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
       }
     } else {
