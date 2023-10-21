@@ -87,6 +87,13 @@
   flex-direction: column;
 }
 
+.typewriter-interface .proof .MuiCircularProgress-root {
+  left: 50%;
+  position: relative;
+  margin-left: -20px;
+  margin-bottom: 0.6em;
+}
+
 .typewriter .typewriter-input {
   flex: 1;
 }

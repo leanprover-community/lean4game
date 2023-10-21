@@ -458,9 +458,6 @@ export function TypewriterInterface(props: { world: string, level: number, data:
     <RpcContext.Provider value={rpcSess}>
     <div className="content">
       <div className="tmp-pusher">
-        {!proof.length &&
-          <CircularProgress />
-        }
       </div>
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement data={props.data} />
@@ -523,11 +520,11 @@ export function TypewriterInterface(props: { world: string, level: number, data:
                 }
               </div>
             }
-          </> : <></>
+          </> : <CircularProgress />
         }
       </div>
     </div>
-    <Typewriter hidden={!withErr && proof[proof.length - 1]?.goals.length == 0} disabled={disableInput}/>
+    <Typewriter hidden={!withErr && proof[proof.length - 1]?.goals.length == 0} disabled={disableInput || !proof.length}/>
     </RpcContext.Provider>
   </div>
 }
