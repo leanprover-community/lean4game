@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import Split from 'react-split'
 import { Box, CircularProgress } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGlobe, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
-import { useAppDispatch } from '../hooks'
-import { changedOpenedIntro } from '../state/progress'
+import { useAppDispatch, useAppSelector } from '../hooks'
+import { changedOpenedIntro, selectOpenedIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { MobileContext } from './infoview/context'
@@ -24,9 +24,9 @@ import { WelcomeAppBar } from './app_bar'
 import { Hint } from './hints'
 
 
-/** The panel showing the game's introduction text */
-function IntroductionPanel({introduction}: {introduction: string}) {
-  const {mobile, setPageNumber} = React.useContext(MobileContext)
+/** the panel showing the game's introduction text */
+function IntroductionPanel({introduction, setPageNumber}: {introduction: string, setPageNumber}) {
+  const {mobile} = React.useContext(MobileContext)
   const gameId = React.useContext(GameIdContext)
   const dispatch = useAppDispatch()
 
@@ -46,11 +46,6 @@ function IntroductionPanel({introduction}: {introduction: string}) {
         : <></>
       ))}
     </div>
-    {/* <Typography variant="body1" component="div" className="welcome-text">
-          <h1>{title}</h1>
-          <Markdown>{introduction}</Markdown>
-        </Typography>
-    */}
     {mobile &&
       <div className="button-row">
         <Button className="btn" to=""
@@ -65,34 +60,32 @@ function IntroductionPanel({introduction}: {introduction: string}) {
   </div>
 }
 
-/** main page of the game showing amoung others the tree of worlds/levels */
+/** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
   const gameId = React.useContext(GameIdContext)
-  const {mobile, pageNumber, setPageNumber} = React.useContext(MobileContext)
+  const {mobile} = React.useContext(MobileContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
-  // impressum pop-up
+  // For mobile only
+  const openedIntro = useAppSelector(selectOpenedIntro(gameId))
+  const [pageNumber, setPageNumber] = React.useState(openedIntro ? 1 : 0)
+
+  // pop-ups
+  const [eraseMenu, setEraseMenu] = React.useState(false)
   const [impressum, setImpressum] = React.useState(false)
-  const [rulesHelp, setRulesHelp] = React.useState(false)
-
-  function closeImpressum() {setImpressum(false)}
-  function toggleImpressum() {setImpressum(!impressum)}
-  function closeRulesHelp() {setRulesHelp(false)}
-
   const [info, setInfo] = React.useState(false)
-  function closeInfo() {setInfo(false)}
-  function toggleInfo() {setInfo(!impressum)}
-
-
-  /* state variables to toggle the pop-up menus */
-  const [eraseMenu, setEraseMenu] = React.useState(false);
-  const openEraseMenu = () => setEraseMenu(true);
-  const closeEraseMenu = () => setEraseMenu(false);
-  const [uploadMenu, setUploadMenu] = React.useState(false);
-  const openUploadMenu = () => setUploadMenu(true);
-  const closeUploadMenu = () => setUploadMenu(false);
-
+  const [rulesHelp, setRulesHelp] = React.useState(false)
+  const [uploadMenu, setUploadMenu] = React.useState(false)
+  function closeEraseMenu()   {setEraseMenu(false)}
+  function closeImpressum()   {setImpressum(false)}
+  function closeInfo()        {setInfo(false)}
+  function closeRulesHelp()   {setRulesHelp(false)}
+  function closeUploadMenu()  {setUploadMenu(false)}
+  function toggleEraseMenu()  {setEraseMenu(!eraseMenu)}
+  function toggleImpressum()  {setImpressum(!impressum)}
+  function toggleInfo()       {setInfo(!info)}
+  function toggleUploadMenu() {setUploadMenu(!uploadMenu)}
 
   // set the window title
   useEffect(() => {
@@ -106,23 +99,26 @@ function Welcome() {
       <CircularProgress />
     </Box>
   : <>
-    <WelcomeAppBar gameInfo={gameInfo.data} toggleImpressum={toggleImpressum} openEraseMenu={openEraseMenu}
-      openUploadMenu={openUploadMenu} toggleInfo={toggleInfo} />
+    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data} toggleImpressum={toggleImpressum}
+      toggleEraseMenu={toggleEraseMenu} toggleUploadMenu={toggleUploadMenu}
+      toggleInfo={toggleInfo} />
     <div className="app-content">
       { mobile ?
           <div className="welcome mobile">
             {(pageNumber == 0 ?
-              <IntroductionPanel introduction={gameInfo.data?.introduction} />
+              <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
             : pageNumber == 1 ?
-              <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
+              <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
+                rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
             :
               <InventoryPanel levelInfo={inventory?.data} />
             )}
           </div>
         :
           <Split className="welcome" minSize={0} snapOffset={200}  sizes={[25, 50, 25]}>
-            <IntroductionPanel introduction={gameInfo.data?.introduction} />
-            <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
+            <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
+            <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
+              rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
             <InventoryPanel levelInfo={inventory?.data} />
           </Split>
       }

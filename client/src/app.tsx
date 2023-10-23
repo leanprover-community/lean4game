@@ -10,8 +10,6 @@ import './css/reset.css';
 import './css/app.css';
 import { MobileContext } from './components/infoview/context';
 import { useWindowDimensions } from './window_width';
-import { selectOpenedIntro } from './state/progress';
-import { useSelector } from 'react-redux';
 
 export const GameIdContext = React.createContext<string>(undefined);
 
@@ -21,14 +19,10 @@ function App() {
   const {width, height} = useWindowDimensions()
   const [mobile, setMobile] = React.useState(width < 800)
 
-  // For mobile only
-  const openedIntro = useSelector(selectOpenedIntro(gameId))
-  const [pageNumber, setPageNumber] = React.useState(openedIntro ? 1 : 0)
-
   return (
     <div className="app">
       <GameIdContext.Provider value={gameId}>
-        <MobileContext.Provider value={{mobile, setMobile, pageNumber, setPageNumber}}>
+        <MobileContext.Provider value={{mobile, setMobile}}>
           <Outlet />
         </MobileContext.Provider>
       </GameIdContext.Provider>
