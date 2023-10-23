@@ -57,6 +57,12 @@ interface Doc {
   category: string,
 }
 
+export interface WorldOverview {
+  world: string
+  tactics: InventoryTile[]
+  lemmas: InventoryTile[]
+  definitions: InventoryTile[]
+}
 
 const customBaseQuery = async (
   args : {game: string, method: string, params?: any},
@@ -86,7 +92,7 @@ export const apiSlice = createApi({
     loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
       query: ({game, world, level}) => {return {game, method: "loadLevel", params: {world, level}}},
     }),
-    loadInventoryOverview: builder.query<InventoryOverview, {game: string}>({
+    loadInventoryOverview: builder.query<WorldOverview[], {game: string}>({
       query: ({game}) => {return {game, method: "loadInventoryOverview", params: {}}},
     }),
     loadDoc: builder.query<Doc, {game: string, name: string, type: "lemma"|"tactic"}>({

@@ -26,7 +26,7 @@ import { changedSelection, codeEdited, selectCode, selectSelections, selectCompl
 import { store } from '../state/store'
 import { Button } from './button'
 import Markdown from './markdown'
-import {InventoryPanel} from './inventory'
+import {InventoryOverviewPanel, InventoryPanel} from './inventory'
 import { hasInteractiveErrors } from './infoview/typewriter'
 import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext,
   ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './infoview/context'
@@ -480,7 +480,7 @@ function Introduction({impressum, setImpressum}) {
         <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
           <IntroductionPanel gameInfo={gameInfo} />
           <div className="world-image-container empty"></div>
-          <InventoryPanel levelInfo={inventory?.data} />
+          <InventoryOverviewPanel data={inventory?.data} showOverview={false}/>
         </Split>
       }
 

@@ -256,6 +256,12 @@ structure GameLevel where
   template: Option String := none
   deriving Inhabited, Repr
 
+structure WorldOverview where
+  world: Name
+  tactics: Array InventoryTile := default
+  definitions: Array InventoryTile := default
+  lemmas: Array InventoryTile := default
+  deriving FromJson, ToJson, Inhabited, Repr
 
 /-! ## World -/
 
