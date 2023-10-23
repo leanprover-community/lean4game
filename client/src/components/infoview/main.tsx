@@ -6,7 +6,7 @@ import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location,
 import 'tachyons/css/tachyons.css';
 import '@vscode/codicons/dist/codicon.css';
 import '../../../../node_modules/lean4-infoview/src/infoview/index.css';
-import './infoview.css'
+import '../../css/infoview.css'
 
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
 import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';

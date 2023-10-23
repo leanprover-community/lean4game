@@ -41,7 +41,7 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import 'lean4web/client/src/editor/infoview.css'
 import 'lean4web/client/src/editor/vscode.css'
-import './level.css'
+import '../css/level.css'
 import { LevelAppBar } from './app_bar'
 
 function Level() {

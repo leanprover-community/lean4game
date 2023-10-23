@@ -19,7 +19,7 @@ import { RulesHelpPopup } from './popup/rules_help'
 import { UploadPopup } from './popup/upload'
 import { WorldTreePanel } from './world_tree'
 
-import './welcome.css'
+import '../css/welcome.css'
 import { WelcomeAppBar } from './app_bar'
 import { Hint } from './hints'
 
