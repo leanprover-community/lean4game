@@ -18,15 +18,11 @@ export const GameIdContext = React.createContext<string>(undefined);
 function App() {
   const params = useParams()
   const gameId = "g/" + params.owner + "/" + params.repo
-
-  // TODO: Make mobileLayout be changeable in settings
-  // TODO: Handle resize Events
   const {width, height} = useWindowDimensions()
   const [mobile, setMobile] = React.useState(width < 800)
 
-  // On mobile, there are multiple pages on the welcome page to switch between
+  // For mobile only
   const openedIntro = useSelector(selectOpenedIntro(gameId))
-  // On mobile, there are multiple pages to switch between
   const [pageNumber, setPageNumber] = React.useState(openedIntro ? 1 : 0)
 
   return (
