@@ -137,9 +137,7 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
     <div className="exercise-statement">
       {data?.descrText &&
         <Markdown>
-          {data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : "" // data?.descrText && "**Exercise**: "
-            + data?.descrText
-          }
+          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + data?.descrText}
         </Markdown>
       }
       {data?.descrFormat && showLeanStatement &&
