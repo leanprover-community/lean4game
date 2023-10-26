@@ -164,7 +164,7 @@ Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet 
           a template.
         </p>
         <p>
-          There is an option to load and run your own games direclty on the server,
+          There is an option to load and run your own games directly on the server,
           instructions are in the NNG repo. Since this is still in development we'd like to
           encourage you to contact us for support creating your own game. The documentation is
           not polished yet.
