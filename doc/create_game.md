@@ -18,7 +18,7 @@ The file `Game.lean` is the backbone of the game putting everything together.
 
 1. `MakeGame`: This command is where the game gets built. If there are things to fix, they will be shown here as warnings or errors (orange/red squigglies in VSCode). Note that you might have to call "Lean: Restart File" (Ctrl+Shift+X) to reload the file and see changes made in other files.
 1. `Title`: Set the display title of your game.
-1. `Ìntroduction`: This is the text displayed at the beggining next to the world selection tree.
+1. `Introduction`: This is the text displayed at the beginning next to the world selection tree.
 1. `Info`: This will be displayed in the game's menu as "Game Info". Use it for credits, funding and other meta information about the game.
 1. Imports: The file needs to import all world files, which we look at in a second. If you add a new world, remember to import it here!
 1. `Dependency`: (optional) This command adds another edge in the world tree. The game computes them automatically based on used tactics/theorems. However, sometimes you need a dependency the game can't compute, for example you explained `≠` in one world and in another world, the user is expected to know it already. The syntax is `Dependency World₁ → World₂ → World₃`.
@@ -209,7 +209,7 @@ There are a few extra tactics that help you structuring the proof:
 
 - `Hint`: You can use `Hint "text"` to display text if the goal state in-game matches
   the one where `Hint` is placed. For more options about hints, see below.
-- `Branch`: In the proof you can add a `Branch` that runs an alternativ tactic sequence, which
+- `Branch`: In the proof you can add a `Branch` that runs an alternative tactic sequence, which
   helps setting `Hints` in different places. The `Branch` does not affect the main
   proof and does not need to finish any goals.
 - `Template`/`Hole`: Used to provide a sample proof template. Anything inside `Template`
@@ -236,7 +236,7 @@ Further, you can choose to hide hints and only have them displayed when the play
 Hint (hidden := true) "some hidden hint"
 ```
 
-Lastly, you should put variable names in hints insid brackets:
+Lastly, you should put variable names in hints inside brackets:
 
 ```
 Hint "now use `rw [{h}]` to use your assumption {h}."
