@@ -67,7 +67,7 @@ structure InventoryTemplate where
   /-- Depends on the type:
   * Tactic: the tactic's name
   * Lemma: fully qualified lemma name
-  * Definition: no restrictions (preferrably the definions fully qualified name)
+  * Definition: no restrictions (preferably the definitions fully qualified name)
   -/
   name: Name
   /-- Only for Lemmas. To sort them into tabs -/
