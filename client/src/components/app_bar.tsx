@@ -1,3 +1,6 @@
+/**
+ *  @file contains the navigation bars of the app.
+ */
 import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
@@ -11,7 +14,7 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
 
-/** navigation buttons to switch between welcome-pages on mobile */
+/** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
   { pageNumber: number,
     setPageNumber: any}) {
@@ -49,10 +52,101 @@ function MobileNavButtons({pageNumber, setPageNumber}:
   </>
 }
 
+/** button to toggle dropdown menu. */
 function MenuButton({navOpen, setNavOpen}) {
   return <Button to="" className="btn toggle-width" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}}>
     {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
   </Button>
+}
+
+/** button to go one level futher.
+ * for the last level, this button turns into a button going back to the welcome page.
+ */
+function NextButton({worldSize, difficulty, completed, setNavOpen}) {
+  const gameId = React.useContext(GameIdContext)
+  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  return (levelId < worldSize ?
+    <Button inverted="true"
+        to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
+        disabled={difficulty >= 2 && !(completed || levelId == 0)}
+        onClick={() => setNavOpen(false)}>
+      <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
+    </Button>
+    :
+    <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
+      <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
+    </Button>
+  )
+}
+
+/** button to go one level back.
+ * only renders if the current level id is > 0.
+ */
+function PreviousButton({setNavOpen}) {
+  const gameId = React.useContext(GameIdContext)
+  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  return (levelId > 0 && <>
+    <Button disabled={levelId <= 0} inverted="true"
+        to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
+        title="previous level"
+        onClick={() => setNavOpen(false)}>
+      <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
+    </Button>
+  </>)
+}
+
+/** button to toggle between editor and typewriter */
+function InputModeButton({setNavOpen, isDropdown}) {
+  const {levelId} = React.useContext(WorldLevelIdContext)
+  const {typewriterMode, setTypewriterMode, lockInputMode} = React.useContext(InputModeContext)
+
+  /** toggle input mode if allowed */
+  function toggleInputMode(ev: React.MouseEvent) {
+    if (!lockInputMode){
+      setTypewriterMode(!typewriterMode)
+      setNavOpen(false)
+    }
+  }
+
+  return <Button
+      className={`btn btn-inverted ${isDropdown? '' : 'toggle-width'}`} disabled={levelId <= 0 || lockInputMode}
+      inverted="true" to=""
+      onClick={(ev) => toggleInputMode(ev)}
+      title={lockInputMode ? "Editor mode is enforced!" : typewriterMode ? "Editor mode" : "Typewriter mode"}>
+    <FontAwesomeIcon icon={typewriterMode ? faCode : faTerminal} />
+    {isDropdown && (typewriterMode ? <>&nbsp;Editor mode</> : <>&nbsp;Typewriter mode</>)}
+  </Button>
+}
+
+/** button to toggle iimpressum popup */
+function ImpressumButton({setNavOpen, toggleImpressum, isDropdown}) {
+  return <Button className="btn btn-inverted toggle-width"
+    title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faCircleInfo} />
+    {isDropdown && <>&nbsp;Info &amp; Impressum</>}
+  </Button>
+}
+
+/**  button to go back to welcome page */
+function HomeButton({isDropdown}) {
+  const gameId = React.useContext(GameIdContext)
+  return <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
+    <FontAwesomeIcon icon={faHome} />
+    {isDropdown && <>&nbsp;Home</>}
+  </Button>
+}
+
+/** button in mobile level to toggle inventory.
+ * only displays a button if `setPageNumber` is set.
+ */
+function InventoryButton({pageNumber, setPageNumber}) {
+  return (setPageNumber &&
+    <Button to="" className="btn btn-inverted toggle-width"
+      title={pageNumber ? "close inventory" : "show inventory"}
+      inverted="true" onClick={() => {setPageNumber(pageNumber ? 0 : 1)}}>
+      <FontAwesomeIcon icon={pageNumber ? faBookOpen : faBook} />
+    </Button>
+  )
 }
 
 /** the navigation bar on the welcome page */
@@ -102,85 +196,6 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
       </Button>
     </div>
   </div>
-}
-
-function NextButton({worldSize, difficulty, completed, setNavOpen}) {
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
-  return (levelId < worldSize ?
-    <Button inverted="true"
-        to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
-        disabled={difficulty >= 2 && !(completed || levelId == 0)}
-        onClick={() => setNavOpen(false)}>
-      <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
-    </Button>
-    :
-    <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
-      <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
-    </Button>
-  )
-}
-
-function PreviousButton({setNavOpen}) {
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
-  return (levelId > 0 && <>
-    <Button disabled={levelId <= 0} inverted="true"
-        to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
-        title="previous level"
-        onClick={() => setNavOpen(false)}>
-      <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
-    </Button>
-  </>)
-}
-
-function InputModeButton({setNavOpen, isDropdown}) {
-  const {levelId} = React.useContext(WorldLevelIdContext)
-  const {typewriterMode, setTypewriterMode, lockInputMode} = React.useContext(InputModeContext)
-
-  /** toggle input mode if allowed */
-  function toggleInputMode(ev: React.MouseEvent) {
-    if (!lockInputMode){
-      setTypewriterMode(!typewriterMode)
-      setNavOpen(false)
-    }
-  }
-
-  return <Button
-      className={`btn btn-inverted ${isDropdown? '' : 'toggle-width'}`} disabled={levelId <= 0 || lockInputMode}
-      inverted="true" to=""
-      onClick={(ev) => toggleInputMode(ev)}
-      title={lockInputMode ? "Editor mode is enforced!" : typewriterMode ? "Editor mode" : "Typewriter mode"}>
-    <FontAwesomeIcon icon={typewriterMode ? faCode : faTerminal} />
-    {isDropdown && (typewriterMode ? <>&nbsp;Editor mode</> : <>&nbsp;Typewriter mode</>)}
-  </Button>
-}
-
-function ImpressumButton({setNavOpen, toggleImpressum, isDropdown}) {
-  return <Button className="btn btn-inverted toggle-width"
-    title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
-    <FontAwesomeIcon icon={faCircleInfo} />
-    {isDropdown && <>&nbsp;Info &amp; Impressum</>}
-  </Button>
-}
-
-function HomeButton({isDropdown}) {
-  const gameId = React.useContext(GameIdContext)
-  return <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
-    <FontAwesomeIcon icon={faHome} />
-    {isDropdown && <>&nbsp;Home</>}
-  </Button>
-}
-
-/** only displays a button if `setPageNumber` is set. */
-function InventoryButton({pageNumber, setPageNumber}) {
-  return (setPageNumber &&
-    <Button to="" className="btn btn-inverted toggle-width"
-      title={pageNumber ? "close inventory" : "show inventory"}
-      inverted="true" onClick={() => {setPageNumber(pageNumber ? 0 : 1)}}>
-      <FontAwesomeIcon icon={pageNumber ? faBookOpen : faBook} />
-    </Button>
-  )
 }
 
 /** the navigation bar in a level */
