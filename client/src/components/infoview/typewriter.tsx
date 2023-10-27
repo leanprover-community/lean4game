@@ -68,8 +68,8 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
-  const model = editor.getModel()
-  const uri = model.uri.toString()
+  const model = editor?.getModel()
+  const uri = model?.uri?.toString()
 
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
@@ -91,11 +91,15 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
    */
   const loadAllGoals = React.useCallback(() => {
 
+    if (!model || ! uri) {
+      return
+    }
+
     let goalCalls = []
     let msgCalls = []
 
     // For each line of code ask the server for the goals and the messages on this line
-    for (let i = 0; i < model.getLineCount(); i++) {
+    for (let i = 0; i < model?.getLineCount(); i++) {
       goalCalls.push(
         rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp({line: i, character: 0, uri: uri}))
       )
@@ -158,7 +162,7 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
           // with no goals there will be no hints.
           let hints : GameHint[] = goals.goals.length ? goals.goals[0].hints : []
 
-          console.debug(`Command (${i}): `, i ? model.getLineContent(i) : '')
+          console.debug(`Command (${i}): `, i ? model?.getLineContent(i) : '')
           console.debug(`Goals: (${i}): `, goalsToString(goals)) //
           console.debug(`Hints: (${i}): `, hints)
           console.debug(`Errors: (${i}): `, messages)
@@ -166,7 +170,7 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
           tmpProof.push({
             // the command of the line above. Note that `getLineContent` starts counting
             // at `1` instead of `zero`. The first ProofStep will have an empty command.
-            command: i ? model.getLineContent(i) : '',
+            command: i ? model?.getLineContent(i) : '',
             // TODO: store correct data
             goals: goals.goals,
             // only need the hints of the active goals in chat
@@ -185,6 +189,7 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
   // Run the command
   const runCommand = React.useCallback(() => {
     if (processing) {return}
+    if (!uri) {return}
 
     // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
     setDeletedChat([])
@@ -195,7 +200,7 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
       editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           pos,
-          editor.getModel().getFullModelRange().getEndPosition()
+          model.getFullModelRange().getEndPosition()
         ),
         text: typewriterInput.trim() + "\n",
         forceMoveMarkers: false
@@ -204,7 +209,7 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
     }
 
     editor.setPosition(pos)
-  }, [typewriterInput, editor])
+  }, [typewriterInput, editor, model])
 
   useEffect(() => {
     if (oneLineEditor && oneLineEditor.getValue() !== typewriterInput) {
@@ -220,12 +225,14 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
 
   // React when answer from the server comes back
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
+    if (!uri) {return}
+
     if (params.uri == uri) {
       setProcessing(false)
       loadAllGoals()
       if (!hasErrors(params.diagnostics)) {
         //setTypewriterInput("")
-        editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
+        editor.setPosition(model.getFullModelRange().getEndPosition())
       }
     } else {
       // console.debug(`expected uri: ${uri}, got: ${params.uri}`)
@@ -234,7 +241,7 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
     // TODO: This is the wrong place apparently. Where do wee need to load them?
     // TODO: instead of loading all goals every time, we could only load the last one
     // loadAllGoals()
-  }, [uri]);
+  }, [uri, editor, model]);
 
   useEffect(() => {
     const myEditor = monaco.editor.create(inputRef.current!, {
@@ -304,10 +311,8 @@ export function Typewriter({hidden, disabled}: {hidden?: boolean, disabled?: boo
   // BUG: Causes `file closed` error
   //TODO: Intention is to run once when loading, does that work?
   useEffect(() => {
-    console.debug(`time to update: ${uri} \n ${rpcSess}`)
-    console.debug(rpcSess)
     loadAllGoals()
-  }, [rpcSess])
+  }, [])
 
   /** Process the entered command */
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {

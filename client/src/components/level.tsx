@@ -237,8 +237,6 @@ function PlayableLevel({impressum, setImpressum}) {
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
   function closeInventoryDoc () {setInventoryDoc(null)}
 
-
-
   const onDidChangeContent = (code) => {
     dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code}))
   }
@@ -254,30 +252,30 @@ function PlayableLevel({impressum, setImpressum}) {
   const {editor, infoProvider, editorConnection} =
     useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
 
-  /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
-   * `TypewriterInterface`.
-   */
-  const handleUndo = () => {
-    const endPos = editor.getModel().getFullModelRange().getEndPosition()
-    let range
-    console.log(endPos.column)
-    if (endPos.column === 1) {
-      range = monaco.Selection.fromPositions(
-        new monaco.Position(endPos.lineNumber - 1, 1),
-        endPos
-      )
-    } else {
-      range = monaco.Selection.fromPositions(
-        new monaco.Position(endPos.lineNumber, 1),
-        endPos
-      )
-    }
-    editor.executeEdits("undo-button", [{
-      range,
-      text: "",
-      forceMoveMarkers: false
-    }]);
-  }
+  // /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
+  //  * `TypewriterInterface`.
+  //  */
+  // const handleUndo = () => {
+  //   const endPos = editor.getModel().getFullModelRange().getEndPosition()
+  //   let range
+  //   console.log(endPos.column)
+  //   if (endPos.column === 1) {
+  //     range = monaco.Selection.fromPositions(
+  //       new monaco.Position(endPos.lineNumber - 1, 1),
+  //       endPos
+  //     )
+  //   } else {
+  //     range = monaco.Selection.fromPositions(
+  //       new monaco.Position(endPos.lineNumber, 1),
+  //       endPos
+  //     )
+  //   }
+  //   editor.executeEdits("undo-button", [{
+  //     range,
+  //     text: "",
+  //     forceMoveMarkers: false
+  //   }]);
+  // }
 
   // Select and highlight proof steps and corresponding hints
   // TODO: with the new design, there is no difference between the introduction and
@@ -296,28 +294,31 @@ function PlayableLevel({impressum, setImpressum}) {
       setTypewriterMode(false)
 
       if (editor) {
-        let code = editor.getModel().getLinesContent()
+        let model = editor.getModel()
+        if (model) {
+          let code = model.getLinesContent()
 
-        // console.log(`insert. code: ${code}`)
-        // console.log(`insert. join: ${code.join('')}`)
-        // console.log(`insert. trim: ${code.join('').trim()}`)
-        // console.log(`insert. length: ${code.join('').trim().length}`)
-        // console.log(`insert. range: ${editor.getModel().getFullModelRange()}`)
+          // console.log(`insert. code: ${code}`)
+          // console.log(`insert. join: ${code.join('')}`)
+          // console.log(`insert. trim: ${code.join('').trim()}`)
+          // console.log(`insert. length: ${code.join('').trim().length}`)
+          // console.log(`insert. range: ${editor.getModel().getFullModelRange()}`)
 
 
-        // TODO: It does seem that the template is always indented by spaces.
-        // This is a hack, assuming there are exactly two.
-        if (!code.join('').trim().length) {
-          console.debug(`inserting template:\n${level.data.template}`)
-          // TODO: This does not work! HERE
-          // Probably overwritten by a query to the server
-          editor.executeEdits("template-writer", [{
-            range: editor.getModel().getFullModelRange(),
-            text: level.data.template + `\n`,
-            forceMoveMarkers: true
-          }])
-        } else {
-          console.debug(`not inserting template.`)
+          // TODO: It does seem that the template is always indented by spaces.
+          // This is a hack, assuming there are exactly two.
+          if (!code.join('').trim().length) {
+            console.debug(`inserting template:\n${level.data.template}`)
+            // TODO: This does not work! HERE
+            // Probably overwritten by a query to the server
+            editor.executeEdits("template-writer", [{
+              range: model.getFullModelRange(),
+              text: level.data.template + `\n`,
+              forceMoveMarkers: true
+            }])
+          } else {
+            console.debug(`not inserting template.`)
+          }
         }
       }
     } else {
@@ -335,17 +336,49 @@ function PlayableLevel({impressum, setImpressum}) {
     setShowHelp(new Set(selectHelp(gameId, worldId, levelId)(store.getState())))
   }, [gameId, worldId, levelId])
 
+  // switching editor mode
   useEffect(() => {
-    if (!typewriterMode) {
-      // Delete last input attempt from command line
-      editor.executeEdits("typewriter", [{
-        range: editor.getSelection(),
-        text: "",
-        forceMoveMarkers: false
-      }]);
-      editor.focus()
+    if (editor) {
+      let model = editor.getModel()
+      if (model) {
+        if (typewriterMode) {
+          // typewriter gets enabled
+          let code = model.getLinesContent().filter(line => line.trim())
+          editor.executeEdits("typewriter", [{
+            range: model.getFullModelRange(),
+            text: code.length ? code.join('\n') + '\n' : '',
+            forceMoveMarkers: true
+          }])
+
+          // let endPos = model.getFullModelRange().getEndPosition()
+          // if (model.getLineContent(endPos.lineNumber).trim() !== "") {
+          //   editor.executeEdits("typewriter", [{
+          //     range: monaco.Selection.fromPositions(endPos, endPos),
+          //     text: "\n",
+          //     forceMoveMarkers: true
+          //   }]);
+          // }
+          // let endPos = model.getFullModelRange().getEndPosition()
+          // let currPos = editor.getPosition()
+          // if (currPos.column != 1 || (currPos.lineNumber != endPos.lineNumber && currPos.lineNumber != endPos.lineNumber - 1)) {
+          //   // This is not a position that would naturally occur from Typewriter, reset:
+          //   editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
+          // }
+        } else {
+          // typewriter gets disabled
+          // delete last input attempt from command line
+          editor.executeEdits("typewriter", [{
+            range: editor.getSelection(),
+            text: "",
+            forceMoveMarkers: false
+          }]);
+          editor.focus()
+        }
+      }
+
+
     }
-  }, [typewriterMode])
+  }, [editor, typewriterMode])
 
   useEffect(() => {
     // Forget whether hidden hints are displayed for steps that don't exist yet
@@ -362,33 +395,6 @@ function PlayableLevel({impressum, setImpressum}) {
       dispatch(helpEdited({game: gameId, world: worldId, level: levelId, help: Array.from(showHelp)}))
     }
   }, [showHelp])
-
-  // Effect when command line mode gets enabled
-  useEffect(() => {
-    if (editor && typewriterMode) {
-      let code = editor.getModel().getLinesContent().filter(line => line.trim())
-      editor.executeEdits("typewriter", [{
-        range: editor.getModel().getFullModelRange(),
-        text: code.length ? code.join('\n') + '\n' : '',
-        forceMoveMarkers: true
-      }]);
-
-      // let endPos = editor.getModel().getFullModelRange().getEndPosition()
-      // if (editor.getModel().getLineContent(endPos.lineNumber).trim() !== "") {
-      //   editor.executeEdits("typewriter", [{
-      //     range: monaco.Selection.fromPositions(endPos, endPos),
-      //     text: "\n",
-      //     forceMoveMarkers: true
-      //   }]);
-      // }
-      // let endPos = editor.getModel().getFullModelRange().getEndPosition()
-      // let currPos = editor.getPosition()
-      // if (currPos.column != 1 || (currPos.lineNumber != endPos.lineNumber && currPos.lineNumber != endPos.lineNumber - 1)) {
-      //   // This is not a position that would naturally occur from Typewriter, reset:
-      //   editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
-      // }
-    }
-  }, [editor, typewriterMode])
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
@@ -483,32 +489,8 @@ function Introduction({impressum, setImpressum}) {
           <InventoryPanel levelInfo={inventory?.data} />
         </Split>
       }
-
   </>
 }
-
-// {mobile?
-//   // TODO: This is copied from the `Split` component below...
-//   <>
-//     <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
-//       <ExercisePanel
-//         impressum={impressum}
-//         closeImpressum={closeImpressum}
-//         codeviewRef={codeviewRef}
-//         visible={pageNumber == 0} />
-//       <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
-//     </div>
-//   </>
-// :
-//   <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
-//     <ChatPanel lastLevel={lastLevel}/>
-//     <ExercisePanel
-//       impressum={impressum}
-//       closeImpressum={closeImpressum}
-//       codeviewRef={codeviewRef} />
-//     <InventoryPanel levelInfo={level?.data} />
-//   </Split>
-// }
 
 function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
 
@@ -604,18 +586,20 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
       if (!model) {
         model = monaco.editor.createModel(initialCode, 'lean4', uri)
       }
-      model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
-      editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
-      editor.setModel(model)
-      if (initialSelections) {
-        console.debug("Initial Selection: ", initialSelections)
-        // BUG: Somehow I get an `invalid arguments` bug here
-        // editor.setSelections(initialSelections)
-      }
+      if (model) { // in case of broken pipe, this remains null
+        model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
+        editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
+        editor.setModel(model)
+        if (initialSelections) {
+          console.debug("Initial Selection: ", initialSelections)
+          // BUG: Somehow I get an `invalid arguments` bug here
+          // editor.setSelections(initialSelections)
+        }
 
-      return () => {
-        editorConnection.api.sendClientNotification(uriStr, "textDocument/didClose", {textDocument: {uri: uriStr}})
-        model.dispose(); }
+        return () => {
+          editorConnection.api.sendClientNotification(uriStr, "textDocument/didClose", {textDocument: {uri: uriStr}})
+          model.dispose(); }
+      }
     }
   }, [editor, levelId, connection, leanClientStarted])
 
@@ -624,14 +608,16 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
     if (editor && leanClientStarted) {
 
       let model = monaco.editor.getModel(uri)
-      infoviewApi.serverRestarted(leanClient.initializeResult)
+      if (model) {
+        infoviewApi.serverRestarted(leanClient.initializeResult)
 
-      infoProvider.openPreview(editor, infoviewApi)
+        infoProvider.openPreview(editor, infoviewApi)
 
-      const taskGutter = new LeanTaskGutter(infoProvider.client, editor)
-      const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
+        const taskGutter = new LeanTaskGutter(infoProvider.client, editor)
+        const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
-      return () => { abbrevRewriter.dispose(); taskGutter.dispose(); }
+        return () => { abbrevRewriter.dispose(); taskGutter.dispose(); }
+      }
     }
   }, [editor, connection, leanClientStarted])
 
@@ -657,7 +643,7 @@ function useLoadWorldFiles(worldId) {
           models.push(monaco.editor.createModel(code, 'lean4', uri))
         }
       }
-      return () => { for (let model of models) { model.dispose() } }
+      return () => { for (let model of models) { try {model.dispose()} catch {console.log(`failed to dispose model ${model}`)}} }
     }
   }, [gameInfo.data, worldId])
 }
