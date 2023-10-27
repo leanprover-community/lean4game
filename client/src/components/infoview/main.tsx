@@ -1,6 +1,7 @@
 /* Partly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/main.tsx */
 
 import * as React from 'react';
+import {useEffect} from 'react';
 import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location, DocumentUri } from 'vscode-languageserver-protocol';
 
 import 'tachyons/css/tachyons.css';
@@ -327,6 +328,17 @@ export function TypewriterInterfaceWrapper(props: { world: string, level: number
   // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
   // that we want to persist.
 
+  // Catch loss of internet connection
+  try {
+    const editor = React.useContext(MonacoEditorContext)
+    const model = editor.getModel()
+    if (!model) {
+      return <p>no internet?</p>
+    }
+  } catch {
+    return <p>no internet??</p>
+  }
+
   if (!serverVersion) { return <></> }
   if (serverStoppedResult) {
     return <div>
@@ -338,19 +350,51 @@ export function TypewriterInterfaceWrapper(props: { world: string, level: number
   return <TypewriterInterface props={props} />
 }
 
+/** Delete all proof lines starting from a given line.
+* Note that the first line (i.e. deleting everything) is `1`!
+*/
+function deleteProof(line: number) {
+  const editor = React.useContext(MonacoEditorContext)
+  const { proof } = React.useContext(ProofContext)
+  const { setSelectedStep } = React.useContext(SelectionContext)
+  const { setDeletedChat, showHelp } = React.useContext(DeletedChatContext)
+  const { setTypewriterInput } = React.useContext(InputModeContext)
+
+  return (ev) => {
+    if (editor) {
+      const model = editor.getModel()
+      if (model) {
+        let deletedChat: Array<GameHint> = []
+        proof.slice(line).map((step, i) => {
+          // Only add these hidden hints to the deletion stack which were visible
+          deletedChat = [...deletedChat, ...step.hints.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
+        })
+        setDeletedChat(deletedChat)
+        editor.executeEdits("typewriter", [{
+          range: monaco.Selection.fromPositions(
+            { lineNumber: line, column: 1 },
+            model.getFullModelRange().getEndPosition()
+          ),
+          text: '',
+          forceMoveMarkers: false
+        }])
+        setSelectedStep(undefined)
+        setTypewriterInput(proof[line].command)
+        ev.stopPropagation()
+      }
+    }
+  }
+}
+
 /** The interface in command line mode */
 export function TypewriterInterface({props}) {
-  const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
   const editor = React.useContext(MonacoEditorContext)
-  const model = editor.getModel()
-  const uri = model.uri.toString()
 
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
-  const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
+  const { showHelp, setShowHelp } = React.useContext(DeletedChatContext)
   const {mobile} = React.useContext(MobileContext)
   const { proof } = React.useContext(ProofContext)
-  const { setTypewriterInput } = React.useContext(InputModeContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
@@ -358,33 +402,9 @@ export function TypewriterInterface({props}) {
   // const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
   // const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
 
-  const rpcSess = useRpcSessionAtPos({uri: uri, line: 0, character: 0})
-
-  /** Delete all proof lines starting from a given line.
-  * Note that the first line (i.e. deleting everything) is `1`!
-  */
-  function deleteProof(line: number) {
-    return (ev) => {
-      let deletedChat: Array<GameHint> = []
-      proof.slice(line).map((step, i) => {
-        // Only add these hidden hints to the deletion stack which were visible
-        deletedChat = [...deletedChat, ...step.hints.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
-      })
-      setDeletedChat(deletedChat)
-
-      editor.executeEdits("typewriter", [{
-        range: monaco.Selection.fromPositions(
-          { lineNumber: line, column: 1 },
-          editor.getModel().getFullModelRange().getEndPosition()
-        ),
-        text: '',
-        forceMoveMarkers: false
-      }])
-      setSelectedStep(undefined)
-      setTypewriterInput(proof[line].command)
-      ev.stopPropagation()
-    }
-  }
+  // rpc session
+  // editor, model or uri might be null if connection is broken
+  const rpcSess = useRpcSessionAtPos({uri: editor?.getModel()?.uri?.toString() ?? '', line: 0, character: 0})
 
   function toggleSelectStep(line: number) {
     return (ev) => {
@@ -399,8 +419,8 @@ export function TypewriterInterface({props}) {
     }
   }
 
-   // Scroll to the end of the proof if it is updated.
-   React.useEffect(() => {
+  // Scroll to the end of the proof if it is updated.
+  React.useEffect(() => {
     if (proof?.length > 1) {
       proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
     } else {

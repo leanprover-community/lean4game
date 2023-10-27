@@ -6,6 +6,7 @@ import { faLock, faBan } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
 import Markdown from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery } from '../state/api';
+import { QueryStatus } from '@reduxjs/toolkit/query/react'
 import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
 import { useSelector } from 'react-redux';
@@ -114,16 +115,32 @@ function InventoryItem({name, displayName, locked, disabled, newly, showDoc, ena
   return <div className={`item ${className}${enableAll ? ' enabled' : ''}`} onClick={handleClick} title={title}>{icon} {displayName}</div>
 }
 
+/** Wrapper to catch rejected/pending queries. */
+function DocContent({doc}) {
+  switch(doc.status) {
+    case QueryStatus.fulfilled:
+      return <>
+        <h1 className="doc">{doc.data.displayName}</h1>
+        <p><code>{doc.data.statement}</code></p>
+        {/* <code>docstring: {doc.data.docstring}</code> */}
+        <Markdown>{doc.data.content}</Markdown>
+      </>
+    case QueryStatus.rejected:
+      return <p>Looks like there is a connection problem!</p>
+    case QueryStatus.pending:
+      return <p>Loading...</p>
+    default:
+      return <></>
+  }
+}
+
 export function Documentation({name, type, handleClose}) {
   const gameId = React.useContext(GameIdContext)
   const doc = useLoadDocQuery({game: gameId, type: type, name: name})
 
   return <div className="documentation">
     <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
-    <h1 className="doc">{doc.data?.displayName}</h1>
-    <p><code>{doc.data?.statement}</code></p>
-    {/* <code>docstring: {doc.data?.docstring}</code> */}
-    <Markdown>{doc.data?.content}</Markdown>
+      <DocContent doc={doc} />
   </div>
 }
 
