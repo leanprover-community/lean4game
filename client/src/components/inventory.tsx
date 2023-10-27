@@ -6,6 +6,7 @@ import { faLock, faBan } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
 import Markdown from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery } from '../state/api';
+import { QueryStatus } from '@reduxjs/toolkit/query/react'
 import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
 import { useSelector } from 'react-redux';
@@ -120,10 +121,14 @@ export function Documentation({name, type, handleClose}) {
 
   return <div className="documentation">
     <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
-    <h1 className="doc">{doc.data?.displayName}</h1>
-    <p><code>{doc.data?.statement}</code></p>
-    {/* <code>docstring: {doc.data?.docstring}</code> */}
-    <Markdown>{doc.data?.content}</Markdown>
+    {doc.status == QueryStatus.fulfilled ?
+      <>
+        <h1 className="doc">{doc.data.displayName}</h1>
+        <p><code>{doc.data.statement}</code></p>
+        {/* <code>docstring: {doc.data.docstring}</code> */}
+        <Markdown>{doc.data.content}</Markdown>
+      </> : <p>Loading...</p>
+    }
   </div>
 }
 
