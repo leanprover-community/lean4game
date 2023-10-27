@@ -15,7 +15,7 @@ The recommended option is "VSCode Dev containers" but you may choose any option 
 
 1.  **Install Docker and Dev Containers** *(once)*:<br/>
     See [official instructions](https://code.visualstudio.com/docs/devcontainers/containers#_getting-started).
-    Explicitely this means:
+    Explicitly this means:
     * Install docker engine if you have not yet: [Instructions](https://docs.docker.com/engine/install/).
       I followed the "Server" instructions for linux.
     * Note that on Linux you need to add your user to the `docker` group

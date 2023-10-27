@@ -215,7 +215,7 @@ LemmaDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
 * The identifier after `in` is the category to group lemmas by (in the Inventory).
 * The description is a string supporting Markdown.
 
-Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requries
+Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requires
 The lemma/definition to have the same fully qualified name as in mathlib.
  -/
 elab "LemmaDoc" name:ident "as" displayName:str "in" category:str content:str : command =>
@@ -243,7 +243,7 @@ DefinitionDoc Function.Bijective as "Bijective" "defined as `Injective f ∧ Sur
 * The string following `as` is the displayed name (in the Inventory).
 * The description is a string supporting Markdown.
 
-Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requries
+Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requires
 The lemma/definition to have the same fully qualified name as in mathlib.
  -/
 elab "DefinitionDoc" name:ident "as" displayName:str template:str : command =>
@@ -521,7 +521,7 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
   let mut strict := false
   let mut hidden := false
 
-  -- remove spaces at the beginngng of new lines
+  -- remove spaces at the beginning of new lines
   let msg := TSyntax.mk $ msg.raw.setArgs $ ← msg.raw.getArgs.mapM fun m => do
     match m with
     | Syntax.node info k args =>
@@ -589,7 +589,7 @@ elab (name := GameServer.Tactic.Hole) "Hole" t:tacticSeq : tactic => do
 
 /--
 Iterate recursively through the Syntax, replace `Hole` with `sorry` and remove all
-`Hint`/`Branch` occurences.
+`Hint`/`Branch` occurrences.
 -/
 def replaceHoles (tacs : Syntax) : Syntax :=
   match tacs with
@@ -603,7 +603,7 @@ where filterArgs (args : List Syntax) : List Syntax :=
     -- replace `Hole` with `sorry`.
     | Syntax.node info `GameServer.Tactic.Hole _ :: r =>
       Syntax.node info `Lean.Parser.Tactic.tacticSorry #[Syntax.atom info "sorry"] :: filterArgs r
-    -- delete all `Hint` and `Branch` occurences in the middle.
+    -- delete all `Hint` and `Branch` occurrences in the middle.
     | Syntax.node _ `GameServer.Tactic.Hint _ :: _ :: r
     | Syntax.node _ `GameServer.Tactic.Branch _ :: _ :: r =>
       filterArgs r

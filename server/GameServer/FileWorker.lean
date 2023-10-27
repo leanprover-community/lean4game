@@ -292,7 +292,7 @@ where
     -- TODO(MH): check for interrupt with increased precision
     cancelTk.check
     /- NOTE(MH): This relies on the client discarding old diagnostics upon receiving new ones
-      while prefering newer versions over old ones. The former is necessary because we do
+      while preferring newer versions over old ones. The former is necessary because we do
       not explicitly clear older diagnostics, while the latter is necessary because we do
       not guarantee that diagnostics are emitted in order. Specifically, it may happen that
       we interrupted this elaboration task right at this point and a newer elaboration task
@@ -300,7 +300,7 @@ where
       the interrupt. Explicitly clearing diagnostics is difficult for a similar reason,
       because we cannot guarantee that no further diagnostics are emitted after clearing
       them. -/
-    -- NOTE(WN): this is *not* redundent even if there are no new diagnostics in this snapshot
+    -- NOTE(WN): this is *not* redundant even if there are no new diagnostics in this snapshot
     -- because empty diagnostics clear existing error/information squiggles. Therefore we always
     -- want to publish in case there was previously a message at this position.
     publishDiagnostics m snap.diagnostics.toArray ctx.hOut
