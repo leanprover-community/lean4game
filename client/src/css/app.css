@@ -108,6 +108,7 @@ em {
   flex: 0;
   background: var(--clr-primary);
   display: flex;
+  position: relative;
   flex-direction: row;
   justify-content: space-between;
   padding: 1.1em;

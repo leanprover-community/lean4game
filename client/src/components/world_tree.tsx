@@ -15,7 +15,7 @@ import { useAppDispatch } from '../hooks'
 import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
 import { store } from '../state/store'
 
-import './world_tree.css'
+import '../css/world_tree.css'
 
 // Settings for the world tree
 cytoscape.use( klay )

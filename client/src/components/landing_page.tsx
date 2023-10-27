@@ -6,7 +6,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import './landing_page.css'
+import '../css/landing_page.css'
 import coverRobo from '../assets/covers/formaloversum.png'
 import bgImage from '../assets/bg.jpg'
 

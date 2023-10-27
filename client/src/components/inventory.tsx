@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import './inventory.css'
+import '../css/inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faBan } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';

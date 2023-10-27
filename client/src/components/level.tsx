@@ -4,7 +4,7 @@ import { useSelector, useStore } from 'react-redux'
 import Split from 'react-split'
 import { useParams } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faCode, faXmark, faHome, faCircleInfo, faArrowRight, faArrowLeft, faTerminal } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgress } from '@mui/material'
 import type { Location } from 'vscode-languageserver-protocol'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
@@ -41,7 +41,7 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import 'lean4web/client/src/editor/infoview.css'
 import 'lean4web/client/src/editor/vscode.css'
-import './level.css'
+import '../css/level.css'
 import { LevelAppBar } from './app_bar'
 
 function Level() {
@@ -222,6 +222,8 @@ function PlayableLevel({impressum, setImpressum}) {
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
   const [typewriterMode, setTypewriterMode] = useState(true)
+  // set to true to prevent switching between typewriter and editor
+  const [lockInputMode, setLockInputMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
   const dispatch = useAppDispatch()
@@ -392,18 +394,16 @@ function PlayableLevel({impressum, setImpressum}) {
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
-        <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput}}>
+        <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockInputMode, setLockInputMode}}>
           <ProofContext.Provider value={{proof, setProof}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={editor}>
                 <LevelAppBar
+                  pageNumber={pageNumber} setPageNumber={setPageNumber}
                   isLoading={level.isLoading}
-                  lockEditorMode={level.data?.template !== null}
                   levelTitle={`${mobile ? '' : 'Level '}${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${level?.data?.title}`)}
-                  impressum={impressum}
-                    toggleImpressum={toggleImpressum}
-                  pageNumber={pageNumber} setPageNumber={setPageNumber} />
+                  toggleImpressum={toggleImpressum} />
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
                   <>
@@ -471,7 +471,7 @@ function Introduction({impressum, setImpressum}) {
   }
 
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" impressum={impressum} toggleImpressum={toggleImpressum}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" toggleImpressum={toggleImpressum}/>
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?
