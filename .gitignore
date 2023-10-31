@@ -1,4 +1,6 @@
 node_modules
 client/dist
 server/build
+server/lakefile.olean
 **/lake-packages/
+**/.DS_Store
