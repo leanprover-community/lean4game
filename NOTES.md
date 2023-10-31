@@ -15,9 +15,6 @@ npm install -g http-server
 
 ```
 git clone https://github.com/hhu-adam/NNG4.git
-cd NNG4
-docker rmi nng4:latest
-docker build --pull --rm -f "Dockerfile" -t nng4:latest "."
 ```
 
 
@@ -145,12 +142,6 @@ Activate config:
   sudo nginx -s reload
 ```
 
-
-## Install `unzip` for Importing Docker Images
-
-```
-sudo apt-get install unzip
-```
 
 ## Install bubblewrap (bwrap)
 ```
