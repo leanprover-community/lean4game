@@ -615,7 +615,7 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
 
       return () => {
         editorConnection.api.sendClientNotification(uriStr, "textDocument/didClose", {textDocument: {uri: uriStr}})
-        model.dispose(); }
+      }
     }
   }, [editor, levelId, connection, leanClientStarted])
 

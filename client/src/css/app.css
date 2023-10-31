@@ -42,12 +42,6 @@ body {
   border-radius: .3em;
 }
 
-
-/* Hide monaco editor notifications */
-.monaco-workbench > .notifications-toasts.visible {
-  display: none !important;
-}
-
 .loading {
   margin: auto;
   height: 100%;
