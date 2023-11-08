@@ -496,7 +496,7 @@ section NotificationHandling
       IO.eprintln s!"Got outdated version number: {newVersion} ≤ {oldDoc.meta.version}"
     else if ¬ changes.isEmpty then
       let newDocText := foldDocumentChanges changes oldDoc.meta.text
-      updateDocument ⟨docId.uri, newVersion, newDocText⟩
+      updateDocument ⟨docId.uri, newVersion, newDocText, .always⟩
 
 end NotificationHandling
 
@@ -573,7 +573,7 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do
     This is because LSP always refers to characters by (line, column),
     so if we get the line number correct it shouldn't matter that there
     is a CR there. -/
-  let meta : DocumentMeta := ⟨doc.uri, doc.version, doc.text.toFileMap⟩
+  let meta : DocumentMeta := ⟨doc.uri, doc.version, doc.text.toFileMap, .always⟩
   let e := e.withPrefix s!"[{param.textDocument.uri}] "
   let _ ← IO.setStderr e
   try
