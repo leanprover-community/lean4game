@@ -2,11 +2,6 @@
 
 This is the source code for a Lean 4 game platform hosted at [adam.math.hhu.de](https://adam.math.hhu.de).
 
-The project is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
-(NNG)](https://www.ma.imperial.ac.uk/~buzzard/xena/natural_number_game/)
-of Kevin Buzzard and Mohammad Pedramfar.
-The project is based on Patrick Massot's prototype: [NNG4](https://github.com/PatrickMassot/NNG4).
-
 ## Creating a Game
 
 Please follow the tutorial [Creating a Game](doc/create_game.md).
@@ -34,3 +29,10 @@ Contributions to `lean4game` are always welcome!
 ## Security
 
 Providing the use access to a Lean instance running on the server is a severe security risk. That is why we start the Lean server with bubblewrap.
+
+## Credits
+
+The project is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
+(NNG)](https://www.ma.imperial.ac.uk/~buzzard/xena/natural_number_game/)
+of Kevin Buzzard and Mohammad Pedramfar.
+The project is based on Patrick Massot's prototype: [NNG4](https://github.com/PatrickMassot/NNG4).
