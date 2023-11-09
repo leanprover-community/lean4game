@@ -4,8 +4,10 @@ This is the source code for a Lean 4 game platform hosted at [adam.math.hhu.de](
 
 ## Creating a Game
 
-Please follow the tutorial [Creating a Game](doc/create_game.md).
-In particular step 5 thereof explains [How to Run Games Locally](doc/running_locally.md) and step 7 [How to Update an existing Game](doc/update_game.md).
+Please follow the tutorial [Creating a Game](doc/create_game.md). In particular, the following steps might be of interest:
+
+* Step 5: [How to Run Games Locally](doc/running_locally.md)
+* Step 7: [How to Update an existing Game](doc/update_game.md)
 
 ### Publishing a Game
 
