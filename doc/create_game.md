@@ -245,7 +245,7 @@ That way, the game will replace it with the actual name the assumption has in th
 
 ## 7. Update your game
 
-In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](https://github.com/leanprover-community/lean4game/edit/main/doc/update_game.md).
+In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](https://github.com/leanprover-community/lean4game/blob/main/doc/update_game.md).
 
 ## Further Notes
 
