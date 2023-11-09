@@ -44,7 +44,7 @@ The template game [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) conta
   you might have deleted stuff from docker via your shell. Try deleting the container and image
   explicitely in VSCode (left side, "Docker" icon). Then reopen vscode and let it rebuild the
   container. (this will again take some time)
-* On a working setup, http://localhost:3000 should directly redirect you to http://localhost:3000/#/g/local/game, try if the latter is accessible.
+* On a working dev container setup, http://localhost:3000 should directly redirect you to http://localhost:3000/#/g/local/game, try if the latter is accessible.
 
 ## Codespaces
 
