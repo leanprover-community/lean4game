@@ -4,12 +4,14 @@ The installation instructions are not yet tested on Mac/Windows. Comments very w
 
 There are several options to play a game locally:
 
-- VSCode Dev Container: needs `docker` installed on your machine
-- Codespaces: Needs active internet connection and computing time is limited.
-- Gitpod: does not work yet (I that true?)
-- Manual installation: Needs `npm` installed on your system
+1. VSCode Dev Container: needs `docker` installed on your machine
+2. Codespaces: Needs active internet connection and computing time is limited.
+3. Gitpod: does not work yet (Is that true?)
+4. Manual installation: Needs `npm` installed on your system
 
 The recommended option is "VSCode Dev containers" but you may choose any option above depending on your setup.
+
+The template game [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) contains all the relevant files to make your local setup (dev container / gitpod / codespaces) work. You might need to update these files manually by copying them from there if you need any new improvements to the dev setup you're using in an existing game.
 
 ## VSCode Dev Containers
 
@@ -27,9 +29,9 @@ The recommended option is "VSCode Dev containers" but you may choose any option 
     Once you have the Dev Containers Extension installed, (re)open the project folder of your game in VSCode.
     A message appears asking you to "Reopen in Container".
 
-    * The first start will take a while, ca. 2-10 minutes. After the first
+    * The first start will take a while, ca. 2-15 minutes. After the first
       start this should be very quickly.
-    * Once built, you can open http://localhost:3000 in your browser. which should load the game
+    * Once built, you can open http://localhost:3000 in your browser. which should load the game.
 
 3.  **Editing Files** *(everytime)*:<br/>
     After editing some Lean files in VSCode, open VSCode's terminal (View > Terminal) and run `lake build`. Now you can reload your browser to see the changes.
@@ -42,12 +44,13 @@ The recommended option is "VSCode Dev containers" but you may choose any option 
   you might have deleted stuff from docker via your shell. Try deleting the container and image
   explicitely in VSCode (left side, "Docker" icon). Then reopen vscode and let it rebuild the
   container. (this will again take some time)
+* On a working setup, http://localhost:3000 should directly redirect you to http://localhost:3000/#/g/local/game, try if the latter is accessible.
 
 ## Codespaces
 
 You can work on your game using Github codespaces (click "Code" and then "Codespaces" and then "create codespace on main"). It it should run the game locally in the background. You can open it for example under "Ports" and clicking on "Open in Browser".
 
-Note: You have to wait until npm started properly. In particular, this is after a message like `[client] webpack 5.81.0 compiled successfully in 38119 ms` appears in the terminal, which might take a good while.
+Note: You have to wait until npm started properly, which might take a good while.
 
 As with devcontainers, you need to run `lake build` after changing any lean files and then reload the browser.
 
@@ -73,15 +76,15 @@ Now install node:
 nvm install node
 ```
 
-Clone the game (e.g. `NNG4` here):
+Clone the game (e.g. `GameSkeleton` here):
 ```bash
-git clone https://github.com/hhu-adam/NNG4.git
-# or: git clone git@github.com:hhu-adam/NNG4.git
+git clone https://github.com/hhu-adam/GameSkeleton.git
+# or: git clone git@github.com:hhu-adam/GameSkeleton.git
 ```
 
 Download dependencies and build the game:
 ```bash
-cd NNG4
+cd GameSkeleton
 lake update
 lake exe cache get   # if your game depends on mathlib
 lake build
@@ -93,7 +96,7 @@ cd ..
 git clone https://github.com/leanprover-community/lean4game.git
 # or: git clone git@github.com:leanprover-community/lean4game.git
 ```
-The folders `NNG4` and `lean4game` must be in the same directory!
+The folders `GameSkeleton` and `lean4game` must be in the same directory!
 
 In `lean4game`, install dependencies:
 ```bash
@@ -106,15 +109,15 @@ Run the game:
 npm start
 ```
 
-This takes a little time. Eventually, the game is available on http://localhost:3000/#/g/local/NNG4. Replace `NNG4` with the folder name of your local game.
+This takes a little time. Eventually, the game is available on http://localhost:3000/#/g/local/GameSkeleton. Replace `GameSkeleton` with the folder name of your local game.
 
 ## Modifying the GameServer
 
-When modifying the game engine itself (in particular the content in `lean4game/server`) you can test it live with the same setup as above (manual installation) by setting `export NODE_ENV=development` inside your local game before building it:
+When modifying the game engine itself (in particular the content in `lean4game/server`) you can test it live with the same setup as above (manual installation) by setting `export LEAN4GAME=local` inside your local game before building it:
 
 ```bash
 cd NNG4
-export NODE_ENV=development
+export LEAN4GAME=local
 lake update
 lake build
 ```
