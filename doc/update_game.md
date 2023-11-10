@@ -10,7 +10,7 @@ Before you continue, make sure there [exists a `v4.X.0`-tag in this repo](https:
 Then, depending on the setup you use, do one of the following:
 
 * Dev Container: Rebuild the VSCode Devcontainer.
-* Local Setup: run `lake update` (followed by `lake exe cache get` if you depend on mathlib.)
+* Local Setup: run `lake update -R` (followed by `lake exe cache get` if you depend on mathlib.)
 * Gitpod/Codespaces: Create a fresh one
 
 This will update `lean4game` and `mathlib` in your project to the new lean version.
