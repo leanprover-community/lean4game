@@ -85,7 +85,7 @@ git clone https://github.com/hhu-adam/GameSkeleton.git
 Download dependencies and build the game:
 ```bash
 cd GameSkeleton
-lake update
+lake update -R
 lake exe cache get   # if your game depends on mathlib
 lake build
 ```
@@ -118,7 +118,7 @@ When modifying the game engine itself (in particular the content in `lean4game/s
 ```bash
 cd NNG4
 export LEAN4GAME=local
-lake update
+lake update -R
 lake build
 ```
 This causes lake to search locally for the `GameServer` lake package instead of using the version from github. Therefore, when you `lake build` your game, it will rebuild with the modified `GameServer`.
