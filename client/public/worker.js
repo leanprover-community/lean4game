@@ -67,7 +67,17 @@ return false;
 
 var stdoutBuffer = ""
 var stderrBuffer = ""
+var messageBuffer = []
+var initialized = false;
 
+function flushMessageBuffer(){
+  if (initialized) {
+    while(messageBuffer.length > 0) {
+      var msg = messageBuffer.shift();
+      Module.ccall('send_message', 'void', ['string'], [msg]);
+    }
+  }
+}
 
 var Module = {
   "arguments": ["--worker"],
@@ -90,14 +100,22 @@ var Module = {
     }
 
     FS.init(stdin, stdout, stderr);
-  }]
+  }],
+  "noInitialRun": true,
+  "onRuntimeInitialized": () => {
+    Module.ccall('main', 'number', [], []);
+    initialized = true;
+    flushMessageBuffer();
+  }
 };
 
 importScripts("server.js")
 
 
+
 onmessage = (ev) => {
-  IO.putLine(ev.data)
+  messageBuffer.push(ev.data);
+  flushMessageBuffer();
 }
 
 IO.listenPutStr(message => {
@@ -116,8 +134,5 @@ setInterval(() => {
 }, 1000)
 
 setTimeout(() =>{
-  Module.ccall('send_message', // name of C function
-  'void', // return type
-  ['string'], // argument types
-  ['Hi there!']); // arguments
+
 },2000)

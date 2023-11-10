@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { LeanClient } from 'lean4web/client/src/editor/leanclient';
+import { LeanClient } from './leanclient';
 
 export class Connection {
   private game: string = undefined // We only keep a connection to a single game at a time

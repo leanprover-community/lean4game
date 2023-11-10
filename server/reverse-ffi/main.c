@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <lean/lean.h>
 
-extern lean_object* my_length(lean_object*, lean_object*);
+extern lean_object* game_send_message(lean_object*, lean_object*);
 
 // see https://leanprover.github.io/lean4/doc/dev/ffi.html#initialization
 extern void lean_initialize_runtime_module();
@@ -29,5 +29,5 @@ int main() {
 
 void send_message(char* msg){
   lean_object * s = lean_mk_string(msg);
-  my_length(s, lean_io_mk_world());
+  game_send_message(s, lean_io_mk_world());
 }
