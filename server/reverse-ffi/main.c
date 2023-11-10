@@ -25,9 +25,9 @@ int main() {
       return 1;  // do not access Lean declarations if initialization failed
   }
   lean_io_mark_end_initialization();
+}
 
-  // actual program
-
-  lean_object * s = lean_mk_string("hello!");
+void send_message(char* msg){
+  lean_object * s = lean_mk_string(msg);
   my_length(s, lean_io_mk_world());
 }

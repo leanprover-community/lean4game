@@ -13,6 +13,8 @@ import { useWindowDimensions } from './window_width';
 
 export const GameIdContext = React.createContext<string>(undefined);
 
+new Worker("worker.js")
+
 function App() {
   const params = useParams()
   const gameId = "g/" + params.owner + "/" + params.repo

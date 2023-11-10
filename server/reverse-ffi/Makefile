@@ -1,15 +1,16 @@
-.PHONY: all run run-local lake
+.PHONY: all run lake
 
-all: run run-local
+
+OUT_DIR = ../../client/public
+LEAN_SYSROOT ?= /home/alex/Projects/lean4/build/release/stage1
+LEAN_LIBDIR := $(LEAN_SYSROOT)/lib/lean
+
+all: $(OUT_DIR)/server.js
 
 # Link C binary against Lake package dynamic library
 
 lake:
 	lake --dir=lib build
-
-OUT_DIR = out
-LEAN_SYSROOT ?= /home/alex/Projects/lean4/build/release/stage1
-LEAN_LIBDIR := $(LEAN_SYSROOT)/lib/lean
 
 $(OUT_DIR):
 	mkdir -p $@
@@ -19,18 +20,12 @@ ifneq ($(OS),Windows_NT)
 LINK_FLAGS=-Wl,-rpath,$(LEAN_LIBDIR) -Wl,-rpath,$(PWD)/lib/build/lib
 endif
 
-$(OUT_DIR)/main: main.c lake | $(OUT_DIR)
+$(OUT_DIR)/server.js: main.c lake | $(OUT_DIR)
 # Add library paths for Lake package and for Lean itself
 	emcc -o $@ $< -I $(LEAN_SYSROOT)/include -L $(LEAN_LIBDIR) lib/build/ir/RFFI.c -lInit -lLean -lleancpp -lleanrt $(LINK_FLAGS) \
-	  -sFORCE_FILESYSTEM -lnodefs.js -s EXIT_RUNTIME=1 -s MAIN_MODULE=1 -s LINKABLE=1 -s EXPORT_ALL=1 -s ALLOW_MEMORY_GROWTH=1 -fwasm-exceptions -pthread -flto
+	  -sFORCE_FILESYSTEM -lnodefs.js -s EXIT_RUNTIME=0 -s MAIN_MODULE=1 -s LINKABLE=1 -s EXPORT_ALL=1 -s ALLOW_MEMORY_GROWTH=1 -fwasm-exceptions -pthread -flto
 
-run: $(OUT_DIR)/main
-ifeq ($(OS),Windows_NT)
-# Add shared library paths to loader path dynamically
-	env PATH="lib/build/lib:$(shell cygpath $(LEAN_SYSROOT))/bin:$(PATH)" $(OUT_DIR)/main
-else
-	$(OUT_DIR)/main
-endif
+
 
 # Alternatively, we can copy all shared lib dependencies to the current directory
 # in order to avoid path set up and obtain a more portable executable

@@ -17,6 +17,10 @@ export default defineConfig({
         {
           src: 'node_modules/@leanprover/infoview/dist/*.production.min.js',
           dest: '.'
+        },
+        {
+          src: 'node_modules/coi-serviceworker/coi-serviceworker.js',
+          dest: '.'
         }
       ]
     })
