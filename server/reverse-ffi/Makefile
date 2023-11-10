@@ -21,7 +21,8 @@ endif
 
 $(OUT_DIR)/main: main.c lake | $(OUT_DIR)
 # Add library paths for Lake package and for Lean itself
-	emcc -o $@ $< -I $(LEAN_SYSROOT)/include -L $(LEAN_LIBDIR) lib/build/ir/RFFI.c -lInit -lLean -lleancpp -lleanrt $(LINK_FLAGS)
+	emcc -o $@ $< -I $(LEAN_SYSROOT)/include -L $(LEAN_LIBDIR) lib/build/ir/RFFI.c -lInit -lLean -lleancpp -lleanrt $(LINK_FLAGS) \
+	  -sFORCE_FILESYSTEM -lnodefs.js -s EXIT_RUNTIME=1 -s MAIN_MODULE=1 -s LINKABLE=1 -s EXPORT_ALL=1 -s ALLOW_MEMORY_GROWTH=1 -fwasm-exceptions -pthread -flto
 
 run: $(OUT_DIR)/main
 ifeq ($(OS),Windows_NT)
@@ -34,26 +35,26 @@ endif
 # Alternatively, we can copy all shared lib dependencies to the current directory
 # in order to avoid path set up and obtain a more portable executable
 
-ifeq ($(OS),Windows_NT)
-SHLIB_PREFIX :=
-SHLIB_EXT := dll
-LEAN_SHLIB := $(LEAN_SYSROOT)/bin/libleanshared.$(SHLIB_EXT)
-else
-SHLIB_PREFIX := lib
-# Add current directory to loader path (default on Windows)
-ifeq ($(shell uname -s),Darwin)
-LINK_FLAGS_LOCAL := -Wl,-rpath,@executable_path
-SHLIB_EXT := dylib
-else
-LINK_FLAGS_LOCAL := -Wl,-rpath,'$${ORIGIN}'
-SHLIB_EXT := so
-endif
-LEAN_SHLIB=$(LEAN_LIBDIR)/libleanshared.$(SHLIB_EXT)
-endif
+# ifeq ($(OS),Windows_NT)
+# SHLIB_PREFIX :=
+# SHLIB_EXT := dll
+# LEAN_SHLIB := $(LEAN_SYSROOT)/bin/libleanshared.$(SHLIB_EXT)
+# else
+# SHLIB_PREFIX := lib
+# # Add current directory to loader path (default on Windows)
+# ifeq ($(shell uname -s),Darwin)
+# LINK_FLAGS_LOCAL := -Wl,-rpath,@executable_path
+# SHLIB_EXT := dylib
+# else
+# LINK_FLAGS_LOCAL := -Wl,-rpath,'$${ORIGIN}'
+# SHLIB_EXT := so
+# endif
+# LEAN_SHLIB=$(LEAN_LIBDIR)/libleanshared.$(SHLIB_EXT)
+# endif
 
-$(OUT_DIR)/main-local: main.c lake | $(OUT_DIR)
-	cp -f $(LEAN_SHLIB) lib/build/lib/$(SHLIB_PREFIX)RFFI.$(SHLIB_EXT) $(OUT_DIR)
-	cc -o $@ $< -I $(LEAN_SYSROOT)/include -L $(OUT_DIR) -lRFFI -lleanshared $(LINK_FLAGS_LOCAL)
+# $(OUT_DIR)/main-local: main.c lake | $(OUT_DIR)
+# 	cp -f $(LEAN_SHLIB) lib/build/lib/$(SHLIB_PREFIX)RFFI.$(SHLIB_EXT) $(OUT_DIR)
+# 	cc -o $@ $< -I $(LEAN_SYSROOT)/include -L $(OUT_DIR) -lRFFI -lleanshared $(LINK_FLAGS_LOCAL)
 
-run-local: $(OUT_DIR)/main-local
-	$(OUT_DIR)/main-local
+# run-local: $(OUT_DIR)/main-local
+# 	$(OUT_DIR)/main-local

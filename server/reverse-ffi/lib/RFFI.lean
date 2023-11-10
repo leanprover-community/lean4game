@@ -1,3 +1,6 @@
+import Lean
+
 @[export my_length]
-def myLength (s : String) : UInt64 :=
-  s.length.toUInt64
+def myLength (s : String) : IO Unit := do
+  IO.println "hello"
+  return () -- IO.println Lean.origin
