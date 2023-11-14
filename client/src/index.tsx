@@ -15,15 +15,6 @@ import { monacoSetup } from 'lean4web/client/src/monacoSetup'
 
 monacoSetup()
 
-// // Do not show the landing page in the dev-container context
-// let root_path: RouteObject = (process.env.LEAN4GAME_SINGLE_GAME == "true") ? {
-//   path: "/",
-//   loader: () => redirect("/g/local/game")
-// } : {
-//   path: "/",
-//   element: <LandingPage />,
-// }
-
 
 // If `VITE_LEAN4GAME_SINGLE` is set to true, then `/` should be redirected to
 // `/g/local/game`. This is used for the devcontainer setup

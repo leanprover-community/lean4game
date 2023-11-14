@@ -113,12 +113,12 @@ This takes a little time. Eventually, the game is available on http://localhost:
 
 ## Modifying the GameServer
 
-When modifying the game engine itself (in particular the content in `lean4game/server`) you can test it live with the same setup as above (manual installation) by setting `export LEAN4GAME=local` inside your local game before building it:
+When modifying the game engine itself (in particular the content in `lean4game/server`) you can test it live with the same setup as above (manual installation) by using `lake update -R -Klean4game.local`:
 
 ```bash
 cd NNG4
-export LEAN4GAME=local
-lake update -R
+lake update -R -Klean4game.local
 lake build
 ```
-This causes lake to search locally for the `GameServer` lake package instead of using the version from github. Therefore, when you `lake build` your game, it will rebuild with the modified `GameServer`.
+This causes lake to search locally for the `GameServer` lake package instead of using the version from github. Therefore, you can the local copy of the edit `GameServer` in `../lean4game` and
+`lake build` will then directly use this modified copy to build your game.
