@@ -2,5 +2,6 @@ node_modules
 client/dist
 server/build
 server/lakefile.olean
+server32bit
 **/lake-packages/
 **/.DS_Store

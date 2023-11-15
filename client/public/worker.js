@@ -75,7 +75,7 @@ onmessage = (ev) => {
 
 setInterval(() => {
   if (stderrBuffer !== "") {
-    console.error(stderrBuffer);
+    console.log(stderrBuffer);
     stderrBuffer = ""
   }
 }, 1000)

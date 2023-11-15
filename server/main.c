@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <lean/lean.h>
 
-extern lean_object* game_send_message(lean_object*, lean_object*);
+extern lean_object* game_send_message(lean_object*, lean_object*, lean_object*);
+extern lean_object* game_make_state(lean_object*);
 
 // see https://leanprover.github.io/lean4/doc/dev/ffi.html#initialization
 extern void lean_initialize_runtime_module();
@@ -9,13 +10,16 @@ extern void lean_initialize();
 extern void lean_io_mark_end_initialization();
 extern lean_object * initialize_GameServer_WasmServer(uint8_t builtin, lean_object *);
 
+lean_object * state;
+lean_object * io_world;
+
 int main() {
   lean_initialize();
   lean_initialize_runtime_module();
   lean_object * res;
   // use same default as for Lean executables
   uint8_t builtin = 1;
-  lean_object * io_world = lean_io_mk_world();
+  io_world = lean_io_mk_world();
   res = initialize_GameServer_WasmServer(builtin, io_world);
   if (lean_io_result_is_ok(res)) {
       lean_dec_ref(res);
@@ -25,9 +29,10 @@ int main() {
       return 1;  // do not access Lean declarations if initialization failed
   }
   lean_io_mark_end_initialization();
+  state = lean_io_result_get_value(game_make_state(io_world));
 }
 
 void send_message(char* msg){
   lean_object * s = lean_mk_string(msg);
-  game_send_message(s, lean_io_mk_world());
+  game_send_message(s, state, io_world);
 }

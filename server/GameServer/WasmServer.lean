@@ -10,58 +10,52 @@ open Lsp
 open JsonRpc
 open System.Uri
 
-def counter := IO.mkRef 0
+def ServerState := GameServerState
 
+@[export game_make_state]
+def makeState : IO (Ref ServerState) := do
+  let e ← IO.getStderr
+  try
+    searchPathRef.set ["/lib", "/gamelib"]
+    let state : GameServerState := {
+      env := ← importModules #[
+          { module := `Init : Import }
+          -- { module := `GameServer : Import }
+        ] {} 0 --← createEnv gameDir module,
+      game := "TEST",
+      gameDir := "test",
+      inventory := #[]
+      difficulty := 0
+    }
+    return ← IO.mkRef state
+  catch err =>
+    e.putStrLn s!"Import error: {err}"
+    throw err
 
-def readLspRequestAs (s : String) (expectedMethod : String) (α : Type) [FromJson α] : IO (Request α) := do
+def readMessage (s : String) : IO JsonRpc.Message := do
   let j ← ofExcept (Json.parse s)
   let m  ← match fromJson? j with
   | Except.ok (m : JsonRpc.Message) => pure m
   | Except.error inner => throw $ userError s!"JSON '{j.compress}' did not have the format of a JSON-RPC message.\n{inner}"
-  let initRequest ← match m with
-    | Message.request id method params? =>
-      if method = expectedMethod then
-        let j := toJson params?
-        match fromJson? j with
-        | Except.ok v => pure $ JsonRpc.Request.mk id expectedMethod (v : α)
-        | Except.error inner => throw $ userError s!"Unexpected param '{j.compress}' for method '{expectedMethod}'\n{inner}"
-      else
-        throw $ userError s!"Expected method '{expectedMethod}', got method '{method}'"
-    | _ => throw $ userError s!"Expected JSON-RPC request, got: '{(toJson m).compress}'"
+  return m
 
+def readLspRequestAs (s : String) (expectedMethod : String) (α : Type) [FromJson α] : IO (Request α) := do
+  let m ← readMessage s
+  match m with
+  | Message.request id method params? =>
+    if method = expectedMethod then
+      let j := toJson params?
+      match fromJson? j with
+      | Except.ok v => pure $ JsonRpc.Request.mk id expectedMethod (v : α)
+      | Except.error inner => throw $ userError s!"Unexpected param '{j.compress}' for method '{expectedMethod}'\n{inner}"
+    else
+      throw $ userError s!"Expected method '{expectedMethod}', got method '{method}'"
+  | _ => throw $ userError s!"Expected JSON-RPC request, got: '{(toJson m).compress}'"
 
-@[export game_send_message]
-def sendMessage (s : String) : IO Unit := do
-  -- IO.println s!"received {s}"
-  -- if args.length < 2 then
-  --   throwServerError s!"Expected 1-3 command line arguments in addition to `--server`:
-  --     game directory, the name of the main module (optional), and the name of the game (optional)."
-  -- let gameDir := args[1]!
-  -- let module := if args.length < 3 then defaultGameModule else args[2]!
-  -- let gameName := if args.length < 4 then defaultGameName else args[3]!
-  -- let workerPath := "./gameserver"
-  -- -- TODO: Do the following commands slow us down?
-  -- let srcSearchPath ← initSrcSearchPath (← getBuildDir)
-  -- let references ← IO.mkRef (← loadReferences)
-  -- let fileWorkersRef ← IO.mkRef (RBMap.empty : FileWorkerMap)
-  -- -- let i ← maybeTee "wdIn.txt" false i
-  -- -- let o ← maybeTee "wdOut.txt" true o
-  -- -- let e ← maybeTee "wdErr.txt" true e
-  -- let state : GameServerState := {
-  --   env := ← importModules #[] {} 0 --← createEnv gameDir module,
-  --   game := "TEST",
-  --   gameDir := "test",
-  --   inventory := #[]
-  --   difficulty := 0
-  --   }
-  let initRequest ← readLspRequestAs s "initialize" InitializeParams
-
-  -- We misuse the `rootUri` field to the gameName
-  let rootUri? := "TEST"
-  let initRequest := {initRequest with param := {initRequest.param with rootUri?}}
+def initializeServer (id : RequestID) : IO Unit := do
   let o ← IO.getStdout
   o.writeLspResponse {
-    id     := initRequest.id
+    id     := id
     result := {
       capabilities := mkLeanServerCapabilities
       serverInfo?  := some {
@@ -71,17 +65,27 @@ def sendMessage (s : String) : IO Unit := do
       : InitializeResult
     }
   }
-  -- let context : ServerContext := {
-  --   hIn            := i
-  --   hOut           := o
-  --   hLog           := e
-  --   args           := args
-  --   fileWorkersRef := fileWorkersRef
-  --   initParams     := initRequest.param
-  --   workerPath
-  --   srcSearchPath
-  --   references
-  -- }
-  -- discard $ ReaderT.run (StateT.run initAndRunWatchdogAux state) context
-
   return ()
+
+@[export game_send_message]
+def sendMessage (s : String) (state : Ref ServerState) : IO Unit := do
+  let o ← IO.getStdout
+  let e ← IO.getStderr
+  try
+    let m ← readMessage s
+    match m with
+    | Message.request id "initialize" params? =>
+      initializeServer id
+    | Message.request id "info" _ =>
+      let some game := (gameExt.getState (← state.get).env).find? `TestGame
+        | throwServerError "Game not found"
+      let gameJson : Json := toJson game
+      -- Add world sizes to Json object
+      let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
+      let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
+      o.writeLspResponse ⟨id, gameJson⟩
+    | _ => throw $ userError s!"Expected JSON-RPC request, got: '{(toJson m).compress}'"
+
+  catch err =>
+    e.putStrLn s!"Server error: {err}"
+    return ()
