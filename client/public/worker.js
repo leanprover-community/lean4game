@@ -1,74 +1,15 @@
 
-const IO = {
-  _resolveGetLine: null,
-  _resolveRead: null,
-  _readPointer: null,
-  _nbytes: 0,
-  bufferStdIn : "",
-  putStrListeners: [],
-  listenPutStr(callback) {
-    this.putStrListeners.push(callback)
-  },
-  putStr(str) {
-    console.log('PUTSTR' + str)
-    str = str.split('\n')[2]
-    this.putStrListeners.forEach((listener) => {
-      listener(str)
-    })
-  },
-  async getLine() {
-    return new Promise((resolve, reject) => {
-        this._resolveGetLine = resolve
-        this.flushStdIn();
-    });
-  },
-  async read(ptr, nbytes) {
-    this._nbytes = nbytes
-    this._readPointer = ptr
-    return new Promise((resolve, reject) => {
-        this._resolveRead = resolve
-        this.flushStdIn();
-    });
-  },
-  flushStdIn() {
-    if(this._resolveGetLine) {
-      var lineBreak = this.bufferStdIn.indexOf("\n")
-      if (lineBreak != -1) {
-        this._resolveGetLine(stringToNewUTF8(this.bufferStdIn.substring(0,lineBreak+1)))
-        this.bufferStdIn = this.bufferStdIn.substring(lineBreak+1)
-        this._resolveGetLine = null
-      }
-    }
-    if(this._resolveRead) {
-      // console.log(`read: ${this.bufferStdIn}`)
-      stringToUTF8(this.bufferStdIn, this._readPointer, this._nbytes);
-      this._resolveRead()
-      this.bufferStdIn = ""
-      this._resolveRead = null
-    }
-  },
-  putLine(data) {
-    console.log("Client: ",data)
-    const str = data + '\r\n'
-    const byteLength = lengthBytesUTF8(str)
-    this.bufferStdIn += `Content-Length: ${byteLength}\r\n\r\n` + str
-    this.flushStdIn();
-  }
-}
-
-
-var input = ""
-var i = 0;
-
-function submit (ev) {
-ev.preventDefault()
-return false;
-}
-
-var stdoutBuffer = ""
 var stderrBuffer = ""
 var messageBuffer = []
 var initialized = false;
+
+var headerMode = true;
+var header="";
+var re = /Content-Length: (\d+)\r\n/i;
+var contentLength = 0;
+var content = []
+var utf8decoder = new TextDecoder();
+
 
 function flushMessageBuffer(){
   if (initialized) {
@@ -83,16 +24,29 @@ var Module = {
   "arguments": ["--worker"],
   "preRun": [function() {
     function stdin() {
-        if (i < input.length) {
-          i++;
-          return input.charCodeAt(i);// Return ASCII code of character, or null if no input
-        } else {
-          return null
-        }
+      return null;
     }
 
     function stdout(asciiCode) {
-      stdoutBuffer += String.fromCharCode(asciiCode)
+      if (headerMode) {
+        header += String.fromCharCode(asciiCode)
+        if (header.endsWith('\r\n\r\n')) {
+          const found = header.match(re)
+          if (found == null) { console.error(`Invalid header: ${header}`) }
+          contentLength = parseInt(found[1])
+          content = []
+          headerMode = false
+        }
+      } else {
+        content.push(asciiCode)
+        if (content.length == contentLength) {
+          const message = utf8decoder.decode(new Uint8Array(content))
+          console.log(`Server: ${message}`)
+          postMessage(message);
+          headerMode = true
+          header = ''
+        }
+      }
     }
 
     function stderr(asciiCode) {
@@ -114,19 +68,12 @@ importScripts("server.js")
 
 
 onmessage = (ev) => {
+  console.log(`Client: ${ev.data}`)
   messageBuffer.push(ev.data);
   flushMessageBuffer();
 }
 
-IO.listenPutStr(message => {
-  postMessage(message)
-})
-
 setInterval(() => {
-  if (stdoutBuffer !== "") {
-    console.log(stdoutBuffer);
-    stdoutBuffer = ""
-  }
   if (stderrBuffer !== "") {
     console.error(stderrBuffer);
     stderrBuffer = ""

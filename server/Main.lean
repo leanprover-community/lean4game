@@ -1,5 +1,6 @@
 import GameServer.FileWorker
 import GameServer.Watchdog
+import GameServer.WasmServer
 import GameServer.Commands
 
 -- TODO: The only reason we import `Commands` is so that it gets built to on `lake build`
