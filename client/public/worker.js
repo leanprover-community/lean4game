@@ -2,6 +2,7 @@
 var stderrBuffer = ""
 var messageBuffer = []
 var initialized = false;
+var pointer = null;
 
 var headerMode = true;
 var header="";
@@ -15,7 +16,7 @@ function flushMessageBuffer(){
   if (initialized) {
     while(messageBuffer.length > 0) {
       var msg = messageBuffer.shift();
-      Module.ccall('send_message', 'void', ['string'], [msg]);
+      Module.ccall('send_message', 'void', ['string', 'pointer'], [msg, pointer]);
     }
   }
 }
@@ -57,8 +58,12 @@ var Module = {
   }],
   "noInitialRun": true,
   "onRuntimeInitialized": () => {
-    Module.ccall('main', 'number', [], []);
+    pointer = Module.ccall('main', 'pointer', [], []);
     initialized = true;
+    if (stderrBuffer !== "") {
+      console.log(stderrBuffer);
+      stderrBuffer = ""
+    }
     flushMessageBuffer();
   }
 };

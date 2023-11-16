@@ -5,6 +5,7 @@ cp -r server server32bit
 
 cd server32bit
 /home/alex/Projects/lean4/build/test/stage1/bin/lake update -R
+/home/alex/Projects/lean4/build/test/stage1/bin/lake clean
 /home/alex/Projects/lean4/build/test/stage1/bin/lake build
 
 cd ../server
@@ -21,7 +22,7 @@ emcc -o $OUT_DIR/server.js main.c -I $LEAN_SYSROOT/include -L $LEAN_LIBDIR build
   --preload-file "${LEAN_SYSROOT}/lib/lean/Init"@/lib/Init \
   --preload-file "${LEAN_SYSROOT}/lib/lean/Init.olean"@/lib/Init.olean \
   --preload-file "${LEAN_SYSROOT}/lib/lean/Init.ilean"@/lib/Init.ilean \
-  # --preload-file "${LEAN_SYSROOT}/lib/lean/Lean"@/lib/Lean \
-  # --preload-file "${LEAN_SYSROOT}/lib/lean/Lean.olean"@/lib/Lean.olean \
-  # --preload-file "${LEAN_SYSROOT}/lib/lean/Lean.ilean"@/lib/Lean.ilean \
-  # --preload-file "../server32bit/build/lib"@/gamelib
+  --preload-file "${LEAN_SYSROOT}/lib/lean/Lean"@/lib/Lean \
+  --preload-file "${LEAN_SYSROOT}/lib/lean/Lean.olean"@/lib/Lean.olean \
+  --preload-file "${LEAN_SYSROOT}/lib/lean/Lean.ilean"@/lib/Lean.ilean \
+  --preload-file "../server32bit/build/lib"@/gamelib

@@ -13,7 +13,8 @@ extern lean_object * initialize_GameServer_WasmServer(uint8_t builtin, lean_obje
 lean_object * state;
 lean_object * io_world;
 
-int main() {
+
+lean_object *  main() {
   lean_initialize();
   lean_initialize_runtime_module();
   lean_object * res;
@@ -26,13 +27,21 @@ int main() {
   } else {
       lean_io_result_show_error(res);
       lean_dec(res);
-      return 1;  // do not access Lean declarations if initialization failed
+      return 0;  // do not access Lean declarations if initialization failed
   }
   lean_io_mark_end_initialization();
-  state = lean_io_result_get_value(game_make_state(io_world));
+  res = game_make_state(io_world);
+  if (lean_io_result_is_ok(res)) {
+    state = lean_io_result_get_value(res);
+    return state;
+  } else {
+    lean_io_result_show_error(res);
+    lean_dec(res);
+    return 0;  // do not access Lean declarations if initialization failed
+  }
 }
 
-void send_message(char* msg){
+void send_message(char* msg, lean_object * state){
   lean_object * s = lean_mk_string(msg);
   game_send_message(s, state, io_world);
 }

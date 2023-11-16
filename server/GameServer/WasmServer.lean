@@ -1,4 +1,5 @@
 import Lean.Server.Watchdog
+import GameServer.EnvExtensions
 import GameServer.Game
 
 namespace WasmServer.Watchdog
@@ -13,21 +14,39 @@ open System.Uri
 def ServerState := GameServerState
 
 @[export game_make_state]
-def makeState : IO (Ref ServerState) := do
+unsafe def makeState : IO (ServerState) := do
   let e ← IO.getStderr
   try
+    Lean.enableInitializersExecution
     searchPathRef.set ["/lib", "/gamelib"]
+    e.putStrLn s!"Importing"
     let state : GameServerState := {
       env := ← importModules #[
-          { module := `Init : Import }
-          -- { module := `GameServer : Import }
+          { module := `Init : Import },
+          { module := `GameServer : Import }
         ] {} 0 --← createEnv gameDir module,
       game := "TEST",
       gameDir := "test",
       inventory := #[]
       difficulty := 0
     }
-    return ← IO.mkRef state
+    e.putStrLn s!"Import complete"
+    let pExtDescrs ← persistentEnvExtensionsRef.get
+    pExtDescrs.forM fun extDescr => do
+      e.putStrLn ("extension '" ++ toString extDescr.name ++ "'")
+      let s := extDescr.toEnvExtension.getState state.env
+      let fmt := extDescr.statsFn s.state
+      unless fmt.isNil do IO.println ("  " ++ toString (Format.nest 2 (extDescr.statsFn s.state)))
+      e.putStrLn ("  number of imported entries: " ++ toString (s.importedEntries.foldl (fun sum es => sum + es.size) 0))
+    e.putStrLn s!"{(gameExt.getState state.env).size}"
+    let some game := (gameExt.getState state.env).find? `TestGame
+      | throwServerError "Game not found"
+    let gameJson : Json := toJson game
+    -- Add world sizes to Json object
+    -- let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
+    -- let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
+    e.putStrLn s!"{gameJson}"
+    return state
   catch err =>
     e.putStrLn s!"Import error: {err}"
     throw err
@@ -67,8 +86,9 @@ def initializeServer (id : RequestID) : IO Unit := do
   }
   return ()
 
+
 @[export game_send_message]
-def sendMessage (s : String) (state : Ref ServerState) : IO Unit := do
+unsafe def sendMessage (s : String) (state : ServerState) : IO Unit := do
   let o ← IO.getStdout
   let e ← IO.getStderr
   try
@@ -77,14 +97,16 @@ def sendMessage (s : String) (state : Ref ServerState) : IO Unit := do
     | Message.request id "initialize" params? =>
       initializeServer id
     | Message.request id "info" _ =>
-      let some game := (gameExt.getState (← state.get).env).find? `TestGame
+
+      let some game := (gameExt.getState state.env).find? `TestGame
         | throwServerError "Game not found"
       let gameJson : Json := toJson game
       -- Add world sizes to Json object
-      let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
-      let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
+      -- let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
+      -- let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
+      e.putStrLn s!"{gameJson}"
       o.writeLspResponse ⟨id, gameJson⟩
-    | _ => throw $ userError s!"Expected JSON-RPC request, got: '{(toJson m).compress}'"
+    | _ => pure () --throw $ userError s!"Expected JSON-RPC request, got: '{(toJson m).compress}'"
 
   catch err =>
     e.putStrLn s!"Server error: {err}"
