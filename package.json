@@ -36,6 +36,7 @@
     "rehype-katex": "^6.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
+    "request": "^2.88.2",
     "request-progress": "^3.0.0",
     "vite": "^4.5.0",
     "vite-plugin-static-copy": "^0.17.0",

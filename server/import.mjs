@@ -41,9 +41,10 @@ async function download(id, url, dest) {
     requestProgress(request({
       url,
       headers: {
-        'User-Agent': 'abentkamp',
+        'accept': 'application/vnd.github+json',
+        'User-Agent': 'joneugster',
         'X-GitHub-Api-Version': '2022-11-28',
-        'Authorization': 'Bearer '+TOKEN
+        'Authorization': 'Bearer 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'
       }
     }))
     .on('progress', function (state) {
@@ -83,25 +84,29 @@ async function doImport (owner, repo, id) {
     await download(id, url, `tmp/artifact_${artifactId}.zip`)
     progress[id].output += `Download finished.\n`
     await runProcess(id, "/bin/bash", [`${__dirname}/unpack.sh`, artifactId],".")
-    let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
-    manifest = JSON.parse(manifest);
-    if (manifest.length !== 1) {
-      throw `Unexpected manifest: ${JSON.stringify(manifest)}`
-    }
-    manifest[0].RepoTags = [`g/${owner.toLowerCase()}/${repo.toLowerCase()}:latest`]
-    fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
-    await runProcess(id, "tar", ["-cvf", `../archive_${artifactId}.tar`, "."], `tmp/artifact_${artifactId}_inner/`)
-    await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
+    // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
+    // manifest = JSON.parse(manifest);
+    // if (manifest.length !== 1) {
+    //   throw `Unexpected manifest: ${JSON.stringify(manifest)}`
+    // }
+    // manifest[0].RepoTags = [`g/${owner.toLowerCase()}/${repo.toLowerCase()}:latest`]
+    // fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
+    // await runProcess(id, "tar", ["-cvf", `../archive_${artifactId}.tar`, "."], `tmp/artifact_${artifactId}_inner/`)
+    // // await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
+
+
+    // TODO: not implemented
+
     progress[id].done = true
     progress[id].output += `Done.\n`
   } catch (e) {
     progress[id].output += `Error: ${e.toString()}\n${e.stack}`
   } finally {
     if (artifactId) {
-      fs.rmSync(`tmp/artifact_${artifactId}.zip`, {force: true, recursive: true});
-      fs.rmSync(`tmp/artifact_${artifactId}`, {force: true, recursive: true});
-      fs.rmSync(`tmp/artifact_${artifactId}_inner`, {force: true, recursive: true});
-      fs.rmSync(`tmp/archive_${artifactId}.tar`, {force: true, recursive: true});
+      // fs.rmSync(`tmp/artifact_${artifactId}.zip`, {force: true, recursive: true});
+      // fs.rmSync(`tmp/artifact_${artifactId}`, {force: true, recursive: true});
+      // fs.rmSync(`tmp/artifact_${artifactId}_inner`, {force: true, recursive: true});
+      // fs.rmSync(`tmp/archive_${artifactId}.tar`, {force: true, recursive: true});
     }
     progress[id].done = true
   }
