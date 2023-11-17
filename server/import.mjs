@@ -11,6 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
+const USERNAME = process.env.LEAN4GAME_GITHUB_USER
 const octokit = new Octokit({
   auth: TOKEN
 })
@@ -42,9 +43,9 @@ async function download(id, url, dest) {
       url,
       headers: {
         'accept': 'application/vnd.github+json',
-        'User-Agent': 'joneugster',
+        'User-Agent': USERNAME,
         'X-GitHub-Api-Version': '2022-11-28',
-        'Authorization': 'Bearer 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'
+        'Authorization': 'Bearer ' + TOKEN
       }
     }))
     .on('progress', function (state) {
