@@ -21,6 +21,10 @@ const games = {
         dir: "NNG4",
         queueLength: 5
     },
+    "g/hhu-adam/STG4": {
+      dir: "STG4",
+      queueLength: 2
+    },
     "g/hhu-adam/nng4-old": {
         dir: "NNG4-OLD",
         queueLength: 0
