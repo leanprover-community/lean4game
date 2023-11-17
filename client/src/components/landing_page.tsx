@@ -8,6 +8,7 @@ import '@fontsource/roboto/700.css';
 
 import '../css/landing_page.css'
 import coverRobo from '../assets/covers/formaloversum.png'
+import coverNNG from '../assets/covers/nng.png'
 import bgImage from '../assets/bg.jpg'
 
 import Markdown from './markdown';
@@ -113,8 +114,19 @@ function LandingPage() {
 learning the basics about theorem proving in Lean.
 
 This is a good first introduction to Lean!"
-        worlds="4"
-        levels="30"
+        worlds="8"
+        levels="67"
+        image={coverNNG}
+        language="English"
+        />
+
+      <GameTile
+        title="Set Theory Game"
+        gameId="g/djvelleman/STG4"
+        intro=""
+        description=""
+        worlds="?"
+        levels="?"
         language="English"
         />
 
