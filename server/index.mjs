@@ -11,6 +11,7 @@ import { importTrigger, importStatus } from './import.mjs'
 // import fs from 'fs'
 
 /**
+ * IMPORTANT! Tags here need to be lower case!
 */
 const games = {
     "g/hhu-adam/robo": {
@@ -21,9 +22,9 @@ const games = {
         dir: "NNG4",
         queueLength: 5
     },
-    "g/hhu-adam/STG4": {
-      dir: "STG4",
-      queueLength: 2
+    "g/djvelleman/stg4": {
+        dir: "STG4",
+        queueLength: 5
     },
     "g/hhu-adam/nng4-old": {
         dir: "NNG4-OLD",

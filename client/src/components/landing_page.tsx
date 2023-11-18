@@ -123,10 +123,10 @@ This is a good first introduction to Lean!"
       <GameTile
         title="Set Theory Game"
         gameId="g/djvelleman/STG4"
-        intro=""
+        intro="A game about set theory"
         description=""
-        worlds="?"
-        levels="?"
+        worlds="5"
+        levels="30"
         language="English"
         />
 
