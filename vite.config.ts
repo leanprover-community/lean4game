@@ -8,7 +8,8 @@ export default defineConfig({
   //root: 'client/src',
   build: {
     // Relative to the root
-    outDir: './dist',
+    // Note: This has to match the path in `server/index.mjs`
+    outDir: 'client/dist',
   },
   plugins: [
     react(),
