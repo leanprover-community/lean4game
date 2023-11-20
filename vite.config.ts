@@ -5,6 +5,11 @@ import svgr from "vite-plugin-svgr"
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  //root: 'client/src',
+  build: {
+    // Relative to the root
+    outDir: './dist',
+  },
   plugins: [
     react(),
     svgr({

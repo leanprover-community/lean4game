@@ -1,6 +1,7 @@
 {
   "name": "lean4-game",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "homepage": ".",
   "dependencies": {
@@ -65,6 +66,7 @@
     "start_server": "cd server && lake build && cross-env NODE_ENV=development nodemon -e mjs --exec \"node ./index.mjs\"",
     "start_client": "cross-env NODE_ENV=development vite --host",
     "build": "npm run build_server && npm run build_client",
+    "preview": "vite preview",
     "build_server": "cd server && lake build",
     "build_client": "cross-env NODE_ENV=production vite build",
     "production": "cross-env NODE_ENV=production node server/index.mjs"
