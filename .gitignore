@@ -5,3 +5,4 @@ server/lakefile.olean
 server32bit
 **/lake-packages/
 **/.DS_Store
+client/public/server.*

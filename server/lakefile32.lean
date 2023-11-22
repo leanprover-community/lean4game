@@ -2,7 +2,7 @@ import Lake
 open Lake DSL
 
 package GameServer {
-  buildDir := "build32"
+  buildDir := ".lake/build32"
 }
 
 @[default_target]

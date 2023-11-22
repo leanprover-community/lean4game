@@ -1,5 +1,3 @@
-build
-build32
+.lake
 adam
-nng
 lakefile32.olean
