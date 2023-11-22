@@ -5,8 +5,9 @@ import GameServer.Game
 Game "TestGame"
 Title "Hello Test"
 
-MakeGame
+World "Test"
+Level 1
 
-#eval do
-  let env ← (Lean.getEnv : Lean.MetaM _)
-  return  (gameExt.getState env).size
+Statement : 1 = 1 := sorry
+
+MakeGame

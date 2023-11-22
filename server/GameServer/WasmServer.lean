@@ -11,10 +11,12 @@ open Lsp
 open JsonRpc
 open System.Uri
 
-def ServerState := GameServerState
+structure WasmServerState :=
+  initParams? : Option InitializeParams
+  gameServerState : GameServerState
 
 @[export game_make_state]
-unsafe def makeState : IO (ServerState) := do
+unsafe def makeState : IO WasmServerState := do
   let e ← IO.getStderr
   try
     Lean.enableInitializersExecution
@@ -25,7 +27,7 @@ unsafe def makeState : IO (ServerState) := do
           { module := `Init : Import },
           { module := `GameServer : Import }
         ] {} 0 --← createEnv gameDir module,
-      game := "TEST",
+      game := `TestGame,
       gameDir := "test",
       inventory := #[]
       difficulty := 0
@@ -46,7 +48,7 @@ unsafe def makeState : IO (ServerState) := do
     -- let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
     -- let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
     e.putStrLn s!"{gameJson}"
-    return state
+    return ⟨none, state⟩
   catch err =>
     e.putStrLn s!"Import error: {err}"
     throw err
@@ -87,27 +89,59 @@ def initializeServer (id : RequestID) : IO Unit := do
   return ()
 
 
-@[export game_send_message]
-unsafe def sendMessage (s : String) (state : ServerState) : IO Unit := do
+def mkContext (state : WasmServerState) : IO ServerContext := do
+  let i ← IO.getStdin
   let o ← IO.getStdout
+  let e ← IO.getStderr
+  let srcSearchPath ← searchPathRef.get
+  let references ← IO.mkRef (← loadReferences)
+  let fileWorkersRef ← IO.mkRef (RBMap.empty : FileWorkerMap)
+  let workerPath := "no-worker-path"
+  let some initParams := state.initParams?
+    | throwServerError "no yet initialized"
+  return {
+    hIn            := i
+    hOut           := o
+    hLog           := e
+    args           := []
+    fileWorkersRef := fileWorkersRef
+    initParams
+    workerPath
+    srcSearchPath
+    references
+  }
+
+def runGameServerM (x : GameServerM α) (state : WasmServerState) : IO (α × WasmServerState) := do
+  let (res, gameServerState) ← ReaderT.run
+      (StateT.run x state.gameServerState)
+      (← mkContext state)
+  return (res, {state with gameServerState})
+
+def readParams (params? : Option Json.Structured) [FromJson α] : IO α :=
+  let j := toJson params?
+  match fromJson? j with
+  | Except.ok v => pure v
+  | Except.error inner => throw $ userError s!"Unexpected param '{j.compress}' \n{inner}"
+
+@[export game_send_message]
+unsafe def sendMessage (s : String) (state : WasmServerState) : IO WasmServerState := do
   let e ← IO.getStderr
   try
     let m ← readMessage s
     match m with
     | Message.request id "initialize" params? =>
+      let p : InitializeParams ← readParams params?
       initializeServer id
-    | Message.request id "info" _ =>
-
-      let some game := (gameExt.getState state.env).find? `TestGame
-        | throwServerError "Game not found"
-      let gameJson : Json := toJson game
-      -- Add world sizes to Json object
-      -- let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
-      -- let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
-      e.putStrLn s!"{gameJson}"
-      o.writeLspResponse ⟨id, gameJson⟩
-    | _ => pure () --throw $ userError s!"Expected JSON-RPC request, got: '{(toJson m).compress}'"
-
+      return {state with initParams? := some p}
+    | _ =>
+      let (isGameEv, state) ← runGameServerM (Game.handleServerEvent (.clientMsg m)) state
+      if isGameEv then
+        return state
+      else
+        match m with
+        | _ =>
+          e.putStrLn s!"Expected JSON-RPC request, got: '{(toJson m).compress}'"
+          return state
   catch err =>
     e.putStrLn s!"Server error: {err}"
-    return ()
+    return state
