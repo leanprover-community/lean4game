@@ -54,7 +54,7 @@
     "concurrently": "^7.6.0",
     "css-loader": "^6.7.3",
     "file-loader": "^6.2.0",
-    "nodemon": "^2.0.20",
+    "nodemon": "^3.0.1",
     "react-refresh": "^0.14.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.2",
