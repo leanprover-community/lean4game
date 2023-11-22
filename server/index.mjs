@@ -86,7 +86,7 @@ function startServerProcess(owner, repo) {
 
   let serverProcess
   if (isDevelopment) {
-    let args = ["--server", path.join("../../../../", game_dir)]
+    let args = ["--server", path.join('..','..','games',`${owner}`,`${repo}`)]
     serverProcess = cp.spawn("./gameserver", args,
         { cwd: path.join(__dirname, "./build/bin/") })
   } else {

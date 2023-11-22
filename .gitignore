@@ -1,7 +1,7 @@
 node_modules
 client/dist
 server/build
-server/tmp
+server/games
 server/lakefile.olean
 **/lake-packages/
 **/.DS_Store
