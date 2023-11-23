@@ -15,24 +15,28 @@ lean_object * io_world;
 
 
 void main() {
-  lean_initialize();
   lean_initialize_runtime_module();
+  lean_initialize();
   lean_object * res;
   // use same default as for Lean executables
   uint8_t builtin = 1;
   io_world = lean_io_mk_world();
   res = initialize_GameServer_WasmServer(builtin, io_world);
   if (lean_io_result_is_ok(res)) {
-      lean_dec_ref(res);
+      lean_dec(res);
   } else {
       lean_io_result_show_error(res);
       lean_dec(res);
       return;  // do not access Lean declarations if initialization failed
   }
+  lean_init_task_manager();
   lean_io_mark_end_initialization();
+
   res = game_make_state(io_world);
   if (lean_io_result_is_ok(res)) {
     state = lean_io_result_get_value(res);
+    lean_inc(state);
+    lean_dec(res);
   } else {
     lean_io_result_show_error(res);
     lean_dec(res);
@@ -45,6 +49,8 @@ void send_message(char* msg){
   lean_object * res = game_send_message(s, state, io_world);
   if (lean_io_result_is_ok(res)) {
     state = lean_io_result_get_value(res);
+    lean_inc(state);
+    lean_dec(res);
   } else {
     lean_io_result_show_error(res);
     lean_dec(res);

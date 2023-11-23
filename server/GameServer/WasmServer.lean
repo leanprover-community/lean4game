@@ -21,33 +21,16 @@ unsafe def makeState : IO WasmServerState := do
   try
     Lean.enableInitializersExecution
     searchPathRef.set ["/lib", "/gamelib"]
-    e.putStrLn s!"Importing"
+    let env ← importModules #[
+      { module := `GameServer : Import }
+    ] {} 0
     let state : GameServerState := {
-      env := ← importModules #[
-          { module := `Init : Import },
-          { module := `GameServer : Import }
-        ] {} 0 --← createEnv gameDir module,
+      env,
       game := `TestGame,
       gameDir := "test",
       inventory := #[]
       difficulty := 0
     }
-    e.putStrLn s!"Import complete"
-    let pExtDescrs ← persistentEnvExtensionsRef.get
-    pExtDescrs.forM fun extDescr => do
-      e.putStrLn ("extension '" ++ toString extDescr.name ++ "'")
-      let s := extDescr.toEnvExtension.getState state.env
-      let fmt := extDescr.statsFn s.state
-      unless fmt.isNil do IO.println ("  " ++ toString (Format.nest 2 (extDescr.statsFn s.state)))
-      e.putStrLn ("  number of imported entries: " ++ toString (s.importedEntries.foldl (fun sum es => sum + es.size) 0))
-    e.putStrLn s!"{(gameExt.getState state.env).size}"
-    let some game := (gameExt.getState state.env).find? `TestGame
-      | throwServerError "Game not found"
-    let gameJson : Json := toJson game
-    -- Add world sizes to Json object
-    -- let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
-    -- let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
-    e.putStrLn s!"{gameJson}"
     return ⟨none, state⟩
   catch err =>
     e.putStrLn s!"Import error: {err}"
@@ -88,7 +71,6 @@ def initializeServer (id : RequestID) : IO Unit := do
   }
   return ()
 
-
 def mkContext (state : WasmServerState) : IO ServerContext := do
   let i ← IO.getStdin
   let o ← IO.getStdout
@@ -105,13 +87,13 @@ def mkContext (state : WasmServerState) : IO ServerContext := do
     hLog           := e
     args           := []
     fileWorkersRef := fileWorkersRef
-    initParams
+    initParams := {initParams with rootUri? := some (toString state.gameServerState.game)}
     workerPath
     srcSearchPath
     references
   }
 
-def runGameServerM (x : GameServerM α) (state : WasmServerState) : IO (α × WasmServerState) := do
+def runGameServerM (state : WasmServerState) (x : GameServerM α) : IO (α × WasmServerState) := do
   let (res, gameServerState) ← ReaderT.run
       (StateT.run x state.gameServerState)
       (← mkContext state)
@@ -133,8 +115,18 @@ unsafe def sendMessage (s : String) (state : WasmServerState) : IO WasmServerSta
       let p : InitializeParams ← readParams params?
       initializeServer id
       return {state with initParams? := some p}
+    | Message.notification "textDocument/didOpen" params? =>
+      let some initParams := state.initParams?
+        | throwServerError "no yet initialized"
+      let p : LeanDidOpenTextDocumentParams ← readParams params?
+      let (_, state) ← runGameServerM state do
+        let some lvl ← GameServer.getLevelByFileName? initParams
+            ((System.Uri.fileUriToPath? p.textDocument.uri).getD p.textDocument.uri |>.toString)
+          | throwServerError s!"Level not found: {p.textDocument.uri}"
+        e.putStrLn s!"{lvl.module}"
+      return state
     | _ =>
-      let (isGameEv, state) ← runGameServerM (Game.handleServerEvent (.clientMsg m)) state
+      let (isGameEv, state) ← runGameServerM state (Game.handleServerEvent (.clientMsg m))
       if isGameEv then
         return state
       else
