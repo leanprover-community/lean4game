@@ -87,7 +87,7 @@ def mkContext (state : WasmServerState) : IO ServerContext := do
     hLog           := e
     args           := []
     fileWorkersRef := fileWorkersRef
-    initParams := {initParams with rootUri? := some (toString state.gameServerState.game)}
+    initParams
     workerPath
     srcSearchPath
     references
@@ -114,6 +114,7 @@ unsafe def sendMessage (s : String) (state : WasmServerState) : IO WasmServerSta
     | Message.request id "initialize" params? =>
       let p : InitializeParams ← readParams params?
       initializeServer id
+      let p := {p with rootUri? := some (toString state.gameServerState.game)}
       return {state with initParams? := some p}
     | Message.notification "textDocument/didOpen" params? =>
       let some initParams := state.initParams?
@@ -122,7 +123,7 @@ unsafe def sendMessage (s : String) (state : WasmServerState) : IO WasmServerSta
       let (_, state) ← runGameServerM state do
         let some lvl ← GameServer.getLevelByFileName? initParams
             ((System.Uri.fileUriToPath? p.textDocument.uri).getD p.textDocument.uri |>.toString)
-          | throwServerError s!"Level not found: {p.textDocument.uri}"
+          | throwServerError s!"Level not found: {p.textDocument.uri} | {initParams.rootUri?}"
         e.putStrLn s!"{lvl.module}"
       return state
     | _ =>
