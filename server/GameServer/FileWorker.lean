@@ -109,7 +109,7 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
           | return () -- not a theorem -> ignore
         -- Forbid the theorem we are proving currently
         if n = levelParams.statementName then
-          addErrorMessage info inputCtx s!"Structural recursion: you can't use '{n}' to proof itself!"
+          addErrorMessage info inputCtx s!"Structural recursion: you can't use '{n}' to prove itself!"
 
         let lemmasAndDefs := levelParams.lemmas ++ levelParams.definitions
         match lemmasAndDefs.find? (fun l => l.name == n) with
