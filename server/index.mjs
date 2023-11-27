@@ -117,13 +117,13 @@ function fillQueue(owner, repo) {
   }
 }
 
-// TODO: We disabled queue for now
-if (!isDevelopment) { // Don't use queue in development
-  for (let tag in queueLength) {
-    queue[tag] = []
-    fillQueue(tag)
-  }
-}
+// // TODO: We disabled queue for now
+// if (!isDevelopment) { // Don't use queue in development
+//   for (let tag in queueLength) {
+//     queue[tag] = []
+//     fillQueue(tag)
+//   }
+// }
 
 const urlRegEx = /^\/websocket\/g\/([\w.-]+)\/([\w.-]+)$/
 
