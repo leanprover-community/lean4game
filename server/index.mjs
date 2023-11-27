@@ -72,8 +72,7 @@ function startServerProcess(owner, repo) {
   }
 
   if(!fs.existsSync(game_dir)) {
-    console.error(`Game 'games/${owner}/${repo}' does not exist!`)
-    cp.spawn("pwd")
+    console.error(`Game '${game_dir}' does not exist!`)
     return
   }
 
