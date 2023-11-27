@@ -5,7 +5,7 @@ OWNER=$2
 REPO=$3
 
 echo "Creating folders"
-cd ../..
+cd ..
 # mkdir -p games
 cd games
 pwd

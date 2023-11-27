@@ -28,6 +28,9 @@ export default defineConfig({
     })
   ],
   publicDir: "client/public",
+  optimizeDeps: {
+    exclude: ['games']
+  },
   server: {
     port: 3000,
     proxy: {

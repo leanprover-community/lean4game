@@ -62,11 +62,11 @@ function startServerProcess(owner, repo) {
   }
 
   let game_dir = (owner == 'local') ?
-    path.join(__dirname, '..', '..', repo) :
-    path.join(__dirname, '..', '..', 'games', `${owner}`, `${repo}`)
+    path.join(__dirname, '..', repo) :
+    path.join(__dirname, '..', 'games', `${owner}`, `${repo}`)
 
-  if(!fs.existsSync(path.join(__dirname, '..', '..', 'games'))) {
-    console.error(`Did not find the following folder: ${path.join(__dirname, '..', '..', 'games')}`)
+  if(!fs.existsSync(path.join(__dirname, '..', 'games'))) {
+    console.error(`Did not find the following folder: ${path.join(__dirname, '..', 'games')}`)
     console.error('Did you already import any games?')
     return
   }
@@ -119,7 +119,7 @@ function fillQueue(owner, repo) {
 
 // TODO: We disabled queue for now
 if (!isDevelopment) { // Don't use queue in development
-  for (let tag in games) {
+  for (let tag in queueLength) {
     queue[tag] = []
     fillQueue(tag)
   }

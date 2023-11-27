@@ -79,14 +79,14 @@ async function doImport (owner, repo, id) {
     artifactId = artifact.id
     const url = artifact.archive_download_url
     // Make sure the download folder exists
-    if (!fs.existsSync("../../games")){
-      fs.mkdirSync("../../games");
+    if (!fs.existsSync("../games")){
+      fs.mkdirSync("../games");
     }
-    if (!fs.existsSync("../../games/tmp")){
-      fs.mkdirSync("../../games/tmp");
+    if (!fs.existsSync("../games/tmp")){
+      fs.mkdirSync("../games/tmp");
     }
     progress[id].output += `Download from ${url}\n`
-    await download(id, url, `../../games/tmp/${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`)
+    await download(id, url, `../games/tmp/${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`)
     progress[id].output += `Download finished.\n`
 
     await runProcess(id, "/bin/bash", [`${__dirname}/unpack.sh`, artifactId, owner.toLowerCase(), repo.toLowerCase()], ".")
