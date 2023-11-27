@@ -101,13 +101,7 @@ function startServerProcess(owner, repo) {
 function fillQueue(owner, repo) {
   while (queue[tag(owner, repo)].length < queueLength[tag(owner, repo)]) {
     let serverProcess
-    try {
-      serverProcess = startServerProcess(tag(owner, repo))
-    } catch (e) {
-      console.error('error starting the server')
-      console.error(e)
-      return
-    }
+    serverProcess = startServerProcess(tag(owner, repo))
     if (serverProcess == null) {
       console.error('serverProcess was undefined/null')
       return
@@ -134,12 +128,7 @@ wss.addListener("connection", function(ws, req) {
 
     let ps
     if (!queue[tag(owner, repo)] || queue[tag(owner, repo)].length == 0) {
-      try {
-        ps = startServerProcess(owner, repo)
-      } catch (e) {
-        console.error('error starting the server')
-        console.error(e)
-      }
+      ps = startServerProcess(owner, repo)
     } else {
         console.info('Got process from the queue')
         ps = queue[tag(owner, repo)].shift() // Pick the first Lean process; it's likely to be ready immediately
