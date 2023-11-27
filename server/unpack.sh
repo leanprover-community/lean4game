@@ -4,8 +4,6 @@ ARTIFACT_ID=$1
 OWNER=$2
 REPO=$3
 
-echo "Creating folders"
-cd ..
 # mkdir -p games
 cd games
 pwd
