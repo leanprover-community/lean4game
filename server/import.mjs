@@ -78,20 +78,17 @@ async function doImport (owner, repo, id) {
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
     artifactId = artifact.id
     const url = artifact.archive_download_url
-    if (!fs.existsSync("games")){
-      fs.mkdirSync("games");
+    // Make sure the download folder exists
+    if (!fs.existsSync("../../games")){
+      fs.mkdirSync("../../games");
     }
-    if (!fs.existsSync("games/tmp")){
-      fs.mkdirSync("games/tmp");
-    }
-    if (!fs.existsSync(`games/${owner}`)){
-      fs.mkdirSync(`games/${owner}`);
+    if (!fs.existsSync("../../games/tmp")){
+      fs.mkdirSync("../../games/tmp");
     }
     progress[id].output += `Download from ${url}\n`
-    // await download(id, url, `games/tmp/${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`)
+    await download(id, url, `../../games/tmp/${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`)
     progress[id].output += `Download finished.\n`
 
-    // BUG: it doesn't wait for this to finish
     await runProcess(id, "/bin/bash", [`${__dirname}/unpack.sh`, artifactId, owner.toLowerCase(), repo.toLowerCase()], ".")
 
 
@@ -104,9 +101,6 @@ async function doImport (owner, repo, id) {
     // fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
     // await runProcess(id, "tar", ["-cvf", `../archive_${artifactId}.tar`, "."], `tmp/artifact_${artifactId}_inner/`)
     // // await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
-
-
-    // TODO: not implemented
 
     progress[id].done = true
     progress[id].output += `Done.\n`

@@ -6,30 +6,20 @@ import * as url from 'url';
 import * as rpc from 'vscode-ws-jsonrpc';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 import os from 'os';
+import fs from 'fs';
 import anonymize from 'ip-anonymize';
 import { importTrigger, importStatus } from './import.mjs'
 // import fs from 'fs'
 
 /**
+ * Add a game here if the server should keep a queue of pre-loaded games ready at all times.
+ *
  * IMPORTANT! Tags here need to be lower case!
 */
-const games = {
-    "g/hhu-adam/robo": {
-        dir: "Robo",
-        queueLength: 5
-    },
-    "g/hhu-adam/nng4": {
-        dir: "NNG4",
-        queueLength: 5
-    },
-    "g/djvelleman/stg4": {
-        dir: "STG4",
-        queueLength: 5
-    },
-    "g/hhu-adam/nng4-old": {
-        dir: "NNG4-OLD",
-        queueLength: 0
-    }
+const queueLength = {
+  "g/hhu-adam/robo": 2,
+  "g/hhu-adam/nng4": 5,
+  "g/djvelleman/stg4": 2,
 }
 
 const __filename = url.fileURLToPath(import.meta.url);
@@ -64,29 +54,32 @@ function tag(owner, repo) {
 }
 
 function startServerProcess(owner, repo) {
-  let game_dir = (owner == 'local') ?
-    repo : games[tag(owner, repo)]?.dir
-
   if (owner == 'local') {
     if(!isDevelopment) {
       console.error(`No local games in production mode.`)
       return
     }
-    // TODO: This test does not work
-    // if (!fs.existsSync(path.join("../", game_dir))) {
-    //   console.error(`Game folder does not exists: ${game_dir}`)
-    //   return
-    // }
   }
 
-  if (!game_dir) {
-    console.error(`Unknown game: ${tag(owner, repo)}`)
+  let game_dir = (owner == 'local') ?
+    path.join(__dirname, '..', '..', repo) :
+    path.join(__dirname, '..', '..', 'games', `${owner}`, `${repo}`)
+
+  if(!fs.existsSync(path.join(__dirname, '..', '..', 'games'))) {
+    console.error(`Did not find the following folder: ${path.join(__dirname, '..', '..', 'games')}`)
+    console.error('Did you already import any games?')
+    return
+  }
+
+  if(!fs.existsSync(game_dir)) {
+    console.error(`Game 'games/${owner}/${repo}' does not exist!`)
+    cp.spawn("pwd")
     return
   }
 
   let serverProcess
   if (isDevelopment) {
-    let args = ["--server", path.join('..','..','games',`${owner}`,`${repo}`)]
+    let args = ["--server", game_dir]
     serverProcess = cp.spawn("./gameserver", args,
         { cwd: path.join(__dirname, "./build/bin/") })
   } else {
@@ -107,18 +100,30 @@ function startServerProcess(owner, repo) {
 
 /** start Lean Server processes to refill the queue */
 function fillQueue(owner, repo) {
-    while (queue[tag(owner, repo)].length < games[tag(owner, repo)].queueLength) {
-      const serverProcess = startServerProcess(tag(owner, repo))
-      queue[tag(owner, repo)].push(serverProcess)
+  while (queue[tag(owner, repo)].length < queueLength[tag(owner, repo)]) {
+    let serverProcess
+    try {
+      serverProcess = startServerProcess(tag(owner, repo))
+    } catch (e) {
+      console.error('error starting the server')
+      console.error(e)
+      return
     }
+    if (serverProcess == null) {
+      console.error('serverProcess was undefined/null')
+      return
+    }
+    queue[tag(owner, repo)].push(serverProcess)
+  }
 }
 
-// if (!isDevelopment) { // Don't use queue in development
-//   for (let tag in games) {
-//     queue[tag] = []
-//     fillQueue(tag)
-//   }
-// }
+// TODO: We disabled queue for now
+if (!isDevelopment) { // Don't use queue in development
+  for (let tag in games) {
+    queue[tag] = []
+    fillQueue(tag)
+  }
+}
 
 const urlRegEx = /^\/websocket\/g\/([\w.-]+)\/([\w.-]+)$/
 
@@ -127,19 +132,24 @@ wss.addListener("connection", function(ws, req) {
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
     const owner = reRes[1]
     const repo = reRes[2]
-    // const tag = `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
 
-    // // TODO
-    // if (isDevelopment && process.env.DEV_CONTAINER) {
-    //     tag = `g/local/game`
-    // }
-
-    let ps;
+    let ps
     if (!queue[tag(owner, repo)] || queue[tag(owner, repo)].length == 0) {
+      try {
         ps = startServerProcess(owner, repo)
+      } catch (e) {
+        console.error('error starting the server')
+        console.error(e)
+      }
     } else {
+        console.info('Got process from the queue')
         ps = queue[tag(owner, repo)].shift() // Pick the first Lean process; it's likely to be ready immediately
         fillQueue(owner, repo)
+    }
+
+    if (ps == null) {
+      console.error('server process is undefined/null')
+      return
     }
 
     socketCounter += 1;
@@ -152,14 +162,14 @@ wss.addListener("connection", function(ws, req) {
         onClose: (cb) => { ws.on("close", cb) },
         send: (data, cb) => { ws.send(data,cb) }
     }
-    const reader = new rpc.WebSocketMessageReader(socket);
-    const writer = new rpc.WebSocketMessageWriter(socket);
+    const reader = new rpc.WebSocketMessageReader(socket)
+    const writer = new rpc.WebSocketMessageWriter(socket)
     const socketConnection = jsonrpcserver.createConnection(reader, writer, () => ws.close())
-    const serverConnection = jsonrpcserver.createProcessStreamConnection(ps);
+    const serverConnection = jsonrpcserver.createProcessStreamConnection(ps)
     socketConnection.forward(serverConnection, message => {
         if (isDevelopment) {console.log(`CLIENT: ${JSON.stringify(message)}`)}
         return message;
-    });
+    })
     serverConnection.forward(socketConnection, message => {
       if (isDevelopment) {console.log(`SERVER: ${JSON.stringify(message)}`)}
         return message;
@@ -170,9 +180,9 @@ wss.addListener("connection", function(ws, req) {
 
     ws.on('close', () => {
       console.log(`[${new Date()}] Socket closed - ${ip}`)
-      socketCounter -= 1;
+      socketCounter -= 1
     })
 
-    socketConnection.onClose(() => serverConnection.dispose());
-    serverConnection.onClose(() => socketConnection.dispose());
+    socketConnection.onClose(() => serverConnection.dispose())
+    serverConnection.onClose(() => socketConnection.dispose())
 })
