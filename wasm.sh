@@ -27,6 +27,7 @@ LEAN_LIBDIR=$LEAN_SYSROOT/lib/lean
 
 emcc -o $OUT_DIR/server.js main.c -I $LEAN_SYSROOT/include -L $LEAN_LIBDIR .lake/build/ir/GameServer/*.c -lInit -lLean -lleancpp -lleanrt \
   -sFORCE_FILESYSTEM -lnodefs.js -s EXIT_RUNTIME=0 -s MAIN_MODULE=1 -s LINKABLE=1 -s EXPORT_ALL=1 -s ALLOW_MEMORY_GROWTH=1 -fwasm-exceptions -pthread -flto \
+  -sPTHREAD_POOL_SIZE_STRICT=2 \
   --preload-file "${LEAN_SYSROOT}/lib/lean/Init"@/lib/Init \
   --preload-file "${LEAN_SYSROOT}/lib/lean/Init.olean"@/lib/Init.olean \
   --preload-file "${LEAN_SYSROOT}/lib/lean/Init.ilean"@/lib/Init.ilean \

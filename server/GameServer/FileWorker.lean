@@ -395,26 +395,9 @@ section Initialization
     fileName := (System.Uri.fileUriToPath? doc.uri).getD doc.uri |>.toString
     fileMap  := default
 
-  def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
-      (levelParams : Game.DidOpenLevelParams) (initParams : InitializeParams) :
+  def mkHeaderTask (m : DocumentMeta) (hOut : FS.Stream) (paths : List System.FilePath)
+      (env : Environment) (opts : Options) (hasWidgets : Bool) :
       IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
-    -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
-    let out ← IO.Process.output
-      { cwd := levelParams.gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
-    if out.exitCode != 0 then
-      throwServerError s!"Error while running Lake: {out.stderr}"
-
-    -- Make the paths relative to the current directory
-    let paths : List System.FilePath := System.SearchPath.parse out.stdout.trim
-    let currentDir ← IO.currentDir
-    let paths := paths.map fun p => currentDir / (levelParams.gameDir : System.FilePath) / p
-
-    -- Set the search path
-    Lean.searchPathRef.set paths
-
-    let env ← importModules #[{ module := `Init : Import }, { module := levelParams.levelModule : Import }] {} 0
-    -- return (env, paths)
-
     -- use empty header
     let (headerStx, headerParserState, msgLog) ← Parser.parseHeader
       {m.mkInputContext with
@@ -456,11 +439,32 @@ section Initialization
       publishDiagnostics m headerSnap.diagnostics.toArray hOut
       return (headerSnap, srcSearchPath)
 
+  def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
+      (levelParams : Game.DidOpenLevelParams) :
+      IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
+    -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
+    let out ← IO.Process.output
+      { cwd := levelParams.gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
+    if out.exitCode != 0 then
+      throwServerError s!"Error while running Lake: {out.stderr}"
+
+    -- Make the paths relative to the current directory
+    let paths : List System.FilePath := System.SearchPath.parse out.stdout.trim
+    let currentDir ← IO.currentDir
+    let paths := paths.map fun p => currentDir / (levelParams.gameDir : System.FilePath) / p
+
+    -- Set the search path
+    Lean.searchPathRef.set paths
+
+    let env ← importModules #[{ module := `Init : Import }, { module := levelParams.levelModule : Import }] {} 0
+    -- return (env, paths)
+    mkHeaderTask m hOut paths env opts hasWidgets
+
   def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
        (levelParams : Game.DidOpenLevelParams) : IO (WorkerContext × WorkerState) := do
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
     let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)
-      levelParams initParams
+      levelParams
     let cancelTk ← CancelToken.new
     let ctx :=
       { hIn  := i
@@ -515,10 +519,8 @@ section MessageHandling
 end MessageHandling
 
 section MainLoop
-  partial def mainLoop : GameWorkerM Unit := do
-    let ctx ← read
+  partial def mainLoop1 (msg : JsonRpc.Message): GameWorkerM Bool := do
     let mut st ← StateT.lift get
-    let msg ← ctx.hIn.readLspMessage
     let filterFinishedTasks (acc : PendingRequestMap) (id : RequestID) (task : Task (Except IO.Error Unit))
         : IO PendingRequestMap := do
       if (← hasFinished task) then
@@ -541,11 +543,11 @@ section MainLoop
     match msg with
     | Message.request id method (some params) =>
       handleRequest id method (toJson params)
-      mainLoop
+      return false
     | Message.notification "exit" none =>
       let doc := st.doc
       doc.cancelTk.set
-      return ()
+      return true
     | Message.notification "$/game/setInventory" params =>
       let p := (← parseParams Game.SetInventoryParams (toJson params))
       let s ← get
@@ -553,11 +555,19 @@ section MainLoop
       set {s with levelParams := {s.levelParams with
         inventory := p.inventory,
         difficulty := p.difficulty}}
-      mainLoop
+      return false
     | Message.notification method (some params) =>
       handleNotification method (toJson params)
-      mainLoop
+      return false
     | _ => throwServerError "Got invalid JSON-RPC message"
+
+
+partial def mainLoop : GameWorkerM Unit := do
+  let ctx ← read
+  let msg ← ctx.hIn.readLspMessage
+  if not (← mainLoop1 msg) then
+    mainLoop
+
 end MainLoop
 
 def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do

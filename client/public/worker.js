@@ -2,6 +2,7 @@
 var stderrBuffer = ""
 var messageBuffer = []
 var initialized = false;
+var flushing = false;
 
 var headerMode = true;
 var header="";
@@ -12,11 +13,15 @@ var utf8decoder = new TextDecoder();
 
 
 function flushMessageBuffer(){
-  if (initialized) {
+  if (initialized && !flushing) {
     while(messageBuffer.length > 0) {
+      flushing = true;
       var msg = messageBuffer.shift();
+      console.log(`Send message: ${msg}`);
       Module.ccall('send_message', 'void', ['string'], [msg]);
+      console.log(`Message done: ${msg}`);
     }
+    flushing = false;
   }
 }
 
