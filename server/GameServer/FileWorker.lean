@@ -1,6 +1,7 @@
 /- This file is mostly copied from `Lean/Server/FileWorker.lean`. -/
 import Lean.Server.FileWorker
 import GameServer.Game
+import GameServer.ImportModules
 
 namespace MyModule
 open Lean
@@ -412,7 +413,7 @@ section Initialization
     -- Set the search path
     Lean.searchPathRef.set paths
 
-    let env ← importModules #[{ module := `Init : Import }, { module := levelParams.levelModule : Import }] {} 0
+    let env ← importModules' #[{ module := `Init : Import }, { module := levelParams.levelModule : Import }]
     -- return (env, paths)
 
     -- use empty header
