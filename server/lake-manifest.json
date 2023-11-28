@@ -1,4 +1,5 @@
-{"version": 6,
- "packagesDir": "lake-packages",
+{"version": 7,
+ "packagesDir": ".lake/packages",
  "packages": [],
- "name": "GameServer"}
+ "name": "GameServer",
+ "lakeDir": ".lake"}
