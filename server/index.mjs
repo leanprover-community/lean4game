@@ -80,7 +80,7 @@ function startServerProcess(owner, repo) {
   if (isDevelopment) {
     let args = ["--server", game_dir]
     serverProcess = cp.spawn("./gameserver", args,
-        { cwd: path.join(__dirname, "./build/bin/") })
+        { cwd: path.join(__dirname, "./.lake/build/bin/") })
   } else {
     serverProcess =  cp.spawn("./bubblewrap.sh",
       [game_dir],
