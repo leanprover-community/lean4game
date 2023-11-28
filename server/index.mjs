@@ -123,8 +123,8 @@ const urlRegEx = /^\/websocket\/g\/([\w.-]+)\/([\w.-]+)$/
 wss.addListener("connection", function(ws, req) {
     const reRes = urlRegEx.exec(req.url)
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
-    const owner = reRes[1]
-    const repo = reRes[2]
+    const owner = reRes[1].toLowerCase()
+    const repo = reRes[2].toLowerCase()
 
     let ps
     if (!queue[tag(owner, repo)] || queue[tag(owner, repo)].length == 0) {
