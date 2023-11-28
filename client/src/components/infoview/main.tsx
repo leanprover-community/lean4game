@@ -458,7 +458,13 @@ export function TypewriterInterface({props}) {
 
 
   useServerNotificationEffect("$/game/loading", (params : any) => {
-    setLoadingProgress(params.counter)
+    if (params.kind == "loadConstants") {
+      setLoadingProgress(params.counter/100*50)
+    } else if (params.kind == "finalizeExtensions") {
+      setLoadingProgress(50 + params.counter/150*50)
+    } else {
+      console.error(`Unknown loading kind: ${params.kind}`)
+    }
   })
 
   return <div className="typewriter-interface">
@@ -527,7 +533,7 @@ export function TypewriterInterface({props}) {
                 }
               </div>
             }
-          </> : <CircularProgress variant="determinate" value={loadingProgress/1.5 + 30} />
+          </> : <CircularProgress variant="determinate" value={loadingProgress} />
         }
       </div>
     </div>

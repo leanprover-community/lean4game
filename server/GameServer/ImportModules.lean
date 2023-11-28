@@ -4,8 +4,12 @@ import Lean.Data.Lsp.Communication
 
 open Lean
 
+inductive LoadingKind := | finalizeExtensions | loadConstants
+  deriving ToJson
+
 structure LoadingParams : Type where
   counter : Nat
+  kind : LoadingKind
   deriving ToJson
 
 -- Code adapted from `Lean/Environment.lean`
@@ -33,7 +37,9 @@ private partial def finalizePersistentExtensions' (env : Environment) (mods : Ar
   loop 0 env
 where
   loop (i : Nat) (env : Environment) : IO Environment := do
-    (← IO.getStdout).writeLspNotification { method := "$/game/loading", param := {counter := i : LoadingParams} }
+    (← IO.getStdout).writeLspNotification {
+      method := "$/game/loading",
+      param := {counter := i, kind := .finalizeExtensions : LoadingParams} }
     -- Recall that the size of the array stored `persistentEnvExtensionRef` may increase when we import user-defined environment extensions.
     let pExtDescrs ← persistentEnvExtensionsRef.get
     if i < pExtDescrs.size then
@@ -61,6 +67,11 @@ def finalizeImport' (s : ImportState) (imports : Array Import) (opts : Options) 
   let mut const2ModIdx : HashMap Name ModuleIdx := mkHashMap (capacity := numConsts)
   let mut constantMap : HashMap Name ConstantInfo := mkHashMap (capacity := numConsts)
   for h:modIdx in [0:s.moduleData.size] do
+    if modIdx % 100 = 0 then
+      let percentage := modIdx * 100 / s.moduleData.size
+      (← IO.getStdout).writeLspNotification {
+        method := "$/game/loading",
+        param := {counter := percentage, kind := .loadConstants : LoadingParams} }
     let mod := s.moduleData[modIdx]'h.upper
     for cname in mod.constNames, cinfo in mod.constants do
       match constantMap.insert' cname cinfo with
