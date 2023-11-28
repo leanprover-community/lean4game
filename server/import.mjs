@@ -103,7 +103,8 @@ async function doImport (owner, repo, id) {
     // // await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
 
     progress[id].done = true
-    progress[id].output += `Done.\n`
+    progress[id].output += `Done!\n`
+    progress[id].output += `Play the game at: {your website}/#/g/${owner}/${repo}\n`
   } catch (e) {
     progress[id].output += `Error: ${e.toString()}\n${e.stack}`
   } finally {
