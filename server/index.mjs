@@ -49,11 +49,12 @@ const isDevelopment = environment === 'development'
 /** We keep queues of started Lean Server processes to be ready when a user arrives */
 const queue = {}
 
-function tag(owner, repo) {
+function getTag(owner, repo) {
   return `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
 }
 
 function startServerProcess(owner, repo) {
+  owner = owner.toLowerCase()
   if (owner == 'local') {
     if(!isDevelopment) {
       console.error(`No local games in production mode.`)
@@ -62,8 +63,8 @@ function startServerProcess(owner, repo) {
   }
 
   let game_dir = (owner == 'local') ?
-    path.join(__dirname, '..', repo) :
-    path.join(__dirname, '..', 'games', `${owner}`, `${repo}`)
+    path.join(__dirname, '..', '..', repo) : // note: here we need `repo` to be case sensitive
+    path.join(__dirname, '..', 'games', `${owner}`, `${repo.toLowerCase()}`)
 
   if(!fs.existsSync(path.join(__dirname, '..', 'games'))) {
     console.error(`Did not find the following folder: ${path.join(__dirname, '..', 'games')}`)
@@ -79,6 +80,7 @@ function startServerProcess(owner, repo) {
   let serverProcess
   if (isDevelopment) {
     let args = ["--server", game_dir]
+    console.error(`debugging: ${__dirname}, ${game_dir}`)
     serverProcess = cp.spawn("./gameserver", args,
         { cwd: path.join(__dirname, "./.lake/build/bin/") })
   } else {
@@ -98,15 +100,15 @@ function startServerProcess(owner, repo) {
 }
 
 /** start Lean Server processes to refill the queue */
-function fillQueue(owner, repo) {
-  while (queue[tag(owner, repo)].length < queueLength[tag(owner, repo)]) {
+function fillQueue(tag) {
+  while (queue[tag].length < queueLength[tag]) {
     let serverProcess
-    serverProcess = startServerProcess(tag(owner, repo))
+    serverProcess = startServerProcess(tag)
     if (serverProcess == null) {
       console.error('serverProcess was undefined/null')
       return
     }
-    queue[tag(owner, repo)].push(serverProcess)
+    queue[tag].push(serverProcess)
   }
 }
 
@@ -123,16 +125,18 @@ const urlRegEx = /^\/websocket\/g\/([\w.-]+)\/([\w.-]+)$/
 wss.addListener("connection", function(ws, req) {
     const reRes = urlRegEx.exec(req.url)
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
-    const owner = reRes[1].toLowerCase()
-    const repo = reRes[2].toLowerCase()
+    const owner = reRes[1]
+    const repo = reRes[2]
+
+    const tag = getTag(owner, repo)
 
     let ps
-    if (!queue[tag(owner, repo)] || queue[tag(owner, repo)].length == 0) {
+    if (!queue[tag] || queue[tag].length == 0) {
       ps = startServerProcess(owner, repo)
     } else {
         console.info('Got process from the queue')
-        ps = queue[tag(owner, repo)].shift() // Pick the first Lean process; it's likely to be ready immediately
-        fillQueue(owner, repo)
+        ps = queue[tag].shift() // Pick the first Lean process; it's likely to be ready immediately
+        fillQueue(tag)
     }
 
     if (ps == null) {
