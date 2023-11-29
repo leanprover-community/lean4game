@@ -80,13 +80,12 @@ function startServerProcess(owner, repo) {
   let serverProcess
   if (isDevelopment) {
     let args = ["--server", game_dir]
-    console.error(`debugging: ${__dirname}, ${game_dir}`)
     serverProcess = cp.spawn("./gameserver", args,
         { cwd: path.join(__dirname, "./.lake/build/bin/") })
   } else {
     serverProcess =  cp.spawn("./bubblewrap.sh",
       [game_dir, path.join(__dirname, '..')],
-      { cwd: path.join(__dirname, '..') })
+      { cwd: __dirname })
   }
   serverProcess.on('error', error =>
     console.error(`Launching Lean Server failed: ${error}`)
