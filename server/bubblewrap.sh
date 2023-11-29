@@ -2,8 +2,10 @@
 
 ELAN_HOME=$(lake env printenv ELAN_HOME)
 
+
+
 (exec bwrap\
-  --bind ../../lean4game /lean4game \
+  --bind $2 /lean4game \
   --bind $1 /game \
   --bind $ELAN_HOME /elan \
   --bind /usr /usr \
@@ -22,6 +24,6 @@ ELAN_HOME=$(lake env printenv ELAN_HOME)
   --unshare-uts  \
   --unshare-cgroup \
   --die-with-parent \
-  --chdir "/lean4game/server/build/bin/" \
+  --chdir "/lean4game/server/.lake/build/bin/" \
   ./gameserver --server /game
 )
