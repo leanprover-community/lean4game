@@ -78,13 +78,20 @@ async function doImport (owner, repo, id) {
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
     artifactId = artifact.id
     const url = artifact.archive_download_url
-    if (!fs.existsSync("tmp")){
-      fs.mkdirSync("tmp");
+    // Make sure the download folder exists
+    if (!fs.existsSync(`${__dirname}/../games`)){
+      fs.mkdirSync(`${__dirname}/../games`);
+    }
+    if (!fs.existsSync(`${__dirname}/../games/tmp`)){
+      fs.mkdirSync(`${__dirname}/../games/tmp`);
     }
     progress[id].output += `Download from ${url}\n`
-    await download(id, url, `tmp/artifact_${artifactId}.zip`)
+    await download(id, url, `${__dirname}/../games/tmp/${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`)
     progress[id].output += `Download finished.\n`
-    await runProcess(id, "/bin/bash", [`${__dirname}/unpack.sh`, artifactId],".")
+
+    await runProcess(id, "/bin/bash", [`${__dirname}/unpack.sh`, artifactId, owner.toLowerCase(), repo.toLowerCase()], `${__dirname}/..`)
+
+
     // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
     // manifest = JSON.parse(manifest);
     // if (manifest.length !== 1) {
@@ -95,22 +102,21 @@ async function doImport (owner, repo, id) {
     // await runProcess(id, "tar", ["-cvf", `../archive_${artifactId}.tar`, "."], `tmp/artifact_${artifactId}_inner/`)
     // // await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
 
-
-    // TODO: not implemented
-
     progress[id].done = true
-    progress[id].output += `Done.\n`
+    progress[id].output += `Done!\n`
+    progress[id].output += `Play the game at: {your website}/#/g/${owner}/${repo}\n`
   } catch (e) {
     progress[id].output += `Error: ${e.toString()}\n${e.stack}`
   } finally {
-    if (artifactId) {
-      // fs.rmSync(`tmp/artifact_${artifactId}.zip`, {force: true, recursive: true});
-      // fs.rmSync(`tmp/artifact_${artifactId}`, {force: true, recursive: true});
-      // fs.rmSync(`tmp/artifact_${artifactId}_inner`, {force: true, recursive: true});
-      // fs.rmSync(`tmp/archive_${artifactId}.tar`, {force: true, recursive: true});
-    }
+    // if (artifactId) {
+    //   // fs.rmSync(`tmp/artifact_${artifactId}.zip`, {force: true, recursive: true});
+    //   // fs.rmSync(`tmp/artifact_${artifactId}`, {force: true, recursive: true});
+    //   // fs.rmSync(`tmp/artifact_${artifactId}_inner`, {force: true, recursive: true});
+    //   // fs.rmSync(`tmp/archive_${artifactId}.tar`, {force: true, recursive: true});
+    // }
     progress[id].done = true
   }
+  await new Promise(resolve => setTimeout(resolve, 10000))
 }
 
 export const importTrigger = (req, res) => {

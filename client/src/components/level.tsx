@@ -48,7 +48,6 @@ function Level() {
   const params = useParams()
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
-  // useLoadWorldFiles(worldId)
 
   const [impressum, setImpressum] = React.useState(false)
 
@@ -615,6 +614,7 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
 
       return () => {
         editorConnection.api.sendClientNotification(uriStr, "textDocument/didClose", {textDocument: {uri: uriStr}})
+        model.dispose();
       }
     }
   }, [editor, levelId, connection, leanClientStarted])
@@ -636,28 +636,4 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
   }, [editor, connection, leanClientStarted])
 
   return {editor, infoProvider, editorConnection}
-}
-
-/** Open all files in this world on the server so that they will load faster when accessed */
-function useLoadWorldFiles(worldId) {
-  const gameId = React.useContext(GameIdContext)
-  const gameInfo = useGetGameInfoQuery({game: gameId})
-  const store = useStore()
-
-  useEffect(() => {
-    if (gameInfo.data) {
-      const models = []
-      for (let levelId = 1; levelId <= gameInfo.data.worldSize[worldId]; levelId++) {
-        const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
-        let model = monaco.editor.getModel(uri)
-        if (model) {
-          models.push(model)
-        } else {
-          const code = selectCode(gameId, worldId, levelId)(store.getState())
-          models.push(monaco.editor.createModel(code, 'lean4', uri))
-        }
-      }
-      return () => { for (let model of models) { model.dispose() } }
-    }
-  }, [gameInfo.data, worldId])
 }

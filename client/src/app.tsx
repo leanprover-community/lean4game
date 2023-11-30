@@ -10,6 +10,7 @@ import './css/reset.css';
 import './css/app.css';
 import { MobileContext } from './components/infoview/context';
 import { useWindowDimensions } from './window_width';
+import { connection } from './connection';
 
 export const GameIdContext = React.createContext<string>(undefined);
 
@@ -18,6 +19,10 @@ function App() {
   const gameId = "g/" + params.owner + "/" + params.repo
   const {width, height} = useWindowDimensions()
   const [mobile, setMobile] = React.useState(width < 800)
+
+  React.useEffect(() => {
+    connection.startLeanClient(gameId);
+  }, [gameId])
 
   return (
     <div className="app">

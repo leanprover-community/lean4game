@@ -35,6 +35,11 @@ const router = createHashRouter([
     loader: () => redirect("/g/hhu-adam/NNG4")
   },
   {
+    // For backwards compatibility
+    path: "/g/hhu-adam/NNG4",
+    loader: () => redirect("/g/leanprover-community/NNG4")
+  },
+  {
     path: "/g/:owner/:repo",
     element: <App />,
     errorElement: <ErrorPage />,

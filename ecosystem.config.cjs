@@ -4,8 +4,10 @@ module.exports = {
     name   : "lean4game",
     script : "server/index.mjs",
     env: {
-       NODE_ENV: "production",
-       PORT: 8002
+      LEAN4GAME_GITHUB_USER: "",
+      LEAN4GAME_GITHUB_TOKEN: "",
+      NODE_ENV: "production",
+      PORT: 8002
     },
   }]
 }

@@ -347,6 +347,7 @@ export function TypewriterInterface({props}) {
   const uri = model.uri.toString()
 
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
+  const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
   const {mobile} = React.useContext(MobileContext)
   const { proof } = React.useContext(ProofContext)
@@ -455,6 +456,17 @@ export function TypewriterInterface({props}) {
 
   let lastStepErrors = proof.length ? hasInteractiveErrors(proof[proof.length - 1].errors) : false
 
+
+  useServerNotificationEffect("$/game/loading", (params : any) => {
+    if (params.kind == "loadConstants") {
+      setLoadingProgress(params.counter/100*50)
+    } else if (params.kind == "finalizeExtensions") {
+      setLoadingProgress(50 + params.counter/150*50)
+    } else {
+      console.error(`Unknown loading kind: ${params.kind}`)
+    }
+  })
+
   return <div className="typewriter-interface">
     <RpcContext.Provider value={rpcSess}>
     <div className="content">
@@ -521,7 +533,7 @@ export function TypewriterInterface({props}) {
                 }
               </div>
             }
-          </> : <CircularProgress />
+          </> : <CircularProgress variant="determinate" value={loadingProgress} />
         }
       </div>
     </div>

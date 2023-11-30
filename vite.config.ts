@@ -28,6 +28,9 @@ export default defineConfig({
     })
   ],
   publicDir: "client/public",
+  optimizeDeps: {
+    exclude: ['games']
+  },
   server: {
     port: 3000,
     proxy: {
@@ -36,6 +39,9 @@ export default defineConfig({
         ws: true
       },
       '/import': {
+        target: 'http://localhost:8080',
+      },
+      '/api': {
         target: 'http://localhost:8080',
       },
     }

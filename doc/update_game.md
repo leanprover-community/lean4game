@@ -10,10 +10,24 @@ Before you continue, make sure there [exists a `v4.X.0`-tag in this repo](https:
 Then, depending on the setup you use, do one of the following:
 
 * Dev Container: Rebuild the VSCode Devcontainer.
-* Local Setup: run `lake update -R` (followed by `lake exe cache get` if you depend on mathlib.)
+* Local Setup: run
+  ```
+  lake update -R
+  lake build
+  ```
+  in your game folder.
+
+  * Additionally, if you have a local copy of the server `lean4game`,
+    you should update this one to the matching version, too:
+    ```
+    git fetch
+    git checkout {VERSION_TAG}
+    npm install
+    ```
+    where `{VERSION_TAG}` is the tag from above of the form `v4.X.0`
 * Gitpod/Codespaces: Create a fresh one
 
-This will update `lean4game` and `mathlib` in your project to the new lean version.
+This will your game (and the mathlib version you might be using) to the new lean version.
 
 ## Newest developing setup
 
@@ -24,14 +38,16 @@ anymore, you will need to copy the relevant files from the [GameSkeleton](https:
 The relevant files are:
 
 ```
+.devcontainer/
+.docker/
+.github/
+.gitpod/
+.vscode/
 lakefile.lean
-.devcontainer/**
-.docker/**
-.gitpod
-.vscode/**
 ```
 
-simply copy them from the `GameSkeleton` into your game.
+simply copy them from the `GameSkeleton` into your game and proceed as above,
+i.e. `lake update -R && lake build`.
 
 (Note: You should not need to modify any of these files, with the exception of the `lakefile.lean`,
-where you need to add any dependencies of your game.)
+where you need to add any dependencies of your game, or remove mathlib if you don't need it.)
