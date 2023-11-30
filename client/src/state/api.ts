@@ -59,19 +59,19 @@ interface Doc {
 // Define a service using a base URL and expected endpoints
 export const apiSlice = createApi({
   reducerPath: 'gameApi',
-  baseQuery: fetchBaseQuery({ baseUrl: window.location.origin + "/api" }),
+  baseQuery: fetchBaseQuery({ baseUrl: window.location.origin + "/data" }),
   endpoints: (builder) => ({
     getGameInfo: builder.query<GameInfo, {game: string}>({
-      query: ({game}) => `${game}/game`,
+      query: ({game}) => `${game}/game.json`,
     }),
     loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
-      query: ({game, world, level}) => `${game}/level/${world}/${level}`,
+      query: ({game, world, level}) => `${game}/level__${world}__${level}.json`,
     }),
     loadInventoryOverview: builder.query<InventoryOverview, {game: string}>({
-      query: ({game}) => `${game}/inventory`,
+      query: ({game}) => `${game}/inventory.json`,
     }),
     loadDoc: builder.query<Doc, {game: string, name: string, type: "lemma"|"tactic"}>({
-      query: ({game, type, name}) => `${game}/doc/${type}/${name}`,
+      query: ({game, type, name}) => `${game}/doc__${type}__${name}.json`,
     }),
   }),
 })
