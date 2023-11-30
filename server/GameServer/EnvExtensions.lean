@@ -108,6 +108,12 @@ structure InventoryTile where
   hidden := false
 deriving ToJson, FromJson, Repr, Inhabited
 
+def InventoryItem.toTile (item : InventoryItem) : InventoryTile := {
+      name := item.name,
+      displayName := item.displayName
+      category := item.category
+}
+
 /-- The extension that stores the doc templates. Note that you can only add, but never modify
 entries! -/
 initialize inventoryTemplateExt :
@@ -135,7 +141,12 @@ def getInventoryItem? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
     m (Option InventoryItem) := do
   return (inventoryExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
 
-
+structure InventoryOverview where
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
+  lemmaTab : Option String
+deriving ToJson, FromJson
 
 /-! ## Environment extensions for game specification -/
 
@@ -256,6 +267,55 @@ structure GameLevel where
   template: Option String := none
   deriving Inhabited, Repr
 
+/-- Json-encodable version of `GameLevel`
+Fields:
+- description: Lemma in mathematical language.
+- descriptionGoal: Lemma printed as Lean-Code.
+-/
+structure LevelInfo where
+  index : Nat
+  title : String
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
+  introduction : String
+  conclusion : String
+  descrText : Option String := none
+  descrFormat : String := ""
+  lemmaTab : Option String
+  displayName : Option String
+  statementName : Option String
+  template : Option String
+deriving ToJson, FromJson
+
+def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
+  { index := lvl.index,
+    title := lvl.title,
+    tactics := lvl.tactics.tiles,
+    lemmas := lvl.lemmas.tiles,
+    definitions := lvl.definitions.tiles,
+    descrText := lvl.descrText,
+    descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
+    introduction := lvl.introduction
+    conclusion := lvl.conclusion
+    lemmaTab := match lvl.lemmaTab with
+    | some tab => tab
+    | none =>
+      -- Try to set the lemma tab to the category of the first added lemma
+      match lvl.lemmas.tiles.find? (·.new) with
+      | some tile => tile.category
+      | none => none
+    statementName := lvl.statementName.toString
+    displayName := match lvl.statementName with
+      | .anonymous => none
+      | name => match (inventoryExt.getState env).find?
+          (fun x => x.name == name && x.type == .Lemma) with
+        | some n => n.displayName
+        | none => name.toString
+        -- Note: we could call `.find!` because we check in `Statement` that the
+        -- lemma doc must exist.
+    template := lvl.template
+  }
 
 /-! ## World -/
 
@@ -297,6 +357,13 @@ structure Game where
   authors : List String := default
   worlds : Graph Name World := default
 deriving Inhabited, ToJson
+
+def getGameJson (game : «Game») : Json := Id.run do
+  let gameJson : Json := toJson game
+  -- Add world sizes to Json object
+  let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
+  let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
+  return gameJson
 
 /-! ## Game environment extension -/
 

@@ -34,6 +34,32 @@ var router = express.Router();
 router.get('/import/status/:owner/:repo', importStatus)
 router.get('/import/trigger/:owner/:repo', importTrigger)
 
+function loadJson(req, filename) {
+  const owner = req.params.owner;
+  const repo = req.params.repo
+  return JSON.parse(fs.readFileSync(path.join(getGameDir(owner,repo),".lake","gamedata",filename)))
+}
+
+router.get("/api/g/:owner/:repo/game", (req, res) => {
+  res.send(loadJson(req, `game.json`));
+});
+
+router.get("/api/g/:owner/:repo/inventory", (req, res) => {
+  res.send(loadJson(req, `inventory.json`));
+});
+
+router.get("/api/g/:owner/:repo/level/:world/:level", (req, res) => {
+  const world = req.params.world;
+  const level = req.params.level;
+  res.send(loadJson(req, `level__${world}__${level}.json`));
+});
+
+router.get("/api/g/:owner/:repo/doc/:type/:name", (req, res) => {
+  const type = req.params.type;
+  const name = req.params.name;
+  res.send(loadJson(req, `doc__${type}__${name}.json`));
+});
+
 const server = app
   .use(express.static(path.join(__dirname, '../client/dist/')))
   .use('/', router)
@@ -53,7 +79,7 @@ function getTag(owner, repo) {
   return `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
 }
 
-function startServerProcess(owner, repo) {
+function getGameDir(owner, repo) {
   owner = owner.toLowerCase()
   if (owner == 'local') {
     if(!isDevelopment) {
@@ -76,6 +102,14 @@ function startServerProcess(owner, repo) {
     console.error(`Game '${game_dir}' does not exist!`)
     return
   }
+
+  return game_dir;
+}
+
+function startServerProcess(owner, repo) {
+
+  let game_dir = getGameDir(owner, repo)
+  if (!game_dir) return;
 
   let serverProcess
   if (isDevelopment) {

@@ -644,6 +644,44 @@ elab "Template" tacs:tacticSeq : tactic => do
 
 /-! # Make Game -/
 
+#eval IO.FS.createDirAll ".lake/gamedata/"
+
+-- TODO: register all of this as ToJson instance?
+def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name)) : CommandElabM Unit:= do
+  let game ← getCurGame
+  let env ← getEnv
+  let path : System.FilePath := s!"{← IO.currentDir}" / ".lake" / "gamedata"
+
+  if ← path.isDir then
+    IO.FS.removeDirAll path
+  IO.FS.createDirAll path
+
+  for (worldId, world) in game.worlds.nodes.toArray do
+    for (levelId, level) in world.levels.toArray do
+      IO.FS.writeFile (path / s!"level__{worldId}__{levelId}.json") (toString (toJson (level.toInfo env)))
+
+  IO.FS.writeFile (path / s!"game.json") (toString (getGameJson game))
+
+  for inventoryType in [InventoryType.Lemma, .Tactic, .Definition] do
+    for name in allItemsByType.findD inventoryType {} do
+      let some item ← getInventoryItem? name inventoryType
+        | throwError "Expected item to exist: {name}"
+      IO.FS.writeFile (path / s!"doc__{inventoryType}__{name}.json") (toString (toJson item))
+
+  let getTiles (type : InventoryType) : CommandElabM (Array InventoryTile) := do
+    (allItemsByType.findD type {}).toArray.mapM (fun name => do
+      let some item ← getInventoryItem? name type
+        | throwError "Expected item to exist: {name}"
+      return item.toTile)
+  let inventory : InventoryOverview := {
+    lemmas := ← getTiles .Lemma
+    tactics := ← getTiles .Tactic
+    definitions := ← getTiles .Definition
+    lemmaTab := none
+  }
+  IO.FS.writeFile (path / s!"inventory.json") (toString (toJson inventory))
+
+
 def GameLevel.getInventory (level : GameLevel) : InventoryType → InventoryInfo
 | .Tactic => level.tactics
 | .Definition => level.definitions
@@ -923,6 +961,7 @@ elab "MakeGame" : command => do
   -- Apparently we need to reload `game` to get the changes to `game.worlds` we just made
   let game ← getCurGame
 
+  let mut allItemsByType : HashMap InventoryType (HashSet Name) := {}
   -- Compute which inventory items are available in which level:
   for inventoryType in #[.Tactic, .Definition, .Lemma] do
 
@@ -1052,6 +1091,9 @@ elab "MakeGame" : command => do
 
         modifyLevel ⟨← getCurGameId, worldId, levelId⟩ fun level => do
           return level.setComputedInventory inventoryType itemsArray
+    allItemsByType := allItemsByType.insert inventoryType allItems
+
+  saveGameData allItemsByType
 
 /-! # Debugging tools -/
 
