@@ -60,17 +60,17 @@ function startServerProcess(owner, repo) {
       console.error(`No local games in production mode.`)
       return
     }
+  } else {
+    if(!fs.existsSync(path.join(__dirname, '..', 'games'))) {
+      console.error(`Did not find the following folder: ${path.join(__dirname, '..', 'games')}`)
+      console.error('Did you already import any games?')
+      return
+    }
   }
 
   let game_dir = (owner == 'local') ?
     path.join(__dirname, '..', '..', repo) : // note: here we need `repo` to be case sensitive
     path.join(__dirname, '..', 'games', `${owner}`, `${repo.toLowerCase()}`)
-
-  if(!fs.existsSync(path.join(__dirname, '..', 'games'))) {
-    console.error(`Did not find the following folder: ${path.join(__dirname, '..', 'games')}`)
-    console.error('Did you already import any games?')
-    return
-  }
 
   if(!fs.existsSync(game_dir)) {
     console.error(`Game '${game_dir}' does not exist!`)
