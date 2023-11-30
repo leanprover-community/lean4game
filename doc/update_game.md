@@ -32,7 +32,7 @@ This will your game (and the mathlib version you might be using) to the new lean
 ## Newest developing setup
 
 There are a few files in your game repository which are used for the developing setup
-(dev container/codespaces/gitpod). If you need to update your're developing setup, for example because it doesn't work
+(dev container/codespaces/gitpod). If you need to update your developing setup, for example because it doesn't work
 anymore, you will need to copy the relevant files from the [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) template into your game repo.
 
 The relevant files are:
