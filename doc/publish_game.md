@@ -1,26 +1,30 @@
-# Importing games
+# Publishing games
 
-There is an mechanism to import games into your server. In order to use this mechanism, you need
-to create a [Github Access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens). A fine-grained access token with only reading rights for public
-repos will suffice.
+You can publish your game on the official (Lean Game Server)[https://adam.math.hhu.de] in a few simple
+steps.
 
-You need to set the environment variables `LEAN4GAME_GITHUB_USER` and `LEAN4GAME_GITHUB_TOKEN`
-with your user name and access token.
+## 1. Upload Game to github
 
-Then you can call:
+First, you need your game in a public Github repository and make sure the github action has run.
+You can check this by spotting the green checkmark on the start page, or by looking at the "Actions"
+tab.
 
-> https://{website}/import/trigger/{owner}/{repo}
+## 2. Import the game
 
-where you replace:
-- website: The website your server runs on, e.g. `localhost:3000`
-- owner, repo: The owner and repository name of the game you want to load from github.
+You call the URL that's listed under "What's Next?" in the latest action run. Explicitely you call
+the URL of the form
 
- will trigger to download the latest version of your game from github onto your server.
- Once this import reports "Done", you should be able to play your game under:
+> adam.math.hhu.de/import/trigger/{USER}/{REPOSITORY}
 
-> https://{website}/#/g/{owner}/{repo}
+where `{USER}` and `{REPOSITORY}` are replaced with the github user and repository name.
 
-## data management
-Everything downloaded remains in the folder `lean4game/games`.
-the subfolder `tmp` contains downloaded artifacts and can be deleted without loss.
-The other folders should only contain the built lean-games, sorted by owner and repo.
+You should see a white screen which shows import updates and eventually reports "Done."
+
+## 3. Play the game
+
+Now you can immediately play the game at `adam.math.hhu.de/#/g/{USER}/{REPOSITORY}`!
+
+## 4. Main page
+
+Adding games to the main page happens manually by the server maintainers. Tell us if you want us
+to add a tile for your game!
