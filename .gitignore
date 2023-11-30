@@ -1,4 +1,5 @@
 node_modules
+games/
 client/dist
 games/
 server/.lake
