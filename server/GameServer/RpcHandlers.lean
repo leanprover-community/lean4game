@@ -114,25 +114,24 @@ def evalHintMessage : Expr → MetaM (Array Expr → MessageData) := fun _ => pu
 open Meta in
 /-- Find all hints whose trigger matches the current goal -/
 def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) (initParams : Lsp.InitializeParams) : MetaM (Array GameHint) := do
-  goal.withContext do
-    let some level ← getLevelByFileName? initParams doc.meta.mkInputContext.fileName
-      | throwError "Level not found: {doc.meta.mkInputContext.fileName}"
-    let hints ← level.hints.filterMapM fun hint => do
-      openAbstractCtxResult hint.goal fun hintFVars hintGoal => do
-        if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
+  let some level ← getLevelByFileName? initParams doc.meta.mkInputContext.fileName
+    | throwError "Level not found: {doc.meta.mkInputContext.fileName}"
+  let hints ← level.hints.filterMapM fun hint => do
+    openAbstractCtxResult hint.goal fun hintFVars hintGoal => goal.withContext do
+      if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
+      then
+        let lctx := (← goal.getDecl).lctx
+        if let some bij ← matchDecls hintFVars lctx.getFVars (strict := hint.strict) (initBij := fvarBij)
         then
-          let lctx := (← goal.getDecl).lctx
-          if let some bij ← matchDecls hintFVars lctx.getFVars (strict := hint.strict) (initBij := fvarBij)
-          then
-            let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
-            let text := (← evalHintMessage hint.text) (userFVars.map Expr.fvar)
-            let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
-            let text ← (MessageData.withContext ctx text).toString
-            return some { text := text, hidden := hint.hidden }
-          else return none
-        else
-          return none
-    return hints
+          let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
+          let text := (← evalHintMessage hint.text) (userFVars.map Expr.fvar)
+          let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
+          let text ← (MessageData.withContext ctx text).toString
+          return some { text := text, hidden := hint.hidden }
+        else return none
+      else
+        return none
+  return hints
 
 open RequestM in
 def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option InteractiveGoals)) := do
