@@ -4,3 +4,4 @@ games/
 server/.lake
 **/.DS_Store
 logs/
+relay/prev_cpu_metric
