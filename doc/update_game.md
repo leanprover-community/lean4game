@@ -10,15 +10,14 @@ Before you continue, make sure there [exists a `v4.X.0`-tag in this repo](https:
 Then, depending on the setup you use, do one of the following:
 
 * Dev Container: Rebuild the VSCode Devcontainer.
-* Local Setup: run
+* Local Setup: in your game's folder run the following:
   ```
   lake update -R
   lake build
   ```
-  in your game folder.
 
   * Additionally, if you have a local copy of the server `lean4game`,
-    you should update this one to the matching version, too:
+    you should update this one to the matching version. Run the following in the folder `lean4game/`:
     ```
     git fetch
     git checkout {VERSION_TAG}
@@ -27,7 +26,7 @@ Then, depending on the setup you use, do one of the following:
     where `{VERSION_TAG}` is the tag from above of the form `v4.X.0`
 * Gitpod/Codespaces: Create a fresh one
 
-This will your game (and the mathlib version you might be using) to the new lean version.
+This will update your game (and the mathlib version you might be using) to the new lean version.
 
 ## Newest developing setup
 
