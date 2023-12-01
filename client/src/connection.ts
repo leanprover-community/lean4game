@@ -3,8 +3,9 @@
  */
 
 import * as React from 'react';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { LeanClient } from 'lean4web/client/src/editor/leanclient';
+import { IConnectionProvider } from 'monaco-languageclient'
+import { toSocket, WebSocketMessageReader, WebSocketMessageWriter } from 'vscode-ws-jsonrpc'
 
 export class Connection {
   private game: string = undefined // We only keep a connection to a single game at a time
@@ -18,8 +19,32 @@ export class Connection {
       this.game = game
       // Start a new Lean client for the new `gameId`.
       const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + game
-      const uri = monaco.Uri.parse('file:///')
-      this.leanClient = new LeanClient(socketUrl, undefined, uri, () => {})
+
+      const connectionProvider : IConnectionProvider = {
+        get: async () => {
+          return await new Promise((resolve, reject) => {
+            console.log(`connecting ${socketUrl}`)
+            const websocket = new WebSocket(socketUrl)
+            websocket.addEventListener('error', (ev) => {
+              reject(ev)
+            })
+            websocket.addEventListener('message', (msg) => {
+              // console.log(msg.data)
+            })
+            websocket.addEventListener('open', () => {
+              const socket = toSocket(websocket)
+              const reader = new WebSocketMessageReader(socket)
+              const writer = new WebSocketMessageWriter(socket)
+              resolve({
+                reader,
+                writer
+              })
+            })
+          })
+        }
+      }
+
+      this.leanClient = new LeanClient(connectionProvider, () => {})
     }
 
     return this.leanClient
