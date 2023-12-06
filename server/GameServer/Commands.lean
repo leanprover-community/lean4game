@@ -46,7 +46,9 @@ elab "Title" t:str : command => do
   match ← getCurLayer with
   | .Level => modifyCurLevel fun level => pure {level with title := t.getString}
   | .World => modifyCurWorld  fun world => pure {world with title := t.getString}
-  | .Game => modifyCurGame  fun game => pure {game with title := t.getString}
+  | .Game => modifyCurGame  fun game => pure {game with
+      title := t.getString
+      tile := {game.tile with title := t.getString}}
 
 /-- Define the introduction of the current game/world/level. -/
 elab "Introduction" t:str : command => do
@@ -70,6 +72,33 @@ elab "Conclusion" t:str : command => do
   | .Level => modifyCurLevel fun level => pure {level with conclusion := t.getString}
   | .World => modifyCurWorld  fun world => pure {world with conclusion := t.getString}
   | .Game => modifyCurGame  fun game => pure {game with conclusion := t.getString}
+
+/-- A list of games that should be played before this one. Example `Prerequisites "NNG" "STG"`. -/
+elab "Prerequisites" t:str* : command => do
+  modifyCurGame fun game => pure {game with
+    tile := {game.tile with prerequisites := t.map (·.getString) |>.toList}}
+
+/-- Short caption for the game (1 sentence) -/
+elab "CaptionShort" t:str : command => do
+  modifyCurGame fun game => pure {game with
+    tile := {game.tile with short := t.getString}}
+
+/-- More detailed description what the game is about (2-4 sentences). -/
+elab "CaptionLong" t:str : command => do
+  modifyCurGame fun game => pure {game with
+    tile := {game.tile with long := t.getString}}
+
+/-- A list of Languages the game is translated to. For example `Languages "German" "English"`.
+NOTE: For the time being, only a single language is supported.
+ -/
+elab "Languages" t:str* : command => do
+  modifyCurGame fun game => pure {game with
+    tile := {game.tile with languages := t.map (·.getString) |>.toList}}
+
+/-- The Image of the game (optional). TODO: Not impementeds -/
+elab "Image" t:str : command => do
+  modifyCurGame fun game => pure {game with
+    tile := {game.tile with image := t.getString}}
 
 
 /-! # Inventory
@@ -848,8 +877,12 @@ elab "MakeGame" : command => do
   -- Items that should not be displayed in inventory
   let mut hiddenItems : HashSet Name := {}
 
+  let allWorlds := game.worlds.nodes.toArray
+  let nrWorlds := allWorlds.size
+  let mut nrLevels := 0
+
   -- Calculate which "items" are used/new in which world
-  for (worldId, world) in game.worlds.nodes.toArray do
+  for (worldId, world) in allWorlds do
     let mut usedItems : HashSet Name := {}
     let mut newItems : HashSet Name := {}
     for inventoryType in #[.Tactic, .Definition, .Lemma] do
@@ -888,9 +921,12 @@ elab "MakeGame" : command => do
     -- logInfo m!"{worldId} uses: {usedItems.toList}"
     -- logInfo m!"{worldId} introduces: {newItems.toList}"
 
+    -- Moreover, count the number of levels in the game
+    nrLevels := nrLevels + world.levels.toArray.size
+
   /- for each "item" this is a HashSet of `worldId`s that introduce this item -/
   let mut worldsWithNewItem : HashMap Name (HashSet Name) := {}
-  for (worldId, _world) in game.worlds.nodes.toArray do
+  for (worldId, _world) in allWorlds do
     for newItem in newItemsInWorld.findD worldId {} do
       worldsWithNewItem := worldsWithNewItem.insert newItem $
         (worldsWithNewItem.findD newItem {}).insert worldId
@@ -902,7 +938,7 @@ elab "MakeGame" : command => do
   let mut dependencyReasons : HashMap (Name × Name) (HashSet Name) := {}
 
   -- Calculate world dependency graph `game.worlds`
-  for (dependentWorldId, _dependentWorld) in game.worlds.nodes.toArray do
+  for (dependentWorldId, _dependentWorld) in allWorlds do
     let mut dependsOnWorlds : HashSet Name := {}
     -- Adding manual dependencies that were specified via the `Dependency` command.
     for (sourceId, targetId) in game.worlds.edges do
@@ -957,6 +993,11 @@ elab "MakeGame" : command => do
       modifyCurGame fun game =>
         pure {game with worlds := {game.worlds with
           edges := game.worlds.edges.append (worldIds.toArray.map fun wid => (wid, dependentWorldId))}}
+
+  -- Add the number of levels and worlds to the tile for the landing page
+  modifyCurGame fun game => pure {game with tile := {game.tile with
+    levels := nrLevels
+    worlds := nrWorlds }}
 
   -- Apparently we need to reload `game` to get the changes to `game.worlds` we just made
   let game ← getCurGame

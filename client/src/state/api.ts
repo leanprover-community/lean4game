@@ -3,6 +3,18 @@
 */
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+
+export interface GameTile {
+  title: string
+  short: string
+  long: string
+  languages: Array<string>
+  prerequisites: Array<string>
+  worlds: number
+  levels: number
+  image: string
+}
+
 export interface GameInfo {
   title: null|string,
   introduction: null|string,
@@ -11,6 +23,7 @@ export interface GameInfo {
   worldSize: null|{[key: string]: number},
   authors: null|string[],
   conclusion: null|string,
+  tile: null|GameTile
 }
 
 export interface InventoryTile {

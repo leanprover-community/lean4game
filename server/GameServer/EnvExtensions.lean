@@ -342,6 +342,32 @@ instance : ToJson World := ⟨
 
 /-! ## Game -/
 
+/-- A tile as they are displayed on the servers landing page. -/
+structure GameTile where
+  /-- The title of the game -/
+  title: String
+  /-- One catch phrase about the game -/
+  short: String := default
+  /-- One paragraph description what the game is about -/
+  long: String := default
+  /-- List of languages the game supports
+
+  TODO: What's the expectected format
+  TODO: Must be a list with a single language currently
+   -/
+  languages: List String := default
+  /-- A list of games which this one builds upon -/
+  prerequisites: List String := default
+  /-- Number of worlds in the game -/
+  worlds: Nat := default
+  /-- Number of levels in the game -/
+  levels: Nat := default
+  /-- A cover image of the game
+
+  TODO: What's the format? -/
+  image: String := default
+deriving Inhabited, ToJson
+
 structure Game where
   /-- Internal name of the game. -/
   name : Name
@@ -356,6 +382,7 @@ structure Game where
   /-- TODO: currently unused. -/
   authors : List String := default
   worlds : Graph Name World := default
+  tile : GameTile := default
 deriving Inhabited, ToJson
 
 def getGameJson (game : «Game») : Json := Id.run do

@@ -35,7 +35,7 @@ router.get('/import/status/:owner/:repo', importStatus)
 router.get('/import/trigger/:owner/:repo', importTrigger)
 
 const server = app
-  .use(express.static(path.join(__dirname, '../client/dist/')))
+  .use(express.static(path.join(__dirname, '../client/dist/'))) // TODO: add a dist folder from inside the game
   .use('/data/g/:owner/:repo/*', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
@@ -95,7 +95,7 @@ function startServerProcess(owner, repo) {
   let serverProcess
   if (isDevelopment) {
     let args = ["--server", game_dir]
-    serverProcess = cp.spawn("./gameserver", args,
+    serverProcess = cp.spawn("./gameserver", args,  // TODO: find gameserver inside the games
         { cwd: path.join(__dirname, "./.lake/build/bin/") })
   } else {
     serverProcess =  cp.spawn("./bubblewrap.sh",
