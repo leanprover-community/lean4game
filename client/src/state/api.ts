@@ -19,11 +19,12 @@ export interface GameInfo {
   title: null|string,
   introduction: null|string,
   info: null|string,
-  worlds: null|{nodes: {[id:string]: {id: string, title: string, introduction: string}}, edges: string[][]},
+  worlds: null|{nodes: {[id:string]: {id: string, title: string, introduction: string, image: string}}, edges: string[][]},
   worldSize: null|{[key: string]: number},
   authors: null|string[],
   conclusion: null|string,
-  tile: null|GameTile
+  tile: null|GameTile,
+  image: null|string
 }
 
 export interface InventoryTile {
@@ -49,7 +50,8 @@ export interface LevelInfo {
   lemmaTab: null|string,
   statementName: null|string,
   displayName: null|string,
-  template: null|string
+  template: null|string,
+  image: null|string
 }
 
 /** Used to display the inventory on the welcome page */

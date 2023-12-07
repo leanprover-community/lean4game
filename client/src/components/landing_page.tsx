@@ -7,13 +7,12 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 import '../css/landing_page.css'
-import coverRobo from '../assets/covers/formaloversum.png'
-import coverNNG from '../assets/covers/nng.png'
 import bgImage from '../assets/bg.jpg'
 
 import Markdown from './markdown';
 import {PrivacyPolicyPopup} from './popup/privacy_policy'
 import { GameTile, useGetGameInfoQuery } from '../state/api'
+import path from 'path';
 
 const flag = {
   'Dutch': '🇳🇱',
@@ -50,7 +49,7 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
       <div className="title">{data.title}</div>
       <div className="short-description">{data.short}
       </div>
-      { data.image ? <img className="image" src={data.image} alt="" /> : <div className="image"/> }
+      { data.image ? <img className="image" src={path.join("data", gameId, data.image)} alt="" /> : <div className="image"/> }
       <div className="long description"><Markdown>{data.long}</Markdown></div>
     </div>
     <table className="info">

@@ -60,10 +60,32 @@ elab "Introduction" t:str : command => do
 /-- Define the info of the current game. Used for e.g. credits -/
 elab "Info" t:str : command => do
   match ← getCurLayer with
-  | .Level => pure ()
-  | .World => pure ()
+  | .Level =>
+    logError "Can't use `Info` in a level!"
+    pure ()
+  | .World =>
+    logError "Can't use `Info` in a world"
+    pure ()
   | .Game => modifyCurGame  fun game => pure {game with info := t.getString}
 
+/-- Provide the location of the image for the current game/world/level.
+Paths are relative to the lean project's root. -/
+elab "Image" t:str : command => do
+  let file := t.getString
+  if not <| ← System.FilePath.pathExists file then
+    logWarningAt t s!"Make sure the cover image '{file}' exists."
+  if not <| file.startsWith "images/" then
+    logWarningAt t s!"The file name should start with `images/`. Make sure all images are in that folder."
+
+  match ← getCurLayer with
+  | .Level =>
+    logWarning "Level-images not implemented yet" -- TODO
+    modifyCurLevel fun level => pure {level with image := file}
+  | .World =>
+    modifyCurWorld  fun world => pure {world with image := file}
+  | .Game =>
+    logWarning "Main image of the game not implemented yet" -- TODO
+    modifyCurGame  fun game => pure {game with image := file}
 
 /-- Define the conclusion of the current game or current level if some
 building a level. -/
@@ -96,10 +118,15 @@ elab "Languages" t:str* : command => do
     tile := {game.tile with languages := t.map (·.getString) |>.toList}}
 
 /-- The Image of the game (optional). TODO: Not impementeds -/
-elab "Image" t:str : command => do
-  modifyCurGame fun game => pure {game with
-    tile := {game.tile with image := t.getString}}
+elab "CoverImage" t:str : command => do
+  let file := t.getString
+  if not <| ← System.FilePath.pathExists file then
+    logWarningAt t s!"Make sure the cover image '{file}' exists."
+  if not <| file.startsWith "images/" then
+    logWarningAt t s!"The file name should start with `images/`. Make sure all images are in that folder."
 
+  modifyCurGame fun game => pure {game with
+    tile := {game.tile with image := file}}
 
 /-! # Inventory
 
@@ -655,6 +682,26 @@ elab "Template" tacs:tacticSeq : tactic => do
   modifyLevel (←getCurLevelId) fun level => do
     return {level with template := s!"{template}"}
 
+
+
+open IO.FS System FilePath in
+/-- Copies the folder `images/` to `.lake/gamedata/images/` -/
+def copyImages : IO Unit := do
+  let target : FilePath := ".lake" / "gamedata"
+  for file in ← walkDir "images" do
+    let outFile := target.join file
+    -- create the directories
+    if ← file.isDir then
+      createDirAll outFile
+    else
+      if let some parent := outFile.parent then
+        createDirAll parent
+      -- copy file
+      let content ← readBinFile file
+      writeBinFile outFile content
+
+
+
 -- TODO: Notes for testing if a declaration has the simp attribute
 
 -- -- Test: From zulip
@@ -676,7 +723,7 @@ elab "Template" tacs:tacticSeq : tactic => do
 #eval IO.FS.createDirAll ".lake/gamedata/"
 
 -- TODO: register all of this as ToJson instance?
-def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name)) : CommandElabM Unit:= do
+def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name)) : CommandElabM Unit := do
   let game ← getCurGame
   let env ← getEnv
   let path : System.FilePath := s!"{← IO.currentDir}" / ".lake" / "gamedata"
@@ -684,6 +731,9 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name)) : Comma
   if ← path.isDir then
     IO.FS.removeDirAll path
   IO.FS.createDirAll path
+
+  -- copy the images folder
+  copyImages
 
   for (worldId, world) in game.worlds.nodes.toArray do
     for (levelId, level) in world.levels.toArray do

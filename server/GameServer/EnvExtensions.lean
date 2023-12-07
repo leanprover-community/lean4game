@@ -265,7 +265,9 @@ structure GameLevel where
   lemmas: InventoryInfo := default
   /-- A proof template that is printed in an empty editor. -/
   template: Option String := none
-  deriving Inhabited, Repr
+  /-- The image for this level. -/
+  image : String := default
+deriving Inhabited, Repr
 
 /-- Json-encodable version of `GameLevel`
 Fields:
@@ -286,6 +288,7 @@ structure LevelInfo where
   displayName : Option String
   statementName : Option String
   template : Option String
+  image: Option String
 deriving ToJson, FromJson
 
 def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
@@ -315,6 +318,7 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
         -- Note: we could call `.find!` because we check in `Statement` that the
         -- lemma doc must exist.
     template := lvl.template
+    image := lvl.image
   }
 
 /-! ## World -/
@@ -331,13 +335,16 @@ structure World where
   conclusion : String := default
   /-- The levels of the world. -/
   levels: HashMap Nat GameLevel := default
+  /-- The introduction image of the world. -/
+  image: String := default
 deriving Inhabited
 
 instance : ToJson World := ⟨
   fun world => Json.mkObj [
     ("name", toJson world.name),
     ("title", world.title),
-    ("introduction", world.introduction)]
+    ("introduction", world.introduction),
+    ("image", world.image)]
 ⟩
 
 /-! ## Game -/
@@ -382,7 +389,10 @@ structure Game where
   /-- TODO: currently unused. -/
   authors : List String := default
   worlds : Graph Name World := default
+  /-- The tile displayed on the server's landing page. -/
   tile : GameTile := default
+  /-- The path to the background image of the world. -/
+  image : String := default
 deriving Inhabited, ToJson
 
 def getGameJson (game : «Game») : Json := Id.run do

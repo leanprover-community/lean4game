@@ -336,6 +336,16 @@ td code  {
   background-color: #eee;
 }
 
+.world-image-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.world-image-container img {
+  object-fit: contain;
+}
+
 .typewriter-interface .proof {
   background-color: #fff;
 }
