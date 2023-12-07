@@ -209,7 +209,6 @@ export function selectTypewriterMode(game: string) {
   }
 }
 
-
 /** Export actions to modify the progress */
 export const { changedSelection, codeEdited, levelCompleted, deleteProgress,
   deleteLevelProgress, loadProgress, helpEdited, changedInventory, changedOpenedIntro,
