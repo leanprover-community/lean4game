@@ -86,11 +86,10 @@ Download dependencies and build the game:
 ```bash
 cd GameSkeleton
 lake update -R
-lake exe cache get   # if your game depends on mathlib
 lake build
 ```
 
-Clone the game repository into a directory next to the game:
+Clone the server repository into a directory next to the game:
 ```bash
 cd ..
 git clone https://github.com/leanprover-community/lean4game.git
