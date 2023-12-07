@@ -22,7 +22,7 @@ import { ConnectionContext, connection, useLeanClient } from '../connection'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
 import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited,
-  selectHelp, selectDifficulty, selectInventory } from '../state/progress'
+  selectHelp, selectDifficulty, selectInventory, selectTypewriterMode, changeTypewriterMode } from '../state/progress'
 import { store } from '../state/store'
 import { Button } from './button'
 import Markdown from './markdown'
@@ -203,12 +203,17 @@ function PlayableLevel({impressum, setImpressum}) {
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(MobileContext)
 
+  const dispatch = useAppDispatch()
+
   const difficulty = useSelector(selectDifficulty(gameId))
   const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
   const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
   const inventory: Array<String> = useSelector(selectInventory(gameId))
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
+  const typewriterMode = useSelector(selectTypewriterMode(gameId))
+  const setTypewriterMode = (newTypewriterMode: boolean) => dispatch(changeTypewriterMode({game: gameId, typewriterMode: newTypewriterMode}))
+
+  const gameInfo = useGetGameInfoQuery({game: gameId})  
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
 
   // The state variables for the `ProofContext`
@@ -220,12 +225,11 @@ function PlayableLevel({impressum, setImpressum}) {
   const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
-  const [typewriterMode, setTypewriterMode] = useState(true)
+
   // set to true to prevent switching between typewriter and editor
   const [lockInputMode, setLockInputMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
-  const dispatch = useAppDispatch()
 
   // impressum pop-up
   function toggleImpressum() {setImpressum(!impressum)}
@@ -319,8 +323,6 @@ function PlayableLevel({impressum, setImpressum}) {
           console.debug(`not inserting template.`)
         }
       }
-    } else {
-      setTypewriterMode(true)
     }
   }, [level, levelId, worldId, gameId, editor])
 
@@ -335,7 +337,7 @@ function PlayableLevel({impressum, setImpressum}) {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    if (!typewriterMode) {
+    if (!typewriterMode && editor) {
       // Delete last input attempt from command line
       editor.executeEdits("typewriter", [{
         range: editor.getSelection(),
