@@ -221,7 +221,10 @@ function PlayableLevel({impressum, setImpressum}) {
   const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
-  const [typewriterMode, setTypewriterMode] = useState(true)
+  const [typewriterMode, setTypewriterMode] = useState(()=>{
+    const savedMode = localStorage.getItem('lean4game:typewriterMode');
+    return savedMode !== null ? JSON.parse(savedMode) : true;
+  })
   // set to true to prevent switching between typewriter and editor
   const [lockInputMode, setLockInputMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
@@ -320,8 +323,6 @@ function PlayableLevel({impressum, setImpressum}) {
           console.debug(`not inserting template.`)
         }
       }
-    } else {
-      setTypewriterMode(true)
     }
   }, [level, levelId, worldId, gameId, editor])
 
@@ -336,7 +337,7 @@ function PlayableLevel({impressum, setImpressum}) {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    if (!typewriterMode) {
+    if (!typewriterMode && editor) {
       // Delete last input attempt from command line
       editor.executeEdits("typewriter", [{
         range: editor.getSelection(),

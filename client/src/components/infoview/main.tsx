@@ -156,7 +156,7 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
 
   const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
 
-  console.debug(`template: ${props.data.template}`)
+  console.debug(`template: ${props.data?.template}`)
 
   // React.useEffect (() => {
   //   if (props.data.template) {
