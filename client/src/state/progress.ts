@@ -26,7 +26,8 @@ export interface GameProgressState {
   inventory: string[],
   difficulty: number,
   openedIntro: boolean,
-  data: WorldProgressState
+  data: WorldProgressState,
+  typewriterMode: boolean
 }
 
 /**
@@ -53,7 +54,7 @@ const initalLevelProgressState: LevelProgressState = {code: "", completed: false
 /** Add an empty skeleton with progress for the current game */
 function addGameProgress (state: ProgressState, action: PayloadAction<{game: string}>) {
   if (!state.games[action.payload.game]) {
-    state.games[action.payload.game] = {inventory: [], openedIntro: true, data: {}, difficulty: DEFAULT_DIFFICULTY}
+    state.games[action.payload.game] = {inventory: [], openedIntro: true, data: {}, difficulty: DEFAULT_DIFFICULTY, typewriterMode: true}
   }
   if (!state.games[action.payload.game].data) {
     state.games[action.payload.game].data = {}
@@ -99,7 +100,7 @@ export const progressSlice = createSlice({
     },
     /** delete all progress for this game */
     deleteProgress(state: ProgressState, action: PayloadAction<{game: string}>) {
-      state.games[action.payload.game] = {inventory: [], data: {}, openedIntro: true, difficulty: DEFAULT_DIFFICULTY}
+      state.games[action.payload.game] = {inventory: [], data: {}, openedIntro: true, difficulty: DEFAULT_DIFFICULTY, typewriterMode: true}
     },
     /** delete progress for this level */
     deleteLevelProgress(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
@@ -126,6 +127,10 @@ export const progressSlice = createSlice({
       addGameProgress(state, action)
       state.games[action.payload.game].openedIntro = action.payload.openedIntro
     },
+    changeTypewriterMode(state: ProgressState, action: PayloadAction<{game: string, typewriterMode: boolean}>) {
+      addGameProgress(state, action)
+      state.games[action.payload.game].typewriterMode = action.payload.typewriterMode
+    }
   }
 })
 
@@ -196,7 +201,15 @@ export function selectOpenedIntro(game: string) {
   }
 }
 
+/** return whether the intro has been read */
+export function selectTypewriterMode(game: string) {
+  return (state) => {
+    return state.progress.games[game] ? state.progress.games[game].typewriterMode : true
+  }
+}
+
+
 /** Export actions to modify the progress */
 export const { changedSelection, codeEdited, levelCompleted, deleteProgress,
   deleteLevelProgress, loadProgress, helpEdited, changedInventory, changedOpenedIntro,
-  changedDifficulty } = progressSlice.actions
+  changedDifficulty, changeTypewriterMode} = progressSlice.actions

@@ -103,7 +103,6 @@ function InputModeButton({setNavOpen, isDropdown}) {
   /** toggle input mode if allowed */
   function toggleInputMode(ev: React.MouseEvent) {
     if (!lockInputMode){
-      localStorage.setItem("lean4game:typewriterMode", JSON.stringify(!typewriterMode))
       setTypewriterMode(!typewriterMode)
       setNavOpen(false)
     }
