@@ -688,17 +688,18 @@ open IO.FS System FilePath in
 /-- Copies the folder `images/` to `.lake/gamedata/images/` -/
 def copyImages : IO Unit := do
   let target : FilePath := ".lake" / "gamedata"
-  for file in ← walkDir "images" do
-    let outFile := target.join file
-    -- create the directories
-    if ← file.isDir then
-      createDirAll outFile
-    else
-      if let some parent := outFile.parent then
-        createDirAll parent
-      -- copy file
-      let content ← readBinFile file
-      writeBinFile outFile content
+  if ← FilePath.pathExists "images" then
+    for file in ← walkDir "images" do
+      let outFile := target.join file
+      -- create the directories
+      if ← file.isDir then
+        createDirAll outFile
+      else
+        if let some parent := outFile.parent then
+          createDirAll parent
+        -- copy file
+        let content ← readBinFile file
+        writeBinFile outFile content
 
 
 
