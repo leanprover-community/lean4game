@@ -65,13 +65,13 @@ function getGameDir(owner, repo) {
   if (owner == 'local') {
     if(!isDevelopment) {
       console.error(`No local games in production mode.`)
-      return
+      return ""
     }
   } else {
     if(!fs.existsSync(path.join(__dirname, '..', 'games'))) {
       console.error(`Did not find the following folder: ${path.join(__dirname, '..', 'games')}`)
       console.error('Did you already import any games?')
-      return
+      return ""
     }
   }
 
@@ -81,7 +81,7 @@ function getGameDir(owner, repo) {
 
   if(!fs.existsSync(game_dir)) {
     console.error(`Game '${game_dir}' does not exist!`)
-    return
+    return ""
   }
 
   return game_dir;
