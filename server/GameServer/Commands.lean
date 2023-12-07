@@ -989,6 +989,11 @@ elab "MakeGame" : command => do
         logError m!"{w1} depends on {w2} because of {items.toList}."
   else
     worldDependsOnWorlds ← removeTransitive worldDependsOnWorlds
+
+    -- need to delete all existing edges as they are already present in `worldDependsOnWorlds`.
+    modifyCurGame fun game =>
+      pure {game with worlds := {game.worlds with edges := Array.empty}}
+
     for (dependentWorldId, worldIds) in worldDependsOnWorlds.toArray do
       modifyCurGame fun game =>
         pure {game with worlds := {game.worlds with
