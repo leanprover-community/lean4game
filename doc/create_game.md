@@ -243,6 +243,14 @@ Hint "now use `rw [{h}]` to use your assumption {h}."
 ```
 That way, the game will replace it with the actual name the assumption has in the player's proof state.
 
+### 6. e) Extra: Images
+You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
+
+The images need to be placed in `images/` and you need to add a command like `Image "images/path/to/myWorldImage.png"` 
+in one of the files you created in 2), 3), or 4) (i.e. game/world/level).
+
+NOTE: At present, only the images for a world are displayed. They appear in the introduction of the world.
+
 ## 7. Update your game
 
 In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](doc/update_game.md).
@@ -250,6 +258,21 @@ In principle, it is as simple as modifying `lean-toolchain` to update your game 
 ## 8. Publish your game
 
 To publish your game on the official server, see [Publishing a game](doc/publish_game.md)
+
+There are a few more options you can add in `Game.lean` before the `MakeGame` command, which describe the tile that is visible on the server's landing page:
+
+```lean
+Languages "English"
+CaptionShort "Game Template"
+CaptionLong "You should use this game as a template for your own game and add your own levels."
+Prerequisites "NNG"
+CoverImage "images/cover.png"
+```
+* `Languages`: Currently only a single language (capital English name). The tile will show a corresponding flag.
+* `CaptionShort`: One catch phrase. Appears above the image.
+* `CaptionLong`: 2-4 sentences to describe the game.
+* `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
+* `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
 ## Further Notes
 
