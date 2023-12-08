@@ -95,7 +95,7 @@ function startServerProcess(owner, repo) {
   let serverProcess
   if (isDevelopment) {
     let args = ["--server", game_dir]
-    let executable = path.join(game_dir, ".lake", "packages", "GameServer", ".lake", "build", "bin", "gameserver")
+    let executable = path.join(game_dir, ".lake", "packages", "GameServer", "server", ".lake", "build", "bin", "gameserver")
     if (fs.existsSync(executable)) {
       // Try to use the game's own copy of `gameserver`.
       serverProcess = cp.spawn(executable, args, { cwd: game_dir })
