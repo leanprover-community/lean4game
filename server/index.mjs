@@ -95,11 +95,20 @@ function startServerProcess(owner, repo) {
   let serverProcess
   if (isDevelopment) {
     let args = ["--server", game_dir]
-    serverProcess = cp.spawn("./gameserver", args,  // TODO: find gameserver inside the games
-        { cwd: path.join(__dirname, "./.lake/build/bin/") })
+    let executable = path.join(game_dir, ".lake", "packages", "GameServer", ".lake", "build", "bin", "gameserver")
+    if (fs.existsSync(executable)) {
+      // Try to use the game's own copy of `gameserver`.
+      serverProcess = cp.spawn(executable, args, { cwd: game_dir })
+    } else {
+      // If the game is built with `-Klean4game.local` there is no copy in the lake packages.
+      serverProcess = cp.spawn("./gameserver", args,
+        { cwd: path.join(__dirname, ".lake", "build", "bin") })
+    }
   } else {
     serverProcess =  cp.spawn("./bubblewrap.sh",
-      [game_dir, path.join(__dirname, '..')],
+      [ game_dir,
+        path.join(__dirname, '..'),
+        path.join(game_dir, ".lake", "packages", "GameServer", ".lake", "build", "bin", "gameserver")],
       { cwd: __dirname })
   }
   serverProcess.on('error', error =>
