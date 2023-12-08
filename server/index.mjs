@@ -95,10 +95,11 @@ function startServerProcess(owner, repo) {
   let serverProcess
   if (isDevelopment) {
     let args = ["--server", game_dir]
-    let executable = path.join(game_dir, ".lake", "packages", "GameServer", "server", ".lake", "build", "bin", "gameserver")
-    if (fs.existsSync(executable)) {
+    let binDir = path.join(game_dir, ".lake", "packages", "GameServer", "server", ".lake", "build", "bin")
+    // Note: `cwd` is important to be the `bin` directory as `Watchdog` calls `./gameserver` again
+    if (fs.existsSync(binDir)) {
       // Try to use the game's own copy of `gameserver`.
-      serverProcess = cp.spawn(executable, args, { cwd: game_dir })
+      serverProcess = cp.spawn("./gameserver", args, { cwd: binDir })
     } else {
       // If the game is built with `-Klean4game.local` there is no copy in the lake packages.
       serverProcess = cp.spawn("./gameserver", args,
