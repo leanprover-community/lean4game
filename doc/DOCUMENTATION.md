@@ -1,6 +1,8 @@
+**NOTE! This document is deprecated! The current documentation is [How To Create A Game](create_game.md)**
+
 # Creating a game.
 
-Ideally one takes the [NNG template](https://github.com/hhu-adam/NNG4) to create a new game.
+Ideally one takes the [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton) to create a new game.
 
 ## Game Structure
 
