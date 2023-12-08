@@ -214,7 +214,7 @@ function PlayableLevel({impressum, setImpressum}) {
   const typewriterMode = useSelector(selectTypewriterMode(gameId))
   const setTypewriterMode = (newTypewriterMode: boolean) => dispatch(changeTypewriterMode({game: gameId, typewriterMode: newTypewriterMode}))
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})  
+  const gameInfo = useGetGameInfoQuery({game: gameId})
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
 
   // The state variables for the `ProofContext`
@@ -488,7 +488,8 @@ function Introduction({impressum, setImpressum}) {
           <IntroductionPanel gameInfo={gameInfo} />
           <div className="world-image-container empty">
             {image &&
-              <img src={path.join("data", gameId, image)} alt="" />
+              // TODO: Temporary for testing
+              <img className={worldId=="Proposition" ? "cover" : "contain"} src={path.join("data", gameId, image)} alt="" />
             }
 
           </div>

@@ -342,8 +342,13 @@ td code  {
   justify-content: center;
 }
 
-.world-image-container img {
+.world-image-container img.contain {
   object-fit: contain;
+}
+
+.world-image-container img.cover {
+  height: 100%;
+  object-fit: cover;
 }
 
 .typewriter-interface .proof {
