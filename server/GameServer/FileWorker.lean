@@ -478,6 +478,8 @@ section Initialization
     return (ctx,
     { doc             := doc
       initHeaderStx   := headerStx
+      currHeaderStx      := headerStx
+      importCachingTask? := none
       pendingRequests := RBMap.empty
       rpcSessions     := RBMap.empty
     })

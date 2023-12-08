@@ -103,7 +103,7 @@ def initAndRunWatchdog (args : List String) (i o e : FS.Stream) : IO Unit := do
   let gameName := if args.length < 4 then defaultGameName else args[3]!
   let workerPath := "./gameserver"
   -- TODO: Do the following commands slow us down?
-  let srcSearchPath ← initSrcSearchPath (← getBuildDir)
+  let srcSearchPath ← initSrcSearchPath
   let references ← IO.mkRef (← loadReferences)
   let fileWorkersRef ← IO.mkRef (RBMap.empty : FileWorkerMap)
   let i ← maybeTee "wdIn.txt" false i
