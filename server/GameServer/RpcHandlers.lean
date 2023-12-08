@@ -126,7 +126,7 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) (initParams : 
           then
             let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
             let text := (← evalHintMessage hint.text) (userFVars.map Expr.fvar)
-            let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
+            let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := lctx, opts := {}}
             let text ← (MessageData.withContext ctx text).toString
             return some { text := text, hidden := hint.hidden }
           else return none

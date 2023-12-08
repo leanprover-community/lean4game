@@ -34,6 +34,7 @@ import { DualEditor } from './infoview/main'
 import { GameHint } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints } from './hints'
 import { PrivacyPolicyPopup } from './popup/privacy_policy'
+import path from 'path';
 
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
@@ -467,6 +468,11 @@ function Introduction({impressum, setImpressum}) {
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
+  const {worldId} = useContext(WorldLevelIdContext)
+
+  let image: string = gameInfo.data?.worlds.nodes[worldId].image
+
+
   const toggleImpressum = () => {
     setImpressum(!impressum)
   }
@@ -480,7 +486,12 @@ function Introduction({impressum, setImpressum}) {
       :
         <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
           <IntroductionPanel gameInfo={gameInfo} />
-          <div className="world-image-container empty"></div>
+          <div className="world-image-container empty">
+            {image &&
+              <img src={path.join("data", gameId, image)} alt="" />
+            }
+
+          </div>
           <InventoryPanel levelInfo={inventory?.data} />
         </Split>
       }

@@ -3,14 +3,28 @@
 */
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+
+export interface GameTile {
+  title: string
+  short: string
+  long: string
+  languages: Array<string>
+  prerequisites: Array<string>
+  worlds: number
+  levels: number
+  image: string
+}
+
 export interface GameInfo {
   title: null|string,
   introduction: null|string,
   info: null|string,
-  worlds: null|{nodes: {[id:string]: {id: string, title: string, introduction: string}}, edges: string[][]},
+  worlds: null|{nodes: {[id:string]: {id: string, title: string, introduction: string, image: string}}, edges: string[][]},
   worldSize: null|{[key: string]: number},
   authors: null|string[],
   conclusion: null|string,
+  tile: null|GameTile,
+  image: null|string
 }
 
 export interface InventoryTile {
@@ -36,7 +50,8 @@ export interface LevelInfo {
   lemmaTab: null|string,
   statementName: null|string,
   displayName: null|string,
-  template: null|string
+  template: null|string,
+  image: null|string
 }
 
 /** Used to display the inventory on the welcome page */
@@ -59,19 +74,19 @@ interface Doc {
 // Define a service using a base URL and expected endpoints
 export const apiSlice = createApi({
   reducerPath: 'gameApi',
-  baseQuery: fetchBaseQuery({ baseUrl: window.location.origin + "/api" }),
+  baseQuery: fetchBaseQuery({ baseUrl: window.location.origin + "/data" }),
   endpoints: (builder) => ({
     getGameInfo: builder.query<GameInfo, {game: string}>({
-      query: ({game}) => `${game}/game`,
+      query: ({game}) => `${game}/game.json`,
     }),
     loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
-      query: ({game, world, level}) => `${game}/level/${world}/${level}`,
+      query: ({game, world, level}) => `${game}/level__${world}__${level}.json`,
     }),
     loadInventoryOverview: builder.query<InventoryOverview, {game: string}>({
-      query: ({game}) => `${game}/inventory`,
+      query: ({game}) => `${game}/inventory.json`,
     }),
     loadDoc: builder.query<Doc, {game: string, name: string, type: "lemma"|"tactic"}>({
-      query: ({game, type, name}) => `${game}/doc/${type}/${name}`,
+      query: ({game, type, name}) => `${game}/doc__${type}__${name}.json`,
     }),
   }),
 })

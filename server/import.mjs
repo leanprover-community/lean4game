@@ -108,12 +108,11 @@ async function doImport (owner, repo, id) {
   } catch (e) {
     progress[id].output += `Error: ${e.toString()}\n${e.stack}`
   } finally {
-    // if (artifactId) {
-    //   // fs.rmSync(`tmp/artifact_${artifactId}.zip`, {force: true, recursive: true});
-    //   // fs.rmSync(`tmp/artifact_${artifactId}`, {force: true, recursive: true});
-    //   // fs.rmSync(`tmp/artifact_${artifactId}_inner`, {force: true, recursive: true});
-    //   // fs.rmSync(`tmp/archive_${artifactId}.tar`, {force: true, recursive: true});
-    // }
+    // clean-up temp. files
+    if (artifactId) {
+      fs.rmSync(`${__dirname}/../games/tmp/${owner}_${repo}_${artifactId}.zip`, {force: true, recursive: false});
+      fs.rmSync(`${__dirname}/../games/tmp/${owner}_${repo}_${artifactId}`, {force: true, recursive: true});
+    }
     progress[id].done = true
   }
   await new Promise(resolve => setTimeout(resolve, 10000))

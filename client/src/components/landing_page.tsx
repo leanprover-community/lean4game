@@ -7,12 +7,12 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 import '../css/landing_page.css'
-import coverRobo from '../assets/covers/formaloversum.png'
-import coverNNG from '../assets/covers/nng.png'
 import bgImage from '../assets/bg.jpg'
 
 import Markdown from './markdown';
 import {PrivacyPolicyPopup} from './popup/privacy_policy'
+import { GameTile, useGetGameInfoQuery } from '../state/api'
+import path from 'path';
 
 const flag = {
   'Dutch': '🇳🇱',
@@ -33,47 +33,42 @@ function GithubIcon({url='https://github.com'}) {
     </div>
 }
 
-function GameTile({
-  title,
-  gameId,
-  intro, // Catchy intro phrase.
-  image=null,
-  worlds='?',
-  levels='?',
-  prereq='&ndash;', // Optional list of games that this game builds on. Use markdown.
-  description, // Longer description. Supports Markdown.
-  language}) {
+function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
 
   let navigate = useNavigate();
   const routeChange = () =>{
     navigate(gameId);
   }
 
+  if (typeof data === 'undefined') {
+    return <></>
+  }
+
   return <div className="game" onClick={routeChange}>
     <div className="wrapper">
-      <div className="title">{title}</div>
-      <div className="short-description">{intro}
+      <div className="title">{data.title}</div>
+      <div className="short-description">{data.short}
       </div>
-      { image ? <img className="image" src={image} alt="" /> : <div className="image"/> }
-      <div className="long description"><Markdown>{description}</Markdown></div>
+      { data.image ? <img className="image" src={path.join("data", gameId, data.image)} alt="" /> : <div className="image"/> }
+      <div className="long description"><Markdown>{data.long}</Markdown></div>
     </div>
     <table className="info">
       <tbody>
       <tr>
         <td title="consider playing these games first.">Prerequisites</td>
-        <td><Markdown>{prereq}</Markdown></td>
+        <td><Markdown>{data.prerequisites.join(', ')}</Markdown></td>
       </tr>
       <tr>
         <td>Worlds</td>
-        <td>{worlds}</td>
+        <td>{data.worlds}</td>
       </tr>
       <tr>
         <td>Levels</td>
-        <td>{levels}</td>
+        <td>{data.levels}</td>
       </tr>
       <tr>
         <td>Language</td>
-        <td title={`in ${language}`}>{flag[language]}</td>
+        <td title={`in ${data.languages.join(', ')}`}>{data.languages.map((lan) => flag[lan]).join(', ')}</td>
       </tr>
       </tbody>
     </table>
@@ -89,6 +84,56 @@ function LandingPage() {
   const openImpressum = () => setImpressum(true);
   const closeImpressum = () => setImpressum(false);
 
+  // const [allGames, setAllGames] = React.useState([])
+  // const [allTiles, setAllTiles] = React.useState([])
+
+  // const getTiles=()=>{
+  //   fetch('featured_games.json', {
+  //     headers : {
+  //       'Content-Type': 'application/json',
+  //       'Accept': 'application/json'
+  //     }
+  //   }
+  //   ).then(function(response){
+  //     return response.json()
+  //   }).then(function(data) {
+  //     setAllGames(data.featured_games)
+
+  //   })
+  // }
+
+  // React.useEffect(()=>{
+  //   getTiles()
+  // },[])
+
+  // React.useEffect(()=>{
+
+  //   Promise.allSettled(
+  //     allGames.map((gameId) => (
+  //       fetch(`data/g/${gameId}/game.json`).catch(err => {return undefined})))
+  //   ).then(responses =>
+  //     responses.forEach((result) => console.log(result)))
+  //   //   Promise.all(responses.map(res => {
+  //   //     if (res.status == "fulfilled") {
+  //   //       console.log(res.value.json())
+  //   //       return res.value.json()
+  //   //     } else {
+  //   //       return undefined
+  //   //     }
+  //   //   }))
+  //   // ).then(allData => {
+  //   //   setAllTiles(allData.map(data => data?.tile))
+  //   // })
+  // },[allGames])
+
+  // TODO: I would like to read the supported games list form a JSON,
+  // Then load all these games in
+  //
+  let allGames = [
+    "leanprover-community/nng4",
+    "djvelleman/stg4",
+    "hhu-adam/robo"]
+  let allTiles = allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
 
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
@@ -105,8 +150,19 @@ function LandingPage() {
       </div>
     </header>
     <div className="game-list">
-
-      <GameTile
+      {allTiles.length == 0 ?
+        <p>No Games loaded. Use <a>http://localhost:3000/#/g/local/FOLDER</a> to open a
+          game directly from a local folder.
+        </p>
+        : allGames.map((id, i) => (
+          <Tile
+            key={id}
+            gameId={`g/${id}`}
+            data={allTiles[i]}
+          />
+        ))
+      }
+      {/* <GameTile
         title="Natural Number Game"
         gameId="g/hhu-adam/NNG4"
         intro="The classical introduction game for Lean."
@@ -129,18 +185,7 @@ This is a good first introduction to Lean!"
         levels="30"
         language="English"
         />
-
-      <GameTile
-        title="Formaloversum"
-        gameId="g/hhu-adam/Robo"
-        intro="Erkunde das Leansche Universum mit deinem Robo, welcher dir bei der Verständigung mit den Formalosophen zur Seite steht."
-        description="
-Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet danach verschiedene Bereiche des Bachelorstudiums an.
-
-(Das Spiel befindet sich noch in der Entstehungsphase.)"
-        image={coverRobo}
-        language="German"
-        />
+   */}
     </div>
     <section>
       <div className="wrapper">

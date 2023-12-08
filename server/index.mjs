@@ -34,34 +34,15 @@ var router = express.Router();
 router.get('/import/status/:owner/:repo', importStatus)
 router.get('/import/trigger/:owner/:repo', importTrigger)
 
-function loadJson(req, filename) {
-  const owner = req.params.owner;
-  const repo = req.params.repo
-  return JSON.parse(fs.readFileSync(path.join(getGameDir(owner,repo),".lake","gamedata",filename)))
-}
-
-router.get("/api/g/:owner/:repo/game", (req, res) => {
-  res.send(loadJson(req, `game.json`));
-});
-
-router.get("/api/g/:owner/:repo/inventory", (req, res) => {
-  res.send(loadJson(req, `inventory.json`));
-});
-
-router.get("/api/g/:owner/:repo/level/:world/:level", (req, res) => {
-  const world = req.params.world;
-  const level = req.params.level;
-  res.send(loadJson(req, `level__${world}__${level}.json`));
-});
-
-router.get("/api/g/:owner/:repo/doc/:type/:name", (req, res) => {
-  const type = req.params.type;
-  const name = req.params.name;
-  res.send(loadJson(req, `doc__${type}__${name}.json`));
-});
-
 const server = app
-  .use(express.static(path.join(__dirname, '../client/dist/')))
+  .use(express.static(path.join(__dirname, '../client/dist/'))) // TODO: add a dist folder from inside the game
+  .use('/data/g/:owner/:repo/*', (req, res, next) => {
+    const owner = req.params.owner;
+    const repo = req.params.repo
+    const filename = req.params[0];
+    req.url = filename;
+    express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
+  })
   .use('/', router)
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
@@ -84,13 +65,13 @@ function getGameDir(owner, repo) {
   if (owner == 'local') {
     if(!isDevelopment) {
       console.error(`No local games in production mode.`)
-      return
+      return ""
     }
   } else {
     if(!fs.existsSync(path.join(__dirname, '..', 'games'))) {
       console.error(`Did not find the following folder: ${path.join(__dirname, '..', 'games')}`)
       console.error('Did you already import any games?')
-      return
+      return ""
     }
   }
 
@@ -100,7 +81,7 @@ function getGameDir(owner, repo) {
 
   if(!fs.existsSync(game_dir)) {
     console.error(`Game '${game_dir}' does not exist!`)
-    return
+    return ""
   }
 
   return game_dir;
@@ -114,7 +95,7 @@ function startServerProcess(owner, repo) {
   let serverProcess
   if (isDevelopment) {
     let args = ["--server", game_dir]
-    serverProcess = cp.spawn("./gameserver", args,
+    serverProcess = cp.spawn("./gameserver", args,  // TODO: find gameserver inside the games
         { cwd: path.join(__dirname, "./.lake/build/bin/") })
   } else {
     serverProcess =  cp.spawn("./bubblewrap.sh",
