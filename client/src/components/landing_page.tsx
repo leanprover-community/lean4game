@@ -20,6 +20,7 @@ const flag = {
   'French': '🇫🇷',
   'German': '🇩🇪',
   'Italian': '🇮🇹',
+  'Spanish': '🇪🇸',
 }
 
 function GithubIcon({url='https://github.com'}) {
@@ -131,8 +132,10 @@ function LandingPage() {
   //
   let allGames = [
     "leanprover-community/nng4",
+    "hhu-adam/robo",
     "djvelleman/stg4",
-    "hhu-adam/robo"]
+    "miguelmarco/STG4",
+  ]
   let allTiles = allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
 
   return <div className="landing-page">
@@ -162,38 +165,14 @@ function LandingPage() {
           />
         ))
       }
-      {/* <GameTile
-        title="Natural Number Game"
-        gameId="g/hhu-adam/NNG4"
-        intro="The classical introduction game for Lean."
-        description="In this game you recreate the natural numbers $\mathbb{N}$ from the Peano axioms,
-learning the basics about theorem proving in Lean.
-
-This is a good first introduction to Lean!"
-        worlds="8"
-        levels="67"
-        image={coverNNG}
-        language="English"
-        />
-
-      <GameTile
-        title="Set Theory Game"
-        gameId="g/djvelleman/STG4"
-        intro="A game about set theory"
-        description=""
-        worlds="5"
-        levels="30"
-        language="English"
-        />
-   */}
     </div>
     <section>
       <div className="wrapper">
         <h2>Development notes</h2>
         <p>
           As this server runs lean on our university machines, it has a limited capacity.
-          Our current estimate is about 55 copies of the NNG or 25 copies of games importing
-          mathlib. We hope to address this limitation in the future.
+          Our current estimate is about 70 simultaneous games.
+          We hope to address and test this limitation better in the future.
         </p>
         <p>
           Most aspects of the games and the infrastructure are still in development. Feel free to
@@ -207,18 +186,19 @@ This is a good first introduction to Lean!"
         <h2>Adding new games</h2>
         <p>
           If you are considering writing your own game, you should use
-          the <a target="_blank" href="https://github.com/hhu-adam/NNG4">NNG Github Repo</a> as
-          a template.
+          the <a target="_blank" href="https://github.com/hhu-adam/GameSkeleton">GameSkeleton Github Repo</a> as
+          a template and read <a target="_blank" href="https://github.com/leanprover-community/lean4game/">How to Create a Game</a>.
         </p>
         <p>
-          There is an option to load and run your own games directly on the server,
-          instructions are in the NNG repo. Since this is still in development we'd like to
-          encourage you to contact us for support creating your own game. The documentation is
-          not polished yet.
+          You can directly load your games into the server and play it using
+          the correct URL. The <a target="_blank" href="https://github.com/leanprover-community/lean4game/">instructions above</a> also
+          explain the details for how to load your game to the server.
+
+          We'd like to encourage you to contact us if you have any questions.
         </p>
         <p>
-          To add games to this main page, you should get in contact as
-          games will need to be added manually.
+          Featured games on this page are added manually.
+          Please get in contact and we-ll happily add yours.
         </p>
       </div>
     </section>
@@ -236,9 +216,6 @@ This is a good first introduction to Lean!"
       <a className="link" onClick={openImpressum}>Impressum</a>
       {impressum? <PrivacyPolicyPopup handleClose={closeImpressum} />: null}
     </footer>
-
-    {/* <PrivacyPolicy/> */}
-
   </div>
 
 }
