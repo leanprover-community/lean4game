@@ -26,5 +26,4 @@ Now you can immediately play the game at `adam.math.hhu.de/#/g/{USER}/{REPOSITOR
 
 ## 4. Main page
 
-Adding games to the main page happens manually by the server maintainers. Tell us if you want us
-to add a tile for your game!
+Adding games to the main page happens manually by the server maintainers. Tell us if youwould like your game to appear on the start page.
