@@ -26,6 +26,6 @@ ELAN_HOME=$(lake env printenv ELAN_HOME)
   --unshare-uts  \
   --unshare-cgroup \
   --die-with-parent \
-  --chdir "/lean4game/server/.lake/build/bin/" \
-  $3 --server /game
+  --chdir "/game/.lake/packages/GameServer/server/.lake/build/bin/" \
+  ./gameserver --server /game
 )

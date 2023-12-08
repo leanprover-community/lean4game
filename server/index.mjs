@@ -106,11 +106,11 @@ function startServerProcess(owner, repo) {
     }
   } else {
     serverProcess =  cp.spawn("./bubblewrap.sh",
-      [ game_dir,
-        path.join(__dirname, '..'),
-        path.join(game_dir, ".lake", "packages", "GameServer", ".lake", "build", "bin", "gameserver")],
+      [ game_dir, path.join(__dirname, '..')],
       { cwd: __dirname })
   }
+
+
   serverProcess.on('error', error =>
     console.error(`Launching Lean Server failed: ${error}`)
   )
