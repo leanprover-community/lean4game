@@ -10,20 +10,25 @@ Please follow the tutorial [Creating a Game](doc/create_game.md). In particular,
 * Step 7: [How to Update an existing Game](doc/update_game.md)
 * Step 8: [How to Publishing a Game](doc/publish_game.md)
 
-### Publishing a Game
-
-We encourage anybody to have games hosted on our [Lean Game Server](https://adam.math.hhu.de) for anybody to play. For that you simply need to contact us with the link to your game repo. We are also happy to add work-in-progress games and games in any language.
-
-For example, you can [contact Jon on Zulip](https://leanprover.zulipchat.com/#narrow/dm/385895-Jon-Eugster). Or [via Email](https://www.math.hhu.de/en/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/jon-eugster).
-
 ## Documentation
 
-The documentation for the game engine itself is still missing, but there is [Creating a Game](doc/create_game.md) explaining the API to create a game.
+The documentation is very much work in progress but the linked documentation here
+should be up-to-date:
 
-Some documentation:
+### Game creation API
 
-- [NPM Scripts](doc/npm_scripts.md)
-- [Old documentation](doc/DOCUMENTATION.md)
+- [Creating a Game](doc/create_game.md): **the main document to consult**.
+- [More about Hints](doc/hints.md): describes the `Hint` and `Branch` tactic.
+
+### Frontend API
+
+* [How to Run Games Locally](doc/running_locally.md): play a game on your computer
+* [How to Update an existing Game](doc/update_game.md): update to a new lean version
+* [How to Publishing a Game](doc/publish_game.md): load your game to adam.math.hhu.de for others to play
+
+### Backend
+
+not written yet
 
 ## Contributing
 
@@ -37,5 +42,5 @@ Providing the use access to a Lean instance running on the server is a severe se
 
 The project is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
 (NNG)](https://www.ma.imperial.ac.uk/~buzzard/xena/natural_number_game/)
-of Kevin Buzzard and Mohammad Pedramfar.
+by Kevin Buzzard and Mohammad Pedramfar.
 The project is based on Patrick Massot's prototype: [NNG4](https://github.com/PatrickMassot/NNG4).

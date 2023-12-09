@@ -223,25 +223,17 @@ One thing to keep in mind is that the game will look at the main proof to figure
 Most important for game development are probably the `Hints`.
 
 The hints will be displayed whenever the player's current goal matches the goal the hint is
-placed at inside the sample proof. You can use `Branch` to place hints in dead ends or alternative proof strands. If you specify
+placed at inside the sample proof. You can use `Branch` to place hints in dead ends or alternative proof strands.
 
-```
-Hint (strict := true) "some hidden hint"
-```
+Read [More about Hints](doc/hints.md) for how they work and what the options are.
 
-a hint only matches iff the assumptions match exactly one-to-one. (Otherwise, it does not care if there are additional assumptions in context)
+### 6. e) Extra: Images
+You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
 
-Further, you can choose to hide hints and only have them displayed when the player presses "More Help":
-```
-Hint (hidden := true) "some hidden hint"
-```
+The images need to be placed in `images/` and you need to add a command like `Image "images/path/to/myWorldImage.png"` 
+in one of the files you created in 2), 3), or 4) (i.e. game/world/level).
 
-Lastly, you should put variable names in hints inside brackets:
-
-```
-Hint "now use `rw [{h}]` to use your assumption {h}."
-```
-That way, the game will replace it with the actual name the assumption has in the player's proof state.
+NOTE: At present, only the images for a world are displayed. They appear in the introduction of the world.
 
 ## 7. Update your game
 
@@ -250,6 +242,21 @@ In principle, it is as simple as modifying `lean-toolchain` to update your game 
 ## 8. Publish your game
 
 To publish your game on the official server, see [Publishing a game](doc/publish_game.md)
+
+There are a few more options you can add in `Game.lean` before the `MakeGame` command, which describe the tile that is visible on the server's landing page:
+
+```lean
+Languages "English"
+CaptionShort "Game Template"
+CaptionLong "You should use this game as a template for your own game and add your own levels."
+Prerequisites "NNG"
+CoverImage "images/cover.png"
+```
+* `Languages`: Currently only a single language (capital English name). The tile will show a corresponding flag.
+* `CaptionShort`: One catch phrase. Appears above the image.
+* `CaptionLong`: 2-4 sentences to describe the game.
+* `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
+* `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
 ## Further Notes
 
