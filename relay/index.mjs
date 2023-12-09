@@ -35,7 +35,7 @@ router.get('/import/status/:owner/:repo', importStatus)
 router.get('/import/trigger/:owner/:repo', importTrigger)
 
 const server = app
-  .use(express.static(path.join(__dirname, '../client/dist/'))) // TODO: add a dist folder from inside the game
+  .use(express.static(path.join(__dirname, '..', 'client', 'dist'))) // TODO: add a dist folder from inside the game
   .use('/data/g/:owner/:repo/*', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
@@ -103,14 +103,13 @@ function startServerProcess(owner, repo) {
     } else {
       // If the game is built with `-Klean4game.local` there is no copy in the lake packages.
       serverProcess = cp.spawn("./gameserver", args,
-        { cwd: path.join(__dirname, ".lake", "build", "bin") })
+        { cwd: path.join(__dirname, "..", "server", ".lake", "build", "bin") })
     }
   } else {
     serverProcess =  cp.spawn("./bubblewrap.sh",
       [ game_dir, path.join(__dirname, '..')],
       { cwd: __dirname })
   }
-
 
   serverProcess.on('error', error =>
     console.error(`Launching Lean Server failed: ${error}`)

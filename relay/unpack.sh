@@ -6,7 +6,7 @@ REPO=$3
 
 # mkdir -p games
 cd games
-pwd
+
 # mkdir -p tmp
 mkdir -p ${OWNER}
 

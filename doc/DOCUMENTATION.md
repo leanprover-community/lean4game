@@ -297,8 +297,9 @@ cd lean4game
 npm install
 ```
 
+TODO: This is outdated!
 If you are developing a game other than `Robo` or `NNG4`, adapt the
-code at the beginning of `lean4game/server/index.mjs`:
+code at the beginning of `lean4game/relay/index.mjs`:
 ```typescript
 const games = {
     "g/hhu-adam/robo": {

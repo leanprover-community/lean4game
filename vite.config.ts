@@ -8,7 +8,7 @@ export default defineConfig({
   //root: 'client/src',
   build: {
     // Relative to the root
-    // Note: This has to match the path in `server/index.mjs`
+    // Note: This has to match the path in `relay/index.mjs`
     outDir: 'client/dist',
   },
   plugins: [
