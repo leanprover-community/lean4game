@@ -1,6 +1,6 @@
 # Lean 4 Game
 
-This is the source code for a Lean 4 game platform hosted at [adam.math.hhu.de](https://adam.math.hhu.de).
+This is the source code for a Lean game platform hosted at [adam.math.hhu.de](https://adam.math.hhu.de).
 
 ## Creating a Game
 
