@@ -19,11 +19,7 @@ export const store = configureStore({
   },
   // Make connection available in thunks:
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({
-      thunk: {
-        extraArgument: { connection }
-      }
-    }).concat(apiSlice.middleware),
+    getDefaultMiddleware().concat(apiSlice.middleware),
 });
 
 /**

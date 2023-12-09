@@ -37,10 +37,6 @@ function App() {
     }
   }, [lockMobile])
 
-  React.useEffect(() => {
-    connection.startLeanClient(gameId);
-  }, [gameId])
-
   return (
     <div className="app">
       <GameIdContext.Provider value={gameId}>
