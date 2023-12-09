@@ -26,4 +26,7 @@ Now you can immediately play the game at `adam.math.hhu.de/#/g/{USER}/{REPOSITOR
 
 ## 4. Main page
 
-Adding games to the main page happens manually by the server maintainers. Tell us if youwould like your game to appear on the start page.
+Adding games to the main page happens manually by the server maintainers. Tell us if you want us
+to add a tile for your game!
+
+For example, you can [contact Jon on Zulip](https://leanprover.zulipchat.com/#narrow/dm/385895-Jon-Eugster). Or [via Email](https://www.math.hhu.de/en/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/jon-eugster).

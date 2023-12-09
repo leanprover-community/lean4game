@@ -223,25 +223,9 @@ One thing to keep in mind is that the game will look at the main proof to figure
 Most important for game development are probably the `Hints`.
 
 The hints will be displayed whenever the player's current goal matches the goal the hint is
-placed at inside the sample proof. You can use `Branch` to place hints in dead ends or alternative proof strands. If you specify
+placed at inside the sample proof. You can use `Branch` to place hints in dead ends or alternative proof strands.
 
-```
-Hint (strict := true) "some hidden hint"
-```
-
-a hint only matches iff the assumptions match exactly one-to-one. (Otherwise, it does not care if there are additional assumptions in context)
-
-Further, you can choose to hide hints and only have them displayed when the player presses "More Help":
-```
-Hint (hidden := true) "some hidden hint"
-```
-
-Lastly, you should put variable names in hints inside brackets:
-
-```
-Hint "now use `rw [{h}]` to use your assumption {h}."
-```
-That way, the game will replace it with the actual name the assumption has in the player's proof state.
+Read [More about Hints](doc/hints.md) for how they work and what the options are.
 
 ### 6. e) Extra: Images
 You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
