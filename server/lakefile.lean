@@ -24,14 +24,4 @@ post_update pkg do
   let rootPkg ← getRootPackage
   if rootPkg.name = pkg.name then
     return -- do not run in GameServer itself
-
-  /-
-  TODO: Could we use the Lake API instead of spawning a new process?
-  -/
-  let toolchain := ← IO.FS.readFile <| pkg.dir / "lean-toolchain"
-  let exitCode ← IO.Process.spawn {
-    cmd := "elan"
-    args := #["run", toolchain.trim, "lake", "build", "gameserver"]
-  } >>= (·.wait)
-  if exitCode ≠ 0 then
-    logError s!"{pkg.name}: failed to build gameserver"
+  discard <| runBuild gameserver.build >>= (·.await)
