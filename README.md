@@ -42,7 +42,8 @@ Providing the use access to a Lean instance running on the server is a severe se
 
 ## Credits
 
-The project is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
+The project has pimarily been developed by Alexander Bentkamp and Jon Eugster.
+
+It is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
 (NNG)](https://www.ma.imperial.ac.uk/~buzzard/xena/natural_number_game/)
-by Kevin Buzzard and Mohammad Pedramfar.
-The project is based on Patrick Massot's prototype: [NNG4](https://github.com/PatrickMassot/NNG4).
+by Kevin Buzzard and Mohammad Pedramfar, and on Patrick Massot's prototype: [NNG4](https://github.com/PatrickMassot/NNG4).
