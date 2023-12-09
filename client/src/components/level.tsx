@@ -32,7 +32,7 @@ import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContex
   ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint } from './infoview/rpc_api'
-import { DeletedHints, Hint, Hints } from './hints'
+import { DeletedHints, Hint, Hints, filterHints } from './hints'
 import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import path from 'path';
 
@@ -138,19 +138,24 @@ function ChatPanel({lastLevel}) {
 
   let introText: Array<string> = level?.data?.introduction.split(/\n(\s*\n)+/)
 
+  // experimental: Remove all hints that appeared identically in the previous step
+  // This effectively prevent consequtive hints being shown.
+  let modifiedHints : GameHint[][] = filterHints(proof)
+
   return <div className="chat-panel">
     <div ref={chatRef} className="chat">
       {introText?.filter(t => t.trim()).map(((t, i) =>
+        // Show the level's intro text as hints, too
         <Hint key={`intro-p-${i}`}
           hint={{text: t, hidden: false}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
       ))}
-      {proof.map((step, i) => {
+      {modifiedHints.map((step, i) => {
         // It the last step has errors, it will have the same hints
         // as the second-to-last step. Therefore we should not display them.
         if (!(i == proof.length - 1 && withErr)) {
           // TODO: Should not use index as key.
           return <Hints key={`hints-${i}`}
-            hints={step.hints} showHidden={showHelp.has(i)} step={i}
+            hints={step} showHidden={showHelp.has(i)} step={i}
             selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof.length - 1}/>
         }
       })}

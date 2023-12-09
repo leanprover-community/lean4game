@@ -34,7 +34,7 @@ import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint } from './rpc_api';
 import { store } from '../../state/store';
-import { Hints } from '../hints';
+import { Hints, filterHints } from '../hints';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -367,9 +367,9 @@ export function TypewriterInterface({props}) {
   function deleteProof(line: number) {
     return (ev) => {
       let deletedChat: Array<GameHint> = []
-      proof.slice(line).map((step, i) => {
+      filterHints(proof).slice(line).map((hintsAtStep, i) => {
         // Only add these hidden hints to the deletion stack which were visible
-        deletedChat = [...deletedChat, ...step.hints.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
+        deletedChat = [...deletedChat, ...hintsAtStep.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
       })
       setDeletedChat(deletedChat)
 
