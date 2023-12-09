@@ -28,7 +28,9 @@ should be up-to-date:
 
 ### Backend
 
-not written yet
+not fully written yet.
+
+* [Server](doc/DOCUMENTATION.md): describes the server part (i.e. the content of `server/` und `relay/`).
 
 ## Contributing
 
