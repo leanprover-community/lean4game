@@ -49,7 +49,7 @@ export function DeletedHints({hints} : {hints: GameHint[]}) {
  *
  * This function takes a `ProofStep[]` and extracts the hints in form of an
  * element of type `GameHint[][]` where it removes hints that are identical to hints
- * appearing in the previous step.
+ * appearing in the previous step. Hidden hints are not filtered.
  *
  * This effectively means we prevent consequtive identical hints from being shown.
  */
@@ -60,7 +60,8 @@ export function filterHints(proof: ProofStep[]): GameHint[][] {
     } else {
       // TODO: Writing all fields explicitely is somewhat fragile to changes, is there a
       // good way to shallow-compare objects?
-      return step.hints.filter((hint) => proof[i-1].hints.find((x) => (x.text == hint.text && x.hidden == hint.hidden)) === undefined)
+      return step.hints.filter((hint) => hint.hidden ||
+        (proof[i-1].hints.find((x) => (x.text == hint.text && x.hidden == hint.hidden)) === undefined))
     }
   })
 }
