@@ -1,6 +1,8 @@
+**NOTE! This document is deprecated! The current documentation is [How To Create A Game](create_game.md)**
+
 # Creating a game.
 
-Ideally one takes the [NNG template](https://github.com/hhu-adam/NNG4) to create a new game.
+Ideally one takes the [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton) to create a new game.
 
 ## Game Structure
 
@@ -17,7 +19,7 @@ Level 1
 Title "The rfl tactic"
 ```
 
-Note that the levels inside a world must have consequtive numbering starting with `1`. The `Game`
+Note that the levels inside a world must have consecutive numbering starting with `1`. The `Game`
 and `World` strings can be anything, see below.
 
 #### Statement
@@ -51,7 +53,7 @@ There are a few extra tactics that help you structuring the proof:
 
 - `Hint`: You can use `Hint "text"` to display text if the goal state in-game matches
   the one where `Hint` is placed. For more options about hints, see below.
-- `Branch`: In the proof you can add a `Branch` that runs an alternativ tactic sequence, which
+- `Branch`: In the proof you can add a `Branch` that runs an alternative tactic sequence, which
   helps setting `Hints` in different   places. The `Branch` does not affect the main
   proof and does not need to finish any goals.
 - `Template`/`Hole`: Used to provide a sample proof template. Anything inside `Template`
@@ -108,7 +110,7 @@ DisabledTactic tauto
 DisabledLemma MyNat.add_zero
 ```
 
-or specify explicitely which items should be available with
+or specify explicitly which items should be available with
 
 ```lean
 OnlyTactic rw rfl apply
@@ -224,7 +226,7 @@ The installation instructions are not yet tested on Mac/Windows. Comments very w
 
 1.  **Install Docker and Dev Containers** *(once)*:<br/>
     See [official instructions](https://code.visualstudio.com/docs/devcontainers/containers#_getting-started).
-    Explicitely this means:
+    Explicitly this means:
     * Install docker engine if you have not yet: [Instructions](https://docs.docker.com/engine/install/).
       I followed the "Server" instructions for linux.
     * Note that on Linux you need to add your user to the `docker` group
@@ -251,7 +253,7 @@ The installation instructions are not yet tested on Mac/Windows. Comments very w
   running the `remote-containers.showReopenInContainerNotificationReset` command in vscode.
 * If the starting the container fails, in particular with a message `Error: network xyz not found`,
   you might have deleted stuff from docker via your shell. Try deleting the container and image
-  explicitely in VSCode (left side, "Docker" icon). Then reopen vscode and let it rebuild the
+  explicitly in VSCode (left side, "Docker" icon). Then reopen vscode and let it rebuild the
   container. (this will again take some time)
 
 
@@ -295,8 +297,9 @@ cd lean4game
 npm install
 ```
 
+TODO: This is outdated!
 If you are developing a game other than `Robo` or `NNG4`, adapt the
-code at the beginning of `lean4game/server/index.mjs`:
+code at the beginning of `lean4game/relay/index.mjs`:
 ```typescript
 const games = {
     "g/hhu-adam/robo": {

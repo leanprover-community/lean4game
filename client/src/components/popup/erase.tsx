@@ -9,6 +9,15 @@ import { deleteProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
 import { Button } from '../button'
 
+/** download the current progress (i.e. what's saved in the browser store) */
+export function downloadProgress(gameId: string, gameProgress: any, ev: React.MouseEvent) {
+  ev.preventDefault()
+  downloadFile({
+    data: JSON.stringify(gameProgress, null, 2),
+    fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
+    fileType: 'text/json',
+  })
+}
 
 /** Pop-up to delete game progress.
  *
@@ -20,23 +29,13 @@ export function ErasePopup ({handleClose}) {
   const gameProgress = useSelector(selectProgress(gameId))
   const dispatch = useAppDispatch()
 
-  /** Download the current progress (i.e. what's saved in the browser store) */
-  const downloadProgress = (e) => {
-    e.preventDefault()
-    downloadFile({
-      data: JSON.stringify(gameProgress, null, 2),
-      fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
-      fileType: 'text/json',
-    })
-  }
-
   const eraseProgress = () => {
     dispatch(deleteProgress({game: gameId}))
     handleClose()
   }
 
-  const downloadAndErase = (e) => {
-    downloadProgress(e)
+  const downloadAndErase = (ev) => {
+    downloadProgress(gameId, gameProgress, ev)
     eraseProgress()
   }
 

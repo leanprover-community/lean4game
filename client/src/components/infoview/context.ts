@@ -65,13 +65,9 @@ export const ProofStateContext = React.createContext<{
 export const MobileContext = React.createContext<{
   mobile : boolean,
   setMobile: React.Dispatch<React.SetStateAction<Boolean>>,
-  pageNumber: number,
-  setPageNumber: React.Dispatch<React.SetStateAction<Number>>
 }>({
   mobile : false,
   setMobile: () => {},
-  pageNumber: 0,
-  setPageNumber: () => {}
 })
 
 export const WorldLevelIdContext = React.createContext<{
@@ -108,10 +104,14 @@ export const InputModeContext = React.createContext<{
   typewriterMode: boolean,
   setTypewriterMode: React.Dispatch<React.SetStateAction<boolean>>,
   typewriterInput: string,
-  setTypewriterInput: React.Dispatch<React.SetStateAction<string>>
+  setTypewriterInput: React.Dispatch<React.SetStateAction<string>>,
+  lockInputMode: boolean,
+  setLockInputMode: React.Dispatch<React.SetStateAction<boolean>>,
 }>({
   typewriterMode: true,
   setTypewriterMode: () => {},
   typewriterInput: "",
   setTypewriterInput: () => {},
+  lockInputMode: false,
+  setLockInputMode: () => {},
 });

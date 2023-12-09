@@ -11,6 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
+const USERNAME = process.env.LEAN4GAME_GITHUB_USER
 const octokit = new Octokit({
   auth: TOKEN
 })
@@ -41,9 +42,10 @@ async function download(id, url, dest) {
     requestProgress(request({
       url,
       headers: {
-        'User-Agent': 'abentkamp',
+        'accept': 'application/vnd.github+json',
+        'User-Agent': USERNAME,
         'X-GitHub-Api-Version': '2022-11-28',
-        'Authorization': 'Bearer '+TOKEN
+        'Authorization': 'Bearer ' + TOKEN
       }
     }))
     .on('progress', function (state) {
@@ -76,35 +78,44 @@ async function doImport (owner, repo, id) {
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
     artifactId = artifact.id
     const url = artifact.archive_download_url
-    if (!fs.existsSync("tmp")){
-      fs.mkdirSync("tmp");
+    // Make sure the download folder exists
+    if (!fs.existsSync(path.join(__dirname, "..", "games"))){
+      fs.mkdirSync(path.join(__dirname, "..", "games"));
+    }
+    if (!fs.existsSync(path.join(__dirname, "..", "games", "tmp"))){
+      fs.mkdirSync(path.join(__dirname, "..", "games", "tmp"));
     }
     progress[id].output += `Download from ${url}\n`
-    await download(id, url, `tmp/artifact_${artifactId}.zip`)
+    await download(id, url, path.join(__dirname, "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
     progress[id].output += `Download finished.\n`
-    await runProcess(id, "/bin/bash", [`${__dirname}/unpack.sh`, artifactId],".")
-    let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
-    manifest = JSON.parse(manifest);
-    if (manifest.length !== 1) {
-      throw `Unexpected manifest: ${JSON.stringify(manifest)}`
-    }
-    manifest[0].RepoTags = [`g/${owner.toLowerCase()}/${repo.toLowerCase()}:latest`]
-    fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
-    await runProcess(id, "tar", ["-cvf", `../archive_${artifactId}.tar`, "."], `tmp/artifact_${artifactId}_inner/`)
-    await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
+
+    await runProcess(id, "/bin/bash", [path.join(__dirname, "unpack.sh"), artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, ".."))
+
+
+    // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
+    // manifest = JSON.parse(manifest);
+    // if (manifest.length !== 1) {
+    //   throw `Unexpected manifest: ${JSON.stringify(manifest)}`
+    // }
+    // manifest[0].RepoTags = [`g/${owner.toLowerCase()}/${repo.toLowerCase()}:latest`]
+    // fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
+    // await runProcess(id, "tar", ["-cvf", `../archive_${artifactId}.tar`, "."], `tmp/artifact_${artifactId}_inner/`)
+    // // await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
+
     progress[id].done = true
-    progress[id].output += `Done.\n`
+    progress[id].output += `Done!\n`
+    progress[id].output += `Play the game at: {your website}/#/g/${owner}/${repo}\n`
   } catch (e) {
     progress[id].output += `Error: ${e.toString()}\n${e.stack}`
   } finally {
+    // clean-up temp. files
     if (artifactId) {
-      fs.rmSync(`tmp/artifact_${artifactId}.zip`, {force: true, recursive: true});
-      fs.rmSync(`tmp/artifact_${artifactId}`, {force: true, recursive: true});
-      fs.rmSync(`tmp/artifact_${artifactId}_inner`, {force: true, recursive: true});
-      fs.rmSync(`tmp/archive_${artifactId}.tar`, {force: true, recursive: true});
+      fs.rmSync(path.join(__dirname, "..", "games", "tmp", `${owner}_${repo}_${artifactId}.zip`), {force: true, recursive: false});
+      fs.rmSync(path.join(__dirname, "..", "games", "tmp", `${owner}_${repo}_${artifactId}`), {force: true, recursive: true});
     }
     progress[id].done = true
   }
+  await new Promise(resolve => setTimeout(resolve, 10000))
 }
 
 export const importTrigger = (req, res) => {

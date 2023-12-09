@@ -42,12 +42,6 @@ body {
   border-radius: .3em;
 }
 
-
-/* Hide monaco editor notifications */
-.monaco-workbench > .notifications-toasts.visible {
-  display: none !important;
-}
-
 .loading {
   margin: auto;
   height: 100%;
@@ -108,6 +102,7 @@ em {
   flex: 0;
   background: var(--clr-primary);
   display: flex;
+  position: relative;
   flex-direction: row;
   justify-content: space-between;
   padding: 1.1em;

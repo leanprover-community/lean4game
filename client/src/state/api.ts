@@ -2,16 +2,29 @@
  * @fileOverview Define API of the server-client communication
 */
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { Connection } from '../connection'
+
+
+export interface GameTile {
+  title: string
+  short: string
+  long: string
+  languages: Array<string>
+  prerequisites: Array<string>
+  worlds: number
+  levels: number
+  image: string
+}
 
 export interface GameInfo {
   title: null|string,
   introduction: null|string,
   info: null|string,
-  worlds: null|{nodes: {[id:string]: {id: string, title: string, introduction: string}}, edges: string[][]},
+  worlds: null|{nodes: {[id:string]: {id: string, title: string, introduction: string, image: string}}, edges: string[][]},
   worldSize: null|{[key: string]: number},
   authors: null|string[],
   conclusion: null|string,
+  tile: null|GameTile,
+  image: null|string
 }
 
 export interface InventoryTile {
@@ -37,7 +50,8 @@ export interface LevelInfo {
   lemmaTab: null|string,
   statementName: null|string,
   displayName: null|string,
-  template: null|string
+  template: null|string,
+  image: null|string
 }
 
 /** Used to display the inventory on the welcome page */
@@ -64,39 +78,22 @@ export interface WorldOverview {
   definitions: InventoryTile[]
 }
 
-const customBaseQuery = async (
-  args : {game: string, method: string, params?: any},
-  { signal, dispatch, getState, extra },
-  extraOptions
-) => {
-  try {
-    const connection : Connection = extra.connection
-    let leanClient = await connection.startLeanClient(args.game)
-    console.log(`Sending request ${args.method}`)
-    let res = await leanClient.sendRequest(args.method, args.params)
-    console.log('Received response') //, res)
-    return {'data': res}
-   } catch (e) {
-    return {'error': e}
-   }
-}
-
 // Define a service using a base URL and expected endpoints
 export const apiSlice = createApi({
   reducerPath: 'gameApi',
-  baseQuery: customBaseQuery,
+  baseQuery: fetchBaseQuery({ baseUrl: window.location.origin + "/data" }),
   endpoints: (builder) => ({
     getGameInfo: builder.query<GameInfo, {game: string}>({
-      query: ({game}) => {return {game, method: 'info', params: {}}},
+      query: ({game}) => `${game}/game.json`,
     }),
     loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
-      query: ({game, world, level}) => {return {game, method: "loadLevel", params: {world, level}}},
+      query: ({game, world, level}) => `${game}/level__${world}__${level}.json`,
     }),
     loadInventoryOverview: builder.query<WorldOverview[], {game: string}>({
-      query: ({game}) => {return {game, method: "loadInventoryOverview", params: {}}},
+      query: ({game}) => `${game}/inventory.json`,
     }),
     loadDoc: builder.query<Doc, {game: string, name: string, type: "lemma"|"tactic"}>({
-      query: ({game, name, type}) => {return {game, method: "loadDoc", params: {name, type}}},
+      query: ({game, type, name}) => `${game}/doc__${type}__${name}.json`,
     }),
   }),
 })

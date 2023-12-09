@@ -6,7 +6,7 @@ import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location,
 import 'tachyons/css/tachyons.css';
 import '@vscode/codicons/dist/codicon.css';
 import '../../../../node_modules/lean4-infoview/src/infoview/index.css';
-import './infoview.css'
+import '../../css/infoview.css'
 
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
 import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
@@ -34,7 +34,7 @@ import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint } from './rpc_api';
 import { store } from '../../state/store';
-import { Hints } from '../hints';
+import { Hints, filterHints } from '../hints';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -137,9 +137,7 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
     <div className="exercise-statement">
       {data?.descrText &&
         <Markdown>
-          {data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : "" // data?.descrText && "**Exercise**: "
-            + data?.descrText
-          }
+          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + data?.descrText}
         </Markdown>
       }
       {data?.descrFormat && showLeanStatement &&
@@ -158,7 +156,7 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
 
   const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
 
-  console.debug(`template: ${props.data.template}`)
+  console.debug(`template: ${props.data?.template}`)
 
   // React.useEffect (() => {
   //   if (props.data.template) {
@@ -349,6 +347,7 @@ export function TypewriterInterface({props}) {
   const uri = model.uri.toString()
 
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
+  const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
   const {mobile} = React.useContext(MobileContext)
   const { proof } = React.useContext(ProofContext)
@@ -368,9 +367,9 @@ export function TypewriterInterface({props}) {
   function deleteProof(line: number) {
     return (ev) => {
       let deletedChat: Array<GameHint> = []
-      proof.slice(line).map((step, i) => {
+      filterHints(proof).slice(line).map((hintsAtStep, i) => {
         // Only add these hidden hints to the deletion stack which were visible
-        deletedChat = [...deletedChat, ...step.hints.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
+        deletedChat = [...deletedChat, ...hintsAtStep.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
       })
       setDeletedChat(deletedChat)
 
@@ -457,6 +456,17 @@ export function TypewriterInterface({props}) {
 
   let lastStepErrors = proof.length ? hasInteractiveErrors(proof[proof.length - 1].errors) : false
 
+
+  useServerNotificationEffect("$/game/loading", (params : any) => {
+    if (params.kind == "loadConstants") {
+      setLoadingProgress(params.counter/100*50)
+    } else if (params.kind == "finalizeExtensions") {
+      setLoadingProgress(50 + params.counter/150*50)
+    } else {
+      console.error(`Unknown loading kind: ${params.kind}`)
+    }
+  })
+
   return <div className="typewriter-interface">
     <RpcContext.Provider value={rpcSess}>
     <div className="content">
@@ -523,7 +533,7 @@ export function TypewriterInterface({props}) {
                 }
               </div>
             }
-          </> : <CircularProgress />
+          </> : <CircularProgress variant="determinate" value={loadingProgress} />
         }
       </div>
     </div>

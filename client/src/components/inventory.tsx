@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import './inventory.css'
+import '../css/inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faBan } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
@@ -159,7 +159,7 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
       {[...modifiedItems].sort(
           // For lemas, sort entries `available > disabled > locked`
           // otherwise alphabetically
-          (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled)
+          (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled) || x.displayName.localeCompare(y.displayName)
         ).filter(item => !item.hidden && ((tab ?? categories[0]) == item.category)).map((item, i) => {
             return <InventoryItem key={`${item.category}-${item.name}`}
               showDoc={() => {openDoc({name: item.name, type: docType})}}

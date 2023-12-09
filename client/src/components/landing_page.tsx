@@ -6,12 +6,13 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import './landing_page.css'
-import coverRobo from '../assets/covers/formaloversum.png'
+import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 
 import Markdown from './markdown';
 import {PrivacyPolicyPopup} from './popup/privacy_policy'
+import { GameTile, useGetGameInfoQuery } from '../state/api'
+import path from 'path';
 
 const flag = {
   'Dutch': '🇳🇱',
@@ -19,6 +20,7 @@ const flag = {
   'French': '🇫🇷',
   'German': '🇩🇪',
   'Italian': '🇮🇹',
+  'Spanish': '🇪🇸',
 }
 
 function GithubIcon({url='https://github.com'}) {
@@ -32,47 +34,42 @@ function GithubIcon({url='https://github.com'}) {
     </div>
 }
 
-function GameTile({
-  title,
-  gameId,
-  intro, // Catchy intro phrase.
-  image=null,
-  worlds='?',
-  levels='?',
-  prereq='&ndash;', // Optional list of games that this game builds on. Use markdown.
-  description, // Longer description. Supports Markdown.
-  language}) {
+function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
 
   let navigate = useNavigate();
   const routeChange = () =>{
     navigate(gameId);
   }
 
+  if (typeof data === 'undefined') {
+    return <></>
+  }
+
   return <div className="game" onClick={routeChange}>
     <div className="wrapper">
-      <div className="title">{title}</div>
-      <div className="short-description">{intro}
+      <div className="title">{data.title}</div>
+      <div className="short-description">{data.short}
       </div>
-      { image ? <img className="image" src={image} alt="" /> : <div className="image"/> }
-      <div className="long description"><Markdown>{description}</Markdown></div>
+      { data.image ? <img className="image" src={path.join("data", gameId, data.image)} alt="" /> : <div className="image"/> }
+      <div className="long description"><Markdown>{data.long}</Markdown></div>
     </div>
     <table className="info">
       <tbody>
       <tr>
         <td title="consider playing these games first.">Prerequisites</td>
-        <td><Markdown>{prereq}</Markdown></td>
+        <td><Markdown>{data.prerequisites.join(', ')}</Markdown></td>
       </tr>
       <tr>
         <td>Worlds</td>
-        <td>{worlds}</td>
+        <td>{data.worlds}</td>
       </tr>
       <tr>
         <td>Levels</td>
-        <td>{levels}</td>
+        <td>{data.levels}</td>
       </tr>
       <tr>
         <td>Language</td>
-        <td title={`in ${language}`}>{flag[language]}</td>
+        <td title={`in ${data.languages.join(', ')}`}>{data.languages.map((lan) => flag[lan]).join(', ')}</td>
       </tr>
       </tbody>
     </table>
@@ -88,6 +85,58 @@ function LandingPage() {
   const openImpressum = () => setImpressum(true);
   const closeImpressum = () => setImpressum(false);
 
+  // const [allGames, setAllGames] = React.useState([])
+  // const [allTiles, setAllTiles] = React.useState([])
+
+  // const getTiles=()=>{
+  //   fetch('featured_games.json', {
+  //     headers : {
+  //       'Content-Type': 'application/json',
+  //       'Accept': 'application/json'
+  //     }
+  //   }
+  //   ).then(function(response){
+  //     return response.json()
+  //   }).then(function(data) {
+  //     setAllGames(data.featured_games)
+
+  //   })
+  // }
+
+  // React.useEffect(()=>{
+  //   getTiles()
+  // },[])
+
+  // React.useEffect(()=>{
+
+  //   Promise.allSettled(
+  //     allGames.map((gameId) => (
+  //       fetch(`data/g/${gameId}/game.json`).catch(err => {return undefined})))
+  //   ).then(responses =>
+  //     responses.forEach((result) => console.log(result)))
+  //   //   Promise.all(responses.map(res => {
+  //   //     if (res.status == "fulfilled") {
+  //   //       console.log(res.value.json())
+  //   //       return res.value.json()
+  //   //     } else {
+  //   //       return undefined
+  //   //     }
+  //   //   }))
+  //   // ).then(allData => {
+  //   //   setAllTiles(allData.map(data => data?.tile))
+  //   // })
+  // },[allGames])
+
+  // TODO: I would like to read the supported games list form a JSON,
+  // Then load all these games in
+  //
+  let allGames = [
+    "leanprover-community/nng4",
+    "hhu-adam/robo",
+    "djvelleman/stg4",
+    "miguelmarco/STG4",
+  ]
+  let allTiles = allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
 
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
@@ -104,49 +153,26 @@ function LandingPage() {
       </div>
     </header>
     <div className="game-list">
-
-      <GameTile
-        title="Natural Number Game"
-        gameId="g/hhu-adam/NNG4"
-        intro="The classical introduction game for Lean."
-        description="In this game you recreate the natural numbers $\mathbb{N}$ from the Peano axioms,
-learning the basics about theorem proving in Lean.
-
-This is a good first introduction to Lean!"
-        worlds="4"
-        levels="30"
-        language="English"
-        />
-
-      <GameTile
-        title="Formaloversum"
-        gameId="g/hhu-adam/Robo"
-        intro="Erkunde das Leansche Universum mit deinem Robo, welcher dir bei der Verständigung mit den Formalosophen zur Seite steht."
-        description="
-Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet danach verschiedene Bereiche des Bachelorstudiums an.
-
-(Das Spiel befindet sich noch in der Entstehungsphase.)"
-        image={coverRobo}
-        language="German"
-        />
-
-      <GameTile
-        title="NNG (OLD)"
-        gameId="g/hhu-adam/nng4-old"
-        intro="The old version of the NNG copied from lean3."
-        description="This version is not maintained and might break at any point. You should play the new version instead"
-        worlds="9"
-        levels="72"
-        language="English"
-        />
+      {allTiles.length == 0 ?
+        <p>No Games loaded. Use <a>http://localhost:3000/#/g/local/FOLDER</a> to open a
+          game directly from a local folder.
+        </p>
+        : allGames.map((id, i) => (
+          <Tile
+            key={id}
+            gameId={`g/${id}`}
+            data={allTiles[i]}
+          />
+        ))
+      }
     </div>
     <section>
       <div className="wrapper">
         <h2>Development notes</h2>
         <p>
           As this server runs lean on our university machines, it has a limited capacity.
-          Our current estimate is about 55 copies of the NNG or 25 copies of games importing
-          mathlib. We hope to address this limitation in the future.
+          Our current estimate is about 70 simultaneous games.
+          We hope to address and test this limitation better in the future.
         </p>
         <p>
           Most aspects of the games and the infrastructure are still in development. Feel free to
@@ -160,18 +186,19 @@ Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet 
         <h2>Adding new games</h2>
         <p>
           If you are considering writing your own game, you should use
-          the <a target="_blank" href="https://github.com/hhu-adam/NNG4">NNG Github Repo</a> as
-          a template.
+          the <a target="_blank" href="https://github.com/hhu-adam/GameSkeleton">GameSkeleton Github Repo</a> as
+          a template and read <a target="_blank" href="https://github.com/leanprover-community/lean4game/">How to Create a Game</a>.
         </p>
         <p>
-          There is an option to load and run your own games direclty on the server,
-          instructions are in the NNG repo. Since this is still in development we'd like to
-          encourage you to contact us for support creating your own game. The documentation is
-          not polished yet.
+          You can directly load your games into the server and play it using
+          the correct URL. The <a target="_blank" href="https://github.com/leanprover-community/lean4game/">instructions above</a> also
+          explain the details for how to load your game to the server.
+
+          We'd like to encourage you to contact us if you have any questions.
         </p>
         <p>
-          To add games to this main page, you should get in contact as
-          games will need to be added manually.
+          Featured games on this page are added manually.
+          Please get in contact and we-ll happily add yours.
         </p>
       </div>
     </section>
@@ -189,9 +216,6 @@ Dieses Spiel führt die Grundlagen zur Beweisführung in Lean ein und schneidet 
       <a className="link" onClick={openImpressum}>Impressum</a>
       {impressum? <PrivacyPolicyPopup handleClose={closeImpressum} />: null}
     </footer>
-
-    {/* <PrivacyPolicy/> */}
-
   </div>
 
 }

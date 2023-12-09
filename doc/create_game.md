@@ -4,7 +4,7 @@ This tutorial walks you through creating a new game for lean4. It covers from wr
 
 ## 1. Create the project
 
-1. Use the [NNG template](https://github.com/hhu-adam/NNG4) to create a new github repo for your game: On github, click on "Use this template" > "Create a new repository".
+1. Use the [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton) to create a new github repo for your game: On github, click on "Use this template" > "Create a new repository".
 2. Clone the game repo.
 3. Call `lake update && lake exe cache get && lake build` to build the Lean project.
 
@@ -18,7 +18,7 @@ The file `Game.lean` is the backbone of the game putting everything together.
 
 1. `MakeGame`: This command is where the game gets built. If there are things to fix, they will be shown here as warnings or errors (orange/red squigglies in VSCode). Note that you might have to call "Lean: Restart File" (Ctrl+Shift+X) to reload the file and see changes made in other files.
 1. `Title`: Set the display title of your game.
-1. `Ìntroduction`: This is the text displayed at the beggining next to the world selection tree.
+1. `Introduction`: This is the text displayed at the beginning next to the world selection tree.
 1. `Info`: This will be displayed in the game's menu as "Game Info". Use it for credits, funding and other meta information about the game.
 1. Imports: The file needs to import all world files, which we look at in a second. If you add a new world, remember to import it here!
 1. `Dependency`: (optional) This command adds another edge in the world tree. The game computes them automatically based on used tactics/theorems. However, sometimes you need a dependency the game can't compute, for example you explained `≠` in one world and in another world, the user is expected to know it already. The syntax is `Dependency World₁ → World₂ → World₃`.
@@ -209,7 +209,7 @@ There are a few extra tactics that help you structuring the proof:
 
 - `Hint`: You can use `Hint "text"` to display text if the goal state in-game matches
   the one where `Hint` is placed. For more options about hints, see below.
-- `Branch`: In the proof you can add a `Branch` that runs an alternativ tactic sequence, which
+- `Branch`: In the proof you can add a `Branch` that runs an alternative tactic sequence, which
   helps setting `Hints` in different places. The `Branch` does not affect the main
   proof and does not need to finish any goals.
 - `Template`/`Hole`: Used to provide a sample proof template. Anything inside `Template`
@@ -223,25 +223,40 @@ One thing to keep in mind is that the game will look at the main proof to figure
 Most important for game development are probably the `Hints`.
 
 The hints will be displayed whenever the player's current goal matches the goal the hint is
-placed at inside the sample proof. You can use `Branch` to place hints in dead ends or alternative proof strands. If you specify
+placed at inside the sample proof. You can use `Branch` to place hints in dead ends or alternative proof strands.
 
-```
-Hint (strict := true) "some hidden hint"
-```
+Read [More about Hints](doc/hints.md) for how they work and what the options are.
 
-a hint only matches iff the assumptions match exactly one-to-one. (Otherwise, it does not care if there are additional assumptions in context)
+### 6. e) Extra: Images
+You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
 
-Further, you can choose to hide hints and only have them displayed when the player presses "More Help":
-```
-Hint (hidden := true) "some hidden hint"
-```
+The images need to be placed in `images/` and you need to add a command like `Image "images/path/to/myWorldImage.png"` 
+in one of the files you created in 2), 3), or 4) (i.e. game/world/level).
 
-Lastly, you should put variable names in hints insid brackets:
+NOTE: At present, only the images for a world are displayed. They appear in the introduction of the world.
 
+## 7. Update your game
+
+In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](doc/update_game.md).
+
+## 8. Publish your game
+
+To publish your game on the official server, see [Publishing a game](doc/publish_game.md)
+
+There are a few more options you can add in `Game.lean` before the `MakeGame` command, which describe the tile that is visible on the server's landing page:
+
+```lean
+Languages "English"
+CaptionShort "Game Template"
+CaptionLong "You should use this game as a template for your own game and add your own levels."
+Prerequisites "NNG"
+CoverImage "images/cover.png"
 ```
-Hint "now use `rw [{h}]` to use your assumption {h}."
-```
-That way, the game will replace it with the actual name the assumption has in the player's proof state.
+* `Languages`: Currently only a single language (capital English name). The tile will show a corresponding flag.
+* `CaptionShort`: One catch phrase. Appears above the image.
+* `CaptionLong`: 2-4 sentences to describe the game.
+* `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
+* `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
 ## Further Notes
 

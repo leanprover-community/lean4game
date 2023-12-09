@@ -48,6 +48,7 @@ a {
   border: 1px solid rgb(140, 140, 140);
   border-radius: 20px;
   box-shadow: 5px 5px 8px rgb(140, 140, 140);
+  width: 100%;
   max-width: 500px;
   display: flex;
   flex-direction: column;

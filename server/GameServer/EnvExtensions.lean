@@ -67,7 +67,7 @@ structure InventoryTemplate where
   /-- Depends on the type:
   * Tactic: the tactic's name
   * Lemma: fully qualified lemma name
-  * Definition: no restrictions (preferrably the definions fully qualified name)
+  * Definition: no restrictions (preferably the definitions fully qualified name)
   -/
   name: Name
   /-- Only for Lemmas. To sort them into tabs -/
@@ -108,6 +108,12 @@ structure InventoryTile where
   hidden := false
 deriving ToJson, FromJson, Repr, Inhabited
 
+def InventoryItem.toTile (item : InventoryItem) : InventoryTile := {
+      name := item.name,
+      displayName := item.displayName
+      category := item.category
+}
+
 /-- The extension that stores the doc templates. Note that you can only add, but never modify
 entries! -/
 initialize inventoryTemplateExt :
@@ -135,7 +141,12 @@ def getInventoryItem? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
     m (Option InventoryItem) := do
   return (inventoryExt.getState (← getEnv)).find? (fun x => x.name == n && x.type == type)
 
-
+structure InventoryOverview where
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
+  lemmaTab : Option String
+deriving ToJson, FromJson
 
 /-! ## Environment extensions for game specification -/
 
@@ -254,7 +265,9 @@ structure GameLevel where
   lemmas: InventoryInfo := default
   /-- A proof template that is printed in an empty editor. -/
   template: Option String := none
-  deriving Inhabited, Repr
+  /-- The image for this level. -/
+  image : String := default
+deriving Inhabited, Repr
 
 structure WorldOverview where
   world: Name
@@ -262,6 +275,58 @@ structure WorldOverview where
   definitions: Array InventoryTile := default
   lemmas: Array InventoryTile := default
   deriving FromJson, ToJson, Inhabited, Repr
+
+/-- Json-encodable version of `GameLevel`
+Fields:
+- description: Lemma in mathematical language.
+- descriptionGoal: Lemma printed as Lean-Code.
+-/
+structure LevelInfo where
+  index : Nat
+  title : String
+  tactics : Array InventoryTile
+  lemmas : Array InventoryTile
+  definitions : Array InventoryTile
+  introduction : String
+  conclusion : String
+  descrText : Option String := none
+  descrFormat : String := ""
+  lemmaTab : Option String
+  displayName : Option String
+  statementName : Option String
+  template : Option String
+  image: Option String
+deriving ToJson, FromJson
+
+def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
+  { index := lvl.index,
+    title := lvl.title,
+    tactics := lvl.tactics.tiles,
+    lemmas := lvl.lemmas.tiles,
+    definitions := lvl.definitions.tiles,
+    descrText := lvl.descrText,
+    descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
+    introduction := lvl.introduction
+    conclusion := lvl.conclusion
+    lemmaTab := match lvl.lemmaTab with
+    | some tab => tab
+    | none =>
+      -- Try to set the lemma tab to the category of the first added lemma
+      match lvl.lemmas.tiles.find? (·.new) with
+      | some tile => tile.category
+      | none => none
+    statementName := lvl.statementName.toString
+    displayName := match lvl.statementName with
+      | .anonymous => none
+      | name => match (inventoryExt.getState env).find?
+          (fun x => x.name == name && x.type == .Lemma) with
+        | some n => n.displayName
+        | none => name.toString
+        -- Note: we could call `.find!` because we check in `Statement` that the
+        -- lemma doc must exist.
+    template := lvl.template
+    image := lvl.image
+  }
 
 /-! ## World -/
 
@@ -277,16 +342,45 @@ structure World where
   conclusion : String := default
   /-- The levels of the world. -/
   levels: HashMap Nat GameLevel := default
+  /-- The introduction image of the world. -/
+  image: String := default
 deriving Inhabited
 
 instance : ToJson World := ⟨
   fun world => Json.mkObj [
     ("name", toJson world.name),
     ("title", world.title),
-    ("introduction", world.introduction)]
+    ("introduction", world.introduction),
+    ("image", world.image)]
 ⟩
 
 /-! ## Game -/
+
+/-- A tile as they are displayed on the servers landing page. -/
+structure GameTile where
+  /-- The title of the game -/
+  title: String
+  /-- One catch phrase about the game -/
+  short: String := default
+  /-- One paragraph description what the game is about -/
+  long: String := default
+  /-- List of languages the game supports
+
+  TODO: What's the expectected format
+  TODO: Must be a list with a single language currently
+   -/
+  languages: List String := default
+  /-- A list of games which this one builds upon -/
+  prerequisites: List String := default
+  /-- Number of worlds in the game -/
+  worlds: Nat := default
+  /-- Number of levels in the game -/
+  levels: Nat := default
+  /-- A cover image of the game
+
+  TODO: What's the format? -/
+  image: String := default
+deriving Inhabited, ToJson
 
 structure Game where
   /-- Internal name of the game. -/
@@ -302,7 +396,18 @@ structure Game where
   /-- TODO: currently unused. -/
   authors : List String := default
   worlds : Graph Name World := default
+  /-- The tile displayed on the server's landing page. -/
+  tile : GameTile := default
+  /-- The path to the background image of the world. -/
+  image : String := default
 deriving Inhabited, ToJson
+
+def getGameJson (game : «Game») : Json := Id.run do
+  let gameJson : Json := toJson game
+  -- Add world sizes to Json object
+  let worldSize := game.worlds.nodes.toList.map (fun (n, w) => (n.toString, w.levels.size))
+  let gameJson := gameJson.mergeObj (Json.mkObj [("worldSize", Json.mkObj worldSize)])
+  return gameJson
 
 /-! ## Game environment extension -/
 
