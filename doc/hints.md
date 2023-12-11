@@ -10,6 +10,8 @@ Statement .... := by
   ...
 ```
 
+Note that hints are only **context-aware but not history-aware**. In particular they only look at the assumptions and the current goal. Player's might encounter hints in a different order - or not at all - if they decide to go for a unique proof idea. The `Branch` tactic helps placing hints outside the sample solution's proof.
+
 ## 1. When do hints show?
 
 A hint will be displayed if the player's goal matches the one where the hint was placed in the
