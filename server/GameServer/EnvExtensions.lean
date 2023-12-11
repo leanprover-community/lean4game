@@ -148,6 +148,12 @@ structure InventoryOverview where
   lemmaTab : Option String
 deriving ToJson, FromJson
 
+-- TODO: Reuse the following code for checking available tactics in user code:
+structure UsedInventory where
+(tactics : HashSet Name := {})
+(definitions : HashSet Name := {})
+(lemmas : HashSet Name := {})
+
 /-! ## Environment extensions for game specification -/
 
 /-- Register a (non-persistent) environment extension to hold the current level -/

@@ -12,7 +12,7 @@ lean_lib GameServer
 
 @[default_target]
 lean_exe gameserver {
-  root := `Main
+  root := `GameServer
   supportInterpreter := true
 }
 
