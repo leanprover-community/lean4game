@@ -5,7 +5,7 @@ import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
-  faCircleInfo, faTerminal } from '@fortawesome/free-solid-svg-icons'
+  faCircleInfo, faTerminal, faMobileScreenButton, faDesktop } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from "../app"
 import { InputModeContext, MobileContext, WorldLevelIdContext } from "./infoview/context"
 import { GameInfo, useGetGameInfoQuery } from '../state/api'
@@ -161,7 +161,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
 }) {
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useAppSelector(selectProgress(gameId))
-  const {mobile} = React.useContext(MobileContext)
+  const {mobile, setMobile} = React.useContext(MobileContext)
   const [navOpen, setNavOpen] = React.useState(false)
 
   return <div className="app-bar">
@@ -182,6 +182,12 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
       <Button title="Game Info & Credits" inverted="true" to="" onClick={() => {toggleInfo(); setNavOpen(false)}}>
         <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Game Info
       </Button>
+      {mobile ? <Button title="Mobile" inverted="true" to="" onClick={() => {setMobile(false)}}>
+        <FontAwesomeIcon icon={faDesktop} />&nbsp;Desktop
+      </Button>: 
+      <Button title="Mobile" inverted="true" to="" onClick={() => {setMobile(true)}}>
+         <FontAwesomeIcon icon={faMobileScreenButton} />&nbsp;Mobile
+       </Button>}
       <Button title="Clear Progress" inverted="true" to="" onClick={() => {toggleEraseMenu(); setNavOpen(false)}}>
         <FontAwesomeIcon icon={faEraser} />&nbsp;Erase
       </Button>
@@ -208,7 +214,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=
 }) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
-  const {mobile} = React.useContext(MobileContext)
+  const {mobile, setMobile} = React.useContext(MobileContext)
   const [navOpen, setNavOpen] = React.useState(false)
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
@@ -231,6 +237,9 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=
           <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} setNavOpen={setNavOpen} />
           <PreviousButton setNavOpen={setNavOpen} />
           <HomeButton isDropdown={true} />
+          <Button title="Mobile" inverted="true" to="" onClick={()=>setMobile(false)}>
+            <FontAwesomeIcon icon={faDesktop} />&nbsp;Desktop
+          </Button>
           <InputModeButton setNavOpen={setNavOpen} isDropdown={true}/>
           <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
         </div>
@@ -248,6 +257,9 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=
           <PreviousButton setNavOpen={setNavOpen} />
           <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} setNavOpen={setNavOpen} />
           <InputModeButton setNavOpen={setNavOpen} isDropdown={false}/>
+          <Button title="Mobile" inverted="true" to="" onClick={() => setMobile(true)}>
+            <FontAwesomeIcon icon={faMobileScreenButton} />
+          </Button>
           <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={false} />
         </div>
       </>
