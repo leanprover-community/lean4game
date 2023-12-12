@@ -114,6 +114,7 @@ em {
 .app-bar > .app-bar-left{
   display: flex;
   align-items: center;
+  gap: .5em;
 }
 
 .app-bar-title, .app-bar-subtitle {
