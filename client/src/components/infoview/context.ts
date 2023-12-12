@@ -62,12 +62,18 @@ export const ProofStateContext = React.createContext<{
   setProofState: () => {},
 })
 
-export const MobileContext = React.createContext<{
+export interface IMobileContext {
   mobile : boolean,
   setMobile: React.Dispatch<React.SetStateAction<Boolean>>,
-}>({
-  mobile : false,
+  lockMobile: boolean,
+  setLockMobile: React.Dispatch<React.SetStateAction<Boolean>>,
+}
+
+export const MobileContext = React.createContext<IMobileContext>({
+  mobile: false,
   setMobile: () => {},
+  lockMobile: false,
+  setLockMobile: () => {}
 })
 
 export const WorldLevelIdContext = React.createContext<{

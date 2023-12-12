@@ -36,3 +36,24 @@ export async function saveState(state: any) {
     // Ignore
   }
 }
+
+const PREFERENCES_KEY = "preferences"
+
+/** Load from browser storage */
+export function loadPreferences() {
+  try {
+    const serializedState = localStorage.getItem(PREFERENCES_KEY);
+    return JSON.parse(serializedState)
+  } catch (e) {
+    return undefined;
+  }
+}
+
+export function savePreferences(state: any) {
+  try {
+    const serializedState = JSON.stringify(state)
+    localStorage.setItem(PREFERENCES_KEY, serializedState);
+  } catch (e) {
+    // Ignore
+  }
+}
