@@ -1,5 +1,6 @@
 #/bin/bash
 
+# Note: This fails if there is no default toolchain installed
 ELAN_HOME=$(lake env printenv ELAN_HOME)
 
 # $1 : the game directory
