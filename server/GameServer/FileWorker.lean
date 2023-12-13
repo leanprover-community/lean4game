@@ -69,75 +69,75 @@ def addErrorMessage (info : SourceInfo) (inputCtx : Parser.InputContext) (s : Me
       }
     }
 
--- TODO: use HashSet for allowed tactics?
-/-- Find all tactics in syntax object that are forbidden according to a
-set `allowed` of allowed tactics. -/
-partial def findForbiddenTactics (inputCtx : Parser.InputContext)
-    (levelParams : Game.DidOpenLevelParams) (stx : Syntax) :
-    Elab.Command.CommandElabM Unit := do
-  match stx with
-  | .missing => return ()
-  | .node _info _kind args =>
-    for arg in args do
-      findForbiddenTactics inputCtx levelParams arg
-  | .atom info val =>
-    -- ignore syntax elements that do not start with a letter
-    -- and ignore "with" keyword
-    let allowed := ["with", "fun", "at", "only", "by", "to"]
-    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
-      let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
-      match levelParams.tactics.find? (·.name.toString == val) with
-      | none =>
-        -- Note: This case means that the tactic will never be introduced in the game.
-        match levelParams.inventory.find? (· == val) with
-        | none =>
-          addWarningMessage info s!"You have not unlocked the tactic '{val}' yet!"
-        | some _ => pure () -- tactic is in the inventory, allow it.
-      | some tac =>
-        if tac.locked then
-          match levelParams.inventory.find? (· == val) with
-          | none =>
-            addWarningMessage info s!"You have not unlocked the tactic '{val}' yet!"
-          | some _ => pure () -- tactic is in the inventory, allow it.
-        else if tac.disabled then
-          addWarningMessage info s!"The tactic '{val}' is disabled in this level!"
-  | .ident info _rawVal val _preresolved =>
-      let ns ←
-        try resolveGlobalConst (mkIdent val)
-        catch | _ => pure [] -- catch "unknown constant" error
-      for n in ns do
-        let some (.thmInfo ..) := (← getEnv).find? n
-          | return () -- not a theorem -> ignore
-        -- Forbid the theorem we are proving currently
-        if n = levelParams.statementName then
-          addErrorMessage info inputCtx s!"Structural recursion: you can't use '{n}' to proof itself!"
+-- -- TODO: use HashSet for allowed tactics?
+-- /-- Find all tactics in syntax object that are forbidden according to a
+-- set `allowed` of allowed tactics. -/
+-- partial def findForbiddenTactics (inputCtx : Parser.InputContext)
+--     (levelParams : Game.DidOpenLevelParams) (stx : Syntax) :
+--     Elab.Command.CommandElabM Unit := do
+--   match stx with
+--   | .missing => return ()
+--   | .node _info _kind args =>
+--     for arg in args do
+--       findForbiddenTactics inputCtx levelParams arg
+--   | .atom info val =>
+--     -- ignore syntax elements that do not start with a letter
+--     -- and ignore "with" keyword
+--     let allowed := ["with", "fun", "at", "only", "by", "to"]
+--     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
+--       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
+--       match levelParams.tactics.find? (·.name.toString == val) with
+--       | none =>
+--         -- Note: This case means that the tactic will never be introduced in the game.
+--         match levelParams.inventory.find? (· == val) with
+--         | none =>
+--           addWarningMessage info s!"You have not unlocked the tactic '{val}' yet!"
+--         | some _ => pure () -- tactic is in the inventory, allow it.
+--       | some tac =>
+--         if tac.locked then
+--           match levelParams.inventory.find? (· == val) with
+--           | none =>
+--             addWarningMessage info s!"You have not unlocked the tactic '{val}' yet!"
+--           | some _ => pure () -- tactic is in the inventory, allow it.
+--         else if tac.disabled then
+--           addWarningMessage info s!"The tactic '{val}' is disabled in this level!"
+--   | .ident info _rawVal val _preresolved =>
+--       let ns ←
+--         try resolveGlobalConst (mkIdent val)
+--         catch | _ => pure [] -- catch "unknown constant" error
+--       for n in ns do
+--         let some (.thmInfo ..) := (← getEnv).find? n
+--           | return () -- not a theorem -> ignore
+--         -- Forbid the theorem we are proving currently
+--         if n = levelParams.statementName then
+--           addErrorMessage info inputCtx s!"Structural recursion: you can't use '{n}' to proof itself!"
 
-        let lemmasAndDefs := levelParams.lemmas ++ levelParams.definitions
-        match lemmasAndDefs.find? (fun l => l.name == n) with
-        | none => addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
-        | some lem =>
-          if lem.locked then
-            addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
-          else if lem.disabled then
-            addWarningMessage info s!"The lemma/definition '{n}' is disabled in this level!"
-where addWarningMessage (info : SourceInfo) (s : MessageData) :=
-  let difficulty := levelParams.difficulty
-  if difficulty > 0 then
-    modify fun st => { st with
-      messages := st.messages.add {
-        fileName := inputCtx.fileName
-        severity := if difficulty > 1 then MessageSeverity.error else MessageSeverity.warning
-        pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
-        data     := s
-      }
-    }
-  else pure ()
--- where addErrorMessage (info : SourceInfo) (s : MessageData) :=
---   pure ()
+--         let lemmasAndDefs := levelParams.lemmas ++ levelParams.definitions
+--         match lemmasAndDefs.find? (fun l => l.name == n) with
+--         | none => addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
+--         | some lem =>
+--           if lem.locked then
+--             addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
+--           else if lem.disabled then
+--             addWarningMessage info s!"The lemma/definition '{n}' is disabled in this level!"
+-- where addWarningMessage (info : SourceInfo) (s : MessageData) :=
+--   let difficulty := levelParams.difficulty
+--   if difficulty > 0 then
+--     modify fun st => { st with
+--       messages := st.messages.add {
+--         fileName := inputCtx.fileName
+--         severity := if difficulty > 1 then MessageSeverity.error else MessageSeverity.warning
+--         pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
+--         data     := s
+--       }
+--     }
+--   else pure ()
+-- -- where addErrorMessage (info : SourceInfo) (s : MessageData) :=
+-- --   pure ()
 
 open Elab Meta Expr in
 def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets : Bool)
-    (couldBeEndSnap : Bool) (levelParams : Game.DidOpenLevelParams)
+    (couldBeEndSnap : Bool)
     (initParams : Lsp.InitializeParams) : IO Snapshot := do
   -- Recognize end snap
   if inputCtx.input.atEnd snap.mpState.pos ∧ couldBeEndSnap then
@@ -168,7 +168,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
     Elab.Command.catchExceptions
       (getResetInfoTrees *> do
         let some level ← GameServer.getLevelByFileName? initParams inputCtx.fileName
-          | throwError "Level not found: {inputCtx.fileName}"
+          | panic! s!"Level not found: {inputCtx.fileName} / {GameServer.levelIdFromFileName? initParams inputCtx.fileName}"
         let scope := level.scope
 
         -- use open namespaces and options as in the level file
@@ -190,8 +190,8 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           modify (fun s => { s with messages := msgLog })
           parseResultRef.set (tacticStx, cmdParserState)
 
-          -- Check for forbidden tactics
-          findForbiddenTactics inputCtx levelParams tacticStx
+          -- TODO: Check for forbidden tactics
+          -- findForbiddenTactics inputCtx levelParams tacticStx
 
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
@@ -219,6 +219,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
     }
 
   let (tacticStx, cmdParserState) ← parseResultRef.get
+  if tacticStx.isMissing then throwServerError "Tactic execution went wrong. No stx found."
 
   let postCmdSnap : Snapshot := {
     beginPos := tacticStx.getPos?.getD 0
@@ -270,7 +271,7 @@ where
 
   /-- Elaborates the next command after `parentSnap` and emits diagnostics into `hOut`. -/
   private def nextSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken)
-      (levelParams : Game.DidOpenLevelParams) (initParams : Lsp.InitializeParams)
+      (initParams : Lsp.InitializeParams)
       : AsyncElabM (Option Snapshot) := do
     cancelTk.check
     let s ← get
@@ -288,7 +289,7 @@ where
     -- we can see the current goal even on an empty document
     let couldBeEndSnap := s.snaps.size > 1
     let snap ← compileProof m.mkInputContext lastSnap ctx.clientHasWidgets couldBeEndSnap
-      levelParams initParams
+      initParams
     set { s with snaps := s.snaps.push snap }
     -- TODO(MH): check for interrupt with increased precision
     cancelTk.check
@@ -310,7 +311,7 @@ where
 
   /-- Elaborates all commands after the last snap (at least the header snap is assumed to exist), emitting the diagnostics into `hOut`. -/
   def unfoldSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken)
-      (startAfterMs : UInt32) (levelParams : Game.DidOpenLevelParams)
+      (startAfterMs : UInt32)
       : ReaderT WorkerContext IO (AsyncList ElabTaskError Snapshot) := do
     let ctx ← read
     let some headerSnap := snaps[0]? | panic! "empty snapshots"
@@ -326,12 +327,12 @@ where
       publishIleanInfoUpdate m ctx.hOut snaps
       return AsyncList.ofList snaps.toList ++ AsyncList.delayed (← EIO.asTask (ε := ElabTaskError) (prio := .dedicated) do
         IO.sleep startAfterMs
-        AsyncList.unfoldAsync (nextSnap ctx m cancelTk levelParams ctx.initParams) { snaps })
+        AsyncList.unfoldAsync (nextSnap ctx m cancelTk ctx.initParams) { snaps })
 
 end Elab
 
+-- TODO: remove?
 structure GameWorkerState :=
-(levelParams : Game.DidOpenLevelParams)
 
 abbrev GameWorkerM := StateT GameWorkerState Server.FileWorker.WorkerM
 
@@ -340,7 +341,6 @@ section Updates
 /-- Given the new document, updates editable doc state. -/
   def updateDocument (newMeta : DocumentMeta) : GameWorkerM Unit := do
     let s ← get
-    let levelParams := s.levelParams
     let ctx ← read
     let oldDoc := (← StateT.lift get).doc
     oldDoc.cancelTk.set
@@ -382,7 +382,7 @@ section Updates
           validSnaps := validSnaps.dropLast
       -- wait for a bit, giving the initial `cancelTk.check` in `nextCmdSnap` time to trigger
       -- before kicking off any expensive elaboration (TODO: make expensive elaboration cancelable)
-      unfoldSnaps newMeta validSnaps.toArray cancelTk levelParams ctx
+      unfoldSnaps newMeta validSnaps.toArray cancelTk ctx
         (startAfterMs := ctx.initParams.editDelay.toUInt32)
     StateT.lift <| modify fun st => { st with
       doc := { meta := newMeta, cmdSnaps := AsyncList.delayed newSnaps, cancelTk }}
@@ -397,23 +397,25 @@ section Initialization
     fileMap  := default
 
   def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
-      (levelParams : Game.DidOpenLevelParams) (initParams : InitializeParams) :
+      (gameDir : String) :
       IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
     -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
     let out ← IO.Process.output
-      { cwd := levelParams.gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
+      { cwd := gameDir, cmd := "lake", args := #["env","printenv","LEAN_PATH"] }
     if out.exitCode != 0 then
       throwServerError s!"Error while running Lake: {out.stderr}"
 
     -- Make the paths relative to the current directory
     let paths : List System.FilePath := System.SearchPath.parse out.stdout.trim
     let currentDir ← IO.currentDir
-    let paths := paths.map fun p => currentDir / (levelParams.gameDir : System.FilePath) / p
+    let paths := paths.map fun p => currentDir / (gameDir : System.FilePath) / p
 
     -- Set the search path
     Lean.searchPathRef.set paths
 
-    let env ← importModules' #[{ module := `Init : Import }, { module := levelParams.levelModule : Import }]
+    --TODO:
+    let levelModule := `Game
+    let env ← importModules' #[{ module := `Init : Import }, { module := levelModule : Import }]
     -- return (env, paths)
 
     -- use empty header
@@ -458,10 +460,13 @@ section Initialization
       return (headerSnap, srcSearchPath)
 
   def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
-       (levelParams : Game.DidOpenLevelParams) : IO (WorkerContext × WorkerState) := do
+      (gameDir : String) : IO (WorkerContext × WorkerState) := do
+    -- TODO: We misuse the `rootUri` field to the gameName
+    let rootUri? := some "MyGame"
+    let initParams := {initParams with rootUri?}
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
     let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)
-      levelParams initParams
+      gameDir
     let cancelTk ← CancelToken.new
     let ctx :=
       { hIn  := i
@@ -472,7 +477,7 @@ section Initialization
         clientHasWidgets
       }
     let cmdSnaps ← EIO.mapTask (t := headerTask) (match · with
-      | Except.ok (s, _) => unfoldSnaps meta #[s] cancelTk levelParams ctx (startAfterMs := 0)
+      | Except.ok (s, _) => unfoldSnaps meta #[s] cancelTk ctx (startAfterMs := 0)
       | Except.error e   => throw (e : ElabTaskError))
     let doc : EditableDocument := { meta, cmdSnaps := AsyncList.delayed cmdSnaps, cancelTk }
     return (ctx,
@@ -509,6 +514,7 @@ section MessageHandling
     match method with
     | "textDocument/didChange" => handle DidChangeTextDocumentParams (handleDidChange)
     | "$/cancelRequest"        => handle CancelParams (handleCancelRequest ·)
+    | "$/setTrace"        => pure ()
     | "$/lean/rpc/release"     => handle RpcReleaseParams (handleRpcRelease ·)
     | "$/lean/rpc/keepAlive"   => handle RpcKeepAliveParams (handleRpcKeepAlive ·)
     | _                        => throwServerError s!"Got unsupported notification method: {method}"
@@ -550,23 +556,34 @@ section MainLoop
     | Message.notification "$/game/setInventory" params =>
       let p := (← parseParams Game.SetInventoryParams (toJson params))
       let s ← get
-
-      set {s with levelParams := {s.levelParams with
-        inventory := p.inventory,
-        difficulty := p.difficulty}}
+      -- TODO
+      -- set {s with levelParams := {s.levelParams with
+      --   inventory := p.inventory,
+      --   difficulty := p.difficulty}}
       mainLoop
     | Message.notification method (some params) =>
       handleNotification method (toJson params)
       mainLoop
-    | _ => throwServerError "Got invalid JSON-RPC message"
+    | _ => throwServerError s!"Got invalid JSON-RPC message: {toJson msg}"
 end MainLoop
 
-def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do
+def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : IO UInt32 := do
   let i ← maybeTee "fwIn.txt" false i
   let o ← maybeTee "fwOut.txt" true o
-  let initParams ← i.readLspRequestAs "initialize" InitializeParams
+  let initRequest ← i.readLspRequestAs "initialize" InitializeParams
+  o.writeLspResponse {
+    id     := initRequest.id
+    result := {
+      capabilities := Watchdog.mkLeanServerCapabilities
+      serverInfo?  := some {
+        name     := "Lean 4 Game Server"
+        version? := "0.1.1"
+      }
+      : InitializeResult
+    }
+  }
+  discard $ i.readLspNotificationAs "initialized" InitializedParams
   let ⟨_, param⟩ ← i.readLspNotificationAs "textDocument/didOpen" DidOpenTextDocumentParams
-  let ⟨_, levelParams⟩ ← i.readLspNotificationAs "$/game/didOpenLevel" Game.DidOpenLevelParams
 
   let doc := param.textDocument
   /- NOTE(WN): `toFileMap` marks line beginnings as immediately following
@@ -578,9 +595,9 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do
   let e := e.withPrefix s!"[{param.textDocument.uri}] "
   let _ ← IO.setStderr e
   try
-    let (ctx, st) ← initializeWorker meta i o e initParams.param opts levelParams
+    let (ctx, st) ← initializeWorker meta i o e initRequest.param opts gameDir
     let _ ← StateRefT'.run (s := st) <| ReaderT.run (r := ctx) <|
-      StateT.run (s := {levelParams := levelParams}) <| (mainLoop)
+      StateT.run (s := {}) <| (mainLoop)
     return (0 : UInt32)
   catch e =>
     IO.eprintln e
@@ -590,12 +607,13 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO UInt32 := do
       message := e.toString }] o
     return (1 : UInt32)
 
-def workerMain (opts : Options) : IO UInt32 := do
+def workerMain (opts : Options) (args : List String): IO UInt32 := do
   let i ← IO.getStdin
   let o ← IO.getStdout
   let e ← IO.getStderr
   try
-    let exitCode ← initAndRunWorker i o e opts
+    let some gameDir := args[1]? | throwServerError "Expected second argument: gameDir"
+    let exitCode ← initAndRunWorker i o e opts gameDir
     -- HACK: all `Task`s are currently "foreground", i.e. we join on them on main thread exit, but we definitely don't
     -- want to do that in the case of the worker processes, which can produce non-terminating tasks evaluating user code
     o.flush

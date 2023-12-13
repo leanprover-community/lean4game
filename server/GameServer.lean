@@ -10,10 +10,11 @@ unsafe def main : List String → IO UInt32 := fun args => do
 
   Lean.enableInitializersExecution
 
+  -- TODO: remove this argument
   if args[0]? == some "--server" then
-    MyServer.Watchdog.watchdogMain args
+    MyServer.FileWorker.workerMain {} args
   else if args[0]? == some "--worker" then
-    MyServer.FileWorker.workerMain {}
+    MyServer.FileWorker.workerMain {} args
   else
     e.putStrLn s!"Expected `--server` or `--worker`"
     return 1
