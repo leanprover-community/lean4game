@@ -1,6 +1,8 @@
+**NOTE! This document is deprecated! The current documentation is [How To Create A Game](create_game.md)**
+
 # Creating a game.
 
-Ideally one takes the [NNG template](https://github.com/hhu-adam/NNG4) to create a new game.
+Ideally one takes the [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton) to create a new game.
 
 ## Game Structure
 
@@ -295,8 +297,9 @@ cd lean4game
 npm install
 ```
 
+TODO: This is outdated!
 If you are developing a game other than `Robo` or `NNG4`, adapt the
-code at the beginning of `lean4game/server/index.mjs`:
+code at the beginning of `lean4game/relay/index.mjs`:
 ```typescript
 const games = {
     "g/hhu-adam/robo": {

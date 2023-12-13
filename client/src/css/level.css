@@ -317,11 +317,6 @@ td code  {
   margin-right: 0;
 }
 
-#home-btn {
-  margin-right: .5em;
-  margin-left: 0;
-}
-
 .menu.dropdown .svg-inline--fa {
   width: 1.8rem;
 }
@@ -334,6 +329,21 @@ td code  {
 
 .typewriter-interface .content, .world-image-container.empty {
   background-color: #eee;
+}
+
+.world-image-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.world-image-container img.contain {
+  object-fit: contain;
+}
+
+.world-image-container img.cover {
+  height: 100%;
+  object-fit: cover;
 }
 
 .typewriter-interface .proof {

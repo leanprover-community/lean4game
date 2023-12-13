@@ -12,5 +12,5 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
   },
-  "exclude": ["server"]
+  "exclude": ["server", "relay"]
 }

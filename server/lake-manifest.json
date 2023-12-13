@@ -1,4 +1,14 @@
-{"version": 6,
- "packagesDir": "lake-packages",
- "packages": [],
- "name": "GameServer"}
+{"version": 7,
+ "packagesDir": ".lake/packages",
+ "packages":
+ [{"url": "https://github.com/leanprover/std4.git",
+   "type": "git",
+   "subDir": null,
+   "rev": "2e4a3586a8f16713f16b2d2b3af3d8e65f3af087",
+   "name": "std",
+   "manifestFile": "lake-manifest.json",
+   "inputRev": "v4.3.0",
+   "inherited": false,
+   "configFile": "lakefile.lean"}],
+ "name": "GameServer",
+ "lakeDir": ".lake"}

@@ -26,7 +26,8 @@ export interface GameProgressState {
   inventory: string[],
   difficulty: number,
   openedIntro: boolean,
-  data: WorldProgressState
+  data: WorldProgressState,
+  typewriterMode?: boolean
 }
 
 /**
@@ -126,6 +127,11 @@ export const progressSlice = createSlice({
       addGameProgress(state, action)
       state.games[action.payload.game].openedIntro = action.payload.openedIntro
     },
+    /** set the typewriter mode */
+    changeTypewriterMode(state: ProgressState, action: PayloadAction<{game: string, typewriterMode: boolean}>) {
+      addGameProgress(state, action)
+      state.games[action.payload.game].typewriterMode = action.payload.typewriterMode
+    }
   }
 })
 
@@ -196,7 +202,14 @@ export function selectOpenedIntro(game: string) {
   }
 }
 
+/** return typewriter mode for the current game if it exists */
+export function selectTypewriterMode(game: string) {
+  return (state) => {
+    return state.progress.games[game]?.typewriterMode ?? true
+  }
+}
+
 /** Export actions to modify the progress */
 export const { changedSelection, codeEdited, levelCompleted, deleteProgress,
   deleteLevelProgress, loadProgress, helpEdited, changedInventory, changedOpenedIntro,
-  changedDifficulty } = progressSlice.actions
+  changedDifficulty, changeTypewriterMode} = progressSlice.actions
