@@ -22,7 +22,7 @@ import { ConnectionContext, connection, useLeanClient } from '../connection'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
 import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited,
-  selectHelp, selectDifficulty, selectInventory } from '../state/progress'
+  selectHelp, selectDifficulty, selectInventory, selectTypewriterMode, changeTypewriterMode } from '../state/progress'
 import { store } from '../state/store'
 import { Button } from './button'
 import Markdown from './markdown'
@@ -32,8 +32,9 @@ import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContex
   ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint } from './infoview/rpc_api'
-import { DeletedHints, Hint, Hints } from './hints'
+import { DeletedHints, Hint, Hints, filterHints } from './hints'
 import { PrivacyPolicyPopup } from './popup/privacy_policy'
+import path from 'path';
 
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
@@ -48,7 +49,6 @@ function Level() {
   const params = useParams()
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
-  // useLoadWorldFiles(worldId)
 
   const [impressum, setImpressum] = React.useState(false)
 
@@ -138,19 +138,24 @@ function ChatPanel({lastLevel}) {
 
   let introText: Array<string> = level?.data?.introduction.split(/\n(\s*\n)+/)
 
+  // experimental: Remove all hints that appeared identically in the previous step
+  // This effectively prevent consequtive hints being shown.
+  let modifiedHints : GameHint[][] = filterHints(proof)
+
   return <div className="chat-panel">
     <div ref={chatRef} className="chat">
       {introText?.filter(t => t.trim()).map(((t, i) =>
+        // Show the level's intro text as hints, too
         <Hint key={`intro-p-${i}`}
           hint={{text: t, hidden: false}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
       ))}
-      {proof.map((step, i) => {
+      {modifiedHints.map((step, i) => {
         // It the last step has errors, it will have the same hints
         // as the second-to-last step. Therefore we should not display them.
         if (!(i == proof.length - 1 && withErr)) {
           // TODO: Should not use index as key.
           return <Hints key={`hints-${i}`}
-            hints={step.hints} showHidden={showHelp.has(i)} step={i}
+            hints={step} showHidden={showHelp.has(i)} step={i}
             selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof.length - 1}/>
         }
       })}
@@ -204,10 +209,15 @@ function PlayableLevel({impressum, setImpressum}) {
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(MobileContext)
 
+  const dispatch = useAppDispatch()
+
   const difficulty = useSelector(selectDifficulty(gameId))
   const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
   const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
   const inventory: Array<String> = useSelector(selectInventory(gameId))
+
+  const typewriterMode = useSelector(selectTypewriterMode(gameId))
+  const setTypewriterMode = (newTypewriterMode: boolean) => dispatch(changeTypewriterMode({game: gameId, typewriterMode: newTypewriterMode}))
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
@@ -221,12 +231,11 @@ function PlayableLevel({impressum, setImpressum}) {
   const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
-  const [typewriterMode, setTypewriterMode] = useState(true)
+
   // set to true to prevent switching between typewriter and editor
   const [lockInputMode, setLockInputMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
-  const dispatch = useAppDispatch()
 
   // impressum pop-up
   function toggleImpressum() {setImpressum(!impressum)}
@@ -320,8 +329,6 @@ function PlayableLevel({impressum, setImpressum}) {
           console.debug(`not inserting template.`)
         }
       }
-    } else {
-      setTypewriterMode(true)
     }
   }, [level, levelId, worldId, gameId, editor])
 
@@ -336,7 +343,7 @@ function PlayableLevel({impressum, setImpressum}) {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    if (!typewriterMode) {
+    if (!typewriterMode && editor) {
       // Delete last input attempt from command line
       editor.executeEdits("typewriter", [{
         range: editor.getSelection(),
@@ -466,6 +473,11 @@ function Introduction({impressum, setImpressum}) {
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
+  const {worldId} = useContext(WorldLevelIdContext)
+
+  let image: string = gameInfo.data?.worlds.nodes[worldId].image
+
+
   const toggleImpressum = () => {
     setImpressum(!impressum)
   }
@@ -479,7 +491,13 @@ function Introduction({impressum, setImpressum}) {
       :
         <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
           <IntroductionPanel gameInfo={gameInfo} />
-          <div className="world-image-container empty"></div>
+          <div className="world-image-container empty">
+            {image &&
+              // TODO: Temporary for testing
+              <img className={worldId=="Proposition" ? "cover" : "contain"} src={path.join("data", gameId, image)} alt="" />
+            }
+
+          </div>
           <InventoryPanel levelInfo={inventory?.data} />
         </Split>
       }
@@ -615,6 +633,7 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
 
       return () => {
         editorConnection.api.sendClientNotification(uriStr, "textDocument/didClose", {textDocument: {uri: uriStr}})
+        model.dispose();
       }
     }
   }, [editor, levelId, connection, leanClientStarted])
@@ -636,28 +655,4 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
   }, [editor, connection, leanClientStarted])
 
   return {editor, infoProvider, editorConnection}
-}
-
-/** Open all files in this world on the server so that they will load faster when accessed */
-function useLoadWorldFiles(worldId) {
-  const gameId = React.useContext(GameIdContext)
-  const gameInfo = useGetGameInfoQuery({game: gameId})
-  const store = useStore()
-
-  useEffect(() => {
-    if (gameInfo.data) {
-      const models = []
-      for (let levelId = 1; levelId <= gameInfo.data.worldSize[worldId]; levelId++) {
-        const uri = monaco.Uri.parse(`file:///${worldId}/${levelId}`)
-        let model = monaco.editor.getModel(uri)
-        if (model) {
-          models.push(model)
-        } else {
-          const code = selectCode(gameId, worldId, levelId)(store.getState())
-          models.push(monaco.editor.createModel(code, 'lean4', uri))
-        }
-      }
-      return () => { for (let model of models) { model.dispose() } }
-    }
-  }, [gameInfo.data, worldId])
 }

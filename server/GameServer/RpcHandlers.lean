@@ -78,7 +78,7 @@ partial def matchExpr (pattern : Expr) (e : Expr) (bij : FVarBijection := {}) : 
   | _, _ => none
 
 /-- Check if each fvar in `patterns` has a matching fvar in `fvars` -/
-def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true) (initBij : FVarBijection := {}) : MetaM Bool := do
+def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true) (initBij : FVarBijection := {}) : MetaM (Option FVarBijection) := do
   -- We iterate through the array backwards hoping that this will find us faster results
   -- TODO: implement backtracking
   let mut bij := initBij
@@ -97,11 +97,11 @@ def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true) (in
         -- usedFvars := usedFvars.set! (fvars.size - j - 1) true
         bij := bij'.insert pattern.fvarId! fvar.fvarId!
         break
-    if ! bij.forward.contains pattern.fvarId! then return false
+    if ! bij.forward.contains pattern.fvarId! then return none
 
-  if strict then
-    return fvars.all (fun fvar => bij.backward.contains fvar.fvarId!)
-  return true
+  if !strict || fvars.all (fun fvar => bij.backward.contains fvar.fvarId!)
+  then return some bij
+  else return none
 
 unsafe def evalHintMessageUnsafe : Expr → MetaM (Array Expr → MessageData) :=
   evalExpr (Array Expr → MessageData)
@@ -122,10 +122,11 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) (initParams : 
         if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
         then
           let lctx := (← goal.getDecl).lctx
-          if ← matchDecls hintFVars lctx.getFVars (strict := hint.strict) (initBij := fvarBij)
+          if let some bij ← matchDecls hintFVars lctx.getFVars (strict := hint.strict) (initBij := fvarBij)
           then
-            let text := (← evalHintMessage hint.text) hintFVars
-            let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
+            let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
+            let text := (← evalHintMessage hint.text) (userFVars.map Expr.fvar)
+            let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := lctx, opts := {}}
             let text ← (MessageData.withContext ctx text).toString
             return some { text := text, hidden := hint.hidden }
           else return none

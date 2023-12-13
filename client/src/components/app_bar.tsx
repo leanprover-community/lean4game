@@ -166,7 +166,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
   const [navOpen, setNavOpen] = React.useState(false)
 
   return <div className="app-bar">
-    <div>
+    <div className='app-bar-left'>
       <Button inverted="false" title="back to games selection" to="/">
         <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
       </Button>
@@ -241,7 +241,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=
       </> :
       <>
         {/* DESKTOP VERSION */}
-        <div>
+        <div className='app-bar-left'>
           <HomeButton isDropdown={false} />
           <span className="app-bar-title">{worldTitle && `World: ${worldTitle}`}</span>
         </div>

@@ -1,12 +1,17 @@
 #/bin/bash
 
+# Note: This fails if there is no default toolchain installed
 ELAN_HOME=$(lake env printenv ELAN_HOME)
 
+# $1 : the game directory
+# $2 : the lean4game folder
+# $3 : the gameserver executable
+
 (exec bwrap\
-  --ro-bind ../../lean4game /lean4game \
-  --ro-bind ../../$1 /game \
-  --ro-bind $ELAN_HOME /elan \
-  --ro-bind /usr /usr \
+  --bind $2 /lean4game \
+  --bind $1 /game \
+  --bind $ELAN_HOME /elan \
+  --bind /usr /usr \
   --dev /dev \
   --proc /proc \
   --symlink usr/lib /lib\
@@ -22,6 +27,6 @@ ELAN_HOME=$(lake env printenv ELAN_HOME)
   --unshare-uts  \
   --unshare-cgroup \
   --die-with-parent \
-  --chdir "/lean4game/server/build/bin/" \
+  --chdir "/game/.lake/packages/GameServer/server/.lake/build/bin/" \
   ./gameserver --server /game
 )

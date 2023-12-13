@@ -11,7 +11,7 @@ import './css/app.css';
 import { MobileContext } from './components/infoview/context';
 import { useMobile } from './hooks';
 import { AUTO_SWITCH_THRESHOLD, getWindowDimensions} from './state/preferences';
-
+import { connection } from './connection';
 
 export const GameIdContext = React.createContext<string>(undefined);
 
@@ -36,6 +36,10 @@ function App() {
       }
     }
   }, [lockMobile])
+
+  React.useEffect(() => {
+    connection.startLeanClient(gameId);
+  }, [gameId])
 
   return (
     <div className="app">

@@ -1,6 +1,7 @@
 {
   "name": "lean4-game",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "homepage": ".",
   "dependencies": {
@@ -36,6 +37,7 @@
     "rehype-katex": "^6.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
+    "request": "^2.88.2",
     "request-progress": "^3.0.0",
     "vite": "^4.5.0",
     "vite-plugin-static-copy": "^0.17.0",
@@ -52,7 +54,7 @@
     "concurrently": "^7.6.0",
     "css-loader": "^6.7.3",
     "file-loader": "^6.2.0",
-    "nodemon": "^2.0.20",
+    "nodemon": "^3.0.1",
     "react-refresh": "^0.14.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.2",
@@ -61,12 +63,13 @@
   },
   "scripts": {
     "start": "concurrently -n server,client -c blue,green \"npm run start_server\" \"npm run start_client\"",
-    "start_server": "cd server && lake build && cross-env NODE_ENV=development nodemon -e mjs --exec \"node ./index.mjs\"",
+    "start_server": "(cd server && lake build) && (cd relay && cross-env NODE_ENV=development nodemon -e mjs --exec \"node ./index.mjs\")",
     "start_client": "cross-env NODE_ENV=development vite --host",
     "build": "npm run build_server && npm run build_client",
+    "preview": "vite preview",
     "build_server": "cd server && lake build",
     "build_client": "cross-env NODE_ENV=production vite build",
-    "production": "cross-env NODE_ENV=production node server/index.mjs"
+    "production": "cross-env NODE_ENV=production node relay/index.mjs"
   },
   "eslintConfig": {
     "extends": [
