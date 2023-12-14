@@ -523,7 +523,7 @@ export function TypewriterInterface({props}) {
               }
             })}
             {mobile && completed &&
-              <div className="button-row">
+              <div className="button-row mobile">
                 {props.level >= props.worldSize ?
                   <Button to={`/${gameId}`}>
                     <FontAwesomeIcon icon={faHome} />&nbsp;Leave World

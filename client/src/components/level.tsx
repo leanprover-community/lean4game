@@ -441,6 +441,7 @@ function PlayableLevel({impressum, setImpressum}) {
 function IntroductionPanel({gameInfo}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId} = useContext(WorldLevelIdContext)
+  const {mobile} = React.useContext(MobileContext)
 
   let text: Array<string> = gameInfo.data?.worlds.nodes[worldId].introduction.split(/\n(\s*\n)+/)
 
@@ -451,7 +452,7 @@ function IntroductionPanel({gameInfo}) {
           hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
       ))}
     </div>
-    <div className="button-row">
+    <div className={`button-row${mobile ? ' mobile' : ''}`}>
       {gameInfo.data?.worldSize[worldId] == 0 ?
         <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
         <Button to={`/${gameId}/world/${worldId}/level/1`}>

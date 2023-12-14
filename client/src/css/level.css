@@ -232,6 +232,20 @@ td code  {
   height: 100%;
 } */
 
+.button-row.mobile {
+  margin: .5rem;
+  padding-top: .2rem;
+}
+
+.button-row.mobile .btn {
+  padding: .5em;
+  border-radius: .2em;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
+
+
 .typewriter-interface {
   display: flex;
   flex-flow: column;
