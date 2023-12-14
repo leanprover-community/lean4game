@@ -11,10 +11,12 @@ import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
 import { useSelector } from 'react-redux';
 
-export function Inventory({levelInfo, openDoc, enableAll=false} :
+export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=false} :
   {
     levelInfo: LevelInfo|InventoryOverview,
     openDoc: (props: {name: string, type: string}) => void,
+    lemmaTab: any,
+    setLemmaTab: any,
     enableAll?: boolean,
   }) {
 
@@ -32,19 +34,20 @@ export function Inventory({levelInfo, openDoc, enableAll=false} :
       }
       <h2>Theorems</h2>
       {levelInfo?.lemmas &&
-        <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc} defaultTab={levelInfo?.lemmaTab} level={levelInfo} enableAll={enableAll}/>
+        <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc} level={levelInfo} enableAll={enableAll} tab={lemmaTab} setTab={setLemmaTab}/>
       }
     </div>
   )
 }
 
-function InventoryList({items, docType, openDoc, defaultTab=null, level=undefined, enableAll=false} :
+function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, level=undefined, enableAll=false} :
   {
     items: InventoryTile[],
     docType: string,
     openDoc(props: {name: string, type: string}): void,
-    defaultTab? : string,
-    level? : LevelInfo|InventoryOverview,
+    tab?: any,
+    setTab?: any,
+    level?: LevelInfo|InventoryOverview,
     enableAll?: boolean,
   }) {
   // TODO: `level` is only used in the `useEffect` below to check if a new level has
@@ -60,21 +63,12 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
   }
   const categories = Array.from(categorySet).sort()
 
-  const [tab, setTab] = useState(defaultTab)
-
   // Add inventory items from local store as unlocked.
   // Items are unlocked if they are in the local store, or if the server says they should be
   // given the dependency graph. (OR-connection) (TODO: maybe add different logic for different
   // modi)
   let inv: string[] = selectInventory(gameId)(store.getState())
   let modifiedItems : InventoryTile[] = items.map(tile => inv.includes(tile.name) ? {...tile, locked: false} : tile)
-
-  useEffect(() => {
-    // If the level specifies `LemmaTab "Nat"`, we switch to this tab on loading.
-    // `defaultTab` is `null` or `undefined` otherwise, in which case we don't want to switch.
-    if (defaultTab) {
-      setTab(defaultTab)
-    }}, [level])
 
   return <>
     {categories.length > 1 &&
@@ -151,16 +145,25 @@ export function Documentation({name, type, handleClose}) {
 export function InventoryPanel({levelInfo, visible = true}) {
   const gameId = React.useContext(GameIdContext)
 
+  const [lemmaTab, setLemmaTab] = useState(levelInfo?.lemmaTab)
+
   // The inventory is overlayed by the doc entry of a clicked item
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
   // Set `inventoryDoc` to `null` to close the doc
   function closeInventoryDoc() {setInventoryDoc(null)}
 
+    useEffect(() => {
+    // If the level specifies `LemmaTab "Nat"`, we switch to this tab on loading.
+    // `defaultTab` is `null` or `undefined` otherwise, in which case we don't want to switch.
+    if (levelInfo?.lemmaTab) {
+      setLemmaTab(levelInfo?.lemmaTab)
+    }}, [levelInfo])
+
   return <div className={`column inventory-panel ${visible ? '' : 'hidden'}`}>
     {inventoryDoc ?
       <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
       :
-      <Inventory levelInfo={levelInfo} openDoc={setInventoryDoc} enableAll={true}/>
+      <Inventory levelInfo={levelInfo} openDoc={setInventoryDoc} enableAll={true} lemmaTab={lemmaTab} setLemmaTab={setLemmaTab}/>
     }
   </div>
 }
