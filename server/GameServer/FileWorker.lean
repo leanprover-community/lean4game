@@ -555,6 +555,9 @@ section MainLoop
       let doc := st.doc
       doc.cancelTk.set
       return ()
+    | Message.request id "shutdown" none =>
+      ctx.hOut.writeLspResponse ⟨id, Json.null⟩
+      mainLoop
     | Message.notification "$/game/setInventory" params =>
       let p := (← parseParams Game.SetInventoryParams (toJson params))
       let s ← get
