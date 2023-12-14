@@ -213,7 +213,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           modify (fun s => { s with messages := msgLog })
           parseResultRef.set (tacticStx, cmdParserState)
 
-          -- TODO: Check for forbidden tactics
+          -- Check for forbidden tactics
           findForbiddenTactics inputCtx gameWorkerState level tacticStx
 
           -- Insert invisible `skip` command to make sure we always display the initial goal
@@ -590,7 +590,7 @@ end MainLoop
 def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : IO UInt32 := do
   let i ← maybeTee "fwIn.txt" false i
   let o ← maybeTee "fwOut.txt" true o
-  let initRequest ← i.readLspRequestAs "initialize" InitializeParams
+  let initRequest ← i.readLspRequestAs "initialize" Game.InitializeParams
   o.writeLspResponse {
     id     := initRequest.id
     result := {
@@ -616,20 +616,15 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : I
   let _ ← IO.setStderr e
   try
     let game ← loadGameData gameDir
-    let s : GameWorkerState:= {
-      -- uri := doc.uri
-      -- gameDir := gameDir
-      -- levelModule := sorry
-      -- tactics := sorry
-      -- lemmas := sorry
-      -- definitions := sorry
-      inventory := #[] -- TODO: Ensure that this is set in time!
-      difficulty := 0 -- TODO: Ensure that this is set in time!
-      -- statementName := sorry
+    let some initializationOptions := initRequest.param.initializationOptions?
+      | throwServerError "no initialization options found"
+    let gameWorkerState : GameWorkerState:= {
+      inventory := initializationOptions.inventory
+      difficulty := initializationOptions.difficulty
     }
-    let (ctx, st) ← initializeWorker meta i o e initRequest.param opts gameDir game s
+    let (ctx, st) ← initializeWorker meta i o e initRequest.param.toLeanInternal opts gameDir game gameWorkerState
     let _ ← StateRefT'.run (s := st) <| ReaderT.run (r := ctx) <|
-      StateT.run (s := s) <| (mainLoop)
+      StateT.run (s := gameWorkerState) <| (mainLoop)
     return (0 : UInt32)
   catch e =>
     IO.eprintln e

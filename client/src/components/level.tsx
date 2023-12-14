@@ -549,6 +549,9 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
   const uriStr = `file:///${worldId}/${levelId}`
   const uri = monaco.Uri.parse(uriStr)
 
+  const inventory: Array<String> = useSelector(selectInventory(gameId))
+  const difficulty: number = useSelector(selectDifficulty(gameId))
+
   useEffect(() => {
     const model = monaco.editor.createModel(initialCode ?? '', 'lean4', uri)
     if (onDidChangeContent) {
@@ -615,7 +618,7 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
     }
 
     // Following `vscode-lean4/webview/index.ts`
-    const client = new LeanClient(connectionProvider, showRestartMessage)
+    const client = new LeanClient(connectionProvider, showRestartMessage, {inventory, difficulty})
     const infoProvider = new InfoProvider(client)
     // const div: HTMLElement = infoviewRef.current!
     const imports = {
