@@ -106,6 +106,8 @@ structure InventoryTile where
   new := false
   /-- hide the item in the inventory display -/
   hidden := false
+  /-- hover text -/
+  altTitle : String := default
 deriving ToJson, FromJson, Repr, Inhabited
 
 def InventoryItem.toTile (item : InventoryItem) : InventoryTile := {

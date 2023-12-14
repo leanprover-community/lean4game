@@ -90,21 +90,24 @@ function InventoryList({items, docType, openDoc, defaultTab=null, level=undefine
           (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled) || x.displayName.localeCompare(y.displayName)
         ).filter(item => !item.hidden && ((tab ?? categories[0]) == item.category)).map((item, i) => {
             return <InventoryItem key={`${item.category}-${item.name}`}
+              item={item}
               showDoc={() => {openDoc({name: item.name, type: docType})}}
               name={item.name} displayName={item.displayName} locked={difficulty > 0 ? item.locked : false}
-              disabled={item.disabled} newly={item.new} enableAll={enableAll}/>
+              disabled={item.disabled} newly={item.new} enableAll={enableAll} />
         })
       }
     </div>
     </>
 }
 
-function InventoryItem({name, displayName, locked, disabled, newly, showDoc, enableAll=false}) {
+function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc, enableAll=false}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
-               disabled ? <FontAwesomeIcon icon={faBan} /> : ""
+               disabled ? <FontAwesomeIcon icon={faBan} /> : item.st
   const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
+  // Note: This is somewhat a hack as the statement of lemmas comes currently in the form
+  // `Namespace.statement_name (x y : Nat) : some type`
   const title = locked ? "Not unlocked yet" :
-                disabled ? "Not available in this level" : ""
+                disabled ? "Not available in this level" : item.altTitle.substring(item.altTitle.indexOf(' ') + 1)
 
   const [copied, setCopied] = useState(false)
 

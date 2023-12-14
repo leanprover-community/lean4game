@@ -781,6 +781,7 @@ elab "MakeGame" : command => do
               name := item
               displayName := data.displayName
               category := data.category
+              altTitle := data.statement
               hidden := hiddenItems.contains item })
 
 
@@ -800,6 +801,7 @@ elab "MakeGame" : command => do
             displayName := data.displayName
             category := data.category
             locked := false
+            altTitle := data.statement
             hidden := hiddenItems.contains item }
       itemsInWorld := itemsInWorld.insert worldId items
 
@@ -819,6 +821,7 @@ elab "MakeGame" : command => do
             displayName := data.displayName
             category := data.category
             locked := false
+            altTitle := data.statement
             hidden := hiddenItems.contains item }
 
         -- add the exercise statement from the previous level
@@ -832,6 +835,7 @@ elab "MakeGame" : command => do
               name := name
               displayName := data.displayName
               category := data.category
+              altTitle := data.statement
               locked := false }
 
         -- add marks for `disabled` and `new` lemmas here, so that they only apply to

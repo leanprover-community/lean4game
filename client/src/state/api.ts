@@ -35,6 +35,7 @@ export interface InventoryTile {
   locked: boolean,
   new: boolean,
   hidden: boolean
+  altTitle: string,
 }
 
 export interface LevelInfo {
