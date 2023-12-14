@@ -129,6 +129,9 @@ NewLemma Nat.zero_mul
 NewDefinition Pow
 ```
 
+**Important:** All commands in this section 6a) expect the `Name` they take as input
+to be **fully qualified**. For example `NewLemma Nat.zero_mul` and not `NewLemma zero_mul`.
+
 #### Doc entries
 
 You'll see a warning about a missing Lemma documentation. You can fix it by adding doc-entries like the following somewhere above it.
@@ -182,6 +185,8 @@ The statement is the exercise of the level. the basics work the same as they wou
 
 You can give your exercise a name: `Statement my_first_exercise (n : Nat) ...`. If you do so, it will be added to the inventory and be available in future levels.
 
+You can but a `Statement` inside namespaces like you would with `theorem`.
+
 #### Doc String / Exercise statement
 
 Add a docstring that contains the exercise statement in natural language. If you do this, it will appear at the top of the exercise. It supports Latex.
@@ -230,7 +235,7 @@ Read [More about Hints](doc/hints.md) for how they work and what the options are
 ### 6. e) Extra: Images
 You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
 
-The images need to be placed in `images/` and you need to add a command like `Image "images/path/to/myWorldImage.png"` 
+The images need to be placed in `images/` and you need to add a command like `Image "images/path/to/myWorldImage.png"`
 in one of the files you created in 2), 3), or 4) (i.e. game/world/level).
 
 NOTE: At present, only the images for a world are displayed. They appear in the introduction of the world.
