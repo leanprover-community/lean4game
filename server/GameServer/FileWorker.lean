@@ -2,6 +2,7 @@
 import Lean.Server.FileWorker
 import GameServer.Game
 import GameServer.ImportModules
+import GameServer.SaveData
 
 namespace MyModule
 open Lean
@@ -461,8 +462,9 @@ section Initialization
 
   def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
       (gameDir : String) : IO (WorkerContext × WorkerState) := do
+    let game ← loadGameData gameDir
     -- TODO: We misuse the `rootUri` field to the gameName
-    let rootUri? := some "MyGame"
+    let rootUri? : Option String := some (toString game.name)
     let initParams := {initParams with rootUri?}
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
     let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)

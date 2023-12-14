@@ -22,17 +22,21 @@ def copyImages : IO Unit := do
         let content ← readBinFile file
         writeBinFile outFile content
 
+namespace GameData
+  def gameDataPath : System.FilePath := ".lake" / "gamedata"
+  def gameFileName := s!"game.json"
+  def docFileName := fun (inventoryType : InventoryType) (name : Name) => s!"doc__{inventoryType}__{name}.json"
+  def levelFileName := fun (worldId : Name) (levelId : Nat) => s!"level__{worldId}__{levelId}.json"
+  def inventoryFileName := s!"inventory.json"
+end GameData
 
--- TODO: I'm not sure this should be happening here...
-#eval IO.FS.createDirAll ".lake/gamedata/"
-
+open GameData in
 -- TODO: register all of this as ToJson instance?
 def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
     (inventory : InventoryOverview): CommandElabM Unit := do
   let game ← getCurGame
   let env ← getEnv
-  let path : System.FilePath := s!"{← IO.currentDir}" / ".lake" / "gamedata"
-
+  let path := (← IO.currentDir) / gameDataPath
   if ← path.isDir then
     IO.FS.removeDirAll path
   IO.FS.createDirAll path
@@ -42,14 +46,37 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
 
   for (worldId, world) in game.worlds.nodes.toArray do
     for (levelId, level) in world.levels.toArray do
-      IO.FS.writeFile (path / s!"level__{worldId}__{levelId}.json") (toString (toJson (level.toInfo env)))
+      IO.FS.writeFile (path / levelFileName worldId levelId) (toString (toJson (level.toInfo env)))
 
-  IO.FS.writeFile (path / s!"game.json") (toString (getGameJson game))
+  IO.FS.writeFile (path / gameFileName) (toString (getGameJson game))
 
   for inventoryType in [InventoryType.Lemma, .Tactic, .Definition] do
     for name in allItemsByType.findD inventoryType {} do
       let some item ← getInventoryItem? name inventoryType
         | throwError "Expected item to exist: {name}"
-      IO.FS.writeFile (path / s!"doc__{inventoryType}__{name}.json") (toString (toJson item))
+      IO.FS.writeFile (path / docFileName inventoryType name) (toString (toJson item))
 
-  IO.FS.writeFile (path / s!"inventory.json") (toString (toJson inventory))
+  let getTiles (type : InventoryType) : CommandElabM (Array InventoryTile) := do
+    (allItemsByType.findD type {}).toArray.mapM (fun name => do
+      let some item ← getInventoryItem? name type
+        | throwError "Expected item to exist: {name}"
+      return item.toTile)
+  let inventory : InventoryOverview := {
+    lemmas := ← getTiles .Lemma
+    tactics := ← getTiles .Tactic
+    definitions := ← getTiles .Definition
+    lemmaTab := none
+  }
+  IO.FS.writeFile (path / inventoryFileName) (toString (toJson inventory))
+
+open GameData in
+def loadGameData (gameDir : System.FilePath) : IO Game := do
+  let path := gameDir / gameDataPath
+  let str ← IO.FS.readFile (path / gameFileName)
+  let json ← match Json.parse str with
+  | .ok v => pure v
+  | .error e => throw (IO.userError e)
+  let data ← match fromJson? json with
+  | .ok v => pure v
+  | .error e => throw (IO.userError e)
+  return data

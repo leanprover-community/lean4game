@@ -381,7 +381,7 @@ structure GameTile where
 
   TODO: What's the format? -/
   image: String := default
-deriving Inhabited, ToJson
+deriving Inhabited, ToJson, FromJson
 
 structure Game where
   /-- Internal name of the game. -/
@@ -401,7 +401,7 @@ structure Game where
   tile : GameTile := default
   /-- The path to the background image of the world. -/
   image : String := default
-deriving Inhabited, ToJson
+deriving Inhabited, ToJson, FromJson
 
 def getGameJson (game : «Game») : Json := Id.run do
   let gameJson : Json := toJson game
