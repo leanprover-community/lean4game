@@ -213,7 +213,7 @@ export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
         title="Game Rules"
         min={0} max={2}
         aria-label="Game Rules"
-        defaultValue={difficulty}
+        value={difficulty}
         marks={[
           {value: 0, label: label(0)},
           {value: 1, label: label(1)},
