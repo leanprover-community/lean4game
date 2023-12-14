@@ -27,7 +27,8 @@ def copyImages : IO Unit := do
 #eval IO.FS.createDirAll ".lake/gamedata/"
 
 -- TODO: register all of this as ToJson instance?
-def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name)) : CommandElabM Unit := do
+def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
+    (inventory : InventoryOverview): CommandElabM Unit := do
   let game ← getCurGame
   let env ← getEnv
   let path : System.FilePath := s!"{← IO.currentDir}" / ".lake" / "gamedata"
@@ -51,15 +52,4 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name)) : Comma
         | throwError "Expected item to exist: {name}"
       IO.FS.writeFile (path / s!"doc__{inventoryType}__{name}.json") (toString (toJson item))
 
-  let getTiles (type : InventoryType) : CommandElabM (Array InventoryTile) := do
-    (allItemsByType.findD type {}).toArray.mapM (fun name => do
-      let some item ← getInventoryItem? name type
-        | throwError "Expected item to exist: {name}"
-      return item.toTile)
-  let inventory : InventoryOverview := {
-    lemmas := ← getTiles .Lemma
-    tactics := ← getTiles .Tactic
-    definitions := ← getTiles .Definition
-    lemmaTab := none
-  }
   IO.FS.writeFile (path / s!"inventory.json") (toString (toJson inventory))

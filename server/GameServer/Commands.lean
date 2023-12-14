@@ -819,7 +819,7 @@ elab "MakeGame" : command => do
             displayName := data.displayName
             category := data.category
             locked := false
-            hidden := levelInfo.hidden.contains item }
+            hidden := hiddenItems.contains item }
 
         -- add the exercise statement from the previous level
         -- if it was named
@@ -851,4 +851,16 @@ elab "MakeGame" : command => do
           return level.setComputedInventory inventoryType itemsArray
     allItemsByType := allItemsByType.insert inventoryType allItems
 
-  saveGameData allItemsByType
+  let getTiles (type : InventoryType) : CommandElabM (Array InventoryTile) := do
+    (allItemsByType.findD type {}).toArray.mapM (fun name => do
+      let some item ← getInventoryItem? name type
+        | throwError "Expected item to exist: {name}"
+      return item.toTile)
+  let inventory : InventoryOverview := {
+    lemmas := (← getTiles .Lemma).map (fun tile => {tile with hidden := hiddenItems.contains tile.name})
+    tactics := (← getTiles .Tactic).map (fun tile => {tile with hidden := hiddenItems.contains tile.name})
+    definitions := (← getTiles .Definition).map (fun tile => {tile with hidden := hiddenItems.contains tile.name})
+    lemmaTab := none
+  }
+
+  saveGameData allItemsByType inventory
