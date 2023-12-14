@@ -202,8 +202,13 @@ elab doc:docComment ? "DefinitionDoc" name:ident "as" displayName:str template:s
 
 /-! ## Add inventory items -/
 
+def checkCommandNotDuplicated (items : Array Name) (cmd := "Command") : CommandElabM Unit := do
+  if ¬ items.isEmpty then
+    logWarning s!"You should only use one `{cmd}` per level, but it takes multiple arguments: `{cmd} obj₁ obj₂ obj₃`!"
+
 /-- Declare tactics that are introduced by this level. -/
 elab "NewTactic" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).tactics.new) "NewTactic"
   for name in ↑args do
     checkInventoryDoc .Tactic name -- TODO: Add (template := "[docstring]")
   modifyCurLevel fun level => pure {level with
@@ -211,6 +216,7 @@ elab "NewTactic" args:ident* : command => do
 
 /-- Declare tactics that are introduced by this level but do not show up in inventory. -/
 elab "NewHiddenTactic" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).tactics.hidden) "NewHiddenTactic"
   for name in ↑args do
     checkInventoryDoc .Tactic name (template := "")
   modifyCurLevel fun level => pure {level with
@@ -219,6 +225,7 @@ elab "NewHiddenTactic" args:ident* : command => do
 
 /-- Declare lemmas that are introduced by this level. -/
 elab "NewLemma" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).lemmas.new) "NewLemma"
   for name in ↑args do
     try let _decl ← getConstInfo name.getId catch
       | _ => logErrorAt name m!"unknown identifier '{name}'."
@@ -228,6 +235,7 @@ elab "NewLemma" args:ident* : command => do
 
 /-- Declare definitions that are introduced by this level. -/
 elab "NewDefinition" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).definitions.new) "NewDefinition"
   for name in ↑args do checkInventoryDoc .Definition name -- TODO: Add (template := "[mathlib]")
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with new := args.map (·.getId)}}
@@ -235,6 +243,7 @@ elab "NewDefinition" args:ident* : command => do
 /-- Declare tactics that are temporarily disabled in this level.
 This is ignored if `OnlyTactic` is set. -/
 elab "DisabledTactic" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).tactics.disabled) "DisabledTactic"
   for name in ↑args do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with disabled := args.map (·.getId)}}
@@ -242,24 +251,28 @@ elab "DisabledTactic" args:ident* : command => do
 /-- Declare lemmas that are temporarily disabled in this level.
 This is ignored if `OnlyLemma` is set. -/
 elab "DisabledLemma" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).lemmas.disabled) "DisabledLemma"
   for name in ↑args  do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with disabled := args.map (·.getId)}}
 
 /-- Declare definitions that are temporarily disabled in this level -/
 elab "DisabledDefinition" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).definitions.disabled) "DisabledDefinition"
   for name in ↑args do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with disabled := args.map (·.getId)}}
 
 /-- Temporarily disable all tactics except the ones declared here -/
 elab "OnlyTactic" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).tactics.only) "OnlyTactic"
   for name in ↑args do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with only := args.map (·.getId)}}
 
 /-- Temporarily disable all lemmas except the ones declared here -/
 elab "OnlyLemma" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).lemmas.only) "OnlyLemma"
   for name in ↑args do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with only := args.map (·.getId)}}
@@ -267,6 +280,7 @@ elab "OnlyLemma" args:ident* : command => do
 /-- Temporarily disable all definitions except the ones declared here.
 This is ignored if `OnlyDefinition` is set. -/
 elab "OnlyDefinition" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).definitions.only) "OnlyDefinition"
   for name in ↑args do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with only := args.map (·.getId)}}
