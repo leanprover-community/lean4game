@@ -2,7 +2,8 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import '../css/inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLock, faBan } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faBan, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faClipboard } from '@fortawesome/free-regular-svg-icons'
 import { GameIdContext } from '../app';
 import Markdown from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery } from '../state/api';
@@ -105,13 +106,29 @@ function InventoryItem({name, displayName, locked, disabled, newly, showDoc, ena
   const title = locked ? "Not unlocked yet" :
                 disabled ? "Not available in this level" : ""
 
+  const [copied, setCopied] = useState(false)
+
   const handleClick = () => {
     if (enableAll || !locked) {
       showDoc()
     }
   }
 
-  return <div className={`item ${className}${enableAll ? ' enabled' : ''}`} onClick={handleClick} title={title}>{icon} {displayName}</div>
+  const copyItemName = (ev) => {
+    navigator.clipboard.writeText(displayName)
+    setCopied(true)
+    setInterval(() => {
+      setCopied(false)
+    }, 3000);
+    ev.stopPropagation()
+  }
+
+return <div className={`item ${className}${enableAll ? ' enabled' : ''}`} onClick={handleClick} title={title}>
+    {icon} {displayName}
+    <div className="copy-button" onClick={copyItemName}>
+      {copied ? <FontAwesomeIcon icon={faCheck} /> : <FontAwesomeIcon icon={faClipboard} />}
+    </div>
+  </div>
 }
 
 export function Documentation({name, type, handleClose}) {
