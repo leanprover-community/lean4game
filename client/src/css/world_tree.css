@@ -49,7 +49,6 @@ svg .disabled {
 }
 
 .world-selection-menu {
-  position: absolute;
   right: 1em;
   top: 1em;
   /* margin: 1em; */
@@ -58,6 +57,10 @@ svg .disabled {
   background-color: #fff;
   border-radius: .5em;
   filter: drop-shadow(4px 4px 5px rgba(0,0,0,0.5));
+}
+
+.world-selection-menu.desktop {
+  position: absolute;
 }
 
 .world-selection-menu .btn, .welcome .btn {

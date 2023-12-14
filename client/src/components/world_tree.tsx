@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
-import { useAppDispatch } from '../hooks'
+import { useAppDispatch, useMobile } from '../hooks'
 import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
 import { store } from '../state/store'
 
@@ -197,13 +197,15 @@ export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const dispatch = useAppDispatch()
+  const { mobile } = useMobile()
+
 
   function label(x : number) {
     return x == 0 ? 'none' : x == 1 ? 'relaxed' : 'regular'
   }
 
 
-  return <nav className="world-selection-menu">
+  return <nav className={`world-selection-menu${mobile ? '' : ' desktop'}`}>
     <div className="slider-wrap">
       <span className="difficulty-label">Rules
         <FontAwesomeIcon icon={rulesHelp ? faXmark : faCircleQuestion} className='helpButton' onClick={() => (setRulesHelp(!rulesHelp))}/>
