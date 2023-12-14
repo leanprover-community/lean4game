@@ -493,18 +493,20 @@ export function TypewriterInterface({props}) {
                       <Markdown>{props.data?.introduction}</Markdown>
                     </div>
                   }
-                  {mobile && <>
+                  {mobile &&
                     <Hints key={`hints-${i}`}
                       hints={step.hints} showHidden={showHelp.has(i)} step={i}
                       selected={selectedStep} toggleSelection={toggleSelectStep(i)}/>
-                    {i == proof.length - 1 && hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
-                      <Button className="btn btn-help" to="" onClick={activateHiddenHints}>
-                        Show more help!
-                      </Button>
-                    }
-                  </>
                   }
                   <GoalsTabs proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/>
+
+                  {mobile && i == proof.length - 1 &&
+                    hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
+                    <Button className="btn btn-help" to="" onClick={activateHiddenHints}>
+                      Show more help!
+                    </Button>
+                  }
+
                   {/* Show a message that there are no goals left */}
                   {!step.goals.length && (
                     <div className="message information">
