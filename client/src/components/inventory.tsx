@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faBan } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from '../app';
 import Markdown from './markdown';
-import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery } from '../state/api';
+import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery, WorldOverview } from '../state/api';
 import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
 import { useSelector } from 'react-redux';
@@ -34,6 +34,79 @@ export function Inventory({levelInfo, openDoc, enableAll=false} :
         <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc} defaultTab={levelInfo?.lemmaTab} level={levelInfo} enableAll={enableAll}/>
       }
     </div>
+  )
+}
+
+export function OverviewInventory({data, openDoc, enableAll=false, showOverview=true} :
+  {
+    data: WorldOverview[],
+    openDoc: (props: {name: string, type: string}) => void,
+    enableAll?: boolean,
+    showOverview?: boolean
+  }) {
+
+  const gameId = React.useContext(GameIdContext)
+  const difficulty = useSelector(selectDifficulty(gameId))
+  const [tab, setTab] = useState<string>()
+  let inv: string[] = selectInventory(gameId)(store.getState())
+
+  let levelInfo : InventoryOverview = {
+    tactics : data ? data.map(world => (world.tactics.map(tile => inv.includes(tile.name) ? {...tile, locked: false} : tile))).flat() : [],
+    lemmas : data ? data.map(world => (world.lemmas.map(tile => inv.includes(tile.name) ? {...tile, locked: false} : tile))).flat() : [],
+    definitions : data ? data.map(world => (world.definitions.map(tile => inv.includes(tile.name) ? {...tile, locked: false} : tile))).flat() : [],
+    lemmaTab: null,
+  }
+
+  return (
+    <>
+      <Inventory levelInfo={levelInfo} openDoc={openDoc} enableAll={enableAll}/>
+      {showOverview &&
+        <div className="inventory">
+          {data && <>
+            <h2>Overviews</h2>
+            <div className="tab-bar">
+              {data.map(world => {
+                return <div key={`category-${world.world}`} className={`tab ${world.world == tab ? "active": ""}`} onClick={() => { setTab((tab == world.world) ? null : world.world) }}>{world.world}</div>
+              })}
+            </div>
+            <div className="inventory-list">
+              {/* TODO: a bit hacky, do we need to redesign inventory completely and provide it in a better order? */}
+              {data.map(world => {
+                if (world.world == tab) {
+                  return [
+                    ...world.tactics.map(item => {
+                      return <InventoryItem
+                        key={`${world.world}-${item.name}`}
+                        showDoc={() => {openDoc({name: item.name, type: 'Tactic'})}}
+                        name={item.name} displayName={item.displayName}
+                        locked={difficulty > 0 ? !inv.includes(item.name) : false}
+                        disabled={item.disabled} newly={false} enableAll={enableAll} />
+                    }),
+                    ...world.lemmas.map(item => {
+                      return <InventoryItem
+                        key={`${world.world}-${item.name}`}
+                        showDoc={() => {openDoc({name: item.name, type: 'Lemma'})}}
+                        name={item.name} displayName={item.displayName}
+                        locked={difficulty > 0 ? item.locked : false}
+                        disabled={item.disabled} newly={false} enableAll={enableAll} />
+                    }),
+                    ...world.definitions.map(item => {
+                      return <InventoryItem
+                        key={`${world.world}-${item.name}`}
+                        showDoc={() => {openDoc({name: item.name, type: 'Definition'})}}
+                        name={item.name} displayName={item.displayName}
+                        locked={difficulty > 0 ? item.locked : false}
+                        disabled={item.disabled} newly={false} enableAll={enableAll} />
+                    })
+                  ]
+                }
+              })}
+            </div>
+          </>}
+        </div>
+      }
+    </>
+
   )
 }
 
@@ -141,6 +214,24 @@ export function InventoryPanel({levelInfo, visible = true}) {
       <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
       :
       <Inventory levelInfo={levelInfo} openDoc={setInventoryDoc} enableAll={true}/>
+    }
+  </div>
+}
+
+/** The panel (on the welcome page) showing the user's inventory with tactics, definitions, and lemmas */
+export function InventoryOverviewPanel({data, visible = true, showOverview=true} : {data : WorldOverview[], visible?: boolean, showOverview?: boolean}) {
+  const gameId = React.useContext(GameIdContext)
+
+  // The inventory is overlayed by the doc entry of a clicked item
+  const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
+  // Set `inventoryDoc` to `null` to close the doc
+  function closeInventoryDoc() {setInventoryDoc(null)}
+
+  return <div className={`column inventory-panel ${visible ? '' : 'hidden'}`}>
+    {inventoryDoc ?
+      <Documentation name={inventoryDoc.name} type={inventoryDoc.type} handleClose={closeInventoryDoc}/>
+      :
+      <OverviewInventory data={data} openDoc={setInventoryDoc} enableAll={true} showOverview={showOverview}/>
     }
   </div>
 }

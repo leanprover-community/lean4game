@@ -11,7 +11,7 @@ import { changedOpenedIntro, selectOpenedIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { MobileContext } from './infoview/context'
-import { InventoryPanel } from './inventory'
+import { InventoryOverviewPanel, InventoryPanel } from './inventory'
 import { ErasePopup } from './popup/erase'
 import { InfoPopup } from './popup/game_info'
 import { PrivacyPolicyPopup } from './popup/privacy_policy'
@@ -111,7 +111,7 @@ function Welcome() {
               <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
                 rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
             :
-              <InventoryPanel levelInfo={inventory?.data} />
+              <InventoryOverviewPanel data={inventory?.data} />
             )}
           </div>
         :
@@ -119,7 +119,7 @@ function Welcome() {
             <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
             <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
               rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
-            <InventoryPanel levelInfo={inventory?.data} />
+            <InventoryOverviewPanel data={inventory?.data} />
           </Split>
       }
     </div>

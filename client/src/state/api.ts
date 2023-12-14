@@ -71,6 +71,13 @@ interface Doc {
   category: string,
 }
 
+export interface WorldOverview {
+  world: string
+  tactics: InventoryTile[]
+  lemmas: InventoryTile[]
+  definitions: InventoryTile[]
+}
+
 // Define a service using a base URL and expected endpoints
 export const apiSlice = createApi({
   reducerPath: 'gameApi',
@@ -82,7 +89,7 @@ export const apiSlice = createApi({
     loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
       query: ({game, world, level}) => `${game}/level__${world}__${level}.json`,
     }),
-    loadInventoryOverview: builder.query<InventoryOverview, {game: string}>({
+    loadInventoryOverview: builder.query<WorldOverview[], {game: string}>({
       query: ({game}) => `${game}/inventory.json`,
     }),
     loadDoc: builder.query<Doc, {game: string, name: string, type: "lemma"|"tactic"}>({

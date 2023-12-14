@@ -93,6 +93,54 @@ partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
         fw.stdin.writeLspMessage msg
 
       return true
+    | Message.request id "loadInventoryOverview" _ =>
+      let s ← get
+      let some game ← getGame? s.game
+        | return false
+
+      let mut overview : Array WorldOverview := #[]
+      for ⟨worldId, world⟩ in game.worlds.nodes.toList do
+        let mut tactics : Array InventoryTile := #[]
+        let mut theorems : Array InventoryTile := #[]
+        let mut definitions : Array InventoryTile := #[]
+        for ⟨_levelId, lvl⟩ in world.levels.toList do
+          tactics := tactics ++ lvl.tactics.tiles.filterMap (fun tile => match tile.new with
+            | true => some {tile with new := false, locked := true, disabled := false}
+            | false => none)
+          theorems := theorems ++ lvl.lemmas.tiles.filterMap (fun tile => match tile.new with
+            | true => some {tile with new := false, locked := true, disabled := false}
+            | false => none)
+          definitions := definitions ++ lvl.definitions.tiles.filterMap (fun tile => match tile.new with
+            | true => some {tile with new := false, locked := true, disabled := false}
+            | false => none)
+        overview := overview.push {
+          world := worldId,
+          tactics := tactics,
+          lemmas := theorems,
+          definitions := definitions }
+      let c ← read
+      c.hOut.writeLspResponse ⟨id, ToJson.toJson overview⟩
+      return true
+      -- -- All Levels have the same tiles, so we just load them from level 1 of an arbitrary world
+      -- -- and reset `new`, `disabled` and `unlocked`.
+      -- -- Note: as we allow worlds without any levels (for developing), we might need
+      -- -- to try until we find the first world with levels.
+      -- for ⟨worldId, _⟩ in game.worlds.nodes.toList do
+      --   let some lvl ← getLevel? {game := s.game, world := worldId, level := 1}
+      --     | do continue
+      --   let inventory : InventoryOverview := {
+      --     tactics := lvl.tactics.tiles.map
+      --       ({ · with locked := true, disabled := false, new := false }),
+      --     lemmas := lvl.lemmas.tiles.map
+      --       ({ · with locked := true, disabled := false, new := false }),
+      --     definitions := lvl.definitions.tiles.map
+      --       ({ · with locked := true, disabled := false, new := false }),
+      --     lemmaTab := none
+      --   }
+      --   let c ← read
+      --   c.hOut.writeLspResponse ⟨id, ToJson.toJson inventory⟩
+      --   return true
+      -- return false
     | _ => return false
   | _ => return false
 

@@ -26,7 +26,7 @@ import { changedSelection, codeEdited, selectCode, selectSelections, selectCompl
 import { store } from '../state/store'
 import { Button } from './button'
 import Markdown from './markdown'
-import {InventoryPanel} from './inventory'
+import {InventoryOverviewPanel, InventoryPanel} from './inventory'
 import { hasInteractiveErrors } from './infoview/typewriter'
 import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext,
   ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './infoview/context'
@@ -498,7 +498,7 @@ function Introduction({impressum, setImpressum}) {
             }
 
           </div>
-          <InventoryPanel levelInfo={inventory?.data} />
+          <InventoryOverviewPanel data={inventory?.data} />
         </Split>
       }
 

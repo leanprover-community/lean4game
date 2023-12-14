@@ -275,6 +275,13 @@ structure GameLevel where
   image : String := default
 deriving Inhabited, Repr
 
+structure WorldOverview where
+  world: Name
+  tactics: Array InventoryTile := default
+  definitions: Array InventoryTile := default
+  lemmas: Array InventoryTile := default
+  deriving FromJson, ToJson, Inhabited, Repr
+
 /-- Json-encodable version of `GameLevel`
 Fields:
 - description: Lemma in mathematical language.
