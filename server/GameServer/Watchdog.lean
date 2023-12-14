@@ -39,11 +39,7 @@ open System.Uri
         | Message.responseError _ _ e .. =>
           throwServerError s!"Unhandled response error: {e}"
         | Message.notification method (some params) =>
-          if method == "textDocument/didOpen" then
-            -- for lean4game, we need to pass in extra information when a level is opened:
-            Game.handleDidOpenLevel (← parseParams _ (toJson params))
-          else
-            handleNotification method (toJson params)
+          handleNotification method (toJson params)
           mainLoop (←runClientTask)
         | _ => throwServerError "Got invalid JSON-RPC message"
       | ServerEvent.clientError e => throw e
