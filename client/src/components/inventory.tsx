@@ -101,7 +101,7 @@ function InventoryItem({item, name, displayName, locked, disabled, newly, showDo
   // Note: This is somewhat a hack as the statement of lemmas comes currently in the form
   // `Namespace.statement_name (x y : Nat) : some type`
   const title = locked ? "Not unlocked yet" :
-                disabled ? "Not available in this level" : item.altTitle.substring(item.altTitle.indexOf(' ') + 1)
+                disabled ? "Not available in this level" : (item.altTitle ? item.altTitle.substring(item.altTitle.indexOf(' ') + 1) : '')
 
   const [copied, setCopied] = useState(false)
 
