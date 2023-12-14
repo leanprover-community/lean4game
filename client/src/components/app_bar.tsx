@@ -5,7 +5,7 @@ import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
-  faCircleInfo, faTerminal } from '@fortawesome/free-solid-svg-icons'
+  faCircleInfo, faTerminal, faMobileScreenButton, faDesktop, faGear } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from "../app"
 import { InputModeContext, MobileContext, WorldLevelIdContext } from "./infoview/context"
 import { GameInfo, useGetGameInfoQuery } from '../state/api'
@@ -150,18 +150,19 @@ function InventoryButton({pageNumber, setPageNumber}) {
 }
 
 /** the navigation bar on the welcome page */
-export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpressum, toggleEraseMenu, toggleUploadMenu, toggleInfo} : {
+export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpressum, toggleEraseMenu, toggleUploadMenu, toggleInfo, togglePreferencesPopup} : {
   pageNumber: number,
   setPageNumber: any,
   gameInfo: GameInfo,
   toggleImpressum: any,
   toggleEraseMenu: any,
   toggleUploadMenu: any,
-  toggleInfo: any
+  toggleInfo: any,
+  togglePreferencesPopup: () => void;
 }) {
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useAppSelector(selectProgress(gameId))
-  const {mobile} = React.useContext(MobileContext)
+  const {mobile, setMobile} = React.useContext(MobileContext)
   const [navOpen, setNavOpen] = React.useState(false)
 
   return <div className="app-bar">
@@ -194,6 +195,9 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
       <Button title="Impressum, privacy policy" inverted="true" to="" onClick={() => {toggleImpressum(); setNavOpen(false)}}>
         <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Impressum
       </Button>
+      <Button title="Preferences" inverted="true" to="" onClick={() => {togglePreferencesPopup(); setNavOpen(false)}}>
+         <FontAwesomeIcon icon={faGear} />&nbsp;Preferences
+       </Button>
     </div>
   </div>
 }

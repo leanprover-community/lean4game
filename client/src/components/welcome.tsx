@@ -17,6 +17,7 @@ import { InfoPopup } from './popup/game_info'
 import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import { RulesHelpPopup } from './popup/rules_help'
 import { UploadPopup } from './popup/upload'
+import { PreferencesPopup} from "./popup/preferences"
 import { WorldTreePanel } from './world_tree'
 
 import '../css/welcome.css'
@@ -63,7 +64,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
   const gameId = React.useContext(GameIdContext)
-  const {mobile} = React.useContext(MobileContext)
+  const {mobile, setMobile, lockMobile, setLockMobile} = React.useContext(MobileContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
@@ -77,15 +78,20 @@ function Welcome() {
   const [info, setInfo] = React.useState(false)
   const [rulesHelp, setRulesHelp] = React.useState(false)
   const [uploadMenu, setUploadMenu] = React.useState(false)
+  const [preferencesPopup, setPreferencesPopup] = React.useState(false)
+
   function closeEraseMenu()   {setEraseMenu(false)}
   function closeImpressum()   {setImpressum(false)}
   function closeInfo()        {setInfo(false)}
   function closeRulesHelp()   {setRulesHelp(false)}
   function closeUploadMenu()  {setUploadMenu(false)}
+  function closePreferencesPopup() {setPreferencesPopup(false)}
   function toggleEraseMenu()  {setEraseMenu(!eraseMenu)}
   function toggleImpressum()  {setImpressum(!impressum)}
   function toggleInfo()       {setInfo(!info)}
   function toggleUploadMenu() {setUploadMenu(!uploadMenu)}
+  function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
+
 
   // set the window title
   useEffect(() => {
@@ -101,7 +107,7 @@ function Welcome() {
   : <>
     <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data} toggleImpressum={toggleImpressum}
       toggleEraseMenu={toggleEraseMenu} toggleUploadMenu={toggleUploadMenu}
-      toggleInfo={toggleInfo} />
+      toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
     <div className="app-content">
       { mobile ?
           <div className="welcome mobile">
@@ -128,6 +134,7 @@ function Welcome() {
     {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
     {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
     {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
+    {preferencesPopup ? <PreferencesPopup mobile={mobile} setMobile={setMobile} lockMobile={lockMobile} setLockMobile={setLockMobile} handleClose={closePreferencesPopup}/> : null}
   </>
 }
 
