@@ -293,6 +293,7 @@ structure LevelInfo where
   descrText : Option String := none
   descrFormat : String := ""
   lemmaTab : Option String
+  module : Name
   displayName : Option String
   statementName : Option String
   template : Option String
@@ -317,6 +318,7 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
       | some tile => tile.category
       | none => none
     statementName := lvl.statementName.toString
+    module := lvl.module
     displayName := match lvl.statementName with
       | .anonymous => none
       | name => match (inventoryExt.getState env).find?
@@ -381,7 +383,7 @@ structure GameTile where
 
   TODO: What's the format? -/
   image: String := default
-deriving Inhabited, ToJson
+deriving Inhabited, ToJson, FromJson
 
 structure Game where
   /-- Internal name of the game. -/
@@ -401,7 +403,7 @@ structure Game where
   tile : GameTile := default
   /-- The path to the background image of the world. -/
   image : String := default
-deriving Inhabited, ToJson
+deriving Inhabited, ToJson, FromJson
 
 def getGameJson (game : «Game») : Json := Id.run do
   let gameJson : Json := toJson game

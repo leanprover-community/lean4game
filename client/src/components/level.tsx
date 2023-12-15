@@ -18,7 +18,6 @@ import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-info
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event'
 
 import { GameIdContext } from '../app'
-import { ConnectionContext, connection, useLeanClient } from '../connection'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
 import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited,
@@ -44,6 +43,15 @@ import 'lean4web/client/src/editor/infoview.css'
 import 'lean4web/client/src/editor/vscode.css'
 import '../css/level.css'
 import { LevelAppBar } from './app_bar'
+import { LeanClient } from 'lean4web/client/src/editor/leanclient'
+import { DisposingWebSocketMessageReader } from 'lean4web/client/src/reader'
+import { WebSocketMessageWriter, toSocket } from 'vscode-ws-jsonrpc'
+import { IConnectionProvider } from 'monaco-languageclient'
+import { monacoSetup } from 'lean4web/client/src/monacoSetup'
+import { onigasmH } from 'onigasm/lib/onigasmH'
+
+
+monacoSetup()
 
 function Level() {
   const params = useParams()
@@ -211,10 +219,8 @@ function PlayableLevel({impressum, setImpressum}) {
 
   const dispatch = useAppDispatch()
 
-  const difficulty = useSelector(selectDifficulty(gameId))
   const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
   const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
-  const inventory: Array<String> = useSelector(selectInventory(gameId))
 
   const typewriterMode = useSelector(selectTypewriterMode(gameId))
   const setTypewriterMode = (newTypewriterMode: boolean) => dispatch(changeTypewriterMode({game: gameId, typewriterMode: newTypewriterMode}))
@@ -293,12 +299,6 @@ function PlayableLevel({impressum, setImpressum}) {
   // a hint at the beginning of the proof...
   const [selectedStep, setSelectedStep] = useState<number>()
 
-  // if the user inventory changes, notify the server
-  useEffect(() => {
-    let leanClient = connection.getLeanClient(gameId)
-    leanClient.sendNotification('$/game/setInventory', {inventory: inventory, difficulty: difficulty})
-  }, [inventory])
-
   useEffect (() => {
     // Lock editor mode
     if (level?.data?.template) {
@@ -372,7 +372,7 @@ function PlayableLevel({impressum, setImpressum}) {
 
   // Effect when command line mode gets enabled
   useEffect(() => {
-    if (editor && typewriterMode) {
+    if (onigasmH && editor && typewriterMode) {
       let code = editor.getModel().getLinesContent().filter(line => line.trim())
       editor.executeEdits("typewriter", [{
         range: editor.getModel().getFullModelRange(),
@@ -395,7 +395,7 @@ function PlayableLevel({impressum, setImpressum}) {
       //   editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
       // }
     }
-  }, [editor, typewriterMode])
+  }, [editor, typewriterMode, onigasmH == null])
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
@@ -531,21 +531,32 @@ function Introduction({impressum, setImpressum}) {
 
 function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
 
-  const connection = React.useContext(ConnectionContext)
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
 
-
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
-  const [infoviewApi, setInfoviewApi] = useState<null|InfoviewApi>(null)
   const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
 
-  // Create Editor
+  const uriStr = `file:///${worldId}/${levelId}`
+  const uri = monaco.Uri.parse(uriStr)
+
+  const inventory: Array<String> = useSelector(selectInventory(gameId))
+  const difficulty: number = useSelector(selectDifficulty(gameId))
+
   useEffect(() => {
+    const model = monaco.editor.createModel(initialCode ?? '', 'lean4', uri)
+    if (onDidChangeContent) {
+      model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
+    }
+
     const editor = monaco.editor.create(codeviewRef.current!, {
+      model,
       glyphMargin: true,
       quickSuggestions: false,
+      lineDecorationsWidth: 5,
+      folding: false,
+      lineNumbers: 'on',
       lightbulb: {
         enabled: true
       },
@@ -557,11 +568,61 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
         enabled: false
       },
       lineNumbersMinChars: 3,
+      tabSize: 2,
       'semanticHighlighting.enabled': true,
       theme: 'vs-code-theme-converted'
     })
+    if (onDidChangeSelection) {
+      editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
+    }
+    if (initialSelections) {
+      console.debug("Initial Selection: ", initialSelections)
+      // BUG: Somehow I get an `invalid arguments` bug here
+      // editor.setSelections(initialSelections)
+    }
+    setEditor(editor)
+    const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
-    const infoProvider = new InfoProvider(connection.getLeanClient(gameId))
+    const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + gameId
+
+    const connectionProvider : IConnectionProvider = {
+      get: async () => {
+        return await new Promise((resolve, reject) => {
+          console.log(`connecting ${socketUrl}`)
+          const websocket = new WebSocket(socketUrl)
+          websocket.addEventListener('error', (ev) => {
+            reject(ev)
+          })
+          websocket.addEventListener('message', (msg) => {
+            // console.log(msg.data)
+          })
+          websocket.addEventListener('open', () => {
+            const socket = toSocket(websocket)
+            const reader = new DisposingWebSocketMessageReader(socket)
+            const writer = new WebSocketMessageWriter(socket)
+            resolve({
+              reader,
+              writer
+            })
+          })
+        })
+      }
+    }
+
+    // Following `vscode-lean4/webview/index.ts`
+    const client = new LeanClient(connectionProvider, showRestartMessage, {inventory, difficulty})
+    const infoProvider = new InfoProvider(client)
+    // const div: HTMLElement = infoviewRef.current!
+    const imports = {
+      '@leanprover/infoview': `${window.location.origin}/index.production.min.js`,
+      'react': `${window.location.origin}/react.production.min.js`,
+      'react/jsx-runtime': `${window.location.origin}/react-jsx-runtime.production.min.js`,
+      'react-dom': `${window.location.origin}/react-dom.production.min.js`,
+      'react-popper': `${window.location.origin}/react-popper.production.min.js`
+    }
+    // loadRenderInfoview(imports, [infoProvider.getApi(), div], setInfoviewApi)
+    setInfoProvider(infoProvider)
+    client.restart()
 
     const editorApi = infoProvider.getApi()
 
@@ -606,54 +667,27 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
 
     setEditor(editor)
     setInfoProvider(infoProvider)
-    setInfoviewApi(infoviewApi)
 
-    return () => { infoProvider.dispose(); editor.dispose() }
-  }, [])
+    infoProvider.openPreview(editor, infoviewApi)
+    const taskgutter = new LeanTaskGutter(infoProvider.client, editor)
 
-  const {leanClient, leanClientStarted} = useLeanClient(gameId)
-  const uriStr = `file:///${worldId}/${levelId}`
-  const uri = monaco.Uri.parse(uriStr)
+    // TODO:
+    // setRestart(() => restart)
 
-  // Create model when level changes
-  useEffect(() => {
-    if (editor && leanClientStarted) {
-
-      let model = monaco.editor.getModel(uri)
-      if (!model) {
-        model = monaco.editor.createModel(initialCode, 'lean4', uri)
-      }
-      model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
-      editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
-      editor.setModel(model)
-      if (initialSelections) {
-        console.debug("Initial Selection: ", initialSelections)
-        // BUG: Somehow I get an `invalid arguments` bug here
-        // editor.setSelections(initialSelections)
-      }
-
-      return () => {
-        editorConnection.api.sendClientNotification(uriStr, "textDocument/didClose", {textDocument: {uri: uriStr}})
-        model.dispose();
-      }
+    return () => {
+      editor.dispose();
+      model.dispose();
+      abbrevRewriter.dispose();
+      taskgutter.dispose();
+      infoProvider.dispose();
+      client.dispose();
     }
-  }, [editor, levelId, connection, leanClientStarted])
+  }, [gameId, worldId, levelId])
 
-
-  useEffect(() => {
-    if (editor && leanClientStarted) {
-
-      let model = monaco.editor.getModel(uri)
-      infoviewApi.serverRestarted(leanClient.initializeResult)
-
-      infoProvider.openPreview(editor, infoviewApi)
-
-      const taskGutter = new LeanTaskGutter(infoProvider.client, editor)
-      const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
-
-      return () => { abbrevRewriter.dispose(); taskGutter.dispose(); }
-    }
-  }, [editor, connection, leanClientStarted])
+  const showRestartMessage = () => {
+    // setRestartMessage(true)
+    console.log("TODO: SHOW RESTART MESSAGE")
+  }
 
   return {editor, infoProvider, editorConnection}
 }

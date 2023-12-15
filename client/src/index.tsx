@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './app'
-import { ConnectionContext, connection } from './connection'
 import { store } from './state/store'
 import { Provider } from 'react-redux'
 import type { RouteObject } from "react-router"
@@ -10,10 +9,7 @@ import ErrorPage from './components/error_page'
 import Welcome from './components/welcome'
 import LandingPage from './components/landing_page'
 import Level from './components/level'
-import { monacoSetup } from 'lean4web/client/src/monacoSetup'
 
-
-monacoSetup()
 
 
 // If `VITE_LEAN4GAME_SINGLE` is set to true, then `/` should be redirected to
@@ -61,9 +57,7 @@ const root = createRoot(container!);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ConnectionContext.Provider value={connection}>
-        <RouterProvider router={router} />
-      </ConnectionContext.Provider>
+      <RouterProvider router={router} />
     </Provider>
   </React.StrictMode>
 );

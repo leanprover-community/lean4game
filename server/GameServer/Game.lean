@@ -25,75 +25,56 @@ open Lsp
 open JsonRpc
 open IO
 
-structure DidOpenLevelParams where
-  uri : String
-  gameDir : String
-  levelModule : Name
-  tactics : Array InventoryTile
-  lemmas : Array InventoryTile
-  definitions : Array InventoryTile
-  inventory : Array String
-  /--
-  Check for tactics/theorems that are not unlocked.
-  0: no check
-  1: give warnings
-  2: give errors
-  -/
+/- Game-specific version of `InitializeParams` that allows for extra options: -/
+
+structure InitializationOptions extends Lean.Lsp.InitializationOptions :=
   difficulty : Nat
-  /-- The name of the theorem to be proven in this level. -/
-  statementName : Name
+  inventory : Array String
   deriving ToJson, FromJson
 
-structure SetInventoryParams where
-  inventory : Array String
-  difficulty : Nat
-deriving ToJson, FromJson
+structure InitializeParams where
+  processId? : Option Int := none
+  clientInfo? : Option ClientInfo := none
+  /- We don't support the deprecated rootPath
+  (rootPath? : Option String) -/
+  rootUri? : Option String := none
+  initializationOptions? : Option InitializationOptions := none
+  capabilities : ClientCapabilities
+  /-- If omitted, we default to off. -/
+  trace : Trace := Trace.off
+  workspaceFolders? : Option (Array WorkspaceFolder) := none
+  deriving ToJson
 
-def handleDidOpenLevel (params : Json) : GameServerM Unit := do
-  let p ← parseParams _ params
-  let m := p.textDocument
-  -- Execute the regular handling of the `didOpen` event
-  handleDidOpen p
-  let fw ← findFileWorker! m.uri
-  -- let s ← get
-  let c ← read
-  let some lvl ← GameServer.getLevelByFileName? c.initParams ((System.Uri.fileUriToPath? m.uri).getD m.uri |>.toString)
-    | do
-      c.hLog.putStr s!"Level not found: {m.uri} {c.initParams.rootUri?}"
-      c.hLog.flush
-  -- Send an extra notification to the file worker to inform it about the level data
-  let s ← get
-  fw.stdin.writeLspNotification {
-    method := "$/game/didOpenLevel"
-    param  := {
-      uri := m.uri
-      gameDir := s.gameDir
-      levelModule := lvl.module
-      tactics := lvl.tactics.tiles
-      lemmas := lvl.lemmas.tiles
-      definitions := lvl.definitions.tiles
-      inventory := s.inventory
-      difficulty := s.difficulty
-      statementName := lvl.statementName
-      : DidOpenLevelParams
-    }
+instance : FromJson InitializeParams where
+  fromJson? j := do
+    let processId? := j.getObjValAs? Int "processId"
+    let clientInfo? := j.getObjValAs? ClientInfo "clientInfo"
+    let rootUri? := j.getObjValAs? String "rootUri"
+    let initializationOptions? := j.getObjValAs? InitializationOptions "initializationOptions"
+    let capabilities ← j.getObjValAs? ClientCapabilities "capabilities"
+    let trace := (j.getObjValAs? Trace "trace").toOption.getD Trace.off
+    let workspaceFolders? := j.getObjValAs? (Array WorkspaceFolder) "workspaceFolders"
+    return ⟨
+      processId?.toOption,
+      clientInfo?.toOption,
+      rootUri?.toOption,
+      initializationOptions?.toOption,
+      capabilities,
+      trace,
+      workspaceFolders?.toOption⟩
+
+def InitializeParams.toLeanInternal (p : InitializeParams) : Lean.Lsp.InitializeParams :=
+{
+  processId? := p.processId?
+  clientInfo? := p.clientInfo?
+  rootUri? := p.rootUri?
+  initializationOptions? := p.initializationOptions?.map fun o => {
+    editDelay? := o.editDelay?
+    hasWidgets? := o.hasWidgets?
   }
-
-partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
-  match ev with
-  | ServerEvent.clientMsg msg =>
-    match msg with
-    | Message.notification "$/game/setInventory" params =>
-      let p := (← parseParams SetInventoryParams (toJson params))
-      let s ← get
-      set {s with inventory := p.inventory, difficulty := p.difficulty}
-      let st ← read
-      let workers ← st.fileWorkersRef.get
-      for (_, fw) in workers do
-        fw.stdin.writeLspMessage msg
-
-      return true
-    | _ => return false
-  | _ => return false
+  capabilities := p.capabilities
+  trace := p.trace
+  workspaceFolders? := p.workspaceFolders?
+}
 
 end Game

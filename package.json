@@ -28,7 +28,7 @@
     "debounce": "^1.2.1",
     "express": "^4.18.2",
     "lean4-infoview": "https://gitpkg.now.sh/leanprover/vscode-lean4/lean4-infoview?de0062c",
-    "lean4web": "github:hhu-adam/lean4web",
+    "lean4web": "github:hhu-adam/lean4web#b91645a7b88814675ba9f99817436d0a2ce3a0ec",
     "octokit": "^2.0.14",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",

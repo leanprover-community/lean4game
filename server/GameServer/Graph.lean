@@ -18,6 +18,14 @@ instance [ToJson β] : ToJson (Graph Name β) := {
   ]
 }
 
+-- Just a dummy implementation for now:
+instance : FromJson (Graph Name β) := {
+  fromJson? := fun _ => .ok {
+    nodes := {}
+    edges := {}
+  }
+}
+
 instance  : EmptyCollection (Graph α β) := ⟨default⟩
 
 def Graph.insertNode (g : Graph α β) (a : α) (b : β) :=
