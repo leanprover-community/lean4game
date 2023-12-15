@@ -219,10 +219,8 @@ function PlayableLevel({impressum, setImpressum}) {
 
   const dispatch = useAppDispatch()
 
-  const difficulty = useSelector(selectDifficulty(gameId))
   const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
   const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
-  const inventory: Array<String> = useSelector(selectInventory(gameId))
 
   const typewriterMode = useSelector(selectTypewriterMode(gameId))
   const setTypewriterMode = (newTypewriterMode: boolean) => dispatch(changeTypewriterMode({game: gameId, typewriterMode: newTypewriterMode}))
@@ -300,12 +298,6 @@ function PlayableLevel({impressum, setImpressum}) {
   // TODO: with the new design, there is no difference between the introduction and
   // a hint at the beginning of the proof...
   const [selectedStep, setSelectedStep] = useState<number>()
-
-  // TODO: if the user inventory changes, notify the server
-  // useEffect(() => {
-  //   let leanClient = connection.getLeanClient(gameId)
-  //   leanClient.sendNotification('$/game/setInventory', {inventory: inventory, difficulty: difficulty})
-  // }, [inventory])
 
   useEffect (() => {
     // Lock editor mode

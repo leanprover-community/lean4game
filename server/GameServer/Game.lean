@@ -77,9 +77,4 @@ def InitializeParams.toLeanInternal (p : InitializeParams) : Lean.Lsp.Initialize
   workspaceFolders? := p.workspaceFolders?
 }
 
-structure SetInventoryParams where
-  inventory : Array String
-  difficulty : Nat
-deriving ToJson, FromJson
-
 end Game
