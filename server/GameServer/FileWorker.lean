@@ -57,14 +57,7 @@ open IO
 open Snapshots
 open JsonRpc
 
--- TODO: check what's necessary and what is constant:
 structure GameWorkerState :=
-  -- uri : String
-  -- gameDir : String
-  -- levelModule : Name
-  -- tactics : Array InventoryTile
-  -- lemmas : Array InventoryTile
-  -- definitions : Array InventoryTile
   inventory : Array String
   /--
   Check for tactics/theorems that are not unlocked.
@@ -415,7 +408,7 @@ section Initialization
     fileMap  := default
 
   def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
-      (gameDir : String) :
+      (gameDir : String) (module : Name):
       IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
     -- Determine search paths of the game project by running `lake env printenv LEAN_PATH`.
     let out ← IO.Process.output
@@ -431,10 +424,7 @@ section Initialization
     -- Set the search path
     Lean.searchPathRef.set paths
 
-    --TODO:
-    let levelModule := `Game
-    let env ← importModules' #[{ module := `Init : Import }, { module := levelModule : Import }]
-    -- return (env, paths)
+    let env ← importModules' #[{ module := `Init : Import }, { module := module : Import }]
 
     -- use empty header
     let (headerStx, headerParserState, msgLog) ← Parser.parseHeader
@@ -483,8 +473,11 @@ section Initialization
     let rootUri? : Option String := some (toString game.name)
     let initParams := {initParams with rootUri?}
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
+    let some (levelId : LevelId) := GameServer.levelIdFromFileName? initParams meta.mkInputContext.fileName
+      | throwServerError "Could not determine level ID"
+    let level ← loadLevelData gameDir levelId.world levelId.level
     let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)
-      gameDir
+      gameDir level.module
     let cancelTk ← CancelToken.new
     let ctx :=
       { hIn  := i

@@ -59,10 +59,10 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
 
   IO.FS.writeFile (path / inventoryFileName) (toString (toJson inventory))
 
-open GameData in
-def loadGameData (gameDir : System.FilePath) : IO Game := do
-  let path := gameDir / gameDataPath
-  let str ← IO.FS.readFile (path / gameFileName)
+open GameData
+
+def loadData (f : System.FilePath) (α : Type) [FromJson α] : IO α := do
+  let str ← IO.FS.readFile f
   let json ← match Json.parse str with
   | .ok v => pure v
   | .error e => throw (IO.userError e)
@@ -70,3 +70,9 @@ def loadGameData (gameDir : System.FilePath) : IO Game := do
   | .ok v => pure v
   | .error e => throw (IO.userError e)
   return data
+
+def loadGameData (gameDir : System.FilePath) : IO Game :=
+  loadData (gameDir / gameDataPath / gameFileName) Game
+
+def loadLevelData (gameDir : System.FilePath) (worldId : Name) (levelId : Nat) : IO LevelInfo :=
+  loadData (gameDir / gameDataPath / levelFileName worldId levelId) LevelInfo

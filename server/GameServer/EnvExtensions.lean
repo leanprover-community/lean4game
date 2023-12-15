@@ -293,6 +293,7 @@ structure LevelInfo where
   descrText : Option String := none
   descrFormat : String := ""
   lemmaTab : Option String
+  module : Name
   displayName : Option String
   statementName : Option String
   template : Option String
@@ -317,6 +318,7 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
       | some tile => tile.category
       | none => none
     statementName := lvl.statementName.toString
+    module := lvl.module
     displayName := match lvl.statementName with
       | .anonymous => none
       | name => match (inventoryExt.getState env).find?
