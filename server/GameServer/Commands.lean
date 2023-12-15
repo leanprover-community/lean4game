@@ -124,7 +124,7 @@ elab "CoverImage" t:str : command => do
 
 /-! # Inventory
 
-The inventory contains docs for tactics, lemmas, and definitions. These are all locked
+The inventory contains docs for tactics, theorems, and definitions. These are all locked
 in the first level and get enabled during the game.
 -/
 
@@ -147,22 +147,22 @@ elab doc:docComment ? "TacticDoc" name:ident content:str ? : command => do
     displayName := name.getId.toString
     content := doc })
 
-/-- Documentation entry of a lemma. Example:
+/-- Documentation entry of a theorem. Example:
 
 ```
-LemmaDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
+TheoremDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
 ```
 
-* The first identifier is used in the commands `[New/Only/Disabled]Lemma`.
-  It is preferably the true name of the lemma. However, this is not required.
+* The first identifier is used in the commands `[New/Only/Disabled]Theorem`.
+  It is preferably the true name of the theorem. However, this is not required.
 * The string following `as` is the displayed name (in the Inventory).
-* The identifier after `in` is the category to group lemmas by (in the Inventory).
+* The identifier after `in` is the category to group theorems by (in the Inventory).
 * The description is a string supporting Markdown.
 
 Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requires
-The lemma/definition to have the same fully qualified name as in mathlib.
+The theorem/definition to have the same fully qualified name as in mathlib.
  -/
-elab doc:docComment ? "LemmaDoc" name:ident "as" displayName:str "in" category:str content:str ? :
+elab doc:docComment ? "TheoremDoc" name:ident "as" displayName:str "in" category:str content:str ? :
     command => do
   let doc ← parseDocCommentLegacy doc content
   modifyEnv (inventoryTemplateExt.addEntry · {
@@ -172,7 +172,7 @@ elab doc:docComment ? "LemmaDoc" name:ident "as" displayName:str "in" category:s
     displayName := displayName.getString
     content := doc })
 -- TODO: Catch the following behaviour.
--- 1. if `LemmaDoc` appears in the same file as `Statement`, it will silently use
+-- 1. if `TheoremDoc` appears in the same file as `Statement`, it will silently use
 -- it but display the info that it wasn't found in `Statement`
 -- 2. if it appears in a later file, however, it will silently not do anything and keep
 -- the first one.
@@ -190,7 +190,7 @@ DefinitionDoc Function.Bijective as "Bijective" "defined as `Injective f ∧ Sur
 * The description is a string supporting Markdown.
 
 Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requires
-The lemma/definition to have the same fully qualified name as in mathlib.
+The theorem/definition to have the same fully qualified name as in mathlib.
  -/
 elab doc:docComment ? "DefinitionDoc" name:ident "as" displayName:str template:str ? : command => do
   let doc ← parseDocCommentLegacy doc template
@@ -223,9 +223,9 @@ elab "NewHiddenTactic" args:ident* : command => do
     tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId),
                                    hidden := level.tactics.hidden ++ args.map (·.getId)}}
 
-/-- Declare lemmas that are introduced by this level. -/
-elab "NewLemma" args:ident* : command => do
-  checkCommandNotDuplicated ((←getCurLevel).lemmas.new) "NewLemma"
+/-- Declare theorems that are introduced by this level. -/
+elab "NewTheorem" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).lemmas.new) "NewTheorem"
   for name in ↑args do
     try let _decl ← getConstInfo name.getId catch
       | _ => logErrorAt name m!"unknown identifier '{name}'."
@@ -248,10 +248,10 @@ elab "DisabledTactic" args:ident* : command => do
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with disabled := args.map (·.getId)}}
 
-/-- Declare lemmas that are temporarily disabled in this level.
-This is ignored if `OnlyLemma` is set. -/
-elab "DisabledLemma" args:ident* : command => do
-  checkCommandNotDuplicated ((←getCurLevel).lemmas.disabled) "DisabledLemma"
+/-- Declare theorems that are temporarily disabled in this level.
+This is ignored if `OnlyTheorem` is set. -/
+elab "DisabledTheorem" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).lemmas.disabled) "DisabledTheorem"
   for name in ↑args  do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with disabled := args.map (·.getId)}}
@@ -270,9 +270,9 @@ elab "OnlyTactic" args:ident* : command => do
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with only := args.map (·.getId)}}
 
-/-- Temporarily disable all lemmas except the ones declared here -/
-elab "OnlyLemma" args:ident* : command => do
-  checkCommandNotDuplicated ((←getCurLevel).lemmas.only) "OnlyLemma"
+/-- Temporarily disable all theorems except the ones declared here -/
+elab "OnlyTheorem" args:ident* : command => do
+  checkCommandNotDuplicated ((←getCurLevel).lemmas.only) "OnlyTheorem"
   for name in ↑args do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with only := args.map (·.getId)}}
@@ -285,9 +285,51 @@ elab "OnlyDefinition" args:ident* : command => do
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with only := args.map (·.getId)}}
 
-/-- Define which tab of Lemmas is opened by default. Usage: `LemmaTab "Nat"`.
+/-- Define which tab of Lemmas is opened by default. Usage: `TheoremTab "Nat"`.
 If omitted, the current tab will remain open. -/
-elab "LemmaTab"  category:str : command =>
+elab "TheoremTab"  category:str : command =>
+  modifyCurLevel fun level => pure {level with lemmaTab := category.getString}
+
+
+/-! DEPRECATED -/
+
+elab doc:docComment ? "LemmaDoc" name:ident "as" displayName:str "in" category:str content:str ? :
+    command => do
+  logWarning "Deprecated. Has been renamed to `TheoremDoc`"
+  let doc ← parseDocCommentLegacy doc content
+  modifyEnv (inventoryTemplateExt.addEntry · {
+    type := .Lemma
+    name := name.getId
+    category := category.getString
+    displayName := displayName.getString
+    content := doc })
+
+elab "NewLemma" args:ident* : command => do
+  logWarning "Deprecated. Has been renamed to `NewTheorem`"
+  checkCommandNotDuplicated ((←getCurLevel).lemmas.new) "NewLemma"
+  for name in ↑args do
+    try let _decl ← getConstInfo name.getId catch
+      | _ => logErrorAt name m!"unknown identifier '{name}'."
+    checkInventoryDoc .Lemma name -- TODO: Add (template := "[mathlib]")
+  modifyCurLevel fun level => pure {level with
+    lemmas := {level.lemmas with new := args.map (·.getId)}}
+
+elab "DisabledLemma" args:ident* : command => do
+  logWarning "Deprecated. Has been renamed to `DisabledTheorem`"
+  checkCommandNotDuplicated ((←getCurLevel).lemmas.disabled) "DisabledLemma"
+  for name in ↑args  do checkInventoryDoc .Lemma name
+  modifyCurLevel fun level => pure {level with
+    lemmas := {level.lemmas with disabled := args.map (·.getId)}}
+
+elab "OnlyLemma" args:ident* : command => do
+  logWarning "Deprecated. Has been renamed to `OnlyTheorem`"
+  checkCommandNotDuplicated ((←getCurLevel).lemmas.only) "OnlyLemma"
+  for name in ↑args do checkInventoryDoc .Lemma name
+  modifyCurLevel fun level => pure {level with
+    lemmas := {level.lemmas with only := args.map (·.getId)}}
+
+elab "LemmaTab"  category:str : command => do
+  logWarning "Deprecated. Has been renamed to `TheoremTab`"
   modifyCurLevel fun level => pure {level with lemmaTab := category.getString}
 
 /-! # Exercise Statement -/

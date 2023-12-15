@@ -46,8 +46,8 @@ partial def matchExpr (pattern : Expr) (e : Expr) (bij : FVarBijection := {}) : 
   | .bvar i1, .bvar i2 => if i1 == i2 then bij else none
   | .fvar i1, .fvar i2 => bij.insert? i1 i2
   | .mvar _, .mvar _ => bij
-  | .sort u1, .sort u2 => bij -- TODO?
-  | .const n1 ls1, .const n2 ls2 =>
+  | .sort _u1, .sort _u2 => bij -- TODO?
+  | .const n1 _ls1, .const n2 _ls2 =>
     if n1 == n2 then bij else none -- && (← (ls1.zip ls2).allM fun (l1, l2) => Meta.isLevelDefEq l1 l2)
   | .app f1 a1, .app f2 a2 =>
     some bij
