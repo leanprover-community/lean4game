@@ -1,4 +1,4 @@
-/- This file is mostly copied from `Lean/Server/FileWorker.lean`. -/
+/- This file is adapted from `Lean/Server/FileWorker.lean`. -/
 import Lean.Server.FileWorker
 import GameServer.Game
 import GameServer.ImportModules

@@ -82,21 +82,4 @@ structure SetInventoryParams where
   difficulty : Nat
 deriving ToJson, FromJson
 
-partial def handleServerEvent (ev : ServerEvent) : GameServerM Bool := do
-  match ev with
-  | ServerEvent.clientMsg msg =>
-    match msg with
-    | Message.notification "$/game/setInventory" params =>
-      let p := (← parseParams SetInventoryParams (toJson params))
-      let s ← get
-      set {s with inventory := p.inventory, difficulty := p.difficulty}
-      let st ← read
-      let workers ← st.fileWorkersRef.get
-      for (_, fw) in workers do
-        fw.stdin.writeLspMessage msg
-
-      return true
-    | _ => return false
-  | _ => return false
-
 end Game

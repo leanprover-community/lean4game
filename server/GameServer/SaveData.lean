@@ -37,6 +37,7 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
   let game ← getCurGame
   let env ← getEnv
   let path := (← IO.currentDir) / gameDataPath
+
   if ← path.isDir then
     IO.FS.removeDirAll path
   IO.FS.createDirAll path
@@ -56,17 +57,6 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
         | throwError "Expected item to exist: {name}"
       IO.FS.writeFile (path / docFileName inventoryType name) (toString (toJson item))
 
-  let getTiles (type : InventoryType) : CommandElabM (Array InventoryTile) := do
-    (allItemsByType.findD type {}).toArray.mapM (fun name => do
-      let some item ← getInventoryItem? name type
-        | throwError "Expected item to exist: {name}"
-      return item.toTile)
-  let inventory : InventoryOverview := {
-    lemmas := ← getTiles .Lemma
-    tactics := ← getTiles .Tactic
-    definitions := ← getTiles .Definition
-    lemmaTab := none
-  }
   IO.FS.writeFile (path / inventoryFileName) (toString (toJson inventory))
 
 open GameData in
