@@ -18,7 +18,7 @@ private def mkEOI (pos : String.Pos) : Syntax :=
   mkNode ``Command.eoi #[atom]
 
 partial def parseTactic (inputCtx : InputContext) (pmctx : ParserModuleContext)
-  (mps : ModuleParserState) (messages : MessageLog) (couldBeEndSnap : Bool) :
+  (mps : ModuleParserState) (messages : MessageLog) :
     Syntax × ModuleParserState × MessageLog × String.Pos := Id.run do
   let mut pos := mps.pos
   let mut recovering := mps.recovering
@@ -66,8 +66,7 @@ structure GameWorkerState :=
   2: give errors
   -/
   difficulty : Nat
-  -- /-- The name of the theorem to be proven in this level. -/
-  -- statementName : Name
+  levelInfo : LevelInfo
   deriving ToJson, FromJson
 
 abbrev GameWorkerM := StateT GameWorkerState Server.FileWorker.WorkerM
@@ -89,20 +88,21 @@ def addErrorMessage (info : SourceInfo) (inputCtx : Parser.InputContext) (s : Me
 /-- Find all tactics in syntax object that are forbidden according to a
 set `allowed` of allowed tactics. -/
 partial def findForbiddenTactics (inputCtx : Parser.InputContext)
-    (gameWorkerState : GameWorkerState) (level : GameLevel) (stx : Syntax) :
+    (gameWorkerState : GameWorkerState) (stx : Syntax) :
     Elab.Command.CommandElabM Unit := do
+  let levelInfo := gameWorkerState.levelInfo
   match stx with
   | .missing => return ()
   | .node _info _kind args =>
     for arg in args do
-      findForbiddenTactics inputCtx gameWorkerState level arg
+      findForbiddenTactics inputCtx gameWorkerState arg
   | .atom info val =>
     -- ignore syntax elements that do not start with a letter
     -- and ignore "with" keyword
     let allowed := ["with", "fun", "at", "only", "by", "to"]
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
-      match level.tactics.tiles.find? (·.name.toString == val) with
+      match levelInfo.tactics.find? (·.name.toString == val) with
       | none =>
         -- Note: This case means that the tactic will never be introduced in the game.
         match gameWorkerState.inventory.find? (· == val) with
@@ -125,10 +125,10 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
         let some (.thmInfo ..) := (← getEnv).find? n
           | return () -- not a theorem -> ignore
         -- Forbid the theorem we are proving currently
-        if n = level.statementName then
+        if some n = levelInfo.statementName then
           addErrorMessage info inputCtx s!"Structural recursion: you can't use '{n}' to proof itself!"
 
-        let lemmasAndDefs := level.lemmas.tiles ++ level.definitions.tiles
+        let lemmasAndDefs := levelInfo.lemmas ++ levelInfo.definitions
         match lemmasAndDefs.find? (fun l => l.name == n) with
         | none => addWarningMessage info s!"You have not unlocked the lemma/definition '{n}' yet!"
         | some lem =>
@@ -202,12 +202,12 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
             currNamespace := scope.currNamespace,
             openDecls := scope.openDecls }
           let (tacticStx, cmdParserState, msgLog, endOfWhitespace) :=
-            MyModule.parseTactic inputCtx pmctx snap.mpState snap.msgLog couldBeEndSnap
+            MyModule.parseTactic inputCtx pmctx snap.mpState snap.msgLog
           modify (fun s => { s with messages := msgLog })
           parseResultRef.set (tacticStx, cmdParserState)
 
           -- Check for forbidden tactics
-          findForbiddenTactics inputCtx gameWorkerState level tacticStx
+          findForbiddenTactics inputCtx gameWorkerState tacticStx
 
           -- Insert invisible `skip` command to make sure we always display the initial goal
           let skip := Syntax.node (.original default 0 default endOfWhitespace) ``Lean.Parser.Tactic.skip #[]
@@ -468,16 +468,11 @@ section Initialization
       return (headerSnap, srcSearchPath)
 
   def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
-      (gameDir : String) (game : Game) (gameWorkerState : GameWorkerState) : IO (WorkerContext × WorkerState) := do
-    -- TODO: We misuse the `rootUri` field to the gameName
-    let rootUri? : Option String := some (toString game.name)
-    let initParams := {initParams with rootUri?}
+      (gameDir : String) (gameWorkerState : GameWorkerState) : IO (WorkerContext × WorkerState) := do
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
-    let some (levelId : LevelId) := GameServer.levelIdFromFileName? initParams meta.mkInputContext.fileName
-      | throwServerError "Could not determine level ID"
-    let level ← loadLevelData gameDir levelId.world levelId.level
+
     let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)
-      gameDir level.module
+      gameDir gameWorkerState.levelInfo.module
     let cancelTk ← CancelToken.new
     let ctx :=
       { hIn  := i
@@ -609,13 +604,21 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : I
   let _ ← IO.setStderr e
   try
     let game ← loadGameData gameDir
+    -- TODO: We misuse the `rootUri` field to the gameName
+    let rootUri? : Option String := some (toString game.name)
+    let initParams := {initRequest.param.toLeanInternal with rootUri?}
+    let some (levelId : LevelId) := GameServer.levelIdFromFileName?
+        initParams meta.mkInputContext.fileName
+      | throwServerError s!"Could not determine level ID: {meta.mkInputContext.fileName}"
+    let levelInfo ← loadLevelData gameDir levelId.world levelId.level
     let some initializationOptions := initRequest.param.initializationOptions?
       | throwServerError "no initialization options found"
     let gameWorkerState : GameWorkerState:= {
       inventory := initializationOptions.inventory
       difficulty := initializationOptions.difficulty
+      levelInfo
     }
-    let (ctx, st) ← initializeWorker meta i o e initRequest.param.toLeanInternal opts gameDir game gameWorkerState
+    let (ctx, st) ← initializeWorker meta i o e initParams opts gameDir gameWorkerState
     let _ ← StateRefT'.run (s := st) <| ReaderT.run (r := ctx) <|
       StateT.run (s := gameWorkerState) <| (mainLoop)
     return (0 : UInt32)
