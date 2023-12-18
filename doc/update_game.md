@@ -9,8 +9,8 @@ Before you continue, make sure there [exists a `v4.X.0`-tag in this repo](https:
 
 Then, depending on the setup you use, do one of the following:
 
-* Dev Container: Rebuild the VSCode Devcontainer.
-* Local Setup: in your game's folder run the following:
+* **Dev Container**: Rebuild the VSCode Devcontainer (without Cache!).
+* **Local Setup**: in your game's folder run the following:
   ```
   lake update -R
   lake build
@@ -24,7 +24,7 @@ Then, depending on the setup you use, do one of the following:
     npm install
     ```
     where `{VERSION_TAG}` is the tag from above of the form `v4.X.0`
-* Gitpod/Codespaces: Create a fresh one
+* **Gitpod/Codespaces**: Create a fresh one
 
 This will update your game (and the mathlib version you might be using) to the new lean version.
 
