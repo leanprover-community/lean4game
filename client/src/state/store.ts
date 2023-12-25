@@ -7,21 +7,19 @@ import { debounce } from "debounce";
 import { connection } from '../connection'
 import { apiSlice } from './api'
 import { progressSlice } from './progress'
-import { saveState } from "./local_storage";
+import { preferencesSlice } from "./preferences"
+import { saveState, savePreferences } from "./local_storage";
 
 
 export const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
     [progressSlice.name]: progressSlice.reducer,
+    [preferencesSlice.name]: preferencesSlice.reducer,
   },
   // Make connection available in thunks:
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({
-      thunk: {
-        extraArgument: { connection }
-      }
-    }).concat(apiSlice.middleware),
+    getDefaultMiddleware().concat(apiSlice.middleware),
 });
 
 /**
@@ -31,6 +29,7 @@ export const store = configureStore({
 store.subscribe(
   debounce(() => {
     saveState(store.getState()[progressSlice.name]);
+    savePreferences(store.getState()[preferencesSlice.name]);
   }, 800)
 );
 

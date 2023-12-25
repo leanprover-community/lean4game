@@ -79,17 +79,17 @@ async function doImport (owner, repo, id) {
     artifactId = artifact.id
     const url = artifact.archive_download_url
     // Make sure the download folder exists
-    if (!fs.existsSync(`${__dirname}/../games`)){
-      fs.mkdirSync(`${__dirname}/../games`);
+    if (!fs.existsSync(path.join(__dirname, "..", "games"))){
+      fs.mkdirSync(path.join(__dirname, "..", "games"));
     }
-    if (!fs.existsSync(`${__dirname}/../games/tmp`)){
-      fs.mkdirSync(`${__dirname}/../games/tmp`);
+    if (!fs.existsSync(path.join(__dirname, "..", "games", "tmp"))){
+      fs.mkdirSync(path.join(__dirname, "..", "games", "tmp"));
     }
     progress[id].output += `Download from ${url}\n`
-    await download(id, url, `${__dirname}/../games/tmp/${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`)
+    await download(id, url, path.join(__dirname, "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
     progress[id].output += `Download finished.\n`
 
-    await runProcess(id, "/bin/bash", [`${__dirname}/unpack.sh`, artifactId, owner.toLowerCase(), repo.toLowerCase()], `${__dirname}/..`)
+    await runProcess(id, "/bin/bash", [path.join(__dirname, "unpack.sh"), artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, ".."))
 
 
     // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
@@ -110,8 +110,8 @@ async function doImport (owner, repo, id) {
   } finally {
     // clean-up temp. files
     if (artifactId) {
-      fs.rmSync(`${__dirname}/../games/tmp/${owner}_${repo}_${artifactId}.zip`, {force: true, recursive: false});
-      fs.rmSync(`${__dirname}/../games/tmp/${owner}_${repo}_${artifactId}`, {force: true, recursive: true});
+      fs.rmSync(path.join(__dirname, "..", "games", "tmp", `${owner}_${repo}_${artifactId}.zip`), {force: true, recursive: false});
+      fs.rmSync(path.join(__dirname, "..", "games", "tmp", `${owner}_${repo}_${artifactId}`), {force: true, recursive: true});
     }
     progress[id].done = true
   }

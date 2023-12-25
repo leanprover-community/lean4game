@@ -26,7 +26,11 @@
 .inventory .item {
   background: #fff;
   border: solid 1px #777;
-  padding: .1em .5em;
+  padding-left: .5rem;
+  padding-right: 1.0rem;
+  padding-top: .1rem;
+  padding-bottom: .1rem;
+  position: relative;
 }
 
 .inventory .item.locked {
@@ -71,4 +75,22 @@
 .tab.active {
   color: black;
   border-bottom: 0.3em solid #999;
+}
+
+
+.inventory .item .copy-button {
+	min-width: 3px;
+	min-height: 3px;
+	display: inline-block;
+	color: #ccc;
+	font-size: 0.6em;
+	padding-right: .2rem;
+	vertical-align: top;
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	width: 1rem;
+	align-items: end;
+	text-align: end;
 }

@@ -106,6 +106,8 @@ structure InventoryTile where
   new := false
   /-- hide the item in the inventory display -/
   hidden := false
+  /-- hover text -/
+  altTitle : String := default
 deriving ToJson, FromJson, Repr, Inhabited
 
 def InventoryItem.toTile (item : InventoryItem) : InventoryTile := {
@@ -147,6 +149,12 @@ structure InventoryOverview where
   definitions : Array InventoryTile
   lemmaTab : Option String
 deriving ToJson, FromJson
+
+-- TODO: Reuse the following code for checking available tactics in user code:
+structure UsedInventory where
+(tactics : HashSet Name := {})
+(definitions : HashSet Name := {})
+(lemmas : HashSet Name := {})
 
 /-! ## Environment extensions for game specification -/
 
@@ -285,6 +293,7 @@ structure LevelInfo where
   descrText : Option String := none
   descrFormat : String := ""
   lemmaTab : Option String
+  module : Name
   displayName : Option String
   statementName : Option String
   template : Option String
@@ -309,6 +318,7 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
       | some tile => tile.category
       | none => none
     statementName := lvl.statementName.toString
+    module := lvl.module
     displayName := match lvl.statementName with
       | .anonymous => none
       | name => match (inventoryExt.getState env).find?
@@ -373,7 +383,7 @@ structure GameTile where
 
   TODO: What's the format? -/
   image: String := default
-deriving Inhabited, ToJson
+deriving Inhabited, ToJson, FromJson
 
 structure Game where
   /-- Internal name of the game. -/
@@ -393,7 +403,7 @@ structure Game where
   tile : GameTile := default
   /-- The path to the background image of the world. -/
   image : String := default
-deriving Inhabited, ToJson
+deriving Inhabited, ToJson, FromJson
 
 def getGameJson (game : «Game») : Json := Id.run do
   let gameJson : Json := toJson game

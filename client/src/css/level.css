@@ -232,6 +232,20 @@ td code  {
   height: 100%;
 } */
 
+.button-row.mobile {
+  margin: .5rem;
+  padding-top: .2rem;
+}
+
+.button-row.mobile .btn {
+  padding: .5em;
+  border-radius: .2em;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
+
+
 .typewriter-interface {
   display: flex;
   flex-flow: column;
@@ -317,11 +331,6 @@ td code  {
   margin-right: 0;
 }
 
-#home-btn {
-  margin-right: .5em;
-  margin-left: 0;
-}
-
 .menu.dropdown .svg-inline--fa {
   width: 1.8rem;
 }
@@ -342,8 +351,13 @@ td code  {
   justify-content: center;
 }
 
-.world-image-container img {
+.world-image-container img.contain {
   object-fit: contain;
+}
+
+.world-image-container img.cover {
+  height: 100%;
+  object-fit: cover;
 }
 
 .typewriter-interface .proof {

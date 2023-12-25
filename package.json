@@ -10,6 +10,10 @@
     "@emotion/styled": "^11.10.5",
     "@fontsource/roboto": "^4.5.8",
     "@fontsource/roboto-mono": "^4.5.8",
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-regular-svg-icons": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@leanprover/infoview": "^0.4.3",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.1",
@@ -24,7 +28,7 @@
     "debounce": "^1.2.1",
     "express": "^4.18.2",
     "lean4-infoview": "https://gitpkg.now.sh/leanprover/vscode-lean4/lean4-infoview?de0062c",
-    "lean4web": "github:hhu-adam/lean4web",
+    "lean4web": "github:hhu-adam/lean4web#b91645a7b88814675ba9f99817436d0a2ce3a0ec",
     "octokit": "^2.0.14",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
@@ -63,13 +67,13 @@
   },
   "scripts": {
     "start": "concurrently -n server,client -c blue,green \"npm run start_server\" \"npm run start_client\"",
-    "start_server": "cd server && lake build && cross-env NODE_ENV=development nodemon -e mjs --exec \"node ./index.mjs\"",
+    "start_server": "(cd server && lake build) && (cd relay && cross-env NODE_ENV=development nodemon -e mjs --exec \"node ./index.mjs\")",
     "start_client": "cross-env NODE_ENV=development vite --host",
     "build": "npm run build_server && npm run build_client",
     "preview": "vite preview",
     "build_server": "cd server && lake build",
     "build_client": "cross-env NODE_ENV=production vite build",
-    "production": "cross-env NODE_ENV=production node server/index.mjs"
+    "production": "cross-env NODE_ENV=production node relay/index.mjs"
   },
   "eslintConfig": {
     "extends": [

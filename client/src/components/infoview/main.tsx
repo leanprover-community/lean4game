@@ -34,7 +34,7 @@ import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint } from './rpc_api';
 import { store } from '../../state/store';
-import { Hints } from '../hints';
+import { Hints, filterHints } from '../hints';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -367,9 +367,9 @@ export function TypewriterInterface({props}) {
   function deleteProof(line: number) {
     return (ev) => {
       let deletedChat: Array<GameHint> = []
-      proof.slice(line).map((step, i) => {
+      filterHints(proof).slice(line).map((hintsAtStep, i) => {
         // Only add these hidden hints to the deletion stack which were visible
-        deletedChat = [...deletedChat, ...step.hints.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
+        deletedChat = [...deletedChat, ...hintsAtStep.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
       })
       setDeletedChat(deletedChat)
 
@@ -493,18 +493,20 @@ export function TypewriterInterface({props}) {
                       <Markdown>{props.data?.introduction}</Markdown>
                     </div>
                   }
-                  {mobile && <>
+                  {mobile &&
                     <Hints key={`hints-${i}`}
                       hints={step.hints} showHidden={showHelp.has(i)} step={i}
                       selected={selectedStep} toggleSelection={toggleSelectStep(i)}/>
-                    {i == proof.length - 1 && hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
-                      <Button className="btn btn-help" to="" onClick={activateHiddenHints}>
-                        Show more help!
-                      </Button>
-                    }
-                  </>
                   }
                   <GoalsTabs proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/>
+
+                  {mobile && i == proof.length - 1 &&
+                    hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
+                    <Button className="btn btn-help" to="" onClick={activateHiddenHints}>
+                      Show more help!
+                    </Button>
+                  }
+
                   {/* Show a message that there are no goals left */}
                   {!step.goals.length && (
                     <div className="message information">
@@ -521,7 +523,7 @@ export function TypewriterInterface({props}) {
               }
             })}
             {mobile && completed &&
-              <div className="button-row">
+              <div className="button-row mobile">
                 {props.level >= props.worldSize ?
                   <Button to={`/${gameId}`}>
                     <FontAwesomeIcon icon={faHome} />&nbsp;Leave World

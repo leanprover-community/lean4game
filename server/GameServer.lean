@@ -1,5 +1,4 @@
 import GameServer.FileWorker
-import GameServer.Watchdog
 import GameServer.Commands
 
 -- TODO: The only reason we import `Commands` is so that it gets built to on `lake build`
@@ -10,13 +9,9 @@ unsafe def main : List String → IO UInt32 := fun args => do
 
   Lean.enableInitializersExecution
 
+  -- TODO: remove this argument
   if args[0]? == some "--server" then
-    MyServer.Watchdog.watchdogMain args
-  else if args[0]? == some "--worker" then
-    MyServer.FileWorker.workerMain {}
+    MyServer.FileWorker.workerMain {} args
   else
-    e.putStrLn s!"Expected `--server` or `--worker`"
+    e.putStrLn s!"Expected `--server`"
     return 1
-
-
--- TODO: Potentially it could be useful to pass in the `gameName` via the websocket connection

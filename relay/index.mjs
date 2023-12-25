@@ -35,7 +35,7 @@ router.get('/import/status/:owner/:repo', importStatus)
 router.get('/import/trigger/:owner/:repo', importTrigger)
 
 const server = app
-  .use(express.static(path.join(__dirname, '../client/dist/'))) // TODO: add a dist folder from inside the game
+  .use(express.static(path.join(__dirname, '..', 'client', 'dist'))) // TODO: add a dist folder from inside the game
   .use('/data/g/:owner/:repo/*', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
@@ -95,13 +95,22 @@ function startServerProcess(owner, repo) {
   let serverProcess
   if (isDevelopment) {
     let args = ["--server", game_dir]
-    serverProcess = cp.spawn("./gameserver", args,  // TODO: find gameserver inside the games
-        { cwd: path.join(__dirname, "./.lake/build/bin/") })
+    let binDir = path.join(game_dir, ".lake", "packages", "GameServer", "server", ".lake", "build", "bin")
+    // Note: `cwd` is important to be the `bin` directory as `Watchdog` calls `./gameserver` again
+    if (fs.existsSync(binDir)) {
+      // Try to use the game's own copy of `gameserver`.
+      serverProcess = cp.spawn("./gameserver", args, { cwd: binDir })
+    } else {
+      // If the game is built with `-Klean4game.local` there is no copy in the lake packages.
+      serverProcess = cp.spawn("./gameserver", args,
+        { cwd: path.join(__dirname, "..", "server", ".lake", "build", "bin") })
+    }
   } else {
     serverProcess =  cp.spawn("./bubblewrap.sh",
-      [game_dir, path.join(__dirname, '..')],
+      [ game_dir, path.join(__dirname, '..')],
       { cwd: __dirname })
   }
+
   serverProcess.on('error', error =>
     console.error(`Launching Lean Server failed: ${error}`)
   )
