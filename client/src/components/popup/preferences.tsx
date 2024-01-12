@@ -5,13 +5,10 @@ import { Switch, Button, ButtonGroup } from '@mui/material';
 
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { IMobileContext } from "../infoview/context"
-import { PreferencesState } from "../../state/preferences"
+import { IPreferencesContext } from "../infoview/context"
 
-interface PreferencesPopupProps extends PreferencesState{
-    handleClose: () => void,
-    setLayout: (layout: "mobile" | "auto" | "desktop") => void,
-    setIsSavePreferences: (isSave: boolean) => void
+interface PreferencesPopupProps extends IPreferencesContext{
+    handleClose: () => void
 }
 
 export function PreferencesPopup({ layout, setLayout, isSavePreferences, setIsSavePreferences, handleClose }: PreferencesPopupProps) {    
