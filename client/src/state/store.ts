@@ -30,7 +30,7 @@ store.subscribe(
   debounce(() => {
     saveState(store.getState()[progressSlice.name]);
 
-    const preferencesState= store.getState()[preferencesSlice.name]
+    const preferencesState = store.getState()[preferencesSlice.name]
     preferencesState.isSavePreferences ? savePreferences(preferencesState) : removePreferences()
   }, 800)
 );
