@@ -28,7 +28,6 @@ export const preferencesSlice = createSlice({
     },
     setisSavePreferences: (state, action) => {
       state.isSavePreferences = action.payload;
-      action.payload ? savePreferences(state) : removePreferences()
     },
   },
 });
