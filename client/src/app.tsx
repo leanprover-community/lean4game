@@ -20,7 +20,7 @@ function App() {
   const params = useParams()
   const gameId = "g/" + params.owner + "/" + params.repo
 
-  // TODO: 
+  // TODO: Modifying setMobile will not change 'layout', and the setMobile function may not exist in the future.
   const [mobile, setMobile] = React.useState<boolean>()
   const layout = useAppSelector((state) => state.preferences.layout);
   const changeLayout = (layout: PreferencesState["layout"]) => dispatch(setLayout(layout))
