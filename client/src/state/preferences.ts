@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { loadPreferences } from "./local_storage";
+import { loadPreferences, removePreferences, savePreferences } from "./local_storage";
 
-interface PreferencesState {
-  mobile: boolean;
-  lockMobile: boolean;
+export interface PreferencesState {
+  layout: "mobile" | "auto" | "desktop";
+  isSavePreferences: boolean;
 }
 
 export function getWindowDimensions() {
@@ -12,26 +12,25 @@ export function getWindowDimensions() {
   return {width, height}
 }
 
-const { width } = getWindowDimensions()
-
 export const AUTO_SWITCH_THRESHOLD = 800
 
-const initialState: PreferencesState = loadPreferences() ?? {
-    mobile: width < AUTO_SWITCH_THRESHOLD,
-    lockMobile: false
+const initialState: PreferencesState = loadPreferences() ??{
+    layout: "auto",
+    isSavePreferences: false
 }
 
 export const preferencesSlice = createSlice({
   name: "preferences",
   initialState,
   reducers: {
-    setMobile: (state, action) => {
-      state.mobile = action.payload;
+    setLayout: (state, action) => {
+      state.layout = action.payload;
     },
-    setLockMobile: (state, action) => {
-      state.lockMobile = action.payload;
+    setisSavePreferences: (state, action) => {
+      state.isSavePreferences = action.payload;
+      action.payload ? savePreferences(state) : removePreferences()
     },
   },
 });
 
-export const { setMobile, setLockMobile } = preferencesSlice.actions;
+export const { setLayout, setisSavePreferences } = preferencesSlice.actions;

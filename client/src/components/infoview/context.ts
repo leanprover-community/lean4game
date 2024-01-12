@@ -5,6 +5,7 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic, InteractiveTermGoal } from '@leanprover/infoview-api';
 import { GameHint, InteractiveGoal, InteractiveGoals } from './rpc_api';
+import { PreferencesState } from '../../state/preferences';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)
@@ -62,18 +63,26 @@ export const ProofStateContext = React.createContext<{
   setProofState: () => {},
 })
 
+export interface IPreferencesContext extends PreferencesState{
+  setLayout: React.Dispatch<React.SetStateAction<PreferencesState["layout"]>>;
+  setIsSavePreferences: React.Dispatch<React.SetStateAction<Boolean>>;
+}
+
+export const PreferencesContext = React.createContext<IPreferencesContext>({
+  layout: "auto",
+  isSavePreferences: false,
+  setLayout: () => {},
+  setIsSavePreferences: () => {}
+})
+
 export interface IMobileContext {
   mobile : boolean,
   setMobile: React.Dispatch<React.SetStateAction<Boolean>>,
-  lockMobile: boolean,
-  setLockMobile: React.Dispatch<React.SetStateAction<Boolean>>,
 }
 
 export const MobileContext = React.createContext<IMobileContext>({
   mobile: false,
   setMobile: () => {},
-  lockMobile: false,
-  setLockMobile: () => {}
 })
 
 export const WorldLevelIdContext = React.createContext<{
