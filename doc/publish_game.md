@@ -1,6 +1,6 @@
 # Publishing games
 
-You can publish your game on the official (Lean Game Server)[https://adam.math.hhu.de] in a few simple
+You can publish your game on the official [Lean Game Server](https://adam.math.hhu.de) in a few simple
 steps.
 
 ## 1. Upload Game to github
