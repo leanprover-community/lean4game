@@ -2,16 +2,41 @@ import * as React from 'react'
 import { Input, Typography } from '@mui/material'
 import Markdown from '../markdown'
 import { Switch, Button, ButtonGroup } from '@mui/material';
+import Box from '@mui/material/Box';
+import Slider from '@mui/material/Slider';
 
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { IPreferencesContext } from "../infoview/context"
 
-interface PreferencesPopupProps extends IPreferencesContext{
+interface PreferencesPopupProps extends IPreferencesContext {
     handleClose: () => void
 }
 
-export function PreferencesPopup({ layout, setLayout, isSavePreferences, setIsSavePreferences, handleClose }: PreferencesPopupProps) {    
+export function PreferencesPopup({ layout, setLayout, isSavePreferences, setIsSavePreferences, handleClose }: PreferencesPopupProps) {
+
+    const marks = [
+        {
+            value: 0,
+            label: 'Mobile',
+            key: "mobile"
+        },
+        {
+            value: 1,
+            label: 'Auto',
+            key: "auto"
+        },
+        {
+            value: 2,
+            label: 'Desktop',
+            key: "desktop"
+        },
+    ];
+
+    const handlerChangeLayout = (_: Event, value: number) => {
+        setLayout(marks[value].key as IPreferencesContext["layout"])
+    }
+
     return <div className="modal-wrapper">
         <div className="modal-backdrop" onClick={handleClose} />
         <div className="modal">
@@ -24,11 +49,19 @@ export function PreferencesPopup({ layout, setLayout, isSavePreferences, setIsSa
                     <div className='preferences-item first leave-left-gap'>
                         <FormControlLabel
                             control={
-                                <ButtonGroup aria-label="outlined primary button group">
-                                    <Button onClick={() => setLayout("mobile")} variant={layout === "mobile" ? "contained" : "outlined"}>Mobile</Button>
-                                    <Button onClick={() => setLayout("auto")} variant={layout === "auto" ? "contained" : "outlined"}>Auto</Button>
-                                    <Button onClick={() => setLayout("desktop")} variant={layout === "desktop" ? "contained" : "outlined"}>Desktop</Button>
-                                </ButtonGroup>
+                                <Box sx={{ width: 300 }}>
+                                    <Slider
+                                        aria-label="Always visible"
+                                        value={marks.find(item => item.key === layout).value}
+                                        step={1}
+                                        marks={marks}
+                                        max={2}
+                                        sx={{
+                                            '& .MuiSlider-track': { display: 'none', },
+                                        }}
+                                        onChange={handlerChangeLayout}
+                                    />
+                                </Box>
                             }
                             label=""
                         />
