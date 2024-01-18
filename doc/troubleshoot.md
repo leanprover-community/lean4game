@@ -21,3 +21,8 @@ Here are known issues/pitfalls with the local setup using `npm`.
   [server] npm run start_server exited with code 1
   ```
   As a fix you might need to delete your manually set `CDPATH` environment variable.
+
+# Publication
+Errors concerning uploads to the server.
+
+* Your game overview loads but the server crashes on loading a level: Check your game's github action is identical to the [GameSkeleton's](https://github.com/hhu-adam/GameSkeleton/blob/main/.github/workflows/build.yml), in particular that there is a step about building the "`gameserver`-executable".
