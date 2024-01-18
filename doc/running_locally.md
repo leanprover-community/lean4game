@@ -2,6 +2,8 @@
 
 The installation instructions are not yet tested on Mac/Windows. Comments very welcome!
 
+Please also consult the [Troubleshooting Collection](doc/troubleshoot.md), where some known pitfalls are collected.
+
 There are several options to play a game locally:
 
 1. VSCode Dev Container: needs `docker` installed on your machine
@@ -35,16 +37,6 @@ The template game [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) conta
 
 3.  **Editing Files** *(everytime)*:<br/>
     After editing some Lean files in VSCode, open VSCode's terminal (View > Terminal) and run `lake build`. Now you can reload your browser to see the changes.
-
-### Errors
-
-* If you don't get the pop-up, you might have disabled them and you can reenable it by
-  running the `remote-containers.showReopenInContainerNotificationReset` command in vscode.
-* If the starting the container fails, in particular with a message `Error: network xyz not found`,
-  you might have deleted stuff from docker via your shell. Try deleting the container and image
-  explicitely in VSCode (left side, "Docker" icon). Then reopen vscode and let it rebuild the
-  container. (this will again take some time)
-* On a working dev container setup, http://localhost:3000 should directly redirect you to http://localhost:3000/#/g/local/game, try if the latter is accessible.
 
 ## Codespaces
 
