@@ -97,9 +97,10 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext)
     for arg in args do
       findForbiddenTactics inputCtx gameWorkerState arg
   | .atom info val =>
-    -- ignore syntax elements that do not start with a letter
-    -- and ignore "with" keyword
-    let allowed := ["with", "fun", "at", "only", "by", "to"]
+    -- Whitelisted keywords.
+    -- Note: We need a whitelist because we cannot really distinguish keywords from tactics.
+    let allowed := ["with", "fun", "at", "only", "by", "to", "generalizing", "says"]
+    -- ignore syntax elements that do not start with a letter or are allowed
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
       match levelInfo.tactics.find? (·.name.toString == val) with
