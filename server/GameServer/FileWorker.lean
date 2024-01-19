@@ -632,8 +632,9 @@ def workerMain (opts : Options) (args : List String): IO UInt32 := do
   try
     let some gameDir := args[1]? | throwServerError "Expected second argument: gameDir"
     let exitCode ← initAndRunWorker i o e opts gameDir
-    -- HACK: all `Task`s are currently "foreground", i.e. we join on them on main thread exit, but we definitely don't
-    -- want to do that in the case of the worker processes, which can produce non-terminating tasks evaluating user code
+    -- HACK: all `Task`s are currently "foreground", i.e. we join on them on main thread exit,
+    -- but we definitely don't want to do that in the case of the worker processes,
+    -- which can produce non-terminating tasks evaluating user code.
     o.flush
     e.flush
     IO.Process.exit exitCode.toUInt8
