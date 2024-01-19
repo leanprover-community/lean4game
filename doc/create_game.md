@@ -98,7 +98,7 @@ This introduction text is shown when one first enters a world.
 1. Use the template above and make sure you import all levels of this world.
 1. In `Game.lean` import the world with `import Game.Levels.MyWorld`
 
-Now you created a world with one level and added it🎉 The command `MakeGame` in `Game.lean` shows you any problems you might need to fix. Currently it shows
+Now you created a world with one level and added it🎉 The command `MakeGame` in `Game.lean` shows you any problems you might need to fix. Currently, it shows
 
 ```text
 No world introducing sorry, but required by MyWorld
@@ -125,26 +125,32 @@ The player has an inventory with tactics, theorems, and definitions that unlock 
 
 ```lean
 NewTactic induction simp
-NewLemma Nat.zero_mul
+NewTheorem Nat.zero_mul
 NewDefinition Pow
 ```
 
 **Important:** All commands in this section 6a) expect the `Name` they take as input
-to be **fully qualified**. For example `NewLemma Nat.zero_mul` and not `NewLemma zero_mul`.
+to be **fully qualified**. For example `NewTheorem Nat.zero_mul` and not `NewTheorem zero_mul`.
 
 #### Doc entries
 
-You'll see a warning about a missing Lemma documentation. You can fix it by adding doc-entries like the following somewhere above it.
+You'll see a warning about a missing Theorem documentation. You can fix it by adding doc-entries like the following somewhere above it.
 
 ```lean
-LemmaDoc Nat.zero_mul as "zero_mul" in "Mul"
-"some description"
+/--
+some description
+-/
+TheoremDoc Nat.zero_mul as "zero_mul" in "Mul"
 
+/--
+some description
+-/
 TacticDoc simp
-"some description"
 
+/--
+some description
+-/
 DefinitionDoc Pow as "^"
-"some description"
 ```
 
 (e.g. you could also create a file `Game/Doc/MyTheorems.lean`, add there your documentation and import it)
@@ -156,7 +162,7 @@ If you do not provide any content for the inventory, the game will try to find a
 You have a few options to disable inventory items that have been unlocked in previous levels:
 
 ```lean
-DisableTactic, DisableLemma, OnlyTactic, OnlyLemma
+DisabledTactic, DisabledTheorem, OnlyTactic, OnlyTheorem
 ```
 
 have the same syntax as above. The former two disable items for this level, the latter two
@@ -164,7 +170,7 @@ disable all items except the ones specified.
 
 #### Theorem Tab
 
-Theorems are sorted into tabs. with `LemmaTab "Mul"` you specify which tab should be open by default in this level.
+Theorems are sorted into tabs. With `TheoremTab "Mul"` you specify which tab should be open by default in this level.
 
 #### HiddenTactic
 
@@ -179,7 +185,7 @@ and only `rw` would show up in the inventory.
 
 ### 6. b) Statement
 
-The statement is the exercise of the level. the basics work the same as they would in `example` or `theorem`. Note however, that you **must** do a tactic proof, i.e. the `:= by` is a hard-coded part of the syntax
+The statement is the exercise of the level. The basics work the same as they would in `example` or `theorem`. Note however, that you **must** do a tactic proof, i.e. the `:= by` is a hard-coded part of the syntax
 
 #### Name
 
@@ -210,7 +216,7 @@ Statement my_simp_lemma ...
 
 The proof must always be a tactic proof, i.e. `:= by` is a mandatory part of the syntax.
 
-There are a few extra tactics that help you structuring the proof:
+There are a few extra tactics that help you with structuring the proof:
 
 - `Hint`: You can use `Hint "text"` to display text if the goal state in-game matches
   the one where `Hint` is placed. For more options about hints, see below.
