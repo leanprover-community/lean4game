@@ -22,7 +22,7 @@ where you replace:
 
 > https://{website}/#/g/{owner}/{repo}
 
-## data management
+## Data management
 Everything downloaded remains in the folder `lean4game/games`.
 The subfolder `tmp` contains downloaded artifacts and can be deleted without loss.
 The other folders should only contain the built lean-games, sorted by owner and repo.

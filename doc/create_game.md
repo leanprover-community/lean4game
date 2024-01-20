@@ -221,7 +221,7 @@ There are a few extra tactics that help you with structuring the proof:
 - `Hint`: You can use `Hint "text"` to display text if the goal state in-game matches
   the one where `Hint` is placed. For more options about hints, see below.
 - `Branch`: In the proof you can add a `Branch` that runs an alternative tactic sequence, which
-  helps setting `Hints` in different places. The `Branch` does not affect the main
+  helps to set `Hints` in different places. The `Branch` does not affect the main
   proof and does not need to finish any goals.
 - `Template`/`Hole`: Used to provide a sample proof template. Anything inside `Template`
   will be copied into the editor with all `Hole`s replaced with `sorry`. Note that
@@ -264,7 +264,7 @@ Prerequisites "NNG"
 CoverImage "images/cover.png"
 ```
 * `Languages`: Currently only a single language (capital English name). The tile will show a corresponding flag.
-* `CaptionShort`: One catch phrase. Appears above the image.
+* `CaptionShort`: One catchphrase. Appears above the image.
 * `CaptionLong`: 2-4 sentences to describe the game.
 * `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
 * `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
