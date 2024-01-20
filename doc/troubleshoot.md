@@ -3,11 +3,11 @@
 Here are some issues experienced by users.
 
 # VSCode Dev-Container
-* If you don't get the pop-up, you might have disabled them and you can reenable it by
+* If you don't get the pop-up, you might have disabled them, and you can reenable it by
   running the `remote-containers.showReopenInContainerNotificationReset` command in vscode.
 * If the starting the container fails, in particular with a message `Error: network xyz not found`,
   you might have deleted stuff from docker via your shell. Try deleting the container and image
-  explicitely in VSCode (left side, "Docker" icon). Then reopen vscode and let it rebuild the
+  explicitly in VSCode (left side, "Docker" icon). Then reopen vscode and let it rebuild the
   container. (this will again take some time)
 * On a working dev container setup, http://localhost:3000 should directly redirect you to http://localhost:3000/#/g/local/game, try if the latter is accessible.
 

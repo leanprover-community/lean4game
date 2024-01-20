@@ -236,7 +236,7 @@ Most important for game development are probably the `Hints`.
 The hints will be displayed whenever the player's current goal matches the goal the hint is
 placed at inside the sample proof. You can use `Branch` to place hints in dead ends or alternative proof strands.
 
-Read [More about Hints](doc/hints.md) for how they work and what the options are.
+Read [More about Hints](hints.md) for how they work and what the options are.
 
 ### 6. e) Extra: Images
 You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
@@ -248,11 +248,11 @@ NOTE: At present, only the images for a world are displayed. They appear in the 
 
 ## 7. Update your game
 
-In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](doc/update_game.md).
+In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](update_game.md).
 
 ## 8. Publish your game
 
-To publish your game on the official server, see [Publishing a game](doc/publish_game.md)
+To publish your game on the official server, see [Publishing a game](publish_game.md)
 
 There are a few more options you can add in `Game.lean` before the `MakeGame` command, which describe the tile that is visible on the server's landing page:
 

@@ -2,7 +2,7 @@
 
 The installation instructions are not yet tested on Mac/Windows. Comments very welcome!
 
-Please also consult the [Troubleshooting Collection](doc/troubleshoot.md), where some known pitfalls are collected.
+Please also consult the [Troubleshooting Collection](troubleshoot.md), where some known pitfalls are collected.
 
 There are several options to play a game locally:
 
@@ -33,14 +33,14 @@ The template game [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) conta
 
     * The first start will take a while, ca. 2-15 minutes. After the first
       start this should be very quickly.
-    * Once built, you can open http://localhost:3000 in your browser. which should load the game.
+    * Once built, you can open http://localhost:3000 in your browser, which should load the game.
 
 3.  **Editing Files** *(everytime)*:<br/>
     After editing some Lean files in VSCode, open VSCode's terminal (View > Terminal) and run `lake build`. Now you can reload your browser to see the changes.
 
 ## Codespaces
 
-You can work on your game using Github codespaces (click "Code" and then "Codespaces" and then "create codespace on main"). It it should run the game locally in the background. You can open it for example under "Ports" and clicking on "Open in Browser".
+You can work on your game using Github codespaces (click "Code" and then "Codespaces" and then "create codespace on main"). It should run the game locally in the background. You can open it for example under "Ports" and clicking on "Open in Browser".
 
 Note: You have to wait until npm started properly, which might take a good while.
 
