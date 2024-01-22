@@ -50,7 +50,7 @@ npm run start_client
 npm run production
 ```
 
-(in two separate terminals) to test the production modes of the server. This way it will only
+(in two separate terminals) to test the production mode of the server. This way it will only
 change once you build and restart the server.
 
 ### Modifying the lean server
