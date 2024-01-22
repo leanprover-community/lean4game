@@ -10,7 +10,7 @@ Statement .... := by
   ...
 ```
 
-Note that hints are only **context-aware but not history-aware**. In particular they only look at the assumptions and the current goal. Player's might encounter hints in a different order - or not at all - if they decide to go for a unique proof idea. The `Branch` tactic helps placing hints outside the sample solution's proof.
+Note that hints are only **context-aware but not history-aware**. In particular, they only look at the assumptions and the current goal. Player's might encounter hints in a different order - or not at all - if they decide to go for a unique proof idea. The `Branch` tactic helps to place hints outside the sample solution's proof.
 
 ## 1. When do hints show?
 
@@ -19,7 +19,7 @@ sample solutions and the entire context from the sample solutions is present in 
 player's context. The player's context may contain additional items.
 
 This means if you have multiple identical
-subgoals, you should only place a single hint in one of them and it will be displayed in
+subgoals, you should only place a single hint in one of them, and it will be displayed in
 all of them.
 
 However, identical (non-hidden) hints which where already present in the step
@@ -32,12 +32,12 @@ Hidden hints are not filtered.
 You can use `Branch` to place hints
 in dead ends or alternative proof strands.
 
-A proof inside a `Branch`-block is normally evaluated by lean but it's discarded at the end
+A proof inside a `Branch`-block is normally evaluated by lean, but it's discarded at the end
 so that no progress has been made on proofing the goal.
 
 ```
 Statement .... := by
-  Hint "Huse `rw` or `rewrite`."
+  Hint "use `rw` or `rewrite`."
   Branch
     rewrite [h]
     Hint "now you still need `rfl`"

@@ -8,7 +8,7 @@ relays messages between the lean server and the client. `index.mjs` is the file 
 be run, which is done for example using `pm2` or by calling `npm run start_server` or
 `npm run production`, see more later.
 
-The latter, "server", is the lean server which has two jobs. For one it produces the "gameserver"
+The latter, "server", is the lean server which has two jobs. For one, it produces the "gameserver"
 executable which is the lean server that handles the files the player plays on. The second job
 is to provide the lean commands which are used when creating a game. These are located in
 `Commands.lean`.
@@ -27,7 +27,7 @@ saved to lean env-extensions which the lean server has access to after loading t
 
 For games to be run successfully, it is important that the "gameserver" executable inside
 the game's `.lake` folder is actually built.
-Currently this happens through a lake-post-update-hook when calling `lake update -R` (in the game's folder), but if this fails, you can always build it manually by calling `lake build gameserver`.
+Currently, this happens through a lake-post-update-hook when calling `lake update -R` (in the game's folder), but if this fails, you can always build it manually by calling `lake build gameserver`.
 (both commands are to be executed in the game's directory!)
 
 ## Modifying the server
@@ -50,7 +50,7 @@ npm run start_client
 npm run production
 ```
 
-(in two separate terminals) to test the production modus of the server. This way it will only
+(in two separate terminals) to test the production mode of the server. This way it will only
 change once you build and restart the server.
 
 ### Modifying the lean server
