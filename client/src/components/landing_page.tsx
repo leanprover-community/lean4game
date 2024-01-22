@@ -134,7 +134,8 @@ function LandingPage() {
     "leanprover-community/nng4",
     "hhu-adam/robo",
     "djvelleman/stg4",
-    "miguelmarco/STG4",
+    "miguelmarco/stg4",
+    "trequetrum/lean4game-logic",
   ]
   let allTiles = allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
 
