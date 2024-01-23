@@ -26,10 +26,10 @@ export const preferencesSlice = createSlice({
     setLayout: (state, action) => {
       state.layout = action.payload;
     },
-    setisSavePreferences: (state, action) => {
+    setIsSavePreferences: (state, action) => {
       state.isSavePreferences = action.payload;
     },
   },
 });
 
-export const { setLayout, setisSavePreferences } = preferencesSlice.actions;
+export const { setLayout, setIsSavePreferences } = preferencesSlice.actions;

@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { changedOpenedIntro, selectOpenedIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
-import { MobileContext, PreferencesContext } from './infoview/context'
+import { PreferencesContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
 import { ErasePopup } from './popup/erase'
 import { InfoPopup } from './popup/game_info'
@@ -27,7 +27,7 @@ import { Hint } from './hints'
 
 /** the panel showing the game's introduction text */
 function IntroductionPanel({introduction, setPageNumber}: {introduction: string, setPageNumber}) {
-  const {mobile} = React.useContext(MobileContext)
+  const {mobile} = React.useContext(PreferencesContext)
   const gameId = React.useContext(GameIdContext)
   const dispatch = useAppDispatch()
 
@@ -64,7 +64,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
   const gameId = React.useContext(GameIdContext)
-  const {mobile, setMobile} = React.useContext(MobileContext)
+  const {mobile} = React.useContext(PreferencesContext)
   const {layout, isSavePreferences, setLayout, setIsSavePreferences} = React.useContext(PreferencesContext)
 
   const gameInfo = useGetGameInfoQuery({game: gameId})

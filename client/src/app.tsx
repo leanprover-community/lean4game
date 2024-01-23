@@ -8,49 +8,24 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
-import { MobileContext, PreferencesContext} from './components/infoview/context';
-import { AUTO_SWITCH_THRESHOLD, getWindowDimensions, setLayout, setisSavePreferences, PreferencesState} from './state/preferences';
-import { useAppDispatch, useAppSelector } from './hooks';
+import { PreferencesContext} from './components/infoview/context';
+import UsePreferences from "./state/hooks/use_preferences"
 
 export const GameIdContext = React.createContext<string>(undefined);
 
 function App() {
-  const dispatch = useAppDispatch()
 
   const params = useParams()
   const gameId = "g/" + params.owner + "/" + params.repo
 
-  // TODO: Modifying setMobile will not change 'layout', and the setMobile function may not exist in the future.
-  const [mobile, setMobile] = React.useState<boolean>()
-  const layout = useAppSelector((state) => state.preferences.layout);
-  const changeLayout = (layout: PreferencesState["layout"]) => dispatch(setLayout(layout))
-  const isSavePreferences = useAppSelector((state) => state.preferences.isSavePreferences);
-  const changeIsSavePreferences = (isSave: boolean) => dispatch(setisSavePreferences(isSave))
-
-  const automaticallyAdjustLayout = () => {
-    const {width} = getWindowDimensions()
-    setMobile(width < AUTO_SWITCH_THRESHOLD)
-  }
-
-  React.useEffect(()=>{
-    if (layout === "auto"){
-      void automaticallyAdjustLayout()
-      window.addEventListener('resize', automaticallyAdjustLayout)
-
-      return () => window.removeEventListener('resize', automaticallyAdjustLayout)
-    } else {
-      setMobile(layout === "mobile")
-    }
-  }, [layout])
+  const {mobile, layout, isSavePreferences, setLayout, setIsSavePreferences} = UsePreferences()
 
   return (
     <div className="app">
       <GameIdContext.Provider value={gameId}>
-        <MobileContext.Provider value={{mobile, setMobile}}>
-          <PreferencesContext.Provider value={{layout, isSavePreferences, setLayout: changeLayout, setIsSavePreferences: changeIsSavePreferences}}>
+          <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, setLayout, setIsSavePreferences}}>
             <Outlet />
           </PreferencesContext.Provider>
-        </MobileContext.Provider>
       </GameIdContext.Provider>
     </div>
   )

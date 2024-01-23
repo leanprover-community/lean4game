@@ -16,7 +16,7 @@ import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/p
 import { store } from '../state/store'
 
 import '../css/world_tree.css'
-import { MobileContext } from './infoview/context'
+import { PreferencesContext } from './infoview/context'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -198,7 +198,7 @@ export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const dispatch = useAppDispatch()
-  const { mobile } = React.useContext(MobileContext)
+  const { mobile } = React.useContext(PreferencesContext)
 
 
   function label(x : number) {

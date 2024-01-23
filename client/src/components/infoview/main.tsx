@@ -27,7 +27,7 @@ import Markdown from '../markdown';
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal } from './goals';
-import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './context';
+import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './context';
 import { Typewriter, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
@@ -349,7 +349,7 @@ export function TypewriterInterface({props}) {
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
-  const {mobile} = React.useContext(MobileContext)
+  const {mobile} = React.useContext(PreferencesContext)
   const { proof } = React.useContext(ProofContext)
   const { setTypewriterInput } = React.useContext(InputModeContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)

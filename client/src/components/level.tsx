@@ -27,7 +27,7 @@ import { Button } from './button'
 import Markdown from './markdown'
 import {InventoryPanel} from './inventory'
 import { hasInteractiveErrors } from './infoview/typewriter'
-import { DeletedChatContext, InputModeContext, MobileContext, MonacoEditorContext,
+import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
   ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint } from './infoview/rpc_api'
@@ -74,7 +74,7 @@ function Level() {
 
 function ChatPanel({lastLevel}) {
   const chatRef = useRef<HTMLDivElement>(null)
-  const {mobile} = useContext(MobileContext)
+  const {mobile} = useContext(PreferencesContext)
   const gameId = useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
@@ -215,7 +215,7 @@ function PlayableLevel({impressum, setImpressum}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
-  const {mobile} = React.useContext(MobileContext)
+  const {mobile} = React.useContext(PreferencesContext)
 
   const dispatch = useAppDispatch()
 
@@ -441,7 +441,7 @@ function PlayableLevel({impressum, setImpressum}) {
 function IntroductionPanel({gameInfo}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId} = useContext(WorldLevelIdContext)
-  const {mobile} = React.useContext(MobileContext)
+  const {mobile} = React.useContext(PreferencesContext)
 
   let text: Array<string> = gameInfo.data?.worlds.nodes[worldId].introduction.split(/\n(\s*\n)+/)
 
@@ -468,7 +468,7 @@ export default Level
 /** The site with the introduction text of a world */
 function Introduction({impressum, setImpressum}) {
   const gameId = React.useContext(GameIdContext)
-  const {mobile} = useContext(MobileContext)
+  const {mobile} = useContext(PreferencesContext)
 
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 

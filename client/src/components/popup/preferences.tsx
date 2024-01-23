@@ -9,7 +9,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { IPreferencesContext } from "../infoview/context"
 
-interface PreferencesPopupProps extends IPreferencesContext {
+interface PreferencesPopupProps extends Omit<IPreferencesContext, 'mobile'> {
     handleClose: () => void
 }
 
