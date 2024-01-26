@@ -8,7 +8,7 @@ import { connection } from '../connection'
 import { apiSlice } from './api'
 import { progressSlice } from './progress'
 import { preferencesSlice } from "./preferences"
-import { saveState, savePreferences } from "./local_storage";
+import { saveState, savePreferences, removePreferences} from "./local_storage";
 
 
 export const store = configureStore({
@@ -29,7 +29,9 @@ export const store = configureStore({
 store.subscribe(
   debounce(() => {
     saveState(store.getState()[progressSlice.name]);
-    savePreferences(store.getState()[preferencesSlice.name]);
+
+    const preferencesState = store.getState()[preferencesSlice.name]
+    preferencesState.isSavePreferences ? savePreferences(preferencesState) : removePreferences()
   }, 800)
 );
 
