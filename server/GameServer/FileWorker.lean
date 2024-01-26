@@ -149,7 +149,10 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (workerState :
           addMessageByDifficulty info s!"The tactic '{val}' is not available in this game!"
       | some tac =>
         -- Tactic is introduced at some point in the game.
-        if tac.locked then
+        if tac.disabled then
+          -- Tactic is disabled in this level.
+          addMessageByDifficulty info s!"The tactic '{val}' is disabled in this level!"
+        else if tac.locked then
           match workerState.inventory.find? (· == val) with
           | none =>
             -- Tactic is marked as locked and not in the inventory.
@@ -157,9 +160,6 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (workerState :
           | some _ =>
             -- Tactic is in the inventory, allow it.
             pure ()
-        else if tac.disabled then
-          -- Tactic is disabled in this level.
-          addMessageByDifficulty info s!"The tactic '{val}' is disabled in this level!"
   | .ident info _rawVal val _preresolved =>
       -- Try to resolve the name
       let ns ←
@@ -181,12 +181,13 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (workerState :
           addMessageByDifficulty info s!"You have not unlocked the theorem/definition '{n}' yet!"
         | some thm =>
           -- Theorem is introduced at some point in the game.
-          if thm.locked then
-            -- Theorem is still locked.
-            addMessageByDifficulty info s!"You have not unlocked the theorem/definition '{n}' yet!"
-          else if thm.disabled then
+          if thm.disabled then
             -- Theorem is disabled in this level.
             addMessageByDifficulty info s!"The theorem/definition '{n}' is disabled in this level!"
+          else if thm.locked then
+            -- Theorem is still locked.
+            addMessageByDifficulty info s!"You have not unlocked the theorem/definition '{n}' yet!"
+
 where addMessageByDifficulty (info : SourceInfo) (s : MessageData) :=
   -- See `GameServer.FileWorker.WorkerState.difficulty`. Send nothing/warnings/errors
   -- deppending on difficulty.
