@@ -161,32 +161,32 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (workerState :
             -- Tactic is in the inventory, allow it.
             pure ()
   | .ident info _rawVal val _preresolved =>
-      -- Try to resolve the name
-      let ns ←
-        try resolveGlobalConst (mkIdent val)
-        -- Catch "unknown constant" error
-        catch | _ => pure []
-      for n in ns do
-        let some (.thmInfo ..) := (← getEnv).find? n
-          -- Not a theorem, no checks needed.
-          | return ()
-        if some n = levelInfo.statementName then
-          -- Forbid the theorem we are proving currently
-          addMessage info inputCtx (severity := .error)
-            s!"Structural recursion: you can't use '{n}' to proof itself!"
-        let theoremsAndDefs := levelInfo.lemmas ++ levelInfo.definitions
-        match theoremsAndDefs.find? (·.name == n) with
-        | none =>
-          -- Theorem will never be introduced in this game
+    -- Try to resolve the name
+    let ns ←
+      try resolveGlobalConst (mkIdent val)
+      -- Catch "unknown constant" error
+      catch | _ => pure []
+    for n in ns do
+      let some (.thmInfo ..) := (← getEnv).find? n
+        -- Not a theorem, no checks needed.
+        | return ()
+      if some n = levelInfo.statementName then
+        -- Forbid the theorem we are proving currently
+        addMessage info inputCtx (severity := .error)
+          s!"Structural recursion: you can't use '{n}' to proof itself!"
+      let theoremsAndDefs := levelInfo.lemmas ++ levelInfo.definitions
+      match theoremsAndDefs.find? (·.name == n) with
+      | none =>
+        -- Theorem will never be introduced in this game
+        addMessageByDifficulty info s!"You have not unlocked the theorem/definition '{n}' yet!"
+      | some thm =>
+        -- Theorem is introduced at some point in the game.
+        if thm.disabled then
+          -- Theorem is disabled in this level.
+          addMessageByDifficulty info s!"The theorem/definition '{n}' is disabled in this level!"
+        else if thm.locked then
+          -- Theorem is still locked.
           addMessageByDifficulty info s!"You have not unlocked the theorem/definition '{n}' yet!"
-        | some thm =>
-          -- Theorem is introduced at some point in the game.
-          if thm.disabled then
-            -- Theorem is disabled in this level.
-            addMessageByDifficulty info s!"The theorem/definition '{n}' is disabled in this level!"
-          else if thm.locked then
-            -- Theorem is still locked.
-            addMessageByDifficulty info s!"You have not unlocked the theorem/definition '{n}' yet!"
 
 where addMessageByDifficulty (info : SourceInfo) (s : MessageData) :=
   -- See `GameServer.FileWorker.WorkerState.difficulty`. Send nothing/warnings/errors
