@@ -21,6 +21,7 @@
     "@types/cytoscape": "^3.19.9",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react-swc": "^3.4.0",
+    "coi-serviceworker": "^0.1.7",
     "cross-env": "^7.0.3",
     "cytoscape": "^3.23.0",
     "cytoscape-elk": "^2.1.0",
