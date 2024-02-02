@@ -1,16 +1,42 @@
 import * as React from 'react'
 import { Input, Typography } from '@mui/material'
 import Markdown from '../markdown'
-import Switch from '@mui/material/Switch';
+import { Switch, Button, ButtonGroup } from '@mui/material';
+import Box from '@mui/material/Box';
+import Slider from '@mui/material/Slider';
+
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { IMobileContext } from "../infoview/context"
+import { IPreferencesContext } from "../infoview/context"
 
-interface PreferencesPopupProps extends IMobileContext{
+interface PreferencesPopupProps extends Omit<IPreferencesContext, 'mobile'> {
     handleClose: () => void
-} 
+}
 
-export function PreferencesPopup({ mobile, setMobile, lockMobile, setLockMobile, handleClose }: PreferencesPopupProps) {
+export function PreferencesPopup({ layout, setLayout, isSavePreferences, setIsSavePreferences, handleClose }: PreferencesPopupProps) {
+
+    const marks = [
+        {
+            value: 0,
+            label: 'Mobile',
+            key: "mobile"
+        },
+        {
+            value: 1,
+            label: 'Auto',
+            key: "auto"
+        },
+        {
+            value: 2,
+            label: 'Desktop',
+            key: "desktop"
+        },
+    ];
+
+    const handlerChangeLayout = (_: Event, value: number) => {
+        setLayout(marks[value].key as IPreferencesContext["layout"])
+    }
+
     return <div className="modal-wrapper">
         <div className="modal-backdrop" onClick={handleClose} />
         <div className="modal">
@@ -18,34 +44,43 @@ export function PreferencesPopup({ mobile, setMobile, lockMobile, setLockMobile,
             <Typography variant="body1" component="div" className="settings">
                 <div className='preferences-category'>
                     <div className='category-title'>
-                        <h3>Mobile layout</h3>
+                        <h3>Layout</h3>
                     </div>
-                    <div className='preferences-item'>
+                    <div className='preferences-item first leave-left-gap'>
                         <FormControlLabel
                             control={
-                            <Switch
-                                checked={mobile}
-                                onChange={() => setMobile(!mobile)}
-                                name="checked"
-                                color="primary"
-                            />
+                                <Box sx={{ width: 300 }}>
+                                    <Slider
+                                        aria-label="Always visible"
+                                        value={marks.find(item => item.key === layout).value}
+                                        step={1}
+                                        marks={marks}
+                                        max={2}
+                                        sx={{
+                                            '& .MuiSlider-track': { display: 'none', },
+                                        }}
+                                        onChange={handlerChangeLayout}
+                                    />
+                                </Box>
                             }
-                            label="Enable"
-                            labelPlacement="start"
+                            label=""
                         />
                     </div>
+                </div>
+
+                <div className='preferences-category tail-category'>
                     <div className='preferences-item'>
                         <FormControlLabel
                             control={
-                            <Switch
-                                checked={!lockMobile}
-                                onChange={() => setLockMobile(!lockMobile)}
-                                name="checked"
-                                color="primary"
-                            />
+                                <Switch
+                                    checked={isSavePreferences}
+                                    onChange={() => setIsSavePreferences(!isSavePreferences)}
+                                    name="checked"
+                                    color="primary"
+                                />
                             }
-                            label="Auto"
-                            labelPlacement="start"
+                            label="Save my settings (in the browser store)"
+                            labelPlacement="end"
                         />
                     </div>
                 </div>

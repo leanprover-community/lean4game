@@ -57,3 +57,12 @@ export function savePreferences(state: any) {
     // Ignore
   }
 }
+
+export function removePreferences() {
+  try {
+    localStorage.removeItem(PREFERENCES_KEY);
+  } catch (e) {
+    // Ignore
+  }
+}
+

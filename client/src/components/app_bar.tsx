@@ -7,7 +7,7 @@ import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
   faCircleInfo, faTerminal, faMobileScreenButton, faDesktop, faGear } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from "../app"
-import { InputModeContext, MobileContext, WorldLevelIdContext } from "./infoview/context"
+import { InputModeContext, PreferencesContext, WorldLevelIdContext } from "./infoview/context"
 import { GameInfo, useGetGameInfoQuery } from '../state/api'
 import { changedOpenedIntro, selectCompleted, selectDifficulty, selectProgress } from '../state/progress'
 import { useAppDispatch, useAppSelector } from '../hooks'
@@ -162,7 +162,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
 }) {
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useAppSelector(selectProgress(gameId))
-  const {mobile, setMobile} = React.useContext(MobileContext)
+  const {mobile} = React.useContext(PreferencesContext)
   const [navOpen, setNavOpen] = React.useState(false)
 
   return <div className="app-bar">
@@ -212,7 +212,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=
 }) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
-  const {mobile} = React.useContext(MobileContext)
+  const {mobile} = React.useContext(PreferencesContext)
   const [navOpen, setNavOpen] = React.useState(false)
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
