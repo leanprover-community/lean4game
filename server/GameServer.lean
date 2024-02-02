@@ -11,7 +11,7 @@ unsafe def main : List String → IO UInt32 := fun args => do
 
   -- TODO: remove this argument
   if args[0]? == some "--server" then
-    MyServer.FileWorker.workerMain {} args
+    GameServer.FileWorker.workerMain {} args
   else
     e.putStrLn s!"Expected `--server`"
     return 1

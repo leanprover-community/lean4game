@@ -11,11 +11,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
-import { useAppDispatch, useMobile } from '../hooks'
+import { useAppDispatch } from '../hooks'
 import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
 import { store } from '../state/store'
 
 import '../css/world_tree.css'
+import { PreferencesContext } from './infoview/context'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -197,7 +198,7 @@ export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const dispatch = useAppDispatch()
-  const { mobile } = useMobile()
+  const { mobile } = React.useContext(PreferencesContext)
 
 
   function label(x : number) {
