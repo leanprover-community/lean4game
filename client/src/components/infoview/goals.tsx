@@ -10,7 +10,10 @@ import { Locations, LocationsContext, SelectableLocation } from '../../../../nod
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
 import { InputModeContext } from './context';
-import { InteractiveGoal, InteractiveGoals, InteractiveHypothesisBundle } from './rpc_api';
+import { InteractiveGoal, InteractiveGoals, InteractiveGoalsWithHints, InteractiveHypothesisBundle, ProofState } from './rpc_api';
+import { RpcSessionAtPos } from '@leanprover/infoview/*';
+import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { DiagnosticSeverity } from 'vscode-languageserver-protocol';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -39,7 +42,11 @@ function goalToString(g: InteractiveGoal): string {
 }
 
 export function goalsToString(goals: InteractiveGoals): string {
-    return goals.goals.map(goalToString).join('\n\n')
+    return goals.goals.map(g => goalToString(g)).join('\n\n')
+}
+
+export function goalsWithHintsToString(goals: InteractiveGoalsWithHints): string {
+    return goals.goals.map(g => goalToString(g.goal)).join('\n\n')
 }
 
 interface GoalFilterState {
@@ -255,7 +262,7 @@ export const ProofDisplay = React.memo((props : ProofDisplayProps) => {
 })
 
 interface GoalsProps {
-    goals: InteractiveGoals
+    goals: InteractiveGoalsWithHints
     filter: GoalFilterState
 }
 
@@ -264,7 +271,7 @@ export function Goals({ goals, filter }: GoalsProps) {
         return <>No goals</>
     } else {
         return <>
-          {goals.goals.map((g, i) => <Goal typewriter={false} key={i} goal={g} filter={filter} />)}
+          {goals.goals.map((g, i) => <Goal typewriter={false} key={i} goal={g.goal} filter={filter} />)}
         </>
     }
 }
@@ -276,7 +283,7 @@ interface FilteredGoalsProps {
      * When this is `undefined`, the component will not appear at all but will remember its state
      * by virtue of still being mounted in the React tree. When it does appear again, the filter
      * settings and collapsed state will be as before. */
-    goals?: InteractiveGoals
+    goals?: InteractiveGoalsWithHints
 }
 
 /**
@@ -291,7 +298,7 @@ export const FilteredGoals = React.memo(({ headerChildren, goals }: FilteredGoal
             data-id="copy-goal-to-comment"
             onClick={e => {
                 e.preventDefault();
-                if (goals) void ec.copyToComment(goalsToString(goals))
+                if (goals) void ec.copyToComment(goalsWithHintsToString(goals))
             }}
             title="copy state to comment" />
 
@@ -336,3 +343,112 @@ export const FilteredGoals = React.memo(({ headerChildren, goals }: FilteredGoal
         </details>
     </div>
 })
+
+export function loadGoals(
+    rpcSess: RpcSessionAtPos,
+    uri: string,
+    setProof: React.Dispatch<React.SetStateAction<ProofState>>) {
+  console.info('sending rpc request to load the proof state')
+
+  rpcSess.call('Game.getProofState', DocumentPosition.toTdpp({line: 0, character: 0, uri: uri})).then(
+    (proof : ProofState) => {
+      console.info(`received a proof state!`)
+      console.log(proof)
+      setProof(proof)
+
+
+
+
+      // let tmpProof : ProofStep[] = []
+
+      // let goalCount = 0
+
+      // steps.map((goals, i) => {
+      //   // The first step has an empty command and therefore also no error messages
+      //   // Usually there is a newline at the end of the editors content, so we need to
+      //   // display diagnostics from potentally two lines in the last step.
+      //   let messages = i ? (i == steps.length - 1 ? diagnostics.slice(i-1).flat() : diagnostics[i-1]) : []
+
+      //   // Filter out the 'unsolved goals' message
+      //   messages = messages.filter((msg) => {
+      //     return !("append" in msg.message &&
+      //       "text" in msg.message.append[0] &&
+      //       msg.message.append[0].text === "unsolved goals")
+      //   })
+
+      //   if (typeof goals == 'undefined') {
+      //     tmpProof.push({
+      //       command: i ? model.getLineContent(i) : '',
+      //       goals: [],
+      //       hints: [],
+      //       errors: messages
+      //     } as ProofStep)
+      //     console.debug('goals is undefined')
+      //     return
+      //   }
+
+      //   // If the number of goals reduce, show a message
+      //   if (goals.length && goalCount > goals.length) {
+      //     messages.unshift({
+      //       range: {
+      //         start: {
+      //           line: i-1,
+      //           character: 0,
+      //         },
+      //         end: {
+      //           line: i-1,
+      //           character: 0,
+      //         }},
+      //       severity: DiagnosticSeverity.Information,
+      //       message: {
+      //       text: 'intermediate goal solved 🎉'
+      //       }
+      //     })
+      //   }
+      //   goalCount = goals.length
+
+      //   // with no goals there will be no hints.
+      //   let hints : GameHint[] = goals.length ? goals[0].hints : []
+
+      //   console.debug(`Command (${i}): `, i ? model.getLineContent(i) : '')
+      //   console.debug(`Goals: (${i}): `, goalsToString(goals)) //
+      //   console.debug(`Hints: (${i}): `, hints)
+      //   console.debug(`Errors: (${i}): `, messages)
+
+      //   tmpProof.push({
+      //     // the command of the line above. Note that `getLineContent` starts counting
+      //     // at `1` instead of `zero`. The first ProofStep will have an empty command.
+      //     command: i ? model.getLineContent(i) : '',
+      //     // TODO: store correct data
+      //     goals: goals.map(g => g.goal),
+      //     // only need the hints of the active goals in chat
+      //     hints: hints,
+      //     // errors and messages from the server
+      //     errors: messages
+      //   } as ProofStep)
+
+      // })
+      // // Save the proof to the context
+      // setProof(tmpProof)
+
+
+
+    }
+  )
+}
+
+
+export function lastStepHasErrors (proof : ProofState): boolean {
+  if (!proof?.steps.length) {return false}
+
+  let diags = [...proof.steps[proof.steps.length - 1].diags, ...proof.diagnostics]
+
+  return diags.some(
+    (d) => (d.severity == DiagnosticSeverity.Error ) // || d.severity == DiagnosticSeverity.Warning
+  )
+}
+
+export function isLastStepWithErrors (proof : ProofState, i: number): boolean {
+  if (!proof?.steps.length) {return false}
+  return (i == proof.steps.length - 1) && lastStepHasErrors(proof)
+}

@@ -26,15 +26,16 @@ import Markdown from '../markdown';
 
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
-import { Goal } from './goals';
-import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext, ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './context';
-import { Typewriter, hasErrors, hasInteractiveErrors } from './typewriter';
+import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
+import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext, ProofContext, SelectionContext, WorldLevelIdContext } from './context';
+import { Typewriter, getInteractiveDiagsAt, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
-import { GameHint } from './rpc_api';
+import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { store } from '../../state/store';
-import { Hints, filterHints } from '../hints';
+import { Hints, MoreHelpButton, filterHints } from '../hints';
+import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -61,36 +62,35 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
   const gameId = React.useContext(GameIdContext)
   const { typewriterMode } = React.useContext(InputModeContext)
 
-  // Mark level as completed when server gives notification
+  const {proof, setProof} = React.useContext(ProofContext)
+
   const dispatch = useAppDispatch()
-  useServerNotificationEffect(
-    '$/game/completed',
-    (params: any) => {
-      if (ec.events.changedCursorLocation.current &&
-          ec.events.changedCursorLocation.current.uri === params.uri) {
-        dispatch(levelCompleted({ game: gameId, world: worldId, level: levelId }))
 
-        // On completion, add the names of all new items to the local storage
-        let newTiles = [
-          ...level?.tactics,
-          ...level?.lemmas,
-          ...level?.definitions
-        ].filter((tile) => tile.new).map((tile) => tile.name)
+  React.useEffect(() => {
+    if (proof.completed) {
+      dispatch(levelCompleted({ game: gameId, world: worldId, level: levelId }))
 
-        // Add the proven statement to the local storage as well.
-        if (level?.statementName != null) {
-          newTiles.push(level?.statementName)
-        }
+      // On completion, add the names of all new items to the local storage
+      let newTiles = [
+        ...level?.tactics,
+        ...level?.lemmas,
+        ...level?.definitions
+      ].filter((tile) => tile.new).map((tile) => tile.name)
 
-        let inv: string[] = selectInventory(gameId)(store.getState())
-
-        // add new items and remove duplicates
-        let newInv = [...inv, ...newTiles].filter((item, i, array) => array.indexOf(item) == i)
-
-        dispatch(changedInventory({ game: gameId, inventory: newInv }))
+      // Add the proven statement to the local storage as well.
+      if (level?.statementName != null) {
+        newTiles.push(level?.statementName)
       }
-    }, [level]
-  )
+
+      let inv: string[] = selectInventory(gameId)(store.getState())
+
+      // add new items and remove duplicates
+      let newInv = [...inv, ...newTiles].filter((item, i, array) => array.indexOf(item) == i)
+
+      dispatch(changedInventory({ game: gameId, inventory: newInv }))
+
+    }
+  }, [proof, level])
 
   /* Set up updates to the global infoview state on editor events. */
   const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
@@ -154,7 +154,7 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
 
-  const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
+  const { proof, setProof } = React.useContext(ProofContext)
 
   console.debug(`template: ${props.data?.template}`)
 
@@ -206,7 +206,7 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
     ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
   } else {
     ret = <div className="infoview vscode-light">
-      {completed && <div className="level-completed">Level completed! 🎉</div>}
+      {proof.completed && <div className="level-completed">Level completed! 🎉</div>}
       <Infos />
     </div>
   }
@@ -223,15 +223,24 @@ const goalFilter = {
 }
 
 /** The display of a single entered lean command */
-function Command({ command, deleteProof }: { command: string, deleteProof: any }) {
+function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, deleteProof: any }) {
   // The first step will always have an empty command
-  if (!command) { return <></> }
-  return <div className="command">
-    <div className="command-text">{command}</div>
-    <Button to="" className="undo-button btn btn-inverted" title="Retry proof from here" onClick={deleteProof}>
-      <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;Retry
-    </Button>
-  </div>
+  if (!proof?.steps[i]?.command) { return <></> }
+
+  if (isLastStepWithErrors(proof, i)) {
+    // If the last step has errors, we display the command in a different style
+    // indicating that it will be removed on the next try.
+    return <div className="failed-command">
+      <i>Failed command</i>: {proof.steps[i].command}
+    </div>
+  } else {
+    return <div className="command">
+      <div className="command-text">{proof.steps[i].command}</div>
+      <Button to="" className="undo-button btn btn-inverted" title="Retry proof from here" onClick={deleteProof}>
+        <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;Retry
+      </Button>
+    </div>
+  }
 }
 
 // const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
@@ -286,9 +295,13 @@ function Command({ command, deleteProof }: { command: string, deleteProof: any }
 // }, fastIsEqual)
 
 /** The tabs of goals that lean ahs after the command of this step has been processed */
-function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: ProofStep, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
+function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: InteractiveGoalsWithHints, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
 
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
+
+  if (proofStep.goals.length == 0) {
+    return <></>
+  }
 
   return <div className="goal-tabs" onClick={onClick}>
     <div className={`tab-bar ${last ? 'current' : ''}`}>
@@ -300,7 +313,7 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
       ))}
     </div>
     <div className="goal-tab vscode-light">
-      <Goal typewriter={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]} />
+      <Goal typewriter={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]?.goal} />
     </div>
   </div>
 }
@@ -350,12 +363,11 @@ export function TypewriterInterface({props}) {
   const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
   const {mobile} = React.useContext(PreferencesContext)
-  const { proof } = React.useContext(ProofContext)
+  const { proof, setProof } = React.useContext(ProofContext)
   const { setTypewriterInput } = React.useContext(InputModeContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
-  const completed = useAppSelector(selectCompleted(gameId, props.world, props.level))
   // const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
   // const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
 
@@ -367,9 +379,11 @@ export function TypewriterInterface({props}) {
   function deleteProof(line: number) {
     return (ev) => {
       let deletedChat: Array<GameHint> = []
-      filterHints(proof).slice(line).map((hintsAtStep, i) => {
+      proof.steps.slice(line).map((step, i) => {
+        let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
+
         // Only add these hidden hints to the deletion stack which were visible
-        deletedChat = [...deletedChat, ...hintsAtStep.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
+        deletedChat = [...deletedChat, ...filteredHints.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
       })
       setDeletedChat(deletedChat)
 
@@ -382,7 +396,9 @@ export function TypewriterInterface({props}) {
         forceMoveMarkers: false
       }])
       setSelectedStep(undefined)
-      setTypewriterInput(proof[line].command)
+      setTypewriterInput(proof.steps[line].command)
+      // Reload proof on deleting
+      loadGoals(rpcSess, uri, setProof)
       ev.stopPropagation()
     }
   }
@@ -402,7 +418,7 @@ export function TypewriterInterface({props}) {
 
    // Scroll to the end of the proof if it is updated.
    React.useEffect(() => {
-    if (proof?.length > 1) {
+    if (proof.steps.length > 1) {
       proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
     } else {
       proofPanelRef.current?.scrollTo(0,0)
@@ -423,38 +439,8 @@ export function TypewriterInterface({props}) {
     }
   }, [selectedStep])
 
-  // TODO: This about hidden hints is all copied from `level.tsx`. Can we move that into `hints.tsx`?
-
-  // If the last step has errors, we want to treat it as if it is part of the second-to-last step
-  let k = proof.length - 1
-  let withErr = hasInteractiveErrors(proof[k]?.errors) ? 1 : 0
-
-  const activateHiddenHints = (ev) => {
-    // If the last step (`k`) has errors, we want the hidden hints from the
-    // second-to-last step to be affected
-    if (!(proof.length)) {return}
-
-    // state must not be mutated, therefore we need to clone the set
-    let tmp = new Set(showHelp)
-    if (tmp.has(k - withErr)) {
-      tmp.delete(k - withErr)
-    } else {
-      tmp.add(k - withErr)
-    }
-    setShowHelp(tmp)
-    console.debug(`help: ${Array.from(tmp.values())}`)
-  }
-
-  function hasHiddenHints(i : number): boolean {
-    let step = proof[i]
-
-    // For example if the proof isn't loaded yet
-    if(!step) {return false}
-
-    return step.hints.some((hint) => hint.hidden)
-  }
-
-  let lastStepErrors = proof.length ? hasInteractiveErrors(proof[proof.length - 1].errors) : false
+  // TODO: superfluous, can be replaced with `withErr` from above
+  let lastStepErrors = proof.steps.length ? hasInteractiveErrors(getInteractiveDiagsAt(proof, proof.steps.length)) : false
 
 
   useServerNotificationEffect("$/game/loading", (params : any) => {
@@ -474,20 +460,22 @@ export function TypewriterInterface({props}) {
       </div>
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement data={props.data} />
-        {proof.length ?
+        {proof.steps.length ?
           <>
-            {proof.map((step, i) => {
-              if (i == proof.length - 1 && lastStepErrors) {
-                // if the last command contains an error, we only display the errors but not the
-                // entered command as it is still present in the command line.
-                // TODO: Should not use index as key.
-                return <div key={`proof-step-${i}`}>
-                  <Errors errors={step.errors} typewriterMode={true} />
-                </div>
-              } else {
+            {proof.steps.map((step, i) => {
+              let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
+
+              // if (i == proof.steps.length - 1 && hasInteractiveErrors(step.diags)) {
+              //   // if the last command contains an error, we only display the errors but not the
+              //   // entered command as it is still present in the command line.
+              //   // TODO: Should not use index as key.
+              //   return <div key={`proof-step-${i}`} className={`step step-${i}`}>
+              //     <Errors errors={step.diags} typewriterMode={true} />
+              //   </div>
+              // } else {
                 return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')}>
-                  <Command command={step.command} deleteProof={deleteProof(i)} />
-                  <Errors errors={step.errors} typewriterMode={true} />
+                  <Command proof={proof} i={i} deleteProof={deleteProof(i)} />
+                  <Errors errors={step.diags} typewriterMode={true} />
                   {mobile && i == 0 && props.data?.introduction &&
                     <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelectStep(0)}>
                       <Markdown>{props.data?.introduction}</Markdown>
@@ -495,22 +483,21 @@ export function TypewriterInterface({props}) {
                   }
                   {mobile &&
                     <Hints key={`hints-${i}`}
-                      hints={step.hints} showHidden={showHelp.has(i)} step={i}
+                      hints={filteredHints} showHidden={showHelp.has(i)} step={i}
                       selected={selectedStep} toggleSelection={toggleSelectStep(i)}/>
                   }
-                  <GoalsTabs proofStep={step} last={i == proof.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/>
-
-                  {mobile && i == proof.length - 1 &&
-                    hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
-                    <Button className="btn btn-help" to="" onClick={activateHiddenHints}>
-                      Show more help!
-                    </Button>
+                  {/* <GoalsTabs proofStep={step} last={i == proof.steps.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof.steps.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/> */}
+                  {!(isLastStepWithErrors(proof, i)) &&
+                    <GoalsTabs proofStep={step} last={i == proof.steps.length - (lastStepHasErrors(proof) ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof.steps.length - (lastStepHasErrors(proof) ? 2 : 1) ? (n) => setDisableInput(n > 0) : (n) => {}}/>
+                  }
+                  {mobile && i == proof.steps.length - 1 &&
+                    <MoreHelpButton />
                   }
 
                   {/* Show a message that there are no goals left */}
-                  {!step.goals.length && (
+                  {/* {!step.goals.length && (
                     <div className="message information">
-                      {completed ?
+                      {proof.completed ?
                         <p>Level completed! 🎉</p> :
                         <p>
                           <b>no goals left</b><br />
@@ -518,11 +505,17 @@ export function TypewriterInterface({props}) {
                         </p>
                       }
                     </div>
-                  )}
+                  )} */}
                 </div>
               }
-            })}
-            {mobile && completed &&
+            //}
+            )}
+            {proof.diagnostics.length > 0 &&
+              <div key={`proof-step-remaining`} className="step step-remaining">
+                <Errors errors={proof.diagnostics} typewriterMode={true} />
+              </div>
+            }
+            {mobile && proof.completed &&
               <div className="button-row mobile">
                 {props.level >= props.worldSize ?
                   <Button to={`/${gameId}`}>
@@ -539,7 +532,7 @@ export function TypewriterInterface({props}) {
         }
       </div>
     </div>
-    <Typewriter hidden={!withErr && proof[proof.length - 1]?.goals.length == 0} disabled={disableInput || !proof.length}/>
+    <Typewriter disabled={disableInput || !proof.steps.length}/>
     </RpcContext.Provider>
   </div>
 }

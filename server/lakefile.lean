@@ -8,6 +8,8 @@ def leanVersion : String := s!"v{Lean.versionString}"
 
 require std from git "https://github.com/leanprover/std4.git" @ leanVersion
 
+require importGraph from git "https://github.com/leanprover-community/import-graph" @ leanVersion
+
 lean_lib GameServer
 
 @[default_target]

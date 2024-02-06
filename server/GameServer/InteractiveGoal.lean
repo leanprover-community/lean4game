@@ -1,62 +1,19 @@
-import Lean.Widget.InteractiveGoal
+import GameServer.Structures
 
 /-!
 This file is a modified copy of `Lean.Widget.InteractiveGoal`.
 
-We add the structure `GameHint` and extend two existing structures:
-
-* `isAssumption?` in `InteractiveHypothesisBundle`: stores if a hypothesis is of type `Prop`.
-* `hint` in `InteractiveGoal`: stores the game hints associated with the goal.
-
-The rest of this file is simply copied to use these new modified stuctures.
+Note that the structures have been moved to `Structures.lean`, but most of the
+functions here must be duplicated from `Lean.Widget.InteractiveGoal` in order
+to use the duplicated structures.
 -/
 
 namespace GameServer
 
 open Lean Lean.Widget Lean.Server
 
-/-- A hint in the game at the corresponding goal. -/
-structure GameHint where
-  text : String
-  hidden : Bool
-deriving FromJson, ToJson
-
-/-- Extend the interactive hypothesis bundle with an option to distinguish
-"assumptions" from "objects". "Assumptions" ate hyptheses of type `Prop`. -/
--- @[inherit_doc Lean.Widget.InteractiveHypothesisBundle]
-structure InteractiveHypothesisBundle extends Lean.Widget.InteractiveHypothesisBundle where
-  /-- The hypothesis's type is of type `Prop` -/
-  isAssumption? : Option Bool := none
-deriving RpcEncodable
-
--- duplicated but with custom `InteractiveHypothesisBundle`
-@[inherit_doc Lean.Widget.InteractiveGoalCore]
-structure InteractiveGoalCore where
-  hyps : Array InteractiveHypothesisBundle
-  type : CodeWithInfos
-  ctx : WithRpcRef Elab.ContextInfo
-
--- duplicated but with custom `InteractiveGoalCore` and extended by `hints`
-@[inherit_doc Lean.Widget.InteractiveGoal]
-structure InteractiveGoal extends InteractiveGoalCore where
-  userName? : Option String
-  goalPrefix : String
-  mvarId : MVarId
-  isInserted? : Option Bool := none
-  isRemoved? : Option Bool := none
-  /-- Extended the `InteractiveGoal` by an array of hints at that goal. -/
-  hints : Array GameHint := #[]
-deriving RpcEncodable
-
 -- duplicated with custom `InteractiveGoalCore`
-@[inherit_doc Lean.Widget.InteractiveTermGoal]
-structure InteractiveTermGoal extends InteractiveGoalCore where
-  range : Lsp.Range
-  term : WithRpcRef Elab.TermInfo
-deriving RpcEncodable
-
--- duplicated with custom `InteractiveGoalCore`
-@[inherit_doc Lean.Widget.InteractiveGoalCore.pretty]
+-- @[inherit_doc Lean.Widget.InteractiveGoalCore.pretty]
 def InteractiveGoalCore.pretty (g : InteractiveGoalCore) (userName? : Option String)
     (goalPrefix : String) : Format := Id.run do
   let indent := 2 -- Use option
@@ -140,10 +97,9 @@ def withGoalCtx (goal : MVarId) (action : LocalContext → MetavarDecl → n α)
 
 open Meta in
 
--- Copied from `Lean.Widget.goalToInteractive` but added
--- argument `hint` which is simply passed along.
+-- Duplicated from `Lean.Widget.goalToInteractive` with custom structures
 @[inherit_doc Lean.Widget.goalToInteractive]
-def goalToInteractive (mvarId : MVarId) (hints : Array GameHint): MetaM InteractiveGoal := do
+def goalToInteractive (mvarId : MVarId) : MetaM InteractiveGoal := do
   let ppAuxDecls := pp.auxDecls.get (← getOptions)
   let ppImplDetailHyps := pp.implementationDetailHyps.get (← getOptions)
   let showLetValues := pp.showLetValues.get (← getOptions)
@@ -165,9 +121,6 @@ def goalToInteractive (mvarId : MVarId) (hints : Array GameHint): MetaM Interact
       else
         match localDecl with
         | LocalDecl.cdecl _index fvarId varName type _ _ =>
-          -- We rely on the fact that `withGoalCtx` runs `LocalContext.sanitizeNames`,
-          -- so the `userName`s of local hypotheses are already pretty-printed
-          -- and it suffices to simply `toString` them.
           let varName := toString varName
           let type ← instantiateMVars type
           if prevType? == none || prevType? == some type then
@@ -197,8 +150,6 @@ def goalToInteractive (mvarId : MVarId) (hints : Array GameHint): MetaM Interact
       userName?
       goalPrefix := getGoalPrefix mvarDecl
       mvarId
-      -- Added:
-      hints
     }
 
 end GameServer

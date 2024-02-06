@@ -368,3 +368,8 @@ td code  {
   min-width: 40px;
   text-align: center;
 }
+
+/* DEBUG */
+.proof .step {
+  border: 2px solid rgb(0, 123, 255);
+}

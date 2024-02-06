@@ -3,6 +3,7 @@ import Lean.Server.FileWorker
 import GameServer.Game
 import GameServer.ImportModules
 import GameServer.SaveData
+import GameServer.EnvExtensions
 
 namespace MyModule
 
@@ -60,8 +61,8 @@ open Snapshots
 open JsonRpc
 
 /--
-Game-specific state to be packed on top of the `Lean.Server.FileWorker.WorkerState`
-used by the lean server.
+Game-specific state to be packed on top of the `Server.FileWorker.WorkerState`
+used by the Lean server.
 -/
 structure WorkerState :=
   /--
@@ -84,7 +85,7 @@ structure WorkerState :=
 deriving ToJson, FromJson
 
 /--
-Pack the `GameServer.FileWorker.WorkerState` on top of the normal worker monad
+Pack the our custom `WorkerState` on top of the normal worker monad
 `Server.FileWorker.WorkerM`.
 -/
 abbrev WorkerM := StateT WorkerState Server.FileWorker.WorkerM
@@ -99,16 +100,6 @@ def addMessage (info : SourceInfo) (inputCtx : Parser.InputContext)
     messages := st.messages.add {
       fileName := inputCtx.fileName
       severity := severity
-      pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
-      data     := s }}
-
-/-- Deprecated! -/
-def addErrorMessage (info : SourceInfo) (inputCtx : Parser.InputContext) (s : MessageData) :
-    Elab.Command.CommandElabM Unit := do
-  modify fun st => { st with
-    messages := st.messages.add {
-      fileName := inputCtx.fileName
-      severity := MessageSeverity.error
       pos      := inputCtx.fileMap.toPosition (info.getPos?.getD 0)
       data     := s }}
 
@@ -322,6 +313,79 @@ where
     uri : String
   deriving ToJson, FromJson
 
+structure GameDiagnostics where
+  diagnostics : List Diagnostic
+deriving ToJson, FromJson
+
+structure GameParams where
+  uri : String
+  diagnostics : GameDiagnostics
+deriving ToJson, FromJson
+
+/-- WIP: publish diagnostics, all intermediate goals and if the game is completed. -/
+def publishProofState (m : DocumentMeta) (snap : Snapshot) (initParams : Lsp.InitializeParams) (hOut : FS.Stream) :
+    IO Unit := do
+  -- let text := m.text
+
+  -- -- `snap` is the one snapshot containing the entire proof.
+  -- let mut goals : Array <| InteractiveGoalsWithHints := #[]
+  -- for pos in text.positions do
+  --   let source := text.getLineBefore pos
+  --   -- iterate over all newlines in the proof and get the goals and hints at each position
+  --   if let goalsAtResult@(_ :: _) := snap.infoTree.goalsAt? text pos then
+  --     pure ()
+  --     let goalAtPos : List <| List InteractiveGoalWithHints ← goalsAtResult.mapM
+  --       fun { ctxInfo := ci, tacticInfo := tacticInfo, useAfter := useAfter, .. } => do
+  --         -- TODO: What does this function body do?
+  --         -- let ciAfter := { ci with mctx := ti.mctxAfter }
+  --         let ci := if useAfter then
+  --             { ci with mctx := tacticInfo.mctxAfter }
+  --           else
+  --             { ci with mctx := tacticInfo.mctxBefore }
+  --         -- compute the interactive goals
+  --         let goalMvars : List MVarId ← ci.runMetaM {} do
+  --           return if useAfter then tacticInfo.goalsAfter else tacticInfo.goalsBefore
+
+  --         let interactiveGoals : List InteractiveGoalWithHints ← ci.runMetaM {} do
+  --           goalMvars.mapM fun goal => do
+  --             let hints ← findHints goal m initParams
+  --             let interactiveGoal ← goalToInteractive goal
+  --             return ⟨interactiveGoal, hints⟩
+  --         -- TODO: This code is way old, can it be deleted?
+  --         -- compute the goal diff
+  --         -- let goals ← ciAfter.runMetaM {} (do
+  --         --     try
+  --         --       Widget.diffInteractiveGoals useAfter ti goals
+  --         --     catch _ =>
+  --         --       -- fail silently, since this is just a bonus feature
+  --         --       return goals
+  --         -- )
+  --         return interactiveGoals
+  --     let goalAtPos : Array InteractiveGoalWithHints := ⟨goalAtPos.foldl (· ++ ·) []⟩
+  --     goals := goals.push ⟨goalAtPos, source⟩
+  --   else
+  --     -- No goals present
+  --     goals := goals.push default
+
+  -- -- Question: Is there a difference between the diags of this snap and the last snap?
+  -- -- Should we get the diags from there?
+  -- let diag : Array Widget.InteractiveDiagnostic := snap.interactiveDiags.toArray
+
+  -- -- Level is completed if there are no errrors or warnings
+  -- let completed : Bool := ¬ diag.any (fun d =>
+  --   d.severity? == some .error ∨ d.severity? == some .warning)
+
+  -- let param : ProofState := {
+  --   steps := goals,
+  --   diagnostics := diag,
+  --   completed := completed }
+
+  -- TODO
+  let param := { uri := m.uri : GameCompletedParams}
+
+
+  hOut.writeLspNotification { method := "$/game/publishProofState", param }
+
   /-- Checks whether game level has been completed and sends a notification to the client -/
   def publishGameCompleted (m : DocumentMeta) (hOut : FS.Stream) (snaps : Array Snapshot) : IO Unit := do
     -- check if there is any error or warning
@@ -331,65 +395,51 @@ where
     let param := { uri := m.uri : GameCompletedParams}
     hOut.writeLspNotification { method := "$/game/completed", param }
 
-  /-- Elaborates the next command after `parentSnap` and emits diagnostics into `hOut`. -/
-  private def nextSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken)
-      (gameWorkerState : WorkerState) (initParams : Lsp.InitializeParams)
-      : AsyncElabM (Option Snapshot) := do
+  /-- copied from `Lean.Server.FileWorker.nextCmdSnap`. -/
+  -- @[inherit_doc Lean.Server.FileWorker.nextCmdSnap] -- cannot inherit from private
+  private def nextCmdSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken)
+      (gameWorkerState : WorkerState) (initParams : Lsp.InitializeParams) :
+      AsyncElabM (Option Snapshot) := do
     cancelTk.check
     let s ← get
     let .some lastSnap := s.snaps.back? | panic! "empty snapshots"
     if lastSnap.isAtEnd then
-      publishGameCompleted m ctx.hOut s.snaps
       publishDiagnostics m lastSnap.diagnostics.toArray ctx.hOut
       publishProgressDone m ctx.hOut
-      -- This will overwrite existing ilean info for the file, in case something
-      -- went wrong during the incremental updates.
       publishIleanInfoFinal m ctx.hOut s.snaps
       return none
     publishProgressAtPos m lastSnap.endPos ctx.hOut
+
+    -- (modified part)
     -- Make sure that there is at least one snap after the head snap, so that
     -- we can see the current goal even on an empty document
     let couldBeEndSnap := s.snaps.size > 1
     let snap ← compileProof m.mkInputContext lastSnap ctx.clientHasWidgets couldBeEndSnap
       gameWorkerState initParams
+
     set { s with snaps := s.snaps.push snap }
-    -- TODO(MH): check for interrupt with increased precision
     cancelTk.check
-    /- NOTE(MH): This relies on the client discarding old diagnostics upon receiving new ones
-      while preferring newer versions over old ones. The former is necessary because we do
-      not explicitly clear older diagnostics, while the latter is necessary because we do
-      not guarantee that diagnostics are emitted in order. Specifically, it may happen that
-      we interrupted this elaboration task right at this point and a newer elaboration task
-      emits diagnostics, after which we emit old diagnostics because we did not yet detect
-      the interrupt. Explicitly clearing diagnostics is difficult for a similar reason,
-      because we cannot guarantee that no further diagnostics are emitted after clearing
-      them. -/
-    -- NOTE(WN): this is *not* redundant even if there are no new diagnostics in this snapshot
-    -- because empty diagnostics clear existing error/information squiggles. Therefore we always
-    -- want to publish in case there was previously a message at this position.
+    publishProofState m snap initParams ctx.hOut
     publishDiagnostics m snap.diagnostics.toArray ctx.hOut
     publishIleanInfoUpdate m ctx.hOut #[snap]
     return some snap
 
-  /-- Elaborates all commands after the last snap (at least the header snap is assumed to exist), emitting the diagnostics into `hOut`. -/
-  def unfoldSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken)
+  -- Copied from `Lean.Server.FileWorker.unfoldCmdSnaps` using our own `nextCmdSnap`.
+  @[inherit_doc Lean.Server.FileWorker.unfoldCmdSnaps]
+  def unfoldCmdSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken)
       (startAfterMs : UInt32) (gameWorkerState : WorkerState)
       : ReaderT WorkerContext IO (AsyncList ElabTaskError Snapshot) := do
     let ctx ← read
     let some headerSnap := snaps[0]? | panic! "empty snapshots"
     if headerSnap.msgLog.hasErrors then
-      -- Treat header processing errors as fatal so users aren't swamped with
-      -- followup errors
       publishProgressAtPos m headerSnap.beginPos ctx.hOut (kind := LeanFileProgressKind.fatalError)
       publishIleanInfoFinal m ctx.hOut #[headerSnap]
       return AsyncList.ofList [headerSnap]
     else
-      -- This will overwrite existing ilean info for the file since this has a
-      -- higher version number.
       publishIleanInfoUpdate m ctx.hOut snaps
       return AsyncList.ofList snaps.toList ++ AsyncList.delayed (← EIO.asTask (ε := ElabTaskError) (prio := .dedicated) do
         IO.sleep startAfterMs
-        AsyncList.unfoldAsync (nextSnap ctx m cancelTk gameWorkerState ctx.initParams) { snaps })
+        AsyncList.unfoldAsync (nextCmdSnap ctx m cancelTk gameWorkerState ctx.initParams) { snaps })
 
 end Elab
 
@@ -439,7 +489,7 @@ def updateDocument (newMeta : DocumentMeta) : WorkerM Unit := do
         validSnaps := validSnaps.dropLast
     -- wait for a bit, giving the initial `cancelTk.check` in `nextCmdSnap` time to trigger
     -- before kicking off any expensive elaboration (TODO: make expensive elaboration cancelable)
-    unfoldSnaps newMeta validSnaps.toArray cancelTk s ctx
+    unfoldCmdSnaps newMeta validSnaps.toArray cancelTk s ctx
       (startAfterMs := ctx.initParams.editDelay.toUInt32)
   StateT.lift <| modify fun st => { st with
     doc := { meta := newMeta, cmdSnaps := AsyncList.delayed newSnaps, cancelTk }}
@@ -513,49 +563,52 @@ def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWid
     publishDiagnostics m headerSnap.diagnostics.toArray hOut
     return (headerSnap, srcSearchPath)
 
+/-- Copied from `Lean.Server.FileWorker.initializeWorker`. Added `gameDir` and
+`gameWorkerState` arguments and use custom `unfoldCmdSnaps`. -/
+-- @[inherit_doc Lean.Server.FileWorker.initializeWorker]
 def initializeWorker (meta : DocumentMeta) (i o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
     (gameDir : String) (gameWorkerState : WorkerState) : IO (WorkerContext × Server.FileWorker.WorkerState) := do
   let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
-
   let (headerStx, headerTask) ← compileHeader meta o opts (hasWidgets := clientHasWidgets)
-    gameDir gameWorkerState.levelInfo.module
+    (gameDir := gameDir) (module := gameWorkerState.levelInfo.module)
   let cancelTk ← CancelToken.new
-  let ctx :=
-    { hIn  := i
-      hOut := o
-      hLog := e
-      headerTask
-      initParams
-      clientHasWidgets
-    }
+  let ctx := {
+    hIn  := i
+    hOut := o
+    hLog := e
+    headerTask
+    initParams
+    clientHasWidgets
+  }
   let cmdSnaps ← EIO.mapTask (t := headerTask) (match · with
-    | Except.ok (s, _) => unfoldSnaps meta #[s] cancelTk gameWorkerState ctx (startAfterMs := 0)
+    | Except.ok (s, _) => unfoldCmdSnaps meta #[s] cancelTk gameWorkerState ctx (startAfterMs := 0)
     | Except.error e   => throw (e : ElabTaskError))
   let doc : EditableDocument := { meta, cmdSnaps := AsyncList.delayed cmdSnaps, cancelTk }
-  return (ctx,
-  { doc             := doc
-    initHeaderStx   := headerStx
+  return (ctx, {
+    doc                := doc
+    initHeaderStx      := headerStx
     currHeaderStx      := headerStx
     importCachingTask? := none
-    pendingRequests := RBMap.empty
-    rpcSessions     := RBMap.empty
+    pendingRequests    := RBMap.empty
+    rpcSessions        := RBMap.empty
   })
 
 end Initialization
 
 section NotificationHandling
 
+/-- Copied from `Lean.Server.FileWorker.handleDidChange` but with our custom `WorkerM` and
+`updateDocument` -/
+-- @[inherit_doc Lean.Server.FileWorker.handleDidChange]
 def handleDidChange (p : DidChangeTextDocumentParams) : WorkerM Unit := do
   let docId := p.textDocument
   let changes := p.contentChanges
-  let oldDoc := (← StateT.lift get).doc
-  let some newVersion ← pure docId.version?
-    | throwServerError "Expected version number"
-  if newVersion ≤ oldDoc.meta.version then
-    -- TODO(WN): This happens on restart sometimes.
-    IO.eprintln s!"Got outdated version number: {newVersion} ≤ {oldDoc.meta.version}"
-  else if ¬ changes.isEmpty then
+  let oldDoc := (← StateT.lift get).doc -- needed a lift to our custom `WorkerM`
+  let newVersion := docId.version?.getD 0
+  if ¬ changes.isEmpty then
     let newDocText := foldDocumentChanges changes oldDoc.meta.text
+    -- modification: set the `DependencyBuildMode` from
+    -- `oldDoc.meta.dependencyBuildMode` to `.always`
     updateDocument ⟨docId.uri, newVersion, newDocText, .always⟩
 
 end NotificationHandling
@@ -591,39 +644,34 @@ end MessageHandling
 section MainLoop
 
 /--
-Erase finished tasks if there are no errors.
+The main-loop. Copied from `Lean.Server.FileWorker.mainLoop`. Use custom `WorkerM` as well
+as custom `handleNotification`.
 -/
-private def filterFinishedTasks (acc : PendingRequestMap) (id : RequestID)
-    (task : Task (Except IO.Error Unit)) : IO PendingRequestMap := do
-  if (← hasFinished task) then
-    /- Handler tasks are constructed so that the only possible errors here
-    are failures of writing a response into the stream. -/
-    if let Except.error e := task.get then
-      throwServerError s!"Failed responding to request {id}: {e}"
-    pure <| acc.erase id
-  else pure acc
-
-/--
-The main-loop.
--/
+--@[inherit_doc Lean.Server.FileWorker.mainLoop]
 partial def mainLoop : WorkerM Unit := do
   let ctx ← read
   let mut st ← StateT.lift get
   let msg ← ctx.hIn.readLspMessage
-  let pendingRequests ← st.pendingRequests.foldM (fun acc id task =>
-    filterFinishedTasks acc id task) st.pendingRequests
+  -- Erase finished tasks if there are no errors.
+  let filterFinishedTasks (acc : PendingRequestMap) (id : RequestID) (task : Task (Except IO.Error Unit))
+      : IO PendingRequestMap := do
+    if (← hasFinished task) then
+      if let Except.error e := task.get then
+        throwServerError s!"Failed responding to request {id}: {e}"
+      pure <| acc.erase id
+    else pure acc
+  let pendingRequests ← st.pendingRequests.foldM (fun acc id task => filterFinishedTasks acc id task) st.pendingRequests
   st := { st with pendingRequests }
-  -- Opportunistically (i.e. when we wake up on messages) check if any RPC session has expired.
   for (id, seshRef) in st.rpcSessions do
     let sesh ← seshRef.get
     if (← sesh.hasExpired) then
       st := { st with rpcSessions := st.rpcSessions.erase id }
 
   set st
-
   -- Process the RPC-message and restart main-loop.
   match msg with
   | Message.request id "shutdown" none =>
+    --added. TODO: why do we need that? Or has it just removed in Lean since when we started?
     ctx.hOut.writeLspResponse ⟨id, Json.null⟩
     mainLoop
   | Message.request id method (some params) =>
@@ -633,6 +681,7 @@ partial def mainLoop : WorkerM Unit := do
   | Message.notification "exit" none =>
     let doc := st.doc
     doc.cancelTk.set
+    doc.cmdSnaps.cancel
     return ()
   | Message.notification method (some params) =>
     -- Custom notification handler
@@ -643,10 +692,15 @@ partial def mainLoop : WorkerM Unit := do
 
 end MainLoop
 
-
+/-- Modified from `Lean.Server.FileWorker.initAndRunWorker`.
+Added `gameDir` argument, -/
+-- @[inherit_doc Lean.Server.FileWorker.initAndRunWorker]
 def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : IO UInt32 := do
   let i ← maybeTee "fwIn.txt" false i
   let o ← maybeTee "fwOut.txt" true o
+
+
+  -- BIG MODIFICATION
   let initRequest ← i.readLspRequestAs "initialize" Game.InitializeParams
   o.writeLspResponse {
     id     := initRequest.id
@@ -662,16 +716,16 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : I
   discard $ i.readLspNotificationAs "initialized" InitializedParams
   let ⟨_, param⟩ ← i.readLspNotificationAs "textDocument/didOpen" DidOpenTextDocumentParams
 
+
   let doc := param.textDocument
-  /- NOTE(WN): `toFileMap` marks line beginnings as immediately following
-    "\n", which should be enough to handle both LF and CRLF correctly.
-    This is because LSP always refers to characters by (line, column),
-    so if we get the line number correct it shouldn't matter that there
-    is a CR there. -/
+  -- modification: using `.always`
   let meta : DocumentMeta := ⟨doc.uri, doc.version, doc.text.toFileMap, .always⟩
   let e := e.withPrefix s!"[{param.textDocument.uri}] "
   let _ ← IO.setStderr e
   try
+
+
+    -- BIG MODIFICATION
     let game ← loadGameData gameDir
     -- TODO: We misuse the `rootUri` field to the gameName
     let rootUri? : Option String := some (toString game.name)
@@ -691,6 +745,8 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : I
     -- Run the main loop
     let _ ← StateRefT'.run (s := st) <| ReaderT.run (r := ctx) <|
       StateT.run (s := gameWorkerState) <| (mainLoop)
+
+
     return (0 : UInt32)
   catch e =>
     IO.eprintln e
@@ -703,8 +759,12 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : I
 /--
 The main function. Simply wrapping `initAndRunWorker`.
 
+Copied from `Lean.Server.FileWorker.workerMain`. We add `args` as an argument to pass on
+the `gameDir`.
+
 TODO: The first arg `args[0]` is always expected to be `--server`. We could drop this completely.
 -/
+-- @[inherit_doc Lean.Server.FileWorker.workerMain]
 def workerMain (opts : Options) (args : List String): IO UInt32 := do
   let i ← IO.getStdin
   let o ← IO.getStdout
@@ -712,9 +772,6 @@ def workerMain (opts : Options) (args : List String): IO UInt32 := do
   try
     let some gameDir := args[1]? | throwServerError "Expected second argument: gameDir"
     let exitCode ← initAndRunWorker i o e opts gameDir
-    -- HACK: all `Task`s are currently "foreground", i.e. we join on them on main thread exit,
-    -- but we definitely don't want to do that in the case of the worker processes,
-    -- which can produce non-terminating tasks evaluating user code.
     o.flush
     e.flush
     IO.Process.exit exitCode.toUInt8

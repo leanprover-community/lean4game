@@ -7,7 +7,6 @@ open Widget
 open RequestM
 open Meta
 
-
 /-! ## GameGoal -/
 
 namespace GameServer
@@ -113,10 +112,10 @@ def evalHintMessage : Expr → MetaM (Array Expr → MessageData) := fun _ => pu
 
 open Meta in
 /-- Find all hints whose trigger matches the current goal -/
-def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) (initParams : Lsp.InitializeParams) : MetaM (Array GameHint) := do
+def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializeParams) : MetaM (Array GameHint) := do
   goal.withContext do
-    let some level ← getLevelByFileName? initParams doc.meta.mkInputContext.fileName
-      | throwError "Level not found: {doc.meta.mkInputContext.fileName}"
+    let some level ← getLevelByFileName? initParams m.mkInputContext.fileName
+      | throwError "Level not found: {m.mkInputContext.fileName}"
     let hints ← level.hints.filterMapM fun hint => do
       openAbstractCtxResult hint.goal fun hintFVars hintGoal => do
         if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
@@ -134,8 +133,212 @@ def findHints (goal : MVarId) (doc : FileWorker.EditableDocument) (initParams : 
           return none
     return hints
 
+/-- Get the line that ends in `pos`. Note that `pos` is expected to be the
+position of a `\n` but this is not enforced. -/
+def _root_.Lean.FileMap.getLineBefore (fmap : FileMap) (pos : String.Pos) : String := Id.run do
+  match fmap.positions.findIdx? (· == pos) with
+  | none =>
+    panic s!"Position {pos} is not a newline character in " ++
+      s!"the following string: '{fmap.source}'!"
+  | some 0 =>
+    -- the first entry of `positions` is always `0`
+    return ""
+  | some (i + 1) =>
+    let line : Substring := ⟨fmap.source, fmap.positions.get! i, pos⟩
+    return line.toString
+
+/-- Returns the `List` without the last element. -/
+def _root_.List.dropBack {α : Type _} : List α → List α
+| [] => []
+| _ :: [] => []
+| x :: xs => x :: xs.dropBack
+
+/-- Trim empty lines from the file and add a single newline. -/
+def _root_.Lean.FileMap.trim (fmap : FileMap) : FileMap :=
+  let str := match fmap.source.trim with
+  | "" => ""
+  | s => s ++ "\n"
+  FileMap.ofString str
+
+/-- Returns the `Array` without the last element. -/
+def _root_.Array.dropBack {α : Type _} (a : Array α) : Array α := ⟨a.data.dropBack⟩
+
+/-- Add custom diagnostics about whether the level is completed. -/
+def addCompletionDiagnostics (diag : Array InteractiveDiagnostic) (goals : Array InteractiveGoalWithHints)
+    (pos : Lsp.Position) (prevGoalCount : Nat) : RequestM <| Array InteractiveDiagnostic := do
+  let mut out : Array InteractiveDiagnostic := diag
+
+  if goals.size == 0 then
+    if diag.any (·.severity? == some .error) then
+      pure ()
+    else if diag.any (·.severity? == some .warning) then
+      out := out.push {
+        message := .text "level completed with warnings. 🎭"
+        range := {
+          start := pos
+          «end» := pos
+          }
+        severity? := Lsp.DiagnosticSeverity.information }
+    else
+      out := out.push {
+        message := .text "level completed! 🎉"
+        range := {
+          start := pos
+          «end» := pos
+          }
+        severity? := Lsp.DiagnosticSeverity.information }
+  else if goals.size < prevGoalCount then
+    out := out.push {
+      message := .text "intermediate goal solved! 🎉"
+      range := {
+        start := pos
+        «end» := pos
+        }
+      severity? := Lsp.DiagnosticSeverity.information
+    }
+
+
+  return out
+          -- diagsAtPos := if goalsAtPos.size < intermediateGoalCount then
+          --   diagsAtPos.push {
+          --     message := .text "intermediate goal solved 🎉"
+          --     range := {
+          --       start := lspPosAt
+          --       «end» := lspPosAt
+          --       }
+          --     severity? := Lsp.DiagnosticSeverity.information
+          --   }
+          --   else diagsAtPos
+
+/-- Request that returns the goals at the end of each line of the tactic proof
+plus the diagnostics (i.e. warnings/errors) for the proof.
+ -/
+def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option ProofState)) := do
+  let doc ← readDoc
+  let rc ← readThe RequestContext
+  let text := doc.meta.text.trim
+
+  -- BUG: trimming here is a problem, since the snap might already be evaluated before
+  -- the trimming and then the positions don't match anymore :((
+
+  withWaitFindSnap
+    doc
+    -- TODO (Alex): I couldn't find a good condition to find the correct snap. So we are looking
+    -- for the first snap with goals here.
+    -- NOTE (Jon): The entire proof is in one snap, so hoped that Position `0` is good enough.
+    (fun snap => ¬ (snap.infoTree.goalsAt? doc.meta.text 0).isEmpty)
+    (notFoundX := return none)
+    fun snap => do
+      -- `snap` is the one snapshot containing the entire proof.
+      let mut steps : Array <| InteractiveGoalsWithHints := #[]
+
+      -- Question: Is there a difference between the diags of this snap and the last snap?
+      -- Should we get the diags from there?
+      -- Answer: The last snap only copied the diags from the end of this snap
+      let mut diag : Array InteractiveDiagnostic := snap.interactiveDiags.toArray
+
+      let mut intermediateGoalCount := 0
+
+      -- Drop the last position as we ensured that there is always a newline at the end
+      for pos in text.positions.dropBack do
+        -- iterate over all newlines in the proof and get the goals and hints at each position
+        -- TODO: we drop the last position because we always have a newline. Would be better
+        -- to trim newlines instead before submitting!
+        let source := text.getLineBefore pos
+
+        if let goalsAtResult@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text pos then
+          pure ()
+          let goalAtPos : List <| List InteractiveGoalWithHints ← goalsAtResult.mapM
+            fun { ctxInfo := ci, tacticInfo := tacticInfo, useAfter := useAfter, .. } => do
+              -- TODO: What does this function body do?
+              -- let ciAfter := { ci with mctx := ti.mctxAfter }
+              let ci := if useAfter then
+                  { ci with mctx := tacticInfo.mctxAfter }
+                else
+                  { ci with mctx := tacticInfo.mctxBefore }
+              -- compute the interactive goals
+              let goalMvars : List MVarId ← ci.runMetaM {} do
+                return if useAfter then tacticInfo.goalsAfter else tacticInfo.goalsBefore
+
+              let interactiveGoals : List InteractiveGoalWithHints ← ci.runMetaM {} do
+                goalMvars.mapM fun goal => do
+                  let hints ← findHints goal doc.meta rc.initParams
+                  let interactiveGoal ← goalToInteractive goal
+                  return ⟨interactiveGoal, hints⟩
+              -- TODO: This code is way old, can it be deleted?
+              -- compute the goal diff
+              -- let goals ← ciAfter.runMetaM {} (do
+              --     try
+              --       Widget.diffInteractiveGoals useAfter ti goals
+              --     catch _ =>
+              --       -- fail silently, since this is just a bonus feature
+              --       return goals
+              -- )
+              return interactiveGoals
+          let goalsAtPos : Array InteractiveGoalWithHints := ⟨goalAtPos.foldl (· ++ ·) []⟩
+
+          -- diags are labeled in Lsp-positions, which differ from the lean-internal
+          -- positions by `1`.
+          let lspPosAt := text.utf8PosToLspPos pos
+
+          let mut diagsAtPos : Array InteractiveDiagnostic :=
+            -- `+1` for getting the errors after the line.
+            diag.filter (·.range.start.line + 1 == lspPosAt.line)
+
+          diagsAtPos ← addCompletionDiagnostics diagsAtPos goalsAtPos lspPosAt intermediateGoalCount
+
+          intermediateGoalCount := goalsAtPos.size
+
+          steps := steps.push ⟨goalsAtPos, source, diagsAtPos, lspPosAt.line, lspPosAt.character⟩
+        else
+          -- No goals present
+          steps := steps.push default
+
+
+
+      --       //   if (goals.length && goalCount > goals.length) {
+      -- //     messages.unshift({
+      -- //       range: {
+      -- //         start: {
+      -- //           line: i-1,
+      -- //           character: 0,
+      -- //         },
+      -- //         end: {
+      -- //           line: i-1,
+      -- //           character: 0,
+      -- //         }},
+      -- //       severity: DiagnosticSeverity.Information,
+      -- //       message: {
+      -- //       text: 'intermediate goal solved 🎉'
+      -- //       }
+      -- //     })
+      -- //   }
+
+      -- Level is completed if there are no errrors or warnings
+
+      let completedWithWarnings : Bool := ¬ diag.any (·.severity? == some .error)
+      let completed : Bool := completedWithWarnings ∧ ¬ diag.any (·.severity? == some .warning)
+
+      -- Filter out the "unsolved goals" message
+      diag := diag.filter (fun d => match d.message with
+        | .append ⟨(.text x) :: _⟩ => x != "unsolved goals"
+        | _ => true)
+
+      let lastPos := text.utf8PosToLspPos text.positions.back
+      let remainingDiags : Array InteractiveDiagnostic :=
+        diag.filter (fun d => d.range.start.line >= lastPos.line)
+
+      return some {
+        steps := steps,
+        diagnostics := remainingDiags,
+        completed := completed,
+        completedWithWarnings := completedWithWarnings,
+        lastPos := lastPos.line
+        }
+
 open RequestM in
-def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option InteractiveGoals)) := do
+
+def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option <| InteractiveGoals)) := do
   let doc ← readDoc
   let rc ← readThe RequestContext
   let text := doc.meta.text
@@ -145,7 +348,7 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
   withWaitFindSnap doc (fun s => ¬ (s.infoTree.goalsAt? doc.meta.text hoverPos).isEmpty)
     (notFoundX := return none) fun snap => do
       if let rs@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text hoverPos then
-        let goals : List InteractiveGoals ← rs.mapM fun { ctxInfo := ci, tacticInfo := ti, useAfter := useAfter, .. } => do
+        let goals : List <| Array InteractiveGoal ← rs.mapM fun { ctxInfo := ci, tacticInfo := ti, useAfter := useAfter, .. } => do
           let ciAfter := { ci with mctx := ti.mctxAfter }
           let ci := if useAfter then ciAfter else { ci with mctx := ti.mctxBefore }
           -- compute the interactive goals
@@ -153,8 +356,8 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
             return List.toArray <| if useAfter then ti.goalsAfter else ti.goalsBefore
           let goals ← ci.runMetaM {} do
              goals.mapM fun goal => do
-              let hints ← findHints goal doc rc.initParams
-              return ← goalToInteractive goal hints
+              -- let hints ← findHints goal doc.meta rc.initParams
+              return ← goalToInteractive goal
           -- compute the goal diff
           -- let goals ← ciAfter.runMetaM {} (do
           --     try
@@ -163,8 +366,8 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
           --       -- fail silently, since this is just a bonus feature
           --       return goals
           -- )
-          return {goals}
-        return some <| goals.foldl (· ++ ·) ⟨#[]⟩
+          return goals
+        return some <| ⟨goals.foldl (· ++ ·) #[]⟩
       else
         return none
 
@@ -172,7 +375,16 @@ builtin_initialize
   registerBuiltinRpcProcedure
     `Game.getInteractiveGoals
     Lsp.PlainGoalParams
-    (Option InteractiveGoals)
+    (Option <| InteractiveGoals
+    )
     getInteractiveGoals
+
+builtin_initialize
+  registerBuiltinRpcProcedure
+    `Game.getProofState
+    Lsp.PlainGoalParams
+    (Option ProofState)
+    getProofState
+
 
 end GameServer

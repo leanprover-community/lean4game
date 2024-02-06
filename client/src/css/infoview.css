@@ -188,6 +188,18 @@
   flex-direction: row;
 }
 
+.exercise .failed-command {
+  background-color: #eee;
+  padding: .5em;
+  border-radius: .2em;
+  /* TODO: It seems my browsers merge the margings of the proof steps,
+  so that it only shows once 0.5rem instead of twice. Thus have 1.5 here now.
+  */
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: row;
+}
+
 .exercise .command-text {
   flex: 1;
   background-color: #fff;
