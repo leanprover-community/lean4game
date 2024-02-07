@@ -6,7 +6,7 @@ In order to set up the server to allow imports, one needs to create a
 repos will suffice.
 
 You need to set the environment variables `LEAN4GAME_GITHUB_USER` and `LEAN4GAME_GITHUB_TOKEN`
-with your user name and access token. For example, you can seet these in `ecosystem.config.cjs` if
+with your user name and access token. For example, you can set these in `ecosystem.config.cjs` if
 you're using `pm2`
 
 Then people can call:
@@ -22,7 +22,7 @@ where you replace:
 
 > https://{website}/#/g/{owner}/{repo}
 
-## data management
+## Data management
 Everything downloaded remains in the folder `lean4game/games`.
-the subfolder `tmp` contains downloaded artifacts and can be deleted without loss.
+The subfolder `tmp` contains downloaded artifacts and can be deleted without loss.
 The other folders should only contain the built lean-games, sorted by owner and repo.

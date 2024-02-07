@@ -1,6 +1,6 @@
 # Publishing games
 
-You can publish your game on the official (Lean Game Server)[https://adam.math.hhu.de] in a few simple
+You can publish your game on the official [Lean Game Server](https://adam.math.hhu.de) in a few simple
 steps.
 
 ## 1. Upload Game to github
@@ -11,7 +11,7 @@ tab.
 
 ## 2. Import the game
 
-You call the URL that's listed under "What's Next?" in the latest action run. Explicitely you call
+You call the URL that's listed under "What's Next?" in the latest action run. Explicitly you call
 the URL of the form
 
 > adam.math.hhu.de/import/trigger/{USER}/{REPOSITORY}

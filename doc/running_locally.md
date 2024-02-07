@@ -2,6 +2,8 @@
 
 The installation instructions are not yet tested on Mac/Windows. Comments very welcome!
 
+Please also consult the [Troubleshooting Collection](troubleshoot.md), where some known pitfalls are collected.
+
 There are several options to play a game locally:
 
 1. VSCode Dev Container: needs `docker` installed on your machine
@@ -31,24 +33,14 @@ The template game [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) conta
 
     * The first start will take a while, ca. 2-15 minutes. After the first
       start this should be very quickly.
-    * Once built, you can open http://localhost:3000 in your browser. which should load the game.
+    * Once built, you can open http://localhost:3000 in your browser, which should load the game.
 
 3.  **Editing Files** *(everytime)*:<br/>
     After editing some Lean files in VSCode, open VSCode's terminal (View > Terminal) and run `lake build`. Now you can reload your browser to see the changes.
 
-### Errors
-
-* If you don't get the pop-up, you might have disabled them and you can reenable it by
-  running the `remote-containers.showReopenInContainerNotificationReset` command in vscode.
-* If the starting the container fails, in particular with a message `Error: network xyz not found`,
-  you might have deleted stuff from docker via your shell. Try deleting the container and image
-  explicitely in VSCode (left side, "Docker" icon). Then reopen vscode and let it rebuild the
-  container. (this will again take some time)
-* On a working dev container setup, http://localhost:3000 should directly redirect you to http://localhost:3000/#/g/local/game, try if the latter is accessible.
-
 ## Codespaces
 
-You can work on your game using Github codespaces (click "Code" and then "Codespaces" and then "create codespace on main"). It it should run the game locally in the background. You can open it for example under "Ports" and clicking on "Open in Browser".
+You can work on your game using Github codespaces (click "Code" and then "Codespaces" and then "create codespace on main"). It should run the game locally in the background. You can open it for example under "Ports" and clicking on "Open in Browser".
 
 Note: You have to wait until npm started properly, which might take a good while.
 
@@ -106,6 +98,29 @@ npm install
 Run the game:
 ```bash
 npm start
+```
+
+You should see a message like this:
+```bash
+[server] > lean4-game@0.1.0 start_server
+[server] > (cd server && lake build) && (cd relay && cross-env NODE_ENV=development nodemon -e mjs --exec "node ./index.mjs")
+[server]
+[client]
+[client] > lean4-game@0.1.0 start_client
+[client] > cross-env NODE_ENV=development vite --host
+[client]
+[server] [nodemon] 3.0.#
+[server] [nodemon] to restart at any time, enter `rs`
+[server] [nodemon] watching path(s): *.*
+[server] [nodemon] watching extensions: mjs
+[server] [nodemon] starting `node ./index.mjs`
+[client]
+[client]   VITE v4.5.1  ready in \#\#\# ms
+[client]
+[client]   ➜  Local:   http://localhost:3000/
+[client]   ➜  Network: http://###.###.###.##:3000/
+[client] [vite-plugin-static-copy] Collected 7 items.
+[server] (node:#####) [DEP0040] [server] Listening on 8080
 ```
 
 This takes a little time. Eventually, the game is available on http://localhost:3000/#/g/local/GameSkeleton. Replace `GameSkeleton` with the folder name of your local game.

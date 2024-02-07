@@ -28,3 +28,7 @@ do
   #tar -xvzf $f -C games/${OWNER}/${REPO}
   unzip -q -o $f -d ${OWNER}/${REPO}
 done
+
+# Delete temporary files
+rm -f tmp/${OWNER}_${REPO}_${ARTIFACT_ID}.zip
+rm -fr tmp/${OWNER}_${REPO}_${ARTIFACT_ID}

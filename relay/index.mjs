@@ -19,7 +19,8 @@ import { importTrigger, importStatus } from './import.mjs'
 const queueLength = {
   "g/hhu-adam/robo": 2,
   "g/hhu-adam/nng4": 5,
-  "g/djvelleman/stg4": 2,
+  "g/djvelleman/stg4": 0,
+  "g/trequetrum/lean4game-logic": 0,
 }
 
 const __filename = url.fileURLToPath(import.meta.url);

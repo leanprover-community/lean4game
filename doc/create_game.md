@@ -98,7 +98,7 @@ This introduction text is shown when one first enters a world.
 1. Use the template above and make sure you import all levels of this world.
 1. In `Game.lean` import the world with `import Game.Levels.MyWorld`
 
-Now you created a world with one level and added it🎉 The command `MakeGame` in `Game.lean` shows you any problems you might need to fix. Currently it shows
+Now you created a world with one level and added it🎉 The command `MakeGame` in `Game.lean` shows you any problems you might need to fix. Currently, it shows
 
 ```text
 No world introducing sorry, but required by MyWorld
@@ -125,26 +125,32 @@ The player has an inventory with tactics, theorems, and definitions that unlock 
 
 ```lean
 NewTactic induction simp
-NewLemma Nat.zero_mul
+NewTheorem Nat.zero_mul
 NewDefinition Pow
 ```
 
 **Important:** All commands in this section 6a) expect the `Name` they take as input
-to be **fully qualified**. For example `NewLemma Nat.zero_mul` and not `NewLemma zero_mul`.
+to be **fully qualified**. For example `NewTheorem Nat.zero_mul` and not `NewTheorem zero_mul`.
 
 #### Doc entries
 
-You'll see a warning about a missing Lemma documentation. You can fix it by adding doc-entries like the following somewhere above it.
+You'll see a warning about a missing Theorem documentation. You can fix it by adding doc-entries like the following somewhere above it.
 
 ```lean
-LemmaDoc Nat.zero_mul as "zero_mul" in "Mul"
-"some description"
+/--
+some description
+-/
+TheoremDoc Nat.zero_mul as "zero_mul" in "Mul"
 
+/--
+some description
+-/
 TacticDoc simp
-"some description"
 
+/--
+some description
+-/
 DefinitionDoc Pow as "^"
-"some description"
 ```
 
 (e.g. you could also create a file `Game/Doc/MyTheorems.lean`, add there your documentation and import it)
@@ -156,7 +162,7 @@ If you do not provide any content for the inventory, the game will try to find a
 You have a few options to disable inventory items that have been unlocked in previous levels:
 
 ```lean
-DisableTactic, DisableLemma, OnlyTactic, OnlyLemma
+DisabledTactic, DisabledTheorem, OnlyTactic, OnlyTheorem
 ```
 
 have the same syntax as above. The former two disable items for this level, the latter two
@@ -164,7 +170,7 @@ disable all items except the ones specified.
 
 #### Theorem Tab
 
-Theorems are sorted into tabs. with `LemmaTab "Mul"` you specify which tab should be open by default in this level.
+Theorems are sorted into tabs. With `TheoremTab "Mul"` you specify which tab should be open by default in this level.
 
 #### HiddenTactic
 
@@ -179,7 +185,7 @@ and only `rw` would show up in the inventory.
 
 ### 6. b) Statement
 
-The statement is the exercise of the level. the basics work the same as they would in `example` or `theorem`. Note however, that you **must** do a tactic proof, i.e. the `:= by` is a hard-coded part of the syntax
+The statement is the exercise of the level. The basics work the same as they would in `example` or `theorem`. Note however, that you **must** do a tactic proof, i.e. the `:= by` is a hard-coded part of the syntax
 
 #### Name
 
@@ -210,12 +216,12 @@ Statement my_simp_lemma ...
 
 The proof must always be a tactic proof, i.e. `:= by` is a mandatory part of the syntax.
 
-There are a few extra tactics that help you structuring the proof:
+There are a few extra tactics that help you with structuring the proof:
 
 - `Hint`: You can use `Hint "text"` to display text if the goal state in-game matches
   the one where `Hint` is placed. For more options about hints, see below.
 - `Branch`: In the proof you can add a `Branch` that runs an alternative tactic sequence, which
-  helps setting `Hints` in different places. The `Branch` does not affect the main
+  helps to set `Hints` in different places. The `Branch` does not affect the main
   proof and does not need to finish any goals.
 - `Template`/`Hole`: Used to provide a sample proof template. Anything inside `Template`
   will be copied into the editor with all `Hole`s replaced with `sorry`. Note that
@@ -230,7 +236,7 @@ Most important for game development are probably the `Hints`.
 The hints will be displayed whenever the player's current goal matches the goal the hint is
 placed at inside the sample proof. You can use `Branch` to place hints in dead ends or alternative proof strands.
 
-Read [More about Hints](doc/hints.md) for how they work and what the options are.
+Read [More about Hints](hints.md) for how they work and what the options are.
 
 ### 6. e) Extra: Images
 You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
@@ -242,11 +248,11 @@ NOTE: At present, only the images for a world are displayed. They appear in the 
 
 ## 7. Update your game
 
-In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](doc/update_game.md).
+In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](update_game.md).
 
 ## 8. Publish your game
 
-To publish your game on the official server, see [Publishing a game](doc/publish_game.md)
+To publish your game on the official server, see [Publishing a game](publish_game.md)
 
 There are a few more options you can add in `Game.lean` before the `MakeGame` command, which describe the tile that is visible on the server's landing page:
 
@@ -258,7 +264,7 @@ Prerequisites "NNG"
 CoverImage "images/cover.png"
 ```
 * `Languages`: Currently only a single language (capital English name). The tile will show a corresponding flag.
-* `CaptionShort`: One catch phrase. Appears above the image.
+* `CaptionShort`: One catchphrase. Appears above the image.
 * `CaptionLong`: 2-4 sentences to describe the game.
 * `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
 * `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.

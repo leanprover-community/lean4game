@@ -9,6 +9,7 @@ Please follow the tutorial [Creating a Game](doc/create_game.md). In particular,
 * Step 5: [How to Run Games Locally](doc/running_locally.md)
 * Step 7: [How to Update an existing Game](doc/update_game.md)
 * Step 8: [How to Publishing a Game](doc/publish_game.md)
+* [Troubleshooting](doc/troubleshoot.md)
 
 ## Documentation
 
