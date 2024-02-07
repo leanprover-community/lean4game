@@ -254,7 +254,7 @@ function useIsProcessingAt(p: DocumentPosition): boolean {
 
 function InfoAux(props: InfoProps) {
 
-    const proofContext = React.useContext(ProofContext)
+    const { setProof } = React.useContext(ProofContext)
 
     const config = React.useContext(ConfigContext)
 
@@ -420,6 +420,11 @@ function InfoAux(props: InfoProps) {
           //   hintContext.setHints(state.value.goals.goals[0].hints)
           // }
           setDisplayProps({ ...state.value, triggerUpdate })
+
+          // Update the game's proof state
+          console.info('updating proof from editor mode.')
+          setProof(state.value.proof)
+
         } else if (state.state === 'rejected' && state.error !== 'retry') {
             // The code inside `useAsyncWithTrigger` may only ever reject with a `retry` exception.
             console.warn('Unreachable code reached with error: ', state.error)
