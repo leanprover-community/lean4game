@@ -155,7 +155,20 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
 
   const { proof, setProof } = React.useContext(ProofContext)
+  const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
+  const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
 
+
+  function toggleSelection(line: number) {
+    return (ev) => {
+      console.debug('toggled selection')
+      if (selectedStep == line) {
+        setSelectedStep(undefined)
+      } else {
+        setSelectedStep(line)
+      }
+    }
+  }
   console.debug(`template: ${props.data?.template}`)
 
   // React.useEffect (() => {
@@ -181,6 +194,19 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
   );
 
   const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
+
+  const curPos: DocumentPosition | undefined =
+    useEventResult(ec.events.changedCursorLocation, loc => loc ? { uri: loc.uri, ...loc.range.start } : undefined)
+
+  // Effect when the cursor changes in the editor
+  React.useEffect(() => {
+    // TODO: this is a bit of a hack and will yield unexpected behaviour if lines
+    // are indented.
+    let newPos = curPos?.line + (curPos?.character == 0 ? 0 : 1)
+
+    // scroll the chat along
+    setSelectedStep(newPos)
+  }, [curPos])
 
   useClientNotificationEffect(
     'textDocument/didClose',
@@ -208,6 +234,11 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
     ret = <div className="infoview vscode-light">
       {proof.completed && <div className="level-completed">Level completed! 🎉</div>}
       <Infos />
+      <Hints hints={proof.steps[curPos?.line]?.goals[0]?.hints}
+        showHidden={showHelp.has(curPos?.line)} step={curPos?.line}
+        selected={selectedStep} toggleSelection={toggleSelection(curPos?.line)}
+        lastLevel={curPos?.line == proof.steps.length - 1}/>
+      <MoreHelpButton selected={curPos?.line}/>
     </div>
   }
 

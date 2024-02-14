@@ -68,12 +68,12 @@ function hasHiddenHints(step: InteractiveGoalsWithHints): boolean {
 }
 
 
-export function MoreHelpButton() {
+export function MoreHelpButton({selected=null} : {selected?: number}) {
 
   const {proof, setProof} = React.useContext(ProofContext)
   const {deletedChat, setDeletedChat, showHelp, setShowHelp} = React.useContext(DeletedChatContext)
 
-  let k = proof.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
+  let k = (selected === null) ? (proof.steps.length - (lastStepHasErrors(proof) ? 2 : 1)) : selected
 
   const activateHiddenHints = (ev) => {
     // If the last step (`k`) has errors, we want the hidden hints from the

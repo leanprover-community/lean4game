@@ -194,16 +194,24 @@ export function AllMessages() {
                 </a>
             </span>
         </summary> */}
-        <AllMessagesBody uri={curPos.uri} key={curPos.uri} messages={iDiags0} />
+        <AllMessagesBody uri={curPos.uri} key={curPos.uri} messages={iDiags0} curPos={curPos} />
     {/* </Details> */}
     </RpcContext.Provider>
     )
 }
 
 /** We factor out the body of {@link AllMessages} which lazily fetches its contents only when expanded. */
-function AllMessagesBody({uri, messages}: {uri: DocumentUri, messages: () => Promise<InteractiveDiagnostic[]>}) {
+function AllMessagesBody({uri, curPos, messages}: {uri: DocumentUri, curPos: DocumentPosition | undefined , messages: () => Promise<InteractiveDiagnostic[]>}) {
     const [msgs, setMsgs] = React.useState<InteractiveDiagnostic[] | undefined>(undefined)
-    React.useEffect(() => { void messages().then(setMsgs) }, [messages])
+    React.useEffect(() => { void messages().then(
+        msgs => setMsgs(msgs.filter(
+            (d)=>{
+                //console.log(`message start: ${d.range.start.line}. CurPos: ${curPos.line}`)
+
+                // Only show the messages from the line where the cursor is.
+                return d.range.start.line == curPos.line
+            }))
+    ) }, [messages, curPos])
     if (msgs === undefined) return <div>Loading messages...</div>
     else return <MessagesList uri={uri} messages={msgs}/>
 }

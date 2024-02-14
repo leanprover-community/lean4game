@@ -73,7 +73,7 @@ function Level() {
   </WorldLevelIdContext.Provider>
 }
 
-function ChatPanel({lastLevel}) {
+function ChatPanel({lastLevel, visible = true}) {
   const chatRef = useRef<HTMLDivElement>(null)
   const {mobile} = useContext(PreferencesContext)
   const gameId = useContext(GameIdContext)
@@ -122,7 +122,7 @@ function ChatPanel({lastLevel}) {
 
   let introText: Array<string> = level?.data?.introduction.split(/\n(\s*\n)+/)
 
-  return <div className="chat-panel">
+  return <div className={`chat-panel ${visible ? '' : 'hidden'}`}>
     <div ref={chatRef} className="chat">
       {introText?.filter(t => t.trim()).map(((t, i) =>
         // Show the level's intro text as hints, too
@@ -177,7 +177,7 @@ function ChatPanel({lastLevel}) {
 }
 
 
-function ExercisePanel({codeviewRef, visible=true}) {
+function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
@@ -602,7 +602,7 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
     setInfoProvider(infoProvider)
 
     // TODO: it looks like we get errors "File Changed" here.
-    client.restart()
+    client.restart("Lean4Game")
 
     const editorApi = infoProvider.getApi()
 
