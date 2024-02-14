@@ -130,7 +130,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
           </div>
           <div>
             { goals && (goals.goals.length > 0
-              ? <Goal typewriter={true} filter={goalFilter} key='mainGoal' goal={goals[0]?.goal} showHints={true} />
+              ? <Goal typewriter={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />
               : <div className="goals-section-title">No Goals</div>
             )}
           </div>
