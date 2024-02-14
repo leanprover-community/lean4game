@@ -304,7 +304,7 @@ where
   private def publishIleanInfo (method : String) (m : DocumentMeta) (hOut : FS.Stream)
       (snaps : Array Snapshot) : IO Unit := do
     let trees := snaps.map fun snap => snap.infoTree
-    let references := findModuleRefs m.text trees (localVars := true)
+    let references ← findModuleRefs m.text trees (localVars := true) |>.toLspModuleRefs
     let param := { version := m.version, references : LeanIleanInfoParams }
     hOut.writeLspNotification { method, param }
 
@@ -508,6 +508,12 @@ def DocumentMeta.mkInputContext (doc : DocumentMeta) : Parser.InputContext where
   fileName := (System.Uri.fileUriToPath? doc.uri).getD doc.uri |>.toString
   fileMap  := default
 
+/-- `gameDir` and `module` were added.
+
+TODO: In general this resembles little similarity with the
+original code, and I don't know why...
+-/
+-- @[inherit_doc Lean.Server.FileWorker.compileHeader]
 def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWidgets : Bool)
     (gameDir : String) (module : Name):
     IO (Syntax × Task (Except Error (Snapshot × SearchPath))) := do
@@ -543,7 +549,7 @@ def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWid
     let cmdState := Elab.Command.mkState headerEnv {} opts
     let cmdState := { cmdState with infoState := {
       enabled := true
-      trees := #[Elab.InfoTree.context ({
+      trees := #[Elab.InfoTree.context (.commandCtx {
         env     := headerEnv
         fileMap := m.text
         ngen    := { namePrefix := `_worker }
@@ -560,7 +566,7 @@ def compileHeader (m : DocumentMeta) (hOut : FS.Stream) (opts : Options) (hasWid
     let headerSnap := {
       beginPos := 0
       stx := headerStx
-      mpState := {}
+      mpState := {} -- was `headerParserState`
       cmdState := cmdState
       interactiveDiags := ← cmdState.messages.msgs.mapM (Widget.msgToInteractiveDiagnostic m.text · hasWidgets)
       tacticCache := (← IO.mkRef {})
