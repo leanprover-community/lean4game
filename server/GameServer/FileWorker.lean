@@ -386,60 +386,60 @@ def publishProofState (m : DocumentMeta) (snap : Snapshot) (initParams : Lsp.Ini
 
   hOut.writeLspNotification { method := "$/game/publishProofState", param }
 
-  /-- Checks whether game level has been completed and sends a notification to the client -/
-  def publishGameCompleted (m : DocumentMeta) (hOut : FS.Stream) (snaps : Array Snapshot) : IO Unit := do
-    -- check if there is any error or warning
-    for snap in snaps do
-      if snap.diagnostics.any fun d => d.severity? == some .error ∨ d.severity? == some .warning
-      then return
-    let param := { uri := m.uri : GameCompletedParams}
-    hOut.writeLspNotification { method := "$/game/completed", param }
+/-- Checks whether game level has been completed and sends a notification to the client -/
+def publishGameCompleted (m : DocumentMeta) (hOut : FS.Stream) (snaps : Array Snapshot) : IO Unit := do
+  -- check if there is any error or warning
+  for snap in snaps do
+    if snap.diagnostics.any fun d => d.severity? == some .error ∨ d.severity? == some .warning
+    then return
+  let param := { uri := m.uri : GameCompletedParams}
+  hOut.writeLspNotification { method := "$/game/completed", param }
 
-  /-- copied from `Lean.Server.FileWorker.nextCmdSnap`. -/
-  -- @[inherit_doc Lean.Server.FileWorker.nextCmdSnap] -- cannot inherit from private
-  private def nextCmdSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken)
-      (gameWorkerState : WorkerState) (initParams : Lsp.InitializeParams) :
-      AsyncElabM (Option Snapshot) := do
-    cancelTk.check
-    let s ← get
-    let .some lastSnap := s.snaps.back? | panic! "empty snapshots"
-    if lastSnap.isAtEnd then
-      publishDiagnostics m lastSnap.diagnostics.toArray ctx.hOut
-      publishProgressDone m ctx.hOut
-      publishIleanInfoFinal m ctx.hOut s.snaps
-      return none
-    publishProgressAtPos m lastSnap.endPos ctx.hOut
+/-- copied from `Lean.Server.FileWorker.nextCmdSnap`. -/
+-- @[inherit_doc Lean.Server.FileWorker.nextCmdSnap] -- cannot inherit from private
+private def nextCmdSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : CancelToken)
+    (gameWorkerState : WorkerState) (initParams : Lsp.InitializeParams) :
+    AsyncElabM (Option Snapshot) := do
+  cancelTk.check
+  let s ← get
+  let .some lastSnap := s.snaps.back? | panic! "empty snapshots"
+  if lastSnap.isAtEnd then
+    publishDiagnostics m lastSnap.diagnostics.toArray ctx.hOut
+    publishProgressDone m ctx.hOut
+    publishIleanInfoFinal m ctx.hOut s.snaps
+    return none
+  publishProgressAtPos m lastSnap.endPos ctx.hOut
 
-    -- (modified part)
-    -- Make sure that there is at least one snap after the head snap, so that
-    -- we can see the current goal even on an empty document
-    let couldBeEndSnap := s.snaps.size > 1
-    let snap ← compileProof m.mkInputContext lastSnap ctx.clientHasWidgets couldBeEndSnap
-      gameWorkerState initParams
+  -- (modified part)
+  -- Make sure that there is at least one snap after the head snap, so that
+  -- we can see the current goal even on an empty document
+  let couldBeEndSnap := s.snaps.size > 1
+  let snap ← compileProof m.mkInputContext lastSnap ctx.clientHasWidgets couldBeEndSnap
+    gameWorkerState initParams
 
-    set { s with snaps := s.snaps.push snap }
-    cancelTk.check
-    publishProofState m snap initParams ctx.hOut
-    publishDiagnostics m snap.diagnostics.toArray ctx.hOut
-    publishIleanInfoUpdate m ctx.hOut #[snap]
-    return some snap
+  set { s with snaps := s.snaps.push snap }
+  cancelTk.check
+  publishProofState m snap initParams ctx.hOut
+  publishDiagnostics m snap.diagnostics.toArray ctx.hOut
+  publishIleanInfoUpdate m ctx.hOut #[snap]
+  return some snap
 
-  -- Copied from `Lean.Server.FileWorker.unfoldCmdSnaps` using our own `nextCmdSnap`.
-  @[inherit_doc Lean.Server.FileWorker.unfoldCmdSnaps]
-  def unfoldCmdSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken)
-      (startAfterMs : UInt32) (gameWorkerState : WorkerState)
-      : ReaderT WorkerContext IO (AsyncList ElabTaskError Snapshot) := do
-    let ctx ← read
-    let some headerSnap := snaps[0]? | panic! "empty snapshots"
-    if headerSnap.msgLog.hasErrors then
-      publishProgressAtPos m headerSnap.beginPos ctx.hOut (kind := LeanFileProgressKind.fatalError)
-      publishIleanInfoFinal m ctx.hOut #[headerSnap]
-      return AsyncList.ofList [headerSnap]
-    else
-      publishIleanInfoUpdate m ctx.hOut snaps
-      return AsyncList.ofList snaps.toList ++ AsyncList.delayed (← EIO.asTask (ε := ElabTaskError) (prio := .dedicated) do
-        IO.sleep startAfterMs
-        AsyncList.unfoldAsync (nextCmdSnap ctx m cancelTk gameWorkerState ctx.initParams) { snaps })
+-- Copied from `Lean.Server.FileWorker.unfoldCmdSnaps` using our own `nextCmdSnap`.
+@[inherit_doc Lean.Server.FileWorker.unfoldCmdSnaps]
+def unfoldCmdSnaps (m : DocumentMeta) (snaps : Array Snapshot) (cancelTk : CancelToken)
+    (startAfterMs : UInt32) (gameWorkerState : WorkerState)
+    : ReaderT WorkerContext IO (AsyncList ElabTaskError Snapshot) := do
+  let ctx ← read
+  let some headerSnap := snaps[0]? | panic! "empty snapshots"
+  if headerSnap.msgLog.hasErrors then
+    publishProgressAtPos m headerSnap.beginPos ctx.hOut (kind := LeanFileProgressKind.fatalError)
+    publishIleanInfoFinal m ctx.hOut #[headerSnap]
+    return AsyncList.ofList [headerSnap]
+  else
+    publishIleanInfoUpdate m ctx.hOut snaps
+    return AsyncList.ofList snaps.toList ++ AsyncList.delayed (← EIO.asTask (ε := ElabTaskError) (prio := .dedicated) do
+      IO.sleep startAfterMs
+      AsyncList.unfoldAsync (nextCmdSnap ctx m cancelTk gameWorkerState ctx.initParams) { snaps })
 
 end Elab
 
