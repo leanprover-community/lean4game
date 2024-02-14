@@ -169,15 +169,20 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (workerState :
       match theoremsAndDefs.find? (·.name == n) with
       | none =>
         -- Theorem will never be introduced in this game
-        addMessageByDifficulty info s!"You have not unlocked the theorem/definition '{n}' yet!"
+        addMessageByDifficulty info s!"The theorem/definition '{n}' is not available in this game!"
       | some thm =>
         -- Theorem is introduced at some point in the game.
         if thm.disabled then
           -- Theorem is disabled in this level.
           addMessageByDifficulty info s!"The theorem/definition '{n}' is disabled in this level!"
         else if thm.locked then
-          -- Theorem is still locked.
-          addMessageByDifficulty info s!"You have not unlocked the theorem/definition '{n}' yet!"
+          match workerState.inventory.find? (· == n.toString) with
+          | none =>
+            -- Theorem is still locked.
+            addMessageByDifficulty info s!"You have not unlocked the theorem/definition '{n}' yet!"
+          | some _ =>
+            -- Theorem is in the inventory, allow it.
+            pure ()
 
 where addMessageByDifficulty (info : SourceInfo) (s : MessageData) :=
   -- See `GameServer.FileWorker.WorkerState.difficulty`. Send nothing/warnings/errors
