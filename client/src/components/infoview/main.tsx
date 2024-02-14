@@ -232,7 +232,11 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
     ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
   } else {
     ret = <div className="infoview vscode-light">
-      {proof.completed && <div className="level-completed">Level completed! 🎉</div>}
+      {proof.completedWithWarnings &&
+        <div className="level-completed">
+          {proof.completed ? "Level completed! 🎉" : "Level completed with warnings 🎭"}
+        </div>
+      }
       <Infos />
       <Hints hints={proof.steps[curPos?.line]?.goals[0]?.hints}
         showHidden={showHelp.has(curPos?.line)} step={curPos?.line}

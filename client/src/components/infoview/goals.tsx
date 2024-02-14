@@ -268,7 +268,7 @@ interface GoalsProps {
 
 export function Goals({ goals, filter }: GoalsProps) {
     if (goals.goals.length === 0) {
-        return <>No goals</>
+        return <></>
     } else {
         return <>
           {goals.goals.map((g, i) => <Goal typewriter={false} key={i} goal={g.goal} filter={filter} />)}
