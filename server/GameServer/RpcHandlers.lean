@@ -121,14 +121,45 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
       openAbstractCtxResult hint.goal fun hintFVars hintGoal => do
         if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
         then
-          let lctx := (← goal.getDecl).lctx
-          if let some bij ← matchDecls hintFVars lctx.getFVars (strict := hint.strict) (initBij := fvarBij)
+
+          -- NOTE: This is a bit a hack of somebody who does not know how meta-programming works.
+          -- All we want here is a list of `userNames` for the `FVarId`s in `hintFVars`...
+          -- and we wrap them in `«{}»` here since I don't know how to do it later.
+          let mut hintFVarsNames : Array Expr := #[]
+          for fvar in hintFVars do
+            let name₁ ← fvar.fvarId!.getUserName
+            hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
+
+          let lctx := (← goal.getDecl).lctx -- the player's local context
+          if let some bij ← matchDecls hintFVars lctx.getFVars
+            (strict := hint.strict) (initBij := fvarBij)
           then
             let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
+            -- Evaluate the text in the player's context to get the new variable names.
             let text := (← evalHintMessage hint.text) (userFVars.map Expr.fvar)
             let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := lctx, opts := {}}
             let text ← (MessageData.withContext ctx text).toString
-            return some { text := text, hidden := hint.hidden }
+
+            -- Evaluate the text in the `Hint`'s context to get the old variable names.
+            let rawText := (← evalHintMessage hint.text) hintFVarsNames
+            let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
+            let rawText ← (MessageData.withContext ctx₂ rawText).toString
+
+            -- Here we map the goal's variable names to the player's variable names.
+            let mut varNames : Array <| Name × Name := #[]
+            for (fvar₁, fvar₂) in bij.forward.toArray do
+              -- get the `userName` of the fvar in the opened local context of the hint.
+              let name₁ ← fvar₁.getUserName
+              -- get the `userName` in the player's local context.
+              let name₂ := (lctx.get! fvar₂).userName
+              varNames := varNames.push (name₁, name₂)
+
+            return some {
+              text := text,
+              hidden := hint.hidden,
+              rawText := rawText,
+              varNames := varNames }
+
           else return none
         else
           return none

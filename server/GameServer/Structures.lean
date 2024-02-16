@@ -54,8 +54,17 @@ deriving RpcEncodable
 
 /-- A hint in the game at the corresponding goal. -/
 structure GameHint where
+  /-- The text with the variable names already inserted.
+
+  Note: This is in theory superfluous and will be completely replaced by `rawText`. We just left
+  it in for debugging for now. -/
   text : String
+  /-- Flag whether the hint should be hidden initially. -/
   hidden : Bool
+  /-- The text with the variables not inserted yet. -/
+  rawText : String
+  /-- The assignment of variable names in the `rawText` to the ones the player used. -/
+  varNames : Array <| Name × Name
 deriving FromJson, ToJson
 
 /-- Bundled `InteractiveGoal` together with an array of hints that apply at this stage. -/

@@ -5,15 +5,33 @@ import { DeletedChatContext, ProofContext } from "./infoview/context";
 import { lastStepHasErrors } from "./infoview/goals";
 import { Button } from "./button";
 
+/** Plug-in the variable names in a hint. We do this client-side to prepare
+ * for i18n in the future. i.e. one should be able translate the `rawText`
+ * and have the variables substituted just before displaying.
+ */
+function getHintText(hint: GameHint): string {
+  if (hint.rawText) {
+    // Replace the variable names used in the hint with the ones used by the player
+    // variable names are marked like `«{g}»` inside the text.
+    return hint.rawText.replace(/«\{(.*?)\}»/, ((_, v) =>
+      // `hint.varNames` contains tuples `[oldName, newName]`
+      (hint.varNames.find(x => x[0] == v))[1]))
+  } else {
+    // hints created in the frontend do not have a `rawText`
+    // TODO: `hint.text` could be removed in theory.
+    return hint.text
+  }
+}
+
 export function Hint({hint, step, selected, toggleSelection, lastLevel} : {hint: GameHint, step: number, selected: number, toggleSelection: any, lastLevel?: boolean}) {
   return <div className={`message information step-${step}` + (step == selected ? ' selected' : '') + (lastLevel ? ' recent' : '')} onClick={toggleSelection}>
-    <Markdown>{hint.text}</Markdown>
+    <Markdown>{getHintText(hint)}</Markdown>
   </div>
 }
 
 export function HiddenHint({hint, step, selected, toggleSelection, lastLevel} : {hint: GameHint, step: number, selected: number, toggleSelection: any, lastLevel?: boolean}) {
   return <div className={`message warning step-${step}` + (step == selected ? ' selected' : '') + (lastLevel ? ' recent' : '')} onClick={toggleSelection}>
-    <Markdown>{hint.text}</Markdown>
+    <Markdown>{getHintText(hint)}</Markdown>
   </div>
 }
 
@@ -31,7 +49,7 @@ export function Hints({hints, showHidden, step, selected, toggleSelection, lastL
 
 export function DeletedHint({hint} : {hint: GameHint}) {
   return <div className="message information deleted-hint">
-    <Markdown>{hint.text}</Markdown>
+    <Markdown>{getHintText(hint)}</Markdown>
   </div>
 }
 
