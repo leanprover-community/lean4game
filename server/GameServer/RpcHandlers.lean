@@ -1,6 +1,7 @@
 import GameServer.EnvExtensions
 import GameServer.InteractiveGoal
 import Std.Data.Array.Init.Basic
+import GameServer.Hints
 
 open Lean
 open Server
@@ -103,14 +104,6 @@ def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true) (in
   then return some bij
   else return none
 
-unsafe def evalHintMessageUnsafe : Expr → MetaM (Array Expr → MessageData) :=
-  evalExpr (Array Expr → MessageData)
-    (.forallE default (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr))
-      (mkConst ``MessageData) .default)
-
-@[implemented_by evalHintMessageUnsafe]
-def evalHintMessage : Expr → MetaM (Array Expr → MessageData) := fun _ => pure (fun _ => "")
-
 open Meta in
 /-- Find all hints whose trigger matches the current goal -/
 def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializeParams) : MetaM (Array GameHint) := do
@@ -122,6 +115,8 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
         if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
         then
 
+          -- NOTE: This code for `hintFVarsNames` is also duplicated in the
+          -- "Statement" command, where `hint.rawText` is created. They need to be matching.
           -- NOTE: This is a bit a hack of somebody who does not know how meta-programming works.
           -- All we want here is a list of `userNames` for the `FVarId`s in `hintFVars`...
           -- and we wrap them in `«{}»` here since I don't know how to do it later.
@@ -140,11 +135,6 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
             let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := lctx, opts := {}}
             let text ← (MessageData.withContext ctx text).toString
 
-            -- Evaluate the text in the `Hint`'s context to get the old variable names.
-            let rawText := (← evalHintMessage hint.text) hintFVarsNames
-            let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
-            let rawText ← (MessageData.withContext ctx₂ rawText).toString
-
             -- Here we map the goal's variable names to the player's variable names.
             let mut varNames : Array <| Name × Name := #[]
             for (fvar₁, fvar₂) in bij.forward.toArray do
@@ -157,7 +147,7 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
             return some {
               text := text,
               hidden := hint.hidden,
-              rawText := rawText,
+              rawText := hint.rawText,
               varNames := varNames }
 
           else return none
