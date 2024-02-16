@@ -2,6 +2,15 @@
 
 Here are some issues experienced by users.
 
+- You can reset the lake projects involved (i.e. the `server/` folder here as well as your [game's folder](https://github.com/hhu-adam/GameSkeleton)) with the following commands:
+  ```
+  cd [THE PROJECT]
+  rm -rf .lake/
+  lake update -R
+  lake build
+  ```
+  If you experience problems related to Lean or lake, you should first try to reset it this way.
+
 # VSCode Dev-Container
 * If you don't get the pop-up, you might have disabled them, and you can reenable it by
   running the `remote-containers.showReopenInContainerNotificationReset` command in vscode.
