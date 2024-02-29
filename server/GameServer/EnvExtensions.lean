@@ -4,6 +4,11 @@ import GameServer.Hints
 
 open GameServer
 
+-- TODO: Is there a better place?
+/-- Keywords that the server should not consider as tactics. -/
+def GameServer.ALLOWED_KEYWORDS : List String :=
+  ["with", "fun", "at", "only", "by", "generalizing"]
+
 /-- The default game name if `Game "MyGame"` is not used. -/
 def defaultGameName: String := "MyGame"
 -- Note: When changing any of these default names, one also needs to change them in `index.mjs`
