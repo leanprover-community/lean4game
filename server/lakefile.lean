@@ -7,8 +7,7 @@ package GameServer
 def leanVersion : String := s!"v{Lean.versionString}"
 
 require std from git "https://github.com/leanprover/std4.git" @ leanVersion
-
--- require importGraph from git "https://github.com/leanprover-community/import-graph" @ leanVersion
+require i18n from git "https://github.com/hhu-adam/lean-i18n.git" @ "main"
 
 lean_lib GameServer
 
