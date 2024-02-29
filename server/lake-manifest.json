@@ -13,7 +13,7 @@
   {"url": "https://github.com/hhu-adam/lean-i18n.git",
    "type": "git",
    "subDir": null,
-   "rev": "a771d4384ab62dc64bdd259b0ee977cf5a5e685c",
+   "rev": "5882ac48f71c44bbde2c34dced8e05e9ee4b7746",
    "name": "i18n",
    "manifestFile": "lake-manifest.json",
    "inputRev": "v4.6.0",
