@@ -11,6 +11,9 @@
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "lib": [
+      "ES2021.String"
+    ]
   },
   "exclude": ["server", "relay"]
 }

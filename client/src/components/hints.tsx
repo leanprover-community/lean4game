@@ -13,7 +13,7 @@ function getHintText(hint: GameHint): string {
   if (hint.rawText) {
     // Replace the variable names used in the hint with the ones used by the player
     // variable names are marked like `«{g}»` inside the text.
-    return hint.rawText.replace(/«\{(.*?)\}»/, ((_, v) =>
+    return hint.rawText.replaceAll(/«\{(.*?)\}»/g, ((_, v) =>
       // `hint.varNames` contains tuples `[oldName, newName]`
       (hint.varNames.find(x => x[0] == v))[1]))
   } else {
