@@ -4,8 +4,6 @@ import Lean
 
 open Lean Meta Elab Command
 
-syntax hintArg := atomic(" (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")")
-
 /-! ## Doc Comment Parsing -/
 
 /-- Read a doc comment and get its content. Return `""` if no doc comment available. -/
@@ -84,23 +82,6 @@ def getStatementString (name : Name) : CommandElabM String := do
 /-- A `attr := ...` option for `Statement`. Add attributes to the defined theorem. -/
 syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
 -- TODO
-
-
-/-- Remove any spaces at the beginning of a new line -/
-partial def removeIndentation (s : String) : String :=
-  let rec loop (i : String.Pos) (acc : String) (removeSpaces := false) : String :=
-    let c := s.get i
-    let i := s.next i
-    if s.atEnd i then
-      acc.push c
-    else if removeSpaces && c == ' ' then
-      loop i acc (removeSpaces := true)
-    else if c == '\n' then
-      loop i (acc.push c) (removeSpaces := true)
-    else
-      loop i (acc.push c)
-  loop ⟨0⟩ ""
-
 
 /-! ## Loops in Graph-like construct
 

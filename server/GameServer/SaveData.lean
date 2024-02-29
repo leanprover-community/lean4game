@@ -1,7 +1,7 @@
 import GameServer.EnvExtensions
+import I18n
 
 open Lean Meta Elab Command
-
 
 /-! ## Copy images -/
 
@@ -58,6 +58,9 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
       IO.FS.writeFile (path / docFileName inventoryType name) (toString (toJson item))
 
   IO.FS.writeFile (path / inventoryFileName) (toString (toJson inventory))
+
+  -- write PO file for translation
+  I18n.createPOTemplate
 
 open GameData
 

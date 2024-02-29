@@ -1,7 +1,8 @@
 import GameServer.AbstractCtx
 import GameServer.Graph
+import GameServer.Hints
 
-
+open GameServer
 
 /-- The default game name if `Game "MyGame"` is not used. -/
 def defaultGameName: String := "MyGame"
@@ -17,22 +18,6 @@ defined in this file.
 -/
 
 open Lean
-
-/-! ## Hints -/
-
-/-- A hint to help the user with a specific goal state -/
-structure GoalHintEntry where
-  goal : AbstractCtxResult
-  /-- Text of the hint as an expression of type `Array Expr → MessageData` -/
-  text : Expr
-  /-- If true, then hint should be hidden and only be shown on player's request -/
-  hidden : Bool := false
-  /-- If true, then the goal must contain only the assumptions specified in `goal` and no others -/
-  strict : Bool := false
-
-instance : Repr GoalHintEntry := {
-  reprPrec := fun a n => reprPrec a.text n
-}
 
 /-! ## Inventory (documentation)
 

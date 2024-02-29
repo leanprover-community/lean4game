@@ -28,10 +28,10 @@ import Markdown from './markdown'
 import {InventoryPanel} from './inventory'
 import { hasInteractiveErrors } from './infoview/typewriter'
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
-  ProofContext, ProofStep, SelectionContext, WorldLevelIdContext } from './infoview/context'
+  ProofContext, SelectionContext, WorldLevelIdContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
-import { GameHint } from './infoview/rpc_api'
-import { DeletedHints, Hint, Hints, filterHints } from './hints'
+import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
+import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
 import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import path from 'path';
 
@@ -49,6 +49,7 @@ import { WebSocketMessageWriter, toSocket } from 'vscode-ws-jsonrpc'
 import { IConnectionProvider } from 'monaco-languageclient'
 import { monacoSetup } from 'lean4web/client/src/monacoSetup'
 import { onigasmH } from 'onigasm/lib/onigasmH'
+import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
 
 
 monacoSetup()
@@ -72,7 +73,7 @@ function Level() {
   </WorldLevelIdContext.Provider>
 }
 
-function ChatPanel({lastLevel}) {
+function ChatPanel({lastLevel, visible = true}) {
   const chatRef = useRef<HTMLDivElement>(null)
   const {mobile} = useContext(PreferencesContext)
   const gameId = useContext(GameIdContext)
@@ -83,9 +84,7 @@ function ChatPanel({lastLevel}) {
   const {selectedStep, setSelectedStep} = useContext(SelectionContext)
   const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
-  // If the last step has errors, we want to treat it as if it is part of the second-to-last step
-  let k = proof.length - 1
-  let withErr = hasInteractiveErrors(proof[k]?.errors) ? 1 : 0
+  let k = proof.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
 
   function toggleSelection(line: number) {
     return (ev) => {
@@ -96,29 +95,6 @@ function ChatPanel({lastLevel}) {
         setSelectedStep(line)
       }
     }
-  }
-
-  function hasHiddenHints(i : number): boolean {
-    let step = proof[i]
-    // For example if the proof isn't loaded yet
-    if(!step) {return false}
-    return step.hints.some((hint) => hint.hidden)
-  }
-
-  const activateHiddenHints = (ev) => {
-    // If the last step (`k`) has errors, we want the hidden hints from the
-    // second-to-last step to be affected
-    if (!(proof.length)) {return}
-
-    // state must not be mutated, therefore we need to clone the set
-    let tmp = new Set(showHelp)
-    if (tmp.has(k - withErr)) {
-      tmp.delete(k - withErr)
-    } else {
-      tmp.add(k - withErr)
-    }
-    setShowHelp(tmp)
-    console.debug(`help: ${Array.from(tmp.values())}`)
   }
 
   useEffect(() => {
@@ -146,29 +122,34 @@ function ChatPanel({lastLevel}) {
 
   let introText: Array<string> = level?.data?.introduction.split(/\n(\s*\n)+/)
 
-  // experimental: Remove all hints that appeared identically in the previous step
-  // This effectively prevent consequtive hints being shown.
-  let modifiedHints : GameHint[][] = filterHints(proof)
-
-  return <div className="chat-panel">
+  return <div className={`chat-panel ${visible ? '' : 'hidden'}`}>
     <div ref={chatRef} className="chat">
       {introText?.filter(t => t.trim()).map(((t, i) =>
         // Show the level's intro text as hints, too
         <Hint key={`intro-p-${i}`}
           hint={{text: t, hidden: false}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
       ))}
-      {modifiedHints.map((step, i) => {
+      {proof.steps.map((step, i) => {
+        let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
+        if (step.goals.length > 0 && !isLastStepWithErrors(proof, i)) {
+          return <Hints key={`hints-${i}`}
+          hints={filteredHints} showHidden={showHelp.has(i)} step={i}
+          selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof.steps.length - 1}/>
+        }
+      })}
+
+      {/* {modifiedHints.map((step, i) => {
         // It the last step has errors, it will have the same hints
         // as the second-to-last step. Therefore we should not display them.
-        if (!(i == proof.length - 1 && withErr)) {
+        if (!(i == proof.steps.length - 1 && withErr)) {
           // TODO: Should not use index as key.
           return <Hints key={`hints-${i}`}
             hints={step} showHidden={showHelp.has(i)} step={i}
-            selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof.length - 1}/>
+            selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof.steps.length - 1}/>
         }
-      })}
+      })} */}
       <DeletedHints hints={deletedChat}/>
-      {completed &&
+      {proof.completed &&
         <>
           <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
             Level completed! 🎉
@@ -182,7 +163,7 @@ function ChatPanel({lastLevel}) {
       }
     </div>
     <div className="button-row">
-      {completed && (lastLevel ?
+      {proof.completed && (lastLevel ?
         <Button to={`/${gameId}`}>
           <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
         </Button> :
@@ -190,16 +171,13 @@ function ChatPanel({lastLevel}) {
           Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>)
         }
-      {hasHiddenHints(proof.length - 1) && !showHelp.has(k - withErr) &&
-        <Button to="" onClick={activateHiddenHints}>
-          Show more help!
-        </Button>
-      }
+      <MoreHelpButton />
     </div>
   </div>
 }
 
-function ExercisePanel({codeviewRef, visible=true}) {
+
+function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
@@ -229,7 +207,7 @@ function PlayableLevel({impressum, setImpressum}) {
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
 
   // The state variables for the `ProofContext`
-  const [proof, setProof] = useState<Array<ProofStep>>([])
+  const [proof, setProof] = useState<ProofState>({steps: [], diagnostics: [], completed: false, completedWithWarnings: false})
   // When deleting the proof, we want to keep to old messages around until
   // a new proof has been entered. e.g. to consult messages coming from dead ends
   const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
@@ -356,15 +334,15 @@ function PlayableLevel({impressum, setImpressum}) {
 
   useEffect(() => {
     // Forget whether hidden hints are displayed for steps that don't exist yet
-    if (proof.length) {
+    if (proof.steps.length) {
       console.debug(Array.from(showHelp))
-      setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof.length))))
+      setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof.steps.length))))
     }
   }, [proof])
 
   // save showed help in store
   useEffect(() => {
-    if (proof.length) {
+    if (proof.steps.length) {
       console.debug(`showHelp:\n ${showHelp}`)
       dispatch(helpEdited({game: gameId, world: worldId, level: levelId, help: Array.from(showHelp)}))
     }
@@ -622,7 +600,9 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
     }
     // loadRenderInfoview(imports, [infoProvider.getApi(), div], setInfoviewApi)
     setInfoProvider(infoProvider)
-    client.restart()
+
+    // TODO: it looks like we get errors "File Changed" here.
+    client.restart("Lean4Game")
 
     const editorApi = infoProvider.getApi()
 

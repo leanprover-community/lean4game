@@ -4,7 +4,7 @@ import * as React from 'react'
 import { CircularProgress } from '@mui/material'
 import type { Location, Diagnostic } from 'vscode-languageserver-protocol'
 import { getInteractiveTermGoal, InteractiveDiagnostic, UserWidgetInstance, Widget_getWidgets, RpcSessionAtPos, isRpcError,
-  RpcErrorCode, getInteractiveDiagnostics, InteractiveTermGoal } from '@leanprover/infoview-api'
+  RpcErrorCode, getInteractiveDiagnostics } from '@leanprover/infoview-api'
 import { basename, DocumentPosition, RangeHelpers, useEvent, usePausableState, discardMethodNotFound,
   mapRpcError, useAsyncWithTrigger, PausableProps } from '../../../../node_modules/lean4-infoview/src/infoview/util'
 import { ConfigContext, EditorContext, LspDiagnosticsContext, ProgressContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts'
@@ -14,7 +14,7 @@ import { GoalsLocation, Locations, LocationsContext } from '../../../../node_mod
 
 import { AllMessages, lspDiagToInteractive } from './messages'
 import { goalsToString, Goal, MainAssumptions, OtherGoals, ProofDisplay } from './goals'
-import { InteractiveGoals } from './rpc_api'
+import { InteractiveTermGoal, InteractiveGoalsWithHints, InteractiveGoals, ProofState } from './rpc_api'
 import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext } from './context'
 
 // TODO: All about pinning could probably be removed
@@ -83,11 +83,11 @@ interface InfoDisplayContentProps extends PausableProps {
   error?: string
   userWidgets: UserWidgetInstance[]
   triggerUpdate: () => Promise<void>
-  proof? : string
+  proofString? : string
 }
 
 const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
-    const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused, proof} = props
+    const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused, proofString} = props
 
     const hasWidget = userWidgets.length > 0
     const hasError = !!error
@@ -114,7 +114,8 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
 
     const goalFilter = { reverse: false, showType: true, showInstance: true, showHiddenAssumption: true, showLetValue: true }
     /* Adding {' '} to manage string literals properly: https://reactjs.org/docs/jsx-in-depth.html#string-literals-1 */
-    return <>
+
+   return <>
         {hasError &&
             <div className='error' key='errors'>
                 Error updating:{' '}{error}.
@@ -137,7 +138,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
         {userWidgets.map(widget =>
           <details key={`widget::${widget.id}::${widget.range?.toString()}`} open>
             <summary className='mv2 pointer'>{widget.name}</summary>
-            <PanelWidgetDisplay pos={pos} goals={goals ? goals.goals.map (goal => goal) : []}
+            <PanelWidgetDisplay pos={pos} goals={goals ? goals.goals : []}
               termGoal={termGoal} selectedLocations={selectedLocs} widget={widget}/>
           </details>
         )}
@@ -166,6 +167,7 @@ interface InfoDisplayProps {
   pos: DocumentPosition,
   status: InfoStatus,
   messages: InteractiveDiagnostic[],
+  proof?: ProofState,
   goals?: InteractiveGoals,
   termGoal?: InteractiveTermGoal,
   error?: string,
@@ -175,7 +177,7 @@ interface InfoDisplayProps {
 }
 
 /** Displays goal state and messages. Can be paused. */
-function InfoDisplay(props0: ProofStateProps & InfoDisplayProps & InfoPinnable) {
+function InfoDisplay(props0: InfoDisplayProps & InfoPinnable) {
     // Used to update the paused state *just once* if it is paused,
     // but a display update is triggered
     const [shouldRefresh, setShouldRefresh] = React.useState<boolean>(false)
@@ -214,7 +216,7 @@ function InfoDisplay(props0: ProofStateProps & InfoDisplayProps & InfoPinnable) 
     {/* <details open> */}
         {/* <InfoStatusBar {...props} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} /> */}
         <div className="vscode-light">
-            <InfoDisplayContent {...props} proof={editor.getValue()} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} />
+            <InfoDisplayContent {...props} proofString={editor.getValue()} triggerUpdate={triggerDisplayUpdate} isPaused={isPaused} setPaused={setPaused} />
         </div>
     {/* </details> */}
     </RpcContext.Provider>
@@ -252,7 +254,7 @@ function useIsProcessingAt(p: DocumentPosition): boolean {
 
 function InfoAux(props: InfoProps) {
 
-    const proofContext = React.useContext(ProofContext)
+    const { setProof } = React.useContext(ProofContext)
 
     const config = React.useContext(ConfigContext)
 
@@ -290,6 +292,8 @@ function InfoAux(props: InfoProps) {
     // with e.g. a new `pos`.
     type InfoRequestResult = Omit<InfoDisplayProps, 'triggerUpdate'>
     const [state, triggerUpdateCore] = useAsyncWithTrigger(() => new Promise<InfoRequestResult>((resolve, reject) => {
+
+        const proofReq = rpcSess.call('Game.getProofState', DocumentPosition.toTdpp(pos))
         const goalsReq = rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp(pos))
         const termGoalReq = getInteractiveTermGoal(rpcSess, DocumentPosition.toTdpp(pos))
         const widgetsReq = Widget_getWidgets(rpcSess, pos).catch(discardMethodNotFound)
@@ -308,6 +312,7 @@ function InfoAux(props: InfoProps) {
                 pos,
                 status: 'updating',
                 messages: lspDiagsHere.map(lspDiagToInteractive),
+                proof: undefined,
                 goals: undefined,
                 termGoal: undefined,
                 error: undefined,
@@ -318,11 +323,12 @@ function InfoAux(props: InfoProps) {
 
         // NB: it is important to await await reqs at once, otherwise
         // if both throw then one exception becomes unhandled.
-        Promise.all([goalsReq, termGoalReq, widgetsReq, messagesReq]).then(
-            ([goals, termGoal, userWidgets, messages]) => resolve({
+        Promise.all([proofReq, goalsReq, termGoalReq, widgetsReq, messagesReq]).then(
+            ([proof, goals, termGoal, userWidgets, messages]) => resolve({
                 pos,
                 status: 'ready',
                 messages,
+                proof : proof as any,
                 goals: goals as any,
                 termGoal,
                 error: undefined,
@@ -353,6 +359,7 @@ function InfoAux(props: InfoProps) {
                     pos,
                     status: 'error',
                     messages: lspDiagsHere.map(lspDiagToInteractive),
+                    proof: undefined,
                     goals: undefined,
                     termGoal: undefined,
                     error: `Error fetching goals: ${errorString}`,
@@ -389,6 +396,7 @@ function InfoAux(props: InfoProps) {
         pos,
         status: 'updating',
         messages: [],
+        proof: undefined,
         goals: undefined,
         termGoal: undefined,
         error: undefined,
@@ -412,6 +420,11 @@ function InfoAux(props: InfoProps) {
           //   hintContext.setHints(state.value.goals.goals[0].hints)
           // }
           setDisplayProps({ ...state.value, triggerUpdate })
+
+          // Update the game's proof state
+          console.info('updating proof from editor mode.')
+          setProof(state.value.proof)
+
         } else if (state.state === 'rejected' && state.error !== 'retry') {
             // The code inside `useAsyncWithTrigger` may only ever reject with a `retry` exception.
             console.warn('Unreachable code reached with error: ', state.error)

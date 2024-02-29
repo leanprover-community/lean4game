@@ -2,6 +2,8 @@ import GameServer.Helpers
 import GameServer.Inventory
 import GameServer.Options
 import GameServer.SaveData
+import GameServer.Hints
+import I18n
 
 open Lean Meta Elab Command
 
@@ -32,16 +34,17 @@ elab "Level" level:num : command => do
 
 /-- Define the title of the current game/world/level. -/
 elab "Title" t:str : command => do
+  let title ← t.getString.translate
   match ← getCurLayer with
-  | .Level => modifyCurLevel fun level => pure {level with title := t.getString}
-  | .World => modifyCurWorld  fun world => pure {world with title := t.getString}
+  | .Level => modifyCurLevel fun level => pure {level with title := title}
+  | .World => modifyCurWorld  fun world => pure {world with title := title}
   | .Game => modifyCurGame  fun game => pure {game with
       title := t.getString
-      tile := {game.tile with title := t.getString}}
+      tile := {game.tile with title := title}}
 
 /-- Define the introduction of the current game/world/level. -/
 elab "Introduction" t:str : command => do
-  let intro := t.getString
+  let intro ← t.getString.translate
   match ← getCurLayer with
   | .Level => modifyCurLevel fun level => pure {level with introduction := intro}
   | .World => modifyCurWorld  fun world => pure {world with introduction := intro}
@@ -49,7 +52,7 @@ elab "Introduction" t:str : command => do
 
 /-- Define the info of the current game. Used for e.g. credits -/
 elab "Info" t:str : command => do
-  let info:= t.getString
+  let info ← t.getString.translate
   match ← getCurLayer with
   | .Level =>
     logError "Can't use `Info` in a level!"
@@ -81,7 +84,7 @@ elab "Image" t:str : command => do
 /-- Define the conclusion of the current game or current level if some
 building a level. -/
 elab "Conclusion" t:str : command => do
-  let conclusion := t.getString
+  let conclusion ← t.getString.translate
   match ← getCurLayer with
   | .Level => modifyCurLevel fun level => pure {level with conclusion := conclusion}
   | .World => modifyCurWorld  fun world => pure {world with conclusion := conclusion}
@@ -94,13 +97,13 @@ elab "Prerequisites" t:str* : command => do
 
 /-- Short caption for the game (1 sentence) -/
 elab "CaptionShort" t:str : command => do
-  let caption := t.getString
+  let caption ← t.getString.translate
   modifyCurGame fun game => pure {game with
     tile := {game.tile with short := caption}}
 
 /-- More detailed description what the game is about (2-4 sentences). -/
 elab "CaptionLong" t:str : command => do
-  let caption := t.getString
+  let caption ← t.getString.translate
   modifyCurGame fun game => pure {game with
     tile := {game.tile with long := caption}}
 
@@ -141,6 +144,7 @@ TacticDoc rw "`rw` stands for rewrite, etc. "
  -/
 elab doc:docComment ? "TacticDoc" name:ident content:str ? : command => do
   let doc ← parseDocCommentLegacy doc content
+  let doc ← doc.translate
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Tactic
     name := name.getId
@@ -165,6 +169,7 @@ The theorem/definition to have the same fully qualified name as in mathlib.
 elab doc:docComment ? "TheoremDoc" name:ident "as" displayName:str "in" category:str content:str ? :
     command => do
   let doc ← parseDocCommentLegacy doc content
+  let doc ← doc.translate
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Lemma
     name := name.getId
@@ -194,6 +199,7 @@ The theorem/definition to have the same fully qualified name as in mathlib.
  -/
 elab doc:docComment ? "DefinitionDoc" name:ident "as" displayName:str template:str ? : command => do
   let doc ← parseDocCommentLegacy doc template
+  let doc ← doc.translate
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Definition
     name := name.getId,
@@ -340,6 +346,9 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   let lvlIdx ← getCurLevelIdx
 
   let docContent ← parseDocComment doc
+  let docContent ← match docContent with
+  | none => pure none
+  | some d => d.translate
 
   -- Save the messages before evaluation of the proof.
   let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
@@ -396,12 +405,41 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
         .nest hidden $
         .compose (.ofGoal text) (.ofGoal goal) := msg.data then
       let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
+
+        let goalDecl ← goal.getDecl
+        let fvars := goalDecl.lctx.decls.toArray.filterMap id |> Array.map (·.fvarId)
+
+        -- NOTE: This code about `hintFVarsNames` is duplicated from `RpcHandlers`
+        -- where the variable bijection is constructed, and they
+        -- need to be matching.
+        -- NOTE: This is a bit a hack of somebody who does not know how meta-programming works.
+        -- All we want here is a list of `userNames` for the `FVarId`s in `hintFVars`...
+        -- and we wrap them in `«{}»` here since I don't know how to do it later.
+        let mut hintFVarsNames : Array Expr := #[]
+        for fvar in fvars do
+          let name₁ ← fvar.getUserName
+          hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
+
+        let text ← instantiateMVars (mkMVar text)
+
+        -- Evaluate the text in the `Hint`'s context to get the old variable names.
+        let rawText := (← GameServer.evalHintMessage text) hintFVarsNames
+        let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
+        let rawText : String ← (MessageData.withContext ctx₂ rawText).toString
+
         return {
           goal := ← abstractCtx goal
-          text := ← instantiateMVars (mkMVar text)
+          text := text
+          rawText := rawText
           strict := strict == 1
           hidden := hidden == 1
         }
+
+      -- Note: The current setup for hints is a bit convoluted, but for now we need to
+      -- send the text once through i18n to register it in the env extension.
+      -- This could probably be rewritten once i18n works fully.
+      let _ ← hint.rawText.translate
+
       hints := hints.push hint
     else
       nonHintMsgs := nonHintMsgs.push msg
@@ -439,6 +477,8 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     lemmas := {level.lemmas with used := usedInventory.lemmas.toArray} }
 
 /-! # Hints -/
+
+open GameServer in
 
 /-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
 see hints. The tactic does not affect the goal state.
