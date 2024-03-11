@@ -127,7 +127,7 @@ function ChatPanel({lastLevel, visible = true}) {
       {introText?.filter(t => t.trim()).map(((t, i) =>
         // Show the level's intro text as hints, too
         <Hint key={`intro-p-${i}`}
-          hint={{text: t, hidden: false}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
+          hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
       ))}
       {proof.steps.map((step, i) => {
         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
@@ -427,7 +427,7 @@ function IntroductionPanel({gameInfo}) {
     <div className="chat">
       {text?.filter(t => t.trim()).map(((t, i) =>
         <Hint key={`intro-p-${i}`}
-          hint={{text: t, hidden: false}} step={0} selected={null} toggleSelection={undefined} />
+          hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={null} toggleSelection={undefined} />
       ))}
     </div>
     <div className={`button-row${mobile ? ' mobile' : ''}`}>
