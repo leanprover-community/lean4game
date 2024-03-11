@@ -36,6 +36,7 @@ import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { store } from '../../state/store';
 import { Hints, MoreHelpButton, filterHints } from '../hints';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { DiagnosticSeverity } from 'vscode-languageclient';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -398,7 +399,7 @@ export function TypewriterInterface({props}) {
   const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
   const {mobile} = React.useContext(PreferencesContext)
-  const { proof, setProof } = React.useContext(ProofContext)
+  const { proof, setProof, crashed, setCrashed, interimDiags } = React.useContext(ProofContext)
   const { setTypewriterInput } = React.useContext(InputModeContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
 
@@ -433,7 +434,7 @@ export function TypewriterInterface({props}) {
       setSelectedStep(undefined)
       setTypewriterInput(proof?.steps[line].command)
       // Reload proof on deleting
-      loadGoals(rpcSess, uri, setProof)
+      loadGoals(rpcSess, uri, setProof, setCrashed)
       ev.stopPropagation()
     }
   }
@@ -495,7 +496,28 @@ export function TypewriterInterface({props}) {
       </div>
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement data={props.data} />
-        {proof?.steps.length ?
+        {crashed ? <div>
+          <p className="crashed_message">Crashed! Go to editor mode and fix your proof!
+          Last server response:</p>
+          {interimDiags.map(diag => {
+            const severityClass = diag.severity ? {
+              [DiagnosticSeverity.Error]: 'error',
+              [DiagnosticSeverity.Warning]: 'warning',
+              [DiagnosticSeverity.Information]: 'information',
+              [DiagnosticSeverity.Hint]: 'hint',
+            }[diag.severity] : '';
+
+            return <div>
+              <div className={`${severityClass} ml1 message`}>
+                <p className="mv2">Line {diag.range.start.line}, Character {diag.range.start.character}</p>
+                <pre className="font-code pre-wrap">
+                  {diag.message}
+                </pre>
+                </div>
+            </div>
+          })}
+
+        </div> : proof?.steps.length ?
           <>
             {proof?.steps.map((step, i) => {
               let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
@@ -563,7 +585,10 @@ export function TypewriterInterface({props}) {
                 }
               </div>
             }
-          </> : <CircularProgress variant="determinate" value={loadingProgress} />
+          </> : <CircularProgress variant="determinate" value={100*(1 - 1.024 ** (- loadingProgress))} />
+        // note: since we don't know the total number of files,
+        // we use a function which strictly monotonely increases towards `100` as `x → ∞`
+        // The base is chosen at random s.t. we get roughly 91% for `x = 100`.
         }
       </div>
     </div>

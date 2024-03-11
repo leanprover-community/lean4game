@@ -4,6 +4,7 @@
 import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic } from '@leanprover/infoview-api';
+import { Diagnostic } from 'vscode-languageserver-types'
 import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { PreferencesState } from '../../state/preferences';
 
@@ -33,9 +34,19 @@ export const ProofContext = React.createContext<{
    */
   proof: ProofState,
   setProof: React.Dispatch<React.SetStateAction<ProofState>>
+  /** TODO: Workaround to capture a crash of the gameserver. */
+  interimDiags: Diagnostic[],
+  setInterimDiags: React.Dispatch<React.SetStateAction<Array<Diagnostic>>>
+  /** TODO: Workaround to capture a crash of the gameserver. */
+  crashed: Boolean,
+  setCrashed: React.Dispatch<React.SetStateAction<Boolean>>
 }>({
-  proof: {steps: [], diagnostics: [], completed: false},
-  setProof: () => {}
+  proof: {steps: [], diagnostics: [], completed: false, completedWithWarnings: false},
+  setProof: () => {},
+  interimDiags: [],
+  setInterimDiags: () => {},
+  crashed: false,
+  setCrashed: () => {}
 })
 
 

@@ -345,96 +345,29 @@ export const FilteredGoals = React.memo(({ headerChildren, goals }: FilteredGoal
 })
 
 export function loadGoals(
-    rpcSess: RpcSessionAtPos,
-    uri: string,
-    setProof: React.Dispatch<React.SetStateAction<ProofState>>) {
-  console.info('sending rpc request to load the proof state')
+  rpcSess: RpcSessionAtPos,
+  uri: string,
+  setProof: React.Dispatch<React.SetStateAction<ProofState>>,
+  setCrashed: React.Dispatch<React.SetStateAction<Boolean>>) {
+console.info('sending rpc request to load the proof state')
 
-  rpcSess.call('Game.getProofState', DocumentPosition.toTdpp({line: 0, character: 0, uri: uri})).then(
-    (proof : ProofState) => {
+rpcSess.call('Game.getProofState', DocumentPosition.toTdpp({line: 0, character: 0, uri: uri})).then(
+  (proof : ProofState) => {
+    if (typeof proof !== 'undefined') {
       console.info(`received a proof state!`)
       console.log(proof)
       setProof(proof)
-
-
-
-
-      // let tmpProof : ProofStep[] = []
-
-      // let goalCount = 0
-
-      // steps.map((goals, i) => {
-      //   // The first step has an empty command and therefore also no error messages
-      //   // Usually there is a newline at the end of the editors content, so we need to
-      //   // display diagnostics from potentally two lines in the last step.
-      //   let messages = i ? (i == steps.length - 1 ? diagnostics.slice(i-1).flat() : diagnostics[i-1]) : []
-
-      //   // Filter out the 'unsolved goals' message
-      //   messages = messages.filter((msg) => {
-      //     return !("append" in msg.message &&
-      //       "text" in msg.message.append[0] &&
-      //       msg.message.append[0].text === "unsolved goals")
-      //   })
-
-      //   if (typeof goals == 'undefined') {
-      //     tmpProof.push({
-      //       command: i ? model.getLineContent(i) : '',
-      //       goals: [],
-      //       hints: [],
-      //       errors: messages
-      //     } as ProofStep)
-      //     console.debug('goals is undefined')
-      //     return
-      //   }
-
-      //   // If the number of goals reduce, show a message
-      //   if (goals.length && goalCount > goals.length) {
-      //     messages.unshift({
-      //       range: {
-      //         start: {
-      //           line: i-1,
-      //           character: 0,
-      //         },
-      //         end: {
-      //           line: i-1,
-      //           character: 0,
-      //         }},
-      //       severity: DiagnosticSeverity.Information,
-      //       message: {
-      //       text: 'intermediate goal solved 🎉'
-      //       }
-      //     })
-      //   }
-      //   goalCount = goals.length
-
-      //   // with no goals there will be no hints.
-      //   let hints : GameHint[] = goals.length ? goals[0].hints : []
-
-      //   console.debug(`Command (${i}): `, i ? model.getLineContent(i) : '')
-      //   console.debug(`Goals: (${i}): `, goalsToString(goals)) //
-      //   console.debug(`Hints: (${i}): `, hints)
-      //   console.debug(`Errors: (${i}): `, messages)
-
-      //   tmpProof.push({
-      //     // the command of the line above. Note that `getLineContent` starts counting
-      //     // at `1` instead of `zero`. The first ProofStep will have an empty command.
-      //     command: i ? model.getLineContent(i) : '',
-      //     // TODO: store correct data
-      //     goals: goals.map(g => g.goal),
-      //     // only need the hints of the active goals in chat
-      //     hints: hints,
-      //     // errors and messages from the server
-      //     errors: messages
-      //   } as ProofStep)
-
-      // })
-      // // Save the proof to the context
-      // setProof(tmpProof)
-
-
-
+      setCrashed(false)
+    } else {
+      console.warn('received undefined proof state!')
+      setCrashed(true)
+      // setProof(undefined)
     }
-  )
+  }
+).catch((error) => {
+  setCrashed(true)
+  console.warn(error)
+})
 }
 
 

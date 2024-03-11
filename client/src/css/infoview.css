@@ -218,3 +218,10 @@
 .undo-button {
   color: #888;
 }
+
+.crashed_message {
+  color: #D8000C;
+  font-weight: bold;
+  padding-left: .5em;
+  padding-right: .5em;
+}

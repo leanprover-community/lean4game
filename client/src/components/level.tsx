@@ -16,6 +16,7 @@ import { InfoviewApi } from '@leanprover/infoview'
 import { EditorContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts'
 import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection'
 import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event'
+import { Diagnostic } from 'vscode-languageserver-types'
 
 import { GameIdContext } from '../app'
 import { useAppDispatch, useAppSelector } from '../hooks'
@@ -208,6 +209,10 @@ function PlayableLevel({impressum, setImpressum}) {
 
   // The state variables for the `ProofContext`
   const [proof, setProof] = useState<ProofState>({steps: [], diagnostics: [], completed: false, completedWithWarnings: false})
+  const [interimDiags, setInterimDiags] = useState<Array<Diagnostic>>([])
+  const [isCrashed, setIsCrashed] = useState<Boolean>(false)
+
+
   // When deleting the proof, we want to keep to old messages around until
   // a new proof has been entered. e.g. to consult messages coming from dead ends
   const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
@@ -380,7 +385,7 @@ function PlayableLevel({impressum, setImpressum}) {
     <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
         <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockInputMode, setLockInputMode}}>
-          <ProofContext.Provider value={{proof, setProof}}>
+          <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={editor}>
                 <LevelAppBar

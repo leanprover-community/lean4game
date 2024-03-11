@@ -87,7 +87,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const inputRef = useRef()
 
   // The context storing all information about the current proof
-  const {proof, setProof} = React.useContext(ProofContext)
+  const {proof, setProof, interimDiags, setInterimDiags, setCrashed} = React.useContext(ProofContext)
 
   // state to store the last batch of deleted messages
   const {setDeletedChat} = React.useContext(DeletedChatContext)
@@ -210,7 +210,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       }])
       setTypewriterInput('')
       // Load proof after executing edits
-      loadGoals(rpcSess, uri, setProof)
+      loadGoals(rpcSess, uri, setProof, setCrashed)
     }
 
     editor.setPosition(pos)
@@ -224,7 +224,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   /* Load proof on start/switching to typewriter */
   useEffect(() => {
-    loadGoals(rpcSess, uri, setProof)
+    loadGoals(rpcSess, uri, setProof, setCrashed)
   }, [])
 
   /** If the last step has an error, add the command to the typewriter. */
@@ -238,6 +238,11 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
     if (params.uri == uri) {
       setProcessing(false)
+
+      console.log('Received lean diagnostics')
+      console.log(params.diagnostics)
+      setInterimDiags(params.diagnostics)
+
       //loadGoals(rpcSess, uri, setProof)
 
       // TODO: loadAllGoals()
@@ -254,13 +259,13 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     // loadAllGoals()
   }, [uri]);
 
-  // React when answer from the server comes back
-  useServerNotificationEffect('$/game/publishDiagnostics', (params: GameDiagnosticsParams) => {
-    console.log('Received game diagnostics')
-    console.log(`diag. uri : ${params.uri}`)
-    console.log(params.diagnostics)
+  // // React when answer from the server comes back
+  // useServerNotificationEffect('$/game/publishDiagnostics', (params: GameDiagnosticsParams) => {
+  //   console.log('Received game diagnostics')
+  //   console.log(`diag. uri : ${params.uri}`)
+  //   console.log(params.diagnostics)
 
-  }, [uri]);
+  // }, [uri]);
 
 
   useEffect(() => {

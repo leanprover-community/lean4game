@@ -424,7 +424,7 @@ private def nextCmdSnap (ctx : WorkerContext) (m : DocumentMeta) (cancelTk : Can
 
   set { s with snaps := s.snaps.push snap }
   cancelTk.check
-  publishProofState m snap initParams ctx.hOut
+  -- publishProofState m snap initParams ctx.hOut
   publishDiagnostics m snap.diagnostics.toArray ctx.hOut
   publishIleanInfoUpdate m ctx.hOut #[snap]
   return some snap

@@ -206,9 +206,6 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
   let rc ← readThe RequestContext
   let text := doc.meta.text
 
-  -- BUG: trimming here is a problem, since the snap might already be evaluated before
-  -- the trimming and then the positions don't match anymore :((
-
   withWaitFindSnap
     doc
     -- TODO (Alex): I couldn't find a good condition to find the correct snap. So we are looking

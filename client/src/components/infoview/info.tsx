@@ -293,7 +293,9 @@ function InfoAux(props: InfoProps) {
     type InfoRequestResult = Omit<InfoDisplayProps, 'triggerUpdate'>
     const [state, triggerUpdateCore] = useAsyncWithTrigger(() => new Promise<InfoRequestResult>((resolve, reject) => {
 
-        const proofReq = rpcSess.call('Game.getProofState', DocumentPosition.toTdpp(pos))
+        const proofReq = rpcSess.call('Game.getProofState', DocumentPosition.toTdpp(pos)).catch((error) => {
+            console.warn(error)
+          })
         const goalsReq = rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp(pos))
         const termGoalReq = getInteractiveTermGoal(rpcSess, DocumentPosition.toTdpp(pos))
         const widgetsReq = Widget_getWidgets(rpcSess, pos).catch(discardMethodNotFound)
