@@ -155,6 +155,12 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
           return none
     return hints
 
+def filterUnsolvedGoal (a : Array InteractiveDiagnostic) :
+    Array InteractiveDiagnostic :=
+  a.filter (fun d => match d.message with
+  | .append ⟨(.text x) :: _⟩ => x != "unsolved goals"
+  | _ => true)
+
 -- TODO: no need to have `RequestM`, just anything where `mut` works
 /-- Add custom diagnostics about whether the level is completed. -/
 def completionDiagnostics (goalCount : Nat) (prevGoalCount : Nat) (completed : Bool)
@@ -182,21 +188,20 @@ def completionDiagnostics (goalCount : Nat) (prevGoalCount : Nat) (completed : B
     else
       pure ()
   else if goalCount < prevGoalCount then
-    out := out.push {
-      message := .text "intermediate goal solved! 🎉"
-      range := {
-        start := pos
-        «end» := pos
-        }
-      severity? := Lsp.DiagnosticSeverity.information
-    }
+    -- If there is any errors, goals might vanish without being 'solved'
+    -- so showing the message "intermediate goal solved" would be confusing.
+    if (¬ (filterUnsolvedGoal startDiags).any (·.severity? == some .error)) then
+      out := out.push {
+        message := .text "intermediate goal solved :(! 🎉"
+        range := {
+          start := pos
+          «end» := pos
+          }
+        severity? := Lsp.DiagnosticSeverity.information
+      }
+
   return out
 
-def filterUnsolvedGoal (a : Array InteractiveDiagnostic) :
-    Array InteractiveDiagnostic :=
-  a.filter (fun d => match d.message with
-  | .append ⟨(.text x) :: _⟩ => x != "unsolved goals"
-  | _ => true)
 
 /-- Request that returns the goals at the end of each line of the tactic proof
 plus the diagnostics (i.e. warnings/errors) for the proof.
