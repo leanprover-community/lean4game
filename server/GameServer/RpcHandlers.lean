@@ -192,7 +192,7 @@ def completionDiagnostics (goalCount : Nat) (prevGoalCount : Nat) (completed : B
     -- so showing the message "intermediate goal solved" would be confusing.
     if (¬ (filterUnsolvedGoal startDiags).any (·.severity? == some .error)) then
       out := out.push {
-        message := .text "intermediate goal solved :(! 🎉"
+        message := .text "intermediate goal solved! 🎉"
         range := {
           start := pos
           «end» := pos
