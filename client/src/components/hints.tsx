@@ -91,12 +91,14 @@ export function MoreHelpButton({selected=null} : {selected?: number}) {
   const {proof, setProof} = React.useContext(ProofContext)
   const {deletedChat, setDeletedChat, showHelp, setShowHelp} = React.useContext(DeletedChatContext)
 
-  let k = (selected === null) ? (proof.steps.length - (lastStepHasErrors(proof) ? 2 : 1)) : selected
+  let k = proof?.steps.length ?
+    ((selected === null) ? (proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)) : selected)
+    : 0
 
   const activateHiddenHints = (ev) => {
     // If the last step (`k`) has errors, we want the hidden hints from the
     // second-to-last step to be affected
-    if (!(proof.steps.length)) {return}
+    if (!(proof?.steps.length)) {return}
 
     // state must not be mutated, therefore we need to clone the set
     let tmp = new Set(showHelp)
@@ -109,7 +111,7 @@ export function MoreHelpButton({selected=null} : {selected?: number}) {
     console.debug(`help: ${Array.from(tmp.values())}`)
   }
 
-  if (hasHiddenHints(proof.steps[k]) && !showHelp.has(k)) {
+  if (hasHiddenHints(proof?.steps[k]) && !showHelp.has(k)) {
     return <Button to="" onClick={activateHiddenHints}>
       Show more help!
     </Button>

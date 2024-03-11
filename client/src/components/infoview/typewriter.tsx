@@ -230,7 +230,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   /** If the last step has an error, add the command to the typewriter. */
   useEffect(() => {
     if (lastStepHasErrors(proof)) {
-      setTypewriterInput(proof.steps[proof.steps.length - 1].command)
+      setTypewriterInput(proof?.steps[proof?.steps.length - 1].command)
     }
   }, [proof])
 
@@ -344,7 +344,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   }
 
   // do not display if the proof is completed (with potential warnings still present)
-  return <div className={`typewriter${proof.completedWithWarnings ? ' hidden' : ''}${disabled ? ' disabled' : ''}`}>
+  return <div className={`typewriter${proof?.completedWithWarnings ? ' hidden' : ''}${disabled ? ' disabled' : ''}`}>
       <form onSubmit={handleSubmit}>
         <div className="typewriter-input-wrapper">
           <div ref={inputRef} className="typewriter-input" />
@@ -376,10 +376,10 @@ export function hasInteractiveErrors (diags: InteractiveDiagnostic[]) {
 export function getInteractiveDiagsAt (proof: ProofState, k : number) {
   if (k == 0) {
     return []
-  } else if (k >= proof.steps.length-1) {
+  } else if (k >= proof?.steps.length-1) {
     // TODO: Do we need that?
-    return proof.diagnostics.filter(msg => msg.range.start.line >= proof.steps.length-1)
+    return proof?.diagnostics.filter(msg => msg.range.start.line >= proof?.steps.length-1)
   } else {
-    return proof.diagnostics.filter(msg => msg.range.start.line == k-1)
+    return proof?.diagnostics.filter(msg => msg.range.start.line == k-1)
   }
 }

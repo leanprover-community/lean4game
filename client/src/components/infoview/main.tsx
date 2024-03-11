@@ -67,7 +67,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
   const dispatch = useAppDispatch()
 
   React.useEffect(() => {
-    if (proof.completed) {
+    if (proof?.completed) {
       dispatch(levelCompleted({ game: gameId, world: worldId, level: levelId }))
 
       // On completion, add the names of all new items to the local storage
@@ -232,16 +232,16 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
     ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
   } else {
     ret = <div className="infoview vscode-light">
-      {proof.completedWithWarnings &&
+      {proof?.completedWithWarnings &&
         <div className="level-completed">
-          {proof.completed ? "Level completed! 🎉" : "Level completed with warnings 🎭"}
+          {proof?.completed ? "Level completed! 🎉" : "Level completed with warnings 🎭"}
         </div>
       }
       <Infos />
-      <Hints hints={proof.steps[curPos?.line]?.goals[0]?.hints}
+      <Hints hints={proof?.steps[curPos?.line]?.goals[0]?.hints}
         showHidden={showHelp.has(curPos?.line)} step={curPos?.line}
         selected={selectedStep} toggleSelection={toggleSelection(curPos?.line)}
-        lastLevel={curPos?.line == proof.steps.length - 1}/>
+        lastLevel={curPos?.line == proof?.steps.length - 1}/>
       <MoreHelpButton selected={curPos?.line}/>
     </div>
   }
@@ -266,11 +266,11 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
     // If the last step has errors, we display the command in a different style
     // indicating that it will be removed on the next try.
     return <div className="failed-command">
-      <i>Failed command</i>: {proof.steps[i].command}
+      <i>Failed command</i>: {proof?.steps[i].command}
     </div>
   } else {
     return <div className="command">
-      <div className="command-text">{proof.steps[i].command}</div>
+      <div className="command-text">{proof?.steps[i].command}</div>
       <Button to="" className="undo-button btn btn-inverted" title="Retry proof from here" onClick={deleteProof}>
         <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;Retry
       </Button>
@@ -414,7 +414,7 @@ export function TypewriterInterface({props}) {
   function deleteProof(line: number) {
     return (ev) => {
       let deletedChat: Array<GameHint> = []
-      proof.steps.slice(line).map((step, i) => {
+      proof?.steps.slice(line).map((step, i) => {
         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
 
         // Only add these hidden hints to the deletion stack which were visible
@@ -431,7 +431,7 @@ export function TypewriterInterface({props}) {
         forceMoveMarkers: false
       }])
       setSelectedStep(undefined)
-      setTypewriterInput(proof.steps[line].command)
+      setTypewriterInput(proof?.steps[line].command)
       // Reload proof on deleting
       loadGoals(rpcSess, uri, setProof)
       ev.stopPropagation()
@@ -453,7 +453,7 @@ export function TypewriterInterface({props}) {
 
    // Scroll to the end of the proof if it is updated.
    React.useEffect(() => {
-    if (proof.steps.length > 1) {
+    if (proof?.steps.length > 1) {
       proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
     } else {
       proofPanelRef.current?.scrollTo(0,0)
@@ -475,7 +475,7 @@ export function TypewriterInterface({props}) {
   }, [selectedStep])
 
   // TODO: superfluous, can be replaced with `withErr` from above
-  let lastStepErrors = proof.steps.length ? hasInteractiveErrors(getInteractiveDiagsAt(proof, proof.steps.length)) : false
+  let lastStepErrors = proof?.steps.length ? hasInteractiveErrors(getInteractiveDiagsAt(proof, proof?.steps.length)) : false
 
 
   useServerNotificationEffect("$/game/loading", (params : any) => {
@@ -495,12 +495,12 @@ export function TypewriterInterface({props}) {
       </div>
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement data={props.data} />
-        {proof.steps.length ?
+        {proof?.steps.length ?
           <>
-            {proof.steps.map((step, i) => {
+            {proof?.steps.map((step, i) => {
               let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
 
-              // if (i == proof.steps.length - 1 && hasInteractiveErrors(step.diags)) {
+              // if (i == proof?.steps.length - 1 && hasInteractiveErrors(step.diags)) {
               //   // if the last command contains an error, we only display the errors but not the
               //   // entered command as it is still present in the command line.
               //   // TODO: Should not use index as key.
@@ -521,18 +521,18 @@ export function TypewriterInterface({props}) {
                       hints={filteredHints} showHidden={showHelp.has(i)} step={i}
                       selected={selectedStep} toggleSelection={toggleSelectStep(i)}/>
                   }
-                  {/* <GoalsTabs proofStep={step} last={i == proof.steps.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof.steps.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/> */}
+                  {/* <GoalsTabs proofStep={step} last={i == proof?.steps.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/> */}
                   {!(isLastStepWithErrors(proof, i)) &&
-                    <GoalsTabs proofStep={step} last={i == proof.steps.length - (lastStepHasErrors(proof) ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof.steps.length - (lastStepHasErrors(proof) ? 2 : 1) ? (n) => setDisableInput(n > 0) : (n) => {}}/>
+                    <GoalsTabs proofStep={step} last={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) ? (n) => setDisableInput(n > 0) : (n) => {}}/>
                   }
-                  {mobile && i == proof.steps.length - 1 &&
+                  {mobile && i == proof?.steps.length - 1 &&
                     <MoreHelpButton />
                   }
 
                   {/* Show a message that there are no goals left */}
                   {/* {!step.goals.length && (
                     <div className="message information">
-                      {proof.completed ?
+                      {proof?.completed ?
                         <p>Level completed! 🎉</p> :
                         <p>
                           <b>no goals left</b><br />
@@ -545,12 +545,12 @@ export function TypewriterInterface({props}) {
               }
             //}
             )}
-            {proof.diagnostics.length > 0 &&
+            {proof?.diagnostics.length > 0 &&
               <div key={`proof-step-remaining`} className="step step-remaining">
-                <Errors errors={proof.diagnostics} typewriterMode={true} />
+                <Errors errors={proof?.diagnostics} typewriterMode={true} />
               </div>
             }
-            {mobile && proof.completed &&
+            {mobile && proof?.completed &&
               <div className="button-row mobile">
                 {props.level >= props.worldSize ?
                   <Button to={`/${gameId}`}>
@@ -567,7 +567,7 @@ export function TypewriterInterface({props}) {
         }
       </div>
     </div>
-    <Typewriter disabled={disableInput || !proof.steps.length}/>
+    <Typewriter disabled={disableInput || !proof?.steps.length}/>
     </RpcContext.Provider>
   </div>
 }

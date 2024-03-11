@@ -84,7 +84,7 @@ function ChatPanel({lastLevel, visible = true}) {
   const {selectedStep, setSelectedStep} = useContext(SelectionContext)
   const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
-  let k = proof.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
+  let k = proof?.steps.length ? proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) : 0
 
   function toggleSelection(line: number) {
     return (ev) => {
@@ -129,27 +129,27 @@ function ChatPanel({lastLevel, visible = true}) {
         <Hint key={`intro-p-${i}`}
           hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
       ))}
-      {proof.steps.map((step, i) => {
+      {proof?.steps.map((step, i) => {
         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
         if (step.goals.length > 0 && !isLastStepWithErrors(proof, i)) {
           return <Hints key={`hints-${i}`}
           hints={filteredHints} showHidden={showHelp.has(i)} step={i}
-          selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof.steps.length - 1}/>
+          selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof?.steps.length - 1}/>
         }
       })}
 
       {/* {modifiedHints.map((step, i) => {
         // It the last step has errors, it will have the same hints
         // as the second-to-last step. Therefore we should not display them.
-        if (!(i == proof.steps.length - 1 && withErr)) {
+        if (!(i == proof?.steps.length - 1 && withErr)) {
           // TODO: Should not use index as key.
           return <Hints key={`hints-${i}`}
             hints={step} showHidden={showHelp.has(i)} step={i}
-            selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof.steps.length - 1}/>
+            selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof?.steps.length - 1}/>
         }
       })} */}
       <DeletedHints hints={deletedChat}/>
-      {proof.completed &&
+      {proof?.completed &&
         <>
           <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
             Level completed! 🎉
@@ -163,7 +163,7 @@ function ChatPanel({lastLevel, visible = true}) {
       }
     </div>
     <div className="button-row">
-      {proof.completed && (lastLevel ?
+      {proof?.completed && (lastLevel ?
         <Button to={`/${gameId}`}>
           <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
         </Button> :
@@ -334,15 +334,15 @@ function PlayableLevel({impressum, setImpressum}) {
 
   useEffect(() => {
     // Forget whether hidden hints are displayed for steps that don't exist yet
-    if (proof.steps.length) {
+    if (proof?.steps.length) {
       console.debug(Array.from(showHelp))
-      setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof.steps.length))))
+      setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof?.steps.length))))
     }
   }, [proof])
 
   // save showed help in store
   useEffect(() => {
-    if (proof.steps.length) {
+    if (proof?.steps.length) {
       console.debug(`showHelp:\n ${showHelp}`)
       dispatch(helpEdited({game: gameId, world: worldId, level: levelId, help: Array.from(showHelp)}))
     }
