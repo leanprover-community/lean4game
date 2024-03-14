@@ -250,7 +250,7 @@ elab "NewDefinition" args:ident* : command => do
 This is ignored if `OnlyTactic` is set. -/
 elab "DisabledTactic" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).tactics.disabled) "DisabledTactic"
-  -- for name in ↑args do checkInventoryDoc .Tactic name
+  for name in ↑args do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with disabled := args.map (·.getId)}}
 
@@ -258,28 +258,28 @@ elab "DisabledTactic" args:ident* : command => do
 This is ignored if `OnlyTheorem` is set. -/
 elab "DisabledTheorem" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).lemmas.disabled) "DisabledTheorem"
-  -- for name in ↑args  do checkInventoryDoc .Lemma name
+  for name in ↑args  do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with disabled := args.map (·.getId)}}
 
 /-- Declare definitions that are temporarily disabled in this level -/
 elab "DisabledDefinition" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).definitions.disabled) "DisabledDefinition"
-  -- for name in ↑args do checkInventoryDoc .Definition name
+  for name in ↑args do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with disabled := args.map (·.getId)}}
 
 /-- Temporarily disable all tactics except the ones declared here -/
 elab "OnlyTactic" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).tactics.only) "OnlyTactic"
-  -- for name in ↑args do checkInventoryDoc .Tactic name
+  for name in ↑args do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with only := args.map (·.getId)}}
 
 /-- Temporarily disable all theorems except the ones declared here -/
 elab "OnlyTheorem" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).lemmas.only) "OnlyTheorem"
-  -- for name in ↑args do checkInventoryDoc .Lemma name
+  for name in ↑args do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with only := args.map (·.getId)}}
 
@@ -287,7 +287,7 @@ elab "OnlyTheorem" args:ident* : command => do
 This is ignored if `OnlyDefinition` is set. -/
 elab "OnlyDefinition" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).definitions.only) "OnlyDefinition"
-  -- for name in ↑args do checkInventoryDoc .Definition name
+  for name in ↑args do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with only := args.map (·.getId)}}
 
