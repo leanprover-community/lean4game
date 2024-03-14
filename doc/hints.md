@@ -86,4 +86,34 @@ create new assumptions.
 
 You can add use markdown to format your hints, for example you can use KaTex: `$\\iff$`
 
+**Escaping**: Generally, if you add text inside quotes `" "` (e.g. in `Hint`) you need to escape
+backslashes, but if you provide text inside a doc comment
+`/-- -/` (e.g. in the `Statement` description) you do not!
+
 TODO: Write a doc about latex/markdown options available.
+
+### Commutative diagrams
+
+Here is an example of how to write a commutative diagram in KaTeX:
+
+$$
+\begin{CD}
+      A  @>{f}>> B @<{g}<< C    \\
+  @V{h}VV    @V{i}VV   @V{j}VV \\
+      D  @<{k}<< E @>{l}>> F    \\
+  @A{m}AA    @A{n}AA   @V{p}VV \\
+      G  @<{q}<< H @>{r}>> I
+\end{CD}
+$$
+
+```
+$$
+\\begin{CD}
+      A  @>{f}>> B @<{g}<< C    \\\\
+  @V{h}VV    @V{i}VV   @V{j}VV \\\\
+      D  @<{k}<< E @>{l}>> F    \\\\
+  @A{m}AA    @A{n}AA   @V{p}VV \\\\
+      G  @<{q}<< H @>{r}>> I
+\\end{CD}
+$$
+```
