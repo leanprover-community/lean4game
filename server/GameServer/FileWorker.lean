@@ -4,6 +4,7 @@ import GameServer.Game
 import GameServer.ImportModules
 import GameServer.SaveData
 import GameServer.EnvExtensions
+import GameServer.Tactic.LetIntros
 
 namespace MyModule
 
@@ -258,8 +259,11 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
           let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
 
+          -- Always call `let_intros` to get rid `let` statements in the goal.
+          -- This makes the experience for the user much nicer and allows for local
+          -- definitions in the exercise.
           let cmdStx ← `(command|
-            theorem the_theorem $(level.goal) := by {$(⟨tacticStx⟩)} )
+            theorem the_theorem $(level.goal) := by {let_intros; $(⟨tacticStx⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
       cmdCtx cmdStateRef
   let postNew := (← tacticCacheNew.get).post

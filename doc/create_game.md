@@ -189,8 +189,7 @@ The statement is the exercise of the level. The basics work the same as they wou
 
 #### Name
 
-You can give your exercise a name: `Statement my_first_exercise (n : Nat) ...`. If you do so, it will be added to the inventory and be available in future levels.
-
+You can give your exercise a name: `Statement my_first_exercise (n : Nat) …`. If you do so, it will be added to the inventory and be available in future levels.
 You can but a `Statement` inside namespaces like you would with `theorem`.
 
 #### Doc String / Exercise statement
@@ -201,6 +200,28 @@ Add a docstring that contains the exercise statement in natural language. If you
 /-- The exercise statement in natural language using latex: $\iff$. -/
 Statement ...
   sorry
+```
+
+#### Local `let` definitions
+
+If you want to make a local definition/notation which only holds for this exercise (e.g.
+a function `f : ℤ → ℤ := fun x ↦ 2 * x`) the recommended way is to use a `let`-statement:
+
+```lean
+Statement (a : ℤ) (h : 0 < a) :
+    let f : ℤ → ℤ := fun x ↦ 2 * x
+    0 < f a := by
+  sorry
+```
+
+The game automatically `intros` such `let`-statements, such that you and the player will see
+the following initial proof state:
+
+```
+a: ℤ
+h: 0 < a
+f: ℤ → ℤ := fun x => 2 * x
+⊢ 0 < f a
 ```
 
 #### Attributes

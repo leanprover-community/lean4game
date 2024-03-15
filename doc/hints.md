@@ -117,3 +117,5 @@ $$
 \\end{CD}
 $$
 ```
+
+See https://www.jmilne.org/not/Mamscd.pdf

@@ -3,6 +3,7 @@ import GameServer.Inventory
 import GameServer.Options
 import GameServer.SaveData
 import GameServer.Hints
+import GameServer.Tactic.LetIntros
 import I18n
 
 open Lean Meta Elab Command
@@ -364,36 +365,38 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     collectUsedInventory proof
   | _ => throwError "expected `:=`"
 
+  -- extract the `tacticSeq` from `val` in order to add `let_intros` in front.
+  -- TODO: don't understand meta-programming enough to avoid having `let_intros`
+  -- duplicated three times below…
+  let tacticStx : TSyntax `Lean.Parser.Tactic.tacticSeq := match val with
+  | `(Parser.Command.declVal| := by $proof) => proof
+  | _ => panic "expected `:= by`"
+
   -- Add theorem to context.
   match statementName with
   | some name =>
     let env ← getEnv
-
     let fullName := (← getCurrNamespace) ++ name.getId
-
     if env.contains fullName then
       let origType := (env.constants.map₁.find! fullName).type
       -- TODO: Check if `origType` agrees with `sig` and output `logInfo` instead of `logWarning`
       -- in that case.
       logWarningAt name (m!"Environment already contains {fullName}! Only the existing " ++
       m!"statement will be available in later levels:\n\n{origType}")
-      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig $val)
+      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨tacticStx⟩)})
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
-
     else
-      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig $val)
+      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig := by {let_intros; $(⟨tacticStx⟩)})
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
-
   | none =>
-    let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig $val)
+    let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨tacticStx⟩)})
     elabCommand thmStatement
 
   let msgs := (← get).messages
-
   let mut hints := #[]
   let mut nonHintMsgs := #[]
   for msg in msgs.msgs do
