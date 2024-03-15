@@ -7,6 +7,10 @@ import Lean.Meta.Tactic.Intro
 
 `let_intros` is a weaker form of `intros` aimed to only introduce `let` statements,
 but not for example `∀`-binders.
+
+Note: Mathlib has a tactic `extract_lets` which does essentially exactly this.
+  The only difference is that `let_intros` is unhygenic, in the sense that it will name
+  the introduced variables `f` instead of leaving them inaccessible `f✝`.
 -/
 
 namespace GameServer
