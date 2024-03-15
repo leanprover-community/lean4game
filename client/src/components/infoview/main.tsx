@@ -423,6 +423,9 @@ export function TypewriterInterface({props}) {
       })
       setDeletedChat(deletedChat)
 
+      // delete showHelp for deleted steps
+      setShowHelp(new Set(Array.from(showHelp).filter(i => i < line - 1)))
+
       editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           { lineNumber: line, column: 1 },
