@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -138,14 +139,20 @@ function LandingPage() {
     "trequetrum/lean4game-logic",
   ]
   let allTiles = allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
+  const { t, i18n } = useTranslation();
 
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
       <nav>
         <GithubIcon url="https://github.com/leanprover-community/lean4game"/>
       </nav>
+      <div>
+      <button onClick={() => i18n.changeLanguage("en")}>{flag["English"]}</button>
+      <button onClick={() => i18n.changeLanguage("fr")}>{flag["French"]}</button>
+      {/* Add more buttons for other languages as needed */}
+    </div>
       <div id="main-title">
-        <h1>Lean Game Server</h1>
+        <h1>{t("Lean Game Server")}</h1>
         <p>
           A repository of learning games for the
           proof assistant <a target="_blank" href="https://leanprover-community.github.io/">Lean</a> <i>(Lean 4)</i> and
