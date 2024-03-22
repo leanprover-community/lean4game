@@ -43,9 +43,9 @@ import { DiagnosticSeverity } from 'vscode-languageclient';
  */
 export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) {
   const ec = React.useContext(EditorContext)
-  const { typewriterMode } = React.useContext(InputModeContext)
+  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
   return <>
-    <div className={typewriterMode ? 'hidden' : ''}>
+    <div className={(typewriterMode && !lockEditorMode) ? 'hidden' : ''}>
       <ExerciseStatement data={level} showLeanStatement={true} />
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
@@ -61,7 +61,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
 function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: string, levelId: number, level: LevelInfo, worldSize: number }) {
   const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
-  const { typewriterMode } = React.useContext(InputModeContext)
+  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
 
   const {proof, setProof} = React.useContext(ProofContext)
 
@@ -111,7 +111,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
         <WithRpcSessions>
           <WithLspDiagnosticsContext>
             <ProgressContext.Provider value={allProgress}>
-              {typewriterMode ?
+              {(typewriterMode && !lockEditorMode) ?
                 <TypewriterInterfaceWrapper world={worldId} level={levelId} data={level} worldSize={worldSize}/>
                 :
                 <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} data={level} />

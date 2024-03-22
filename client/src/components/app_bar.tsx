@@ -98,23 +98,23 @@ function PreviousButton({setNavOpen}) {
 /** button to toggle between editor and typewriter */
 function InputModeButton({setNavOpen, isDropdown}) {
   const {levelId} = React.useContext(WorldLevelIdContext)
-  const {typewriterMode, setTypewriterMode, lockInputMode} = React.useContext(InputModeContext)
+  const {typewriterMode, setTypewriterMode, lockEditorMode} = React.useContext(InputModeContext)
 
   /** toggle input mode if allowed */
   function toggleInputMode(ev: React.MouseEvent) {
-    if (!lockInputMode){
+    if (!lockEditorMode){
       setTypewriterMode(!typewriterMode)
       setNavOpen(false)
     }
   }
 
   return <Button
-      className={`btn btn-inverted ${isDropdown? '' : 'toggle-width'}`} disabled={levelId <= 0 || lockInputMode}
+      className={`btn btn-inverted ${isDropdown? '' : 'toggle-width'}`} disabled={levelId <= 0 || lockEditorMode}
       inverted="true" to=""
       onClick={(ev) => toggleInputMode(ev)}
-      title={lockInputMode ? "Editor mode is enforced!" : typewriterMode ? "Editor mode" : "Typewriter mode"}>
-    <FontAwesomeIcon icon={typewriterMode ? faCode : faTerminal} />
-    {isDropdown && (typewriterMode ? <>&nbsp;Editor mode</> : <>&nbsp;Typewriter mode</>)}
+      title={lockEditorMode ? "Editor mode is enforced!" : typewriterMode ? "Editor mode" : "Typewriter mode"}>
+    <FontAwesomeIcon icon={(typewriterMode && !lockEditorMode) ? faCode : faTerminal} />
+    {isDropdown && ((typewriterMode && !lockEditorMode) ? <>&nbsp;Editor mode</> : <>&nbsp;Typewriter mode</>)}
   </Button>
 }
 

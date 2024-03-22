@@ -170,7 +170,6 @@ export const Goal = React.memo((props: GoalProps) => {
     // const hints = <Hints hints={goal.hints} key={goal.mvarId} />
     const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
     const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
-    const {typewriterMode} = React.useContext(InputModeContext)
 
     return <div>
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
@@ -181,7 +180,6 @@ export const Goal = React.memo((props: GoalProps) => {
         {!typewriter && assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        {/* {typewriter && typewriterMode && <Typewriter />} */}
         {!filter.reverse && goalLi}
         {/* {showHints && hints} */}
     </div>

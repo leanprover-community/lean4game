@@ -125,13 +125,13 @@ export const InputModeContext = React.createContext<{
   setTypewriterMode: React.Dispatch<React.SetStateAction<boolean>>,
   typewriterInput: string,
   setTypewriterInput: React.Dispatch<React.SetStateAction<string>>,
-  lockInputMode: boolean,
-  setLockInputMode: React.Dispatch<React.SetStateAction<boolean>>,
+  lockEditorMode: boolean,
+  setLockEditorMode: React.Dispatch<React.SetStateAction<boolean>>,
 }>({
   typewriterMode: true,
   setTypewriterMode: () => {},
   typewriterInput: "",
   setTypewriterInput: () => {},
-  lockInputMode: false,
-  setLockInputMode: () => {},
+  lockEditorMode: false,
+  setLockEditorMode: () => {},
 });

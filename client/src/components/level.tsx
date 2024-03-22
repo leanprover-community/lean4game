@@ -222,7 +222,7 @@ function PlayableLevel({impressum, setImpressum}) {
   const [pageNumber, setPageNumber] = useState(0)
 
   // set to true to prevent switching between typewriter and editor
-  const [lockInputMode, setLockInputMode] = useState(false)
+  const [lockEditorMode, setLockEditorMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
 
@@ -282,10 +282,11 @@ function PlayableLevel({impressum, setImpressum}) {
   // a hint at the beginning of the proof...
   const [selectedStep, setSelectedStep] = useState<number>()
 
+
   useEffect (() => {
     // Lock editor mode
     if (level?.data?.template) {
-      setTypewriterMode(false)
+      setLockEditorMode(true)
 
       if (editor) {
         let code = editor.getModel().getLinesContent()
@@ -312,6 +313,8 @@ function PlayableLevel({impressum, setImpressum}) {
           console.debug(`not inserting template.`)
         }
       }
+    } else {
+      setLockEditorMode(false)
     }
   }, [level, levelId, worldId, gameId, editor])
 
@@ -326,7 +329,7 @@ function PlayableLevel({impressum, setImpressum}) {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    if (!typewriterMode && editor) {
+    if (!(typewriterMode && !lockEditorMode) && editor) {
       // Delete last input attempt from command line
       editor.executeEdits("typewriter", [{
         range: editor.getSelection(),
@@ -335,7 +338,7 @@ function PlayableLevel({impressum, setImpressum}) {
       }]);
       editor.focus()
     }
-  }, [typewriterMode])
+  }, [typewriterMode, lockEditorMode])
 
   useEffect(() => {
     // Forget whether hidden hints are displayed for steps that don't exist yet
@@ -355,7 +358,7 @@ function PlayableLevel({impressum, setImpressum}) {
 
   // Effect when command line mode gets enabled
   useEffect(() => {
-    if (onigasmH && editor && typewriterMode) {
+    if (onigasmH && editor && (typewriterMode && !lockEditorMode)) {
       let code = editor.getModel().getLinesContent().filter(line => line.trim())
       editor.executeEdits("typewriter", [{
         range: editor.getModel().getFullModelRange(),
@@ -378,13 +381,13 @@ function PlayableLevel({impressum, setImpressum}) {
       //   editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
       // }
     }
-  }, [editor, typewriterMode, onigasmH == null])
+  }, [editor, typewriterMode, lockEditorMode, onigasmH == null])
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
-        <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockInputMode, setLockInputMode}}>
+        <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode}}>
           <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={editor}>

@@ -79,7 +79,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         message = diag.message
     }
 
-    const { typewriterMode } = React.useContext(InputModeContext)
+    const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
 
     return (
     // <details open>
@@ -98,7 +98,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         //     </span>
         // </summary>
         <div className={severityClass + ' ml1 message'}>
-            {!typewriterMode && <p className="mv2">{title}</p>}
+            {!(typewriterMode && !lockEditorMode) && <p className="mv2">{title}</p>}
             <pre className="font-code pre-wrap">
                 <InteractiveMessage fmt={message} />
             </pre>
