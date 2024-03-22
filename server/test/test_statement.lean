@@ -73,10 +73,13 @@ theorem xy (n : Nat) : n + 0 = n := by
 
 /-- Doc comment -/
 @[simp]
-Statement My.add_comm (n m : Nat) : n + m = m + n := by
-  rw [Nat.add_comm]
+Statement My.add_assoc (n m x : Nat) : (m + n) + x = m + (n + x) := by
+  rw [Nat.add_assoc]
 
-example (n m : Nat) : n + m = m + n := by
+example (n m : Nat) : (m + n) + x = m + (n + x) := by
   simp
 
-#check My.add_comm
+#check My.add_assoc
+
+Statement My.add_comm (preample := simp [add_comm m n]) (n m : Nat) : n + (m + 0) = m + n := by
+  rw [Nat.add_comm]
