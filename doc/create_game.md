@@ -202,36 +202,7 @@ Statement ...
   sorry
 ```
 
-#### Local `let` definitions
-
-If you want to make a local definition/notation which only holds for this exercise (e.g.
-a function `f : ℤ → ℤ := fun x ↦ 2 * x`) the recommended way is to use a `let`-statement:
-
-```lean
-Statement (a : ℤ) (h : 0 < a) :
-    let f : ℤ → ℤ := fun x ↦ 2 * x
-    0 < f a := by
-  sorry
-```
-
-The game automatically `intros` such `let`-statements, such that you and the player will see
-the following initial proof state:
-
-```
-a: ℤ
-h: 0 < a
-f: ℤ → ℤ := fun x => 2 * x
-⊢ 0 < f a
-```
-
-#### Attributes
-
-You can add attributes as you would for a `theorem`. Most notably, you can make your named exercise a `simp` lemma:
-
-```lean
-@[simp]
-Statement my_simp_lemma ...
-```
+For more details and features, read [Writing Exercises](writing_exercises.md)
 
 ### 6. c) Proof
 
