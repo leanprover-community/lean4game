@@ -3,4 +3,3 @@ client/dist
 games/
 server/.lake
 **/.DS_Store
-/.lake
