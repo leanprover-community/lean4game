@@ -373,3 +373,12 @@ td code  {
 /* .proof .step {
   border: 2px solid rgb(0, 123, 255);
 } */
+
+.nav-btns {
+  height: 2rem;
+}
+
+.nav-btns .language-btn {
+  background: #DDF6FF;
+  text-align: center;
+}

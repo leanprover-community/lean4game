@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Input, Typography } from '@mui/material'
+import { Input, MenuItem, Select, Typography } from '@mui/material'
 import Markdown from '../markdown'
 import { Switch, Button, ButtonGroup } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -8,6 +8,7 @@ import Slider from '@mui/material/Slider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { IPreferencesContext } from "../infoview/context"
+import ReactCountryFlag from 'react-country-flag';
 
 interface PreferencesPopupProps extends Omit<IPreferencesContext, 'mobile'> {
     handleClose: () => void
@@ -42,6 +43,27 @@ export function PreferencesPopup({ layout, setLayout, isSavePreferences, setIsSa
         <div className="modal">
             <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
             <Typography variant="body1" component="div" className="settings">
+                <div className='preferences-category'>
+                    <div className='category-title'>
+                        <h3>Language</h3>
+                    </div>
+                    <div className='preferences-item first leave-left-gap'>
+                        <FormControlLabel
+                            control={
+                                <Box sx={{ width: 300 }}>
+                                    <Select
+                                        value={'GB'}
+                                        label={"Language"}>
+                                        <MenuItem value={'GB'}>
+                                            <ReactCountryFlag countryCode="GB"/>&nbsp;English
+                                        </MenuItem>
+                                    </Select>
+                                </Box>
+                            }
+                            label=""
+                        />
+                    </div>
+                </div>
                 <div className='preferences-category'>
                     <div className='category-title'>
                         <h3>Layout</h3>

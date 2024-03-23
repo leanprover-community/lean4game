@@ -13,6 +13,7 @@ import { changedOpenedIntro, selectCompleted, selectDifficulty, selectProgress }
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
+import ReactCountryFlag from "react-country-flag"
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -127,6 +128,22 @@ function ImpressumButton({setNavOpen, toggleImpressum, isDropdown}) {
   </Button>
 }
 
+/** button to toggle iimpressum popup */
+function LanguageButton({setNavOpen, toggleLangNav, isDropdown}) {
+  return <Button className="btn btn-inverted language-btn"
+    title="language" inverted="true" to="" onClick={(ev) => {toggleLangNav(ev); setNavOpen(false)}}>
+    <ReactCountryFlag countryCode="GB"
+      className="emojiFlag"
+      style={{
+          height: '1.3em',
+          width: '1.6em',
+      }}
+      title="English"
+    />
+    {isDropdown && <>&nbsp;Language</>}
+  </Button>
+}
+
 /**  button to go back to welcome page */
 function HomeButton({isDropdown}) {
   const gameId = React.useContext(GameIdContext)
@@ -237,6 +254,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=
           <HomeButton isDropdown={true} />
           <InputModeButton setNavOpen={setNavOpen} isDropdown={true}/>
           <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+          <LanguageButton setNavOpen={setNavOpen} toggleLangNav={() => {}} isDropdown={true} />
         </div>
       </> :
       <>
@@ -253,6 +271,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=
           <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} setNavOpen={setNavOpen} />
           <InputModeButton setNavOpen={setNavOpen} isDropdown={false}/>
           <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={false} />
+          <LanguageButton setNavOpen={setNavOpen} toggleLangNav={() => {}} isDropdown={false} />
         </div>
       </>
     }

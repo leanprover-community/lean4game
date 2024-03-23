@@ -42,7 +42,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
       {text?.map(((t, i) =>
         t.trim() ?
           <Hint key={`intro-p-${i}`}
-            hint={{text: t, hidden: false}}
+            hint={{text: t, hidden: false, rawText: t, varNames: []}}
             step={0} selected={null} toggleSelection={undefined} />
         : <></>
       ))}
@@ -93,7 +93,6 @@ function Welcome() {
   function toggleInfo()       {setInfo(!info)}
   function toggleUploadMenu() {setUploadMenu(!uploadMenu)}
   function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
-
 
   // set the window title
   useEffect(() => {
