@@ -17,6 +17,7 @@ import { store } from '../state/store'
 
 import '../css/world_tree.css'
 import { PreferencesContext } from './infoview/context'
+import { useTranslation } from 'react-i18next'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -195,6 +196,7 @@ export const downloadFile = ({ data, fileName, fileType } :
 
 /** The menu that is shown next to the world selection graph */
 export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
+  const { t, i18n } = useTranslation()
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const dispatch = useAppDispatch()
@@ -202,20 +204,20 @@ export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
 
 
   function label(x : number) {
-    return x == 0 ? 'none' : x == 1 ? 'relaxed' : 'regular'
+    return x == 0 ? t("none") : x == 1 ? t("relaxed") : t("regular")
   }
 
 
   return <nav className={`world-selection-menu${mobile ? '' : ' desktop'}`}>
     <div className="slider-wrap">
-      <span className="difficulty-label">Rules
+      <span className="difficulty-label">{t("Rules")}
         <FontAwesomeIcon icon={rulesHelp ? faXmark : faCircleQuestion} className='helpButton' onClick={() => (setRulesHelp(!rulesHelp))}/>
       </span>
       <Slider
         orientation="vertical"
-        title="Game Rules"
+        title={t("Game Rules")}
         min={0} max={2}
-        aria-label="Game Rules"
+        aria-label={t("Game Rules")}
         value={difficulty}
         marks={[
           {value: 0, label: label(0)},

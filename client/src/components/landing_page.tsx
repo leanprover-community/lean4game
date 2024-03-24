@@ -139,7 +139,7 @@ function LandingPage() {
     "trequetrum/lean4game-logic",
   ]
   let allTiles = allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation()
 
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
@@ -149,6 +149,7 @@ function LandingPage() {
       <div>
       <button onClick={() => i18n.changeLanguage("en")}>{flag["English"]}</button>
       <button onClick={() => i18n.changeLanguage("fr")}>{flag["French"]}</button>
+      <button onClick={() => i18n.changeLanguage("de")}>{flag["German"]}</button>
       {/* Add more buttons for other languages as needed */}
     </div>
       <div id="main-title">

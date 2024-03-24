@@ -28,6 +28,8 @@
     "debounce": "^1.2.1",
     "express": "^4.18.2",
     "i18next": "^23.10.1",
+    "i18next-http-backend": "^2.5.0",
+    "i18next-scanner-typescript": "^1.2.0",
     "lean4-infoview": "https://gitpkg.now.sh/leanprover/vscode-lean4/lean4-infoview?de0062c",
     "lean4web": "github:hhu-adam/lean4web#414d9e62638a392fca278761b4c61a1d2e138bc7",
     "octokit": "^3.1.2",
@@ -61,6 +63,7 @@
     "concurrently": "^7.6.0",
     "css-loader": "^6.7.3",
     "file-loader": "^6.2.0",
+    "i18next-scanner": "^4.4.0",
     "nodemon": "^3.0.1",
     "react-refresh": "^0.14.0",
     "style-loader": "^3.3.1",
@@ -76,7 +79,8 @@
     "preview": "vite preview",
     "build_server": "cd server && lake build",
     "build_client": "cross-env NODE_ENV=production vite build",
-    "production": "cross-env NODE_ENV=production node relay/index.mjs"
+    "production": "cross-env NODE_ENV=production node relay/index.mjs",
+    "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs"
   },
   "eslintConfig": {
     "extends": [

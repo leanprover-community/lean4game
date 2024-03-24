@@ -1,0 +1,11 @@
+{
+  "Lean Game Server": "Lean Game Server",
+  "<p>Game rules determine if it is allowed to skip levels and if the games runs checks to only allow unlocked tactics and theorems in proofs.</p><1>Note: \"Unlocked\" tactics (or theorems) are determined by two things: The set of minimal tactics needed to solve a level, plus any tactics you unlocked in another level. That means if you unlock <1>simp</1> in a level, you can use it henceforth in any level.</1><p>The options are:</p>": "<p>Game rules determine if it is allowed to skip levels and if the games runs checks to only allow unlocked tactics and theorems in proofs.</p><1>Note: \"Unlocked\" tactics (or theorems) are determined by two things: The set of minimal tactics needed to solve a level, plus any tactics you unlocked in another level. That means if you unlock <1>simp</1> in a level, you can use it henceforth in any level.</1><p>The options are:</p>",
+  "Game Rules": "Game Rules",
+  "levels": "levels",
+  "tactics": "tactics",
+  "regular": "regular",
+  "relaxed": "relaxed",
+  "none": "none",
+  "Rules": "Rules"
+}
