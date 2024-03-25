@@ -5,7 +5,7 @@ import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
-  faCircleInfo, faTerminal, faMobileScreenButton, faDesktop, faGear } from '@fortawesome/free-solid-svg-icons'
+  faCircleInfo, faTerminal, faGear } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext } from "../app"
 import { InputModeContext, PreferencesContext, WorldLevelIdContext } from "./infoview/context"
 import { GameInfo, useGetGameInfoQuery } from '../state/api'
@@ -13,7 +13,6 @@ import { changedOpenedIntro, selectCompleted, selectDifficulty, selectProgress }
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
-import ReactCountryFlag from "react-country-flag"
 import { t } from 'i18next'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
@@ -24,13 +23,13 @@ function MobileNavButtons({pageNumber, setPageNumber}:
   const dispatch = useAppDispatch()
 
   // if `prevText` or `prevIcon` is set, show a button to go back
-  let prevText  = {0: null, 1: "Intro", 2: null}[pageNumber]
+  let prevText  = {0: null, 1: t("Intro"), 2: null}[pageNumber]
   let prevIcon  = {0: null, 1: null, 2: faBookOpen}[pageNumber]
-  let prevTitle = {0: null, 1: "Game Introduction", 2: "World selection"}[pageNumber]
+  let prevTitle = {0: null, 1: t("Game Introduction"), 2: t("World selection")}[pageNumber]
   // if `nextText` or `nextIcon` is set, show a button to go forward
-  let nextText  = {0: "Start", 1: null, 2: null}[pageNumber]
+  let nextText  = {0: t("Start"), 1: null, 2: null}[pageNumber]
   let nextIcon  = {0: null, 1: faBook, 2: null}[pageNumber]
-  let nextTitle = {0: "World selection", 1: "Inventory", 2: null}[pageNumber]
+  let nextTitle = {0: t("World selection"), 1: t("Inventory"), 2: null}[pageNumber]
 
   return <>
     {(prevText || prevIcon) &&
@@ -69,14 +68,14 @@ function NextButton({worldSize, difficulty, completed, setNavOpen}) {
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
   return (levelId < worldSize ?
     <Button inverted="true"
-        to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title="next level"
+        to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title={t("next level")}
         disabled={difficulty >= 2 && !(completed || levelId == 0)}
         onClick={() => setNavOpen(false)}>
-      <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? "Next" : "Start"}
+      <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? t("Next") : t("Start")}
     </Button>
     :
-    <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
-      <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
+    <Button to={`/${gameId}`} inverted="true" title={t("back to world selection")} id="home-btn">
+      <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
     </Button>
   )
 }
@@ -90,9 +89,9 @@ function PreviousButton({setNavOpen}) {
   return (levelId > 0 && <>
     <Button disabled={levelId <= 0} inverted="true"
         to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
-        title="previous level"
+        title={t("previous level")}
         onClick={() => setNavOpen(false)}>
-      <FontAwesomeIcon icon={faArrowLeft} />&nbsp;Previous
+      <FontAwesomeIcon icon={faArrowLeft} />&nbsp;{t("Previous")}
     </Button>
   </>)
 }
@@ -114,66 +113,66 @@ function InputModeButton({setNavOpen, isDropdown}) {
       className={`btn btn-inverted ${isDropdown? '' : 'toggle-width'}`} disabled={levelId <= 0 || lockEditorMode}
       inverted="true" to=""
       onClick={(ev) => toggleInputMode(ev)}
-      title={lockEditorMode ? "Editor mode is enforced!" : typewriterMode ? "Editor mode" : "Typewriter mode"}>
+      title={lockEditorMode ? t("Editor mode is enforced!") : typewriterMode ? t("Editor mode") : t("Typewriter mode")}>
     <FontAwesomeIcon icon={(typewriterMode && !lockEditorMode) ? faCode : faTerminal} />
-    {isDropdown && ((typewriterMode && !lockEditorMode) ? <>&nbsp;Editor mode</> : <>&nbsp;Typewriter mode</>)}
+    {isDropdown && ((typewriterMode && !lockEditorMode) ? <>&nbsp;{t("Editor mode")}</> : <>&nbsp;{t("Typewriter mode")}</>)}
   </Button>
 }
 
 /** button to toggle iimpressum popup
  *
- * Note: Do not translate "Impressum"!
+ * Note: Do not translate the word "Impressum"! German GDPR needs this.
 */
 function ImpressumButton({setNavOpen, toggleImpressum, isDropdown}) {
   return <Button className="btn btn-inverted"
-    title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
+    title={t("information, Impressum, privacy policy")} inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faCircleInfo} />
-    {isDropdown && <>&nbsp;Impressum</>}
+    {isDropdown && <>&nbsp;{t("Impressum")}</>}
   </Button>
 }
 
 function PreferencesButton({setNavOpen, togglePreferencesPopup}) {
-  return <Button title="Preferences" inverted="true" to="" onClick={() => {togglePreferencesPopup(); setNavOpen(false)}}>
+  return <Button title={t("Preferences")} inverted="true" to="" onClick={() => {togglePreferencesPopup(); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faGear} />&nbsp;{t("Preferences")}
   </Button>
 }
 
 function GameInfoButton({setNavOpen, toggleInfo}) {
   return <Button className="btn btn-inverted"
-    title="Game Info & Credits" inverted="true" to="" onClick={() => {toggleInfo(); setNavOpen(false)}}>
-    <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Game Info
+    title={t("Game Info & Credits")} inverted="true" to="" onClick={() => {toggleInfo(); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faCircleInfo} />&nbsp;{t("Game Info")}
   </Button>
 }
 
 function EraseButton ({setNavOpen, toggleEraseMenu}) {
-  return <Button title="Clear Progress" inverted="true" to="" onClick={() => {toggleEraseMenu(); setNavOpen(false)}}>
-    <FontAwesomeIcon icon={faEraser} />&nbsp;Erase
+  return <Button title={t("Clear Progress")} inverted="true" to="" onClick={() => {toggleEraseMenu(); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faEraser} />&nbsp;{t("Erase")}
   </Button>
 }
 
 function DownloadButton ({setNavOpen, gameId, gameProgress}) {
-  return <Button title="Download Progress" inverted="true" to="" onClick={(ev) => {downloadProgress(gameId, gameProgress, ev); setNavOpen(false)}}>
-    <FontAwesomeIcon icon={faDownload} />&nbsp;Download
+  return <Button title={t("Download Progress")} inverted="true" to="" onClick={(ev) => {downloadProgress(gameId, gameProgress, ev); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faDownload} />&nbsp;{t("Download")}
   </Button>
 }
 
 function UploadButton ({setNavOpen, toggleUploadMenu}) {
-  return <Button title="Load Progress from JSON" inverted="true" to="" onClick={() => {toggleUploadMenu(); setNavOpen(false)}}>
-    <FontAwesomeIcon icon={faUpload} />&nbsp;Upload
+  return <Button title={t("Load Progress from JSON")} inverted="true" to="" onClick={() => {toggleUploadMenu(); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faUpload} />&nbsp;{t("Upload")}
   </Button>
 }
 
 /**  button to go back to welcome page */
 function HomeButton({isDropdown}) {
   const gameId = React.useContext(GameIdContext)
-  return <Button to={`/${gameId}`} inverted="true" title="back to world selection" id="home-btn">
+  return <Button to={`/${gameId}`} inverted="true" title={t("back to world selection")} id="home-btn">
     <FontAwesomeIcon icon={faHome} />
-    {isDropdown && <>&nbsp;Home</>}
+    {isDropdown && <>&nbsp;{t("Home")}</>}
   </Button>
 }
 
 function LandingPageButton() {
-  return <Button inverted="false" title="back to games selection" to="/">
+  return <Button inverted="false" title={t("back to games selection")} to="/">
     <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
     </Button>
 }
@@ -184,7 +183,7 @@ function LandingPageButton() {
 function InventoryButton({pageNumber, setPageNumber}) {
   return (setPageNumber &&
     <Button to="" className="btn btn-inverted toggle-width"
-      title={pageNumber ? "close inventory" : "show inventory"}
+      title={pageNumber ? t("close inventory") : t("show inventory")}
       inverted="true" onClick={() => {setPageNumber(pageNumber ? 0 : 1)}}>
       <FontAwesomeIcon icon={pageNumber ? faBookOpen : faBook} />
     </Button>
