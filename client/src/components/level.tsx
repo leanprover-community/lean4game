@@ -62,7 +62,6 @@ function Level() {
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
 
-  const {layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
@@ -84,7 +83,7 @@ function Level() {
       <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>}
     {impressum ? <PrivacyPolicyPopup handleClose={closeImpressum} /> : null}
     {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
-    {preferencesPopup ? <PreferencesPopup layout={layout} isSavePreferences={isSavePreferences} setLayout={setLayout} setIsSavePreferences={setIsSavePreferences} handleClose={closePreferencesPopup} language={language} setLanguage={setLanguage}/> : null}
+    {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </WorldLevelIdContext.Provider>
 }
 

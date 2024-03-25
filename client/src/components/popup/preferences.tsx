@@ -8,31 +8,28 @@ import lean4gameConfig from '../../config.json'
 
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { IPreferencesContext } from "../infoview/context"
+import { IPreferencesContext, PreferencesContext } from "../infoview/context"
 import ReactCountryFlag from 'react-country-flag';
 import { useTranslation } from 'react-i18next';
 
-interface PreferencesPopupProps extends Omit<IPreferencesContext, 'mobile'> {
-  handleClose: () => void
-}
-
-export function PreferencesPopup({ layout, setLayout, isSavePreferences, language, setIsSavePreferences, handleClose, setLanguage }: PreferencesPopupProps) {
+export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
   let { t } = useTranslation()
+  const {layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
 
   const marks = [
     {
       value: 0,
-      label: 'Mobile',
+      label: t('Mobile'),
       key: "mobile"
     },
     {
       value: 1,
-      label: 'Auto',
+      label: t('Auto'),
       key: "auto"
     },
     {
       value: 2,
-      label: 'Desktop',
+      label: t('Desktop'),
       key: "desktop"
     },
   ];

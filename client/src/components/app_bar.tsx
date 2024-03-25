@@ -55,7 +55,7 @@ function MobileNavButtons({pageNumber, setPageNumber}:
 }
 
 /** button to toggle dropdown menu. */
-function MenuButton({navOpen, setNavOpen}) {
+export function MenuButton({navOpen, setNavOpen}) {
   return <Button to="" className="btn toggle-width" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}}>
     {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
   </Button>
@@ -127,16 +127,16 @@ function InputModeButton({setNavOpen, isDropdown}) {
  *
  * Note: Do not translate the word "Impressum"! German GDPR needs this.
 */
-function ImpressumButton({setNavOpen, toggleImpressum, isDropdown}) {
+export function ImpressumButton({setNavOpen, toggleImpressum, isDropdown}) {
   const { t } = useTranslation()
   return <Button className="btn btn-inverted"
     title={t("information, Impressum, privacy policy")} inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faCircleInfo} />
-    {isDropdown && <>&nbsp;{t("Impressum")}</>}
+    {isDropdown && <>&nbsp;Impressum</>}
   </Button>
 }
 
-function PreferencesButton({setNavOpen, togglePreferencesPopup}) {
+export function PreferencesButton({setNavOpen, togglePreferencesPopup}) {
   const { t } = useTranslation()
   return <Button title={t("Preferences")} inverted="true" to="" onClick={() => {togglePreferencesPopup(); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faGear} />&nbsp;{t("Preferences")}

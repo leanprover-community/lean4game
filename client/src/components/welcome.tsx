@@ -135,7 +135,7 @@ function Welcome() {
     {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
     {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
     {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
-    {preferencesPopup ? <PreferencesPopup layout={layout} isSavePreferences={isSavePreferences} setLayout={setLayout} setIsSavePreferences={setIsSavePreferences} handleClose={closePreferencesPopup} language={language} setLanguage={setLanguage}/> : null}
+    {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </>
 }
 

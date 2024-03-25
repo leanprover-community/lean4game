@@ -16,6 +16,8 @@ import { GameTile, useGetGameInfoQuery } from '../state/api'
 import path from 'path';
 
 import lean4gameConfig from '../config.json'
+import { PreferencesPopup } from './popup/preferences';
+import { ImpressumButton, MenuButton, PreferencesButton } from './app_bar';
 
 const flag = {
   'Dutch': '🇳🇱',
@@ -84,24 +86,28 @@ function LandingPage() {
 
   const navigate = useNavigate();
 
-  const [impressum, setImpressum] = React.useState(false);
-  const openImpressum = () => setImpressum(true);
-  const closeImpressum = () => setImpressum(false);
+  const [impressumPopup, setImpressumPopup] = React.useState(false);
+  const [preferencesPopup, setPreferencesPopup] = React.useState(false);
+  const [navOpen, setNavOpen] = React.useState(false);
+  const openImpressum = () => setImpressumPopup(true);
+  const closeImpressum = () => setImpressumPopup(false);
+  const toggleImpressum = () => setImpressumPopup(!impressumPopup);
+  const closePreferencesPopup = () => setPreferencesPopup(false);
+  const togglePreferencesPopup = () => setPreferencesPopup(!preferencesPopup);
 
   let allTiles = lean4gameConfig.allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
   const { t, i18n } = useTranslation()
 
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
-      <nav>
+      <nav className="landing-page-nav">
         <GithubIcon url="https://github.com/leanprover-community/lean4game"/>
+        <MenuButton navOpen={navOpen} setNavOpen={setNavOpen}/>
+        <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
+            <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+            <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
+        </div>
       </nav>
-      <div>
-      <button onClick={() => i18n.changeLanguage("en")}>{flag["English"]}</button>
-      <button onClick={() => i18n.changeLanguage("fr")}>{flag["French"]}</button>
-      <button onClick={() => i18n.changeLanguage("de")}>{flag["German"]}</button>
-      {/* Add more buttons for other languages as needed */}
-    </div>
       <div id="main-title">
         <h1>{t("Lean Game Server")}</h1>
         <p>
@@ -185,7 +191,8 @@ function LandingPage() {
     <footer>
       {/* Do not translate "Impressum", it's needed for German GDPR */}
       <a className="link" onClick={openImpressum}>Impressum</a>
-      {impressum? <PrivacyPolicyPopup handleClose={closeImpressum} />: null}
+      {impressumPopup? <PrivacyPolicyPopup handleClose={closeImpressum} />: null}
+      {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
     </footer>
   </div>
 

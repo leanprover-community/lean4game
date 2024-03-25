@@ -36,6 +36,13 @@ a {
   padding-bottom: 80px;
 }
 
+.landing-page-nav {
+  position: relative;
+}
+
+#menu-btn {
+  background-color: unset;
+}
 
 @media screen and (max-width: 440px) {
   .game-list {

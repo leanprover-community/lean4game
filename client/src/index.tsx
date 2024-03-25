@@ -21,7 +21,14 @@ let root_object: RouteObject = single_game ? {
   loader: () => redirect("/g/local/game")
 } : {
   path: "/",
-  element: <LandingPage />,
+  element: <App />,
+  errorElement: <ErrorPage />,
+  children: [
+    {
+      path: "/",
+      element: <LandingPage />,
+    }
+  ]
 }
 
 const router = createHashRouter([
