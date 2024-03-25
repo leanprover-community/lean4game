@@ -5,6 +5,7 @@ import { loadPreferences, removePreferences, savePreferences } from "./local_sto
 export interface PreferencesState {
   layout: "mobile" | "auto" | "desktop";
   isSavePreferences: boolean;
+  language: string;
 }
 
 export function getWindowDimensions() {
@@ -16,7 +17,8 @@ export const AUTO_SWITCH_THRESHOLD = 800
 
 const initialState: PreferencesState = loadPreferences() ??{
     layout: "auto",
-    isSavePreferences: false
+    isSavePreferences: false,
+    language: "en",
 }
 
 export const preferencesSlice = createSlice({
@@ -29,7 +31,10 @@ export const preferencesSlice = createSlice({
     setIsSavePreferences: (state, action) => {
       state.isSavePreferences = action.payload;
     },
+    setLanguage: (state, action) => {
+      state.language = action.payload;
+    },
   },
 });
 
-export const { setLayout, setIsSavePreferences } = preferencesSlice.actions;
+export const { setLayout, setIsSavePreferences, setLanguage } = preferencesSlice.actions;

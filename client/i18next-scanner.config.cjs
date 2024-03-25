@@ -36,7 +36,7 @@ module.exports = {
         },
         lngs: ['en','de'],
         ns: [],
-        defaultLng: 'en',
+        defaultLng: 'en-GB',
         defaultNs: 'translation',
          defaultValue: (lng, ns, key) => {
             if (lng === 'en') {

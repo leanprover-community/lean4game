@@ -10,6 +10,7 @@ import './css/reset.css';
 import './css/app.css';
 import { PreferencesContext} from './components/infoview/context';
 import UsePreferences from "./state/hooks/use_preferences"
+import i18n from './i18n';
 
 export const GameIdContext = React.createContext<string>(undefined);
 
@@ -18,12 +19,16 @@ function App() {
   const params = useParams()
   const gameId = "g/" + params.owner + "/" + params.repo
 
-  const {mobile, layout, isSavePreferences, setLayout, setIsSavePreferences} = UsePreferences()
+  const {mobile, layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = UsePreferences()
+
+  React.useEffect(() => {
+    i18n.changeLanguage(language)
+  }, [language])
 
   return (
     <div className="app">
       <GameIdContext.Provider value={gameId}>
-          <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, setLayout, setIsSavePreferences}}>
+          <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage}}>
             <React.Suspense>
               <Outlet />
             </React.Suspense>

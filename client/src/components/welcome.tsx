@@ -65,7 +65,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
 function Welcome() {
   const gameId = React.useContext(GameIdContext)
   const {mobile} = React.useContext(PreferencesContext)
-  const {layout, isSavePreferences, setLayout, setIsSavePreferences} = React.useContext(PreferencesContext)
+  const {layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
@@ -135,7 +135,7 @@ function Welcome() {
     {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
     {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
     {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
-    {preferencesPopup ? <PreferencesPopup layout={layout} isSavePreferences={isSavePreferences} setLayout={setLayout} setIsSavePreferences={setIsSavePreferences} handleClose={closePreferencesPopup}/> : null}
+    {preferencesPopup ? <PreferencesPopup layout={layout} isSavePreferences={isSavePreferences} setLayout={setLayout} setIsSavePreferences={setIsSavePreferences} handleClose={closePreferencesPopup} language={language} setLanguage={setLanguage}/> : null}
   </>
 }
 

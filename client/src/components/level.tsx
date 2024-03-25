@@ -51,6 +51,8 @@ import { IConnectionProvider } from 'monaco-languageclient'
 import { monacoSetup } from 'lean4web/client/src/monacoSetup'
 import { onigasmH } from 'onigasm/lib/onigasmH'
 import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
+import { InfoPopup } from './popup/game_info'
+import { PreferencesPopup } from './popup/preferences'
 
 
 monacoSetup()
@@ -60,17 +62,29 @@ function Level() {
   const levelId = parseInt(params.levelId)
   const worldId = params.worldId
 
-  const [impressum, setImpressum] = React.useState(false)
+  const {layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
+  const gameId = React.useContext(GameIdContext)
+  const gameInfo = useGetGameInfoQuery({game: gameId})
 
-  const closeImpressum = () => {
-    setImpressum(false)
-  }
+  // pop-ups
+  const [impressum, setImpressum] = React.useState(false)
+  const [info, setInfo] = React.useState(false)
+  const [preferencesPopup, setPreferencesPopup] = React.useState(false)
+
+  function closeImpressum()   {setImpressum(false)}
+  function closeInfo()        {setInfo(false)}
+  function closePreferencesPopup() {setPreferencesPopup(false)}
+  function toggleImpressum()  {setImpressum(!impressum)}
+  function toggleInfo()       {setInfo(!info)}
+  function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
 
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
     {levelId == 0 ?
-      <Introduction impressum={impressum} setImpressum={setImpressum} /> :
-      <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} />}
+      <Introduction impressum={impressum} setImpressum={setImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup} /> :
+      <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>}
     {impressum ? <PrivacyPolicyPopup handleClose={closeImpressum} /> : null}
+    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
+    {preferencesPopup ? <PreferencesPopup layout={layout} isSavePreferences={isSavePreferences} setLayout={setLayout} setIsSavePreferences={setIsSavePreferences} handleClose={closePreferencesPopup} language={language} setLanguage={setLanguage}/> : null}
   </WorldLevelIdContext.Provider>
 }
 
@@ -190,7 +204,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
   </div>
 }
 
-function PlayableLevel({impressum, setImpressum}) {
+function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPopup}) {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
@@ -396,7 +410,10 @@ function PlayableLevel({impressum, setImpressum}) {
                   isLoading={level.isLoading}
                   levelTitle={`${mobile ? '' : 'Level '}${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${level?.data?.title}`)}
-                  toggleImpressum={toggleImpressum} />
+                  toggleImpressum={toggleImpressum}
+                  toggleInfo={toggleInfo}
+                  togglePreferencesPopup={togglePreferencesPopup}
+                  />
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
                   <>
@@ -452,7 +469,7 @@ function IntroductionPanel({gameInfo}) {
 export default Level
 
 /** The site with the introduction text of a world */
-function Introduction({impressum, setImpressum}) {
+function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPopup}) {
   const gameId = React.useContext(GameIdContext)
   const {mobile} = useContext(PreferencesContext)
 
@@ -470,7 +487,7 @@ function Introduction({impressum, setImpressum}) {
   }
 
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" toggleImpressum={toggleImpressum}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" toggleImpressum={toggleImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?

@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
 import ReactCountryFlag from "react-country-flag"
+import { t } from 'i18next'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -119,28 +120,46 @@ function InputModeButton({setNavOpen, isDropdown}) {
   </Button>
 }
 
-/** button to toggle iimpressum popup */
+/** button to toggle iimpressum popup
+ *
+ * Note: Do not translate "Impressum"!
+*/
 function ImpressumButton({setNavOpen, toggleImpressum, isDropdown}) {
-  return <Button className="btn btn-inverted toggle-width"
+  return <Button className="btn btn-inverted"
     title="information, Impressum, privacy policy" inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faCircleInfo} />
-    {isDropdown && <>&nbsp;Info &amp; Impressum</>}
+    {isDropdown && <>&nbsp;Impressum</>}
   </Button>
 }
 
-/** button to toggle iimpressum popup */
-function LanguageButton({setNavOpen, toggleLangNav, isDropdown}) {
-  return <Button className="btn btn-inverted language-btn"
-    title="language" inverted="true" to="" onClick={(ev) => {toggleLangNav(ev); setNavOpen(false)}}>
-    <ReactCountryFlag countryCode="GB"
-      className="emojiFlag"
-      style={{
-          height: '1.3em',
-          width: '1.6em',
-      }}
-      title="English"
-    />
-    {isDropdown && <>&nbsp;Language</>}
+function PreferencesButton({setNavOpen, togglePreferencesPopup}) {
+  return <Button title="Preferences" inverted="true" to="" onClick={() => {togglePreferencesPopup(); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faGear} />&nbsp;{t("Preferences")}
+  </Button>
+}
+
+function GameInfoButton({setNavOpen, toggleInfo}) {
+  return <Button className="btn btn-inverted"
+    title="Game Info & Credits" inverted="true" to="" onClick={() => {toggleInfo(); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Game Info
+  </Button>
+}
+
+function EraseButton ({setNavOpen, toggleEraseMenu}) {
+  return <Button title="Clear Progress" inverted="true" to="" onClick={() => {toggleEraseMenu(); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faEraser} />&nbsp;Erase
+  </Button>
+}
+
+function DownloadButton ({setNavOpen, gameId, gameProgress}) {
+  return <Button title="Download Progress" inverted="true" to="" onClick={(ev) => {downloadProgress(gameId, gameProgress, ev); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faDownload} />&nbsp;Download
+  </Button>
+}
+
+function UploadButton ({setNavOpen, toggleUploadMenu}) {
+  return <Button title="Load Progress from JSON" inverted="true" to="" onClick={() => {toggleUploadMenu(); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faUpload} />&nbsp;Upload
   </Button>
 }
 
@@ -151,6 +170,12 @@ function HomeButton({isDropdown}) {
     <FontAwesomeIcon icon={faHome} />
     {isDropdown && <>&nbsp;Home</>}
   </Button>
+}
+
+function LandingPageButton() {
+  return <Button inverted="false" title="back to games selection" to="/">
+    <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
+    </Button>
 }
 
 /** button in mobile level to toggle inventory.
@@ -184,9 +209,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
 
   return <div className="app-bar">
     <div className='app-bar-left'>
-      <Button inverted="false" title="back to games selection" to="/">
-        <FontAwesomeIcon icon={faArrowLeft} />&nbsp;<FontAwesomeIcon icon={faGlobe} />
-      </Button>
+      <LandingPageButton />
       <span className="app-bar-title"></span>
     </div>
     <div>
@@ -197,33 +220,23 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
       <MenuButton navOpen={navOpen} setNavOpen={setNavOpen} />
     </div>
     <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
-      <Button title="Game Info & Credits" inverted="true" to="" onClick={() => {toggleInfo(); setNavOpen(false)}}>
-        <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Game Info
-      </Button>
-      <Button title="Clear Progress" inverted="true" to="" onClick={() => {toggleEraseMenu(); setNavOpen(false)}}>
-        <FontAwesomeIcon icon={faEraser} />&nbsp;Erase
-      </Button>
-      <Button title="Download Progress" inverted="true" to="" onClick={(ev) => {downloadProgress(gameId, gameProgress, ev); setNavOpen(false)}}>
-        <FontAwesomeIcon icon={faDownload} />&nbsp;Download
-      </Button>
-      <Button title="Load Progress from JSON" inverted="true" to="" onClick={() => {toggleUploadMenu(); setNavOpen(false)}}>
-        <FontAwesomeIcon icon={faUpload} />&nbsp;Upload
-      </Button>
-      <Button title="Impressum, privacy policy" inverted="true" to="" onClick={() => {toggleImpressum(); setNavOpen(false)}}>
-        <FontAwesomeIcon icon={faCircleInfo} />&nbsp;Impressum
-      </Button>
-      <Button title="Preferences" inverted="true" to="" onClick={() => {togglePreferencesPopup(); setNavOpen(false)}}>
-         <FontAwesomeIcon icon={faGear} />&nbsp;Preferences
-       </Button>
+      <GameInfoButton setNavOpen={setNavOpen} toggleInfo={toggleInfo}/>
+      <EraseButton setNavOpen={setNavOpen} toggleEraseMenu={toggleEraseMenu}/>
+      <DownloadButton setNavOpen={setNavOpen} gameId={gameId} gameProgress={gameProgress}/>
+      <UploadButton setNavOpen={setNavOpen} toggleUploadMenu={toggleUploadMenu}/>
+      <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+      <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
     </div>
   </div>
 }
 
 /** the navigation bar in a level */
-export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=undefined, setPageNumber=undefined} : {
+export function LevelAppBar({isLoading, levelTitle, toggleImpressum, toggleInfo, togglePreferencesPopup, pageNumber=undefined, setPageNumber=undefined} : {
   isLoading: boolean,
   levelTitle: string,
   toggleImpressum: any,
+  toggleInfo: any,
+  togglePreferencesPopup: any,
   pageNumber?: number,
   setPageNumber?: any,
 }) {
@@ -253,15 +266,16 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=
           <PreviousButton setNavOpen={setNavOpen} />
           <HomeButton isDropdown={true} />
           <InputModeButton setNavOpen={setNavOpen} isDropdown={true}/>
+          <GameInfoButton setNavOpen={setNavOpen} toggleInfo={toggleInfo}/>
           <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
-          <LanguageButton setNavOpen={setNavOpen} toggleLangNav={() => {}} isDropdown={true} />
+          <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
       </> :
       <>
         {/* DESKTOP VERSION */}
         <div className='app-bar-left'>
           <HomeButton isDropdown={false} />
-          <span className="app-bar-title">{worldTitle && `World: ${worldTitle}`}</span>
+          <span className="app-bar-title">{worldTitle && `${t("World")}: ${worldTitle}`}</span>
         </div>
         <div>
           <span className="app-bar-title">{levelTitle}</span>
@@ -270,8 +284,12 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, pageNumber=
           <PreviousButton setNavOpen={setNavOpen} />
           <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} setNavOpen={setNavOpen} />
           <InputModeButton setNavOpen={setNavOpen} isDropdown={false}/>
-          <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={false} />
-          <LanguageButton setNavOpen={setNavOpen} toggleLangNav={() => {}} isDropdown={false} />
+          <MenuButton navOpen={navOpen} setNavOpen={setNavOpen}/>
+        </div>
+        <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
+          <GameInfoButton setNavOpen={setNavOpen} toggleInfo={toggleInfo}/>
+          <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+          <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
       </>
     }

@@ -1,0 +1,14 @@
+{
+  "languages": [
+    {
+      "iso": "en",
+      "flag": "GB",
+      "name": "English"
+    },
+    {
+      "iso": "de",
+      "flag": "DE",
+      "name": "Deutsch"
+    }
+  ]
+}

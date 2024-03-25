@@ -79,15 +79,18 @@ export interface ProofStateProps {
 export interface IPreferencesContext extends PreferencesState{
   mobile: boolean, // The variables that actually control the page 'layout' can only be changed through layout.
   setLayout: React.Dispatch<React.SetStateAction<PreferencesState["layout"]>>;
-  setIsSavePreferences: React.Dispatch<React.SetStateAction<Boolean>>;
+  setIsSavePreferences: React.Dispatch<React.SetStateAction<PreferencesState["isSavePreferences"]>>;
+  setLanguage: React.Dispatch<React.SetStateAction<PreferencesState["language"]>>;
 }
 
 export const PreferencesContext = React.createContext<IPreferencesContext>({
   mobile: false,
   layout: "auto",
   isSavePreferences: false,
+  language: "en",
   setLayout: () => {},
-  setIsSavePreferences: () => {}
+  setIsSavePreferences: () => {},
+  setLanguage: () => {},
 })
 
 export const WorldLevelIdContext = React.createContext<{

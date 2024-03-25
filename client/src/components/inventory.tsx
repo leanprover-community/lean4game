@@ -10,6 +10,7 @@ import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadIn
 import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
 import { useSelector } from 'react-redux';
+import { t } from 'i18next';
 
 export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=false} :
   {
@@ -24,7 +25,7 @@ export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=
     <div className="inventory">
     {/* TODO: Click on Tactic: show info
       TODO: click on paste icon -> paste into command line */}
-      <h2>Tactics</h2>
+      <h2>{t("Tactics")}</h2>
       {levelInfo?.tactics &&
         <InventoryList items={levelInfo?.tactics} docType="Tactic" openDoc={openDoc} enableAll={enableAll}/>
       }
