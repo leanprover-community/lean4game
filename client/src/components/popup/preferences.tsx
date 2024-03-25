@@ -4,18 +4,20 @@ import Markdown from '../markdown'
 import { Switch, Button, ButtonGroup } from '@mui/material';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import supportedLanguages from './language_config.json'
+import lean4gameConfig from '../../config.json'
 
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { IPreferencesContext } from "../infoview/context"
 import ReactCountryFlag from 'react-country-flag';
+import { useTranslation } from 'react-i18next';
 
 interface PreferencesPopupProps extends Omit<IPreferencesContext, 'mobile'> {
   handleClose: () => void
 }
 
 export function PreferencesPopup({ layout, setLayout, isSavePreferences, language, setIsSavePreferences, handleClose, setLanguage }: PreferencesPopupProps) {
+  let { t } = useTranslation()
 
   const marks = [
     {
@@ -50,7 +52,7 @@ export function PreferencesPopup({ layout, setLayout, isSavePreferences, languag
       <Typography variant="body1" component="div" className="settings">
         <div className='preferences-category'>
           <div className='category-title'>
-            <h3>Language</h3>
+            <h3>{t("Language")}</h3>
           </div>
           <div className='preferences-item first leave-left-gap'>
             <FormControlLabel
@@ -58,9 +60,9 @@ export function PreferencesPopup({ layout, setLayout, isSavePreferences, languag
                 <Box sx={{ width: 300 }}>
                   <Select
                     value={language}
-                    label={"Language"}
+                    label={t("Language")}
                     onChange={handlerChangeLanguage}>
-                      {supportedLanguages.languages.map(lang => {return <MenuItem key={`menu-item-lang-${lang.iso}`} value={lang.iso}><ReactCountryFlag countryCode={lang.flag}/>&nbsp;{lang.name}</MenuItem>})}
+                      {lean4gameConfig.languages.map(lang => {return <MenuItem key={`menu-item-lang-${lang.iso}`} value={lang.iso}><ReactCountryFlag countryCode={lang.flag}/>&nbsp;{lang.name}</MenuItem>})}
                   </Select>
                 </Box>
               }
@@ -70,14 +72,14 @@ export function PreferencesPopup({ layout, setLayout, isSavePreferences, languag
         </div>
         <div className='preferences-category'>
           <div className='category-title'>
-            <h3>Layout</h3>
+            <h3>{t("Layout")}</h3>
           </div>
           <div className='preferences-item first leave-left-gap'>
             <FormControlLabel
               control={
                 <Box sx={{ width: 300 }}>
                   <Slider
-                    aria-label="Always visible"
+                    aria-label={t("Always visible")}
                     value={marks.find(item => item.key === layout).value}
                     step={1}
                     marks={marks}
@@ -105,7 +107,7 @@ export function PreferencesPopup({ layout, setLayout, isSavePreferences, languag
                   color="primary"
                 />
               }
-              label="Save my settings (in the browser store)"
+              label={t("Save my settings (in the browser store)")}
               labelPlacement="end"
             />
           </div>

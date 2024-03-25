@@ -99,7 +99,7 @@ module.exports = {
     },
     lngs: ['en','de'],
     ns: [],
-    defaultLng: 'en-GB',
+    defaultLng: 'en',
     defaultNs: 'translation',
     defaultValue: (lng, ns, key) => {
       if (lng === 'en') {
@@ -139,14 +139,8 @@ module.exports = {
       'use strict';
       const parser = this.parser;
 
-      let count = 0;
-
       parser.parseTransFromString(outputText);
       parser.parseFuncFromString(outputText);
-
-        if (count > 0) {
-          console.log(`[i18next-scanner] transform: count=${chalk.cyan(count)}, file=${chalk.yellow(JSON.stringify(file.relative))}`);
-        }
 
       done();
     }

@@ -4,6 +4,7 @@ import Markdown from './markdown';
 import { DeletedChatContext, ProofContext } from "./infoview/context";
 import { lastStepHasErrors } from "./infoview/goals";
 import { Button } from "./button";
+import { useTranslation } from "react-i18next";
 
 /** Plug-in the variable names in a hint. We do this client-side to prepare
  * for i18n in the future. i.e. one should be able translate the `rawText`
@@ -88,6 +89,8 @@ function hasHiddenHints(step: InteractiveGoalsWithHints): boolean {
 
 export function MoreHelpButton({selected=null} : {selected?: number}) {
 
+  const { t } = useTranslation()
+
   const {proof, setProof} = React.useContext(ProofContext)
   const {deletedChat, setDeletedChat, showHelp, setShowHelp} = React.useContext(DeletedChatContext)
 
@@ -113,7 +116,7 @@ export function MoreHelpButton({selected=null} : {selected?: number}) {
 
   if (hasHiddenHints(proof?.steps[k]) && !showHelp.has(k)) {
     return <Button to="" onClick={activateHiddenHints}>
-      Show more help!
+      {t("Show more help!")}
     </Button>
   }
 }

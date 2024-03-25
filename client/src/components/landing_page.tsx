@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate, Link } from "react-router-dom";
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -14,6 +14,8 @@ import Markdown from './markdown';
 import {PrivacyPolicyPopup} from './popup/privacy_policy'
 import { GameTile, useGetGameInfoQuery } from '../state/api'
 import path from 'path';
+
+import lean4gameConfig from '../config.json'
 
 const flag = {
   'Dutch': '🇳🇱',
@@ -36,7 +38,7 @@ function GithubIcon({url='https://github.com'}) {
 }
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
-
+  let { t } = useTranslation()
   let navigate = useNavigate();
   const routeChange = () =>{
     navigate(gameId);
@@ -57,19 +59,19 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
     <table className="info">
       <tbody>
       <tr>
-        <td title="consider playing these games first.">Prerequisites</td>
+        <td title="consider playing these games first.">{t("Prerequisites")}</td>
         <td><Markdown>{data.prerequisites.join(', ')}</Markdown></td>
       </tr>
       <tr>
-        <td>Worlds</td>
+        <td>{t("Worlds")}</td>
         <td>{data.worlds}</td>
       </tr>
       <tr>
-        <td>Levels</td>
+        <td>{t("Levels")}</td>
         <td>{data.levels}</td>
       </tr>
       <tr>
-        <td>Language</td>
+        <td>{t("Language")}</td>
         <td title={`in ${data.languages.join(', ')}`}>{data.languages.map((lan) => flag[lan]).join(', ')}</td>
       </tr>
       </tbody>
@@ -86,59 +88,7 @@ function LandingPage() {
   const openImpressum = () => setImpressum(true);
   const closeImpressum = () => setImpressum(false);
 
-  // const [allGames, setAllGames] = React.useState([])
-  // const [allTiles, setAllTiles] = React.useState([])
-
-  // const getTiles=()=>{
-  //   fetch('featured_games.json', {
-  //     headers : {
-  //       'Content-Type': 'application/json',
-  //       'Accept': 'application/json'
-  //     }
-  //   }
-  //   ).then(function(response){
-  //     return response.json()
-  //   }).then(function(data) {
-  //     setAllGames(data.featured_games)
-
-  //   })
-  // }
-
-  // React.useEffect(()=>{
-  //   getTiles()
-  // },[])
-
-  // React.useEffect(()=>{
-
-  //   Promise.allSettled(
-  //     allGames.map((gameId) => (
-  //       fetch(`data/g/${gameId}/game.json`).catch(err => {return undefined})))
-  //   ).then(responses =>
-  //     responses.forEach((result) => console.log(result)))
-  //   //   Promise.all(responses.map(res => {
-  //   //     if (res.status == "fulfilled") {
-  //   //       console.log(res.value.json())
-  //   //       return res.value.json()
-  //   //     } else {
-  //   //       return undefined
-  //   //     }
-  //   //   }))
-  //   // ).then(allData => {
-  //   //   setAllTiles(allData.map(data => data?.tile))
-  //   // })
-  // },[allGames])
-
-  // TODO: I would like to read the supported games list form a JSON,
-  // Then load all these games in
-  //
-  let allGames = [
-    "leanprover-community/nng4",
-    "hhu-adam/robo",
-    "djvelleman/stg4",
-    "miguelmarco/stg4",
-    "trequetrum/lean4game-logic",
-  ]
-  let allTiles = allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
+  let allTiles = lean4gameConfig.allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
   const { t, i18n } = useTranslation()
 
   return <div className="landing-page">
@@ -155,18 +105,23 @@ function LandingPage() {
       <div id="main-title">
         <h1>{t("Lean Game Server")}</h1>
         <p>
-          A repository of learning games for the
-          proof assistant <a target="_blank" href="https://leanprover-community.github.io/">Lean</a> <i>(Lean 4)</i> and
-          its mathematical library <a target="_blank" href="https://github.com/leanprover-community/mathlib4">mathlib</a>
+          <Trans>
+            A repository of learning games for the
+            proof assistant <a target="_blank" href="https://leanprover-community.github.io/">Lean</a> <i>(Lean 4)</i> and
+            its mathematical library <a target="_blank" href="https://github.com/leanprover-community/mathlib4">mathlib</a>
+          </Trans>
         </p>
       </div>
     </header>
     <div className="game-list">
       {allTiles.length == 0 ?
-        <p>No Games loaded. Use <a>http://localhost:3000/#/g/local/FOLDER</a> to open a
-          game directly from a local folder.
+        <p>
+          <Trans>
+            No Games loaded. Use <a>http://localhost:3000/#/g/local/FOLDER</a> to open a
+            game directly from a local folder.
+          </Trans>
         </p>
-        : allGames.map((id, i) => (
+        : lean4gameConfig.allGames.map((id, i) => (
           <Tile
             key={id}
             gameId={`g/${id}`}
@@ -177,51 +132,58 @@ function LandingPage() {
     </div>
     <section>
       <div className="wrapper">
-        <h2>Development notes</h2>
-        <p>
-          As this server runs lean on our university machines, it has a limited capacity.
-          Our current estimate is about 70 simultaneous games.
-          We hope to address and test this limitation better in the future.
-        </p>
-        <p>
-          Most aspects of the games and the infrastructure are still in development. Feel free to
-          file a <a target="_blank" href="https://github.com/leanprover-community/lean4game/issues">GitHub Issue</a> about
-          any problems you experience!
-        </p>
+        <h2>{t("Development notes")}</h2>
+        <Trans>
+          <p>
+            As this server runs lean on our university machines, it has a limited capacity.
+            Our current estimate is about 70 simultaneous games.
+            We hope to address and test this limitation better in the future.
+          </p>
+          <p>
+            Most aspects of the games and the infrastructure are still in development. Feel free to
+            file a <a target="_blank" href="https://github.com/leanprover-community/lean4game/issues">GitHub Issue</a> about
+            any problems you experience!
+          </p>
+        </Trans>
       </div>
     </section>
     <section>
       <div className="wrapper">
-        <h2>Adding new games</h2>
-        <p>
-          If you are considering writing your own game, you should use
-          the <a target="_blank" href="https://github.com/hhu-adam/GameSkeleton">GameSkeleton Github Repo</a> as
-          a template and read <a target="_blank" href="https://github.com/leanprover-community/lean4game/">How to Create a Game</a>.
-        </p>
-        <p>
-          You can directly load your games into the server and play it using
-          the correct URL. The <a target="_blank" href="https://github.com/leanprover-community/lean4game/">instructions above</a> also
-          explain the details for how to load your game to the server.
+        <h2>{t("Adding new games")}</h2>
+        <Trans>
+          <p>
+            If you are considering writing your own game, you should use
+            the <a target="_blank" href="https://github.com/hhu-adam/GameSkeleton">GameSkeleton Github Repo</a> as
+            a template and read <a target="_blank" href="https://github.com/leanprover-community/lean4game/">How to Create a Game</a>.
+          </p>
+          <p>
+            You can directly load your games into the server and play it using
+            the correct URL. The <a target="_blank" href="https://github.com/leanprover-community/lean4game/">instructions above</a> also
+            explain the details for how to load your game to the server.
 
-          We'd like to encourage you to contact us if you have any questions.
-        </p>
-        <p>
-          Featured games on this page are added manually.
-          Please get in contact and we-ll happily add yours.
-        </p>
+            We'd like to encourage you to contact us if you have any questions.
+          </p>
+          <p>
+            Featured games on this page are added manually.
+            Please get in contact and we-ll happily add yours.
+          </p>
+        </Trans>
       </div>
     </section>
     <section>
       <div className="wrapper">
-        <h2>Funding</h2>
+        <h2>{t("Funding")}</h2>
         <p>
-          This server has been developed as part of the
-          project <a target="_blank" href="https://hhu-adam.github.io">ADAM : Anticipating the Digital Age of Mathematics</a> at
-          Heinrich-Heine-Universität in Düsseldorf.
+          <Trans>
+            This server has been developed as part of the
+            project <a target="_blank" href="https://hhu-adam.github.io">ADAM : Anticipating the Digital Age of Mathematics</a> at
+            Heinrich-Heine-Universität in Düsseldorf.
+          </Trans>
         </p>
       </div>
     </section>
     <footer>
+      {/* Do not translate "Impressum", it's needed for German GDPR */}
       <a className="link" onClick={openImpressum}>Impressum</a>
       {impressum? <PrivacyPolicyPopup handleClose={closeImpressum} />: null}
     </footer>

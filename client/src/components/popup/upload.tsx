@@ -8,6 +8,7 @@ import { useAppDispatch } from '../../hooks'
 import { GameProgressState, loadProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
 import { Button } from '../button'
+import { Trans, useTranslation } from 'react-i18next'
 
 /** Pop-up that is displaying the Game Info.
  *
@@ -15,6 +16,8 @@ import { Button } from '../button'
  * controlled by the containing element.
  */
 export function UploadPopup ({handleClose}) {
+  let { t } = useTranslation()
+
   const [file, setFile] = React.useState<File>();
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useSelector(selectProgress(gameId))
@@ -54,17 +57,19 @@ export function UploadPopup ({handleClose}) {
   <div className="modal-backdrop" onClick={handleClose} />
   <div className="modal">
     <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
-    <h2>Upload Saved Progress</h2>
+    <h2>{t("Upload Saved Progress")}</h2>
+    <Trans>
+      <p>Select a JSON file with the saved game progress to load your progress.</p>
 
-    <p>Select a JSON file with the saved game progress to load your progress.</p>
-
-    <p><b>Warning:</b> This will delete your current game progress!
-      Consider <a className="download-link" onClick={downloadProgress} >downloading your current progress</a> first!</p>
+      <p><b>Warning:</b> This will delete your current game progress!
+        Consider <a className="download-link" onClick={downloadProgress} >downloading your current progress</a> first!
+      </p>
+    </Trans>
     <p>
       <input type="file" onChange={handleFileChange}/>
     </p>
 
-    <Button to="" onClick={uploadProgress}>Load selected file</Button>
+    <Button to="" onClick={uploadProgress}>{t("Load selected file")}</Button>
   </div>
 </div>
 }

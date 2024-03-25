@@ -14,6 +14,7 @@ import { InteractiveGoal, InteractiveGoals, InteractiveGoalsWithHints, Interacti
 import { RpcSessionAtPos } from '@leanprover/infoview/*';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageserver-protocol';
+import { useTranslation } from 'react-i18next';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -134,11 +135,6 @@ interface GoalProps {
     typewriter: boolean
 }
 
-interface ProofDisplayProps {
-  proof: string
-}
-
-
 /**
  * Displays the hypotheses, target type and optional case label of a goal according to the
  * provided `filter`. */
@@ -186,6 +182,7 @@ export const Goal = React.memo((props: GoalProps) => {
 })
 
 export const MainAssumptions = React.memo((props: GoalProps2) => {
+  let { t } = useTranslation()
   const { goals, filter } = props
 
   const goal = goals[0]
@@ -200,7 +197,7 @@ export const MainAssumptions = React.memo((props: GoalProps2) => {
       [locs, goal.mvarId])
 
   const goalLi = <div key={'goal'}>
-    <div className="goal-title">Goal: </div>
+    <div className="goal-title">{t("Goal") + ":"}</div>
     <LocationsContext.Provider value={goalLocs}>
       <InteractiveCode fmt={goal.type} />
     </LocationsContext.Provider>
@@ -210,25 +207,26 @@ export const MainAssumptions = React.memo((props: GoalProps2) => {
   const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
 
   return <div id="main-assumptions">
-    <div className="goals-section-title">Current Goal</div>
+    <div className="goals-section-title">{t("Current Goal")}</div>
     {filter.reverse && goalLi}
     { objectHyps.length > 0 &&
-      <div className="hyp-group"><div className="hyp-group-title">Objects:</div>
+      <div className="hyp-group"><div className="hyp-group-title">{t("Objects") + ":"}</div>
       {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
     { assumptionHyps.length > 0 &&
       <div className="hyp-group">
-        <div className="hyp-group-title">Assumptions:</div>
+        <div className="hyp-group-title">{t("Assumptions") + ":"}</div>
         {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}
       </div> }
   </div>
 })
 
 export const OtherGoals = React.memo((props: GoalProps2) => {
+  let { t } = useTranslation()
   const { goals, filter } = props
   return <>
     {goals && goals.length > 1 &&
       <div id="other-goals" className="other-goals">
-        <div className="goals-section-title">Further Goals</div>
+        <div className="goals-section-title">{t("Further Goals")}</div>
         {goals.slice(1).map((goal, i) =>
           <details key={i}>
             <summary>
@@ -236,25 +234,6 @@ export const OtherGoals = React.memo((props: GoalProps2) => {
             </summary>
             <Goal typewriter={false} filter={filter} goal={goal} />
           </details>)}
-      </div>}
-  </>
-})
-
-// TODO: deprecated
-export const ProofDisplay = React.memo((props : ProofDisplayProps) => {
-  const { proof } = props
-  const steps = proof.match(/.+/g)
-  return <>
-    { steps &&
-      <div id="current-proof">
-        <div className="goals-section-title">Proof history</div>
-        <div className="proof-display-wrapper">
-          <div className="proof-display">
-            {steps.map((s) =>
-              <div>{s}</div>
-            )}
-          </div>
-        </div>
       </div>}
   </>
 })

@@ -6,9 +6,11 @@ import { DidChangeTextDocumentParams, DidCloseTextDocumentParams, TextDocumentCo
 import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
 import { DocumentPosition, Keyed, PositionHelpers, useClientNotificationEffect, useClientNotificationState, useEvent, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { Info, InfoProps } from './info';
+import { useTranslation } from 'react-i18next';
 
 /** Manages and displays pinned infos, as well as info for the current location. */
 export function Infos() {
+    let { t } = useTranslation()
     const ec = React.useContext(EditorContext);
 
     // Update pins when the document changes. In particular, when edits are made
@@ -126,6 +128,6 @@ export function Infos() {
 
     return <div>
         {infoProps.map (ps => <Info {...ps} />)}
-        {!curPos && <p>Click somewhere in the Lean file to enable the infoview.</p> }
+        {!curPos && <p>{t("Click somewhere in the Lean file to enable the infoview.")}</p> }
     </div>;
 }

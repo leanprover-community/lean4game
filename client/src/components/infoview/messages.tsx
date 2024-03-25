@@ -11,6 +11,7 @@ import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions'
 
 import { InputModeContext } from './context'
+import { useTranslation } from 'react-i18next'
 
 interface MessageViewProps {
     uri: DocumentUri;
@@ -202,6 +203,7 @@ export function AllMessages() {
 
 /** We factor out the body of {@link AllMessages} which lazily fetches its contents only when expanded. */
 function AllMessagesBody({uri, curPos, messages}: {uri: DocumentUri, curPos: DocumentPosition | undefined , messages: () => Promise<InteractiveDiagnostic[]>}) {
+    let { t } = useTranslation()
     const [msgs, setMsgs] = React.useState<InteractiveDiagnostic[] | undefined>(undefined)
     React.useEffect(() => { void messages().then(
         msgs => setMsgs(msgs.filter(
@@ -212,7 +214,7 @@ function AllMessagesBody({uri, curPos, messages}: {uri: DocumentUri, curPos: Doc
                 return d.range.start.line == curPos.line
             }))
     ) }, [messages, curPos])
-    if (msgs === undefined) return <div>Loading messages...</div>
+    if (msgs === undefined) return <div>{t("Loading messages…")}</div>
     else return <MessagesList uri={uri} messages={msgs}/>
 }
 

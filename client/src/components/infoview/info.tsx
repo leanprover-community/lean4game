@@ -13,9 +13,10 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-i
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation'
 
 import { AllMessages, lspDiagToInteractive } from './messages'
-import { goalsToString, Goal, MainAssumptions, OtherGoals, ProofDisplay } from './goals'
+import { goalsToString, Goal, MainAssumptions, OtherGoals } from './goals'
 import { InteractiveTermGoal, InteractiveGoalsWithHints, InteractiveGoals, ProofState } from './rpc_api'
 import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext } from './context'
+import { useTranslation } from 'react-i18next'
 
 // TODO: All about pinning could probably be removed
 type InfoKind = 'cursor' | 'pin'
@@ -87,6 +88,7 @@ interface InfoDisplayContentProps extends PausableProps {
 }
 
 const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
+    let { t } = useTranslation()
     const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused, proofString} = props
 
     const hasWidget = userWidgets.length > 0
@@ -131,7 +133,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
           <div>
             { goals && (goals.goals.length > 0
               ? <Goal typewriter={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />
-              : <div className="goals-section-title">No Goals</div>
+              : <div className="goals-section-title">{t("No Goals")}</div>
             )}
           </div>
         </LocationsContext.Provider>
@@ -150,7 +152,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                     {' '}or <a className='link pointer dim' onClick={e => { e.preventDefault(); setPaused(false) }}>resume updating</a>
                     {' '}to see information.
                 </span> :
-                <><CircularProgress /><div>Loading goal...</div></>)}
+                <><CircularProgress /><div>{t("Loading goal…")}</div></>)}
         <AllMessages />
         {/* <LocationsContext.Provider value={locs}>
             {goals && goals.goals.length > 1 && <div className="goals-section other-goals">

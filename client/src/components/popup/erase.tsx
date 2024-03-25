@@ -8,6 +8,7 @@ import { useAppDispatch } from '../../hooks'
 import { deleteProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
 import { Button } from '../button'
+import { Trans, useTranslation } from 'react-i18next'
 
 /** download the current progress (i.e. what's saved in the browser store) */
 export function downloadProgress(gameId: string, gameProgress: any, ev: React.MouseEvent) {
@@ -25,6 +26,7 @@ export function downloadProgress(gameId: string, gameProgress: any, ev: React.Mo
  * controlled by the containing element.
  */
 export function ErasePopup ({handleClose}) {
+  let { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useSelector(selectProgress(gameId))
   const dispatch = useAppDispatch()
@@ -43,17 +45,17 @@ export function ErasePopup ({handleClose}) {
   <div className="modal-backdrop" onClick={handleClose} />
   <div className="modal">
     <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
-    <h2>Delete Progress?</h2>
-
-    <p>Do you want to delete your saved progress irreversibly?</p>
-    <p>
-      (This deletes your proofs and your collected inventory.
-      Saves from other games are not deleted.)
-    </p>
-
-    <Button onClick={eraseProgress} to="">Delete</Button>
-    <Button onClick={downloadAndErase} to="">Download & Delete</Button>
-    <Button onClick={handleClose} to="">Cancel</Button>
+    <h2>{t("Delete Progress?")}</h2>
+    <Trans>
+      <p>Do you want to delete your saved progress irreversibly?</p>
+      <p>
+        (This deletes your proofs and your collected inventory.
+        Saves from other games are not deleted.)
+      </p>
+    </Trans>
+    <Button onClick={eraseProgress} to="">{t("Delete")}</Button>
+    <Button onClick={downloadAndErase} to="">{t("Download & Delete")}</Button>
+    <Button onClick={handleClose} to="">{t("Cancel")}</Button>
   </div>
 </div>
 }

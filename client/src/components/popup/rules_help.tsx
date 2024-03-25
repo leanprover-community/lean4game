@@ -10,7 +10,7 @@ import { Trans, useTranslation } from 'react-i18next'
  * controlled by the containing element.
  */
 export function RulesHelpPopup ({handleClose}: {handleClose: () => void}) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   return <div className="privacy-policy modal-wrapper">
   <div className="modal-backdrop" onClick={handleClose} />

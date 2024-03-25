@@ -37,6 +37,7 @@ import { store } from '../../state/store';
 import { Hints, MoreHelpButton, filterHints } from '../hints';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
+import { useTranslation } from 'react-i18next';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -151,6 +152,7 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
 // TODO: This is only used in `EditorInterface`
 // while `TypewriterInterface` has this copy-pasted in.
 export function Main(props: { world: string, level: number, data: LevelInfo}) {
+  let { t } = useTranslation()
   const ec = React.useContext(EditorContext);
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
@@ -228,14 +230,14 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
   // that we want to persist.
   let ret
   if (!serverVersion) {
-    ret = <p>Waiting for Lean server to start...</p>
+    ret = <p>{t("Waiting for Lean server to start…")}</p>
   } else if (serverStoppedResult) {
     ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
   } else {
     ret = <div className="infoview vscode-light">
       {proof?.completedWithWarnings &&
         <div className="level-completed">
-          {proof?.completed ? "Level completed! 🎉" : "Level completed with warnings 🎭"}
+          {proof?.completed ? t("Level completed! 🎉") : t("Level completed with warnings 🎭")}
         </div>
       }
       <Infos />
@@ -272,8 +274,8 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
   } else {
     return <div className="command">
       <div className="command-text">{proof?.steps[i].command}</div>
-      <Button to="" className="undo-button btn btn-inverted" title="Retry proof from here" onClick={deleteProof}>
-        <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;Retry
+      <Button to="" className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={deleteProof}>
+        <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;{this("Retry")}
       </Button>
     </div>
   }
@@ -332,7 +334,7 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
 
 /** The tabs of goals that lean ahs after the command of this step has been processed */
 function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: InteractiveGoalsWithHints, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
-
+  let { t } = useTranslation()
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
   if (proofStep.goals.length == 0) {
@@ -344,7 +346,7 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
       {proofStep.goals.map((goal, i) => (
         // TODO: Should not use index as key.
         <div key={`proof-goal-${i}`} className={`tab ${i == (selectedGoal) ? "active" : ""}`} onClick={(ev) => { onGoalChange(i); setSelectedGoal(i); ev.stopPropagation() }}>
-          {i ? `Goal ${i + 1}` : "Active Goal"}
+          {i ? t("Goal") + ` ${i + 1}` : t("Active Goal")}
         </div>
       ))}
     </div>
@@ -389,6 +391,7 @@ export function TypewriterInterfaceWrapper(props: { world: string, level: number
 
 /** The interface in command line mode */
 export function TypewriterInterface({props}) {
+  let { t } = useTranslation()
   const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
   const editor = React.useContext(MonacoEditorContext)
@@ -500,8 +503,7 @@ export function TypewriterInterface({props}) {
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement data={props.data} />
         {crashed ? <div>
-          <p className="crashed_message">Crashed! Go to editor mode and fix your proof!
-          Last server response:</p>
+          <p className="crashed_message">{t("Crashed! Go to editor mode and fix your proof! Last server response:")}</p>
           {interimDiags.map(diag => {
             const severityClass = diag.severity ? {
               [DiagnosticSeverity.Error]: 'error',
@@ -512,7 +514,7 @@ export function TypewriterInterface({props}) {
 
             return <div>
               <div className={`${severityClass} ml1 message`}>
-                <p className="mv2">Line {diag.range.start.line}, Character {diag.range.start.character}</p>
+                <p className="mv2">{t("Line")}&nbsp;{diag.range.start.line}, {t("Character")}&nbsp;{diag.range.start.character}</p>
                 <pre className="font-code pre-wrap">
                   {diag.message}
                 </pre>
@@ -579,7 +581,7 @@ export function TypewriterInterface({props}) {
               <div className="button-row mobile">
                 {props.level >= props.worldSize ?
                   <Button to={`/${gameId}`}>
-                    <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
+                    <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
                   </Button>
                 :
                   <Button to={`/${gameId}/world/${props.world}/level/${props.level + 1}`}>

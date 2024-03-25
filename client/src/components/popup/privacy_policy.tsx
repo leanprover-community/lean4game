@@ -9,6 +9,8 @@ import * as React from 'react'
  *
  * `handleClose` is the function to close it again because it's open/closed state is
  * controlled by the containing element.
+ *
+ * Note: Do not translate the Impressum!
  */
 export function PrivacyPolicyPopup ({handleClose}: {handleClose: () => void}) {
   return <div className="privacy-policy modal-wrapper">
@@ -56,20 +58,4 @@ export function PrivacyPolicyPopup ({handleClose}: {handleClose: () => void}) {
     </p>
   </div>
 </div>
-}
-
-export const PrivacyPolicy: React.FC = () => {
-  const [open, setOpen] = React.useState(false)
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
-  return (
-    <>
-      <div className="privacy" onClick={handleOpen} title="Privacy Policy &amp; Impressum">
-        <FontAwesomeIcon icon={faShield} />
-        <p className="p1">legal</p>
-        <p className="p2">notes</p>
-      </div>
-      {open ? <PrivacyPolicyPopup handleClose={handleClose} /> : null}
-    </>
-  )
 }

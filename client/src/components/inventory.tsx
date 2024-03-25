@@ -10,6 +10,7 @@ import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadIn
 import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
 
 export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=false} :
@@ -20,6 +21,7 @@ export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=
     setLemmaTab: any,
     enableAll?: boolean,
   }) {
+  const { t } = useTranslation()
 
   return (
     <div className="inventory">
@@ -29,11 +31,11 @@ export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=
       {levelInfo?.tactics &&
         <InventoryList items={levelInfo?.tactics} docType="Tactic" openDoc={openDoc} enableAll={enableAll}/>
       }
-      <h2>Definitions</h2>
+      <h2>{t("Definitions")}</h2>
       {levelInfo?.definitions &&
         <InventoryList items={levelInfo?.definitions} docType="Definition" openDoc={openDoc} enableAll={enableAll}/>
       }
-      <h2>Theorems</h2>
+      <h2>{t("Theorems")}</h2>
       {levelInfo?.lemmas &&
         <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc} level={levelInfo} enableAll={enableAll} tab={lemmaTab} setTab={setLemmaTab}/>
       }
@@ -98,11 +100,11 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
 function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc, enableAll=false}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : item.st
-  const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
+  const className = locked ? t("locked") : disabled ? t("disabled") : newly ? t("new") : ""
   // Note: This is somewhat a hack as the statement of lemmas comes currently in the form
   // `Namespace.statement_name (x y : Nat) : some type`
-  const title = locked ? "Not unlocked yet" :
-                disabled ? "Not available in this level" : (item.altTitle ? item.altTitle.substring(item.altTitle.indexOf(' ') + 1) : '')
+  const title = locked ? t("Not unlocked yet") :
+                disabled ? t("Not available in this level") : (item.altTitle ? item.altTitle.substring(item.altTitle.indexOf(' ') + 1) : '')
 
   const [copied, setCopied] = useState(false)
 

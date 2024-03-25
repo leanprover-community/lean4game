@@ -20,14 +20,12 @@ import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview
 import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
+import { useTranslation } from 'react-i18next'
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;
   diagnostics: Diagnostic[];
 }
-
-
-
 
 /* We register a new language `leancmd` that looks like lean4, but does not use the lsp server. */
 
@@ -73,6 +71,7 @@ monaco.languages.setLanguageConfiguration('lean4cmd', config);
 
 /** The input field */
 export function Typewriter({disabled}: {disabled?: boolean}) {
+  let { t } = useTranslation()
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
@@ -93,102 +92,6 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const {setDeletedChat} = React.useContext(DeletedChatContext)
 
   const rpcSess = React.useContext(RpcContext)
-
-  /** Load all goals an messages of the current proof (line-by-line) and save
-   * the retrieved information into context (`ProofContext`)
-   */
-  // const loadAllGoals = React.useCallback(() => {
-
-  //   let goalCalls = []
-  //   let msgCalls = []
-
-  //   // For each line of code ask the server for the goals and the messages on this line
-  //   for (let i = 0; i < model.getLineCount(); i++) {
-  //     goalCalls.push(
-  //       rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp({line: i, character: 0, uri: uri}))
-  //     )
-  //     msgCalls.push(
-  //       getInteractiveDiagnostics(rpcSess, {start: i, end: i+1}).catch((error) => {console.debug("promise broken")})
-  //     )
-  //   }
-
-  //   // Wait for all these requests to be processed before saving the results
-  //   Promise.all(goalCalls).then((steps : InteractiveGoalsWithHints[]) => {
-  //     Promise.all(msgCalls).then((diagnostics : [InteractiveDiagnostic[]]) => {
-  //       let tmpProof : ProofStep[] = []
-
-  //       let goalCount = 0
-
-  //       steps.map((goals, i) => {
-  //         // The first step has an empty command and therefore also no error messages
-  //         // Usually there is a newline at the end of the editors content, so we need to
-  //         // display diagnostics from potentally two lines in the last step.
-  //         let messages = i ? (i == steps.length - 1 ? diagnostics.slice(i-1).flat() : diagnostics[i-1]) : []
-
-  //         // Filter out the 'unsolved goals' message
-  //         messages = messages.filter((msg) => {
-  //           return !("append" in msg.message &&
-  //             "text" in msg.message.append[0] &&
-  //             msg.message.append[0].text === "unsolved goals")
-  //         })
-
-  //         if (typeof goals == 'undefined') {
-  //           tmpProof.push({
-  //             command: i ? model.getLineContent(i) : '',
-  //             goals: [],
-  //             hints: [],
-  //             errors: messages
-  //           } as ProofStep)
-  //           console.debug('goals is undefined')
-  //           return
-  //         }
-
-  //         // If the number of goals reduce, show a message
-  //         if (goals.length && goalCount > goals.length) {
-  //           messages.unshift({
-  //             range: {
-  //               start: {
-  //                 line: i-1,
-  //                 character: 0,
-  //               },
-  //               end: {
-  //                 line: i-1,
-  //                 character: 0,
-  //               }},
-  //             severity: DiagnosticSeverity.Information,
-  //             message: {
-  //             text: 'intermediate goal solved 🎉'
-  //             }
-  //           })
-  //         }
-  //         goalCount = goals.length
-
-  //         // with no goals there will be no hints.
-  //         let hints : GameHint[] = goals.length ? goals[0].hints : []
-
-  //         console.debug(`Command (${i}): `, i ? model.getLineContent(i) : '')
-  //         console.debug(`Goals: (${i}): `, goalsToString(goals)) //
-  //         console.debug(`Hints: (${i}): `, hints)
-  //         console.debug(`Errors: (${i}): `, messages)
-
-  //         tmpProof.push({
-  //           // the command of the line above. Note that `getLineContent` starts counting
-  //           // at `1` instead of `zero`. The first ProofStep will have an empty command.
-  //           command: i ? model.getLineContent(i) : '',
-  //           // TODO: store correct data
-  //           goals: goals.map(g => g.goal),
-  //           // only need the hints of the active goals in chat
-  //           hints: hints,
-  //           // errors and messages from the server
-  //           errors: messages
-  //         } as ProofStep)
-
-  //       })
-  //       // Save the proof to the context
-  //       setProof(tmpProof)
-  //     }).catch((error) => {console.debug("promise broken")})
-  //   }).catch((error) => {console.debug("promise broken")})
-  // }, [editor, rpcSess, uri, model])
 
   // Run the command
   const runCommand = React.useCallback(() => {
@@ -355,7 +258,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
           <div ref={inputRef} className="typewriter-input" />
         </div>
         <button type="submit" disabled={processing} className="btn btn-inverted">
-          <FontAwesomeIcon icon={faWandMagicSparkles} /> Execute
+          <FontAwesomeIcon icon={faWandMagicSparkles} />&nbsp;{t("Execute")}
         </button>
       </form>
     </div>
