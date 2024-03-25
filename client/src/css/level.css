@@ -369,6 +369,11 @@ td code  {
   text-align: center;
 }
 
+/* Fixes https://github.com/leanprover-community/lean4game/issues/202 */
+.katex-mathml {
+  display: none;
+}
+
 /* DEBUG */
 /* .proof .step {
   border: 2px solid rgb(0, 123, 255);
