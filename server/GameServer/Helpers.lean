@@ -1,10 +1,13 @@
 import Lean
+import GameServer.Helpers.PrettyPrinter
 
 /-! This document contains various things which cluttered `Commands.lean`. -/
 
 open Lean Meta Elab Command
 
 /-! ## Doc Comment Parsing -/
+
+namespace GameServer
 
 /-- Read a doc comment and get its content. Return `""` if no doc comment available. -/
 def parseDocComment! (doc: Option (TSyntax `Lean.Parser.Command.docComment)) :
@@ -58,26 +61,6 @@ def parseDocCommentLegacy (doc: Option (TSyntax `Lean.Parser.Command.docComment)
 
         and remove the string following it!"
         pure <| ← parseDocComment! doc
-
-/-! ## Statement string -/
-
-def getStatement (name : Name) : CommandElabM MessageData := do
-  return ← addMessageContextPartial (.ofPPFormat { pp := fun
-    | some ctx => ctx.runMetaM <| PrettyPrinter.ppSignature name
-    | none     => return "that's a bug." })
-
--- Note: We use `String` because we can't send `MessageData` as json, but
--- `MessageData` might be better for interactive highlighting.
-/-- Get a string of the form `my_lemma (n : ℕ) : n + n = 2 * n`.
-
-Note: A statement like `theorem abc : ∀ x : Nat, x ≥ 0` would be turned into
-`theorem abc (x : Nat) : x ≥ 0` by `PrettyPrinter.ppSignature`. -/
-def getStatementString (name : Name) : CommandElabM String := do
-  try
-    return ← (← getStatement name).toString
-  catch
-  | _ => throwError m!"Could not find {name} in context."
-  -- TODO: I think it would be nicer to unresolve Namespaces as much as possible.
 
 /-- A `attr := ...` option for `Statement`. Add attributes to the defined theorem. -/
 syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"

@@ -8,6 +8,8 @@ import I18n
 
 open Lean Meta Elab Command
 
+open GameServer
+
 set_option autoImplicit false
 
 /-! # Game metadata -/
