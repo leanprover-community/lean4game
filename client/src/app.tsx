@@ -24,7 +24,9 @@ function App() {
     <div className="app">
       <GameIdContext.Provider value={gameId}>
           <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, setLayout, setIsSavePreferences}}>
-            <Outlet />
+            <React.Suspense>
+              <Outlet />
+            </React.Suspense>
           </PreferencesContext.Provider>
       </GameIdContext.Provider>
     </div>
