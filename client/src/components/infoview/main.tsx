@@ -20,7 +20,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
 import { GameIdContext } from '../../app';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { LevelInfo } from '../../state/api';
+import { LevelInfo, useGetGameInfoQuery } from '../../state/api';
 import { changedInventory, levelCompleted, selectCode, selectCompleted, selectInventory } from '../../state/progress';
 import Markdown from '../markdown';
 
@@ -38,6 +38,8 @@ import { Hints, MoreHelpButton, filterHints } from '../hints';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
+import path from 'path';
+
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -260,6 +262,7 @@ const goalFilter = {
   showLetValue: true
 }
 
+// TODD: Mark for translation!
 /** The display of a single entered lean command */
 function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, deleteProof: any }) {
   // The first step will always have an empty command
@@ -274,8 +277,8 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
   } else {
     return <div className="command">
       <div className="command-text">{proof?.steps[i].command}</div>
-      <Button to="" className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={deleteProof}>
-        <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;{this("Retry")}
+      <Button to="" className="undo-button btn btn-inverted" title={"Retry proof from here"} onClick={deleteProof}>
+        <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;{"Retry"}
       </Button>
     </div>
   }
@@ -398,6 +401,11 @@ export function TypewriterInterface({props}) {
   const model = editor.getModel()
   const uri = model.uri.toString()
 
+  const gameInfo = useGetGameInfoQuery({game: gameId})
+  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  let image: string = gameInfo.data?.worlds.nodes[worldId].image
+
+
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
@@ -498,7 +506,16 @@ export function TypewriterInterface({props}) {
   return <div className="typewriter-interface">
     <RpcContext.Provider value={rpcSess}>
     <div className="content">
+      <div className='world-image-container empty'>
+        {image &&
+          <img className="contain" src={path.join("data", gameId, image)} alt="" />
+        }
+
+      </div>
       <div className="tmp-pusher">
+        {/* <div className="world-image-container empty">
+
+        </div> */}
       </div>
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement data={props.data} />

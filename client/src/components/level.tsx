@@ -494,10 +494,9 @@ function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPop
       :
         <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
           <IntroductionPanel gameInfo={gameInfo} />
-          <div className="world-image-container empty">
+          <div className="world-image-container empty center">
             {image &&
-              // TODO: Temporary for testing
-              <img className={worldId=="Proposition" ? "cover" : "contain"} src={path.join("data", gameId, image)} alt="" />
+              <img className="contain" src={path.join("data", gameId, image)} alt="" />
             }
 
           </div>

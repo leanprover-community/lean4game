@@ -348,12 +348,17 @@ td code  {
 .world-image-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  min-height: 0px; /* somehow this has a desired affect, but why? */
 }
 
 .world-image-container img.contain {
   object-fit: contain;
 }
+
+.world-image-container.center {
+  justify-content: center;
+}
+
 
 .world-image-container img.cover {
   height: 100%;
