@@ -172,7 +172,7 @@ function LandingPage() {
           </p>
           <p>
             Featured games on this page are added manually.
-            Please get in contact and we-ll happily add yours.
+            Please get in contact and we'll happily add yours.
           </p>
         </Trans>
       </div>

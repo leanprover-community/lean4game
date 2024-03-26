@@ -100,7 +100,7 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
 function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc, enableAll=false}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : item.st
-  const className = locked ? t("locked") : disabled ? t("disabled") : newly ? t("new") : ""
+  const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
   // Note: This is somewhat a hack as the statement of lemmas comes currently in the form
   // `Namespace.statement_name (x y : Nat) : some type`
   const title = locked ? t("Not unlocked yet") :
