@@ -349,6 +349,7 @@ td code  {
   display: flex;
   flex-direction: column;
   min-height: 0px; /* somehow this has a desired affect, but why? */
+  overflow: hidden;
 }
 
 .world-image-container img.contain {
