@@ -14,9 +14,6 @@ open Lean.Parser Term
 open PrettyPrinter Delaborator SubExpr
 open TSyntax.Compat
 
-
-#check Command.declSig
-
 open private shouldGroupWithNext evalSyntaxConstant from Lean.PrettyPrinter.Delaborator.Builtins
 
 -- def typeSpec := leading_parser " :\\n: " >> termParser

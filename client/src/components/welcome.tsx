@@ -23,19 +23,24 @@ import { WorldTreePanel } from './world_tree'
 import '../css/welcome.css'
 import { WelcomeAppBar } from './app_bar'
 import { Hint } from './hints'
+import i18next from 'i18next'
+import { useTranslation } from 'react-i18next'
 
 
 /** the panel showing the game's introduction text */
 function IntroductionPanel({introduction, setPageNumber}: {introduction: string, setPageNumber}) {
   const {mobile} = React.useContext(PreferencesContext)
   const gameId = React.useContext(GameIdContext)
+
+  let { t } = useTranslation()
+
   const dispatch = useAppDispatch()
 
   // TODO: I left the setup for splitting up the introduction in place, but if it's not needed
   // then this can be simplified.
 
   // let text: Array<string> = introduction.split(/\n(\s*\n)+/)
-  let text: Array<string> = introduction ? [introduction] : []
+  let text: Array<string> = introduction ? [t(introduction, {ns : gameId})] : []
 
   return <div className="column chat-panel">
     <div className="chat">
@@ -64,6 +69,10 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
   const gameId = React.useContext(GameIdContext)
+
+  // Load the namespace of the game
+  i18next.loadNamespaces(gameId)
+
   const {mobile} = React.useContext(PreferencesContext)
   const {layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
 

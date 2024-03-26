@@ -8,7 +8,7 @@ package GameServer
 def leanVersion := "v4.6.0" -- TODO
 
 require std from git "https://github.com/leanprover/std4.git" @ leanVersion
-require i18n from git "https://github.com/hhu-adam/lean-i18n.git" @ leanVersion
+require i18n from git "https://github.com/hhu-adam/lean-i18n.git" @ "main" -- leanVersion
 
 lean_lib GameServer
 

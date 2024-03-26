@@ -52,8 +52,6 @@ If names are provided, it will introduce as many `let` statements as there are n
 syntax (name := letIntros) "let_intros" : tactic
 -- (ppSpace colGt (ident <|> hole))*
 
-#check letIntros
-
 @[tactic letIntros] def evalLetIntros : Tactic := fun stx => do
   match stx with
   | `(tactic| let_intros) => liftMetaTactic fun mvarId => do

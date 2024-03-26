@@ -53,6 +53,8 @@ import { onigasmH } from 'onigasm/lib/onigasmH'
 import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
 import { InfoPopup } from './popup/game_info'
 import { PreferencesPopup } from './popup/preferences'
+import { useTranslation } from 'react-i18next'
+import i18next from 'i18next'
 
 
 monacoSetup()
@@ -63,6 +65,10 @@ function Level() {
   const worldId = params.worldId
 
   const gameId = React.useContext(GameIdContext)
+
+  // Load the namespace of the game
+  i18next.loadNamespaces(gameId)
+
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
   // pop-ups
@@ -88,6 +94,7 @@ function Level() {
 }
 
 function ChatPanel({lastLevel, visible = true}) {
+  let { t } = useTranslation()
   const chatRef = useRef<HTMLDivElement>(null)
   const {mobile} = useContext(PreferencesContext)
   const gameId = useContext(GameIdContext)
@@ -134,7 +141,7 @@ function ChatPanel({lastLevel, visible = true}) {
   //   // chatRef.current!.scrollTo(0,0)
   // }, [gameId, worldId, levelId])
 
-  let introText: Array<string> = level?.data?.introduction.split(/\n(\s*\n)+/)
+  let introText: Array<string> = t(level?.data?.introduction, {ns: gameId}).split(/\n(\s*\n)+/)
 
   return <div className={`chat-panel ${visible ? '' : 'hidden'}`}>
     <div ref={chatRef} className="chat">
@@ -441,11 +448,12 @@ function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPo
 }
 
 function IntroductionPanel({gameInfo}) {
+  let { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
   const {worldId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
 
-  let text: Array<string> = gameInfo.data?.worlds.nodes[worldId].introduction.split(/\n(\s*\n)+/)
+  let text: Array<string> = t(gameInfo.data?.worlds.nodes[worldId].introduction, {ns: gameId}).split(/\n(\s*\n)+/)
 
   return <div className="chat-panel">
     <div className="chat">

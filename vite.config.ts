@@ -44,6 +44,9 @@ export default defineConfig({
       '/data': {
         target: 'http://localhost:8080',
       },
+      '/i18n': {
+        target: 'http://localhost:8080',
+      },
     }
   },
   resolve: {

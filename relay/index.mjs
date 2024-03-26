@@ -37,6 +37,14 @@ router.get('/import/trigger/:owner/:repo', importTrigger)
 
 const server = app
   .use(express.static(path.join(__dirname, '..', 'client', 'dist'))) // TODO: add a dist folder from inside the game
+  .use('/i18n/g/:owner/:repo/:lang/*', (req, res, next) => {
+    const owner = req.params.owner;
+    const repo = req.params.repo
+    const lang = req.params.lang
+    const filename = req.params[0];
+    req.url = filename;
+    express.static(path.join(getGameDir(owner,repo),".i18n",lang))(req, res, next);
+  })
   .use('/data/g/:owner/:repo/*', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo

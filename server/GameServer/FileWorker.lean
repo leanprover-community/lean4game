@@ -331,6 +331,9 @@ structure GameParams where
   diagnostics : GameDiagnostics
 deriving ToJson, FromJson
 
+-- `snap` and `initParams` are unused
+set_option linter.unusedVariables false in
+
 /-- WIP: publish diagnostics, all intermediate goals and if the game is completed. -/
 def publishProofState (m : DocumentMeta) (snap : Snapshot) (initParams : Lsp.InitializeParams) (hOut : FS.Stream) :
     IO Unit := do

@@ -19,6 +19,7 @@ import { PreferencesPopup } from './popup/preferences';
 import { ImpressumButton, MenuButton, PreferencesButton } from './app_bar';
 import ReactCountryFlag from 'react-country-flag';
 import lean4gameConfig from '../config.json'
+import i18next from 'i18next';
 
 function GithubIcon({url='https://github.com'}) {
 
@@ -32,7 +33,7 @@ function GithubIcon({url='https://github.com'}) {
 }
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
-  let { t } = useTranslation()
+  let { t, i18n } = useTranslation()
   let navigate = useNavigate();
   const routeChange = () =>{
     navigate(gameId);
@@ -42,19 +43,22 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
     return <></>
   }
 
+  // Load the namespace of the game
+  i18next.loadNamespaces(gameId)
+
   return <div className="game" onClick={routeChange}>
     <div className="wrapper">
-      <div className="title">{data.title}</div>
-      <div className="short-description">{data.short}
+      <div className="title">{t(data.title, { ns: gameId })}</div>
+      <div className="short-description">{t(data.short, { ns: gameId })}
       </div>
       { data.image ? <img className="image" src={path.join("data", gameId, data.image)} alt="" /> : <div className="image"/> }
-      <div className="long description"><Markdown>{data.long}</Markdown></div>
+      <div className="long description"><Markdown>{t(data.long, { ns: gameId })}</Markdown></div>
     </div>
     <table className="info">
       <tbody>
       <tr>
         <td title="consider playing these games first.">{t("Prerequisites")}</td>
-        <td><Markdown>{data.prerequisites.join(', ')}</Markdown></td>
+        <td><Markdown>{t(data.prerequisites.join(', '), { ns: gameId })}</Markdown></td>
       </tr>
       <tr>
         <td>{t("Worlds")}</td>

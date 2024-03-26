@@ -59,8 +59,8 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
 
   IO.FS.writeFile (path / inventoryFileName) (toString (toJson inventory))
 
-  -- write PO file for translation
-  I18n.createPOTemplate
+  -- write file for translation
+  I18n.createTemplate
 
 open GameData
 
