@@ -87,5 +87,8 @@
   "Save my settings (in the browser store)": "Save my settings (in the browser store)",
   "<p>Select a JSON file with the saved game progress to load your progress.</p><1><0>Warning:</0> This will delete your current game progress! Consider <2>downloading your current progress</2> first!</1>": "<p>Select a JSON file with the saved game progress to load your progress.</p><1><0>Warning:</0> This will delete your current game progress! Consider <2>downloading your current progress</2> first!</1>",
   "Upload Saved Progress": "Upload Saved Progress",
-  "Load selected file": "Load selected file"
+  "Load selected file": "Load selected file",
+  "Mobile": "Mobile",
+  "Auto": "Auto",
+  "Desktop": "Desktop"
 }

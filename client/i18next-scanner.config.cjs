@@ -1,3 +1,5 @@
+const lean4gameConfig = require("./src/config.json")
+
 const typescriptTransform = require('i18next-scanner-typescript');
 
 const fs = require('fs');
@@ -97,7 +99,7 @@ module.exports = {
       //     sourceType: 'module', // defaults to 'module'
       // }
     },
-    lngs: ['en','de'],
+    lngs: lean4gameConfig.languages.map(e => e.iso),
     ns: [],
     defaultLng: 'en',
     defaultNs: 'translation',
