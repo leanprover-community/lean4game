@@ -30,7 +30,7 @@ The inventory contains documentation that the user can access.
 There are three inventory types: Lemma, Tactic, Definition. They vary about in the information
 they carry.
 
-The commands `LemmaDoc`, `TacticDoc`, and `DefinitionDoc` add keys and templates to an
+The commands `TheoremDoc`, `TacticDoc`, and `DefinitionDoc` add keys and templates to an
 env. extension called `InventoryTemplateExt`. Commands like `NewLemma`, etc. as well as
 `Statement` check if there is a key registered in this extension and might add a default or
 print a warning if not.

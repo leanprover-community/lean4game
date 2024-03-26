@@ -406,7 +406,9 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     let env ← getEnv
     let fullName := (← getCurrNamespace) ++ name.getId
     if env.contains fullName then
-      let origType := (env.constants.map₁.find! fullName).type
+      let some orig := env.constants.map₁.find? fullName
+        | throwError s!"error in \"Statement\": `{fullName}` not found."
+      let origType := orig.type
       -- TODO: Check if `origType` agrees with `sig` and output `logInfo` instead of `logWarning`
       -- in that case.
       logWarningAt name (m!"Environment already contains {fullName}! Only the existing " ++
@@ -738,7 +740,8 @@ elab "MakeGame" : command => do
           | 0 => pure ()
           | 1 => pure () -- level ids start with 1, so we need to skip 1, too
           | i₀ + 1 =>
-            match (world.levels.find! (i₀)).statementName with
+            let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
+            match (idx).statementName with
             | .anonymous => pure ()
             | .num _ _ => panic "Did not expect to get a numerical statement name!"
             | .str pre s =>
@@ -749,7 +752,9 @@ elab "MakeGame" : command => do
 
       -- if the last level was named, we need to add it as a new lemma
       let i₀ := world.levels.size
-        match (world.levels.find! (i₀)).statementName with
+
+        let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
+        match (idx).statementName with
         | .anonymous => pure ()
         | .num _ _ => panic "Did not expect to get a numerical statement name!"
         | .str pre s =>
@@ -871,7 +876,8 @@ elab "MakeGame" : command => do
           | 1 => pure () -- level ids start with 1, so we need to skip 1, too.
           | i₀ + 1 =>
             -- add named statement from previous level to the available lemmas.
-            match (world.levels.find! (i₀)).statementName with
+            let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
+            match (idx).statementName with
             | .anonymous => pure ()
             | .num _ _ => panic "Did not expect to get a numerical statement name!"
             | .str pre s =>
@@ -885,7 +891,8 @@ elab "MakeGame" : command => do
         match i₀ with
         | 0 => logWarning m!"World `{worldId}` contains no levels."
         | i₀ =>
-          match (world.levels.find! (i₀)).statementName with
+          let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
+          match (idx).statementName with
           | .anonymous => pure ()
           | .num _ _ => panic "Did not expect to get a numerical statement name!"
           | .str pre s =>
