@@ -189,6 +189,8 @@ footer .link {
 
 .github-link {
   height: 24px; /* TODO: why do I need that? s*/
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .landing-page > section {
