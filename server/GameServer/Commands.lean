@@ -110,8 +110,9 @@ elab "CaptionLong" t:str : command => do
   modifyCurGame fun game => pure {game with
     tile := {game.tile with long := caption}}
 
-/-- A list of Languages the game is translated to. For example `Languages "German" "English"`.
-NOTE: For the time being, only a single language is supported.
+/-- A list of Languages the game is translated to. For example `Languages "de" "en"`.
+
+The keys are ISO language codes.
  -/
 elab "Languages" t:str* : command => do
   modifyCurGame fun game => pure {game with

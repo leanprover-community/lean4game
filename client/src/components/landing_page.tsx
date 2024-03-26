@@ -15,18 +15,10 @@ import {PrivacyPolicyPopup} from './popup/privacy_policy'
 import { GameTile, useGetGameInfoQuery } from '../state/api'
 import path from 'path';
 
-import lean4gameConfig from '../config.json'
 import { PreferencesPopup } from './popup/preferences';
 import { ImpressumButton, MenuButton, PreferencesButton } from './app_bar';
-
-const flag = {
-  'Dutch': '🇳🇱',
-  'English': '🇬🇧',
-  'French': '🇫🇷',
-  'German': '🇩🇪',
-  'Italian': '🇮🇹',
-  'Spanish': '🇪🇸',
-}
+import ReactCountryFlag from 'react-country-flag';
+import lean4gameConfig from '../config.json'
 
 function GithubIcon({url='https://github.com'}) {
 
@@ -74,7 +66,16 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
       </tr>
       <tr>
         <td>{t("Language")}</td>
-        <td title={`in ${data.languages.join(', ')}`}>{data.languages.map((lan) => flag[lan]).join(', ')}</td>
+
+        <td>
+          {data.languages.map((lang) => {
+            let langOpt = lean4gameConfig.languages.find((e) => e.iso == lang)
+            if (langOpt) {
+              return <ReactCountryFlag title={langOpt.name} countryCode={langOpt.flag} className="emojiFlag"/>
+            } else
+              return <></>
+          })}
+        </td>
       </tr>
       </tbody>
     </table>
