@@ -17,6 +17,11 @@
       "iso": "de",
       "flag": "DE",
       "name": "Deutsch"
+    },
+    {
+      "iso": "zh",
+      "flag": "CN",
+      "name": "中国人"
     }
   ]
 }
