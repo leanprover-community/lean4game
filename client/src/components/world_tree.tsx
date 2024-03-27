@@ -113,6 +113,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
     difficulty: number,
     worldSize: number
   }) {
+  const { t } = useTranslation()
 
   // See level icons. Match radius computed there minus `1.2*r`
   const N = Math.max(worldSize, NMIN)
@@ -151,7 +152,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
           width={1.42*R} height={1.42*R} transform={"translate("+ -.71*R +","+ -.71*R +")"}>
         <div className={unlocked && !completed ? "playable-world" : ''}>
           <p className="world-title" style={{fontSize: fontSize + "px"}}>
-            {title ? title : world}
+            {title ? t(title, {ns: gameId}) : world}
           </p>
         </div>
       </foreignObject>
@@ -162,7 +163,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
           >
         <div className='world-label' style={{backgroundColor: completed ? darkgreen : unlocked ? darkblue : darkgrey}}>
           <p className='world-title' style={{fontSize: MINFONT + "px"}}>
-            {title ? title : world}
+            {title ? t(title, {ns: gameId}) : world}
           </p>
         </div>
       </foreignObject>}

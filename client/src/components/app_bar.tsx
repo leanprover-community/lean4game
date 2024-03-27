@@ -214,6 +214,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
   toggleInfo: any,
   togglePreferencesPopup: () => void;
 }) {
+  const { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useAppSelector(selectProgress(gameId))
   const {mobile} = React.useContext(PreferencesContext)
@@ -225,7 +226,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
       <span className="app-bar-title"></span>
     </div>
     <div>
-      {!mobile && <span className="app-bar-title">{gameInfo?.title}</span>}
+      {!mobile && <span className="app-bar-title">{t(gameInfo?.title, {ns: gameId})}</span>}
     </div>
     <div className="nav-btns">
       {mobile && <MobileNavButtons pageNumber={pageNumber} setPageNumber={setPageNumber} />}
@@ -288,7 +289,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, toggleInfo,
         {/* DESKTOP VERSION */}
         <div className='app-bar-left'>
           <HomeButton isDropdown={false} />
-          <span className="app-bar-title">{worldTitle && `${t("World")}: ${worldTitle}`}</span>
+          <span className="app-bar-title">{worldTitle && `${t("World")}: ${t(worldTitle, {ns: gameId})}`}</span>
         </div>
         <div>
           <span className="app-bar-title">{levelTitle}</span>

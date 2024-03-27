@@ -136,12 +136,15 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
  * If `showLeanStatement` is true, it will additionally display the lean code.
  */
 function ExerciseStatement({ data, showLeanStatement = false }) {
+  let { t } = useTranslation()
+  const gameId = React.useContext(GameIdContext)
+
   if (!(data?.descrText || data?.descrFormat)) { return <></> }
   return <>
     <div className="exercise-statement">
       {data?.descrText &&
         <Markdown>
-          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + data?.descrText}
+          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + t(data?.descrText, {ns: gameId})}
         </Markdown>
       }
       {data?.descrFormat && showLeanStatement &&

@@ -140,7 +140,7 @@ export function Documentation({name, type, handleClose}) {
     <h1 className="doc">{doc.data?.displayName}</h1>
     <p><code>{doc.data?.statement}</code></p>
     {/* <code>docstring: {doc.data?.docstring}</code> */}
-    <Markdown>{doc.data?.content}</Markdown>
+    <Markdown>{t(doc.data?.content, {ns: gameId})}</Markdown>
   </div>
 }
 

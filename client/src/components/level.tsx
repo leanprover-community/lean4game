@@ -173,11 +173,11 @@ function ChatPanel({lastLevel, visible = true}) {
       {proof?.completed &&
         <>
           <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
-            Level completed! 🎉
+            {t("Level completed! 🎉")}
           </div>
           {level?.data?.conclusion?.trim() &&
             <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
-              <Markdown>{level?.data?.conclusion}</Markdown>
+              <Markdown>{t(level?.data?.conclusion, {ns: gameId})}</Markdown>
             </div>
           }
         </>
@@ -186,10 +186,10 @@ function ChatPanel({lastLevel, visible = true}) {
     <div className="button-row">
       {proof?.completed && (lastLevel ?
         <Button to={`/${gameId}`}>
-          <FontAwesomeIcon icon={faHome} />&nbsp;Leave World
+          <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
         </Button> :
         <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-          Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+          {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>)
         }
       <MoreHelpButton />
