@@ -46,9 +46,9 @@
   "Assumptions": "假设",
   "Further Goals": "Further Goals",
   "No Goals": "无目标",
-  "Loading goal…": "加载目标...",
+  "Loading goal…": "加载目标。。。",
   "Click somewhere in the Lean file to enable the infoview.": "单击Lean文件中的某处以启用信息视图。",
-  "Waiting for Lean server to start…": "等待 Lean 服务器启动...",
+  "Waiting for Lean server to start…": "等待 Lean 服务器启动。。。",
   "Level completed! 🎉": "完成关卡！🎉",
   "Level completed with warnings 🎭": "关卡完成（带有警告） 🎭",
   "Retry proof from here": "从这里重新试着证明",
@@ -56,7 +56,7 @@
   "Crashed! Go to editor mode and fix your proof! Last server response:": "程序崩溃！请转到编辑器模式，修复您的证明！最后一次服务器响应：",
   "Line": "行",
   "Character": "字符",
-  "Loading messages…": "正在加载信息...",
+  "Loading messages…": "正在加载信息。。。",
   "Execute": "执行",
   "Definitions": "定义",
   "Theorems": "定理",
@@ -68,7 +68,7 @@
   "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "一个用于<1>Lean</1> <i>（Lean 4）</i>及其数学库<5>mathlib</5>的学习游戏库",
   "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder.": "没有加载游戏。使用<1>http://localhost:3000/#/g/local/FOLDER</1>直接从本地文件夹打开游戏。",
   "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games. We hope to address and test this limitation better in the future.</p><1>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</1>": "<p>由于这个服务器在我们大学的机器上运行Lean，它的容量是有限的。我们当前的估计是大约70个同时进行的游戏。我们希望将来能更好地解决和测试这个限制。</p><1>游戏和基础设施的大多数方面仍在开发中。遇到任何问题，请随时提交<1>GitHub Issue</1>！</1>",
-  "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we-ll happily add yours.</p>": "<0>如果您想编写自己的游戏，您应该使用<1>GameSkeleton Github Repo</1>作为模板，并阅读<3>如何创建游戏</3>。</0><1>您可以直接将游戏加载到服务器上并使用正确的URL进行游戏。上面的<1>说明</1>也解释了如何将游戏加载到服务器的详细步骤。如果您有任何疑问，请您与我们联系。</1><p>本页面上的游戏是手动添加的。请与我们联系，我们很乐意添加您的游戏。</p>",
+  "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>如果您想编写自己的游戏，您应该使用<1>GameSkeleton Github Repo</1>作为模板，并阅读<3>如何创建游戏</3>。</0><1>您可以直接将游戏加载到服务器上并使用正确的URL进行游戏。上面的<1>说明</1>也解释了如何将游戏加载到服务器的详细步骤。如果您有任何疑问，请您与我们联系。</1><p>本页面上的游戏是手动添加的。请与我们联系，我们很乐意添加您的游戏。</p>",
   "This server has been developed as part of the project <1>ADAM : Anticipating the Digital Age of Mathematics</1> at Heinrich-Heine-Universität in Düsseldorf.": "这个服务器是作为杜塞尔多夫海因里希·海涅大学项目<1>ADAM：预见数学的数字时代</1>的一部分而开发的。",
   "Prerequisites": "前置条件",
   "Worlds": "世界(Worlds)",
@@ -90,6 +90,5 @@
   "Load selected file": "加载所选文件",
   "Mobile": "移动端",
   "Auto": "自动",
-  "Desktop": "桌面端",
-  "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>如果您想编写自己的游戏，您应该使用<1>GameSkeleton Github Repo</1>作为模板，并阅读<3>如何创建游戏</3>。</0><1>您可以直接将游戏加载到服务器上并使用正确的URL进行游戏。上面的<1>说明</1>也解释了如何将游戏加载到服务器的详细步骤。如果您有任何疑问，请您与我们联系。</1><p>本页面上的游戏是手动添加的。请与我们联系，我们很乐意添加您的游戏。</p>"
+  "Desktop": "桌面端"
 }
