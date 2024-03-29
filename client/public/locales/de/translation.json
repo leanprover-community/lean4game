@@ -62,7 +62,7 @@
   "locked": "nicht verfügbar",
   "disabled": "gesperrt",
   "new": "neu",
-  "Not unlocked yet": "Not nicht verfügbar",
+  "Not unlocked yet": "Noch nicht verfügbar",
   "Not available in this level": "In diesem Level nicht verfügbar",
   "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "Eine Sammlung von Lernspielen für den Beweisassistenten <1>Lean</1> <i>(Lean 4)</i> und dessen mathematische Bibliothek <5>mathlib</5>",
   "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder.": "Kein Spiel geladen. öffne <1>http://localhost:3000/#/g/local/FOLDER</1> um ein Spiel direkt von einem lokalen Ordner zu laden.",
