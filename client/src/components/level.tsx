@@ -67,7 +67,9 @@ function Level() {
   const gameId = React.useContext(GameIdContext)
 
   // Load the namespace of the game
-  i18next.loadNamespaces(gameId)
+  i18next.loadNamespaces(gameId).catch(err => {
+    console.warn(`translations for ${gameId} do not exist.`)
+  })
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
