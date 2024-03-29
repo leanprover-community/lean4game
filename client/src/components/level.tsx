@@ -213,6 +213,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
 }
 
 function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPopup}) {
+  let { t } = useTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
@@ -416,7 +417,7 @@ function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPo
                 <LevelAppBar
                   pageNumber={pageNumber} setPageNumber={setPageNumber}
                   isLoading={level.isLoading}
-                  levelTitle={`${mobile ? '' : 'Level '}${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
+                  levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${level?.data?.title}`)}
                   toggleImpressum={toggleImpressum}
                   toggleInfo={toggleInfo}
@@ -479,6 +480,8 @@ export default Level
 
 /** The site with the introduction text of a world */
 function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPopup}) {
+  let { t } = useTranslation()
+
   const gameId = React.useContext(GameIdContext)
   const {mobile} = useContext(PreferencesContext)
 
@@ -496,7 +499,7 @@ function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPop
   }
 
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle="Introduction" toggleImpressum={toggleImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?
