@@ -39,12 +39,15 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
     navigate(gameId);
   }
 
+  // we use this to reload the tile 1x after the translation is loaded.
+  let [loadedTranslation, setLoadedTranslation] = React.useState(false)
+
+  // Load the namespace of the game
+  i18next.loadNamespaces(gameId).catch(err => {}).then(() => {setLoadedTranslation(true)})
+
   if (typeof data === 'undefined') {
     return <></>
   }
-
-  // Load the namespace of the game
-  i18next.loadNamespaces(gameId)
 
   return <div className="game" onClick={routeChange}>
     <div className="wrapper">
