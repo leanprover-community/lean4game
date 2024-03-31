@@ -466,7 +466,7 @@ function IntroductionPanel({gameInfo}) {
       {gameInfo.data?.worldSize[worldId] == 0 ?
         <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
         <Button to={`/${gameId}/world/${worldId}/level/1`}>
-          Start&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+          {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>
       }
     </div>
