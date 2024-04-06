@@ -78,6 +78,7 @@ module.exports = {
   ],
   options: {
     debug: true,
+    removeUnusedKeys: true,
     func: {
       list: ['i18next.t', 'i18n.t', 't'],
       extensions: ['.js', '.jsx'] // not .ts or .tsx since we use i18next-scanner-typescript!
