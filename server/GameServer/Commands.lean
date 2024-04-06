@@ -42,7 +42,7 @@ elab "Title" t:str : command => do
   | .Level => modifyCurLevel fun level => pure {level with title := title}
   | .World => modifyCurWorld  fun world => pure {world with title := title}
   | .Game => modifyCurGame  fun game => pure {game with
-      title := t.getString
+      title := title
       tile := {game.tile with title := title}}
 
 /-- Define the introduction of the current game/world/level. -/

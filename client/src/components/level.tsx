@@ -418,7 +418,7 @@ function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPo
                   pageNumber={pageNumber} setPageNumber={setPageNumber}
                   isLoading={level.isLoading}
                   levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
-                    (level?.data?.title && ` : ${level?.data?.title}`)}
+                    (level?.data?.title && ` : ${t(level?.data?.title, {ns: gameId})}`)}
                   toggleImpressum={toggleImpressum}
                   toggleInfo={toggleInfo}
                   togglePreferencesPopup={togglePreferencesPopup}
