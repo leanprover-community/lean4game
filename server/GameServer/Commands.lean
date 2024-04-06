@@ -4,6 +4,7 @@ import GameServer.Options
 import GameServer.SaveData
 import GameServer.Hints
 import GameServer.Tactic.LetIntros
+import GameServer.RpcHandlers -- only needed to collect the translations of "level completed" msgs
 import I18n
 
 open Lean Meta Elab Command
