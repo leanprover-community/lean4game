@@ -263,7 +263,7 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           -- This makes the experience for the user much nicer and allows for local
           -- definitions in the exercise.
           let cmdStx ← `(command|
-            theorem the_theorem $(level.goal) := by {let_intros; $(⟨level.preample⟩); $(⟨tacticStx⟩)} )
+            theorem the_theorem $(level.goal) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
       cmdCtx cmdStateRef
   let postNew := (← tacticCacheNew.get).post

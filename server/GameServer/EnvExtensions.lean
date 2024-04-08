@@ -266,7 +266,7 @@ structure GameLevel where
   /-- The image for this level. -/
   image : String := default
   /-- A sequence of tactics the game automatically executes before the first step. -/
-  preample : TSyntax `Lean.Parser.Tactic.tacticSeq := default
+  preamble : TSyntax `Lean.Parser.Tactic.tacticSeq := default
 deriving Inhabited, Repr
 
 /-- Json-encodable version of `GameLevel`

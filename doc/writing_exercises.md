@@ -26,23 +26,23 @@ f: ℤ → ℤ := fun x => 2 * x
 ⊢ 0 < f a
 ```
 
-## "Preample" & non-`Prop`-valued exercises
+## "Preamble" & non-`Prop`-valued exercises
 
-You can use the following syntax with `(preample := tac)` where `tac` is a tactic sequence.
+You can use the following syntax with `(preamble := tac)` where `tac` is a tactic sequence.
 
 ```
-Statement my_statement (preample := dsimp) (a : ℤ) (h : 0 < a) :
+Statement my_statement (preamble := dsimp) (a : ℤ) (h : 0 < a) :
     0 < f a := by
   sorry
 ```
 
 This tactic sequence will be executed before the exercise is handed to the player.
 
-For example, if your exercise is to construct a structure, you could use `preample` to fill
+For example, if your exercise is to construct a structure, you could use `preamble` to fill
 all data fields correctly, leaving all `Prop`-valued fields of the structure as separate goals
 for the player to proof.
 
-Note: `(preample := tac)` always has to be written between the optional name and the first
+Note: `(preamble := tac)` always has to be written between the optional name and the first
 hypothesis. Nevertheless, you can use all hypotheses in the tactic sequence, because it is
 only evaluated at the beginning of the proof.
 
