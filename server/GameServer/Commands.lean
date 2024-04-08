@@ -577,7 +577,8 @@ elab (name := GameServer.Tactic.Branch) "Branch" t:tacticSeq : tactic => do
   -- Show an info whether the branch proofs all remaining goals.
   let gs ← Tactic.getUnsolvedGoals
   if gs.isEmpty then
-    trace[debug] "This branch finishes the proof."
+    -- trace[debug] "This branch finishes the proof."
+    pure ()
   else
     trace[debug] "This branch leaves open goals."
 
