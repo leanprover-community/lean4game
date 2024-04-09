@@ -140,6 +140,7 @@ interface GoalProps {
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
     const { goal, filter, showHints, typewriter } = props
+    let { t } = useTranslation()
 
     // TODO: Apparently `goal` can be `undefined`
     if (!goal) {return <></>}
@@ -153,7 +154,7 @@ export const Goal = React.memo((props: GoalProps) => {
             undefined,
         [locs, goal.mvarId])
     const goalLi = <div key={'goal'}>
-        <div className="goal-title">Goal: </div>
+        <div className="goal-title">{t("Goal")}:</div>
         <LocationsContext.Provider value={goalLocs}>
             <InteractiveCode fmt={goal.type} />
         </LocationsContext.Provider>
@@ -171,10 +172,10 @@ export const Goal = React.memo((props: GoalProps) => {
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
         {filter.reverse && goalLi}
         {! typewriter && objectHyps.length > 0 &&
-            <div className="hyp-group"><div className="hyp-group-title">Objects:</div>
+            <div className="hyp-group"><div className="hyp-group-title">{t("Objects")}:</div>
             {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {!typewriter && assumptionHyps.length > 0 &&
-            <div className="hyp-group"><div className="hyp-group-title">Assumptions:</div>
+            <div className="hyp-group"><div className="hyp-group-title">{t("Assumptions")}:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {!filter.reverse && goalLi}
         {/* {showHints && hints} */}
