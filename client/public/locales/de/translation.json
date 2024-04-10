@@ -87,8 +87,9 @@
   "Desktop": "Desktop",
   "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "",
   "Level": "",
-  "Introduction": "",
-  "Retry proof from here": "",
+  "Introduction": "Einführung",
+  "Retry proof from here": "Ab hier erneut versuchen",
   "Retry": "",
-  "Failed command": ""
+  "Failed command": "Befehl fehlgeschlagen",
+  "view the Lean game server on Github": "Lean game Server auf Github ansehen"
 }

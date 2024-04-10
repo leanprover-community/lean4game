@@ -90,5 +90,6 @@
   "Introduction": "Introduction",
   "Retry proof from here": "Retry proof from here",
   "Retry": "Retry",
-  "Failed command": "Failed command"
+  "Failed command": "Failed command",
+  "view the Lean game server on Github": "view the Lean game server on Github"
 }
