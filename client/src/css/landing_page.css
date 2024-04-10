@@ -19,7 +19,7 @@ a {
 
 @viewport {
   width: device-width ;
-  zoom: 1.0 ;
+  initial-scale: 1.0 ;
 }
 
 .landing-page {
