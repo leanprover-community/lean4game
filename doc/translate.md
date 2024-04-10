@@ -2,6 +2,8 @@
 
 The game server supports internationalisation ("i18n") using [lean-i18n](https://github.com/hhu-adam/lean-i18n) and [i18next](https://www.npmjs.com/package/i18next).
 
+The intended workflow currently is the following:
+
 1. When you call `lake build` in your game, it should automatically create a template file `.i18n/en/Game.pot`. Alternatively you can call `lake exe i18n --template` to recreate it.
 2. Open the file `Game.pot` (the "t" stands for "template") with [Poedit](https://poedit.net/) (or a similar software) and translate all strings. Save your work as `.i18n/{language}/Game.po`.
 4. Call `lake exe i18n --export-json` to create all Json files `.i18n/{language}/Game.json` which the server needs.
