@@ -17,9 +17,9 @@ Note: This workflow is subject to change, and it might be that in future the ser
 1. `lake build` or `lake exe i18n --template` will now create a Json instead: `.i18n/en/Game.json`.
 2. Add translations to a copy of this Json an save it as `.i18n/{language}/Game.json`
 
-## non-English games
+## Non-English games
 
-For games not originally written in English, you should set the correct source language (`sourceLang`) in `.i18n/config.json`. Now the template should appear under the chosen language.
+For games written in a language different than English, you should set the correct source language (`sourceLang`) in `.i18n/config.json`. Afterwards, on `lake build` the template should appear under the chosen language, and can be translated (e.g. into English) as described above.
 
 ## New languages
 
