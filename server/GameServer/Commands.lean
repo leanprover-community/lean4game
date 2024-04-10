@@ -4,6 +4,7 @@ import GameServer.Options
 import GameServer.SaveData
 import GameServer.Hints
 import GameServer.Tactic.LetIntros
+import GameServer.RpcHandlers -- only needed to collect the translations of "level completed" msgs
 import I18n
 
 open Lean Meta Elab Command
@@ -42,7 +43,7 @@ elab "Title" t:str : command => do
   | .Level => modifyCurLevel fun level => pure {level with title := title}
   | .World => modifyCurWorld  fun world => pure {world with title := title}
   | .Game => modifyCurGame  fun game => pure {game with
-      title := t.getString
+      title := title
       tile := {game.tile with title := title}}
 
 /-- Define the introduction of the current game/world/level. -/
@@ -344,7 +345,7 @@ elab "LemmaTab"  category:str : command => do
 
 /-! # Exercise Statement -/
 
-/-- You can write `Statement add_comm (preample := simp) .... := by` which
+/-- You can write `Statement add_comm (preamble := simp) .... := by` which
 will automatically execute the given tactic sequence before the exercise
 is handed to the player.
 
@@ -360,18 +361,18 @@ For example in "Show that all matrices with first column zero form a submodule",
 you could provide the set of all these matrices as `carrier` and the player will receive
 all the `Prop`-valued fields as goals.
 -/
-syntax preampleArg := atomic(" (preample := " withoutPosition(tacticSeq) ")")
+syntax preambleArg := atomic(" (preamble := " withoutPosition(tacticSeq) ")")
 
 /-- Define the statement of the current level. -/
 elab doc:docComment ? attrs:Parser.Term.attributes ?
-    "Statement" statementName:ident ? preample:preampleArg ? sig:declSig val:declVal : command => do
+    "Statement" statementName:ident ? preamble:preambleArg ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
   -- add an optional tactic sequence that the engine executes before the game starts
-  let preampleSeq : TSyntax `Lean.Parser.Tactic.tacticSeq ← match preample with
+  let preambleSeq : TSyntax `Lean.Parser.Tactic.tacticSeq ← match preamble with
   | none => `(Parser.Tactic.tacticSeq|skip)
   | some x => match x with
-    | `(preampleArg| (preample := $tac)) => pure tac
+    | `(preambleArg| (preamble := $tac)) => pure tac
     | _ => `(Parser.Tactic.tacticSeq|skip)
 
   let docContent ← parseDocComment doc
@@ -413,17 +414,17 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
       -- in that case.
       logWarningAt name (m!"Environment already contains {fullName}! Only the existing " ++
       m!"statement will be available in later levels:\n\n{origType}")
-      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preampleSeq⟩); $(⟨tacticStx⟩)})
+      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
     else
-      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig := by {let_intros; $(⟨preampleSeq⟩); $(⟨tacticStx⟩)})
+      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
   | none =>
-    let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preampleSeq⟩); $(⟨tacticStx⟩)})
+    let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
     elabCommand thmStatement
 
   let msgs := (← get).messages
@@ -498,7 +499,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   modifyCurLevel fun level => pure { level with
     module := env.header.mainModule
     goal := sig,
-    preample := preampleSeq
+    preamble := preambleSeq
     scope := scope,
     descrText := docContent
     statementName := match statementName with
@@ -576,7 +577,8 @@ elab (name := GameServer.Tactic.Branch) "Branch" t:tacticSeq : tactic => do
   -- Show an info whether the branch proofs all remaining goals.
   let gs ← Tactic.getUnsolvedGoals
   if gs.isEmpty then
-    trace[debug] "This branch finishes the proof."
+    -- trace[debug] "This branch finishes the proof."
+    pure ()
   else
     trace[debug] "This branch leaves open goals."
 

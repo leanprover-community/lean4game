@@ -265,9 +265,10 @@ const goalFilter = {
   showLetValue: true
 }
 
-// TODD: Mark for translation!
 /** The display of a single entered lean command */
 function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, deleteProof: any }) {
+  let {t} = useTranslation()
+
   // The first step will always have an empty command
   if (!proof?.steps[i]?.command) { return <></> }
 
@@ -275,13 +276,13 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
     // If the last step has errors, we display the command in a different style
     // indicating that it will be removed on the next try.
     return <div className="failed-command">
-      <i>Failed command</i>: {proof?.steps[i].command}
+      <i>{t("Failed command")}</i>: {proof?.steps[i].command}
     </div>
   } else {
     return <div className="command">
       <div className="command-text">{proof?.steps[i].command}</div>
-      <Button to="" className="undo-button btn btn-inverted" title={"Retry proof from here"} onClick={deleteProof}>
-        <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;{"Retry"}
+      <Button to="" className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={deleteProof}>
+        <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;{t("Retry")}
       </Button>
     </div>
   }

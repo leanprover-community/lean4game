@@ -39,12 +39,17 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
     navigate(gameId);
   }
 
+  // we use this to reload the tile 1x after the translation is loaded.
+  let [loadedTranslation, setLoadedTranslation] = React.useState(false)
+
+  // Load the namespace of the game
+  i18next.loadNamespaces(gameId).catch(err => {
+    console.warn(`translations for ${gameId} do not exist`)
+  }).then(() => {setLoadedTranslation(true)})
+
   if (typeof data === 'undefined') {
     return <></>
   }
-
-  // Load the namespace of the game
-  i18next.loadNamespaces(gameId)
 
   return <div className="game" onClick={routeChange}>
     <div className="wrapper">
@@ -74,10 +79,8 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
         <td>
           {data.languages.map((lang) => {
             let langOpt = lean4gameConfig.languages.find((e) => e.iso == lang)
-            if (langOpt) {
-              return <ReactCountryFlag title={langOpt.name} countryCode={langOpt.flag} className="emojiFlag"/>
-            } else
-              return <></>
+            return <ReactCountryFlag key={`flag-${lang}`} title={langOpt?.name} countryCode={langOpt?.flag} className="emojiFlag"/>
+
           })}
         </td>
       </tr>
@@ -100,8 +103,25 @@ function LandingPage() {
   const closePreferencesPopup = () => setPreferencesPopup(false);
   const togglePreferencesPopup = () => setPreferencesPopup(!preferencesPopup);
 
-  let allTiles = lean4gameConfig.allGames.map((gameId) => (useGetGameInfoQuery({game: `g/${gameId}`}).data?.tile))
   const { t, i18n } = useTranslation()
+
+  let allTiles = lean4gameConfig.allGames.map((gameId) => {
+
+    let q =  useGetGameInfoQuery({game: `g/${gameId}`})
+
+    // if (q.isError) {
+    //   if (q.error?.originalStatus === 404) {
+    //     // Handle 404 error
+    //     console.log('File not found');
+    //   } else {
+    //     // Suppress additional console.error messages
+    //     console.error(q.error);
+    //   }
+    // }
+
+    return q.data?.tile
+  })
+
 
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
@@ -125,7 +145,7 @@ function LandingPage() {
       </div>
     </header>
     <div className="game-list">
-      {allTiles.length == 0 ?
+      {allTiles.filter(x => x != null).length == 0 ?
         <p>
           <Trans>
             No Games loaded. Use <a>http://localhost:3000/#/g/local/FOLDER</a> to open a

@@ -2,6 +2,7 @@ import GameServer.EnvExtensions
 import GameServer.InteractiveGoal
 import Std.Data.Array.Init.Basic
 import GameServer.Hints
+import I18n
 
 open Lean
 open Server
@@ -171,7 +172,11 @@ def completionDiagnostics (goalCount : Nat) (prevGoalCount : Nat) (completed : B
   if goalCount == 0 then
     if completed then
       out := out.push {
-        message := .text "level completed! 🎉"
+        -- TODO: marking these with `t!` has the implication that every game
+        -- needs to translate these messages again,
+        -- but cannot think of another option
+        -- that would not involve manually adding them somewhere in the translation files.
+        message := .text t!"level completed! 🎉"
         range := {
           start := pos
           «end» := pos
@@ -179,7 +184,7 @@ def completionDiagnostics (goalCount : Nat) (prevGoalCount : Nat) (completed : B
         severity? := Lsp.DiagnosticSeverity.information }
     else if completedWithWarnings then
       out := out.push {
-        message := .text "level completed with warnings… 🎭"
+        message := .text t!"level completed with warnings… 🎭"
         range := {
           start := pos
           «end» := pos
@@ -192,7 +197,7 @@ def completionDiagnostics (goalCount : Nat) (prevGoalCount : Nat) (completed : B
     -- so showing the message "intermediate goal solved" would be confusing.
     if (¬ (filterUnsolvedGoal startDiags).any (·.severity? == some .error)) then
       out := out.push {
-        message := .text "intermediate goal solved! 🎉"
+        message := .text t!"intermediate goal solved! 🎉"
         range := {
           start := pos
           «end» := pos

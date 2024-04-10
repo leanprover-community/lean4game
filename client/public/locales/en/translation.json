@@ -50,7 +50,6 @@
   "Waiting for Lean server to start…": "Waiting for Lean server to start…",
   "Level completed! 🎉": "Level completed! 🎉",
   "Level completed with warnings 🎭": "Level completed with warnings 🎭",
-  "Retry proof from here": "Retry proof from here",
   "Active Goal": "Active Goal",
   "Crashed! Go to editor mode and fix your proof! Last server response:": "Crashed! Go to editor mode and fix your proof! Last server response:",
   "Line": "Line",
@@ -59,9 +58,6 @@
   "Execute": "Execute",
   "Definitions": "Definitions",
   "Theorems": "Theorems",
-  "locked": "locked",
-  "disabled": "disabled",
-  "new": "new",
   "Not unlocked yet": "Not unlocked yet",
   "Not available in this level": "Not available in this level",
   "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>",
@@ -89,5 +85,10 @@
   "Mobile": "Mobile",
   "Auto": "Auto",
   "Desktop": "Desktop",
-  "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>"
+  "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>",
+  "Level": "Level",
+  "Introduction": "Introduction",
+  "Retry proof from here": "Retry proof from here",
+  "Retry": "Retry",
+  "Failed command": "Failed command"
 }

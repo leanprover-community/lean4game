@@ -81,5 +81,5 @@ example (n m : Nat) : (m + n) + x = m + (n + x) := by
 
 #check My.add_assoc
 
-Statement My.add_comm (preample := simp [add_comm m n]) (n m : Nat) : n + (m + 0) = m + n := by
+Statement My.add_comm (preamble := simp [add_comm m n]) (n m : Nat) : n + (m + 0) = m + n := by
   rw [Nat.add_comm]
