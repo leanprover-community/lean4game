@@ -33,19 +33,11 @@ function GithubIcon({url='https://github.com'}) {
 }
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
-  let { t, i18n } = useTranslation()
+  let { t } = useTranslation()
   let navigate = useNavigate();
   const routeChange = () =>{
     navigate(gameId);
   }
-
-  // we use this to reload the tile 1x after the translation is loaded.
-  let [loadedTranslation, setLoadedTranslation] = React.useState(false)
-
-  // Load the namespace of the game
-  i18next.loadNamespaces(gameId).catch(err => {
-    console.warn(`translations for ${gameId} do not exist`)
-  }).then(() => {setLoadedTranslation(true)})
 
   if (typeof data === 'undefined') {
     return <></>
@@ -105,8 +97,11 @@ function LandingPage() {
 
   const { t, i18n } = useTranslation()
 
-  let allTiles = lean4gameConfig.allGames.map((gameId) => {
+  // Load the namespaces of all games
+  // TODO: should `allGames` contain game-ids starting with `g/`?
+  i18next.loadNamespaces(lean4gameConfig.allGames.map(id => `g/${id}`))
 
+  let allTiles = lean4gameConfig.allGames.map((gameId) => {
     let q =  useGetGameInfoQuery({game: `g/${gameId}`})
 
     // if (q.isError) {
@@ -121,7 +116,6 @@ function LandingPage() {
 
     return q.data?.tile
   })
-
 
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
