@@ -95,5 +95,6 @@
   "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>": "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>",
   "<0>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</0>": "<0>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</0>",
   "This server has been developed as part of the project <1>ADAM: Anticipating the Digital Age of Mathematics</1> at Heinrich Heine University Düsseldorf.": "This server has been developed as part of the project <1>ADAM: Anticipating the Digital Age of Mathematics</1> at Heinrich Heine University Düsseldorf.",
-  " used": " used"
+  " used": " used",
+  "view the Lean game server on Github": "view the Lean game server on Github",
 }
