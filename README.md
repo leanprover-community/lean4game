@@ -37,6 +37,17 @@ not fully written yet.
 
 Contributions to `lean4game` are always welcome!
 
+### Translation
+
+The interface can be translated to various languages. For adding a translation, one needs to do the following:
+
+1. In `client/src/config.json`, add your new language. The "iso" key is the ISO language code, i.e. it should be accepted by "i18next" and "GNU gettext"; the "flag" key is once accepted by [react-country-flag](https://www.npmjs.com/package/react-country-flag).
+2. Run `npm run translate`. This should create a new file `client/public/locales/{language}/translation.json`. (alternatively you can copy-paste `client/public/locales/en/translation.json`)
+3. Add all translations.
+4. Commit the changes you made to `config.json` together with the new `translation.json`.
+
+For translating games, see [Translating a game](doc/translate.md).
+
 ## Security
 
 Providing the use access to a Lean instance running on the server is a severe security risk. That is why we start the Lean server with bubblewrap.
