@@ -59,6 +59,7 @@
   "Execute": "执行",
   "Definitions": "定义",
   "Theorems": "定理",
+  "Theorem": "定理",
   "Not unlocked yet": "尚未解锁",
   "Not available in this level": "本关卡不提供",
   "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "一个用于<1>Lean</1> <i>（Lean 4）</i>及其数学库<5>mathlib</5>的学习游戏库",
@@ -87,8 +88,8 @@
   "Mobile": "移动端",
   "Auto": "自动",
   "Desktop": "桌面端",
-  "Level": "",
-  "Introduction": "",
-  "Retry": "",
-  "Failed command": ""
+  "Level": "关卡",
+  "Introduction": "介绍",
+  "Retry": "重试",
+  "Failed command": "命令失败"
 }
