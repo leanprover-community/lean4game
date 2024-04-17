@@ -229,7 +229,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     if (!oneLineEditor) return
     // Run command when pressing enter
     const l = oneLineEditor.onKeyUp((ev) => {
-      if (ev.code === "Enter") {
+      if (ev.code === "Enter" || ev.code === "NumpadEnter") {
         runCommand()
       }
     })
