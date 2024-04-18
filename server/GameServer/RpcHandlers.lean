@@ -1,6 +1,5 @@
 import GameServer.EnvExtensions
 import GameServer.InteractiveGoal
-import Std.Data.Array.Init.Basic
 import GameServer.Hints
 import I18n
 

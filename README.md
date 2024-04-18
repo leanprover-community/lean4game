@@ -8,7 +8,7 @@ Please follow the tutorial [Creating a Game](doc/create_game.md). In particular,
 
 * Step 5: [How to Run Games Locally](doc/running_locally.md)
 * Step 7: [How to Update an existing Game](doc/update_game.md)
-* Step 8: [How to Publishing a Game](doc/publish_game.md)
+* Step 9: [How to Publishing a Game](doc/publish_game.md)
 * [Troubleshooting](doc/troubleshoot.md)
 
 ## Documentation
@@ -36,6 +36,17 @@ not fully written yet.
 ## Contributing
 
 Contributions to `lean4game` are always welcome!
+
+### Translation
+
+The interface can be translated to various languages. For adding a translation, one needs to do the following:
+
+1. In `client/src/config.json`, add your new language. The "iso" key is the ISO language code, i.e. it should be accepted by "i18next" and "GNU gettext"; the "flag" key is once accepted by [react-country-flag](https://www.npmjs.com/package/react-country-flag).
+2. Run `npm run translate`. This should create a new file `client/public/locales/{language}/translation.json`. (alternatively you can copy-paste `client/public/locales/en/translation.json`)
+3. Add all translations.
+4. Commit the changes you made to `config.json` together with the new `translation.json`.
+
+For translating games, see [Translating a game](doc/translate.md).
 
 ## Security
 

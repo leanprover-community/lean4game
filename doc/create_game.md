@@ -242,7 +242,11 @@ NOTE: At present, only the images for a world are displayed. They appear in the 
 
 In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](update_game.md).
 
-## 8. Publish your game
+## 8. Add translation
+
+See [Translating a game](translate.md).
+
+## 9. Publish your game
 
 To publish your game on the official server, see [Publishing a game](publish_game.md)
 
