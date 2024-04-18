@@ -5,9 +5,14 @@ import GameServer.Hints
 open GameServer
 
 -- TODO: Is there a better place?
-/-- Keywords that the server should not consider as tactics. -/
+/-- Keywords that the server should not consider as tactics.
+
+Note: Added `clear` tactic because currently it is very useful in combination with
+`Branch` and `Hint` (i.e. using `clear` before a `Hint` in order to remove any irrelevant
+hypotheses).
+-/
 def GameServer.ALLOWED_KEYWORDS : List String :=
-  ["with", "fun", "at", "only", "by", "generalizing"]
+  ["with", "fun", "at", "only", "by", "generalizing", "if", "then", "else", "clear"]
 
 /-- The default game name if `Game "MyGame"` is not used. -/
 def defaultGameName: String := "MyGame"
