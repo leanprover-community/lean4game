@@ -22,5 +22,6 @@
       "flag": "CN",
       "name": "中文"
     }
-  ]
+  ],
+  "useFlags": false
 }
