@@ -22,7 +22,6 @@ import { Tile } from './landing_page/tile';
 import { navOpenAtom } from '../store/navigation-atoms';
 
 
-
 function LandingPage() {
   const [, setPopup] = useAtom(popupAtom)
   const [navOpen, setNavOpen] = useAtom(navOpenAtom)
