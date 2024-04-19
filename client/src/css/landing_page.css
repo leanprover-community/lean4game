@@ -231,3 +231,7 @@ footer .link {
     margin-right: calc(50% - 650px);
   }
 }
+
+.info .languages span + span {
+  margin-left: .5em;
+}
