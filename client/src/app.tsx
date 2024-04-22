@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams, useSearchParams } from "react-router-dom";
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -18,13 +18,18 @@ function App() {
 
   const params = useParams()
   const gameId = "g/" + params.owner + "/" + params.repo
+  const [searchParams, ] = useSearchParams()
+
+  const lang = searchParams.get("lang")
 
   const {mobile, layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = UsePreferences()
-
   React.useEffect(() => {
-    i18n.changeLanguage(language)
-  }, [language])
-
+    if (lang) {
+      i18n.changeLanguage(lang)
+    } else {
+      i18n.changeLanguage(language)
+    }
+  }, [language, lang])
   return (
     <div className="app">
       <GameIdContext.Provider value={gameId}>
