@@ -11,12 +11,12 @@ import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 
 import Markdown from './markdown';
-import {PrivacyPolicyPopup} from './popup/privacy_policy'
+import {PrivacyPolicyPopup, ImpressumPopup} from './popup/privacy_policy'
 import { GameTile, useGetGameInfoQuery } from '../state/api'
 import path from 'path';
 
 import { PreferencesPopup } from './popup/preferences';
-import { ImpressumButton, MenuButton, PreferencesButton } from './app_bar';
+import { ImpressumButton, MenuButton, PreferencesButton, PrivacyButton } from './app_bar';
 import ReactCountryFlag from 'react-country-flag';
 import lean4gameConfig from '../config.json'
 import i18next from 'i18next';
@@ -91,11 +91,15 @@ function LandingPage() {
   const navigate = useNavigate();
 
   const [impressumPopup, setImpressumPopup] = React.useState(false);
+  const [privacyPopup, setPrivacyPopup] = React.useState(false);
   const [preferencesPopup, setPreferencesPopup] = React.useState(false);
   const [navOpen, setNavOpen] = React.useState(false);
   const openImpressum = () => setImpressumPopup(true);
   const closeImpressum = () => setImpressumPopup(false);
   const toggleImpressum = () => setImpressumPopup(!impressumPopup);
+  const openPrivacy = () => setPrivacyPopup(true);
+  const closePrivacy = () => setPrivacyPopup(false);
+  const togglePrivacy = () => setPrivacyPopup(!privacyPopup);
   const closePreferencesPopup = () => setPreferencesPopup(false);
   const togglePreferencesPopup = () => setPreferencesPopup(!preferencesPopup);
 
@@ -128,6 +132,7 @@ function LandingPage() {
         <MenuButton navOpen={navOpen} setNavOpen={setNavOpen}/>
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
             <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+            <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
             <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
       </nav>
@@ -214,7 +219,9 @@ function LandingPage() {
     <footer>
       {/* Do not translate "Impressum", it's needed for German GDPR */}
       <a className="link" onClick={openImpressum}>Impressum</a>
-      {impressumPopup? <PrivacyPolicyPopup handleClose={closeImpressum} />: null}
+      <a className="link" onClick={openPrivacy}>{t("Privacy Policy")}</a>
+      {privacyPopup? <PrivacyPolicyPopup handleClose={closePrivacy} />: null}
+      {impressumPopup? <ImpressumPopup handleClose={closeImpressum} />: null}
       {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
     </footer>
   </div>
