@@ -12,6 +12,7 @@ import { store } from '../state/store';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
+import { WorldLevelIdContext } from './infoview/context';
 import { useAppendTypewriterInput } from "./infoview/context"
 
 export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=false} :
@@ -56,6 +57,7 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
   // been loaded. Is there a better way to observe this?
 
   const gameId = React.useContext(GameIdContext)
+  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
 
   const difficulty = useSelector(selectDifficulty(gameId))
 
@@ -72,12 +74,15 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
   let inv: string[] = selectInventory(gameId)(store.getState())
   let modifiedItems : InventoryTile[] = items.map(tile => inv.includes(tile.name) ? {...tile, locked: false} : tile)
 
+  // Item(s) proved in the preceeding level
+  let recentItems = modifiedItems.filter(x => x.world == worldId && x.level == levelId - 1)
+
   return <>
     {categories.length > 1 &&
       <div className="tab-bar">
         {categories.map((cat) => {
           let hasNew = modifiedItems.filter(item => item.new && (cat == item.category)).length > 0
-          return <div key={`category-${cat}`} className={`tab${cat == (tab ?? categories[0]) ? " active": ""}${hasNew ? " new": ""}`}
+          return <div key={`category-${cat}`} className={`tab${cat == (tab ?? categories[0]) ? " active": ""}${hasNew ? ' new': ''}${recentItems.map(x => x.category).includes(cat) ? ' recent': ''}`}
             onClick={() => { setTab(cat) }}>{cat}</div>})}
       </div>}
     <div className="inventory-list">
@@ -125,7 +130,7 @@ function InventoryItem({item, name, displayName, locked, disabled, newly, showDo
     ev.stopPropagation()
   }
 
-return <div className={`item ${className}${enableAll ? ' enabled' : ''}`} onClick={handleClick} title={title}>
+return <div className={`item ${className}${enableAll ? ' enabled' : ''}${recent ? ' recent' : ''}`} onClick={handleClick} title={title}>
     {icon} {displayName}
     <div className="copy-button" onClick={copyItemName}>
       {copied ? <FontAwesomeIcon icon={faCheck} /> : <FontAwesomeIcon icon={faClipboard} />}

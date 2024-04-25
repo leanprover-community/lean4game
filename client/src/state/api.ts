@@ -36,6 +36,9 @@ export interface InventoryTile {
   new: boolean,
   hidden: boolean
   altTitle: string,
+  world : string|null,
+  level : number|null,
+  proven : boolean
 }
 
 export interface LevelInfo {

@@ -46,6 +46,9 @@
   background-color: rgb(255, 242, 190);
 }
 
+.inventory .item.recent {
+  background-color: rgb(242, 190, 255);
+}
 .inventory .item:not(.locked), .inventory .item.enabled {
   cursor: pointer;
 }
@@ -70,6 +73,14 @@
 .tab-bar.current .tab.active {
   color: black;
   border-bottom: 0.3em solid var(--clr-primary);
+}
+
+.inventory .tab.recent {
+  background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(242, 190, 255));
+}
+
+.inventory .tab.recent:not(.active) {
+  border-bottom: 0.3em solid rgb(242, 190, 255);
 }
 
 .inventory .tab.new {
