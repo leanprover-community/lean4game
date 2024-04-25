@@ -142,9 +142,12 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
   if (!(data?.descrText || data?.descrFormat)) { return <></> }
   return <>
     <div className="exercise-statement">
-      {data?.descrText &&
+      {data?.descrText ?
         <Markdown>
           {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + t(data?.descrText, {ns: gameId})}
+        </Markdown> : data?.displayName &&
+        <Markdown>
+          {`**${t("Theorem")}** \`${data?.displayName}\``}
         </Markdown>
       }
       {data?.descrFormat && showLeanStatement &&
