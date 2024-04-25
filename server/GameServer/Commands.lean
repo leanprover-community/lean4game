@@ -973,6 +973,10 @@ elab "MakeGame" : command => do
               name := name
               displayName := data.displayName
               category := data.category
+              world := worldId
+              -- from the previous level. This is fine b/c in practise levels start at 1
+              level := (levelId - 1 : Nat)
+              proven := true
               altTitle := data.statement
               locked := false }
 
