@@ -33,7 +33,7 @@ You can use `Branch` to place hints
 in dead ends or alternative proof strands.
 
 A proof inside a `Branch`-block is normally evaluated by lean, but it's discarded at the end
-so that no progress has been made on proofing the goal.
+so that no progress has been made on proving the goal.
 
 ```
 Statement .... := by
