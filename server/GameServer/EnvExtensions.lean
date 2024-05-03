@@ -12,7 +12,7 @@ Note: Added `clear` tactic because currently it is very useful in combination wi
 hypotheses).
 -/
 def GameServer.ALLOWED_KEYWORDS : List String :=
-  ["with", "fun", "at", "only", "by", "generalizing", "if", "then", "else", "clear"]
+  ["with", "fun", "at", "only", "by", "generalizing", "if", "then", "else", "clear", "using"]
 
 /-- The default game name if `Game "MyGame"` is not used. -/
 def defaultGameName: String := "MyGame"
@@ -532,3 +532,11 @@ def modifyLevel (levelId : LevelId) (fn : GameLevel → m GameLevel) [MonadError
   let world' := {world with levels := world.levels.insert levelId.level level'}
   let game' := {game with worlds := game.worlds.insertNode levelId.world world'}
   insertGame levelId.game game'
+
+-- def getIntroducedInventory (game : Game) [MonadError m] : m (Array Name) := do
+--   let allItems : Array Name := game.worlds.nodes.fold (fun L _ world => L ++
+--     world.levels.fold (fun LL _ level =>
+--       LL ++ level.tactics.new ++ level.lemmas.new
+--     ) #[]) #[]
+
+--   pure allItems

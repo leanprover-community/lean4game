@@ -389,7 +389,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     ("level" ++ toString lvlIdx : String)
 
   -- Collect all used tactics/lemmas in the sample proof:
-  let usedInventory ← match val with
+  let usedInventory : UsedInventory ← match val with
   | `(Parser.Command.declVal| := $proof:term) => do
     collectUsedInventory proof
   | _ => throwError "expected `:=`"
