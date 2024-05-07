@@ -1,0 +1,60 @@
+#error-page {
+  height: 100%;
+  background-image: url("/RoboSurprised.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: right bottom;
+}
+
+/* these colours are matching the ones of `.messages.error` */
+.error-message{
+  border: 2px solid #D8000C;
+  background-color: #FFBABA;
+  border-radius: 1rem;
+  display: inline-block;
+  margin: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  /* color: #D8000C; */
+  position: relative;
+}
+
+
+.thought-bubble {
+  border: 2px solid #D8000C;
+  background-color: #FFBABA;
+  position: absolute;
+  display: block;
+}
+
+.thought-bubble:nth-of-type(1) {
+  bottom: -3.5rem;
+  left: 1rem;
+  border-radius: 1.2rem;
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+.thought-bubble:nth-of-type(2) {
+  bottom: -6rem;
+  left: 2.5rem;
+  border-radius: 1rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.thought-bubble:nth-of-type(3) {
+  bottom: -7.5rem;
+  left: 4.5rem;
+  border-radius: 0.8rem;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.thought-bubble:nth-of-type(4) {
+  bottom: -8.2rem;
+  left: 6.8rem;
+  border-radius: 0.6rem;
+  width: 1.4rem;
+  height: 1.4rem;
+}
