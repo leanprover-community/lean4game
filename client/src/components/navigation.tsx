@@ -11,6 +11,8 @@ import { downloadProgress } from './popup/erase'
 import { useTranslation } from 'react-i18next'
 import '../css/navigation.css'
 import { PopupContext } from './popup/popup'
+import { useSelector } from 'react-redux'
+import { selectProgress } from '../state/progress'
 
 /** SVG github icon */
 function GithubIcon () {
@@ -41,15 +43,29 @@ const NavigationContext = createContext<{
   setNavOpen: React.Dispatch<React.SetStateAction<boolean>>
 }>({navOpen: false, setNavOpen: () => {}})
 
+/** Content of the navigation during game selection. */
+function NavigationLandingPage () {
+  return <div className="nav-content">
+    <div className="nav-title-left"></div>
+    <div className="nav-title-middle"></div>
+    <div className="nav-title-right"></div>
+  </div>
+}
 
 /** Content of the navigation on Desktop during world selection. */
 function DesktopNavigationOverview () {
   const { t } = useTranslation()
-  const {gameId} = useContext(GameIdContext)
+  const { gameId } = useContext(GameIdContext)
+  const { setPopupContent } = useContext(PopupContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
   return <div className="nav-content">
-    <div className="nav-title-left"></div>
+    <div className="nav-title-left">
+      <NavButton
+        text={t("Rules")}
+        onClick={() => {setPopupContent("rules")}}
+        inverted={true} />
+    </div>
     <div className="nav-title-middle">
       <span className="nav-title">{t(gameInfo.data?.title, {ns: gameId})}</span>
     </div>
@@ -61,9 +77,15 @@ function DesktopNavigationOverview () {
 function MobileNavigationOverview () {
   const { t } = useTranslation()
   const {page, setPage} = useContext(PageContext)
+  const { setPopupContent } = useContext(PopupContext)
 
   return <div className="nav-content">
-    <div className="nav-title-left"></div>
+    <div className="nav-title-left">
+      <NavButton
+        text={t("Rules")}
+        onClick={() => {setPopupContent("rules")}}
+        inverted={true} />
+    </div>
     <div className="nav-title-middle">
       <span className="nav-title">
       </span>
@@ -85,15 +107,6 @@ function MobileNavigationOverview () {
       }
     </div>
 
-  </div>
-}
-
-/** Content of the navigation during game selection. */
-function NavigationLandingPage () {
-  return <div className="nav-content">
-    <div className="nav-title-left"></div>
-    <div className="nav-title-middle"></div>
-    <div className="nav-title-right"></div>
   </div>
 }
 
@@ -201,6 +214,8 @@ export function Navigation () {
   const { gameId, worldId } = useContext(GameIdContext)
   const { mobile } = useContext(PreferencesContext)
   const { setPopupContent } = useContext(PopupContext)
+  const gameProgress = useSelector(selectProgress(gameId))
+
 
   const [navOpen, setNavOpen] = useState(false)
   function toggleNav () {setNavOpen(!navOpen)}
@@ -246,7 +261,7 @@ export function Navigation () {
             <NavButton
               icon={faDownload}
               text={t("Download")}
-              onClick={() => {downloadProgress(gameId)}}
+              onClick={() => {downloadProgress(gameId, gameProgress)}}
               inverted={true} />
             <NavButton
               icon={faUpload}

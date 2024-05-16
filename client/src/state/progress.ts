@@ -184,7 +184,7 @@ export function selectCompleted(game: string, world: string, level: number) {
 /** return progress for the current game if it exists */
 export function selectProgress(game: string) {
   return (state) => {
-    return state.progress.games[game.toLowerCase()] ?? null
+    return state.progress.games[game?.toLowerCase()] ?? null
   }
 }
 
@@ -198,7 +198,7 @@ export function selectDifficulty(game: string) {
 /** return whether the intro has been read */
 export function selectOpenedIntro(game: string) {
   return (state) => {
-    return state.progress.games[game.toLowerCase()]?.openedIntro
+    return state.progress.games[game?.toLowerCase()]?.openedIntro
   }
 }
 

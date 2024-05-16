@@ -1,6 +1,3 @@
-/**
- * @fileOverview
-*/
 import * as React from 'react'
 import { Typography } from '@mui/material'
 import Markdown from '../markdown'

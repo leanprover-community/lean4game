@@ -9,14 +9,14 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
-import { PageContext, PopupContext, PreferencesContext} from './components/infoview/context';
+import { PageContext, PreferencesContext} from './components/infoview/context';
 import UsePreferences from "./state/hooks/use_preferences"
 import i18n from './i18n';
 import { Navigation } from './components/navigation';
 import { useSelector } from 'react-redux';
-import { changeTypewriterMode, selectTypewriterMode } from './state/progress';
+import { changeTypewriterMode, selectOpenedIntro, selectTypewriterMode } from './state/progress';
 import { useAppDispatch } from './hooks';
-import { Popup } from './components/popup/popup';
+import { Popup, PopupContext } from './components/popup/popup';
 
 export const GameIdContext = React.createContext<{
   gameId: string,
@@ -39,6 +39,16 @@ function App() {
   const [typewriterInput, setTypewriterInput] = useState("")
   const [page, setPage] = useState(0)
   const [popupContent, setPopupContent] = useState(null)
+
+
+  const openedIntro = useSelector(selectOpenedIntro(gameId))
+
+  useEffect(() => {
+    if (openedIntro && !worldId && page == 0) {
+      setPage(1)
+    }
+  }, [openedIntro])
+
 
   useEffect(() => {
     i18n.changeLanguage(language)

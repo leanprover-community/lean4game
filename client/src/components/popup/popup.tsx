@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { useContext } from 'react'
-import { PrivacyPolicyPopup } from './privacy_policy'
+import { PrivacyPolicyPopup } from './privacy'
 import { ImpressumPopup } from './impressum'
-import { InfoPopup } from './game_info'
+import { InfoPopup } from './info'
 import { ErasePopup } from './erase'
 import { PreferencesPopup } from './preferences'
 import { UploadPopup } from './upload'
+import { RulesPopup } from './rules'
+import '../../css/popup.css'
 
 /** The context which manages if a popup is shown.
  * If `popupContent` is `null`, the popup is closed.
@@ -30,6 +32,7 @@ export const Popups = {
   "info": <InfoPopup />,
   "preferences": <PreferencesPopup />,
   "privacy": <PrivacyPolicyPopup />,
+  "rules": <RulesPopup />,
   "upload": <UploadPopup />,
 }
 

@@ -10,8 +10,7 @@ import { useContext } from 'react'
 import { PopupContext } from './popup'
 
 /** download the current progress (i.e. what's saved in the browser store) */
-export function downloadProgress(gameId: string) {
-  const gameProgress = useSelector(selectProgress(gameId))
+export function downloadProgress(gameId: string, gameProgress) {
 
   // ev.preventDefault()
   downloadFile({
@@ -33,14 +32,15 @@ export function ErasePopup () {
   const dispatch = useAppDispatch()
   const { setPopupContent } = useContext(PopupContext)
 
-  const eraseProgress = () => {
+  const eraseProgress = (ev) => {
     dispatch(deleteProgress({game: gameId}))
     setPopupContent(null)
+    ev.preventDefault() // TODO: this is a hack to prevent the buttons below from opening a link
   }
 
   const downloadAndErase = (ev) => {
-    downloadProgress(gameId)
-    eraseProgress()
+    downloadProgress(gameId, gameProgress)
+    eraseProgress(ev)
   }
 
   return <>
@@ -54,6 +54,6 @@ export function ErasePopup () {
     </Trans>
     <Button onClick={eraseProgress} to="">{t("Delete")}</Button>
     <Button onClick={downloadAndErase} to="">{t("Download & Delete")}</Button>
-    <Button onClick={() => {setPopupContent(null)}} to="">{t("Cancel")}</Button>
+    <Button onClick={(ev) => {setPopupContent(null); ev.preventDefault()}} to="">{t("Cancel")}</Button>
   </>
 }

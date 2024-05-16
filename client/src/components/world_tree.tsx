@@ -360,7 +360,7 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
   let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : null
 
   return <div className="column">
-      <WorldSelectionMenu rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
+      {/* <WorldSelectionMenu rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} /> */}
       <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
           width={bounds ? `${ds * dx}` : ''}
           viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
