@@ -214,7 +214,7 @@ function MobileNavigationLevel () {
 
 /** The skeleton of the navigation which is the same across all layouts. */
 export function Navigation () {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { gameId, worldId } = useContext(GameIdContext)
   const { mobile, language, setLanguage } = useContext(PreferencesContext)
   const { setPopupContent } = useContext(PopupContext)
@@ -249,7 +249,7 @@ export function Navigation () {
       {(!gameId || gameInfo.data?.tile?.languages.length > 1) &&
         // Language button only visible if the game exists in `>1` languages
         <NavButton
-          iconElement={langNavOpen ? null : <Flag iso={language} />}
+          iconElement={langNavOpen ? null : <Flag iso={i18n.language} />}
           icon={langNavOpen ? faXmark : null}
           title={langNavOpen ? t('close language menu') : t('open language menu')}
           onClick={toggleLangNav}
