@@ -1,7 +1,7 @@
 {
   "allGames": [
     "leanprover-community/nng4",
-    "local/Robo",
+    "hhu-adam/Robo",
     "djvelleman/stg4",
     "trequetrum/lean4game-logic"
   ],

@@ -180,7 +180,7 @@ function LandingPage() {
     </section>
     <footer>
       {/* Do not translate "Impressum", it's needed for German GDPR */}
-      <a className="link" onClick={() => {setPopupContent("impressum")}}>Impressum</a>
+      <a className="link" onClick={() => {setPopupContent("impressum")}}>{t("Impressum")}</a>
       <a className="link" onClick={() => {setPopupContent("privacy")}}>{t("Privacy Policy")}</a>
     </footer>
   </div>

@@ -305,7 +305,7 @@ export function Navigation () {
           </>}
           <NavButton
             icon={faCircleInfo}
-            text={"Impressum"}
+            text={t("Impressum")}
             onClick={() => {setPopupContent("impressum")}}
             inverted={true} />
           <NavButton

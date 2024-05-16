@@ -56,10 +56,10 @@ function App() {
     if (gameId && availableLangs?.length > 0 && !(availableLangs.includes(language))) {
       // if the game is not available in the preferred language, display it in the original
       // language
-      console.log(`using default language: ${availableLangs[0]}`)
+      console.debug(`using default language: ${availableLangs[0]}`)
       i18n.changeLanguage(availableLangs[0])
     } else {
-      console.log(`using language: ${language}`)
+      console.debug(`using language: ${language}`)
       i18n.changeLanguage(language)
     }
   }, [gameId, gameInfo.data?.tile?.languages, language])
