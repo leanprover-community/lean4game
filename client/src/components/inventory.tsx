@@ -64,7 +64,7 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
   // TODO: `level` is only used in the `useEffect` below to check if a new level has
   // been loaded. Is there a better way to observe this?
 
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
 
   const difficulty = useSelector(selectDifficulty(gameId))
@@ -147,7 +147,7 @@ return <div className={`item ${className}${enableAll ? ' enabled' : ''}${recent 
 }
 
 export function Documentation({name, type, handleClose}) {
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const doc = useLoadDocQuery({game: gameId, type: type, name: name})
 
   return <div className="documentation">
@@ -161,7 +161,7 @@ export function Documentation({name, type, handleClose}) {
 
 /** The panel (on the welcome page) showing the user's inventory with tactics, definitions, and lemmas */
 export function InventoryPanel({levelInfo, visible = true}) {
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
 
   const [lemmaTab, setLemmaTab] = useState(levelInfo?.lemmaTab)
 

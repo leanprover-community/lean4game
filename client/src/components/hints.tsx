@@ -12,7 +12,7 @@ import { GameIdContext } from "../app";
  * and have the variables substituted just before displaying.
  */
 function getHintText(hint: GameHint): string {
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   let { t } = useTranslation()
   if (hint.rawText) {
     // Replace the variable names used in the hint with the ones used by the player

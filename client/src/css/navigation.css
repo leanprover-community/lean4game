@@ -1,0 +1,77 @@
+
+nav {
+  flex: 0;
+  background: var(--clr-primary);
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1em;
+  filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+  z-index: 2;
+}
+
+.nav-content {
+  flex: 1;
+  display: flex;
+}
+
+.nav-content > div {
+  /* border: 1px solid red; */
+  text-align: center;
+}
+
+.nav-title-left, .nav-title-right {
+  flex-grow: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nav-title-middle {
+  flex-grow: 1;
+  flex-shrink: 1;
+  margin-left: .5rem;
+  margin-right: .5rem;
+}
+
+.nav-title {
+  color: white;
+  font-weight: 500;
+  font-size: 1.3rem;
+  display: inline-block;
+  margin: 0;
+  /* margin: 0 1em; */
+}
+
+/* fix to make toggle buttons work */
+.svg-inline--fa {
+  width: 1em;
+}
+
+/* TODO */
+.nav-button:not(.btn-inverted) {
+  font-size: 1.3rem;
+}
+
+.dropdown {
+  z-index: 10;
+}
+
+.dropdown {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  top: 100%;
+  background-color: #fff;
+  z-index: 5;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: -.1rem .3rem .3rem 0 rgba(0, 0, 0, 0.1);
+}
+
+.dropdown .svg-inline--fa {
+  width: 1.8rem;
+}

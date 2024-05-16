@@ -65,7 +65,7 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
   // Sinus-Satz: (1.1*r) / sin(β/2) = R / sin(π/2)
   let R = 1.1 * r / Math.sin(beta/2)
 
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const levelDisabled = (difficulty >= 2 && !(unlocked || completed))
 
@@ -137,7 +137,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
     nextLevel = 0
   }
   let playable = difficulty <= 1 || completed || unlocked
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
 
   return <Link
       to={playable ? `/${gameId}/world/${world}/level/${nextLevel}` : ''}
@@ -198,7 +198,7 @@ export const downloadFile = ({ data, fileName, fileType } :
 /** The menu that is shown next to the world selection graph */
 export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
   const { t, i18n } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const dispatch = useAppDispatch()
   const { mobile } = React.useContext(PreferencesContext)
@@ -277,7 +277,7 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
     rulesHelp: boolean,
     setRulesHelp: any,
   }) {
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const {nodes, bounds}: any = worlds ? computeWorldLayout(worlds) : {nodes: []}
 

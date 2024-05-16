@@ -6,14 +6,13 @@
   --clr-light-gray: #ddd;
   --clr-dark-gray: #aaa;
   --clr-darker-gray: #555;
-  --ff-primary: Roboto;
 }
 
 
 /* General styling */
 
 body {
-  font-family: var(--ff-primary);
+  font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -98,6 +97,7 @@ em {
   flex-direction: column;
 }
 
+/* TODO: remove */
 .app-bar {
   flex: 0;
   background: var(--clr-primary);
@@ -142,7 +142,7 @@ em {
 	margin:0 1.5em 1.5em 1.5em;
 }
 
-.privacy-policy {
+.modal-wrapper {
   z-index: 10;
 }
 
@@ -150,4 +150,19 @@ em {
   margin-top: 3rem;
   margin-bottom: 3rem;
   border-color: var(--vscode-breadcrumb-foreground);
+}
+
+/* TODO: should not be #root */
+#root code {
+  font-family: "JuliaMono", monospace;
+}
+
+@font-face {
+  font-family: 'JuliaMono';
+  src: local('JuliaMono'), url('/fonts/JuliaMono-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: local('Roboto'), url('/fonts/Roboto-Regular.ttf') format('truetype');
 }

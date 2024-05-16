@@ -27,7 +27,7 @@ import Markdown from '../markdown';
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
-import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext, ProofContext, SelectionContext, WorldLevelIdContext } from './context';
+import { DeletedChatContext, PageContext, PreferencesContext, MonacoEditorContext, ProofContext, SelectionContext, WorldLevelIdContext } from './context';
 import { Typewriter, getInteractiveDiagsAt, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
@@ -46,7 +46,7 @@ import path from 'path';
  */
 export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) {
   const ec = React.useContext(EditorContext)
-  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+  const { typewriterMode, lockEditorMode } = React.useContext(PageContext)
   return <>
     <div className={(typewriterMode && !lockEditorMode) ? 'hidden' : ''}>
       <ExerciseStatement data={level} showLeanStatement={true} />
@@ -63,8 +63,8 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
 /** The part of the two editors that needs the editor connection first */
 function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: string, levelId: number, level: LevelInfo, worldSize: number }) {
   const ec = React.useContext(EditorContext)
-  const gameId = React.useContext(GameIdContext)
-  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+  const {gameId} = React.useContext(GameIdContext)
+  const { typewriterMode, lockEditorMode } = React.useContext(PageContext)
 
   const {proof, setProof} = React.useContext(ProofContext)
 
@@ -137,7 +137,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
  */
 function ExerciseStatement({ data, showLeanStatement = false }) {
   let { t } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
 
   if (!(data?.descrText || data?.descrFormat)) { return <></> }
   return <>
@@ -162,7 +162,7 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
 export function Main(props: { world: string, level: number, data: LevelInfo}) {
   let { t } = useTranslation()
   const ec = React.useContext(EditorContext);
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
 
   const { proof, setProof } = React.useContext(ProofContext)
@@ -314,7 +314,7 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
 //       message = diag.message
 //   }
 
-//   const { typewriterMode } = React.useContext(InputModeContext)
+//   const { typewriterMode } = React.useContext(PageContext)
 
 //   return (
 //   // <details open>
@@ -369,7 +369,7 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
 // Splitting up Typewriter into two parts is a HACK
 export function TypewriterInterfaceWrapper(props: { world: string, level: number, data: LevelInfo, worldSize: number }) {
   const ec = React.useContext(EditorContext)
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
 
   useClientNotificationEffect(
     'textDocument/didClose',
@@ -403,7 +403,7 @@ export function TypewriterInterfaceWrapper(props: { world: string, level: number
 export function TypewriterInterface({props}) {
   let { t } = useTranslation()
   const ec = React.useContext(EditorContext)
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const editor = React.useContext(MonacoEditorContext)
   const model = editor.getModel()
   const uri = model.uri.toString()
@@ -418,7 +418,7 @@ export function TypewriterInterface({props}) {
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
   const {mobile} = React.useContext(PreferencesContext)
   const { proof, setProof, crashed, setCrashed, interimDiags } = React.useContext(ProofContext)
-  const { setTypewriterInput } = React.useContext(InputModeContext)
+  const { setTypewriterInput } = React.useContext(PageContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)

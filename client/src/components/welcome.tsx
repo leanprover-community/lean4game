@@ -10,18 +10,17 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { changedOpenedIntro, selectOpenedIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
-import { PreferencesContext } from './infoview/context'
+import { PageContext, PreferencesContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
 import { ErasePopup } from './popup/erase'
 import { InfoPopup } from './popup/game_info'
-import { ImpressumPopup, PrivacyPolicyPopup } from './popup/privacy_policy'
+import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import { RulesHelpPopup } from './popup/rules_help'
 import { UploadPopup } from './popup/upload'
 import { PreferencesPopup} from "./popup/preferences"
 import { WorldTreePanel } from './world_tree'
 
 import '../css/welcome.css'
-import { WelcomeAppBar } from './app_bar'
 import { Hint } from './hints'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
@@ -30,7 +29,7 @@ import { useTranslation } from 'react-i18next'
 /** the panel showing the game's introduction text */
 function IntroductionPanel({introduction, setPageNumber}: {introduction: string, setPageNumber}) {
   const {mobile} = React.useContext(PreferencesContext)
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
 
   let { t } = useTranslation()
 
@@ -68,7 +67,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
 
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
 
   // Load the namespace of the game
   i18next.loadNamespaces(gameId)
@@ -81,7 +80,12 @@ function Welcome() {
 
   // For mobile only
   const openedIntro = useAppSelector(selectOpenedIntro(gameId))
-  const [pageNumber, setPageNumber] = React.useState(openedIntro ? 1 : 0)
+
+  const {page, setPage} = React.useContext(PageContext)
+
+  // TODO: recover `openedIntro` functionality
+
+  // const [pageNumber, setPageNumber] = React.useState(openedIntro ? 1 : 0)
 
   // pop-ups
   const [eraseMenu, setEraseMenu] = React.useState(false)
@@ -118,15 +122,15 @@ function Welcome() {
       <CircularProgress />
     </Box>
   : <>
-    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy}
+    {/* <WelcomeAppBar pageNumber={page} setPageNumber={setPage} gameInfo={gameInfo.data} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy}
       toggleEraseMenu={toggleEraseMenu} toggleUploadMenu={toggleUploadMenu}
-      toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
+      toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/> */}
     <div className="app-content">
       { mobile ?
           <div className="welcome mobile">
-            {(pageNumber == 0 ?
-              <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
-            : pageNumber == 1 ?
+            {(page == 0 ?
+              <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPage} />
+            : page == 1 ?
               <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
                 rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
             :
@@ -135,20 +139,13 @@ function Welcome() {
           </div>
         :
           <Split className="welcome" minSize={0} snapOffset={200}  sizes={[25, 50, 25]}>
-            <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
+            <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPage} />
             <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
               rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
             <InventoryPanel levelInfo={inventory?.data} />
           </Split>
       }
     </div>
-    {impressum ? <ImpressumPopup handleClose={closeImpressum} /> : null}
-    {privacy ? <PrivacyPolicyPopup handleClose={closePrivacy} /> : null}
-    {rulesHelp ? <RulesHelpPopup handleClose={closeRulesHelp} /> : null}
-    {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
-    {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
-    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
-    {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </>
 }
 

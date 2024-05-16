@@ -10,7 +10,7 @@ import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/co
 import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer'
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions'
 
-import { InputModeContext } from './context'
+import { PageContext } from './context'
 import { useTranslation } from 'react-i18next'
 
 interface MessageViewProps {
@@ -80,7 +80,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         message = diag.message
     }
 
-    const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+    const { typewriterMode, lockEditorMode } = React.useContext(PageContext)
 
     return (
     // <details open>

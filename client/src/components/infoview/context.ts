@@ -123,6 +123,26 @@ export const DeletedChatContext = React.createContext<{
   setShowHelp: () => {}
 })
 
+export const PageContext = React.createContext<{
+  typewriterMode: boolean,
+  setTypewriterMode: React.Dispatch<React.SetStateAction<boolean>>,
+  typewriterInput: string,
+  setTypewriterInput: React.Dispatch<React.SetStateAction<string>>,
+  lockEditorMode: boolean,
+  setLockEditorMode: React.Dispatch<React.SetStateAction<boolean>>,
+  page: number, /* only for mobile */
+  setPage: React.Dispatch<React.SetStateAction<number>>,
+}>({
+  typewriterMode: true,
+  setTypewriterMode: () => {},
+  typewriterInput: "",
+  setTypewriterInput: () => {},
+  lockEditorMode: false,
+  setLockEditorMode: () => {},
+  page: 0,
+  setPage: () => {}
+});
+
 export const InputModeContext = React.createContext<{
   typewriterMode: boolean,
   setTypewriterMode: React.Dispatch<React.SetStateAction<boolean>>,

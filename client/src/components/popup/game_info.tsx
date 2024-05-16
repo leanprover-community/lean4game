@@ -6,22 +6,21 @@ import { Typography } from '@mui/material'
 import Markdown from '../markdown'
 import { Trans, useTranslation } from 'react-i18next'
 import { GameIdContext } from '../../app'
+import { useGetGameInfoQuery } from '../../state/api'
 
 /** Pop-up that is displaying the Game Info.
  *
  * `handleClose` is the function to close it again because it's open/closed state is
  * controlled by the containing element.
  */
-export function InfoPopup ({info, handleClose}: {info: string, handleClose: () => void}) {
+export function InfoPopup () {
   let { t } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
+  const gameInfo = useGetGameInfoQuery({game: gameId})
 
-  return <div className="modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+  return <>
     <Typography variant="body1" component="div" className="welcome-text">
-      <Markdown>{t(info, {ns: gameId})}</Markdown>
+      <Markdown>{t(gameInfo.data?.info, {ns: gameId})}</Markdown>
       <hr />
       <Trans>
         <h2>Progress saving</h2>
@@ -51,6 +50,5 @@ export function InfoPopup ({info, handleClose}: {info: string, handleClose: () =
         </p>
       </Trans>
     </Typography>
-  </div>
-</div>
+  </>
 }

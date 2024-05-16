@@ -205,7 +205,7 @@ export function selectOpenedIntro(game: string) {
 /** return typewriter mode for the current game if it exists */
 export function selectTypewriterMode(game: string) {
   return (state) => {
-    return state.progress.games[game.toLowerCase()]?.typewriterMode ?? true
+    return state.progress.games[game?.toLowerCase()]?.typewriterMode ?? true
   }
 }
 

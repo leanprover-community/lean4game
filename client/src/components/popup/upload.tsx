@@ -9,19 +9,23 @@ import { GameProgressState, loadProgress, selectProgress } from '../../state/pro
 import { downloadFile } from '../world_tree'
 import { Button } from '../button'
 import { Trans, useTranslation } from 'react-i18next'
+import { PopupContext } from './popup'
+import { useContext } from 'react'
 
 /** Pop-up that is displaying the Game Info.
  *
  * `handleClose` is the function to close it again because it's open/closed state is
  * controlled by the containing element.
  */
-export function UploadPopup ({handleClose}) {
+export function UploadPopup () {
   let { t } = useTranslation()
 
   const [file, setFile] = React.useState<File>();
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const gameProgress = useSelector(selectProgress(gameId))
   const dispatch = useAppDispatch()
+
+  const { setPopupContent } = useContext(PopupContext)
 
   const handleFileChange = (e) => {
     if (e.target.files) {
@@ -39,7 +43,7 @@ export function UploadPopup ({handleClose}) {
       console.debug("Json Data", data)
       dispatch(loadProgress({game: gameId, data: data}))
     }
-    handleClose()
+    setPopupContent(null) // close the popup
   }
 
   /** Download the current progress (i.e. what's saved in the browser store) */
@@ -53,10 +57,7 @@ export function UploadPopup ({handleClose}) {
   }
 
 
-  return <div className="modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+  return <>
     <h2>{t("Upload Saved Progress")}</h2>
     <Trans>
       <p>Select a JSON file with the saved game progress to load your progress.</p>
@@ -70,6 +71,5 @@ export function UploadPopup ({handleClose}) {
     </p>
 
     <Button to="" onClick={uploadProgress}>{t("Load selected file")}</Button>
-  </div>
-</div>
+  </>
 }

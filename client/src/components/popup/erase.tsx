@@ -1,6 +1,3 @@
-/**
- * @fileOverview
-*/
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { GameIdContext } from '../../app'
@@ -9,10 +6,14 @@ import { deleteProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
 import { Button } from '../button'
 import { Trans, useTranslation } from 'react-i18next'
+import { useContext } from 'react'
+import { PopupContext } from './popup'
 
 /** download the current progress (i.e. what's saved in the browser store) */
-export function downloadProgress(gameId: string, gameProgress: any, ev: React.MouseEvent) {
-  ev.preventDefault()
+export function downloadProgress(gameId: string) {
+  const gameProgress = useSelector(selectProgress(gameId))
+
+  // ev.preventDefault()
   downloadFile({
     data: JSON.stringify(gameProgress, null, 2),
     fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
@@ -25,26 +26,24 @@ export function downloadProgress(gameId: string, gameProgress: any, ev: React.Mo
  * `handleClose` is the function to close it again because it's open/closed state is
  * controlled by the containing element.
  */
-export function ErasePopup ({handleClose}) {
+export function ErasePopup () {
   let { t } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const gameProgress = useSelector(selectProgress(gameId))
   const dispatch = useAppDispatch()
+  const { setPopupContent } = useContext(PopupContext)
 
   const eraseProgress = () => {
     dispatch(deleteProgress({game: gameId}))
-    handleClose()
+    setPopupContent(null)
   }
 
   const downloadAndErase = (ev) => {
-    downloadProgress(gameId, gameProgress, ev)
+    downloadProgress(gameId)
     eraseProgress()
   }
 
-  return <div className="modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+  return <>
     <h2>{t("Delete Progress?")}</h2>
     <Trans>
       <p>Do you want to delete your saved progress irreversibly?</p>
@@ -55,7 +54,6 @@ export function ErasePopup ({handleClose}) {
     </Trans>
     <Button onClick={eraseProgress} to="">{t("Delete")}</Button>
     <Button onClick={downloadAndErase} to="">{t("Download & Delete")}</Button>
-    <Button onClick={handleClose} to="">{t("Cancel")}</Button>
-  </div>
-</div>
+    <Button onClick={() => {setPopupContent(null)}} to="">{t("Cancel")}</Button>
+  </>
 }

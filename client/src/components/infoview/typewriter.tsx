@@ -17,7 +17,7 @@ import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } fro
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext } from './context'
+import { DeletedChatContext, PageContext, MonacoEditorContext, ProofContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
@@ -87,7 +87,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
-  const {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
+  const {typewriterInput, setTypewriterInput} = React.useContext(PageContext)
 
   const inputRef = useRef()
 

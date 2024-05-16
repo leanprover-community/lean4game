@@ -29,11 +29,10 @@ import Markdown from './markdown'
 import {InventoryPanel} from './inventory'
 import { hasInteractiveErrors } from './infoview/typewriter'
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
-  ProofContext, SelectionContext, WorldLevelIdContext } from './infoview/context'
+  ProofContext, SelectionContext, WorldLevelIdContext, PageContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
-import { ImpressumPopup, PrivacyPolicyPopup } from './popup/privacy_policy'
 import path from 'path';
 
 import '@fontsource/roboto/300.css'
@@ -43,7 +42,6 @@ import '@fontsource/roboto/700.css'
 import 'lean4web/client/src/editor/infoview.css'
 import 'lean4web/client/src/editor/vscode.css'
 import '../css/level.css'
-import { LevelAppBar } from './app_bar'
 import { LeanClient } from 'lean4web/client/src/editor/leanclient'
 import { DisposingWebSocketMessageReader } from 'lean4web/client/src/reader'
 import { WebSocketMessageWriter, toSocket } from 'vscode-ws-jsonrpc'
@@ -61,10 +59,10 @@ monacoSetup()
 
 function Level() {
   const params = useParams()
-  const levelId = parseInt(params.levelId)
-  const worldId = params.worldId
+  // const levelId = parseInt(params.levelId)
+  // const worldId = params.worldId
 
-  const gameId = React.useContext(GameIdContext)
+  const {gameId, worldId, levelId} = React.useContext(GameIdContext)
 
   // Load the namespace of the game
   i18next.loadNamespaces(gameId).catch(err => {
@@ -87,14 +85,12 @@ function Level() {
   function toggleInfo()       {setInfo(!info)}
   function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
 
+  useEffect(() => {}, [])
+
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
     {levelId == 0 ?
       <Introduction impressum={impressum} setImpressum={setImpressum} privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup} /> :
       <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>}
-    {impressum ? <ImpressumPopup handleClose={closeImpressum} /> : null}
-    {privacy ? <PrivacyPolicyPopup handleClose={closePrivacy} /> : null}
-    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
-    {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </WorldLevelIdContext.Provider>
 }
 
@@ -102,7 +98,7 @@ function ChatPanel({lastLevel, visible = true}) {
   let { t } = useTranslation()
   const chatRef = useRef<HTMLDivElement>(null)
   const {mobile} = useContext(PreferencesContext)
-  const gameId = useContext(GameIdContext)
+  const {gameId} = useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
   const {proof, setProof} = useContext(ProofContext)
@@ -204,7 +200,7 @@ function ChatPanel({lastLevel, visible = true}) {
 
 
 function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
   const gameInfo = useGetGameInfoQuery({game: gameId})
@@ -218,7 +214,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
 function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
   let { t } = useTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
 
@@ -245,7 +241,7 @@ function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo
   // A set of row numbers where help is displayed
   const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
   // Only for mobile layout
-  const [pageNumber, setPageNumber] = useState(0)
+  const {page, setPage} = useContext(PageContext)
 
   // set to true to prevent switching between typewriter and editor
   const [lockEditorMode, setLockEditorMode] = useState(false)
@@ -418,8 +414,8 @@ function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo
           <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={editor}>
-                <LevelAppBar
-                  pageNumber={pageNumber} setPageNumber={setPageNumber}
+                {/* <LevelAppBar
+                  pageNumber={page} setPageNumber={setPage}
                   isLoading={level.isLoading}
                   levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${t(level?.data?.title, {ns: gameId})}`)}
@@ -427,15 +423,15 @@ function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo
                     togglePrivacy={togglePrivacy}
                     toggleInfo={toggleInfo}
                   togglePreferencesPopup={togglePreferencesPopup}
-                  />
+                  /> */}
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
                   <>
                     <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
                       <ExercisePanel
                         codeviewRef={codeviewRef}
-                        visible={pageNumber == 0} />
-                      <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
+                        visible={page == 0} />
+                      <InventoryPanel levelInfo={level?.data} visible={page == 1} />
                     </div>
                   </>
                 :
@@ -457,7 +453,7 @@ function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo
 
 function IntroductionPanel({gameInfo}) {
   let { t } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const {worldId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
 
@@ -487,7 +483,7 @@ export default Level
 function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
   let { t } = useTranslation()
 
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const {mobile} = useContext(PreferencesContext)
 
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
@@ -506,7 +502,7 @@ function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo,
     setPrivacy(!privacy)
   }
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
+    {/* <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/> */}
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?
@@ -552,7 +548,7 @@ function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo,
 
 function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
 
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
 
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)

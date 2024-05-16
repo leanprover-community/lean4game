@@ -16,23 +16,21 @@ import './i18n';
 // If `VITE_LEAN4GAME_SINGLE` is set to true, then `/` should be redirected to
 // `/g/local/game`. This is used for the devcontainer setup
 let single_game = (import.meta.env.VITE_LEAN4GAME_SINGLE == "true")
-let root_object: RouteObject = single_game ? {
-  path: "/",
-  loader: () => redirect("/g/local/game")
-} : {
-  path: "/",
-  element: <App />,
-  errorElement: <ErrorPage />,
-  children: [
-    {
-      path: "/",
-      element: <LandingPage />,
-    }
-  ]
-}
+// let root_object: RouteObject = single_game ? {
+//   path: "/",
+//   loader: () => redirect("/g/local/game")
+// }
+
+let landing_page: RouteObject = single_game ? {
+    path: "/",
+    loader: () => redirect("/g/local/game")
+  } : {
+    path: "/",
+    element: <LandingPage />,
+  }
 
 const router = createHashRouter([
-  root_object,
+  // root_object,
   {
     // For backwards compatibility
     path: "/game/nng",
@@ -44,10 +42,11 @@ const router = createHashRouter([
     loader: () => redirect("/g/leanprover-community/NNG4")
   },
   {
-    path: "/g/:owner/:repo",
+    path: "/",
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
+      landing_page,
       {
         path: "/g/:owner/:repo",
         element: <Welcome />,

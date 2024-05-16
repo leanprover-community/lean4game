@@ -11,8 +11,8 @@ export default function ErrorPage() {
       <div className="error-message">
         <h1>Oops!</h1>
         <p>Something unexpected happened:</p>
-        <p><code>{error.statusText || error.message}</code></p>
-        <p>Please create an issue on the <a href="https://github.com/leanprover-community/lean4game/issues" target="_blank">lean4game repo</a>.</p>
+        <p><code>({error.status}) {error.statusText || error.message}<br/>{error.data}</code></p>
+        <p>Please create an issue at the <a href="https://github.com/leanprover-community/lean4game/issues" target="_blank">lean4game repo</a>.</p>
         <div className="thought-bubble" />
         <div className="thought-bubble" />
         <div className="thought-bubble" />
