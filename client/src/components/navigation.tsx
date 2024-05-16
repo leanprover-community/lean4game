@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
@@ -13,7 +13,6 @@ import '../css/navigation.css'
 import { PopupContext } from './popup/popup'
 import { useSelector } from 'react-redux'
 import { selectProgress } from '../state/progress'
-import ReactCountryFlag from 'react-country-flag'
 import lean4gameConfig from '../config.json'
 import { Flag } from './flag'
 
@@ -210,7 +209,6 @@ function MobileNavigationLevel () {
     </div>
   </div>
 }
-
 
 /** The skeleton of the navigation which is the same across all layouts. */
 export function Navigation () {
