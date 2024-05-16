@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
@@ -13,6 +13,9 @@ import '../css/navigation.css'
 import { PopupContext } from './popup/popup'
 import { useSelector } from 'react-redux'
 import { selectProgress } from '../state/progress'
+import ReactCountryFlag from 'react-country-flag'
+import lean4gameConfig from '../config.json'
+import { Flag } from './flag'
 
 /** SVG github icon */
 function GithubIcon () {
@@ -208,17 +211,20 @@ function MobileNavigationLevel () {
   </div>
 }
 
+
 /** The skeleton of the navigation which is the same across all layouts. */
 export function Navigation () {
   const { t } = useTranslation()
   const { gameId, worldId } = useContext(GameIdContext)
-  const { mobile } = useContext(PreferencesContext)
+  const { mobile, language, setLanguage } = useContext(PreferencesContext)
   const { setPopupContent } = useContext(PopupContext)
   const gameProgress = useSelector(selectProgress(gameId))
-
+  const gameInfo = useGetGameInfoQuery({game: gameId})
 
   const [navOpen, setNavOpen] = useState(false)
-  function toggleNav () {setNavOpen(!navOpen)}
+  const [langNavOpen, setLangNavOpen] = useState(false)
+  function toggleNav () {setNavOpen(!navOpen); setLangNavOpen(false)}
+  function toggleLangNav () {setLangNavOpen(!langNavOpen); setNavOpen(false)}
 
   return <nav>
     <NavigationContext.Provider value={{navOpen, setNavOpen}}>
@@ -238,13 +244,41 @@ export function Navigation () {
         <NavButton
           iconElement={<GithubIcon />}
           title={t("view the Lean game server on Github")}
-          href='https://github.com/leanprover-community/lean4game'
-        />
+          href='https://github.com/leanprover-community/lean4game' />
+      }
+      {(!gameId || gameInfo.data?.tile?.languages.length > 1) &&
+        // Language button only visible if the game exists in `>1` languages
+        <NavButton
+          iconElement={langNavOpen ? null : <Flag iso={language} />}
+          icon={langNavOpen ? faXmark : null}
+          title={langNavOpen ? t('close language menu') : t('open language menu')}
+          onClick={toggleLangNav}
+          />
       }
       <NavButton
         icon={navOpen ? faXmark : faBars}
         title={navOpen ? t('close menu') : t('open menu')}
         onClick={toggleNav} />
+      { langNavOpen &&
+        <div className='dropdown' onClick={toggleLangNav} >
+          {gameId && gameInfo.data?.tile?.languages ?
+            // Show all languages the game is available in
+            gameInfo.data?.tile?.languages.map(iso =>
+              <NavButton
+                iconElement={<Flag iso={iso} />}
+                text={lean4gameConfig.newLanguages[iso]?.name}
+                onClick={() => {setLanguage(iso)}}
+                inverted={true} />) :
+            // Show all languages the interface is available in (e.g. landing page)
+            Object.entries(lean4gameConfig.newLanguages).map(([iso, val]) =>
+              <NavButton
+                iconElement={<Flag iso={iso} />}
+                text={lean4gameConfig.newLanguages[iso]?.name}
+                onClick={() => {setLanguage(iso)}}
+                inverted={true} />)
+          }
+        </div>
+      }
       { navOpen &&
         <div className='dropdown' onClick={toggleNav} >
           { gameId && <>

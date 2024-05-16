@@ -1,7 +1,7 @@
 {
   "allGames": [
     "leanprover-community/nng4",
-    "hhu-adam/robo",
+    "local/Robo",
     "djvelleman/stg4",
     "trequetrum/lean4game-logic"
   ],
@@ -23,5 +23,19 @@
       "name": "中文"
     }
   ],
-  "useFlags": false
+  "newLanguages": {
+    "en": {
+      "flag": "GB",
+      "name": "English"
+    },
+    "de": {
+      "flag": "DE",
+      "name": "Deutsch"
+    },
+    "zh": {
+      "flag": "CN",
+      "name": "中文"
+    }
+  },
+  "useFlags": true
 }

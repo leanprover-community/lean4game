@@ -19,6 +19,7 @@ import lean4gameConfig from '../config.json'
 import i18next from 'i18next';
 import { useContext } from 'react';
 import { PopupContext } from './popup/popup';
+import { Flag } from './flag';
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
   let { t } = useTranslation()
@@ -57,14 +58,9 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
         <td>{t("Language")}</td>
 
         <td>
-          {data.languages.map((lang) => {
-            let langOpt = lean4gameConfig.languages.find((e) => e.iso == lang)
-            if (lean4gameConfig.useFlags) {
-              return <ReactCountryFlag key={`flag-${lang}`} title={langOpt?.name} countryCode={langOpt?.flag} className="emojiFlag"/>
-            } else {
-              return <span key={`flag-text-${lang}`} title={langOpt?.name}>{lang}</span>
-            }
-          })}
+          {data.languages.map((lang) => (
+            <Flag iso={lang} showTitle={true} />
+          ))}
         </td>
       </tr>
       </tbody>

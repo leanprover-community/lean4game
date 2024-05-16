@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux';
 import { changeTypewriterMode, selectOpenedIntro, selectTypewriterMode } from './state/progress';
 import { useAppDispatch } from './hooks';
 import { Popup, PopupContext } from './components/popup/popup';
+import { useGetGameInfoQuery } from './state/api';
 
 export const GameIdContext = React.createContext<{
   gameId: string,
@@ -39,6 +40,7 @@ function App() {
   const [typewriterInput, setTypewriterInput] = useState("")
   const [page, setPage] = useState(0)
   const [popupContent, setPopupContent] = useState(null)
+  const gameInfo = useGetGameInfoQuery({game: gameId})
 
 
   const openedIntro = useSelector(selectOpenedIntro(gameId))
@@ -49,10 +51,18 @@ function App() {
     }
   }, [openedIntro])
 
-
   useEffect(() => {
-    i18n.changeLanguage(language)
-  }, [language])
+    let availableLangs = gameInfo.data?.tile?.languages
+    if (gameId && availableLangs?.length > 0 && !(availableLangs.includes(language))) {
+      // if the game is not available in the preferred language, display it in the original
+      // language
+      console.log(`using default language: ${availableLangs[0]}`)
+      i18n.changeLanguage(availableLangs[0])
+    } else {
+      console.log(`using language: ${language}`)
+      i18n.changeLanguage(language)
+    }
+  }, [gameId, gameInfo.data?.tile?.languages, language])
 
   return (
     <div className="app">
