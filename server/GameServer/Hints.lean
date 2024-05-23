@@ -20,7 +20,7 @@ structure GoalHintEntry where
   hidden : Bool := false
   /-- If true, then the goal must contain only the assumptions specified in `goal` and no others -/
   strict : Bool := false
-  defeq : Bool := false
+  defeq : Bool := true
 
 instance : Repr GoalHintEntry := {
   reprPrec := fun a n => reprPrec a.text n

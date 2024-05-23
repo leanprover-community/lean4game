@@ -524,7 +524,7 @@ see hints. The tactic does not affect the goal state.
 elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
   let mut strict := false
   let mut hidden := false
-  let mut defeq := false
+  let mut defeq := true
 
   -- remove spaces at the beginning of new lines
   let msg := TSyntax.mk $ msg.raw.setArgs $ ← msg.raw.getArgs.mapM fun m => do
