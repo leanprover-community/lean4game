@@ -4,7 +4,7 @@ import GameServer.Options
 import GameServer.SaveData
 import GameServer.Hints
 import GameServer.Tactic.LetIntros
-import GameServer.RpcHandlers -- only needed to collect the translations of "level completed" msgs
+-- import GameServer.RpcHandlers -- only needed to collect the translations of "level completed" msgs
 import I18n
 
 open Lean Meta Elab Command
@@ -437,6 +437,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
         .tagged `Hint $
         .nest strict $
         .nest hidden $
+        .nest defeq $
         .compose (.ofGoal text) (.ofGoal goal) := msg.data then
       let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
 
@@ -467,6 +468,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
           rawText := rawText
           strict := strict == 1
           hidden := hidden == 1
+          defeq := defeq == 1
         }
 
       -- Note: The current setup for hints is a bit convoluted, but for now we need to
@@ -522,6 +524,7 @@ see hints. The tactic does not affect the goal state.
 elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
   let mut strict := false
   let mut hidden := false
+  let mut defeq := false
 
   -- remove spaces at the beginning of new lines
   let msg := TSyntax.mk $ msg.raw.setArgs $ ← msg.raw.getArgs.mapM fun m => do
@@ -543,6 +546,8 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
     | `(hintArg| (strict := false)) => strict := false
     | `(hintArg| (hidden := true)) => hidden := true
     | `(hintArg| (hidden := false)) => hidden := false
+    | `(hintArg| (defeq := true)) => defeq := true
+    | `(hintArg| (defeq := false)) => defeq := false
     | _ => throwUnsupportedSyntax
 
   let goal ← Tactic.getMainGoal
@@ -566,6 +571,7 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
       .tagged `Hint $
       .nest (if strict then 1 else 0) $
       .nest (if hidden then 1 else 0) $
+      .nest (if defeq then 1 else 0) $
       .compose (.ofGoal textmvar.mvarId!) (.ofGoal goal)
 
 /-- This tactic allows us to execute an alternative sequence of tactics, but without affecting the

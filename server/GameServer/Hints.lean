@@ -8,7 +8,7 @@ open Lean Meta Elab
 
 namespace GameServer
 
-syntax hintArg := atomic(" (" (&"strict" <|> &"hidden") " := " withoutPosition(term) ")")
+syntax hintArg := atomic(" (" (&"strict" <|> &"hidden" <|> &"defeq") " := " withoutPosition(term) ")")
 
 /-- A hint to help the user with a specific goal state -/
 structure GoalHintEntry where
@@ -20,6 +20,7 @@ structure GoalHintEntry where
   hidden : Bool := false
   /-- If true, then the goal must contain only the assumptions specified in `goal` and no others -/
   strict : Bool := false
+  defeq : Bool := false
 
 instance : Repr GoalHintEntry := {
   reprPrec := fun a n => reprPrec a.text n

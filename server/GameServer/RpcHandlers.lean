@@ -79,7 +79,9 @@ partial def matchExpr (pattern : Expr) (e : Expr) (bij : FVarBijection := {}) : 
   | _, _ => none
 
 /-- Check if each fvar in `patterns` has a matching fvar in `fvars` -/
-def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true) (initBij : FVarBijection := {}) : MetaM (Option FVarBijection) := do
+def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true)
+    (initBij : FVarBijection := {}) (defeq := false) : MetaM (Option FVarBijection) := do
+  let reducer := if defeq then whnf else pure
   -- We iterate through the array backwards hoping that this will find us faster results
   -- TODO: implement backtracking
   let mut bij := initBij
@@ -93,8 +95,8 @@ def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true) (in
         continue
 
       if let some bij' := matchExpr
-          (← instantiateMVars $ ← inferType pattern)
-          (← instantiateMVars $ ← inferType fvar) bij then
+          (← reducer <| ← instantiateMVars $ ← inferType pattern)
+          (← reducer <| ← instantiateMVars $ ← inferType fvar) bij then
         -- usedFvars := usedFvars.set! (fvars.size - j - 1) true
         bij := bij'.insert pattern.fvarId! fvar.fvarId!
         break
@@ -112,7 +114,10 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
       | throwError "Level not found: {m.mkInputContext.fileName}"
     let hints ← level.hints.filterMapM fun hint => do
       openAbstractCtxResult hint.goal fun hintFVars hintGoal => do
-        if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
+        let reducer := if hint.defeq then whnf else pure
+        if let some fvarBij := matchExpr
+          (← reducer <| ← instantiateMVars $ hintGoal)
+          (← reducer <| ← instantiateMVars $ ← inferType $ mkMVar goal)
         then
 
           -- NOTE: This code for `hintFVarsNames` is also duplicated in the
@@ -127,7 +132,7 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
 
           let lctx := (← goal.getDecl).lctx -- the player's local context
           if let some bij ← matchDecls hintFVars lctx.getFVars
-            (strict := hint.strict) (initBij := fvarBij)
+            (strict := hint.strict) (initBij := fvarBij) (defeq := hint.defeq)
           then
             let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
             -- Evaluate the text in the player's context to get the new variable names.
