@@ -53,12 +53,13 @@ import { InfoPopup } from './popup/info'
 import { PreferencesPopup } from './popup/preferences'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
+import { ChatButtons } from './chat'
 
 
 monacoSetup()
 
-function Level() {
-  const params = useParams()
+export function Level({visible = true}) {
+  // const params = useParams()
   // const levelId = parseInt(params.levelId)
   // const worldId = params.worldId
 
@@ -87,11 +88,11 @@ function Level() {
 
   useEffect(() => {}, [])
 
-  return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
-    {levelId == 0 ?
-      <Introduction impressum={impressum} setImpressum={setImpressum} privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup} /> :
-      <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>}
-  </WorldLevelIdContext.Provider>
+  return <div className={visible?'':'hidden'}>
+    <WorldLevelIdContext.Provider value={{worldId, levelId}} >
+      <PlayableLevel key={`${worldId}/${levelId}`} />
+    </WorldLevelIdContext.Provider>
+  </div>
 }
 
 function ChatPanel({lastLevel, visible = true}) {
@@ -199,7 +200,7 @@ function ChatPanel({lastLevel, visible = true}) {
 }
 
 
-function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
+export function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
   const {gameId} = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
@@ -211,7 +212,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
   </div>
 }
 
-function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
+export function PlayableLevel() {
   let { t } = useTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
   const {gameId} = React.useContext(GameIdContext)
@@ -248,9 +249,9 @@ function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo
   const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
 
-  // impressum pop-up
-  function toggleImpressum() {setImpressum(!impressum)}
-  function togglePrivacy() {setPrivacy(!privacy)}
+  // // impressum pop-up
+  // function toggleImpressum() {setImpressum(!impressum)}
+  // function togglePrivacy() {setPrivacy(!privacy)}
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
   // If this state is set to a pair `(name, type)` then the according doc will be open.
@@ -424,24 +425,7 @@ function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo
                     toggleInfo={toggleInfo}
                   togglePreferencesPopup={togglePreferencesPopup}
                   /> */}
-                {mobile?
-                  // TODO: This is copied from the `Split` component below...
-                  <>
-                    <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
-                      <ExercisePanel
-                        codeviewRef={codeviewRef}
-                        visible={page == 0} />
-                      <InventoryPanel levelInfo={level?.data} visible={page == 1} />
-                    </div>
-                  </>
-                :
-                  <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
-                    <ChatPanel lastLevel={lastLevel}/>
-                    <ExercisePanel
-                      codeviewRef={codeviewRef} />
-                    <InventoryPanel levelInfo={level?.data} />
-                  </Split>
-                }
+                <ExercisePanel codeviewRef={codeviewRef} />
               </MonacoEditorContext.Provider>
             </EditorContext.Provider>
           </ProofContext.Provider>
@@ -450,6 +434,11 @@ function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo
     </DeletedChatContext.Provider>
   </>
 }
+
+  // <Split minSize={0} snapOffset={200} sizes={[25, 75]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+  // <ChatPanel lastLevel={lastLevel}/>
+  // <InventoryPanel />
+  // </Split>
 
 function IntroductionPanel({gameInfo}) {
   let { t } = useTranslation()
@@ -466,21 +455,14 @@ function IntroductionPanel({gameInfo}) {
           hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={null} toggleSelection={undefined} />
       ))}
     </div>
-    <div className={`button-row${mobile ? ' mobile' : ''}`}>
-      {gameInfo.data?.worldSize[worldId] == 0 ?
-        <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
-        <Button to={`/${gameId}/world/${worldId}/level/1`}>
-          {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
-        </Button>
-      }
-    </div>
+    <ChatButtons />
   </div>
 }
 
 export default Level
 
 /** The site with the introduction text of a world */
-function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
+function Introduction() {
   let { t } = useTranslation()
 
   const {gameId} = React.useContext(GameIdContext)
@@ -495,12 +477,12 @@ function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo,
   let image: string = gameInfo.data?.worlds.nodes[worldId].image
 
 
-  const toggleImpressum = () => {
-    setImpressum(!impressum)
-  }
-  const togglePrivacy = () => {
-    setPrivacy(!privacy)
-  }
+  // const toggleImpressum = () => {
+  //   setImpressum(!impressum)
+  // }
+  // const togglePrivacy = () => {
+  //   setPrivacy(!privacy)
+  // }
   return <>
     {/* <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/> */}
     {gameInfo.isLoading ?
@@ -508,16 +490,16 @@ function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo,
     : mobile ?
         <IntroductionPanel gameInfo={gameInfo} />
       :
-        <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
-          <IntroductionPanel gameInfo={gameInfo} />
+        // <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
+        //   <IntroductionPanel gameInfo={gameInfo} />
           <div className="world-image-container empty center">
             {image &&
               <img className="contain" src={path.join("data", gameId, image)} alt="" />
             }
 
           </div>
-          <InventoryPanel levelInfo={inventory?.data} />
-        </Split>
+          // {/* <InventoryPanel /> */}
+        // </Split>
       }
 
   </>

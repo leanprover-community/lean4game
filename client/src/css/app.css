@@ -17,6 +17,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .markdown code {
   color: rgba(0, 32, 90, 0.87);
   background-color: rgba(223, 227, 234);
@@ -125,14 +129,6 @@ em {
   margin: 0;
   /* margin: 0 1em; */
 }
-
-.app-content {
-  height: 100%;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-}
-
 
 .markdown li ul, .markdown li ol {
 	margin:0 1.5em;

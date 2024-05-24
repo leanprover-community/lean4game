@@ -109,23 +109,26 @@ function LandingPage() {
         </p>
       </div>
     </header>
-    <div className="game-list">
-      {allTiles.filter(x => x != null).length == 0 ?
-        <p>
-          <Trans>
-            No Games loaded. Use <a>http://localhost:3000/#/g/local/FOLDER</a> to open a
-            game directly from a local folder.
-          </Trans>
-        </p>
-        : lean4gameConfig.allGames.map((id, i) => (
-          <Tile
-            key={id}
-            gameId={`g/${id}`}
-            data={allTiles[i]}
-          />
-        ))
-      }
-    </div>
+    <React.Suspense>
+      <div className="game-list">
+
+        {allTiles.filter(x => x != null).length == 0 ?
+          <p>
+            <Trans>
+              No Games loaded. Use <a>http://localhost:3000/#/g/local/FOLDER</a> to open a
+              game directly from a local folder.
+            </Trans>
+          </p>
+          : lean4gameConfig.allGames.map((id, i) => (
+            <Tile
+              key={id}
+              gameId={`g/${id}`}
+              data={allTiles[i]}
+            />
+          ))
+        }
+      </div>
+    </React.Suspense>
     <section>
       <div className="wrapper">
         <h2>{t("Development notes")}</h2>

@@ -133,7 +133,7 @@ function Welcome() {
               <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
                 rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
             :
-              <InventoryPanel levelInfo={inventory?.data} />
+              <InventoryPanel />
             )}
           </div>
         :
@@ -141,7 +141,7 @@ function Welcome() {
             <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPage} />
             <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
               rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
-            <InventoryPanel levelInfo={inventory?.data} />
+            <InventoryPanel />
           </Split>
       }
     </div>

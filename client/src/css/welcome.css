@@ -14,9 +14,6 @@
   width: 100%;
 }
 
-.app-content {
-  height: 100%
-}
 
 .welcome .column {
   height: 100%;
@@ -157,19 +154,6 @@ h5, h6 {
   border-radius: .2em;
   display: block;
   margin: 1em auto;
-}
-
-.modal-close {
-  float: right;
-  scale: 2;
-  color: var(--vscode-breadcrumb-foreground);
-  cursor: pointer;
-}
-
-.modal-close:hover {
-  float: right;
-  scale: 2;
-  color: var(--vscode-breadcrumb-focusForeground);
 }
 
 .modal table {

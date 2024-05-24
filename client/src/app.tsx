@@ -49,10 +49,18 @@ function App() {
 
   // mobile only: game intro should only be shown once and skipped afterwards
   useEffect(() => {
-    if (openedIntro && !worldId && page == 0) {
+    if (worldId) {
+      console.log('setting page to 1')
       setPage(1)
+    } else {
+      if (openedIntro && page == 0) {
+        console.log('setting page to 1')
+        setPage(1)
+      } else {
+        // setPage(0)
+      }
     }
-  }, [openedIntro])
+  }, [openedIntro, worldId, levelId])
 
   // option to pass language as `?lang=de` in the URL
   useEffect(() => {
@@ -96,11 +104,9 @@ function App() {
           <PopupContext.Provider value={{popupContent, setPopupContent}}>
             <PageContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode, page, setPage}}>
               <Navigation />
-              <React.Suspense>
-                <Outlet />
-              </React.Suspense>
+              <Outlet />
+              { popupContent && <Popup /> }
             </PageContext.Provider>
-            { popupContent && <Popup /> }
           </PopupContext.Provider>
         </PreferencesContext.Provider>
       </GameIdContext.Provider>

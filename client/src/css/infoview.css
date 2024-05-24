@@ -1,28 +1,4 @@
 
-.message {
-  margin: 10px 0;
-  padding: 5px 10px;
-  border-radius: 3px 3px 3px 3px;
-}
-.message.information, .message.info {
-  /* color: #059; */
-  color: #000;
-  background-color: #DDF6FF;
-}
-.message.warning {
-  color: #9F6000;
-  background-color: #FEEFB3;
-}
-.message.error {
-  color: #D8000C;
-  background-color: #FFBABA;
-}
-
-.message.deleted-hint {
-  background-color: #eee;
-  color: #777;
-  box-shadow: .0em .0em .5em .2em #eee;
- }
 
 .hyp-group {
   margin-bottom: 0.3em;

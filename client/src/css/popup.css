@@ -5,3 +5,21 @@
   padding-right: 2rem;
   padding-top: 1rem;
 }
+
+.modal-close {
+  float: right;
+  scale: 2;
+  color: var(--vscode-breadcrumb-foreground);
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  float: right;
+  scale: 2;
+  color: var(--vscode-breadcrumb-focusForeground);
+}
+
+.documentation .nav-button, .modal .nav-button {
+  float: right;
+  font-size: 1.5rem;
+}

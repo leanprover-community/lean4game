@@ -10,6 +10,7 @@ import Welcome from './components/welcome'
 import LandingPage from './components/landing_page'
 import Level from './components/level'
 import './i18n';
+import Game from './components/game'
 
 
 
@@ -49,11 +50,11 @@ const router = createHashRouter([
       landing_page,
       {
         path: "/g/:owner/:repo",
-        element: <Welcome />,
+        element: <Game />,
       },
       {
         path: "/g/:owner/:repo/world/:worldId/level/:levelId",
-        element: <Level />,
+        element: <Game />,
       },
     ],
   },

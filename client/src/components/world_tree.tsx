@@ -18,6 +18,8 @@ import { store } from '../state/store'
 import '../css/world_tree.css'
 import { PreferencesContext } from './infoview/context'
 import { useTranslation } from 'react-i18next'
+import { useGetGameInfoQuery } from '../state/api'
+import { LoadingIcon } from './utils'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -271,15 +273,14 @@ export function computeWorldLayout(worlds) {
 }
 
 
-export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
-  { worlds: any,
-    worldSize: any,
-    rulesHelp: boolean,
-    setRulesHelp: any,
-  }) {
+export function WorldTreePanel ({visible = true}) {
   const {gameId} = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
-  const {nodes, bounds}: any = worlds ? computeWorldLayout(worlds) : {nodes: []}
+  const gameInfo = useGetGameInfoQuery({game: gameId})
+
+
+  const {nodes, bounds}: any = gameInfo.data?.worlds ? computeWorldLayout(gameInfo.data?.worlds) : {nodes: []}
+
 
   // scroll to playable world
   React.useEffect(() => {
@@ -292,7 +293,7 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
       console.debug(`scrolling to ${elem.textContent}`)
       elem.scrollIntoView({block: "center"})
     }
-  }, [worlds, worldSize])
+  }, [gameInfo])
 
   let svgElements = []
 
@@ -301,18 +302,18 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
   // Indices `1, …, n` indicate if the corresponding level is completed
   var completed = {}
 
-  if (worlds && worldSize) {
+  if (gameInfo.data?.worlds && gameInfo.data?.worldSize) {
     // Fill `completed` with the level data.
     for (let worldId in nodes) {
-      completed[worldId] = Array.from({ length: worldSize[worldId] + 1 }, (_, i) => {
+      completed[worldId] = Array.from({ length: gameInfo.data?.worldSize[worldId] + 1 }, (_, i) => {
         // index `0` starts off as `true` but can be set to `false` by any edge with non-completed source
         return i == 0 || selectCompleted(gameId, worldId, i)(store.getState())
       })
     }
 
     // draw all connecting paths
-    for (let i in worlds.edges) {
-      const edge = worlds.edges[i]
+    for (let i in gameInfo.data?.worlds.edges) {
+      const edge = gameInfo.data?.worlds.edges[i]
       let sourceCompleted = completed[edge[0]].slice(1).every(Boolean)
       // if the origin world is not completed, mark the target world as non-playable
       if (!sourceCompleted) {completed[edge[1]][0] = false}
@@ -332,11 +333,11 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
           completedLevels={completed[worldId]}
           difficulty={difficulty}
           key={`${gameId}-${worldId}`}
-          worldSize={worldSize[worldId]}
+          worldSize={gameInfo.data?.worldSize[worldId]}
         />
       )
 
-      for (let i = 1; i <= worldSize[worldId]; i++) {
+      for (let i = 1; i <= gameInfo.data?.worldSize[worldId]; i++) {
         svgElements.push(
           <LevelIcon
             world={worldId}
@@ -345,7 +346,7 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
             completed={completed[worldId][i]}
             unlocked={completed[worldId][i-1]}
             key={`${gameId}-${worldId}-${i}`}
-            worldSize={worldSize[worldId]}
+            worldSize={gameInfo.data?.worldSize[worldId]}
           />
         )
       }
@@ -359,13 +360,14 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
 
   let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : null
 
-  return <div className="column">
+  return <div className={`column${visible ? '' : ' hidden'}`}>
       {/* <WorldSelectionMenu rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} /> */}
+      { gameInfo.data ?
       <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
           width={bounds ? `${ds * dx}` : ''}
           viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
           className="world-selection" >
         {svgElements}
-      </svg>
+      </svg> : <LoadingIcon/> }
   </div>
 }

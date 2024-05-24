@@ -12,9 +12,10 @@ import { useTranslation } from 'react-i18next'
 import '../css/navigation.css'
 import { PopupContext } from './popup/popup'
 import { useSelector } from 'react-redux'
-import { selectProgress } from '../state/progress'
+import { selectCompleted, selectDifficulty, selectProgress } from '../state/progress'
 import lean4gameConfig from '../config.json'
 import { Flag } from './flag'
+import { useAppSelector } from '../hooks'
 
 /** SVG github icon */
 function GithubIcon () {
@@ -119,6 +120,8 @@ function DesktopNavigationLevel () {
   const { typewriterMode, setTypewriterMode, lockEditorMode } = useContext(PageContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const levelInfo = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  const difficulty = useSelector(selectDifficulty(gameId))
+  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
   /** toggle input mode if allowed */
   function toggleInputMode(ev: React.MouseEvent) {
@@ -151,32 +154,34 @@ function DesktopNavigationLevel () {
       </span>
     </div>
     <div className="nav-title-right" >
-    { levelId > 0 &&
-      <NavButton
-        icon={faArrowLeft}
-        text={t("Previous")}
-        inverted={true}
-        href={`#/${gameId}/world/${worldId}/level/${levelId - 1}`} />
-    }
-    { levelId == gameInfo.data?.worldSize[worldId] ?
-      <NavButton
-        icon={faHome}
-        text={t("Leave World")}
-        inverted={true}
-        href={`#/${gameId}`} /> :
-      <NavButton
-        icon={faArrowRight}
-        text={levelId == 0 ? t("Start") : t("Next")} inverted={true}
-        href={`#/${gameId}/world/${worldId}/level/${levelId + 1}`} />
-    }
-    { levelId > 0 &&
-      <NavButton
-        icon={(typewriterMode && !lockEditorMode) ? faCode : faTerminal}
-        inverted={true}
-        disabled={levelId == 0 || lockEditorMode}
-        onClick={(ev) => toggleInputMode(ev)}
-        title={lockEditorMode ? t("Editor mode is enforced!") : typewriterMode ? t("Editor mode") : t("Typewriter mode")} />
-    }
+      { levelId > 0 &&
+        <NavButton
+          icon={faArrowLeft}
+          text={t("Previous")}
+          inverted={true}
+          href={`#/${gameId}/world/${worldId}/level/${levelId - 1}`} />
+      }
+      { levelId == gameInfo.data?.worldSize[worldId] ?
+        <NavButton
+          icon={faHome}
+          text={t("Leave World")}
+          inverted={true}
+          disabled={difficulty == 0 || !completed}
+          href={`#/${gameId}`} /> :
+        <NavButton
+          icon={faArrowRight}
+          text={levelId == 0 ? t("Start") : t("Next")} inverted={true}
+          disabled={difficulty == 0 || !completed}
+          href={`#/${gameId}/world/${worldId}/level/${levelId + 1}`} />
+      }
+      { levelId > 0 &&
+        <NavButton
+          icon={(typewriterMode && !lockEditorMode) ? faCode : faTerminal}
+          inverted={true}
+          disabled={levelId == 0 || lockEditorMode}
+          onClick={(ev) => toggleInputMode(ev)}
+          title={lockEditorMode ? t("Editor mode is enforced!") : typewriterMode ? t("Editor mode") : t("Typewriter mode")} />
+      }
     </div>
   </div>
 }
@@ -203,9 +208,9 @@ function MobileNavigationLevel () {
     </div>
     <div className="nav-title-right">
       <NavButton
-        icon={page?faBookOpen:faBook}
-        onClick={() => setPage(page?0:1)}
-        inverted={true}/>
+        icon={(page == 1) ? faBook : faBookOpen}
+        onClick={() => setPage((page == 1) ? 2 : 1)}
+        inverted={true} />
     </div>
   </div>
 }
@@ -213,16 +218,28 @@ function MobileNavigationLevel () {
 /** The skeleton of the navigation which is the same across all layouts. */
 export function Navigation () {
   const { t, i18n } = useTranslation()
-  const { gameId, worldId } = useContext(GameIdContext)
+  const { gameId, worldId, levelId } = useContext(GameIdContext)
   const { mobile, language, setLanguage } = useContext(PreferencesContext)
   const { setPopupContent } = useContext(PopupContext)
+  const { typewriterMode, setTypewriterMode, lockEditorMode } = useContext(PageContext)
   const gameProgress = useSelector(selectProgress(gameId))
   const gameInfo = useGetGameInfoQuery({game: gameId})
+  const levelInfo = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  const difficulty = useSelector(selectDifficulty(gameId))
+  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
   const [navOpen, setNavOpen] = useState(false)
   const [langNavOpen, setLangNavOpen] = useState(false)
   function toggleNav () {setNavOpen(!navOpen); setLangNavOpen(false)}
   function toggleLangNav () {setLangNavOpen(!langNavOpen); setNavOpen(false)}
+
+  /** toggle input mode if allowed */
+  function toggleInputMode(ev: React.MouseEvent) {
+    if (!lockEditorMode) {
+      setTypewriterMode(!typewriterMode)
+      console.log('test')
+    }
+  }
 
   return <nav>
     <NavigationContext.Provider value={{navOpen, setNavOpen}}>
@@ -280,6 +297,35 @@ export function Navigation () {
       { navOpen &&
         <div className='dropdown' onClick={toggleNav} >
           { gameId && <>
+            { mobile && (levelId == gameInfo.data?.worldSize[worldId] ?
+              <NavButton
+                icon={faHome}
+                text={t("Leave World")}
+                inverted={true}
+                disabled={difficulty == 0 || !completed}
+                href={`#/${gameId}`} /> :
+              <NavButton
+                icon={faArrowRight}
+                text={levelId == 0 ? t("Start") : t("Next")} inverted={true}
+                disabled={difficulty == 0 || !completed}
+                href={`#/${gameId}/world/${worldId}/level/${levelId + 1}`} />
+            )}
+            {mobile && levelId > 0 &&
+              <NavButton
+                icon={faArrowLeft}
+                text={t("Previous")}
+                inverted={true}
+                href={`#/${gameId}/world/${worldId}/level/${levelId - 1}`} />
+            }
+            { mobile && levelId > 0 &&
+              <NavButton
+                icon={(typewriterMode && !lockEditorMode) ? faCode : faTerminal}
+                inverted={true}
+                text={typewriterMode ? t("Editor Mode") : t("Typewriter Mode")}
+                disabled={levelId == 0 || lockEditorMode}
+                onClick={(ev) => toggleInputMode(ev)}
+                title={lockEditorMode ? t("Editor mode is enforced!") : typewriterMode ? t("Editor mode") : t("Typewriter mode")} />
+            }
             <NavButton
               icon={faCircleInfo}
               text={t("Game Info")}

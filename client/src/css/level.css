@@ -5,25 +5,6 @@
   /* display: flex; */
 }
 
-.hidden {
-  display: none;
-}
-
-.gutter {
-  background-color: #eee;
-
-  background-repeat: no-repeat;
-  background-position: 50%;
-}
-
-.gutter.gutter-vertical {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
-}
-
-.gutter.gutter-horizontal {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
-}
-
 .inventory-panel, .exercise-panel, .doc-panel, .introduction-panel {
   height: 100%;
   width: 100%;
@@ -213,17 +194,26 @@ td code  {
 
 .chat-panel .button-row {
   /* width:100%; */
-  margin-left: .5em;
-  margin-right: .5em;
+  /* margin-left: .5em;
+  margin-right: .5em; */
   min-height: 2.5em;
   border-top:  0.1em solid #aaa;
+  display: flex;
+  padding-top: .2rem;
+  margin: .5rem;
+
 }
 
 .chat-panel .btn {
-  margin-top: 1rem;
+  flex: 1;
+  /* margin-top: 1rem;
   margin-bottom: 1rem;
   margin-left: .5rem;
-  margin-right: .5rem;
+  margin-right: .5rem; */
+  text-align: center;
+
+  margin: 0;
+  padding: .5em;
 }
 
 /* .exercise-panel {
@@ -232,7 +222,7 @@ td code  {
   height: 100%;
 } */
 
-.button-row.mobile {
+/* .button-row.mobile {
   margin: .5rem;
   padding-top: .2rem;
 }
@@ -243,7 +233,7 @@ td code  {
   width: 100%;
   margin: 0;
   text-align: center;
-}
+} */
 
 
 .typewriter-interface {

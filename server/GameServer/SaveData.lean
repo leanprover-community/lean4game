@@ -25,7 +25,7 @@ def copyImages : IO Unit := do
 namespace GameData
   def gameDataPath : System.FilePath := ".lake" / "gamedata"
   def gameFileName := s!"game.json"
-  def docFileName := fun (inventoryType : InventoryType) (name : Name) => s!"doc__{inventoryType}__{name}.json"
+  def docFileName := fun (inventoryType : InventoryType) (name : Name) => s!"doc__{name}.json"
   def levelFileName := fun (worldId : Name) (levelId : Nat) => s!"level__{worldId}__{levelId}.json"
   def inventoryFileName := s!"inventory.json"
 end GameData

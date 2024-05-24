@@ -8,6 +8,8 @@ import { PreferencesPopup } from './preferences'
 import { UploadPopup } from './upload'
 import { RulesPopup } from './rules'
 import '../../css/popup.css'
+import { NavButton } from '../navigation'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
 
 /** The context which manages if a popup is shown.
  * If `popupContent` is `null`, the popup is closed.
@@ -46,6 +48,9 @@ export function Popup () {
   return <div className="modal-wrapper">
   <div className="modal-backdrop" onClick={closePopup} />
   <div className="modal">
+    <NavButton icon={faXmark}
+      onClick={closePopup}
+      inverted={true} />
     <div className="codicon codicon-close modal-close" onClick={closePopup}></div>
     {Popups[popupContent]}
   </div>

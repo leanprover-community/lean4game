@@ -1,5 +1,5 @@
 #error-page {
-  height: 100%;
+  height: 100vh;
   background-image: url("/RoboSurprised.png");
   background-repeat: no-repeat;
   background-size: contain;

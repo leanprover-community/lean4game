@@ -536,7 +536,7 @@ export function TypewriterInterface({props}) {
               [DiagnosticSeverity.Hint]: 'hint',
             }[diag.severity] : '';
 
-            return <div>
+            return <div key={diag.message} >
               <div className={`${severityClass} ml1 message`}>
                 <p className="mv2">{t("Line")}&nbsp;{diag.range.start.line}, {t("Character")}&nbsp;{diag.range.start.character}</p>
                 <pre className="font-code pre-wrap">
