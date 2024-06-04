@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react-swc'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import svgr from "vite-plugin-svgr"
 
+const backendPort = process.env.PORT || 8080;
+const clientPort = process.env.CLIENT_PORT || 3000;
+
 // https://vitejs.dev/config/
 export default defineConfig({
   //root: 'client/src',
@@ -32,20 +35,20 @@ export default defineConfig({
     exclude: ['games']
   },
   server: {
-    port: 3000,
+    port: Number(clientPort),
     proxy: {
       '/websocket': {
-        target: 'ws://localhost:8080',
+        target: `ws://localhost:${backendPort}`,
         ws: true
       },
       '/import': {
-        target: 'http://localhost:8080',
+        target: `http://localhost:${backendPort}`,
       },
       '/data': {
-        target: 'http://localhost:8080',
+        target: `http://localhost:${backendPort}`,
       },
       '/i18n': {
-        target: 'http://localhost:8080',
+        target: `http://localhost:${backendPort}`,
       },
     }
   },
