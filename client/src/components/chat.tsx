@@ -60,6 +60,7 @@ export function MoreHelpButton({selected=null} : {selected?: number}) {
       {t("Show more help!")}
     </Button>
   }
+  return <></>
 }
 
 /** Placeholder that takes the same space as a button. */
@@ -83,21 +84,6 @@ export function ChatButtons ({counter=undefined, setCounter=()=>{}, introMessage
   const readIntro = useSelector(selectReadIntro(gameId, worldId))
 
   return <div className="button-row">
-    {/* { ((mobile && !worldId) || worldId && !levelId) &&
-      // Start button appears only on world selection and level 0.
-      <Button className="btn"
-          title=""
-          to={worldId ? `/${gameId}/world/${worldId}/level/1` : ''}
-          onClick={() => {
-            if (!worldId) {
-              console.log('setting `readIntro` to true')
-              setPage(1)
-              dispatch(changedReadIntro({game: gameId, readIntro: true}))
-            }
-          }} >
-        Start&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
-      </Button>
-    } */}
     {!levelId && (readIntro || (counter >= introMessages.length) ?
       ((worldId || mobile) &&
         <>
@@ -138,9 +124,8 @@ export function ChatButtons ({counter=undefined, setCounter=()=>{}, introMessage
           Skip all
         </Button>
       </>
-
     )}
-    { worldId && levelId && <MoreHelpButton /> }
+    { (worldId && levelId) ? <MoreHelpButton /> : <></> }
   </div>
 }
 
