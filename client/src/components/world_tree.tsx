@@ -197,47 +197,6 @@ export const downloadFile = ({ data, fileName, fileType } :
   a.remove()
 }
 
-/** The menu that is shown next to the world selection graph */
-export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
-  const { t, i18n } = useTranslation()
-  const {gameId} = React.useContext(GameIdContext)
-  const difficulty = useSelector(selectDifficulty(gameId))
-  const dispatch = useAppDispatch()
-  const { mobile } = React.useContext(PreferencesContext)
-
-
-  function label(x : number) {
-    return x == 0 ? t("none") : x == 1 ? t("relaxed") : t("regular")
-  }
-
-
-  return <nav className={`world-selection-menu${mobile ? '' : ' desktop'}`}>
-    <div className="slider-wrap">
-      <span className="difficulty-label">{t("Rules")}
-        <FontAwesomeIcon icon={rulesHelp ? faXmark : faCircleQuestion} className='helpButton' onClick={() => (setRulesHelp(!rulesHelp))}/>
-      </span>
-      <Slider
-        orientation="vertical"
-        title={t("Game Rules")}
-        min={0} max={2}
-        aria-label={t("Game Rules")}
-        value={difficulty}
-        marks={[
-          {value: 0, label: label(0)},
-          {value: 1, label: label(1)},
-          {value: 2, label: label(2)}
-        ]}
-        valueLabelFormat={label}
-        getAriaValueText={label}
-        valueLabelDisplay="off"
-        onChange={(ev, val: number) => {
-          dispatch(changedDifficulty({game: gameId, difficulty: val}))
-        }}
-        ></Slider>
-    </div>
-  </nav>
-}
-
 export function computeWorldLayout(worlds) {
   let elements = []
   for (let id in worlds.nodes) {
@@ -360,7 +319,7 @@ export function WorldTreePanel ({visible = true}) {
 
   let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : null
 
-  return <div className={`column${visible ? '' : ' hidden'}`}>
+  return <div className={`${visible ? '' : 'hidden'}`}>
       {/* <WorldSelectionMenu rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} /> */}
       { gameInfo.data ?
       <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"

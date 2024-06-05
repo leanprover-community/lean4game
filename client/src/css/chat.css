@@ -18,7 +18,24 @@
 }
 
 .message.deleted-hint {
-  background-color: #eee;
+  background-color: #EEE;
   color: #777;
-  box-shadow: .0em .0em .5em .2em #eee;
+  box-shadow: .0em .0em .5em .2em #EEE;
  }
+
+.message.success {
+  color: #000;
+  background-color: #E5FFDD;
+}
+
+
+.button-row > *:not(:last-child) {
+  /* display: block; */
+  margin-right: .2rem;
+}
+
+.button-row .btn-placeholder {
+  display: inline-block;
+  flex: 1;
+  margin: 0;
+}

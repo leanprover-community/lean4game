@@ -93,30 +93,17 @@ export const PreferencesContext = React.createContext<IPreferencesContext>({
   setLanguage: () => {},
 })
 
-export const WorldLevelIdContext = React.createContext<{
-  worldId : string,
-  levelId: number
-}>({
-  worldId : null,
-  levelId: 0,
-})
 
-/** Context to keep highlight selected proof step and corresponding chat messages. */
-export const SelectionContext = React.createContext<{
+export const ChatContext = React.createContext<{
   selectedStep : number,
   setSelectedStep: React.Dispatch<React.SetStateAction<number>>
-}>({
-  selectedStep : undefined,
-  setSelectedStep: () => {}
-})
-
-/** Context for deleted Hints that are visible just a bit after they've been deleted */
-export const DeletedChatContext = React.createContext<{
   deletedChat : GameHint[],
   setDeletedChat: React.Dispatch<React.SetStateAction<Array<GameHint>>>
   showHelp : Set<number>,
   setShowHelp: React.Dispatch<React.SetStateAction<Set<number>>>
 }>({
+  selectedStep : undefined,
+  setSelectedStep: () => {},
   deletedChat: undefined,
   setDeletedChat: () => {},
   showHelp: undefined,

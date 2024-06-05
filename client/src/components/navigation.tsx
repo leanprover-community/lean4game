@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import '../css/navigation.css'
 import { PopupContext } from './popup/popup'
 import { useSelector } from 'react-redux'
-import { selectCompleted, selectDifficulty, selectProgress } from '../state/progress'
+import { selectCompleted, selectDifficulty, selectProgress, selectReadIntro } from '../state/progress'
 import lean4gameConfig from '../config.json'
 import { Flag } from './flag'
 import { useAppSelector } from '../hooks'
@@ -34,8 +34,9 @@ export const NavButton: React.FC<{
   href?: string
   inverted?: boolean
   disabled?: boolean
-}> = ({icon, iconElement, text, onClick=()=>{}, title, href=null, inverted=false, disabled=false}) => {
-  return <a className={`nav-button btn${inverted?' btn-inverted':''}${disabled?' btn-disabled':''}`} onClick={disabled?null:onClick} href={disabled?null:href} title={title}>
+  className?: string
+}> = ({icon, iconElement, text, onClick=()=>{}, title, href=null, inverted=false, disabled=false, className=''}) => {
+  return <a className={`${className} nav-button btn${inverted?' btn-inverted':''}${disabled?' btn-disabled':''}`} onClick={disabled?null:onClick} href={disabled?null:href} title={title}>
     {iconElement ?? (icon && <FontAwesomeIcon icon={icon} />)}{text && <>&nbsp;{text}</>}
   </a>
 }
@@ -82,6 +83,9 @@ function MobileNavigationOverview () {
   const {page, setPage} = useContext(PageContext)
   const { setPopupContent } = useContext(PopupContext)
 
+  const { gameId, worldId } = useContext(GameIdContext)
+  const readIntro = useSelector(selectReadIntro(gameId, worldId))
+
   return <div className="nav-content">
     <div className="nav-title-left">
       <NavButton
@@ -106,6 +110,7 @@ function MobileNavigationOverview () {
           text={(page==0) ? t("Start") : null}
           icon={(page==0) ? null : faBook}
           onClick={() => setPage(page+1)}
+          disabled={!readIntro}
           inverted={true} />
       }
     </div>
@@ -123,13 +128,7 @@ function DesktopNavigationLevel () {
   const difficulty = useSelector(selectDifficulty(gameId))
   const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
-  /** toggle input mode if allowed */
-  function toggleInputMode(ev: React.MouseEvent) {
-    if (!lockEditorMode) {
-      setTypewriterMode(!typewriterMode)
-      console.log('test')
-    }
-  }
+  const readIntro = useSelector(selectReadIntro(gameId, worldId))
 
   const worldTitle = gameInfo.data?.worlds.nodes[worldId]?.title
   const levelTitle = ((levelId == 0) ?
@@ -166,21 +165,13 @@ function DesktopNavigationLevel () {
           icon={faHome}
           text={t("Leave World")}
           inverted={true}
-          disabled={difficulty == 0 || !completed}
+          disabled={levelId > 0 && difficulty == 2 && !completed}
           href={`#/${gameId}`} /> :
         <NavButton
           icon={faArrowRight}
           text={levelId == 0 ? t("Start") : t("Next")} inverted={true}
-          disabled={difficulty == 0 || !completed}
+          disabled={levelId == 0 ? !readIntro : (difficulty == 2 && !completed)}
           href={`#/${gameId}/world/${worldId}/level/${levelId + 1}`} />
-      }
-      { levelId > 0 &&
-        <NavButton
-          icon={(typewriterMode && !lockEditorMode) ? faCode : faTerminal}
-          inverted={true}
-          disabled={levelId == 0 || lockEditorMode}
-          onClick={(ev) => toggleInputMode(ev)}
-          title={lockEditorMode ? t("Editor mode is enforced!") : typewriterMode ? t("Editor mode") : t("Typewriter mode")} />
       }
     </div>
   </div>
@@ -227,6 +218,8 @@ export function Navigation () {
   const levelInfo = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
   const difficulty = useSelector(selectDifficulty(gameId))
   const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
+
+  const readIntro = useSelector(selectReadIntro(gameId, worldId))
 
   const [navOpen, setNavOpen] = useState(false)
   const [langNavOpen, setLangNavOpen] = useState(false)
@@ -280,6 +273,7 @@ export function Navigation () {
             // Show all languages the game is available in
             gameInfo.data?.tile?.languages.map(iso =>
               <NavButton
+                key={`lang-selection-${iso}`}
                 iconElement={<Flag iso={iso} />}
                 text={lean4gameConfig.newLanguages[iso]?.name}
                 onClick={() => {setLanguage(iso)}}
@@ -287,6 +281,7 @@ export function Navigation () {
             // Show all languages the interface is available in (e.g. landing page)
             Object.entries(lean4gameConfig.newLanguages).map(([iso, val]) =>
               <NavButton
+                key={`lang-selection-${iso}`}
                 iconElement={<Flag iso={iso} />}
                 text={lean4gameConfig.newLanguages[iso]?.name}
                 onClick={() => {setLanguage(iso)}}
@@ -302,12 +297,12 @@ export function Navigation () {
                 icon={faHome}
                 text={t("Leave World")}
                 inverted={true}
-                disabled={difficulty == 0 || !completed}
+                disabled={levelId > 0 && difficulty == 2 && !completed}
                 href={`#/${gameId}`} /> :
               <NavButton
                 icon={faArrowRight}
                 text={levelId == 0 ? t("Start") : t("Next")} inverted={true}
-                disabled={difficulty == 0 || !completed}
+                disabled={levelId == 0 ? !readIntro : (difficulty == 2 && !completed)}
                 href={`#/${gameId}/world/${worldId}/level/${levelId + 1}`} />
             )}
             {mobile && levelId > 0 &&

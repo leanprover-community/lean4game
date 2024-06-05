@@ -17,10 +17,11 @@ import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } fro
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { DeletedChatContext, PageContext, MonacoEditorContext, ProofContext } from './context'
+import { ChatContext, PageContext, MonacoEditorContext, ProofContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
+import { GameIdContext } from '../../app'
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;
@@ -81,8 +82,8 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
-  const model = editor.getModel()
-  const uri = model.uri.toString()
+  const model = editor?.getModel()
+  const uri = model?.uri.toString()
 
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
@@ -94,8 +95,10 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   // The context storing all information about the current proof
   const {proof, setProof, interimDiags, setInterimDiags, setCrashed} = React.useContext(ProofContext)
 
+  const {gameId, worldId, levelId} = React.useContext(GameIdContext)
+
   // state to store the last batch of deleted messages
-  const {setDeletedChat} = React.useContext(DeletedChatContext)
+  const {setDeletedChat} = React.useContext(ChatContext)
 
   const rpcSess = React.useContext(RpcContext)
 
@@ -106,13 +109,13 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
     setDeletedChat([])
 
-    const pos = editor.getPosition()
+    const pos = editor?.getPosition()
     if (typewriterInput) {
       setProcessing(true)
-      editor.executeEdits("typewriter", [{
+      editor?.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           pos,
-          editor.getModel().getFullModelRange().getEndPosition()
+          editor?.getModel()?.getFullModelRange()?.getEndPosition()
         ),
         text: typewriterInput.trim() + "\n",
         forceMoveMarkers: false
@@ -122,7 +125,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       loadGoals(rpcSess, uri, setProof, setCrashed)
     }
 
-    editor.setPosition(pos)
+    editor?.setPosition(pos)
   }, [typewriterInput, editor])
 
   useEffect(() => {
@@ -133,8 +136,9 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   /* Load proof on start/switching to typewriter */
   useEffect(() => {
+    setProof(null)
     loadGoals(rpcSess, uri, setProof, setCrashed)
-  }, [])
+  }, [gameId, worldId, levelId])
 
   /** If the last step has an error, add the command to the typewriter. */
   useEffect(() => {
@@ -157,7 +161,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       // TODO: loadAllGoals()
       if (!hasErrors(params.diagnostics)) {
         //setTypewriterInput("")
-        editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
+        editor?.setPosition(editor?.getModel()?.getFullModelRange()?.getEndPosition())
       }
     } else {
       // console.debug(`expected uri: ${uri}, got: ${params.uri}`)

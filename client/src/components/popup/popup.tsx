@@ -48,9 +48,9 @@ export function Popup () {
   return <div className="modal-wrapper">
   <div className="modal-backdrop" onClick={closePopup} />
   <div className="modal">
-    <NavButton icon={faXmark}
+    {/* <NavButton icon={faXmark}
       onClick={closePopup}
-      inverted={true} />
+      inverted={true} /> */}
     <div className="codicon codicon-close modal-close" onClick={closePopup}></div>
     {Popups[popupContent]}
   </div>

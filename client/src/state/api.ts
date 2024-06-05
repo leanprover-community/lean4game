@@ -85,7 +85,7 @@ export const apiSlice = createApi({
     }),
     loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
       query: ({game, world, level}) => {
-        if (world) {
+        if (world && level > 0) {
           return `${game}/level__${world}__${level}.json`
         } else {
           return `${game}/inventory.json`

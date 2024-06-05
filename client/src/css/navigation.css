@@ -75,3 +75,23 @@ nav {
 .dropdown .svg-inline--fa {
   width: 1.8rem;
 }
+
+.btn-right {
+  float: right;
+  margin: 0.2rem;
+}
+
+.btn-input-mode {
+  position: absolute;
+  right: 0.4rem;
+  z-index: 5;
+  top: 0.4rem;
+  margin: 0;
+  border: 1px solid var(--clr-primary);
+  background-color: #eee;
+  font-size: .7rem;
+  /* box-shadow: .0em .0em .4em .1em var(--clr-primary); */
+  /* box-shadow: -.1rem .3rem .3rem 0 var(--clr-primary); */
+  /* border-top-right-radius: 0;
+  border-bottom-right-radius: 0; */
+}

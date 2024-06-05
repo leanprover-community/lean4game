@@ -7,7 +7,7 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { changedOpenedIntro, selectOpenedIntro } from '../state/progress'
+import { changedReadIntro, selectReadIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { PageContext, PreferencesContext } from './infoview/context'
@@ -55,7 +55,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
         <Button className="btn" to=""
           title="" onClick={() => {
             setPageNumber(1);
-            dispatch(changedOpenedIntro({game: gameId, openedIntro: true}))
+            dispatch(changedReadIntro({game: gameId, readIntro: true}))
           }}>
           Start&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
         </Button>
@@ -66,7 +66,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
 
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
-  const {gameId} = React.useContext(GameIdContext)
+  const {gameId, worldId} = React.useContext(GameIdContext)
 
   // Load the namespace of the game
   i18next.loadNamespaces(gameId)
@@ -78,13 +78,13 @@ function Welcome() {
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   // For mobile only
-  const openedIntro = useAppSelector(selectOpenedIntro(gameId))
+  const readIntro = useAppSelector(selectReadIntro(gameId, worldId))
 
   const {page, setPage} = React.useContext(PageContext)
 
-  // TODO: recover `openedIntro` functionality
+  // TODO: recover `readIntro` functionality
 
-  // const [pageNumber, setPageNumber] = React.useState(openedIntro ? 1 : 0)
+  // const [pageNumber, setPageNumber] = React.useState(readIntro ? 1 : 0)
 
   // pop-ups
   const [eraseMenu, setEraseMenu] = React.useState(false)

@@ -8,7 +8,6 @@ import { createHashRouter, RouterProvider, Route, redirect } from "react-router-
 import ErrorPage from './components/error_page'
 import Welcome from './components/welcome'
 import LandingPage from './components/landing_page'
-import Level from './components/level'
 import './i18n';
 import Game from './components/game'
 

@@ -46,9 +46,14 @@
   background-color: rgb(255, 242, 190);
 }
 
+.inventory .item.current-world {
+  background-color: rgb(250, 231, 255);
+}
+
 .inventory .item.recent {
   background-color: rgb(242, 190, 255);
 }
+
 .inventory .item:not(.locked), .inventory .item.enabled {
   cursor: pointer;
 }

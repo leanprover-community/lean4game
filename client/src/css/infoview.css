@@ -70,13 +70,6 @@
   flex-direction: column;
 }
 
-.typewriter-interface .proof .MuiCircularProgress-root {
-  left: 50%;
-  position: relative;
-  margin-left: -20px;
-  margin-bottom: 0.6em;
-}
-
 .typewriter .typewriter-input {
   flex: 1;
 }
@@ -143,20 +136,10 @@
 }
 
 
-/* Push the goals to the bottom for now, until we insert the proof history above. */
-.typewriter-interface .content {
-  display: flex;
-  flex-direction: column;
-  scroll-behavior: smooth;
-}
 
 /* TODO this is in the wrong file */
 .chat {
   scroll-behavior: smooth;
-}
-
-.typewriter-interface .content .tmp-pusher {
-  flex: 1;
 }
 
 .exercise .command {

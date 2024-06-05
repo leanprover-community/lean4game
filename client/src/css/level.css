@@ -5,12 +5,12 @@
   /* display: flex; */
 }
 
-.inventory-panel, .exercise-panel, .doc-panel, .introduction-panel {
+/* .inventory-panel, .exercise-panel, .doc-panel, .introduction-panel {
   height: 100%;
   width: 100%;
   overflow: auto;
   position: relative;
-}
+} */
 
 .infoview {
   padding-top: 1em;
@@ -44,11 +44,11 @@
   padding-top: 0em;
 }
 
-.exercise {
+/* .exercise {
   flex: 1 1 auto;
   display: flex;
   flex-flow: column;
-}
+} */
 
 .codeview {
   flex: 1 1 auto;
@@ -216,12 +216,6 @@ td code  {
   padding: .5em;
 }
 
-/* .exercise-panel {
-  display: flex;
-  flex-flow: column;
-  height: 100%;
-} */
-
 /* .button-row.mobile {
   margin: .5rem;
   padding-top: .2rem;
@@ -236,17 +230,18 @@ td code  {
 } */
 
 
-.typewriter-interface {
+.exercise-content {
   display: flex;
   flex-flow: column;
   height: 100%;
+  z-index: 1;
 }
 
 .typewriter {
   flex: 0 1 auto;
 }
 
-.typewriter-interface .content {
+.exercise-content {
   flex: 1 1 auto;
   overflow-y: scroll;
   padding: 0;
@@ -332,22 +327,31 @@ td code  {
   justify-content: center;
 }
 
-.typewriter-interface .content, .world-image-container.empty {
+.exercise {
   background-color: #eee;
+  position: relative;
 }
 
-.world-image-container {
+.world-image {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 0px; /* somehow this has a desired affect, but why? */
-  overflow: hidden;
+  position: absolute;
+  z-index: 0;
+  /* min-height: 0px;*/ /* somehow this has a desired affect, but why? */
 }
 
-.world-image-container img.contain {
+.world-image img.contain {
+  height: 100%;
+  width: 100%;
   object-fit: contain;
+  object-position: top center;
+  pointer-events: none;
 }
 
-.world-image-container.center {
+.world-image.center {
   justify-content: center;
 }
 
@@ -357,8 +361,31 @@ td code  {
   object-fit: cover;
 }
 
-.typewriter-interface .proof {
+.proof {
+  z-index: 2;
   background-color: #fff;
+}
+
+.exercise-content .tmp-pusher {
+  flex: 1;
+}
+
+.exercise-content {
+  background: none;
+}
+
+/* Push the goals to the bottom for now, until we insert the proof history above. */
+.exercise-content {
+  display: flex;
+  flex-direction: column;
+  scroll-behavior: smooth;
+}
+
+.exercise-content .proof .MuiCircularProgress-root {
+  left: 50%;
+  position: relative;
+  margin-left: -20px;
+  margin-bottom: 0.6em;
 }
 
 .toggle-width {

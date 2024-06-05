@@ -59,7 +59,7 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
 
         <td>
           {data.languages.map((lang) => (
-            <Flag iso={lang} showTitle={true} />
+            <Flag key={lang} iso={lang} showTitle={true} />
           ))}
         </td>
       </tr>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Outlet, useParams, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -13,7 +13,7 @@ import { PageContext, PreferencesContext} from './components/infoview/context';
 import UsePreferences from "./state/hooks/use_preferences"
 import { Navigation } from './components/navigation';
 import { useSelector } from 'react-redux';
-import { changeTypewriterMode, selectOpenedIntro, selectTypewriterMode } from './state/progress';
+import { changeTypewriterMode, selectReadIntro, selectTypewriterMode } from './state/progress';
 import { useAppDispatch } from './hooks';
 import { Popup, PopupContext } from './components/popup/popup';
 import { useGetGameInfoQuery } from './state/api';
@@ -45,7 +45,7 @@ function App() {
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const openedIntro = useSelector(selectOpenedIntro(gameId))
+  const readIntro = useSelector(selectReadIntro(gameId, worldId))
 
   // mobile only: game intro should only be shown once and skipped afterwards
   useEffect(() => {
@@ -53,14 +53,14 @@ function App() {
       console.log('setting page to 1')
       setPage(1)
     } else {
-      if (openedIntro && page == 0) {
+      if (readIntro && page == 0) {
         console.log('setting page to 1')
         setPage(1)
       } else {
         // setPage(0)
       }
     }
-  }, [openedIntro, worldId, levelId])
+  }, [worldId, levelId])
 
   // option to pass language as `?lang=de` in the URL
   useEffect(() => {

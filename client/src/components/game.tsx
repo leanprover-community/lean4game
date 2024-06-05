@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import Split from 'react-split'
 import { Box, CircularProgress } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -7,10 +7,10 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { changedOpenedIntro, selectOpenedIntro } from '../state/progress'
+import { changeTypewriterMode, changedReadIntro, changedSelection, codeEdited, selectCode, selectReadIntro, selectSelections, selectTypewriterMode } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
 import { Button } from './button'
-import { PageContext, PreferencesContext } from './infoview/context'
+import { ChatContext, PageContext, PreferencesContext, ProofContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
 import { ErasePopup } from './popup/erase'
 import { InfoPopup } from './popup/info'
@@ -22,25 +22,25 @@ import { WorldTreePanel } from './world_tree'
 import '../css/game.css'
 import '../css/welcome.css'
 import '../css/level.css'
-import { Hint } from './hints'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { LoadingIcon } from './utils'
 import { ChatPanel } from './chat'
 import { DualEditor } from './infoview/main'
-import { Level } from './level'
+import { Level, LevelWrapper } from './level'
+import { GameHint, ProofState } from './infoview/rpc_api'
+import { useSelector } from 'react-redux'
+import { Diagnostic } from 'vscode-languageserver-types'
 
 /** main page of the game showing among others the tree of worlds/levels */
 function Game() {
-
-  const codeviewRef = useRef<HTMLDivElement>(null)
 
   const { gameId, worldId, levelId } = React.useContext(GameIdContext)
 
   // Load the namespace of the game
   i18next.loadNamespaces(gameId)
 
-  const {mobile} = React.useContext(PreferencesContext)
+  const {mobile} = useContext(PreferencesContext)
   const {isSavePreferences, language, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
@@ -48,21 +48,35 @@ function Game() {
 
   const levelInfo = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
 
+  const {page, setPage} = useContext(PageContext)
 
-  const {page, setPage} = React.useContext(PageContext)
+  // TODO: recover `readIntro` functionality
 
-  // TODO: recover `openedIntro` functionality
+  // const [pageNumber, setPageNumber] = React.useState(readIntro ? 1 : 0)
 
-  // const [pageNumber, setPageNumber] = React.useState(openedIntro ? 1 : 0)
+  // When deleting the proof, we want to keep to old messages around until
+  // a new proof has been entered. e.g. to consult messages coming from dead ends
+  const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
+  // A set of row numbers where help is displayed
+  const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
+  // Select and highlight proof steps and corresponding hints
+  // TODO: with the new design, there is no difference between the introduction and
+  // a hint at the beginning of the proof...
+  const [selectedStep, setSelectedStep] = useState<number>(null)
 
-  // pop-ups
-  const [eraseMenu, setEraseMenu] = React.useState(false)
-  const [impressum, setImpressum] = React.useState(false)
-  const [privacy, setPrivacy] = React.useState(false)
-  const [info, setInfo] = React.useState(false)
-  const [rulesHelp, setRulesHelp] = React.useState(false)
-  const [uploadMenu, setUploadMenu] = React.useState(false)
-  const [preferencesPopup, setPreferencesPopup] = React.useState(false)
+  // The state variables for the `ProofContext`
+  const [proof, setProof] = useState<ProofState>({steps: [], diagnostics: [], completed: false, completedWithWarnings: false})
+  const [interimDiags, setInterimDiags] = useState<Array<Diagnostic>>([])
+  const [isCrashed, setIsCrashed] = useState<Boolean>(false)
+
+
+  const dispatch = useAppDispatch()
+
+  const typewriterMode = useSelector(selectTypewriterMode(gameId))
+  const setTypewriterMode = (newTypewriterMode: boolean) => dispatch(changeTypewriterMode({game: gameId, typewriterMode: newTypewriterMode}))
+
+  const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
+  const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
 
   // set the window title
   useEffect(() => {
@@ -71,27 +85,40 @@ function Game() {
     }
   }, [gameInfo.data?.title])
 
-  return mobile ?
-    <div className="app-content mobile">
-      {<>
-        <ChatPanel visible={worldId ? (levelId == 0 && page == 1) :(page == 0)} />
-        { worldId ?
-          <Level visible={levelId > 0 && page == 1} /> :
-          <WorldTreePanel visible={page == 1} />
+  // Delete the current proof on changing level
+  useEffect(() => {
+    setProof(null)
+    setSelectedStep(null)
+    setDeletedChat([])
+    setShowHelp(new Set())
+  }, [gameId, worldId, levelId])
+
+  return <ChatContext.Provider value={{selectedStep, setSelectedStep, deletedChat, setDeletedChat, showHelp, setShowHelp}}>
+    <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
+    { mobile ?
+      <div className="app-content mobile">
+        {<>
+          <ChatPanel visible={worldId ? (levelId == 0 && page == 1) :(page == 0)} />
+          { worldId ?
+            (levelId > 0 && <LevelWrapper visible={page == 1} />) :
+            <WorldTreePanel visible={page == 1} />
+          }
+          <InventoryPanel visible={page == 2} />
+        </>
         }
-        <InventoryPanel visible={page == 2} />
-      </>
-      }
-    </div>
-  :
-    <Split className="app-content" minSize={0} snapOffset={200}  sizes={[25, 50, 25]}>
-      <ChatPanel />
-      <div>
-        {/* Note: apparently without this `div` the split panel bugs out. */}
-        {worldId ? <Level /> : <WorldTreePanel /> }
       </div>
-      <InventoryPanel />
-    </Split>
+    :
+      <Split className="app-content" minSize={0} snapOffset={200}  sizes={[25, 50, 25]}>
+        <ChatPanel />
+        <div className="column">
+          {/* Note: apparently without this `div` the split panel bugs out. */}
+          {worldId ? (levelId > 0 && <LevelWrapper />) : <WorldTreePanel /> }
+        </div>
+        <InventoryPanel />
+        </Split>
+    }
+    </ProofContext.Provider>
+  </ChatContext.Provider>
 
 }
 

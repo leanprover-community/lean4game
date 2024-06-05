@@ -12,7 +12,6 @@ import { store } from '../state/store';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
-import { WorldLevelIdContext } from './infoview/context';
 import { NavButton } from './navigation';
 import { LoadingIcon } from './utils';
 
@@ -37,16 +36,24 @@ const InventoryContext = createContext<{
 
 /**
  */
-function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc, recent=false }) {
+function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc } :
+    { item: InventoryTile,
+      name: any,
+      displayName: any,
+      locked: any,
+      disabled: any,
+      newly: any,
+      showDoc: any
+    }) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
-               disabled ? <FontAwesomeIcon icon={faBan} /> : item.st
+               disabled ? <FontAwesomeIcon icon={faBan} /> : <></>
   const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
   // Note: This is somewhat a hack as the statement of lemmas comes currently in the form
   // `Namespace.statement_name (x y : Nat) : some type`
   const title = locked ? t("Not unlocked yet") :
                 disabled ? t("Not available in this level") : (item.altTitle ? item.altTitle.substring(item.altTitle.indexOf(' ') + 1) : '')
 
-  const { gameId } = React.useContext(GameIdContext)
+  const { gameId, worldId, levelId } = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
 
   // local state to show checkmark after pressing the copy button
@@ -67,7 +74,10 @@ function InventoryItem({item, name, displayName, locked, disabled, newly, showDo
     ev.stopPropagation()
   }
 
-  return <div className={`item ${className}${(difficulty == 0) ? ' enabled' : ''}${recent ? ' recent' : ''}`} onClick={handleClick} title={title}>
+  return <div className={`item ${className}` +
+      `${(difficulty == 0) ? ' enabled' : ''}` +
+      `${item.world == worldId && item.level == levelId - 1 ? ' recent' : ''}` +
+      `${item.world == worldId && item.level < levelId ? ' current-world' : ''}` } onClick={handleClick} title={title}>
     {icon} {displayName}
     <div className="copy-button" onClick={copyItemName}>
       {copied ? <FontAwesomeIcon icon={faCheck} /> : <FontAwesomeIcon icon={faClipboard} />}
@@ -92,7 +102,7 @@ function InventoryList({ items, tab=null, setTab=()=>{} } :
 
   const [categories, setCategories] = useState<Array<string>>([])
   const [modifiedItems, setModifiedItems] = useState<Array<InventoryTile>>([])
-  const [recentItems, setRecentItems] = useState<Array<InventoryTile>>([])
+  const [currentWorldItems, setCurrentWorldItems] = useState<Array<InventoryTile>>([])
 
 
   useEffect(() => {
@@ -111,7 +121,8 @@ function InventoryList({ items, tab=null, setTab=()=>{} } :
     let _modifiedItems : InventoryTile[] = items?.map(tile => inventory.includes(tile.name) ? {...tile, locked: false} : tile)
     setModifiedItems(_modifiedItems)
     // Item(s) proved in the preceeding level
-    setRecentItems(_modifiedItems.filter(x => x.world == worldId && x.level == levelId - 1))
+    setCurrentWorldItems(_modifiedItems.filter(x => x.world == worldId && x.level < levelId))
+    // setRecentItems(_modifiedItems.filter(x => x.world == worldId && x.level == levelId - 1))
 
   }, [items, inventory])
 
@@ -120,7 +131,7 @@ function InventoryList({ items, tab=null, setTab=()=>{} } :
       <div className="tab-bar">
         {categories.map((cat) => {
           let hasNew = modifiedItems.filter(item => item.new && (cat == item.category)).length > 0
-          return <div key={`category-${cat}`} className={`tab${cat == (tab ?? categories[0]) ? " active": ""}${hasNew ? ' new': ''}${recentItems.map(x => x.category).includes(cat) ? ' recent': ''}`}
+          return <div key={`category-${cat}`} className={`tab${cat == (tab ?? categories[0]) ? " active": ""}${hasNew ? ' new': ''}${currentWorldItems.map(x => x.category).includes(cat) ? ' recent': ''}`}
             onClick={() => { setTab(cat) }}>{cat}</div>})}
       </div>}
     <div className="inventory-list">
@@ -134,7 +145,6 @@ function InventoryList({ items, tab=null, setTab=()=>{} } :
               showDoc={() => {setDocTile(item)}}
               name={item.name} displayName={item.displayName} locked={difficulty > 0 ? item.locked : false}
               disabled={item.disabled}
-              recent={recentItems.map(x => x.name).includes(item.name)}
               newly={item.new} />
         })
       }
@@ -155,7 +165,6 @@ export function Inventory () {
 
   /** Helper function to find if a list of tiles comprises any new elements. */
   function containsNew(tiles: InventoryTile[]) {
-    console.log(tiles)
     return tiles?.filter(item => item.new).length > 0
   }
 

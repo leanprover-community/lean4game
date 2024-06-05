@@ -20,25 +20,26 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
 import { GameIdContext } from '../../app';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { LevelInfo, useGetGameInfoQuery } from '../../state/api';
+import { LevelInfo, useGetGameInfoQuery, useLoadLevelQuery } from '../../state/api';
 import { changedInventory, levelCompleted, selectCode, selectCompleted, selectInventory } from '../../state/progress';
 import Markdown from '../markdown';
 
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
-import { DeletedChatContext, PageContext, PreferencesContext, MonacoEditorContext, ProofContext, SelectionContext, WorldLevelIdContext } from './context';
+import { ChatContext, PageContext, PreferencesContext, MonacoEditorContext, ProofContext } from './context';
 import { Typewriter, getInteractiveDiagsAt, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { store } from '../../state/store';
-import { Hints, MoreHelpButton, filterHints } from '../hints';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
+import { useContext } from 'react';
+import { Hints, MoreHelpButton, filterHints } from '../chat';
 
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
@@ -49,7 +50,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
   const { typewriterMode, lockEditorMode } = React.useContext(PageContext)
   return <>
     <div className={(typewriterMode && !lockEditorMode) ? 'hidden' : ''}>
-      <ExerciseStatement data={level} showLeanStatement={true} />
+      {/* <ExerciseStatement showLeanStatement={true} /> */}
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
     {ec ?
@@ -135,23 +136,24 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
  *
  * If `showLeanStatement` is true, it will additionally display the lean code.
  */
-function ExerciseStatement({ data, showLeanStatement = false }) {
+export function ExerciseStatement({ showLeanStatement = false }) {
   let { t } = useTranslation()
-  const {gameId} = React.useContext(GameIdContext)
+  const {gameId, worldId, levelId } = React.useContext(GameIdContext)
+  const levelInfo = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
 
-  if (!(data?.descrText || data?.descrFormat)) { return <></> }
+  if (!(levelInfo.data?.descrText || levelInfo.data?.descrFormat)) { return <></> }
   return <>
     <div className="exercise-statement">
-      {data?.descrText ?
+      {levelInfo.data?.descrText ?
         <Markdown>
-          {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + t(data?.descrText, {ns: gameId})}
-        </Markdown> : data?.displayName &&
+          {(levelInfo.data?.displayName ? `**${t("Theorem")}** \`${levelInfo.data?.displayName}\`: ` : '') + t(levelInfo.data?.descrText, {ns: gameId})}
+        </Markdown> : levelInfo.data?.displayName &&
         <Markdown>
-          {`**${t("Theorem")}** \`${data?.displayName}\``}
+          {`**${t("Theorem")}** \`${levelInfo.data?.displayName}\``}
         </Markdown>
       }
-      {data?.descrFormat && showLeanStatement &&
-        <p><code className="lean-code">{data?.descrFormat}</code></p>
+      {levelInfo.data?.descrFormat && showLeanStatement &&
+        <p><code className="lean-code">{levelInfo.data?.descrFormat}</code></p>
       }
     </div>
   </>
@@ -162,13 +164,10 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
 export function Main(props: { world: string, level: number, data: LevelInfo}) {
   let { t } = useTranslation()
   const ec = React.useContext(EditorContext);
-  const {gameId} = React.useContext(GameIdContext)
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  const {gameId, worldId, levelId} = React.useContext(GameIdContext)
 
   const { proof, setProof } = React.useContext(ProofContext)
-  const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
-  const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
-
+  const {selectedStep, setSelectedStep, setDeletedChat, showHelp, setShowHelp} = React.useContext(ChatContext)
 
   function toggleSelection(line: number) {
     return (ev) => {
@@ -249,11 +248,11 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
         </div>
       }
       <Infos />
-      <Hints hints={proof?.steps[curPos?.line]?.goals[0]?.hints}
+      {/* <Hints hints={proof?.steps[curPos?.line]?.goals[0]?.hints}
         showHidden={showHelp.has(curPos?.line)} step={curPos?.line}
         selected={selectedStep} toggleSelection={toggleSelection(curPos?.line)}
         lastLevel={curPos?.line == proof?.steps.length - 1}/>
-      <MoreHelpButton selected={curPos?.line}/>
+      <MoreHelpButton selected={curPos?.line}/> */}
     </div>
   }
 
@@ -403,23 +402,21 @@ export function TypewriterInterfaceWrapper(props: { world: string, level: number
 export function TypewriterInterface({props}) {
   let { t } = useTranslation()
   const ec = React.useContext(EditorContext)
-  const {gameId} = React.useContext(GameIdContext)
+  const {gameId,worldId, levelId} = React.useContext(GameIdContext)
   const editor = React.useContext(MonacoEditorContext)
   const model = editor.getModel()
   const uri = model.uri.toString()
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
   let image: string = gameInfo.data?.worlds.nodes[worldId].image
 
 
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
-  const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
+  const { selectedStep, setSelectedStep, setDeletedChat, showHelp, setShowHelp } = React.useContext(ChatContext)
   const {mobile} = React.useContext(PreferencesContext)
   const { proof, setProof, crashed, setCrashed, interimDiags } = React.useContext(ProofContext)
   const { setTypewriterInput } = React.useContext(PageContext)
-  const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
   // const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
@@ -513,19 +510,19 @@ export function TypewriterInterface({props}) {
   return <div className="typewriter-interface">
     <RpcContext.Provider value={rpcSess}>
     <div className="content">
-      <div className='world-image-container empty'>
+      {/* <div className='world-image-container empty'>
         {image &&
           <img className="contain" src={path.join("data", gameId, image)} alt="" />
         }
 
-      </div>
-      <div className="tmp-pusher">
-        {/* <div className="world-image-container empty">
+      </div> */}
+      {/* <div className="tmp-pusher">
+        <div className="world-image-container empty">
 
-        </div> */}
-      </div>
+        </div>
+      </div> */}
       <div className='proof' ref={proofPanelRef}>
-        <ExerciseStatement data={props.data} />
+        {/* <ExerciseStatement /> */}
         {crashed ? <div>
           <p className="crashed_message">{t("Crashed! Go to editor mode and fix your proof! Last server response:")}</p>
           {interimDiags.map(diag => {
@@ -569,8 +566,7 @@ export function TypewriterInterface({props}) {
                   }
                   {mobile &&
                     <Hints key={`hints-${i}`}
-                      hints={filteredHints} showHidden={showHelp.has(i)} step={i}
-                      selected={selectedStep} toggleSelection={toggleSelectStep(i)}/>
+                      hints={filteredHints.map(hint => ({hint: hint, step: i}))} />
                   }
                   {/* <GoalsTabs proofStep={step} last={i == proof?.steps.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/> */}
                   {!(isLastStepWithErrors(proof, i)) &&
