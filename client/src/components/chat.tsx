@@ -14,8 +14,8 @@ import Markdown from './markdown'
 import { useSelector } from 'react-redux'
 import { lastStepHasErrors } from './infoview/goals'
 
-import '../css/level.css'
 import '../css/chat.css'
+import { hasErrors } from './infoview/typewriter'
 
 /** Split a string by double newlines and filters out empty segments. */
 function splitIntro (intro : string) {
@@ -195,7 +195,7 @@ export function Hint({hint, step=null, conclusion=false} : GameHintWithStep) {
   // render all hints
   return <div className={`message ${conclusion ? 'success' : hint.hidden ? 'warning' : 'information'} step-${step}` +
       ((selectedStep !== null && step == selectedStep) ? ' selected' : '') +
-      //
+      (step == proof?.steps?.length - (lastStepHasErrors(proof) ? 2 : 1) ? ' recent' : '') +
       (!conclusion && step >= (typewriterMode ? proof?.steps?.length : selectedStep+1) ? ' deleted-hint' : '') } onClick={toggleSelection}>
     <Markdown>{getHintText(hint)}</Markdown>
   </div>
