@@ -26,7 +26,7 @@
 
 }
 
-.button-row > *:not(:last-child) {
+.button-row > .btn:not(:last-child), .button-row > .btn-placeholder:not(:last-child) {
   /* display: block; */
   margin-right: .2rem;
 }
