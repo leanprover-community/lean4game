@@ -173,7 +173,7 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
     return (ev) => {
       console.debug('toggled selection')
       if (selectedStep == line) {
-        setSelectedStep(undefined)
+        setSelectedStep(null)
       } else {
         setSelectedStep(line)
       }
@@ -449,7 +449,7 @@ export function TypewriterInterface({props}) {
         text: '',
         forceMoveMarkers: false
       }])
-      setSelectedStep(undefined)
+      setSelectedStep(null)
       setTypewriterInput(proof?.steps[line].command)
       // Reload proof on deleting
       loadGoals(rpcSess, uri, setProof, setCrashed)
@@ -461,7 +461,7 @@ export function TypewriterInterface({props}) {
     return (ev) => {
       if (mobile) {return}
       if (selectedStep == line) {
-        setSelectedStep(undefined)
+        setSelectedStep(null)
         console.debug(`unselected step`)
       } else {
         setSelectedStep(line)

@@ -174,7 +174,7 @@ export function filterHints(hints: GameHint[], prevHints: GameHint[]): GameHint[
 /** A hint as it is displayed in the chat. */
 export function Hint({hint, step=null, conclusion=false} : GameHintWithStep) {
   const { levelId } = useContext(GameIdContext)
-  const { selectedStep, setSelectedStep, setDeletedChat, showHelp, setShowHelp } = useContext(ChatContext)
+  const { selectedStep, setSelectedStep } = useContext(ChatContext)
 
   const { proof } = useContext(ProofContext)
   const { typewriterMode } = useContext(PageContext)
@@ -183,7 +183,7 @@ export function Hint({hint, step=null, conclusion=false} : GameHintWithStep) {
     if (!levelId) {return}
 
     if (selectedStep !== null && selectedStep == step) {
-      setSelectedStep(undefined)
+      setSelectedStep(null)
     } else if (step < proof?.steps?.length) {
       setSelectedStep(step)
     }
@@ -251,12 +251,12 @@ export function ChatPanel ({visible = true}) {
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const levelInfo = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
 
-  let [counter, setCounter] = useState(1)
+  const [counter, setCounter] = useState(1)
 
-  let [introText, setIntroText] = useState<Array<GameHintWithStep>>([])
-  let [chatMessages, setChatMessages] = useState<Array<GameHintWithStep>>([])
-  let { deletedChat } = useContext(ChatContext)
-  let {proof} = useContext(ProofContext)
+  const [introText, setIntroText] = useState<Array<GameHintWithStep>>([])
+  const [chatMessages, setChatMessages] = useState<Array<GameHintWithStep>>([])
+  const { deletedChat, showHelp, selectedStep } = useContext(ChatContext)
+  const { proof } = useContext(ProofContext)
 
   const readIntro = useSelector(selectReadIntro(gameId, worldId))
 
@@ -315,6 +315,49 @@ export function ChatPanel ({visible = true}) {
     console.log(messages)
     setChatMessages(messages)
   }, [gameInfo, levelInfo, gameId, worldId, levelId, proof])
+
+  // Scroll to the top when loading a new page
+  useEffect(() => {
+    console.debug(`scroll chat: top`)
+    chatRef.current!.scrollTo(0,0)
+  }, [completed, gameId, worldId, levelId])
+
+  // Scroll to first message of the last step.
+  // If the proof is currently completed, scroll to the conclusion
+  useEffect(() => {
+    if (levelId > 0 && proof) {
+      if (proof?.completed) {
+        console.debug('scroll chat: down to conclusion')
+        chatRef.current!.lastElementChild?.scrollIntoView({block: "center"})
+      } else {
+        let lastStep = proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
+        console.debug(`scroll chat: first message of step ${lastStep}`)
+        chatRef.current?.getElementsByClassName(`step-${lastStep}`)[0]?.scrollIntoView({block: "center"})
+      }
+    }
+  }, [chatMessages, gameId, worldId, levelId])
+
+  // Scroll down when new hidden hints are triggered
+  useEffect(() => {
+    if (levelId > 0) {
+      let lastStep = proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
+      if (showHelp.has(lastStep)) {
+        console.debug('scroll chat: down to hidden hints')
+        chatRef.current!.lastElementChild?.scrollIntoView({block: "center"})
+      }
+    }
+  }, [showHelp, gameId, worldId, levelId])
+
+  // Scroll to corresponding messages if selected step changes
+  useEffect(() => {
+    if (levelId > 0 && selectedStep !== null) {
+      console.debug(`scroll chat: first message of selected step ${selectedStep}`)
+      chatRef.current?.getElementsByClassName(`step-${selectedStep}`)[0]?.scrollIntoView({block: "center"})
+      // Array.from(chatRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
+      //   elem.scrollIntoView({block: "center"})
+      // })
+    }
+  }, [selectedStep, gameId, worldId, levelId])
 
   return <div className={`column chat-panel${visible ? '' : ' hidden'}`}>
     <div ref={chatRef} className="chat" >
