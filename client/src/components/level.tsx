@@ -176,7 +176,7 @@ function ChatPanel({lastLevel, visible = true}) {
     <div className="button-row">
       {proof?.completed && (lastLevel ?
         <Button ref={focusRef} to={`/${gameId}`}>
-          <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
+          <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
         </Button> :
         <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
           {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />

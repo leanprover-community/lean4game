@@ -30,11 +30,11 @@ function MobileNavButtons({pageNumber, setPageNumber}:
   // if `prevText` or `prevIcon` is set, show a button to go back
   let prevText  = {0: null, 1: t("Intro"), 2: null}[pageNumber]
   let prevIcon  = {0: null, 1: null, 2: faBookOpen}[pageNumber]
-  let prevTitle = {0: null, 1: t("Game Introduction"), 2: t("World selection")}[pageNumber]
+  let prevTitle = {0: null, 1: t("Game Introduction"), 2: t("close inventory")}[pageNumber]
   // if `nextText` or `nextIcon` is set, show a button to go forward
   let nextText  = {0: t("Start"), 1: null, 2: null}[pageNumber]
   let nextIcon  = {0: null, 1: faBook, 2: null}[pageNumber]
-  let nextTitle = {0: t("World selection"), 1: t("Inventory"), 2: null}[pageNumber]
+  let nextTitle = {0: t("Start"), 1: t("Inventory"), 2: null}[pageNumber]
 
   return <>
     {(prevText || prevIcon) &&
@@ -82,8 +82,8 @@ function NextButton({worldSize, difficulty, completed}) {
       <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? t("Next") : t("Start")}
     </Button>
     :
-    <Button to={`/${gameId}`} inverted="true" title={t("back to world selection")} id="home-btn">
-      <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
+    <Button to={`/${gameId}`} inverted="true" title={t("Home")} id="home-btn">
+      <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
     </Button>
   )
 }
@@ -202,7 +202,7 @@ function UploadButton () {
 function HomeButton({isDropdown}) {
   const { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
-  return <Button to={`/${gameId}`} inverted="true" title={t("back to world selection")} id="home-btn">
+  return <Button to={`/${gameId}`} inverted="true" title={t("Home")} id="home-btn">
     <FontAwesomeIcon icon={faHome} />
     {isDropdown && <>&nbsp;{t("Home")}</>}
   </Button>
@@ -313,7 +313,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
         {/* DESKTOP VERSION */}
         <div className='app-bar-left'>
           <HomeButton isDropdown={false} />
-          <span className="app-bar-title">{worldTitle && `${t("World")}: ${gT(worldTitle)}`}</span>
+          <span className="app-bar-title">{worldTitle && gT(worldTitle)}</span>
         </div>
         <div>
           <span className="app-bar-title">{levelTitle}</span>
