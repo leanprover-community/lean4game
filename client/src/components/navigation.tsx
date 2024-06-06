@@ -143,7 +143,7 @@ function DesktopNavigationLevel () {
 
   return <div className="nav-content">
     <div className="nav-title-left">
-    <span className="nav-title">{worldTitle ? `${t("World")}: ${t(worldTitle, {ns: gameId})}` : ''}
+    <span className="nav-title">{worldTitle ? `${t(worldTitle, {ns: gameId})}` : '' /* ${t("World")}: */ }
     </span>
     </div>
     <div className="nav-title-middle">
@@ -163,7 +163,7 @@ function DesktopNavigationLevel () {
       { levelId == gameInfo.data?.worldSize[worldId] ?
         <NavButton
           icon={faHome}
-          text={t("Leave World")}
+          text={t("Home")}
           inverted={true}
           disabled={levelId > 0 && difficulty == 2 && !completed}
           href={`#/${gameId}`} /> :
@@ -239,7 +239,7 @@ export function Navigation () {
       { gameId && <>
         <NavButton
           icon={worldId ? faHome : faGlobe}
-          title={worldId ? t("back to world selection") : t("back to games selection")}
+          title={worldId ? t("home") : t("back to games selection")}
           href={worldId ? `#/${gameId}` : `#`} />
       </>}
       { gameId ?
@@ -295,7 +295,7 @@ export function Navigation () {
             { mobile && (levelId == gameInfo.data?.worldSize[worldId] ?
               <NavButton
                 icon={faHome}
-                text={t("Leave World")}
+                text={t("Home")}
                 inverted={true}
                 disabled={levelId > 0 && difficulty == 2 && !completed}
                 href={`#/${gameId}`} /> :

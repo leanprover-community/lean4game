@@ -601,7 +601,7 @@ export function TypewriterInterface({props}) {
               <div className="button-row mobile">
                 {props.level >= props.worldSize ?
                   <Button to={`/${gameId}`}>
-                    <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
+                    <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
                   </Button>
                 :
                   <Button to={`/${gameId}/world/${props.world}/level/${props.level + 1}`}>

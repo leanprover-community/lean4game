@@ -502,7 +502,7 @@ export function LevelWrapper({visible = true}) {
 //     <div className="button-row">
 //       {proof?.completed && (lastLevel ?
 //         <Button to={`/${gameId}`}>
-//           <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
+//           <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
 //         </Button> :
 //         <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
 //           {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
