@@ -44,6 +44,7 @@
     "react-router-dom": "^6.5.0",
     "react-split": "^2.0.14",
     "rehype-katex": "^6.0.2",
+    "rehype-raw": "^7.0.0",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "request": "^2.88.2",
