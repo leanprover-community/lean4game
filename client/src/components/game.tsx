@@ -54,6 +54,7 @@ function Game() {
 
   // const [pageNumber, setPageNumber] = React.useState(readIntro ? 1 : 0)
 
+  const chatRef = useRef<HTMLDivElement>(null)
   // When deleting the proof, we want to keep to old messages around until
   // a new proof has been entered. e.g. to consult messages coming from dead ends
   const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
@@ -93,7 +94,7 @@ function Game() {
     setShowHelp(new Set())
   }, [gameId, worldId, levelId])
 
-  return <ChatContext.Provider value={{selectedStep, setSelectedStep, deletedChat, setDeletedChat, showHelp, setShowHelp}}>
+  return <ChatContext.Provider value={{selectedStep, setSelectedStep, deletedChat, setDeletedChat, showHelp, setShowHelp, chatRef}}>
     <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
     { mobile ?
       <div className="app-content mobile">

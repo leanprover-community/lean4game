@@ -241,7 +241,6 @@ export function Hints({ hints, conclusion, counter=undefined } : {
 export function ChatPanel ({visible = true}) {
 
   let { t } = useTranslation()
-  const chatRef = useRef<HTMLDivElement>(null)
 
   const { mobile } = useContext(PreferencesContext)
   const { gameId, worldId, levelId } = useContext(GameIdContext)
@@ -255,7 +254,7 @@ export function ChatPanel ({visible = true}) {
 
   const [introText, setIntroText] = useState<Array<GameHintWithStep>>([])
   const [chatMessages, setChatMessages] = useState<Array<GameHintWithStep>>([])
-  const { deletedChat, showHelp, selectedStep } = useContext(ChatContext)
+  const { chatRef, deletedChat, showHelp, selectedStep } = useContext(ChatContext)
   const { proof } = useContext(ProofContext)
 
   const readIntro = useSelector(selectReadIntro(gameId, worldId))
@@ -316,26 +315,32 @@ export function ChatPanel ({visible = true}) {
     setChatMessages(messages)
   }, [gameInfo, levelInfo, gameId, worldId, levelId, proof])
 
-  // Scroll to the top when loading a new page
+  // Scroll the chat
   useEffect(() => {
-    console.debug(`scroll chat: top`)
-    chatRef.current!.scrollTo(0,0)
-  }, [completed, gameId, worldId, levelId])
+    if (levelId > 0) {
 
-  // Scroll to first message of the last step.
-  // If the proof is currently completed, scroll to the conclusion
-  useEffect(() => {
-    if (levelId > 0 && proof) {
-      if (proof?.completed) {
-        console.debug('scroll chat: down to conclusion')
-        chatRef.current!.lastElementChild?.scrollIntoView({block: "center"})
+      if (proof) {
+        if (proof?.completed) {
+          // proof currently completed: scroll down
+          console.debug('scroll chat: down to conclusion')
+          chatRef.current!.lastElementChild?.scrollIntoView({block: "center"})
+        } else {
+          // proof currently not completed: first message of last step
+          let lastStep = proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
+          console.debug(`scroll chat: first message of step ${lastStep}`)
+          chatRef.current?.getElementsByClassName(`step-${lastStep}`)[0]?.scrollIntoView({block: "center"})
+        }
       } else {
-        let lastStep = proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
-        console.debug(`scroll chat: first message of step ${lastStep}`)
-        chatRef.current?.getElementsByClassName(`step-${lastStep}`)[0]?.scrollIntoView({block: "center"})
+        // no proof available: scroll to top.
+        console.debug(`scroll chat: top`)
+        chatRef.current!.scrollTo(0,0)
       }
+    } else {
+      // introduction: scroll to last message
+      console.debug('scroll chat: down')
+      chatRef.current!.lastElementChild?.scrollIntoView({block: "center"})
     }
-  }, [chatMessages, gameId, worldId, levelId])
+  }, [counter, introText, chatMessages, gameId, worldId, levelId])
 
   // Scroll down when new hidden hints are triggered
   useEffect(() => {
@@ -343,6 +348,7 @@ export function ChatPanel ({visible = true}) {
       let lastStep = proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
       if (showHelp.has(lastStep)) {
         console.debug('scroll chat: down to hidden hints')
+        // TODO: last element of hidden hints?
         chatRef.current!.lastElementChild?.scrollIntoView({block: "center"})
       }
     }

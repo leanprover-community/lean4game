@@ -95,19 +95,21 @@ export const PreferencesContext = React.createContext<IPreferencesContext>({
 
 
 export const ChatContext = React.createContext<{
-  selectedStep : number,
+  selectedStep : number
   setSelectedStep: React.Dispatch<React.SetStateAction<number>>
-  deletedChat : GameHint[],
+  deletedChat : GameHint[]
   setDeletedChat: React.Dispatch<React.SetStateAction<Array<GameHint>>>
-  showHelp : Set<number>,
+  showHelp : Set<number>
   setShowHelp: React.Dispatch<React.SetStateAction<Set<number>>>
+  chatRef: React.MutableRefObject<HTMLDivElement>
 }>({
   selectedStep : undefined,
   setSelectedStep: () => {},
   deletedChat: undefined,
   setDeletedChat: () => {},
   showHelp: undefined,
-  setShowHelp: () => {}
+  setShowHelp: () => {},
+  chatRef: null
 })
 
 export const PageContext = React.createContext<{
