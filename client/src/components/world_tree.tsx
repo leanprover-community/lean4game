@@ -3,19 +3,15 @@
 */
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { useStore, useSelector } from 'react-redux'
-import { Slider } from '@mui/material'
+import { useSelector } from 'react-redux'
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
-import { useAppDispatch } from '../hooks'
-import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
+import { selectDifficulty, selectCompleted } from '../state/progress'
 import { store } from '../state/store'
 
 import '../css/world_tree.css'
-import { GameIdContext, PreferencesContext } from '../state/context'
+import { GameIdContext } from '../state/context'
 import { useTranslation } from 'react-i18next'
 import { useGetGameInfoQuery } from '../state/api'
 import { LoadingIcon } from './utils'
