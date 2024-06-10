@@ -82,17 +82,6 @@ function LandingPage() {
 
   let allTiles = lean4gameConfig.allGames.map((gameId) => {
     let q =  useGetGameInfoQuery({game: `g/${gameId}`})
-
-    // if (q.isError) {
-    //   if (q.error?.originalStatus === 404) {
-    //     // Handle 404 error
-    //     console.log('File not found');
-    //   } else {
-    //     // Suppress additional console.error messages
-    //     console.error(q.error);
-    //   }
-    // }
-
     return q.data?.tile
   })
 
