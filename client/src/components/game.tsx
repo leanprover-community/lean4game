@@ -101,7 +101,7 @@ function Game() {
         {<>
           <ChatPanel visible={worldId ? (levelId == 0 && page == 1) :(page == 0)} />
           { worldId ?
-            (levelId > 0 && <LevelWrapper visible={page == 1} />) :
+            <LevelWrapper visible={page == 1} /> :
             <WorldTreePanel visible={page == 1} />
           }
           <InventoryPanel visible={page == 2} />
@@ -113,7 +113,7 @@ function Game() {
         <ChatPanel />
         <div className="column">
           {/* Note: apparently without this `div` the split panel bugs out. */}
-          {worldId ? (levelId > 0 && <LevelWrapper />) : <WorldTreePanel /> }
+          {worldId ? <LevelWrapper /> : <WorldTreePanel /> }
         </div>
         <InventoryPanel />
         </Split>

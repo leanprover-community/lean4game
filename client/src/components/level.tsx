@@ -34,7 +34,6 @@ import { ChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
   ProofContext, PageContext } from './infoview/context'
 import { DualEditor, ExerciseStatement } from './infoview/main'
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
-import { DeletedHints, Hints, MoreHelpButton } from './hints'
 import path from 'path';
 
 import '@fontsource/roboto/300.css'
