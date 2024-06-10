@@ -8,13 +8,12 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { changedReadIntro, selectCompleted, selectReadIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api'
 import { useAppDispatch, useAppSelector } from '../hooks'
-
+import { Button, Markdown } from './utils'
 import { ChatContext, GameIdContext, PageContext, PreferencesContext, ProofContext } from '../state/context'
 import { GameHint, InteractiveGoalsWithHints } from './infoview/rpc_api'
 import { lastStepHasErrors } from './infoview/goals'
 
 import '../css/chat.css'
-import { Button, Markdown } from './utils'
 
 /** Split a string by double newlines and filters out empty segments. */
 function splitIntro (intro : string) {
