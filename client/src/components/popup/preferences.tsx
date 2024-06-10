@@ -8,7 +8,7 @@ import lean4gameConfig from '../../config.json'
 
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { IPreferencesContext, PreferencesContext } from "../infoview/context"
+import { IPreferencesContext, PreferencesContext } from "../../state/context"
 import ReactCountryFlag from 'react-country-flag';
 import { useTranslation } from 'react-i18next';
 

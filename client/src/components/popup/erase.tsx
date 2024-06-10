@@ -1,14 +1,13 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { GameIdContext } from '../../app'
 import { useAppDispatch } from '../../hooks'
 import { deleteProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
-import { Button, Button2 } from '../button'
+import { Button } from '../button'
 import { Trans, useTranslation } from 'react-i18next'
 import { useContext } from 'react'
 import { PopupContext } from './popup'
-import { PageContext } from '../infoview/context'
+import { GameIdContext, PageContext } from '../../state/context'
 
 /** download the current progress (i.e. what's saved in the browser store) */
 export function downloadProgress(gameId: string, gameProgress) {

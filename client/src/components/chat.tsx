@@ -1,21 +1,23 @@
 import * as React from 'react'
-import { ChatContext, PageContext, PreferencesContext, ProofContext } from './infoview/context'
-import { GameIdContext } from '../app'
+import { useContext, useEffect, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useAppDispatch, useAppSelector } from '../hooks'
-import { Button } from './button'
-import { changedReadIntro, selectCompleted, selectReadIntro } from '../state/progress'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
-import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api'
-import { useContext, useEffect, useRef, useState } from 'react'
-import { GameHint, InteractiveGoalsWithHints } from './infoview/rpc_api'
+
+
 import Markdown from './markdown'
-import { useSelector } from 'react-redux'
+import { Button } from './button'
+
+import { changedReadIntro, selectCompleted, selectReadIntro } from '../state/progress'
+import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api'
+import { useAppDispatch, useAppSelector } from '../hooks'
+
+import { ChatContext, GameIdContext, PageContext, PreferencesContext, ProofContext } from '../state/context'
+import { GameHint, InteractiveGoalsWithHints } from './infoview/rpc_api'
 import { lastStepHasErrors } from './infoview/goals'
 
 import '../css/chat.css'
-import { hasErrors } from './infoview/typewriter'
 
 /** Split a string by double newlines and filters out empty segments. */
 function splitIntro (intro : string) {

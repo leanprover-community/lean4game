@@ -1,40 +1,29 @@
 import * as React from 'react'
 import { useContext, useEffect, useRef, useState } from 'react'
 import Split from 'react-split'
-import { Box, CircularProgress } from '@mui/material'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
-import { GameIdContext } from '../app'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { changeTypewriterMode, changedReadIntro, changedSelection, codeEdited, selectCode, selectReadIntro, selectSelections, selectTypewriterMode } from '../state/progress'
+import { changeTypewriterMode, selectCode, selectSelections, selectTypewriterMode } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
-import { Button } from './button'
-import { ChatContext, PageContext, PreferencesContext, ProofContext } from './infoview/context'
+import { ChatContext, GameIdContext, PageContext, PreferencesContext, ProofContext } from '../state/context'
 import { InventoryPanel } from './inventory'
-import { ErasePopup } from './popup/erase'
-import { InfoPopup } from './popup/info'
-import { PrivacyPolicyPopup } from './popup/privacy'
-import { UploadPopup } from './popup/upload'
-import { PreferencesPopup} from "./popup/preferences"
 import { WorldTreePanel } from './world_tree'
 
-import '../css/game.css'
-import '../css/welcome.css'
-import '../css/level.css'
 import i18next from 'i18next'
-import { useTranslation } from 'react-i18next'
-import { LoadingIcon } from './utils'
 import { ChatPanel } from './chat'
-import { DualEditor } from './infoview/main'
-import { Level, LevelWrapper } from './level'
+import { LevelWrapper } from './level'
 import { GameHint, ProofState } from './infoview/rpc_api'
 import { useSelector } from 'react-redux'
 import { Diagnostic } from 'vscode-languageserver-types'
 
+import '../css/game.css'
+import '../css/welcome.css'
+import '../css/level.css'
+
 /** main page of the game showing among others the tree of worlds/levels */
 function Game() {
 
+  const dispatch = useAppDispatch()
   const { gameId, worldId, levelId } = React.useContext(GameIdContext)
 
   // Load the namespace of the game
@@ -44,15 +33,10 @@ function Game() {
   const {isSavePreferences, language, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
+  const levelInfo = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
-  const levelInfo = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
-
   const {page, setPage} = useContext(PageContext)
-
-  // TODO: recover `readIntro` functionality
-
-  // const [pageNumber, setPageNumber] = React.useState(readIntro ? 1 : 0)
 
   const chatRef = useRef<HTMLDivElement>(null)
   // When deleting the proof, we want to keep to old messages around until
@@ -70,8 +54,6 @@ function Game() {
   const [interimDiags, setInterimDiags] = useState<Array<Diagnostic>>([])
   const [isCrashed, setIsCrashed] = useState<Boolean>(false)
 
-
-  const dispatch = useAppDispatch()
 
   const typewriterMode = useSelector(selectTypewriterMode(gameId))
   const setTypewriterMode = (newTypewriterMode: boolean) => dispatch(changeTypewriterMode({game: gameId, typewriterMode: newTypewriterMode}))

@@ -1,11 +1,11 @@
 import { Box, Slider } from '@mui/material'
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { GameIdContext } from '../../app'
 import { changedDifficulty, selectDifficulty } from '../../state/progress'
 import { useSelector } from 'react-redux'
 import { useContext } from 'react'
 import { useAppDispatch } from '../../hooks'
+import { GameIdContext } from '../../state/context'
 
 /** Pop-up that is displayed when opening the help explaining the game rules.
  *

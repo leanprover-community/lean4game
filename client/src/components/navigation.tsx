@@ -4,8 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
   faCircleInfo, faTerminal, faGear, IconDefinition, faShield } from '@fortawesome/free-solid-svg-icons'
-import { GameIdContext } from "../app"
-import { PageContext, PreferencesContext } from "./infoview/context"
+import { GameIdContext, PageContext, PreferencesContext } from "../state/context"
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api'
 import { downloadProgress } from './popup/erase'
 import { useTranslation } from 'react-i18next'

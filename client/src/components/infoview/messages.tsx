@@ -10,7 +10,7 @@ import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/co
 import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer'
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions'
 
-import { PageContext } from './context'
+import { PageContext } from '../../state/context'
 import { useTranslation } from 'react-i18next'
 
 interface MessageViewProps {

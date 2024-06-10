@@ -5,13 +5,19 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types'
-import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from './rpc_api';
-import { PreferencesState } from '../../state/preferences';
+import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from '../components/infoview/rpc_api';
+import { PreferencesState } from './preferences';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)
 
 export type InfoStatus = 'updating' | 'error' | 'ready';
+
+
+export const GameIdContext = React.createContext<{
+  gameId: string,
+  worldId: string|null,
+  levelId: number|null}>({gameId: null, worldId: null, levelId: null});
 
 // /** One step of the proof */
 // export type ProofStep = {

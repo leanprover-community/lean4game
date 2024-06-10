@@ -9,7 +9,7 @@ import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infov
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
-import { PageContext } from './context';
+import { PageContext } from '../../state/context';
 import { InteractiveGoal, InteractiveGoals, InteractiveGoalsWithHints, InteractiveHypothesisBundle, ProofState } from './rpc_api';
 import { RpcSessionAtPos } from '@leanprover/infoview/*';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';

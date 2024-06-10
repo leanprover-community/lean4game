@@ -2,8 +2,8 @@ import * as React from 'react'
 import { Typography } from '@mui/material'
 import Markdown from '../markdown'
 import { Trans, useTranslation } from 'react-i18next'
-import { GameIdContext } from '../../app'
 import { useGetGameInfoQuery } from '../../state/api'
+import { GameIdContext } from '../../state/context'
 
 /** Pop-up that is displaying the Game Info.
  *

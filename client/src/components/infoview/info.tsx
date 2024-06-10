@@ -15,7 +15,7 @@ import { GoalsLocation, Locations, LocationsContext } from '../../../../node_mod
 import { AllMessages, lspDiagToInteractive } from './messages'
 import { goalsToString, Goal, MainAssumptions, OtherGoals } from './goals'
 import { InteractiveTermGoal, InteractiveGoalsWithHints, InteractiveGoals, ProofState } from './rpc_api'
-import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext } from './context'
+import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext } from '../../state/context'
 import { useTranslation } from 'react-i18next'
 
 // TODO: All about pinning could probably be removed

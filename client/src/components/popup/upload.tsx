@@ -3,7 +3,6 @@
 */
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { GameIdContext } from '../../app'
 import { useAppDispatch } from '../../hooks'
 import { GameProgressState, loadProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
@@ -11,6 +10,7 @@ import { Button } from '../button'
 import { Trans, useTranslation } from 'react-i18next'
 import { PopupContext } from './popup'
 import { useContext } from 'react'
+import { GameIdContext } from '../../state/context'
 
 /** Pop-up that is displaying the Game Info.
  *

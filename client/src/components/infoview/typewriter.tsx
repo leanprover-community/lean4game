@@ -17,11 +17,10 @@ import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } fro
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { ChatContext, PageContext, MonacoEditorContext, ProofContext } from './context'
+import { ChatContext, PageContext, MonacoEditorContext, ProofContext, GameIdContext } from '../../state/context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
-import { GameIdContext } from '../../app'
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;

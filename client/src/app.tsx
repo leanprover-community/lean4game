@@ -9,7 +9,7 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
-import { PageContext, PreferencesContext} from './components/infoview/context';
+import { GameIdContext, PageContext, PreferencesContext} from './state/context';
 import UsePreferences from "./state/hooks/use_preferences"
 import { Navigation } from './components/navigation';
 import { useSelector } from 'react-redux';
@@ -19,11 +19,6 @@ import { Popup, PopupContext } from './components/popup/popup';
 import { useGetGameInfoQuery } from './state/api';
 import lean4gameConfig from './config.json'
 import { useTranslation } from 'react-i18next';
-
-export const GameIdContext = React.createContext<{
-  gameId: string,
-  worldId: string|null,
-  levelId: number|null}>({gameId: null, worldId: null, levelId: null});
 
 function App() {
   let { t, i18n } = useTranslation()

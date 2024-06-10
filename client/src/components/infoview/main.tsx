@@ -18,7 +18,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDeleteLeft, faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
-import { GameIdContext } from '../../app';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { LevelInfo, useGetGameInfoQuery, useLoadLevelQuery } from '../../state/api';
 import { changedInventory, levelCompleted, selectCode, selectCompleted, selectInventory } from '../../state/progress';
@@ -27,7 +26,7 @@ import Markdown from '../markdown';
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
-import { ChatContext, PageContext, PreferencesContext, MonacoEditorContext, ProofContext } from './context';
+import { ChatContext, PageContext, PreferencesContext, MonacoEditorContext, ProofContext, GameIdContext } from '../../state/context';
 import { Typewriter, getInteractiveDiagsAt, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';

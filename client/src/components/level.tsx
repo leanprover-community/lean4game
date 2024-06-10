@@ -19,7 +19,6 @@ import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/
 import { Diagnostic } from 'vscode-languageserver-types'
 import { DiagnosticSeverity } from 'vscode-languageclient';
 
-import { GameIdContext } from '../app'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
 import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited,
@@ -31,7 +30,7 @@ import {InventoryPanel} from './inventory'
 import { Editor } from './editor'
 import { Typewriter } from './typewriter'
 import { ChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
-  ProofContext, PageContext } from './infoview/context'
+  ProofContext, PageContext, GameIdContext } from '../state/context'
 import { DualEditor, ExerciseStatement } from './infoview/main'
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
 import path from 'path';
