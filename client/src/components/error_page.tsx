@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useRouteError } from "react-router-dom";
 import '../css/error_page.css'
 
+/** The fallback error page */
 export default function ErrorPage() {
   const error: any = useRouteError()
   console.error(error)
