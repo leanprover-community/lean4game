@@ -148,9 +148,9 @@ export const progressSlice = createSlice({
 export function selectLevel(game: string, world: string, level: number) {
   return (state) => {
     if (!state.progress.games[game?.toLowerCase()]) { return initalLevelProgressState }
-    if (!state.progress.games[game?.toLowerCase()].data[world]) { return initalLevelProgressState }
-    if (!state.progress.games[game?.toLowerCase()].data[world][level]) { return initalLevelProgressState }
-    return state.progress.games[game?.toLowerCase()].data[world][level]
+    if (!state.progress.games[game?.toLowerCase()]?.data[world]) { return initalLevelProgressState }
+    if (!state.progress.games[game?.toLowerCase()]?.data[world][level]) { return initalLevelProgressState }
+    return state.progress.games[game?.toLowerCase()]?.data[world][level]
   }
 }
 
@@ -165,7 +165,7 @@ export function selectCode(game: string, world: string, level: number) {
 export function selectInventory(game: string) {
   return (state) => {
     if (!state.progress.games[game?.toLowerCase()]) { return [] }
-    return state.progress.games[game?.toLowerCase()].inventory
+    return state.progress.games[game?.toLowerCase()]?.inventory
   }
 }
 
@@ -208,7 +208,7 @@ export function selectDifficulty(game: string) {
 export function selectReadIntro(game: string, worldId: string) {
   return (state) => {
     if (worldId) {
-      return state.progress.games[game?.toLowerCase()].data[worldId]?.readIntro
+      return state.progress.games[game?.toLowerCase()]?.data[worldId]?.readIntro
     }
     return state.progress.games[game?.toLowerCase()]?.readIntro
   }

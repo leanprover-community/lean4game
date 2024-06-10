@@ -367,6 +367,11 @@ export function ChatPanel ({visible = true}) {
 
   return <div className={`column chat-panel${visible ? '' : ' hidden'}`}>
     <div ref={chatRef} className="chat" >
+      { gameInfo.error &&
+        <div className="message error">
+          Could not find the game!
+        </div>
+        }
       <Hints hints={introText} counter={readIntro ? undefined : counter}/>
       <Hints hints={chatMessages}/>
       {/* {proof?.steps.map((step, i) =>
