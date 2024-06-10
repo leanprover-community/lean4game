@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Input, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
-import Markdown from '../markdown'
+import { Markdown } from '../utils'
 import { Switch, Button, ButtonGroup } from '@mui/material';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';

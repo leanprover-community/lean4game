@@ -4,7 +4,6 @@ import '../css/inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faBan, faCheck, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { faClipboard } from '@fortawesome/free-regular-svg-icons'
-import Markdown from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api';
 import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
@@ -12,7 +11,7 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
 import { NavButton } from './navigation';
-import { LoadingIcon } from './utils';
+import { LoadingIcon, Markdown } from './utils';
 import { GameIdContext } from '../state/context';
 
 

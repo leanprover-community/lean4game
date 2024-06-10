@@ -10,7 +10,6 @@ import '@fontsource/roboto/700.css';
 import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 
-import Markdown from './markdown';
 import { GameTile, useGetGameInfoQuery } from '../state/api'
 import path from 'path';
 
@@ -20,6 +19,7 @@ import i18next from 'i18next';
 import { useContext } from 'react';
 import { PopupContext } from './popup/popup';
 import { Flag } from './flag';
+import { Markdown } from './utils';
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
   let { t } = useTranslation()

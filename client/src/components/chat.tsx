@@ -5,10 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
-
-import Markdown from './markdown'
-import { Button } from './button'
-
 import { changedReadIntro, selectCompleted, selectReadIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api'
 import { useAppDispatch, useAppSelector } from '../hooks'
@@ -18,6 +14,7 @@ import { GameHint, InteractiveGoalsWithHints } from './infoview/rpc_api'
 import { lastStepHasErrors } from './infoview/goals'
 
 import '../css/chat.css'
+import { Button, Markdown } from './utils'
 
 /** Split a string by double newlines and filters out empty segments. */
 function splitIntro (intro : string) {

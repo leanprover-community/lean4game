@@ -21,7 +21,6 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { LevelInfo, useGetGameInfoQuery, useLoadLevelQuery } from '../../state/api';
 import { changedInventory, levelCompleted, selectCode, selectCompleted, selectInventory } from '../../state/progress';
-import Markdown from '../markdown';
 
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
@@ -29,7 +28,6 @@ import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goal
 import { ChatContext, PageContext, PreferencesContext, MonacoEditorContext, ProofContext, GameIdContext } from '../../state/context';
 import { Typewriter, getInteractiveDiagsAt, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
-import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { store } from '../../state/store';
@@ -39,6 +37,7 @@ import { useTranslation } from 'react-i18next';
 import path from 'path';
 import { useContext } from 'react';
 import { Hints, MoreHelpButton, filterHints } from '../chat';
+import { Button, Markdown } from '../utils'
 
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Typography } from '@mui/material'
-import Markdown from '../markdown'
+import { Markdown } from '../utils'
 import { Trans, useTranslation } from 'react-i18next'
 import { useGetGameInfoQuery } from '../../state/api'
 import { GameIdContext } from '../../state/context'
