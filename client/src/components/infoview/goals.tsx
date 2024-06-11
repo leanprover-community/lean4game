@@ -133,13 +133,14 @@ interface GoalProps {
     filter: GoalFilterState
     showHints?: boolean
     typewriter: boolean
+    unbundle?: boolean /** unbundle `x y : Nat` into `x : Nat` and `y : Nat` */
 }
 
 /**
  * Displays the hypotheses, target type and optional case label of a goal according to the
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
-    const { goal, filter, showHints, typewriter } = props
+    const { goal, filter, showHints, typewriter, unbundle } = props
     let { t } = useTranslation()
 
     // TODO: Apparently `goal` can be `undefined`
@@ -164,9 +165,15 @@ export const Goal = React.memo((props: GoalProps) => {
     // if (props.goal.isInserted) cn += 'b--inserted '
     // if (props.goal.isRemoved) cn += 'b--removed '
 
+    function unbundleHyps (hyps: InteractiveHypothesisBundle[]) : InteractiveHypothesisBundle[] {
+        return hyps.flatMap(hyp => (
+            unbundle ? hyp.names.map(name => {return {...hyp, names: [name]}}) : [hyp]
+        ))
+    }
+
     // const hints = <Hints hints={goal.hints} key={goal.mvarId} />
-    const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
-    const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
+    const objectHyps = unbundleHyps(hyps.filter(hyp => !hyp.isAssumption))
+    const assumptionHyps = unbundleHyps(hyps.filter(hyp => hyp.isAssumption))
 
     return <>
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
