@@ -22,7 +22,7 @@ Statement foo.bar2 : 3 ≤ 7 := by
   simp
 
 
-NewLemma foo.bar
+NewTheorem foo.bar
 DisabledTactic tauto
 
 
@@ -39,7 +39,7 @@ end myNamespace
 
 /- Other tests -/
 
-LemmaDoc add_zero as "add_zero" in "Nat" "(nothing)"
+TheoremDoc add_zero as "add_zero" in "Nat" "(nothing)"
 
 /-- test -/
 Statement add_zero (n : Nat) : n + 0 = n := by
@@ -58,7 +58,7 @@ Statement (n : Nat) : 0 + n = n := by
   simp
 
 
-NewLemma add_zero
+NewTheorem add_zero
 
 --attribute [simp] add_zero
 

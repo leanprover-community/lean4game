@@ -47,11 +47,11 @@ export interface LevelInfo {
   conclusion: null|string,
   index: number,
   tactics: InventoryTile[],
-  lemmas: InventoryTile[],
+  theorems: InventoryTile[],
   definitions: InventoryTile[],
   descrText: null|string,
   descrFormat: null|string,
-  lemmaTab: null|string,
+  theoremTab: null|string,
   statementName: null|string,
   displayName: null|string,
   template: null|string,
@@ -61,9 +61,9 @@ export interface LevelInfo {
 /** Used to display the inventory on the welcome page */
 export interface InventoryOverview {
   tactics: InventoryTile[],
-  lemmas: InventoryTile[],
+  theorems: InventoryTile[],
   definitions: InventoryTile[],
-  lemmaTab: null,
+  theoremTab: null,
 }
 
 interface Doc {

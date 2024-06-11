@@ -32,40 +32,40 @@ open Lean
 /-! ## Inventory (documentation)
 
 The inventory contains documentation that the user can access.
-There are three inventory types: Lemma, Tactic, Definition. They vary about in the information
+There are three inventory types: Theorem, Tactic, Definition. They vary about in the information
 they carry.
 
 The commands `TheoremDoc`, `TacticDoc`, and `DefinitionDoc` add keys and templates to an
-env. extension called `InventoryTemplateExt`. Commands like `NewLemma`, etc. as well as
+env. extension called `InventoryTemplateExt`. Commands like `NewTheorem`, etc. as well as
 `Statement` check if there is a key registered in this extension and might add a default or
 print a warning if not.
 
 Then, `MakeGame` takes the templates from `InventoryTemplateExt` and creates the documentation entries
 that are sent to the client. This allows us to modify them like adding information from
-mathlib or from parsing the lemma in question.
+mathlib or from parsing the theorem in question.
 -/
 
 /-- The game knows three different inventory types that contain slightly different information -/
-inductive InventoryType := | Tactic | Lemma | Definition
+inductive InventoryType := | Tactic | Theorem | Definition
 deriving ToJson, FromJson, Repr, BEq, Hashable, Inhabited
 
 -- TODO: golf this?
 instance : ToString InventoryType := ⟨fun t => match t with
 | .Tactic => "Tactic"
-| .Lemma => "Lemma"
+| .Theorem => "Theorem"
 | .Definition => "Definition"⟩
 
 /-- The keys/templates of the inventory items, stored in `InventoryTemplateExt`. -/
 structure InventoryTemplate where
-  /-- Lemma, Tactic, or Definition -/
+  /-- Theorem, Tactic, or Definition -/
   type: InventoryType
   /-- Depends on the type:
   * Tactic: the tactic's name
-  * Lemma: fully qualified lemma name
+  * Theorem: fully qualified theorem name
   * Definition: no restrictions (preferably the definitions fully qualified name)
   -/
   name: Name
-  /-- Only for Lemmas. To sort them into tabs -/
+  /-- Only for Theorems. To sort them into tabs -/
   category: String := default
   /-- Free-text short name -/
   displayName: String := name.toString
@@ -85,13 +85,13 @@ structure InventoryTile where
   The name of the item. The restrictions are:
 
   * for Tactics: The name of the tactic.
-  * for Lemmas: *Fully qualified* lemma name.
+  * for Theorems: *Fully qualified* theorem name.
   * for Definitions: no restrictions.
   -/
   name : Name
   /-- The display name shown in the inventory. This can be free-text. -/
   displayName : String
-  /-- Category to group inventory items by (currently only used for lemmas). -/
+  /-- Category to group inventory items by (currently only used for theorems). -/
   category : String
   /-- The world which introduced this item. -/
   world : Option Name := none
@@ -146,16 +146,16 @@ def getInventoryItem? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
 
 structure InventoryOverview where
   tactics : Array InventoryTile
-  lemmas : Array InventoryTile
+  theorems : Array InventoryTile
   definitions : Array InventoryTile
-  lemmaTab : Option String
+  theoremTab : Option String
 deriving ToJson, FromJson
 
 -- TODO: Reuse the following code for checking available tactics in user code:
 structure UsedInventory where
 (tactics : HashSet Name := {})
 (definitions : HashSet Name := {})
-(lemmas : HashSet Name := {})
+(theorems : HashSet Name := {})
 
 /-! ## Environment extensions for game specification -/
 
@@ -255,7 +255,7 @@ structure GameLevel where
   /-- Introduction text shown all the time. (markdown) -/
   introduction: String := default
   conclusion: String := default
-  /-- The name of the exercise proven. If provided this lemma will be available in
+  /-- The name of the exercise proven. If provided this theorem will be available in
   future levels. -/
   statementName: Name := default
   hints: Array GoalHintEntry := default
@@ -265,13 +265,13 @@ structure GameLevel where
   /-- The mathematical statement in mathematician-readable form. (markdown) -/
   descrText: Option String := none
   descrFormat : String := default
-  /-- The `category` of lemmas to be open by default -/
-  lemmaTab: Option String := none
+  /-- The `category` of theorems to be open by default -/
+  theoremTab: Option String := none
   /-- The module to be imported when playing this level -/
   module : Name := default
   tactics: InventoryInfo := default
   definitions: InventoryInfo := default
-  lemmas: InventoryInfo := default
+  theorems: InventoryInfo := default
   /-- A proof template that is printed in an empty editor. -/
   template: Option String := none
   /-- The image for this level. -/
@@ -282,20 +282,20 @@ deriving Inhabited, Repr
 
 /-- Json-encodable version of `GameLevel`
 Fields:
-- description: Lemma in mathematical language.
-- descriptionGoal: Lemma printed as Lean-Code.
+- description: Theorem in mathematical language.
+- descriptionGoal: Theorem printed as Lean-Code.
 -/
 structure LevelInfo where
   index : Nat
   title : String
   tactics : Array InventoryTile
-  lemmas : Array InventoryTile
+  theorems : Array InventoryTile
   definitions : Array InventoryTile
   introduction : String
   conclusion : String
   descrText : Option String := none
   descrFormat : String := ""
-  lemmaTab : Option String
+  theoremTab : Option String
   module : Name
   displayName : Option String
   statementName : Option String
@@ -307,17 +307,17 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
   { index := lvl.index,
     title := lvl.title,
     tactics := lvl.tactics.tiles,
-    lemmas := lvl.lemmas.tiles,
+    theorems := lvl.theorems.tiles,
     definitions := lvl.definitions.tiles,
     descrText := lvl.descrText,
     descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
     introduction := lvl.introduction
     conclusion := lvl.conclusion
-    lemmaTab := match lvl.lemmaTab with
+    theoremTab := match lvl.theoremTab with
     | some tab => tab
     | none =>
-      -- Try to set the lemma tab to the category of the first added lemma
-      match lvl.lemmas.tiles.find? (·.new) with
+      -- Try to set the theorem tab to the category of the first added theorem
+      match lvl.theorems.tiles.find? (·.new) with
       | some tile => tile.category
       | none => none
     statementName := lvl.statementName.toString
@@ -325,11 +325,11 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
     displayName := match lvl.statementName with
       | .anonymous => none
       | name => match (inventoryExt.getState env).find?
-          (fun x => x.name == name && x.type == .Lemma) with
+          (fun x => x.name == name && x.type == .Theorem) with
         | some n => n.displayName
         | none => name.toString
         -- Note: we could call `.find!` because we check in `Statement` that the
-        -- lemma doc must exist.
+        -- theorem doc must exist.
     template := lvl.template
     image := lvl.image
   }
@@ -536,7 +536,7 @@ def modifyLevel (levelId : LevelId) (fn : GameLevel → m GameLevel) [MonadError
 -- def getIntroducedInventory (game : Game) [MonadError m] : m (Array Name) := do
 --   let allItems : Array Name := game.worlds.nodes.fold (fun L _ world => L ++
 --     world.levels.fold (fun LL _ level =>
---       LL ++ level.tactics.new ++ level.lemmas.new
+--       LL ++ level.tactics.new ++ level.theorems.new
 --     ) #[]) #[]
 
 --   pure allItems

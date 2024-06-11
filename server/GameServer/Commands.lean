@@ -176,7 +176,7 @@ elab doc:docComment ? "TheoremDoc" name:ident "as" displayName:str "in" category
   let doc ← parseDocCommentLegacy doc content
   let doc ← doc.translate
   modifyEnv (inventoryTemplateExt.addEntry · {
-    type := .Lemma
+    type := .Theorem
     name := name.getId
     category := category.getString
     displayName := displayName.getString
@@ -236,13 +236,13 @@ elab "NewHiddenTactic" args:ident* : command => do
 
 /-- Declare theorems that are introduced by this level. -/
 elab "NewTheorem" args:ident* : command => do
-  checkCommandNotDuplicated ((←getCurLevel).lemmas.new) "NewTheorem"
+  checkCommandNotDuplicated ((←getCurLevel).theorems.new) "NewTheorem"
   for name in ↑args do
     try let _decl ← getConstInfo name.getId catch
       | _ => logErrorAt name m!"unknown identifier '{name}'."
-    checkInventoryDoc .Lemma name -- TODO: Add (template := "[mathlib]")
+    checkInventoryDoc .Theorem name -- TODO: Add (template := "[mathlib]")
   modifyCurLevel fun level => pure {level with
-    lemmas := {level.lemmas with new := args.map (·.getId)}}
+    theorems := {level.theorems with new := args.map (·.getId)}}
 
 /-- Declare definitions that are introduced by this level. -/
 elab "NewDefinition" args:ident* : command => do
@@ -262,10 +262,10 @@ elab "DisabledTactic" args:ident* : command => do
 /-- Declare theorems that are temporarily disabled in this level.
 This is ignored if `OnlyTheorem` is set. -/
 elab "DisabledTheorem" args:ident* : command => do
-  checkCommandNotDuplicated ((←getCurLevel).lemmas.disabled) "DisabledTheorem"
-  for name in ↑args  do checkInventoryDoc .Lemma name
+  checkCommandNotDuplicated ((←getCurLevel).theorems.disabled) "DisabledTheorem"
+  for name in ↑args  do checkInventoryDoc .Theorem name
   modifyCurLevel fun level => pure {level with
-    lemmas := {level.lemmas with disabled := args.map (·.getId)}}
+    theorems := {level.theorems with disabled := args.map (·.getId)}}
 
 /-- Declare definitions that are temporarily disabled in this level -/
 elab "DisabledDefinition" args:ident* : command => do
@@ -283,10 +283,10 @@ elab "OnlyTactic" args:ident* : command => do
 
 /-- Temporarily disable all theorems except the ones declared here -/
 elab "OnlyTheorem" args:ident* : command => do
-  checkCommandNotDuplicated ((←getCurLevel).lemmas.only) "OnlyTheorem"
-  for name in ↑args do checkInventoryDoc .Lemma name
+  checkCommandNotDuplicated ((←getCurLevel).theorems.only) "OnlyTheorem"
+  for name in ↑args do checkInventoryDoc .Theorem name
   modifyCurLevel fun level => pure {level with
-    lemmas := {level.lemmas with only := args.map (·.getId)}}
+    theorems := {level.theorems with only := args.map (·.getId)}}
 
 /-- Temporarily disable all definitions except the ones declared here.
 This is ignored if `OnlyDefinition` is set. -/
@@ -296,10 +296,10 @@ elab "OnlyDefinition" args:ident* : command => do
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with only := args.map (·.getId)}}
 
-/-- Define which tab of Lemmas is opened by default. Usage: `TheoremTab "Nat"`.
+/-- Define which tab of Theorems is opened by default. Usage: `TheoremTab "Nat"`.
 If omitted, the current tab will remain open. -/
 elab "TheoremTab"  category:str : command =>
-  modifyCurLevel fun level => pure {level with lemmaTab := category.getString}
+  modifyCurLevel fun level => pure {level with theoremTab := category.getString}
 
 
 /-! DEPRECATED -/
@@ -309,7 +309,7 @@ elab doc:docComment ? "LemmaDoc" name:ident "as" displayName:str "in" category:s
   logWarning "Deprecated. Has been renamed to `TheoremDoc`"
   let doc ← parseDocCommentLegacy doc content
   modifyEnv (inventoryTemplateExt.addEntry · {
-    type := .Lemma
+    type := .Theorem
     name := name.getId
     category := category.getString
     displayName := displayName.getString
@@ -317,31 +317,31 @@ elab doc:docComment ? "LemmaDoc" name:ident "as" displayName:str "in" category:s
 
 elab "NewLemma" args:ident* : command => do
   logWarning "Deprecated. Has been renamed to `NewTheorem`"
-  checkCommandNotDuplicated ((←getCurLevel).lemmas.new) "NewLemma"
+  checkCommandNotDuplicated ((←getCurLevel).theorems.new) "NewTheorem"
   for name in ↑args do
     try let _decl ← getConstInfo name.getId catch
       | _ => logErrorAt name m!"unknown identifier '{name}'."
-    checkInventoryDoc .Lemma name -- TODO: Add (template := "[mathlib]")
+    checkInventoryDoc .Theorem name -- TODO: Add (template := "[mathlib]")
   modifyCurLevel fun level => pure {level with
-    lemmas := {level.lemmas with new := args.map (·.getId)}}
+    theorems := {level.theorems with new := args.map (·.getId)}}
 
 elab "DisabledLemma" args:ident* : command => do
   logWarning "Deprecated. Has been renamed to `DisabledTheorem`"
-  checkCommandNotDuplicated ((←getCurLevel).lemmas.disabled) "DisabledLemma"
-  for name in ↑args  do checkInventoryDoc .Lemma name
+  checkCommandNotDuplicated ((←getCurLevel).theorems.disabled) "DisabledTheorem"
+  for name in ↑args  do checkInventoryDoc .Theorem name
   modifyCurLevel fun level => pure {level with
-    lemmas := {level.lemmas with disabled := args.map (·.getId)}}
+    theorems := {level.theorems with disabled := args.map (·.getId)}}
 
 elab "OnlyLemma" args:ident* : command => do
   logWarning "Deprecated. Has been renamed to `OnlyTheorem`"
-  checkCommandNotDuplicated ((←getCurLevel).lemmas.only) "OnlyLemma"
-  for name in ↑args do checkInventoryDoc .Lemma name
+  checkCommandNotDuplicated ((←getCurLevel).theorems.only) "OnlyTheorem"
+  for name in ↑args do checkInventoryDoc .Theorem name
   modifyCurLevel fun level => pure {level with
-    lemmas := {level.lemmas with only := args.map (·.getId)}}
+    theorems := {level.theorems with only := args.map (·.getId)}}
 
 elab "LemmaTab"  category:str : command => do
   logWarning "Deprecated. Has been renamed to `TheoremTab`"
-  modifyCurLevel fun level => pure {level with lemmaTab := category.getString}
+  modifyCurLevel fun level => pure {level with theoremTab := category.getString}
 
 /-! # Exercise Statement -/
 
@@ -388,7 +388,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   let defaultDeclName : Ident := mkIdent <| (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
 
-  -- Collect all used tactics/lemmas in the sample proof:
+  -- Collect all used tactics/theorems in the sample proof:
   let usedInventory : UsedInventory ← match val with
   | `(Parser.Command.declVal| := $proof:term) => do
     collectUsedInventory proof
@@ -417,12 +417,12 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
       let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
+      checkInventoryDoc .Theorem name (name := fullName) (template := docContent)
     else
       let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
+      checkInventoryDoc .Theorem name (name := fullName) (template := docContent)
   | none =>
     let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
     elabCommand thmStatement
@@ -511,7 +511,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     hints := hints
     tactics := {level.tactics with used := usedInventory.tactics.toArray}
     definitions := {level.definitions with used := usedInventory.definitions.toArray}
-    lemmas := {level.lemmas with used := usedInventory.lemmas.toArray}
+    theorems := {level.theorems with used := usedInventory.theorems.toArray}
     }
 
 /-! # Hints -/
@@ -644,7 +644,7 @@ elab "Template" tacs:tacticSeq : tactic => do
 -- open Lean Meta Elab Command Tactic Simp
 
 -- def Lean.Meta.SimpTheorems.hasAttribute (d : SimpTheorems) (decl : Name) :=
---   d.isLemma (.decl decl) || d.isDeclToUnfold decl
+--   d.isTheorem (.decl decl) || d.isDeclToUnfold decl
 
 -- def isInSimpset (simpAttr decl: Name) : CoreM Bool := do
 --   let .some simpDecl ←getSimpExtension? simpAttr | return false
@@ -662,8 +662,8 @@ def Parser.dependency := Parser.sepBy1Indent Parser.ident "→"
 /-- Manually add a dependency between two worlds.
 
 Normally, the dependencies are computed automatically by the
-tactics & lemmas used in the example
-proof and the ones introduced by `NewLemma`/`NewTactic`.
+tactics & theorems used in the example
+proof and the ones introduced by `NewTheorem`/`NewTactic`.
 Use the command `Dependency World₁ → World₂` to add a manual edge to the graph,
 for example if the only dependency between the worlds is given by
 the narrative. -/
@@ -708,10 +708,10 @@ elab "MakeGame" : command => do
         s!"[mathlib doc](https://leanprover-community.github.io/mathlib4_docs/find/?pattern={name}#doc)"
 
     match item.type with
-    | .Lemma =>
+    | .Theorem =>
       modifyEnv (inventoryExt.addEntry · { item with
         content := content
-        -- Add the lemma statement to the doc
+        -- Add the theorem statement to the doc
         statement := (← getStatementString name)
       })
     | _ =>
@@ -736,14 +736,14 @@ elab "MakeGame" : command => do
   for (worldId, world) in allWorlds do
     let mut usedItems : HashSet Name := {}
     let mut newItems : HashSet Name := {}
-    for inventoryType in #[.Tactic, .Definition, .Lemma] do
+    for inventoryType in #[.Tactic, .Definition, .Theorem] do
       for (levelId, level) in world.levels.toArray do
         usedItems := usedItems.insertMany (level.getInventory inventoryType).used
         newItems := newItems.insertMany (level.getInventory inventoryType).new
         hiddenItems := hiddenItems.insertMany (level.getInventory inventoryType).hidden
 
-        -- if the previous level was named, we need to add it as a new lemma
-        if inventoryType == .Lemma then
+        -- if the previous level was named, we need to add it as a new theorem
+        if inventoryType == .Theorem then
           match levelId with
           | 0 => pure ()
           | 1 => pure () -- level ids start with 1, so we need to skip 1, too
@@ -756,9 +756,9 @@ elab "MakeGame" : command => do
               let name := Name.str pre s
               newItems := newItems.insert name
 
-          if inventoryType == .Lemma then
+          if inventoryType == .Theorem then
 
-      -- if the last level was named, we need to add it as a new lemma
+      -- if the last level was named, we need to add it as a new theorem
       let i₀ := world.levels.size
 
         let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
@@ -863,27 +863,27 @@ elab "MakeGame" : command => do
 
   let mut allItemsByType : HashMap InventoryType (HashSet Name) := {}
   -- Compute which inventory items are available in which level:
-  for inventoryType in #[.Tactic, .Definition, .Lemma] do
+  for inventoryType in #[.Tactic, .Definition, .Theorem] do
 
     -- Which items are introduced in which world?
-    let mut lemmaStatements : HashMap (Name × Nat) Name := {}
+    let mut theoremStatements : HashMap (Name × Nat) Name := {}
     -- TODO: I believe `newItemsInWorld` has way to many elements in it which we iterate over
-    -- e.g. we iterate over `ring` for `Lemma`s as well, but so far that seems to cause no problems
+    -- e.g. we iterate over `ring` for `Theorem`s as well, but so far that seems to cause no problems
     let mut allItems : HashSet Name := {}
     for (worldId, world) in game.worlds.nodes.toArray do
       let mut newItems : HashSet Name := {}
       for (levelId, level) in world.levels.toArray do
-        let newLemmas := (level.getInventory inventoryType).new
-        newItems := newItems.insertMany newLemmas
-        allItems := allItems.insertMany newLemmas
-        if inventoryType == .Lemma then
+        let newTheorems := (level.getInventory inventoryType).new
+        newItems := newItems.insertMany newTheorems
+        allItems := allItems.insertMany newTheorems
+        if inventoryType == .Theorem then
           -- For levels `2, 3, …` we check if the previous level was named
-          -- in which case we add it as available lemma.
+          -- in which case we add it as available theorem.
           match levelId with
           | 0 => pure ()
           | 1 => pure () -- level ids start with 1, so we need to skip 1, too.
           | i₀ + 1 =>
-            -- add named statement from previous level to the available lemmas.
+            -- add named statement from previous level to the available theorems.
             let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
             match (idx).statementName with
             | .anonymous => pure ()
@@ -892,9 +892,9 @@ elab "MakeGame" : command => do
               let name := Name.str pre s
               newItems := newItems.insert name
               allItems := allItems.insert name
-              lemmaStatements := lemmaStatements.insert (worldId, levelId) name
-      if inventoryType == .Lemma then
-        -- if named, add the lemma from the last level of the world to the inventory
+              theoremStatements := theoremStatements.insert (worldId, levelId) name
+      if inventoryType == .Theorem then
+        -- if named, add the theorem from the last level of the world to the inventory
         let i₀ := world.levels.size
         match i₀ with
         | 0 => logWarning m!"World `{worldId}` contains no levels."
@@ -916,7 +916,7 @@ elab "MakeGame" : command => do
           -- Using a match statement because the error message of `Option.get!` is not helpful.
           match (← getInventoryItem? item inventoryType) with
           | none =>
-            -- Note: we did have a panic here before because lemma statement and doc entry
+            -- Note: we did have a panic here before because theorem statement and doc entry
             -- had mismatching namespaces
             logError m!"There is no inventory item ({inventoryType}) for: {item}."
             panic s!"Inventory item {item} not found!"
@@ -970,8 +970,8 @@ elab "MakeGame" : command => do
 
         -- add the exercise statement from the previous level
         -- if it was named
-        if inventoryType == .Lemma then
-          match lemmaStatements.find? (worldId, levelId) with
+        if inventoryType == .Theorem then
+          match theoremStatements.find? (worldId, levelId) with
           | none => pure ()
           | some name =>
             let data := (← getInventoryItem? name inventoryType).get!
@@ -986,7 +986,7 @@ elab "MakeGame" : command => do
               altTitle := data.statement
               locked := false }
 
-        -- add marks for `disabled` and `new` lemmas here, so that they only apply to
+        -- add marks for `disabled` and `new` theorems here, so that they only apply to
         -- the current level.
         let itemsArray := items.toArray
           |>.insertionSort (fun a b => a.1.toString < b.1.toString)
@@ -1009,10 +1009,10 @@ elab "MakeGame" : command => do
         | throwError "Expected item to exist: {name}"
       return item.toTile)
   let inventory : InventoryOverview := {
-    lemmas := (← getTiles .Lemma).map (fun tile => {tile with hidden := hiddenItems.contains tile.name})
+    theorems := (← getTiles .Theorem).map (fun tile => {tile with hidden := hiddenItems.contains tile.name})
     tactics := (← getTiles .Tactic).map (fun tile => {tile with hidden := hiddenItems.contains tile.name})
     definitions := (← getTiles .Definition).map (fun tile => {tile with hidden := hiddenItems.contains tile.name})
-    lemmaTab := none
+    theoremTab := none
   }
 
   saveGameData allItemsByType inventory

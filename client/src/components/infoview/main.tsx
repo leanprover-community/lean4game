@@ -76,7 +76,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
       // On completion, add the names of all new items to the local storage
       let newTiles = [
         ...level?.tactics,
-        ...level?.lemmas,
+        ...level?.theorems,
         ...level?.definitions
       ].filter((tile) => tile.new).map((tile) => tile.name)
 

@@ -59,7 +59,7 @@ def getDocstring (env : Environment) (name : Name) (type : InventoryType) :
   match type with
   -- for tactics it's a lookup following mathlib's `#help`. not guaranteed to be the correct one.
   | .Tactic => getTacticDocstring env name
-  | .Lemma => findDocString? env name
+  | .Theorem => findDocString? env name
   -- TODO: for definitions not implemented yet, does it work?
   | .Definition => findDocString? env name
 
@@ -99,14 +99,14 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
       modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
         name := name
-        category := if type == .Lemma then s!"{n.getPrefix}" else ""
+        category := if type == .Theorem then s!"{n.getPrefix}" else ""
         content := docstring})
     -- Add the default documentation
     | some s =>
       modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
         name := name
-        category := if type == .Lemma then s!"{n.getPrefix}" else ""
+        category := if type == .Theorem then s!"{n.getPrefix}" else ""
         content := s })
       logInfoAt ref (m!"Missing {type} Documentation: {name}, used default (e.g. provided " ++
         m!"docstring) instead. If you want to write a different description, add " ++
@@ -133,7 +133,7 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
         catch | _ => pure [] -- catch "unknown constant" error
       return ← ns.foldlM (fun acc n => do
         if let some (.thmInfo ..) := (← getEnv).find? n then
-          return {acc with lemmas := acc.lemmas.insertMany ns}
+          return {acc with theorems := acc.theorems.insertMany ns}
         else
           return {acc with definitions := acc.definitions.insertMany ns}
       ) acc
@@ -143,10 +143,10 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
 def GameLevel.getInventory (level : GameLevel) : InventoryType → InventoryInfo
 | .Tactic => level.tactics
 | .Definition => level.definitions
-| .Lemma => level.lemmas
+| .Theorem => level.theorems
 
 def GameLevel.setComputedInventory (level : GameLevel) :
     InventoryType → Array InventoryTile → GameLevel
 | .Tactic, v =>     {level with tactics     := {level.tactics     with tiles := v}}
 | .Definition, v => {level with definitions := {level.definitions with tiles := v}}
-| .Lemma, v =>      {level with lemmas      := {level.lemmas      with tiles := v}}
+| .Theorem, v =>      {level with theorems      := {level.theorems      with tiles := v}}

@@ -166,7 +166,7 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (workerState :
         -- Forbid the theorem we are proving currently
         addMessage info inputCtx (severity := .error)
           s!"Structural recursion: you can't use '{n}' to proof itself!"
-      let theoremsAndDefs := levelInfo.lemmas ++ levelInfo.definitions
+      let theoremsAndDefs := levelInfo.theorems ++ levelInfo.definitions
       match theoremsAndDefs.find? (·.name == n) with
       | none =>
         -- Theorem will never be introduced in this game

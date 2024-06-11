@@ -81,7 +81,7 @@ def getStatement (name : Name) : CommandElabM MessageData := do
 
 -- Note: We use `String` because we can't send `MessageData` as json, but
 -- `MessageData` might be better for interactive highlighting.
-/-- Get a string of the form `my_lemma (n : ℕ) : n + n = 2 * n`.
+/-- Get a string of the form `my_theorem (n : ℕ) : n + n = 2 * n`.
 
 Note: A statement like `theorem abc : ∀ x : Nat, x ≥ 0` would be turned into
 `theorem abc (x : Nat) : x ≥ 0` by `PrettyPrinter.ppSignature`. -/

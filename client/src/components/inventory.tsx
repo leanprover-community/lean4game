@@ -48,7 +48,7 @@ function InventoryItem({item, name, displayName, locked, disabled, newly, showDo
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : <></>
   const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
-  // Note: This is somewhat a hack as the statement of lemmas comes currently in the form
+  // Note: This is somewhat a hack as the statement of theorems comes currently in the form
   // `Namespace.statement_name (x y : Nat) : some type`
   const title = locked ? t("Not unlocked yet") :
                 disabled ? t("Not available in this level") : (item.altTitle ? item.altTitle.substring(item.altTitle.indexOf(' ') + 1) : '')
@@ -172,12 +172,12 @@ export function Inventory () {
     <div className="inventory">
       { levelInfo.data ? <>
       <div className="tab-bar major">
-        <div className={`tab${(categoryTab == "theorem") ? " active": ""}${containsNew(levelInfo.data?.lemmas) ? " new" : ""}`} onClick={() => { setCategoryTab("theorem") }}>{t("Theorems")}</div>
+        <div className={`tab${(categoryTab == "theorem") ? " active": ""}${containsNew(levelInfo.data?.theorems) ? " new" : ""}`} onClick={() => { setCategoryTab("theorem") }}>{t("Theorems")}</div>
         <div className={`tab${(categoryTab == "tactic") ? " active": ""}${containsNew(levelInfo.data?.tactics) ? " new" : ""}`} onClick={() => { setCategoryTab("tactic") }}>{t("Tactics")}</div>
         <div className={`tab${(categoryTab == "definition") ? " active": ""}${containsNew(levelInfo.data?.definitions) ? " new" : ""}`} onClick={() => { setCategoryTab("definition") }}>{t("Definitions")}</div>
       </div>
       { (categoryTab == "theorem") &&
-        <InventoryList items={levelInfo.data?.lemmas} tab={theoremTab} setTab={setTheoremTab} />
+        <InventoryList items={levelInfo.data?.theorems} tab={theoremTab} setTab={setTheoremTab} />
       }
       { (categoryTab == "tactic") &&
         <InventoryList items={levelInfo.data?.tactics} />
@@ -228,7 +228,7 @@ export function Documentation() {
   </div>
 }
 
-/** The panel showing the user's inventory with tactics, definitions, and lemmas */
+/** The panel showing the user's inventory with tactics, definitions, and theorems */
 export function InventoryPanel({visible = true}) {
   const {gameId, worldId, levelId} = React.useContext(GameIdContext)
   const levelInfo = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
@@ -240,10 +240,10 @@ export function InventoryPanel({visible = true}) {
   const [docTile, setDocTile] = useState<InventoryTile>(null)
 
   useEffect(() => {
-    // If the level specifies `LemmaTab "Nat"`, we switch to this tab on loading.
+    // If the level specifies `TheoremTab "Nat"`, we switch to this tab on loading.
     // `defaultTab` is `null` or `undefined` otherwise, in which case we don't want to switch.
-    if (levelInfo?.data?.lemmaTab) {
-      setTheoremTab(levelInfo?.data?.lemmaTab)
+    if (levelInfo?.data?.theoremTab) {
+      setTheoremTab(levelInfo?.data?.theoremTab)
     }}, [levelInfo])
 
   return <div className={`column inventory-panel ${visible ? '' : 'hidden'}`}>
