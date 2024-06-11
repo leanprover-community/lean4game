@@ -141,6 +141,7 @@ interface GoalProps {
     filter: GoalFilterState
     showHints?: boolean
     typewriter: boolean
+    unbundle?: boolean /** unbundle `x y : Nat` into `x : Nat` and `y : Nat` */
 }
 
 /**
@@ -150,7 +151,7 @@ export const Goal = React.memo((props: GoalProps) => {
     const gameId = React.useContext(GameIdContext)
     const {mobile} = React.useContext(PreferencesContext)
     const typewriterMode = useSelector(selectTypewriterMode(gameId))
-    const { goal, filter, showHints, typewriter } = props
+    const { goal, filter, showHints, typewriter, unbundle } = props
     let { t } = useTranslation()
 
     // TODO: Apparently `goal` can be `undefined`
@@ -175,9 +176,15 @@ export const Goal = React.memo((props: GoalProps) => {
     // if (props.goal.isInserted) cn += 'b--inserted '
     // if (props.goal.isRemoved) cn += 'b--removed '
 
+    function unbundleHyps (hyps: InteractiveHypothesisBundle[]) : InteractiveHypothesisBundle[] {
+        return hyps.flatMap(hyp => (
+            unbundle ? hyp.names.map(name => {return {...hyp, names: [name]}}) : [hyp]
+        ))
+    }
+
     // const hints = <Hints hints={goal.hints} key={goal.mvarId} />
-    const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
-    const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
+    const objectHyps = unbundleHyps(hyps.filter(hyp => !hyp.isAssumption))
+    const assumptionHyps = unbundleHyps(hyps.filter(hyp => hyp.isAssumption))
 
     return <>
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
