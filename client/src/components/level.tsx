@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useEffect, useState, useRef, useContext } from 'react'
 import { useSelector, useStore } from 'react-redux'
 import Split from 'react-split'
-import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faArrowRight, faCode, faTerminal } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgress } from '@mui/material'
@@ -24,8 +24,6 @@ import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery }
 import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited,
   selectHelp, selectDifficulty, selectInventory, selectTypewriterMode, changeTypewriterMode } from '../state/progress'
 import { store } from '../state/store'
-import { Button } from './button'
-import Markdown from './markdown'
 import {InventoryPanel} from './inventory'
 import { Editor } from './editor'
 import { Typewriter } from './typewriter'
@@ -286,6 +284,7 @@ export function LevelWrapper({visible = true}) {
   const [lockEditorMode, setLockEditorMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
+  const { proof } = useContext(ProofContext)
 
   // // impressum pop-up
   // function toggleImpressum() {setImpressum(!impressum)}
@@ -327,7 +326,27 @@ export function LevelWrapper({visible = true}) {
   // const {editor, infoProvider, editorConnection} =
   // useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
 
+  const navigate = useNavigate()
 
+  // Keyboard listener
+  useEffect(() => {
+    function keyDownHandler(e: globalThis.KeyboardEvent) {
+      if (e.key === "Enter") {
+        // use enter on a completed proof to go to the next level or home.
+        if (proof?.completed) {
+          if (levelId == gameInfo.data?.worldSize[worldId]){
+            navigate(`/${gameId}`)
+            e.preventDefault()
+          } else {
+            navigate(`/${gameId}/world/${worldId}/level/${levelId+1}`)
+            e.preventDefault()
+          }
+        }
+      }
+    }
+    document.addEventListener("keydown", keyDownHandler)
+    return () => {document.removeEventListener("keydown", keyDownHandler)}
+  }, [proof])
 
   /** toggle input mode if allowed */
   function toggleInputMode(ev: React.MouseEvent) {
