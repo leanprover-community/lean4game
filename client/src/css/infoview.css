@@ -189,3 +189,32 @@
 .tooltip-arrow {
   display: none;
 }
+
+
+.goal-tab {
+  /* border: 2px dotted darkgreen; */
+  display: flex;
+  flex-direction: row;
+}
+
+.goal-tab .goal, .goal-tab .hypotheses {
+  /* border: 1px solid lightblue; */
+  display: inline-block;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.goal-sign {
+  /* border: 1px solid lightblue; */
+  width: 1rem;
+  margin-left: .5rem;
+  margin-right: .5rem;
+  display: inline-block;
+}
+
+.goal-sign line {
+  stroke: var(--clr-dark-gray);
+  stroke-width: 2;
+}
