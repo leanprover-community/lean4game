@@ -339,7 +339,7 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
 //   )
 // }, fastIsEqual)
 
-/** The tabs of goals that lean ahs after the command of this step has been processed */
+/** The tabs of goals that lean has after the command of this step has been processed */
 function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: InteractiveGoalsWithHints, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
   let { t } = useTranslation()
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
@@ -555,8 +555,10 @@ export function TypewriterInterface({props}) {
               //   </div>
               // } else {
                 return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')}>
-                  <Command proof={proof} i={i} deleteProof={deleteProof(i)} />
-                  <Errors errors={step.diags} typewriterMode={true} />
+                  {i > 0 && <>
+                    <Command proof={proof} i={i} deleteProof={deleteProof(i)} />
+                    <Errors errors={step.diags} typewriterMode={true} />
+                  </>}
                   {mobile && i == 0 && props.data?.introduction &&
                     <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelectStep(0)}>
                       <Markdown>{props.data?.introduction}</Markdown>
