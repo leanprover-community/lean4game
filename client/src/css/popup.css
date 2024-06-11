@@ -19,7 +19,7 @@
   color: var(--vscode-breadcrumb-focusForeground);
 }
 
-.documentation .nav-button, .modal .nav-button {
+.modal .nav-button {
   float: right;
   font-size: 1.5rem;
 }

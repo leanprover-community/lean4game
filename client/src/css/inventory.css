@@ -54,7 +54,7 @@
   background-color: rgb(242, 190, 255);
 }
 
-.inventory .item:not(.locked), .inventory .item.enabled {
+.inventory .item, .inventory .item.enabled {
   cursor: pointer;
 }
 
@@ -133,4 +133,14 @@
 	width: 1rem;
 	align-items: end;
 	text-align: end;
+}
+
+.documentation .nav-button {
+  float: right;
+  font-size: 1.5rem;
+}
+
+.documentation .nav-button.lock {
+  float: left;
+  font-size: .7rem;
 }

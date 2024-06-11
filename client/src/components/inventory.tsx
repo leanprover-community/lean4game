@@ -4,8 +4,8 @@ import '../css/inventory.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faBan, faCheck, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { faClipboard } from '@fortawesome/free-regular-svg-icons'
-import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api';
-import { selectDifficulty, selectInventory } from '../state/progress';
+import { useLoadDocQuery, InventoryTile, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api';
+import { changedInventory, selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,7 @@ import { t } from 'i18next';
 import { NavButton } from './navigation';
 import { LoadingIcon, Markdown } from './utils';
 import { GameIdContext } from '../state/context';
+import { useAppDispatch } from '../hooks';
 
 
 /** Context which manages the inventory */
@@ -21,8 +22,8 @@ const InventoryContext = createContext<{
   setTheoremTab: React.Dispatch<React.SetStateAction<string>>,
   categoryTab: "tactic"|"theorem"|"definition",
   setCategoryTab: React.Dispatch<React.SetStateAction<"tactic"|"theorem"|"definition">>,
-  docTile: any,
-  setDocTile: React.Dispatch<React.SetStateAction<any>>
+  docTile: InventoryTile,
+  setDocTile: React.Dispatch<React.SetStateAction<InventoryTile>>
 }>({
   theoremTab: null,
   setTheoremTab: () => {},
@@ -191,21 +192,37 @@ export function Inventory () {
 
 /** The `documentation` */
 export function Documentation() {
-  const { gameId } = React.useContext(GameIdContext)
+  const dispatch = useAppDispatch()
+  const { gameId } = useContext(GameIdContext)
+  const difficulty = useSelector(selectDifficulty(gameId))
+
   // const docEntry = useLoadDocQuery({game: gameId, type: type, name: name})
   let { docTile, setDocTile } = useContext(InventoryContext)
 
   const docEntry = useLoadDocQuery({game: gameId, name: docTile.name})
-
+  let inv: string[] = selectInventory(gameId)(store.getState())
 
   // Set `inventoryDoc` to `null` to close the doc
   function closeInventoryDoc() { setDocTile(null) }
 
   return <div className="documentation">
-    <NavButton icon={faXmark}
+    <NavButton
+      icon={faXmark}
       onClick={closeInventoryDoc}
       inverted={true} />
-    <h1 className="doc">{docTile.data?.displayName}</h1>
+    { difficulty == 1 && docTile.locked &&
+      <NavButton
+        icon={faLock}
+        title={t("Unlock this item!")}
+        onClick={() => {
+          console.log(`Adding '${docTile.name}' to the inventory.`)
+          dispatch(changedInventory({ game: gameId, inventory: [...inv, docTile.name] }))
+          closeInventoryDoc() // note: closing seems better than keeping it open without the lock disappearing
+        }}
+        className="lock"
+        inverted={true} />
+    }
+    <h1 className="doc">{docTile.displayName}</h1>
     <p><code>{docEntry.data?.statement}</code></p>
     <Markdown>{t(docEntry.data?.content, {ns: gameId})}</Markdown>
   </div>
