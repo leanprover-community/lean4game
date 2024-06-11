@@ -210,6 +210,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       },
       overviewRulerBorder: false,
       theme: 'vs-code-theme-converted',
+      fontFamily: "JuliaMono",
       contextmenu: false
     })
 

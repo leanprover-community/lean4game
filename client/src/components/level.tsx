@@ -656,6 +656,7 @@ function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChange
       lineNumbersMinChars: 3,
       tabSize: 2,
       'semanticHighlighting.enabled': true,
+      fontFamily: "JuliaMono",
       theme: 'vs-code-theme-converted'
     })
     if (onDidChangeSelection) {

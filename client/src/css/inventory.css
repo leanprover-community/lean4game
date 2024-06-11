@@ -10,6 +10,7 @@
 
 .documentation h1 {
   font-weight: 900;
+  font-family: "JuliaMono", monospace;
 }
 
 .documentation.hidden {
@@ -31,6 +32,11 @@
   padding-top: .1rem;
   padding-bottom: .1rem;
   position: relative;
+}
+
+.inventory .item, .inventory .tab-bar:not(.major) .tab {
+  font-family: "JuliaMono", monospace;
+  font-size: .9rem;
 }
 
 .inventory .item.locked {

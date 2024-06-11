@@ -169,8 +169,8 @@
 .exercise .command-text {
   flex: 1;
   background-color: #fff;
-  font-family: "Droid Sans Mono", "monospace", monospace;
   font-size: 14px;
+  font-family: "JuliaMono", monospace;
   padding: 0.4em .6em 0;
 }
 
@@ -195,6 +195,11 @@
   /* border: 2px dotted darkgreen; */
   display: flex;
   flex-direction: row;
+  font-family: "JuliaMono", monospace;
+}
+
+.goal-tab .hyp-group-title {
+  font-family: "Roboto", sans-serif;
 }
 
 .goal-tab .goal, .goal-tab .hypotheses {
