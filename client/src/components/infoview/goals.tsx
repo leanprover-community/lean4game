@@ -158,8 +158,8 @@ export const Goal = React.memo((props: GoalProps) => {
             { ...locs, subexprTemplate: { mvarId: goal.mvarId, loc: { target: '' }}} :
             undefined,
         [locs, goal.mvarId])
-    const goalLi = <div key={'goal'}>
-        <div className="goal-title">{t("Goal")}:</div>
+    const goalLi = <div key={'goal'} className="goal">
+        {/* <div className="goal-title">{t("Goal")}:</div> */}
         <LocationsContext.Provider value={goalLocs}>
             <InteractiveCode fmt={goal.type} />
         </LocationsContext.Provider>
@@ -173,18 +173,28 @@ export const Goal = React.memo((props: GoalProps) => {
     const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
     const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
 
-    return <div>
+    return <>
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
         {filter.reverse && goalLi}
+        <div className="hypotheses">
         {! typewriter && objectHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">{t("Objects")}:</div>
             {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {!typewriter && assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">{t("Assumptions")}:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        {!filter.reverse && goalLi}
+        </div>
+        {!filter.reverse && <>
+            <div className='goal-sign'>
+                <svg width="100%" height="100%">
+                    <line x1="0%" y1="0%" x2="0%" y2="100%" />
+                    <line x1="0%" y1="50%" x2="100%" y2="50%" />
+                </svg>
+            </div>
+            {goalLi}
+        </>}
         {/* {showHints && hints} */}
-    </div>
+    </>
 })
 
 export const MainAssumptions = React.memo((props: GoalProps2) => {
