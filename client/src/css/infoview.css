@@ -193,6 +193,7 @@
 
 .goal-tab {
   /* border: 2px dotted darkgreen; */
+  padding: .2rem;
   display: flex;
   flex-direction: row;
   font-family: "JuliaMono", monospace;

@@ -14,6 +14,7 @@ import { GameHint, InteractiveGoalsWithHints } from './infoview/rpc_api'
 import { lastStepHasErrors } from './infoview/goals'
 
 import '../css/chat.css'
+import { faHome } from '@fortawesome/free-solid-svg-icons'
 
 /** Split a string by double newlines and filters out empty segments. */
 function splitIntro (intro : string) {
@@ -72,12 +73,14 @@ export function ChatButtons ({counter=undefined, setCounter=()=>{}, introMessage
   setCounter?: React.Dispatch<React.SetStateAction<number>>
   introMessages?: GameHintWithStep[]
 }) {
+  let { t } = useTranslation()
 
   const { mobile } = useContext(PreferencesContext)
   const { gameId, worldId, levelId } = useContext(GameIdContext)
   const {setPage} = useContext(PageContext)
   const dispatch = useAppDispatch()
   const gameInfo = useGetGameInfoQuery({game: gameId})
+  const { proof } = useContext(ProofContext)
 
   const readIntro = useSelector(selectReadIntro(gameId, worldId))
 
@@ -124,6 +127,20 @@ export function ChatButtons ({counter=undefined, setCounter=()=>{}, introMessage
       </>
     )}
     { (worldId && levelId) ? <MoreHelpButton /> : <></> }
+    { (worldId && levelId && proof?.completed) ?
+      (levelId == gameInfo.data?.worldSize[worldId] ?
+        <Button className="btn"
+            title=""
+            to={`/${gameId}`} >
+          <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
+        </Button> :
+        <Button className="btn"
+            title=""
+            to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} >
+          {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+
+        </Button>
+      ) : <></> }
   </div>
 }
 
