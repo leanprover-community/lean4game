@@ -107,9 +107,14 @@ export const progressSlice = createSlice({
     deleteProgress(state: ProgressState, action: PayloadAction<{game: string}>) {
       state.games[action.payload.game.toLowerCase()] = {inventory: [], data: {}, readIntro: false, difficulty: DEFAULT_DIFFICULTY}
     },
+    /** delete progress for this world */
+    deleteWorldProgress(state: ProgressState, action: PayloadAction<{game: string, world: string}>) {
+      // addWorldProgress(state, action)
+      state.games[action.payload.game.toLowerCase()].data[action.payload.world] = {readIntro: false}
+    },
     /** delete progress for this level */
     deleteLevelProgress(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
-      addLevelProgress(state, action)
+      // addLevelProgress(state, action)
       state.games[action.payload.game.toLowerCase()].data[action.payload.world][action.payload.level] = initalLevelProgressState
     },
     /** load progress, e.g. from external import */
@@ -223,5 +228,5 @@ export function selectTypewriterMode(game: string) {
 
 /** Export actions to modify the progress */
 export const { changedSelection, codeEdited, levelCompleted, deleteProgress,
-  deleteLevelProgress, loadProgress, helpEdited, changedInventory, changedReadIntro,
+  deleteLevelProgress, deleteWorldProgress, loadProgress, helpEdited, changedInventory, changedReadIntro,
   changedDifficulty, changeTypewriterMode} = progressSlice.actions

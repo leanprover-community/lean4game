@@ -23,3 +23,8 @@
   float: right;
   font-size: 1.5rem;
 }
+
+.settings-buttons .btn {
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+}
