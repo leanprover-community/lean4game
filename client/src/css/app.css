@@ -78,6 +78,7 @@ body {
 .btn-disabled, .btn[disabled] {
   color: var(--clr-dark-gray);
   background: var(--clr-light-gray);
+  cursor: not-allowed;
 }
 
 .btn-inverted.btn-disabled, .btn-inverted.btn[disabled] {
