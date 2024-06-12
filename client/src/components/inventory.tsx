@@ -136,9 +136,13 @@ function InventoryList({ items, tab=null, setTab=()=>{} } :
       </div>}
     <div className="inventory-list">
       {[...modifiedItems].sort(
-          // For lemas, sort entries `available > disabled > locked`
-          // otherwise alphabetically
-          (x, y) => +(categoryTab == "theorem") * (+x.locked - +y.locked || +x.disabled - +y.disabled) || x.displayName.localeCompare(y.displayName)
+          // alternative approach:
+          // // For theorems, sort entries `available > disabled > locked`
+          // // otherwise alphabetically
+          // (x, y) => +(categoryTab == "theorem") * (+x.locked - +y.locked || +x.disabled - +y.disabled) || x.displayName.localeCompare(y.displayName)
+
+          // sort alphabetically
+          (x, y) => x.displayName.localeCompare(y.displayName)
         ).filter(item => !item.hidden && ((tab ?? categories[0]) == item.category)).map((item, i) => {
             return <InventoryItem key={`${item.category}-${item.name}`}
               item={item}
