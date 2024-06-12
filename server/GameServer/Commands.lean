@@ -301,48 +301,6 @@ If omitted, the current tab will remain open. -/
 elab "TheoremTab"  category:str : command =>
   modifyCurLevel fun level => pure {level with theoremTab := category.getString}
 
-
-/-! DEPRECATED -/
-
-elab doc:docComment ? "LemmaDoc" name:ident "as" displayName:str "in" category:str content:str ? :
-    command => do
-  logWarning "Deprecated. Has been renamed to `TheoremDoc`"
-  let doc ← parseDocCommentLegacy doc content
-  modifyEnv (inventoryTemplateExt.addEntry · {
-    type := .Theorem
-    name := name.getId
-    category := category.getString
-    displayName := displayName.getString
-    content := doc })
-
-elab "NewLemma" args:ident* : command => do
-  logWarning "Deprecated. Has been renamed to `NewTheorem`"
-  checkCommandNotDuplicated ((←getCurLevel).theorems.new) "NewTheorem"
-  for name in ↑args do
-    try let _decl ← getConstInfo name.getId catch
-      | _ => logErrorAt name m!"unknown identifier '{name}'."
-    checkInventoryDoc .Theorem name -- TODO: Add (template := "[mathlib]")
-  modifyCurLevel fun level => pure {level with
-    theorems := {level.theorems with new := args.map (·.getId)}}
-
-elab "DisabledLemma" args:ident* : command => do
-  logWarning "Deprecated. Has been renamed to `DisabledTheorem`"
-  checkCommandNotDuplicated ((←getCurLevel).theorems.disabled) "DisabledTheorem"
-  for name in ↑args  do checkInventoryDoc .Theorem name
-  modifyCurLevel fun level => pure {level with
-    theorems := {level.theorems with disabled := args.map (·.getId)}}
-
-elab "OnlyLemma" args:ident* : command => do
-  logWarning "Deprecated. Has been renamed to `OnlyTheorem`"
-  checkCommandNotDuplicated ((←getCurLevel).theorems.only) "OnlyTheorem"
-  for name in ↑args do checkInventoryDoc .Theorem name
-  modifyCurLevel fun level => pure {level with
-    theorems := {level.theorems with only := args.map (·.getId)}}
-
-elab "LemmaTab"  category:str : command => do
-  logWarning "Deprecated. Has been renamed to `TheoremTab`"
-  modifyCurLevel fun level => pure {level with theoremTab := category.getString}
-
 /-! # Exercise Statement -/
 
 /-- You can write `Statement add_comm (preamble := simp) .... := by` which
@@ -988,6 +946,8 @@ elab "MakeGame" : command => do
 
         -- add marks for `disabled` and `new` theorems here, so that they only apply to
         -- the current level.
+
+
         let itemsArray := items.toArray
           |>.insertionSort (fun a b => a.1.toString < b.1.toString)
           |>.map (·.2)
