@@ -91,8 +91,8 @@
   flex-direction: row;
 }
 
-.goals-section div {
-  flex-grow: 1;
+.goal-tabs {
+  width: 100%;
 }
 
 #current-proof, #main-assumptions {

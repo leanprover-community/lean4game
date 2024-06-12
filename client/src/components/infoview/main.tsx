@@ -29,7 +29,7 @@ import { ChatContext, PageContext, PreferencesContext, MonacoEditorContext, Proo
 import { Typewriter, getInteractiveDiagsAt, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { CircularProgress } from '@mui/material';
-import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
+import { GameHint, InteractiveGoalWithHints, InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { store } from '../../state/store';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
@@ -340,17 +340,17 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
 // }, fastIsEqual)
 
 /** The tabs of goals that lean has after the command of this step has been processed */
-function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: InteractiveGoalsWithHints, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
+export function GoalsTabs({ goals, last, onClick, onGoalChange=(n)=>{}}: { goals: InteractiveGoalWithHints[], last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
   let { t } = useTranslation()
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
-  if (proofStep.goals.length == 0) {
+  if (goals.length == 0) {
     return <></>
   }
 
   return <div className="goal-tabs" onClick={onClick}>
     <div className={`tab-bar ${last ? 'current' : ''}`}>
-      {proofStep.goals.map((goal, i) => (
+      {goals.map((goal, i) => (
         // TODO: Should not use index as key.
         <div key={`proof-goal-${i}`} className={`tab ${i == (selectedGoal) ? "active" : ""}`} onClick={(ev) => { onGoalChange(i); setSelectedGoal(i); ev.stopPropagation() }}>
           {i ? t("Goal") + ` ${i + 1}` : t("Active Goal")}
@@ -358,7 +358,7 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
       ))}
     </div>
     <div className="goal-tab vscode-light">
-      <Goal typewriter={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]?.goal} unbundle={false} />
+      <Goal typewriter={false} filter={goalFilter} goal={goals[selectedGoal]?.goal} unbundle={false} />
     </div>
   </div>
 }
@@ -570,7 +570,7 @@ export function TypewriterInterface({props}) {
                   }
                   {/* <GoalsTabs proofStep={step} last={i == proof?.steps.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/> */}
                   {!(isLastStepWithErrors(proof, i)) &&
-                    <GoalsTabs proofStep={step} last={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) ? (n) => setDisableInput(n > 0) : (n) => {}}/>
+                    <GoalsTabs goals={step.goals} last={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) ? (n) => setDisableInput(n > 0) : (n) => {}}/>
                   }
                   {mobile && i == proof?.steps.length - 1 &&
                     <MoreHelpButton />
