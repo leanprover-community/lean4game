@@ -26,6 +26,11 @@ export function InfoPopup () {
           Warning: In most browsers, deleting cookies will also clear the local storage (or "local site data").
           Make sure to download your game progress first!
         </p>
+        <h2>Accessibility</h2>
+        <p>
+          If you experience any accessibilty barriers, please get in contact with us!
+          We are dedicated to address such barriers to the best of our abilities.
+        </p>
         <h2>Development</h2>
         <p>The game engine has been created by <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>.
           On a prototype by <strong>Patrick Massot</strong>.
