@@ -311,6 +311,14 @@ td code  {
   background: none;
 }
 
+.editor-mode .proof {
+  height: 100%;
+}
+
+.editor-mode .tmp-pusher {
+  height: 0;
+}
+
 /* Push the goals to the bottom for now, until we insert the proof history above. */
 .exercise-content {
   display: flex;

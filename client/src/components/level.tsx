@@ -367,7 +367,7 @@ export function LevelWrapper({visible = true}) {
         </div>
       }
       { levelId > 0 &&
-        <div className="exercise-content">
+        <div className={`exercise-content ${(typewriterMode && !lockEditorMode) ? 'typewriter-mode': 'editor-mode' }`}>
             <NavButton
               className="btn-input-mode"
               icon={(typewriterMode && !lockEditorMode) ? faCode : faTerminal}
