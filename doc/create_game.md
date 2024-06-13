@@ -8,9 +8,10 @@ This tutorial walks you through creating a new game for lean4. It covers from wr
 2. Clone the game repo.
 3. Call `lake update -R && lake build` to build the Lean project.
 
-Note that you need to host your game's code on github to publish it online later on. If you only
-want to play it locally, you can simply clone the NNG repo and start modifying that one.
+### Running the game
 
+Now you can open the game in VSCode (`cd YourGame/` and `code .`), and start modifying it like a regular Lean project. To run the game consult
+[Running Games Locally](https://github.com/leanprover-community/lean4game/blob/main/doc/running_locally.md).
 
 ## 2. Game.lean
 
