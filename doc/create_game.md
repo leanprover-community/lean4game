@@ -10,8 +10,7 @@ This tutorial walks you through creating a new game for lean4. It covers from wr
 
 ### Running the game
 
-Now you can open the game in VSCode (`cd YourGame/` and `code .`), and start modifying it like a regular Lean project. To run the game consult
-[Running Games Locally](https://github.com/leanprover-community/lean4game/blob/main/doc/running_locally.md).
+Now you can open the game in VSCode (`cd YourGame/` and `code .`), and start modifying it like a regular Lean project. To run the game consult the section " 5.Testing the Game Locally" below.
 
 ## 2. Game.lean
 
