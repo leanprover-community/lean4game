@@ -326,15 +326,15 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     "Statement" statementName:ident ? preamble:preambleArg ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
-  -- add an optional tactic sequence that the engine executes before the game starts
+  -- Add an optional tactic sequence that the engine executes before the game starts
   let preambleSeq : TSyntax `Lean.Parser.Tactic.tacticSeq ← match preamble with
-  | none => `(Parser.Tactic.tacticSeq|skip)
-  | some x => match x with
+  | some arg => match arg with
     | `(preambleArg| (preamble := $tac)) => pure tac
-    | _ => `(Parser.Tactic.tacticSeq|skip)
+    | _ => `(Parser.Tactic.tacticSeq| skip)
+  | none => `(Parser.Tactic.tacticSeq| skip)
 
-  let docContent ← parseDocComment doc
-  let docContent ← match docContent with
+  -- Translate the docstring of the `Statement`
+  let docComment : Option String ← match (← parseDocComment doc) with
   | none => pure none
   | some d => d.translate
 
@@ -356,7 +356,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   let modifiedVal ← match val with
   | `(Parser.Command.declVal| := by $proof) =>
     `(Parser.Command.declVal| := by {let_intros; $(⟨preambleSeq⟩); $(⟨proof⟩)})
-  | _ => panic "expected `:= by`"
+  | _ => panic "Expected `:= by`!"
 
   -- Add theorem to context.
   match statementName with
@@ -374,12 +374,12 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
       let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig $modifiedVal)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Theorem name (name := fullName) (template := docContent)
+      checkInventoryDoc .Theorem name (name := fullName) (template := docComment)
     else
       let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig $modifiedVal)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Theorem name (name := fullName) (template := docContent)
+      checkInventoryDoc .Theorem name (name := fullName) (template := docComment)
   | none =>
     let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig $modifiedVal)
     elabCommand thmStatement
@@ -460,7 +460,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     goal := sig,
     preamble := preambleSeq
     scope := scope,
-    descrText := docContent
+    descrText := docComment
     statementName := match statementName with
     | none => default
     | some name => currNamespace ++ name.getId
