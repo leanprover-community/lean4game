@@ -356,3 +356,15 @@ td code  {
   background: #DDF6FF;
   text-align: center;
 }
+
+#unicode-input {
+  min-width: 0;
+  flex: 1;
+  /* padding: 0.4em .6em 0; */
+  font-size: var(--vscode-editor-font-size);
+  background-color: white;
+  border: 2px solid orange;
+  display: flex;
+  flex-direction: column;
+  font-family: JuliaMono, monospace;
+}

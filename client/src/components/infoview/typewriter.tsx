@@ -21,6 +21,8 @@ import { ChatContext, PageContext, MonacoEditorContext, ProofContext, GameIdCont
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
+import { InputAbbreviationRewriter } from '@leanprover/unicode-input-component'
+import ContentEditable from 'react-contenteditable'
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;
@@ -90,6 +92,19 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const {typewriterInput, setTypewriterInput} = React.useContext(PageContext)
 
   const inputRef = useRef()
+
+  // TODO: added for new typewriter. Clean up.
+  const [abbrRewriter, setAbbrRewriter] = useState<InputAbbreviationRewriter>()
+  const typewriterRef = useRef()
+  const typewriterContent = useRef('(new typewriter)')
+  const handleTypewriterChange = evt => {
+    typewriterContent.current = evt.target.value;
+    abbrRewriter?.resetAbbreviations()
+  };
+  const handleTypeWriterBlur = () => {
+    console.log(`handle typewriter blur. content: ${typewriterContent.current}`);
+  };
+
 
   // The context storing all information about the current proof
   const {proof, setProof, interimDiags, setInterimDiags, setCrashed} = React.useContext(ProofContext)
@@ -179,6 +194,15 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   // }, [uri]);
 
+  // Use unicode abbreviations in typewriter input
+  useEffect(() => {
+    const abbrRewriter = new InputAbbreviationRewriter({
+      abbreviationCharacter: "\\",
+      customTranslations: {},
+      eagerReplacementEnabled: false
+    }, typewriterRef.current!)
+    setAbbrRewriter(abbrRewriter)
+  }, [])
 
   useEffect(() => {
     const myEditor = monaco.editor.create(inputRef.current!, {
@@ -267,6 +291,14 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
         <div className="typewriter-input-wrapper">
           <div ref={inputRef} className="typewriter-input" />
         </div>
+
+        <ContentEditable
+          innerRef={typewriterRef}
+          id="unicode-input"
+          html={typewriterContent.current}
+          onBlur={handleTypeWriterBlur}
+          onChange={handleTypewriterChange} />
+        {/* <div ref={inputRef2} id="unicode-input" contentEditable="true"></div> */}
         <button type="submit" disabled={processing} className="btn btn-inverted">
           <FontAwesomeIcon icon={faWandMagicSparkles} />&nbsp;{t("Execute")}
         </button>
