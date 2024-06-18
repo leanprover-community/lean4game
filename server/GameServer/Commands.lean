@@ -352,11 +352,10 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     collectUsedInventory proof
   | _ => throwError "expected `:=`"
 
-  -- extract the `tacticSeq` from `val` in order to add `let_intros` in front.
-  -- TODO: don't understand meta-programming enough to avoid having `let_intros`
-  -- duplicated three times below…
-  let tacticStx : TSyntax `Lean.Parser.Tactic.tacticSeq := match val with
-  | `(Parser.Command.declVal| := by $proof) => proof
+  -- modify the proof to start with `let_intros` and any specified preamble sequence.
+  let modifiedVal ← match val with
+  | `(Parser.Command.declVal| := by $proof) =>
+    `(Parser.Command.declVal| := by {let_intros; $(⟨preambleSeq⟩); $(⟨proof⟩)})
   | _ => panic "expected `:= by`"
 
   -- Add theorem to context.
@@ -372,17 +371,17 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
       -- in that case.
       logWarningAt name (m!"Environment already contains {fullName}! Only the existing " ++
       m!"statement will be available in later levels:\n\n{origType}")
-      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
+      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig $modifiedVal)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Theorem name (name := fullName) (template := docContent)
     else
-      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
+      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig $modifiedVal)
       elabCommand thmStatement
       -- Check that statement has a docs entry.
       checkInventoryDoc .Theorem name (name := fullName) (template := docContent)
   | none =>
-    let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
+    let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig $modifiedVal)
     elabCommand thmStatement
 
   let msgs := (← get).messages
