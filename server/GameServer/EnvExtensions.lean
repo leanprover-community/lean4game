@@ -109,7 +109,7 @@ structure InventoryTile where
   hidden := false
   /-- hover text -/
   altTitle : String := default
-deriving ToJson, FromJson, Repr, Inhabited
+deriving ToJson, FromJson, Repr, Inhabited, BEq
 
 def InventoryItem.toTile (item : InventoryItem) : InventoryTile := {
       name := item.name,

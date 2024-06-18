@@ -229,6 +229,16 @@ export function Documentation() {
     <h1 className="doc">{docTile.displayName}</h1>
     <p><code>{docEntry.data?.statement}</code></p>
     <Markdown>{t(docEntry.data?.content, {ns: gameId})}</Markdown>
+    {/* TODO: The condition below should be updated so that the section
+    is displayed whenever it's non-empty. */}
+    {docTile.proven && <>
+        <h2>Further details</h2>
+        <ul>
+          {docTile.proven && <li>Proven in: <a href={`#/${gameId}/world/${docTile.world}/level/${docTile.level}`}>{docTile.world} level {docTile.level}</a></li>}
+        </ul>
+      </>
+    }
+
   </div>
 }
 
