@@ -14,7 +14,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@leanprover/infoview": "^0.4.3",
+    "@leanprover/infoview": "^0.7.1",
     "@leanprover/unicode-input-component": "^0.1.0",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.1",

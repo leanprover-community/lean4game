@@ -55,18 +55,18 @@
   border-radius: 3px 3px 3px 3px;
 }
 
-.message.information, .message.info {
+.message.information, .message.info, .message.kind-5, .message.kind-3, .message.kind-4 {
   /* color: #059; */
   color: #000;
   background-color: #DDF6FF;
 }
 
-.message.warning {
+.message.warning, .message.kind-2 {
   color: #9F6000;
   background-color: #FEEFB3;
 }
 
-.message.error {
+.message.error, .message.kind-1 {
   color: #D8000C;
   background-color: #FFBABA;
 }
@@ -77,7 +77,7 @@
   box-shadow: .0em .0em .5em .2em #EEE;
  }
 
-.message.success {
+.message.success, , .message.kind-6 {
   color: #000;
   background-color: #E5FFDD;
 }

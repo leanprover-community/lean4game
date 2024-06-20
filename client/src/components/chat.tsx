@@ -12,9 +12,14 @@ import { Button, Markdown } from './utils'
 import { ChatContext, GameIdContext, PageContext, PreferencesContext, ProofContext } from '../state/context'
 import { GameHint, InteractiveGoalsWithHints } from './infoview/rpc_api'
 import { lastStepHasErrors } from './infoview/goals'
+import { AllMessages } from '../../../node_modules/@leanprover/infoview/dist/infoview/messages'
+import { LeanDiagnostic, RpcErrorCode, getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api'
+import { Location, DocumentUri, Diagnostic, DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol'
+import { InteractiveMessage } from '../../../node_modules/lean4-infoview/src/infoview/traceExplorer'
 
 import '../css/chat.css'
 import { faHome } from '@fortawesome/free-solid-svg-icons'
+
 
 /** Split a string by double newlines and filters out empty segments. */
 function splitIntro (intro : string) {
@@ -164,11 +169,23 @@ function getHintText(hint: GameHint): string {
   }
 }
 
+/** Hint kinds. Note that number 1-4 are matching the numbers from `DiagnosticSeverity`
+ * from the vscode language server protocol.
+ */
+enum HintKind {
+  Error = 1,
+  Warning = 2,
+  Information = 3,
+  Hint = 4,
+  GameHint = 5,
+  Conclusion = 7,
+}
+
 /** Bundling a hint with the proof-step it comes from. */
 type GameHintWithStep = {
   hint: GameHint
+  kind: HintKind
   step?: number
-  conclusion?: boolean
 }
 
 /** Filter hints to not show consequtive identical hints twice.
@@ -186,8 +203,14 @@ export function filterHints(hints: GameHint[], prevHints: GameHint[]): GameHint[
   }
 }
 
+// TODO
+function helper(step, proof, kind, typewriterMode, selectedStep) {
+  return (step == proof?.steps?.length - (lastStepHasErrors(proof) ? 2 : 1) ? ' recent' : '') +
+  (!(kind == HintKind.Conclusion) && step >= (typewriterMode ? proof?.steps?.length : selectedStep+1) ? ' deleted-hint' : '')
+}
+
 /** A hint as it is displayed in the chat. */
-export function Hint({hint, step=null, conclusion=false} : GameHintWithStep) {
+export function Hint({hint, kind, step=null} : GameHintWithStep) {
   const { levelId } = useContext(GameIdContext)
   const { selectedStep, setSelectedStep } = useContext(ChatContext)
 
@@ -208,10 +231,9 @@ export function Hint({hint, step=null, conclusion=false} : GameHintWithStep) {
   // In typewriter, deleting parts of the proof stores the removed hints as `deletedChat`
   // until the next command is submitted; in editor, moving the cursor through the proof will
   // render all hints
-  return <div className={`message ${conclusion ? 'success' : hint.hidden ? 'warning' : 'information'} step-${step}` +
-      ((selectedStep !== null && step == selectedStep) ? ' selected' : '') +
-      (step == proof?.steps?.length - (lastStepHasErrors(proof) ? 2 : 1) ? ' recent' : '') +
-      (!conclusion && step >= (typewriterMode ? proof?.steps?.length : selectedStep+1) ? ' deleted-hint' : '') } onClick={toggleSelection}>
+  return <div className={`message kind-${kind} step-${step}` +
+      ((selectedStep !== null && step == selectedStep) ? ' selected' : '') + helper(step, proof, kind, typewriterMode, selectedStep)
+       } onClick={toggleSelection}>
     <Markdown>{getHintText(hint)}</Markdown>
   </div>
 }
@@ -221,9 +243,8 @@ export function Hint({hint, step=null, conclusion=false} : GameHintWithStep) {
  *
  * Set `conclusion` to true to trigger different style and disable selecting/deleting.
  */
-export function Hints({ hints, conclusion, counter=undefined } : {
+export function Hints({ hints, counter=undefined } : {
   hints: GameHintWithStep[],
-  conclusion?: boolean,
   counter?: number
 }) {
 
@@ -238,7 +259,7 @@ export function Hints({ hints, conclusion, counter=undefined } : {
   return <>
     { hints.slice(0, counter).map((hint, j) =>
       ((!hint.hint.hidden || showHelp.has(hint.step)) &&
-        <Hint key={`hint-${hint.step}-${j}`} hint={hint.hint} step={hint.step} conclusion={conclusion} />
+        <Hint key={`hint-${hint.step}-${j}`} hint={hint.hint} kind={hint.kind} step={hint.step} />
       )
     )}
     {/* { //showHelp.has(hint.step) &&
@@ -268,7 +289,6 @@ export function ChatPanel ({visible = true}) {
   const [counter, setCounter] = useState(1)
 
   const [introText, setIntroText] = useState<Array<GameHintWithStep>>([])
-  const [chatMessages, setChatMessages] = useState<Array<GameHintWithStep>>([])
   const { chatRef, deletedChat, showHelp, selectedStep } = useContext(ChatContext)
   const { proof } = useContext(ProofContext)
 
@@ -280,11 +300,9 @@ export function ChatPanel ({visible = true}) {
 
   // load and display the correct intro text
   useEffect(() => {
-    let messages: GameHintWithStep[] = []
-
     if (levelId > 0) {
       let introText = t(levelInfo.data?.introduction, {ns : gameId}).trim()
-      let introHint: GameHintWithStep = {hint: {text: introText, hidden: false, rawText: introText }, step: 0}
+      let introHint: GameHintWithStep = {hint: {text: introText, hidden: false, rawText: introText }, kind: HintKind.GameHint, step: 0}
 
       // playable level: show the level's intro
       if (levelInfo.data?.introduction) {
@@ -294,16 +312,10 @@ export function ChatPanel ({visible = true}) {
       else {
         setIntroText([])
       }
-
-      proof?.steps?.forEach((step, i) => {
-        console.log("tesr")
-        messages = messages.concat(filterHints(step.goals[0]?.hints, proof.steps[i-1]?.goals[0]?.hints).map(hint => ({hint: hint, step: i})))
-      })
-
     } else {
       if (worldId) {
         let introText = t(gameInfo.data?.worlds.nodes[worldId].introduction, {ns: gameId}).trim()
-        let introHints: GameHintWithStep[] = splitIntro(introText).map( txt => ({hint: {text: txt, hidden: false, rawText: txt }, step: 0}))
+        let introHints: GameHintWithStep[] = splitIntro(introText).map( txt => ({hint: {text: txt, hidden: false, rawText: txt }, kind: HintKind.GameHint, step: 0}))
 
         // Level 0: show the world's intro
         if (gameInfo.data?.worlds.nodes[worldId].introduction) {
@@ -314,7 +326,7 @@ export function ChatPanel ({visible = true}) {
         }
       } else {
         let introText = t(gameInfo.data?.introduction, {ns : gameId}).trim()
-        let introHints: GameHintWithStep[] = splitIntro(introText).map( txt => ({hint: {text: txt, hidden: false, rawText: txt }, step: 0}))
+        let introHints: GameHintWithStep[] = splitIntro(introText).map( txt => ({hint: {text: txt, hidden: false, rawText: txt }, kind: HintKind.GameHint, step: 0}))
 
         // world overview: show the game's intro
         if (gameInfo.data?.introduction) {
@@ -325,9 +337,6 @@ export function ChatPanel ({visible = true}) {
         }
       }
     }
-    console.log('chat messages:')
-    console.log(messages)
-    setChatMessages(messages)
   }, [gameInfo, levelInfo, gameId, worldId, levelId, proof])
 
   // Scroll the chat
@@ -355,7 +364,7 @@ export function ChatPanel ({visible = true}) {
       console.debug('scroll chat: down')
       chatRef.current!.lastElementChild?.scrollIntoView({block: "center"})
     }
-  }, [counter, introText, chatMessages, gameId, worldId, levelId])
+  }, [counter, introText, gameId, worldId, levelId])
 
   // Scroll down when new hidden hints are triggered
   useEffect(() => {
@@ -380,6 +389,19 @@ export function ChatPanel ({visible = true}) {
     }
   }, [selectedStep, gameId, worldId, levelId])
 
+  /** TODO: What's the magic here? Only needed if diags are displayed in chat. */
+  function diagToString (diag) {
+    // Hide "unsolved goals" messages
+    let message;
+    if ("append" in diag.message && "text" in diag.message.append[0] &&
+    diag.message?.append[0].text === "unsolved goals") {
+        message = diag.message.append[0]
+    } else {
+        message = diag.message
+    }
+    return message
+  }
+
   return <div className={`column chat-panel${visible ? '' : ' hidden'}`}>
     <div ref={chatRef} className="chat" >
       { gameInfo.error &&
@@ -388,17 +410,32 @@ export function ChatPanel ({visible = true}) {
         </div>
         }
       <Hints hints={introText} counter={readIntro ? undefined : counter}/>
-      <Hints hints={chatMessages}/>
+      {proof?.steps.map((step, i) => {
+        let x = [].concat(
+          filterHints(step.goals[0]?.hints, proof.steps[i-1]?.goals[0]?.hints).map(hint => ({hint: hint, kind: HintKind.GameHint, step: i})),
+          // // TODO: Uncomment this if you want to see the diags in chat
+          // step.diags.map(diag => ({hint: diagToString(diag), kind: diag.severity, step: i}))
+        )
+
+        return <>
+          <Hints hints={x}/>
+        </>
+      })}
+
+      {/* <Hints hints={chatMessages}/> */}
       {/* {proof?.steps.map((step, i) =>
         <Hints hints={step.goals[0]?.hints.map(hint => ({hint: hint, step: i}))}/>
       )} */}
       {/* <Hints hints={proof?.steps[proof?.steps?.length - 1]?.goals[0].hints.map(hint => ({hint: hint, step: proof?.steps?.length - 1}))} /> */}
 
       { deletedChat &&
-        <Hints hints={deletedChat.map(hint => ({hint: hint, step: proof?.steps?.length}))} />
+        <Hints hints={deletedChat.map(hint => ({hint: hint, kind: HintKind.GameHint, step: proof?.steps?.length}))} />
       }
       { completed && levelInfo.data?.conclusion &&
-        <Hints hints={[{hint: {text: t("Level completed! 🎉"), rawText: t("Level completed! 🎉"), hidden: false}, step: proof?.steps?.length}, {hint: {text: levelInfo.data?.conclusion, rawText: levelInfo.data?.conclusion, hidden: false}, step: proof?.steps?.length} ]} conclusion={true} />
+        <Hints hints={[
+          {hint: {text: t("Level completed! 🎉"), rawText: t("Level completed! 🎉"), hidden: false}, kind: HintKind.Conclusion, step: proof?.steps?.length},
+          {hint: {text: levelInfo.data?.conclusion, rawText: levelInfo.data?.conclusion, hidden: false}, kind: HintKind.GameHint, step: proof?.steps?.length}
+        ]} />
       }
 
       {/* {chatMessages.map(((t, i) =>
