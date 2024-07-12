@@ -18,8 +18,8 @@ export const AUTO_SWITCH_THRESHOLD = 800
 const initialState: PreferencesState = loadPreferences() ??{
     layout: "auto",
     isSavePreferences: false,
-    language: "en",
-}
+    language: import.meta.env.VITE_CLIENT_DEFAULT_LANGUAGE || "en",
+};
 
 export const preferencesSlice = createSlice({
   name: "preferences",
