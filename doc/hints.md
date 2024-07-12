@@ -89,6 +89,7 @@ You can add use markdown to format your hints, for example you can use KaTex: `$
 **Escaping**: Generally, if you add text inside quotes `" "` (e.g. in `Hint`) you need to escape
 backslashes, but if you provide text inside a doc comment
 `/-- -/` (e.g. in the `Statement` description) you do not!
+Further, inside `Hint` you need to escape all opening curly brackets as `\{` since `{h}` is syntax for inserting a variable name `h`.
 
 TODO: Write a doc about latex/markdown options available.
 
