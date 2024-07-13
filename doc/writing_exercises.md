@@ -54,3 +54,8 @@ You can add attributes as you would for a `theorem`. Most notably, you can make 
 @[simp]
 Statement my_simp_lemma ...
 ```
+
+## Formatting
+
+You can use markdown to format inside quotes like `Hint ""`.
+Latex is also supported, see latex.md.

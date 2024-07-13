@@ -82,16 +82,7 @@ You should probably use `(strict := true)` if you want to give fine-grained deta
 tactics like `have` which do not modify the goal or any existing assumptions, but only
 create new assumptions.
 
-## 6. Formatting
 
-You can add use markdown to format your hints, for example you can use KaTex: `$\\iff$`
-
-**Escaping**: Generally, if you add text inside quotes `" "` (e.g. in `Hint`) you need to escape
-backslashes, but if you provide text inside a doc comment
-`/-- -/` (e.g. in the `Statement` description) you do not!
-Further, inside `Hint` you need to escape all opening curly brackets as `\{` since `{h}` is syntax for inserting a variable name `h`.
-
-TODO: Write a doc about latex/markdown options available.
 
 ### Commutative diagrams
 
