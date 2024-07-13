@@ -194,7 +194,7 @@ You can but a `Statement` inside namespaces like you would with `theorem`.
 
 #### Doc String / Exercise statement
 
-Add a docstring that contains the exercise statement in natural language. If you do this, it will appear at the top of the exercise. It supports Latex.
+Add a docstring that contains the exercise statement in natural language. If you do this, it will appear at the top of the exercise. It supports KateX.
 
 ```lean
 /-- The exercise statement in natural language using latex: $\iff$. -/
@@ -265,13 +265,7 @@ CoverImage "images/cover.png"
 * `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
 * `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
-## Further Notes
-
-Here are some random further things you should consider designing a new game:
-
-* Inside strings, you need to escape backslashes, but not inside doc-strings, therefore you
-  would write `Introduction "some latex here: $\\iff$."` but
-  `/-- some latex here: $\iff$. -/ Statement ...`
-* A world with more than 16 levels will be displayed with the levels spiraling outwards,
-  it might be desirable to stay below that bound. Above 22 levels the spiral starts getting out
-  of control.
+## Number Of Levels Limit
+A world with more than 16 levels will be displayed with the levels spiraling outwards,
+it might be desirable to stay below that bound. Above 22 levels the spiral starts getting out
+of control.

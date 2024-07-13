@@ -120,3 +120,19 @@ $$
 ```
 
 See https://www.jmilne.org/not/Mamscd.pdf
+
+### Truth Tables
+KateX does not support the tabular environment. You can use the array environment instead.
+```
+$$
+\\begin{array}{|c|c|} 
+\\hline
+P & ¬P \\\\
+\\hline
+T & F  \\\\
+F & T  \\\\
+\\hline
+\\end{array}
+$$
+```
+
