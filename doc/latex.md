@@ -13,7 +13,3 @@ Inside strings, you need to escape backslashes, but not inside doc-strings, ther
 # Support
 It is important to mention that KateX supports most but not all of latex and its packages.
 See [supported](https://katex.org/docs/supported.html).
-
-
-
-

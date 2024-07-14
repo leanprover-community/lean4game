@@ -265,7 +265,11 @@ CoverImage "images/cover.png"
 * `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
 * `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
-## Number Of Levels Limit
+## 10. Advanced Topics
+### Number Of Levels Limit
 A world with more than 16 levels will be displayed with the levels spiraling outwards,
 it might be desirable to stay below that bound. Above 22 levels the spiral starts getting out
 of control.
+
+### Latex support
+See latex.md
