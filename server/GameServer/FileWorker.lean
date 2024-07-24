@@ -187,7 +187,7 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (workerState :
 
 where addMessageByDifficulty (info : SourceInfo) (s : MessageData) :=
   -- See `GameServer.FileWorker.WorkerState.difficulty`. Send nothing/warnings/errors
-  -- deppending on difficulty.
+  -- depending on difficulty.
   let difficulty := workerState.difficulty
   if difficulty > 0 then
     addMessage info inputCtx (if difficulty > 1 then .error else .warning) s
@@ -383,7 +383,7 @@ def publishProofState (m : DocumentMeta) (snap : Snapshot) (initParams : Lsp.Ini
   -- -- Should we get the diags from there?
   -- let diag : Array Widget.InteractiveDiagnostic := snap.interactiveDiags.toArray
 
-  -- -- Level is completed if there are no errrors or warnings
+  -- -- Level is completed if there are no errors or warnings
   -- let completed : Bool := ¬ diag.any (fun d =>
   --   d.severity? == some .error ∨ d.severity? == some .warning)
 
