@@ -119,7 +119,7 @@ elab "Languages" t:str* : command => do
   modifyCurGame fun game => pure {game with
     tile := {game.tile with languages := t.map (·.getString) |>.toList}}
 
-/-- The Image of the game (optional). TODO: Not impementeds -/
+/-- The Image of the game (optional). TODO: Not implemented -/
 elab "CoverImage" t:str : command => do
   let file := t.getString
   if not <| ← System.FilePath.pathExists file then
@@ -610,7 +610,7 @@ where filterArgs (args : List Syntax) : List Syntax :=
     | Syntax.node _ `GameServer.Tactic.Hint _ :: _ :: r
     | Syntax.node _ `GameServer.Tactic.Branch _ :: _ :: r =>
       filterArgs r
-    -- delete `Hint` and `Branch` occurence at the end of the tactic sequence.
+    -- delete `Hint` and `Branch` occurrence at the end of the tactic sequence.
     | Syntax.node _ `GameServer.Tactic.Hint _ :: []
     | Syntax.node _ `GameServer.Tactic.Branch _ :: [] =>
         []
