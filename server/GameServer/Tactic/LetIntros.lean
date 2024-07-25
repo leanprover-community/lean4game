@@ -44,7 +44,7 @@ def _root_.Lean.MVarId.letIntros (mvarId : MVarId) : MetaM (Array FVarId × MVar
     mvarId.introNP n
 
 /--
-`let_intros` introduces all `let` statements that are preceeding the proof. Concretely
+`let_intros` introduces all `let` statements that are preceding the proof. Concretely
 it does a subset of what `intros` does.
 
 If names are provided, it will introduce as many `let` statements as there are names.
