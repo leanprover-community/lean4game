@@ -7,6 +7,7 @@ import { ErasePopup } from './erase'
 import { PreferencesPopup } from './preferences'
 import { UploadPopup } from './upload'
 import { RulesPopup } from './rules'
+import { ReportProblemPopup } from './report_problem'
 import '../../css/popup.css'
 import { NavButton } from '../navigation'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -23,7 +24,7 @@ export const PopupContext = React.createContext<{
 })
 
 /** To create a new Popup, one needs to add its content as `React.JSX.Element` here
- * and then call `setPopupConent(key)` at the place where to popup should be opened.
+ * and then call `setPopupContent(key)` at the place where to popup should be opened.
  *
  * TODO: The drawback of this design is that there is no check for key missmatches.
  *       How could that be achieved?
@@ -36,6 +37,7 @@ export const Popups = {
   "privacy": <PrivacyPolicyPopup />,
   "rules": <RulesPopup />,
   "upload": <UploadPopup />,
+  "report_problem": <ReportProblemPopup />,
 }
 
 /** The skeleton for the popups. */

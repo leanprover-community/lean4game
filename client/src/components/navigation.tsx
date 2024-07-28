@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
-  faCircleInfo, faTerminal, faGear, IconDefinition, faShield } from '@fortawesome/free-solid-svg-icons'
+  faCircleInfo, faTerminal, faGear, IconDefinition, faShield, faBug } from '@fortawesome/free-solid-svg-icons'
 import { GameIdContext, PageContext, PreferencesContext } from "../state/context"
 import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api'
 import { downloadProgress } from './popup/erase'
@@ -339,6 +339,11 @@ export function Navigation () {
               icon={faUpload}
               text={t("Upload")}
               onClick={() => {setPopupContent("upload")}}
+              inverted={true} />
+			<NavButton
+              icon={faBug}
+              text={t("Report Problem")}
+              onClick={() => {setPopupContent("report_problem")}}
               inverted={true} />
           </>}
           <NavButton
