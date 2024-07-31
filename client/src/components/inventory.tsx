@@ -124,7 +124,7 @@ function InventoryList({ items, tab=null, setTab=()=>{} } :
     setCurrentWorldItems(_modifiedItems.filter(x => x.world == worldId && x.level < levelId))
     // setRecentItems(_modifiedItems.filter(x => x.world == worldId && x.level == levelId - 1))
 
-  }, [items, inventory])
+  }, []) // TODO: had `items, inventory`
 
   return <>
     { categories.length > 1 &&
