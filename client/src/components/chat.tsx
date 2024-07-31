@@ -417,9 +417,7 @@ export function ChatPanel ({visible = true}) {
           // step.diags.map(diag => ({hint: diagToString(diag), kind: diag.severity, step: i}))
         )
 
-        return <>
-          <Hints hints={x}/>
-        </>
+        return <Hints key={`hints-step-${i}`} hints={x}/>
       })}
 
       {/* <Hints hints={chatMessages}/> */}
