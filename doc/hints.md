@@ -49,6 +49,9 @@ Statement .... := by
 Put variables in the hint text inside brackets like this: `{h}`! This way the server can replace
 the variable's name with the one the user actually used.
 
+*Note*: This means you need to escape any other uses of **opening** curly brackets (i.e. `\{`). See also [LaTeX in Games](latex.md) for
+examples of this.
+
 For example, if the sample proof contains
 
 ```
@@ -84,39 +87,19 @@ create new assumptions.
 
 ## 6. Formatting
 
-You can add use markdown to format your hints, for example you can use KaTex: `$\\iff$`
+You can use Markdown to format your hints and you can
+use LaTeX. See [LaTeX in Games](latex.md) for more details.
 
-**Escaping**: Generally, if you add text inside quotes `" "` (e.g. in `Hint`) you need to escape
-backslashes, but if you provide text inside a doc comment
-`/-- -/` (e.g. in the `Statement` description) you do not!
-Further, inside `Hint` you need to escape all opening curly brackets as `\{` since `{h}` is syntax for inserting a variable name `h`.
+### Images
 
-TODO: Write a doc about latex/markdown options available.
+Hints and introductions/conclusions can also contain images.
 
-### Commutative diagrams
-
-Here is an example of how to write a commutative diagram in KaTeX:
-
-$$
-\begin{CD}
-      A  @>{f}>> B @<{g}<< C    \\
-  @V{h}VV    @V{i}VV   @V{j}VV \\
-      D  @<{k}<< E @>{l}>> F    \\
-  @A{m}AA    @A{n}AA   @V{p}VV \\
-      G  @<{q}<< H @>{r}>> I
-\end{CD}
-$$
+For remote images, simply add:
 
 ```
-$$
-\\begin{CD}
-      A  @>{f}>> B @<{g}<< C    \\\\
-  @V{h}VV    @V{i}VV   @V{j}VV \\\\
-      D  @<{k}<< E @>{l}>> F    \\\\
-  @A{m}AA    @A{n}AA   @V{p}VV \\\\
-      G  @<{q}<< H @>{r}>> I
-\\end{CD}
-$$
+<img src=\"https://url.com/to/image\"/>
 ```
 
-See https://www.jmilne.org/not/Mamscd.pdf
+Local images can currently only be included with a hack:
+
+Images in the game's `images/` folder will be accessible at `data/g/[user]/[repo]/[image].[png|jpg|…]` and thus can be included as if they were external images.
