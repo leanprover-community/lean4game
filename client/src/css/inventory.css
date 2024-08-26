@@ -42,6 +42,7 @@
 .inventory .item.locked {
   border: solid 1px #ccc;
   color: #ccc;
+  background-color: #f2f2f2;
 }
 
 .inventory .item.disabled {
