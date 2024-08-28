@@ -11,7 +11,7 @@ import { WorldTreePanel } from './world_tree'
 
 import i18next from 'i18next'
 import { ChatPanel } from './chat'
-import { LevelWrapper } from './level'
+import { NewLevel } from './level'
 import { GameHint, ProofState } from './infoview/rpc_api'
 import { useSelector } from 'react-redux'
 import { Diagnostic } from 'vscode-languageserver-types'
@@ -54,7 +54,6 @@ function Game() {
   const [interimDiags, setInterimDiags] = useState<Array<Diagnostic>>([])
   const [isCrashed, setIsCrashed] = useState<Boolean>(false)
 
-
   const typewriterMode = useSelector(selectTypewriterMode(gameId))
   const setTypewriterMode = (newTypewriterMode: boolean) => dispatch(changeTypewriterMode({game: gameId, typewriterMode: newTypewriterMode}))
 
@@ -83,7 +82,7 @@ function Game() {
         {<>
           <ChatPanel visible={worldId ? (levelId == 0 && page == 1) :(page == 0)} />
           { worldId ?
-            <LevelWrapper visible={page == 1} /> :
+            <NewLevel visible={page == 1} /> :
             <WorldTreePanel visible={page == 1} />
           }
           <InventoryPanel visible={page == 2} />
@@ -95,10 +94,12 @@ function Game() {
         <ChatPanel />
         <div className="column">
           {/* Note: apparently without this `div` the split panel bugs out. */}
-          {worldId ? <LevelWrapper /> : <WorldTreePanel /> }
+          {worldId ?
+            <NewLevel />
+          : <WorldTreePanel /> }
         </div>
         <InventoryPanel />
-        </Split>
+      </Split>
     }
     </ProofContext.Provider>
   </ChatContext.Provider>

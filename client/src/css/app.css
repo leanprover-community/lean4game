@@ -11,6 +11,10 @@
 
 /* General styling */
 
+html, body, #root, .app {
+    height: 100%;
+}
+
 body {
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -92,12 +96,7 @@ em {
 
 /* App Bar */
 
-#root {
-  height: 100%;
-}
-
 .app {
-  height: 100%;
   display: flex;
   flex-direction: column;
 }

@@ -11,11 +11,11 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button, Markdown } from './utils'
 import { ChatContext, GameIdContext, PageContext, PreferencesContext, ProofContext } from '../state/context'
 import { GameHint, InteractiveGoalsWithHints } from './infoview/rpc_api'
-import { lastStepHasErrors } from './infoview/goals'
-import { AllMessages } from '../../../node_modules/@leanprover/infoview/dist/infoview/messages'
-import { LeanDiagnostic, RpcErrorCode, getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api'
+// import { lastStepHasErrors } from './infoview/goals'
+// import { AllMessages } from '../../../node_modules/@leanprover/infoview/dist/infoview/messages'
+// import { LeanDiagnostic, RpcErrorCode, getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api'
 import { Location, DocumentUri, Diagnostic, DiagnosticSeverity, PublishDiagnosticsParams } from 'vscode-languageserver-protocol'
-import { InteractiveMessage } from '../../../node_modules/lean4-infoview/src/infoview/traceExplorer'
+// import { InteractiveMessage } from '../../../node_modules/lean4-infoview/src/infoview/traceExplorer'
 
 import '../css/chat.css'
 import { faHome } from '@fortawesome/free-solid-svg-icons'
@@ -39,9 +39,10 @@ export function MoreHelpButton({selected=null} : {selected?: number}) {
   const { proof } = React.useContext(ProofContext)
   const { showHelp, setShowHelp } = React.useContext(ChatContext)
 
-  let k = proof?.steps.length ?
-    ((selected === null) ? (proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)) : selected)
-    : 0
+  let k = 0
+  // let k = proof?.steps.length ?
+  //   ((selected === null) ? (proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)) : selected)
+  //   : 0
 
   const activateHiddenHints = (ev) => {
     // If the last step (`k`) has errors, we want the hidden hints from the
@@ -204,10 +205,10 @@ export function filterHints(hints: GameHint[], prevHints: GameHint[]): GameHint[
 }
 
 // TODO
-function helper(step, proof, kind, typewriterMode, selectedStep) {
-  return (step == proof?.steps?.length - (lastStepHasErrors(proof) ? 2 : 1) ? ' recent' : '') +
-  (!(kind == HintKind.Conclusion) && step >= (typewriterMode ? proof?.steps?.length : selectedStep+1) ? ' deleted-hint' : '')
-}
+// function helper(step, proof, kind, typewriterMode, selectedStep) {
+//   return (step == proof?.steps?.length - (lastStepHasErrors(proof) ? 2 : 1) ? ' recent' : '') +
+//   (!(kind == HintKind.Conclusion) && step >= (typewriterMode ? proof?.steps?.length : selectedStep+1) ? ' deleted-hint' : '')
+// }
 
 /** A hint as it is displayed in the chat. */
 export function Hint({hint, kind, step=null} : GameHintWithStep) {
@@ -232,7 +233,7 @@ export function Hint({hint, kind, step=null} : GameHintWithStep) {
   // until the next command is submitted; in editor, moving the cursor through the proof will
   // render all hints
   return <div className={`message kind-${kind} step-${step}` +
-      ((selectedStep !== null && step == selectedStep) ? ' selected' : '') + helper(step, proof, kind, typewriterMode, selectedStep)
+      ((selectedStep !== null && step == selectedStep) ? ' selected' : '') //+ helper(step, proof, kind, typewriterMode, selectedStep)
        } onClick={toggleSelection}>
     <Markdown>{getHintText(hint)}</Markdown>
   </div>
@@ -350,7 +351,7 @@ export function ChatPanel ({visible = true}) {
           chatRef.current!.lastElementChild?.scrollIntoView({block: "center"})
         } else {
           // proof currently not completed: first message of last step
-          let lastStep = proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
+          let lastStep = proof?.steps.length //- (lastStepHasErrors(proof) ? 2 : 1)
           console.debug(`scroll chat: first message of step ${lastStep}`)
           chatRef.current?.getElementsByClassName(`step-${lastStep}`)[0]?.scrollIntoView({block: "center"})
         }
@@ -369,7 +370,7 @@ export function ChatPanel ({visible = true}) {
   // Scroll down when new hidden hints are triggered
   useEffect(() => {
     if (levelId > 0) {
-      let lastStep = proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)
+      let lastStep = proof?.steps.length //- (lastStepHasErrors(proof) ? 2 : 1)
       if (showHelp.has(lastStep)) {
         console.debug('scroll chat: down to hidden hints')
         // TODO: last element of hidden hints?

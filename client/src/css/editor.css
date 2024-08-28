@@ -1,0 +1,17 @@
+.editor-wrapper {
+  flex: 1;
+}
+
+#editor {
+  height: 400px;
+}
+
+#infoview {
+  height: 400px;
+}
+
+#infoview iframe {
+  width: 100%;
+  height: 95%; /* TODO: setting this to 100% makes it a few pixels too high... */
+  border: unset;
+}

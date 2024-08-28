@@ -4,8 +4,8 @@
  * This file is based on `vscode-lean4/vscode-lean4/src/rpcApi.ts`
  */
 import type { Range } from 'vscode-languageserver-protocol';
-import type { ContextInfo, FVarId, CodeWithInfos, MVarId } from '@leanprover/infoview-api';
-import { InteractiveDiagnostic, TermInfo } from '@leanprover/infoview/*';
+// import type { ContextInfo, FVarId, CodeWithInfos, MVarId } from '@leanprover/infoview-api';
+// import { InteractiveDiagnostic, TermInfo } from '@leanprover/infoview/*';
 import type { Diagnostic } from 'vscode-languageserver-protocol';
 
 export interface InteractiveHypothesisBundle {
@@ -13,9 +13,9 @@ export interface InteractiveHypothesisBundle {
    * as `"[anonymous]"` whereas inaccessible ones have a `✝` appended at the end.
    * Use `InteractiveHypothesisBundle_nonAnonymousNames` to filter anonymouse ones out. */
   names: string[];
-  fvarIds?: FVarId[];
-  type: CodeWithInfos;
-  val?: CodeWithInfos;
+  fvarIds?: any // FVarId[];
+  type: any // CodeWithInfos;
+  val?: any // CodeWithInfos;
   isInstance?: boolean;
   isType?: boolean;
   isInserted?: boolean;
@@ -25,14 +25,14 @@ export interface InteractiveHypothesisBundle {
 
 export interface InteractiveGoalCore {
   hyps: InteractiveHypothesisBundle[];
-  type: CodeWithInfos;
-  ctx?: ContextInfo;
+  type: any // CodeWithInfos;
+  ctx?: any // ContextInfo;
 }
 
 export interface InteractiveGoal extends InteractiveGoalCore {
   userName?: string;
   goalPrefix?: string;
-  mvarId?: MVarId;
+  mvarId?: any // MVarId;
   isInserted?: boolean;
   isRemoved?: boolean;
 }
@@ -43,7 +43,7 @@ export interface InteractiveGoals extends InteractiveGoalCore {
 
 export interface InteractiveTermGoal extends InteractiveGoalCore {
   range?: Range;
-  term?: TermInfo;
+  term?: any //TermInfo;
 }
 
 export interface GameHint {
@@ -61,7 +61,7 @@ export interface InteractiveGoalWithHints {
 export interface InteractiveGoalsWithHints {
   goals: InteractiveGoalWithHints[];
   command: string;
-  diags: InteractiveDiagnostic[];
+  diags: any //InteractiveDiagnostic[];
 }
 
 /**
@@ -78,7 +78,7 @@ export interface ProofState {
   /** The remaining diagnostics that are not in the steps. Usually this should only
    * be the "unsolved goals" message, I believe.
    */
-  diagnostics : InteractiveDiagnostic[];
+  diagnostics : any // InteractiveDiagnostic[];
   completed : Boolean;
   completedWithWarnings : Boolean;
 }
