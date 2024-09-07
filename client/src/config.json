@@ -26,6 +26,11 @@
       "iso": "es",
       "flag": "ES",
       "name": "Español"
+    },
+    {
+      "iso": "kr",
+      "flag": "KR",
+      "name": "한국어"
     }
   ]
 }
