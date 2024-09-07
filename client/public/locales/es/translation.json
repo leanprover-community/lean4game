@@ -1,4 +1,4 @@
- {
+{
   "Intro": "Introducción",
   "Game Introduction": "Introducción del juego",
   "World selection": "Seleccionar mundo",
@@ -44,7 +44,7 @@
   "Retry proof from here": "Reintentar la prueba desde aquí",
   "Retry": "Reintentar",
   "Active Goal": "Objetivo activo",
-  "Crashed! Go to editor mode and fix your proof! Last server response:": "¡Error! Vaya al modo editor y corrija su prueba. Última respuesta del servidor:",  
+  "Crashed! Go to editor mode and fix your proof! Last server response:": "¡Error! Vaya al modo editor y corrija su prueba. Última respuesta del servidor:",
   "Line": "Línea",
   "Character": "Carácter",
   "Loading messages…": "Cargando mensajes…",
@@ -69,7 +69,7 @@
   "Funding": "Financiación",
   "Level": "Nivel",
   "Introduction": "Introducción",
-  "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>" : "<p>¿Desea eliminar su progreso guardado definitivamente?</p><p>(Esto elimina sus pruebas y su inventario recopilado. Los progresos guardados de otros juegos no se eliminan.)</p>",
+  "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>¿Desea eliminar su progreso guardado definitivamente?</p><p>(Esto elimina sus pruebas y su inventario recopilado. Los progresos guardados de otros juegos no se eliminan.)</p>",
   "Delete Progress?": "¿Borrar Progreso?",
   "Delete": "Borrar",
   "Download & Delete": "Descargar y Borrar",
