@@ -2,7 +2,7 @@ import * as React from 'react';
 import Split from 'react-split'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from "react-i18next"
-import { GameIdContext } from '../../state/context';
+import { GameIdContext, MonacoEditorContext } from '../../state/context';
 import { useLoadLevelQuery } from '../../state/api';
 import { Markdown } from '../utils';
 import * as monaco from 'monaco-editor'
@@ -11,6 +11,7 @@ import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions } from 'lean4monaco'
 import '../../css/editor.css'
 import { useSelector } from 'react-redux';
 import { selectTypewriterMode } from '../../state/progress';
+import { Typewriter } from './Typewriter';
 
 export function Editor() {
   let { t } = useTranslation()
@@ -37,7 +38,12 @@ export function Editor() {
       window.location.host + `/websocket/${gameId}`
     console.log(`[LeanGame] socket url: ${socketUrl}`)
     var _options: LeanMonacoOptions = {
-      websocket: {url: socketUrl},
+      websocket: {
+        url: socketUrl,
+        // @ts-ignore
+        difficulty: 1,
+        inventory: []
+      },
       // Restrict monaco's extend (e.g. context menu) to the editor itself
       htmlElement: editorRef.current ?? undefined,
       vscode: {
@@ -69,7 +75,8 @@ export function Editor() {
     _leanMonaco.setInfoviewElement(infoviewRef.current!)
     ;(async () => {
         await _leanMonaco.start(options)
-        await leanMonacoEditor.start(editorRef.current!, `${gameId}/${worldId}/Level_${levelId}.lean`, code)
+        console.warn('gameId', gameId)
+        await leanMonacoEditor.start(editorRef.current!, `/${worldId}/L_${levelId}.lean`, code)
 
         setEditor(leanMonacoEditor.editor)
         setLeanMonaco(_leanMonaco)
@@ -85,9 +92,13 @@ export function Editor() {
     }
   }, [options, infoviewRef, editorRef, gameId, worldId, levelId])
 
-  return <Split direction='vertical' minSize={200} sizes={[50, 50]}
-        className={`editor-wrapper ${typewriterMode ? 'hidden' : ''}`} >
-      <div ref={editorRef} id="editor" />
-      <div ref={infoviewRef} id="infoview" />
-    </Split>
+  return <MonacoEditorContext.Provider value={editor}>
+    <div className="editor-wrapper"><Split direction='vertical' minSize={200} sizes={[50, 50]}
+          className={`editor-split ${typewriterMode ? 'hidden' : ''}`} >
+        <div ref={editorRef} id="editor" />
+        <div ref={infoviewRef} id="infoview" />
+      </Split>
+      {typewriterMode && <Typewriter />}
+    </div>
+  </MonacoEditorContext.Provider>
 }

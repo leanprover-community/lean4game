@@ -1,17 +1,21 @@
 #/bin/bash
 
 # Note: This fails if there is no default toolchain installed
-ELAN_HOME=$(lake env printenv ELAN_HOME)
+LEAN_ROOT="$(cd $1 && lean --print-prefix)"
+LEAN_PATH="$(cd $1 && lake env printenv LEAN_PATH)"
 
 # $1 : the game directory
 # $2 : the lean4game folder
 # $3 : the gameserver executable
 
+# # print commands as they are executed
+# set -x
+
 (exec bwrap\
-  --bind $2 /lean4game \
-  --bind $1 /game \
-  --bind $ELAN_HOME /elan \
-  --bind /usr /usr \
+  --ro-bind $2 /lean4game \
+  --ro-bind $1 /game \
+  --ro-bind "$LEAN_ROOT" /lean \
+  --ro-bind /usr /usr \
   --dev /dev \
   --proc /proc \
   --symlink usr/lib /lib\
@@ -19,8 +23,9 @@ ELAN_HOME=$(lake env printenv ELAN_HOME)
   --symlink usr/bin /bin\
   --symlink usr/sbin /sbin\
   --clearenv \
-  --setenv PATH "/elan/bin:/bin" \
-  --setenv ELAN_HOME "/elan" \
+  --setenv PATH "/lean/bin" \
+  --setenv LAKE "/no" `# tries to invoke git otherwise` \
+  --setenv LEAN_PATH "$LEAN_PATH" \
   --unshare-user \
   --unshare-pid  \
   --unshare-net  \
@@ -30,3 +35,7 @@ ELAN_HOME=$(lake env printenv ELAN_HOME)
   --chdir "/game/.lake/packages/GameServer/server/.lake/build/bin/" \
   ./gameserver --server /game
 )
+
+# TODO
+# --chdir "/game/.lake/packages/GameServer/server/.lake/build/bin/" \
+# ./gameserver --server /game

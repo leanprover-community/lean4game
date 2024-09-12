@@ -257,13 +257,13 @@ def compileProof (inputCtx : Parser.InputContext) (snap : Snapshot) (hasWidgets 
           -- Insert final `done` command to display unsolved goal error in the end
           let done := Syntax.node (.synthetic cmdParserState.pos cmdParserState.pos) ``Lean.Parser.Tactic.done #[]
           let tacticStx := (#[skip] ++ tacticStx.getArgs ++ #[done]).map (⟨.⟩)
-          let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
+          let tacticStx' := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
 
           -- Always call `let_intros` to get rid `let` statements in the goal.
           -- This makes the experience for the user much nicer and allows for local
           -- definitions in the exercise.
           let cmdStx ← `(command|
-            theorem the_theorem $(level.goal) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩)} )
+            theorem the_theorem $(level.goal) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx'⟩)} )
           Elab.Command.elabCommandTopLevel cmdStx)
       cmdCtx cmdStateRef
   let postNew := (← tacticCacheNew.get).post
@@ -742,7 +742,6 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : I
   let _ ← IO.setStderr e
   try
 
-
     -- BIG MODIFICATION
     let game ← loadGameData gameDir
     -- TODO: We misuse the `rootUri` field to the gameName
@@ -752,8 +751,18 @@ def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : I
         initParams meta.mkInputContext.fileName
       | throwServerError s!"Could not determine level ID: {meta.mkInputContext.fileName}"
     let levelInfo ← loadLevelData gameDir levelId.world levelId.level
-    let some initializationOptions := initRequest.param.initializationOptions?
-      | throwServerError "no initialization options found"
+
+    -- TODO: I don't know how to pass these options to the Lean server
+    -- with the new lean4monaco setup!!
+    -- let some initializationOptions := initRequest.param.initializationOptions?
+    --   | throwServerError "no initialization options found"
+    let initializationOptions : Game.InitializationOptions := {
+      difficulty := 1
+      inventory := #[]
+      editDelay? := none
+      hasWidgets? := none
+    }
+
     let gameWorkerState : WorkerState := {
       inventory := initializationOptions.inventory
       difficulty := initializationOptions.difficulty

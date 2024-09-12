@@ -26,11 +26,11 @@ import { changedSelection, codeEdited, selectCode, selectSelections, selectCompl
   selectHelp, selectDifficulty, selectInventory, selectTypewriterMode, changeTypewriterMode } from '../state/progress'
 import { store } from '../state/store'
 import {InventoryPanel} from './inventory'
-import { Typewriter } from './typewriter'
 import { ChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
   ProofContext, PageContext, GameIdContext } from '../state/context'
 // import { DualEditor, ExerciseStatement } from './infoview/main'
-import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
+// import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
+
 import path from 'path';
 
 import '@fontsource/roboto/300.css'
@@ -449,144 +449,6 @@ export function LevelWrapper({visible = true}) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function ChatPanel({lastLevel, visible = true}) {
-//   let { t } = useTranslation()
-//   const chatRef = useRef<HTMLDivElement>(null)
-//   const {mobile} = useContext(PreferencesContext)
-//   const {gameId, worldId, levelId} = useContext(GameIdContext)
-//   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
-//   const {proof, setProof} = useContext(ProofContext)
-//   const {deletedChat, setDeletedChat, showHelp, setShowHelp} = useContext(DeletedChatContext)
-//   const {selectedStep, setSelectedStep} = useContext(SelectionContext)
-//   const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
-
-//   let k = proof?.steps.length ? proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) : 0
-
-//   function toggleSelection(line: number) {
-//     return (ev) => {
-//       console.debug('toggled selection')
-//       if (selectedStep == line) {
-//         setSelectedStep(undefined)
-//       } else {
-//         setSelectedStep(line)
-//       }
-//     }
-//   }
-
-//   useEffect(() => {
-//     // TODO: For some reason this is always called twice
-//     console.debug('scroll chat')
-//     if (!mobile) {
-//       chatRef.current!.lastElementChild?.scrollIntoView() //scrollTo(0,0)
-//     }
-//   }, [proof, showHelp])
-
-//   // Scroll to element if selection changes
-//   useEffect(() => {
-//     if (typeof selectedStep !== 'undefined') {
-//       Array.from(chatRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
-//         elem.scrollIntoView({block: "center"})
-//       })
-//     }
-//   }, [selectedStep])
-
-//   // useEffect(() => {
-//   //   // // Scroll to top when loading a new level
-//   //   // // TODO: Thats the wrong behaviour probably
-//   //   // chatRef.current!.scrollTo(0,0)
-//   // }, [gameId, worldId, levelId])
-
-//   let introText: Array<string> = t(level?.data?.introduction, {ns: gameId}).split(/\n(\s*\n)+/)
-
-//   return <div className={`chat-panel ${visible ? '' : 'hidden'}`}>
-//     <div ref={chatRef} className="chat">
-//       {introText?.filter(t => t.trim()).map(((t, i) =>
-//         // Show the level's intro text as hints, too
-//         <Hint key={`intro-p-${i}`}
-//           hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
-//       ))}
-//       {proof?.steps.map((step, i) => {
-//         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
-//         if (step.goals.length > 0 && !isLastStepWithErrors(proof, i)) {
-//           return <Hints key={`hints-${i}`}
-//           hints={filteredHints} showHidden={showHelp.has(i)} step={i}
-//           selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof?.steps.length - 1}/>
-//         }
-//       })}
-
-//       {/* {modifiedHints.map((step, i) => {
-//         // It the last step has errors, it will have the same hints
-//         // as the second-to-last step. Therefore we should not display them.
-//         if (!(i == proof?.steps.length - 1 && withErr)) {
-//           // TODO: Should not use index as key.
-//           return <Hints key={`hints-${i}`}
-//             hints={step} showHidden={showHelp.has(i)} step={i}
-//             selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof?.steps.length - 1}/>
-//         }
-//       })} */}
-//       <DeletedHints hints={deletedChat}/>
-//       {proof?.completed &&
-//         <>
-//           <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
-//             {t("Level completed! 🎉")}
-//           </div>
-//           {level?.data?.conclusion?.trim() &&
-//             <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
-//               <Markdown>{t(level?.data?.conclusion, {ns: gameId})}</Markdown>
-//             </div>
-//           }
-//         </>
-//       }
-//     </div>
-//     <div className="button-row">
-//       {proof?.completed && (lastLevel ?
-//         <Button to={`/${gameId}`}>
-//           <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
-//         </Button> :
-//         <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-//           {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
-//         </Button>)
-//         }
-//       <MoreHelpButton />
-//     </div>
-//   </div>
-// }
-
-
 export function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
   const {gameId, worldId, levelId} = React.useContext(GameIdContext)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
@@ -599,259 +461,259 @@ export function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.M
 }
 
 
-  // <Split minSize={0} snapOffset={200} sizes={[25, 75]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
-  // <ChatPanel lastLevel={lastLevel}/>
-  // <InventoryPanel />
-  // </Split>
+  <Split minSize={0} snapOffset={200} sizes={[25, 75]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+  <ChatPanel lastLevel={lastLevel}/>
+  <InventoryPanel />
+  </Split>
 
-// function IntroductionPanel({gameInfo}) {
-//   let { t } = useTranslation()
-//   const {gameId, worldId} = React.useContext(GameIdContext)
-//   const {mobile} = React.useContext(PreferencesContext)
+function IntroductionPanel({gameInfo}) {
+  let { t } = useTranslation()
+  const {gameId, worldId} = React.useContext(GameIdContext)
+  const {mobile} = React.useContext(PreferencesContext)
 
-//   let text: Array<string> = t(gameInfo.data?.worlds.nodes[worldId].introduction, {ns: gameId}).split(/\n(\s*\n)+/)
+  let text: Array<string> = t(gameInfo.data?.worlds.nodes[worldId].introduction, {ns: gameId}).split(/\n(\s*\n)+/)
 
-//   return <div className="chat-panel">
-//     <div className="chat">
-//       {text?.filter(t => t.trim()).map(((t, i) =>
-//         <Hint key={`intro-p-${i}`}
-//           hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={null} toggleSelection={undefined} />
-//       ))}
-//     </div>
-//     <ChatButtons />
-//   </div>
-// }
+  return <div className="chat-panel">
+    <div className="chat">
+      {text?.filter(t => t.trim()).map(((t, i) =>
+        <Hint key={`intro-p-${i}`}
+          hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={null} toggleSelection={undefined} />
+      ))}
+    </div>
+    <ChatButtons />
+  </div>
+}
 
-// /** The site with the introduction text of a world */
-// function Introduction() {
-//   let { t } = useTranslation()
+/** The site with the introduction text of a world */
+function Introduction() {
+  let { t } = useTranslation()
 
-//   const {gameId, worldId} = React.useContext(GameIdContext)
-//   const {mobile} = useContext(PreferencesContext)
+  const {gameId, worldId} = React.useContext(GameIdContext)
+  const {mobile} = useContext(PreferencesContext)
 
-//   const inventory = useLoadInventoryOverviewQuery({game: gameId})
+  const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
-//   const gameInfo = useGetGameInfoQuery({game: gameId})
-
-
-//   let image: string = gameInfo.data?.worlds.nodes[worldId].image
+  const gameInfo = useGetGameInfoQuery({game: gameId})
 
 
-//   // const toggleImpressum = () => {
-//   //   setImpressum(!impressum)
-//   // }
-//   // const togglePrivacy = () => {
-//   //   setPrivacy(!privacy)
-//   // }
-//   return <>
-//     {/* <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/> */}
-//     {gameInfo.isLoading ?
-//       <div className="app-content loading"><CircularProgress /></div>
-//     : mobile ?
-//         <IntroductionPanel gameInfo={gameInfo} />
-//       :
-//         // <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
-//         //   <IntroductionPanel gameInfo={gameInfo} />
-//           <div className="world-image-container empty center">
-//             {image &&
-//               <img className="contain" src={path.join("data", gameId, image)} alt="" />
-//             }
+  let image: string = gameInfo.data?.worlds.nodes[worldId].image
 
-//           </div>
-//           // {/* <InventoryPanel /> */}
-//         // </Split>
-//       }
 
-//   </>
-// }
+  // const toggleImpressum = () => {
+  //   setImpressum(!impressum)
+  // }
+  // const togglePrivacy = () => {
+  //   setPrivacy(!privacy)
+  // }
+  return <>
+    {/* <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/> */}
+    {gameInfo.isLoading ?
+      <div className="app-content loading"><CircularProgress /></div>
+    : mobile ?
+        <IntroductionPanel gameInfo={gameInfo} />
+      :
+        // <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
+        //   <IntroductionPanel gameInfo={gameInfo} />
+          <div className="world-image-container empty center">
+            {image &&
+              <img className="contain" src={path.join("data", gameId, image)} alt="" />
+            }
 
-// {mobile?
-//   // TODO: This is copied from the `Split` component below...
-//   <>
-//     <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
-//       <ExercisePanel
-//         impressum={impressum}
-//         closeImpressum={closeImpressum}
-//         codeviewRef={codeviewRef}
-//         visible={pageNumber == 0} />
-//       <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
-//     </div>
-//   </>
-// :
-//   <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
-//     <ChatPanel lastLevel={lastLevel}/>
-//     <ExercisePanel
-//       impressum={impressum}
-//       closeImpressum={closeImpressum}
-//       codeviewRef={codeviewRef} />
-//     <InventoryPanel levelInfo={level?.data} />
-//   </Split>
-// }
+          </div>
+          // {/* <InventoryPanel /> */}
+        // </Split>
+      }
 
-// function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
+  </>
+}
 
-//   const {gameId, worldId, levelId} = React.useContext(GameIdContext)
+{mobile?
+  // TODO: This is copied from the `Split` component below...
+  <>
+    <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
+      <ExercisePanel
+        impressum={impressum}
+        closeImpressum={closeImpressum}
+        codeviewRef={codeviewRef}
+        visible={pageNumber == 0} />
+      <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
+    </div>
+  </>
+:
+  <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+    <ChatPanel lastLevel={lastLevel}/>
+    <ExercisePanel
+      impressum={impressum}
+      closeImpressum={closeImpressum}
+      codeviewRef={codeviewRef} />
+    <InventoryPanel levelInfo={level?.data} />
+  </Split>
+}
 
-//   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
-//   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
-//   const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
+function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
 
-//   const uriStr = `file:///${worldId}/${levelId}`
-//   const uri = monaco.Uri.parse(uriStr)
+  const {gameId, worldId, levelId} = React.useContext(GameIdContext)
 
-//   const inventory: Array<String> = useSelector(selectInventory(gameId))
-//   const difficulty: number = useSelector(selectDifficulty(gameId))
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
+  const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
+  const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
 
-//   useEffect(() => {
-//     // monaco.editor.getModels().forEach(model => model.dispose());
+  const uriStr = `file:///${worldId}/${levelId}`
+  const uri = monaco.Uri.parse(uriStr)
 
-//     console.info(`trying to create model: ${gameId} ${worldId} ${levelId} ${uri}`)
-//     const model = monaco.editor.createModel(initialCode ?? '', 'lean4', uri)
-//     if (onDidChangeContent) {
-//       model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
-//     }
+  const inventory: Array<String> = useSelector(selectInventory(gameId))
+  const difficulty: number = useSelector(selectDifficulty(gameId))
 
-//     const editor = monaco.editor.create(codeviewRef.current!, {
-//       model,
-//       glyphMargin: true,
-//       quickSuggestions: false,
-//       lineDecorationsWidth: 5,
-//       folding: false,
-//       lineNumbers: 'on',
-//       lightbulb: {
-//         enabled: true
-//       },
-//       unicodeHighlight: {
-//           ambiguousCharacters: false,
-//       },
-//       automaticLayout: true,
-//       minimap: {
-//         enabled: false
-//       },
-//       lineNumbersMinChars: 3,
-//       tabSize: 2,
-//       'semanticHighlighting.enabled': true,
-//       fontFamily: "JuliaMono",
-//       theme: 'vs-code-theme-converted'
-//     })
-//     if (onDidChangeSelection) {
-//       editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
-//     }
-//     if (initialSelections) {
-//       console.debug("Initial Selection: ", initialSelections)
-//       // BUG: Somehow I get an `invalid arguments` bug here
-//       // editor.setSelections(initialSelections)
-//     }
-//     setEditor(editor)
-//     const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
+  useEffect(() => {
+    // monaco.editor.getModels().forEach(model => model.dispose());
 
-//     const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + gameId
+    console.info(`trying to create model: ${gameId} ${worldId} ${levelId} ${uri}`)
+    const model = monaco.editor.createModel(initialCode ?? '', 'lean4', uri)
+    if (onDidChangeContent) {
+      model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
+    }
 
-//     const connectionProvider : IConnectionProvider = {
-//       get: async () => {
-//         return await new Promise((resolve, reject) => {
-//           console.log(`connecting ${socketUrl}`)
-//           const websocket = new WebSocket(socketUrl)
-//           websocket.addEventListener('error', (ev) => {
-//             reject(ev)
-//           })
-//           websocket.addEventListener('message', (msg) => {
-//             // console.log(msg.data)
-//           })
-//           websocket.addEventListener('open', () => {
-//             const socket = toSocket(websocket)
-//             const reader = new DisposingWebSocketMessageReader(socket)
-//             const writer = new WebSocketMessageWriter(socket)
-//             resolve({
-//               reader,
-//               writer
-//             })
-//           })
-//         })
-//       }
-//     }
+    const editor = monaco.editor.create(codeviewRef.current!, {
+      model,
+      glyphMargin: true,
+      quickSuggestions: false,
+      lineDecorationsWidth: 5,
+      folding: false,
+      lineNumbers: 'on',
+      lightbulb: {
+        enabled: true
+      },
+      unicodeHighlight: {
+          ambiguousCharacters: false,
+      },
+      automaticLayout: true,
+      minimap: {
+        enabled: false
+      },
+      lineNumbersMinChars: 3,
+      tabSize: 2,
+      'semanticHighlighting.enabled': true,
+      fontFamily: "JuliaMono",
+      theme: 'vs-code-theme-converted'
+    })
+    if (onDidChangeSelection) {
+      editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
+    }
+    if (initialSelections) {
+      console.debug("Initial Selection: ", initialSelections)
+      // BUG: Somehow I get an `invalid arguments` bug here
+      // editor.setSelections(initialSelections)
+    }
+    setEditor(editor)
+    const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
-//     // Following `vscode-lean4/webview/index.ts`
-//     const client = new LeanClient(connectionProvider, showRestartMessage, {inventory, difficulty})
-//     const infoProvider = new InfoProvider(client)
-//     // const div: HTMLElement = infoviewRef.current!
-//     const imports = {
-//       '@leanprover/infoview': `${window.location.origin}/index.production.min.js`,
-//       'react': `${window.location.origin}/react.production.min.js`,
-//       'react/jsx-runtime': `${window.location.origin}/react-jsx-runtime.production.min.js`,
-//       'react-dom': `${window.location.origin}/react-dom.production.min.js`,
-//       'react-popper': `${window.location.origin}/react-popper.production.min.js`
-//     }
-//     // loadRenderInfoview(imports, [infoProvider.getApi(), div], setInfoviewApi)
-//     setInfoProvider(infoProvider)
+    const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + gameId
 
-//     // TODO: it looks like we get errors "File Changed" here.
-//     client.restart("Lean4Game")
+    const connectionProvider : IConnectionProvider = {
+      get: async () => {
+        return await new Promise((resolve, reject) => {
+          console.log(`connecting ${socketUrl}`)
+          const websocket = new WebSocket(socketUrl)
+          websocket.addEventListener('error', (ev) => {
+            reject(ev)
+          })
+          websocket.addEventListener('message', (msg) => {
+            // console.log(msg.data)
+          })
+          websocket.addEventListener('open', () => {
+            const socket = toSocket(websocket)
+            const reader = new DisposingWebSocketMessageReader(socket)
+            const writer = new WebSocketMessageWriter(socket)
+            resolve({
+              reader,
+              writer
+            })
+          })
+        })
+      }
+    }
 
-//     const editorApi = infoProvider.getApi()
+    // Following `vscode-lean4/webview/index.ts`
+    const client = new LeanClient(connectionProvider, showRestartMessage, {inventory, difficulty})
+    const infoProvider = new InfoProvider(client)
+    // const div: HTMLElement = infoviewRef.current!
+    const imports = {
+      '@leanprover/infoview': `${window.location.origin}/index.production.min.js`,
+      'react': `${window.location.origin}/react.production.min.js`,
+      'react/jsx-runtime': `${window.location.origin}/react-jsx-runtime.production.min.js`,
+      'react-dom': `${window.location.origin}/react-dom.production.min.js`,
+      'react-popper': `${window.location.origin}/react-popper.production.min.js`
+    }
+    // loadRenderInfoview(imports, [infoProvider.getApi(), div], setInfoviewApi)
+    setInfoProvider(infoProvider)
 
-//     const editorEvents: EditorEvents = {
-//         initialize: new EventEmitter(),
-//         gotServerNotification: new EventEmitter(),
-//         sentClientNotification: new EventEmitter(),
-//         serverRestarted: new EventEmitter(),
-//         serverStopped: new EventEmitter(),
-//         changedCursorLocation: new EventEmitter(),
-//         changedInfoviewConfig: new EventEmitter(),
-//         runTestScript: new EventEmitter(),
-//         requestedAction: new EventEmitter(),
-//     };
+    // TODO: it looks like we get errors "File Changed" here.
+    client.restart("Lean4Game")
 
-//     // Challenge: write a type-correct fn from `Eventify<T>` to `T` without using `any`
-//     const infoviewApi: InfoviewApi = {
-//         initialize: async l => editorEvents.initialize.fire(l),
-//         gotServerNotification: async (method, params) => {
-//             editorEvents.gotServerNotification.fire([method, params]);
-//         },
-//         sentClientNotification: async (method, params) => {
-//             editorEvents.sentClientNotification.fire([method, params]);
-//         },
-//         serverRestarted: async r => editorEvents.serverRestarted.fire(r),
-//         serverStopped: async serverStoppedReason => {
-//             editorEvents.serverStopped.fire(serverStoppedReason)
-//         },
-//         changedCursorLocation: async loc => editorEvents.changedCursorLocation.fire(loc),
-//         changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
-//         requestedAction: async action => editorEvents.requestedAction.fire(action),
-//         // See https://rollupjs.org/guide/en/#avoiding-eval
-//         // eslint-disable-next-line @typescript-eslint/no-implied-eval
-//         runTestScript: async script => new Function(script)(),
-//         getInfoviewHtml: async () => document.body.innerHTML,
-//     };
+    const editorApi = infoProvider.getApi()
 
-//     const ec = new EditorConnection(editorApi, editorEvents);
-//     setEditorConnection(ec)
+    const editorEvents: EditorEvents = {
+        initialize: new EventEmitter(),
+        gotServerNotification: new EventEmitter(),
+        sentClientNotification: new EventEmitter(),
+        serverRestarted: new EventEmitter(),
+        serverStopped: new EventEmitter(),
+        changedCursorLocation: new EventEmitter(),
+        changedInfoviewConfig: new EventEmitter(),
+        runTestScript: new EventEmitter(),
+        requestedAction: new EventEmitter(),
+    };
 
-//     editorEvents.initialize.on((loc: Location) => ec.events.changedCursorLocation.fire(loc))
+    // Challenge: write a type-correct fn from `Eventify<T>` to `T` without using `any`
+    const infoviewApi: InfoviewApi = {
+        initialize: async l => editorEvents.initialize.fire(l),
+        gotServerNotification: async (method, params) => {
+            editorEvents.gotServerNotification.fire([method, params]);
+        },
+        sentClientNotification: async (method, params) => {
+            editorEvents.sentClientNotification.fire([method, params]);
+        },
+        serverRestarted: async r => editorEvents.serverRestarted.fire(r),
+        serverStopped: async serverStoppedReason => {
+            editorEvents.serverStopped.fire(serverStoppedReason)
+        },
+        changedCursorLocation: async loc => editorEvents.changedCursorLocation.fire(loc),
+        changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
+        requestedAction: async action => editorEvents.requestedAction.fire(action),
+        // See https://rollupjs.org/guide/en/#avoiding-eval
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval
+        runTestScript: async script => new Function(script)(),
+        getInfoviewHtml: async () => document.body.innerHTML,
+    };
 
-//     setEditor(editor)
-//     setInfoProvider(infoProvider)
+    const ec = new EditorConnection(editorApi, editorEvents);
+    setEditorConnection(ec)
 
-//     infoProvider.openPreview(editor, infoviewApi)
-//     const taskgutter = new LeanTaskGutter(infoProvider.client, editor)
+    editorEvents.initialize.on((loc: Location) => ec.events.changedCursorLocation.fire(loc))
 
-//     // TODO:
-//     // setRestart(() => restart)
+    setEditor(editor)
+    setInfoProvider(infoProvider)
 
-//     return () => {
-//       editor.dispose();
-//       model.dispose();
-//       abbrevRewriter.dispose();
-//       taskgutter.dispose();
-//       infoProvider.dispose();
-//       client.dispose();
-//     }
-//   }, [gameId, worldId, levelId])
+    infoProvider.openPreview(editor, infoviewApi)
+    const taskgutter = new LeanTaskGutter(infoProvider.client, editor)
 
-//   const showRestartMessage = () => {
-//     // setRestartMessage(true)
-//     console.log("TODO: SHOW RESTART MESSAGE")
-//   }
+    // TODO:
+    // setRestart(() => restart)
 
-//   return {editor, infoProvider, editorConnection}
-// }
+    return () => {
+      editor.dispose();
+      model.dispose();
+      abbrevRewriter.dispose();
+      taskgutter.dispose();
+      infoProvider.dispose();
+      client.dispose();
+    }
+  }, [gameId, worldId, levelId])
+
+  const showRestartMessage = () => {
+    // setRestartMessage(true)
+    console.log("TODO: SHOW RESTART MESSAGE")
+  }
+
+  return {editor, infoProvider, editorConnection}
+}

@@ -13,11 +13,16 @@ open Meta
 
 namespace GameServer
 
+/-- expects a file name of the form `/{worldId}/Level_{levelId}.lean` where `{levelId}` is a Nat. -/
 def levelIdFromFileName? (initParams : Lsp.InitializeParams) (fileName : String) : Option LevelId := Id.run do
   let fileParts := fileName.splitOn "/"
   if fileParts.length == 3 then
-    if let (some level, some game) := (fileParts[2]!.toNat?, initParams.rootUri?) then
-      return some {game, world := fileParts[1]!, level := level}
+    let some game := initParams.rootUri?
+      | return none
+    -- the filename has the form `Level_01.lean` and we extract `01`.
+    let some level := ((fileParts[2]!.splitOn ".")[0]!.splitOn "_")[1]!.toNat?
+      | return none
+    return some {game := game, world := fileParts[1]!, level := level}
   return none
 
 def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameLevel) := do

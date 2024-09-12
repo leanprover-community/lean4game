@@ -1,67 +1,72 @@
 /**
  *  @fileOverview Defines the interface for the communication with the server.
  *
- * This file is based on `vscode-lean4/vscode-lean4/src/rpcApi.ts`
  */
-import type { Range } from 'vscode-languageserver-protocol';
-// import type { ContextInfo, FVarId, CodeWithInfos, MVarId } from '@leanprover/infoview-api';
-// import { InteractiveDiagnostic, TermInfo } from '@leanprover/infoview/*';
-import type { Diagnostic } from 'vscode-languageserver-protocol';
+import type { Range } from 'vscode-languageserver-protocol'
+import type {
+  CodeWithInfos,
+  ContextInfo,
+  FVarId,
+  InteractiveDiagnostic,
+  MVarId,
+  TermInfo
+} from '@leanprover/infoview-api'
+import type { Diagnostic } from 'vscode-languageserver-protocol'
 
 export interface InteractiveHypothesisBundle {
   /** The pretty names of the variables in the bundle. Anonymous names are rendered
    * as `"[anonymous]"` whereas inaccessible ones have a `✝` appended at the end.
    * Use `InteractiveHypothesisBundle_nonAnonymousNames` to filter anonymouse ones out. */
-  names: string[];
-  fvarIds?: any // FVarId[];
-  type: any // CodeWithInfos;
-  val?: any // CodeWithInfos;
-  isInstance?: boolean;
-  isType?: boolean;
-  isInserted?: boolean;
-  isRemoved?: boolean;
-  isAssumption?: boolean;
+  names: string[]
+  fvarIds?: FVarId[]
+  type: CodeWithInfos
+  val?: CodeWithInfos
+  isInstance?: boolean
+  isType?: boolean
+  isInserted?: boolean
+  isRemoved?: boolean
+  isAssumption?: boolean
 }
 
 export interface InteractiveGoalCore {
-  hyps: InteractiveHypothesisBundle[];
-  type: any // CodeWithInfos;
-  ctx?: any // ContextInfo;
+  hyps: InteractiveHypothesisBundle[]
+  type: CodeWithInfos
+  ctx?: ContextInfo
 }
 
 export interface InteractiveGoal extends InteractiveGoalCore {
-  userName?: string;
-  goalPrefix?: string;
-  mvarId?: any // MVarId;
-  isInserted?: boolean;
-  isRemoved?: boolean;
+  userName?: string
+  goalPrefix?: string
+  mvarId?: MVarId
+  isInserted?: boolean
+  isRemoved?: boolean
 }
 
 export interface InteractiveGoals extends InteractiveGoalCore {
-  goals: InteractiveGoals[];
+  goals: InteractiveGoals[]
 }
 
 export interface InteractiveTermGoal extends InteractiveGoalCore {
-  range?: Range;
-  term?: any //TermInfo;
+  range?: Range
+  term?: TermInfo
 }
 
 export interface GameHint {
-  text: string;
-  hidden: boolean;
-  rawText: string;
-  varNames?: string[][]; // in Lean: `Array (Name × Name)`
+  text: string
+  hidden: boolean
+  rawText: string
+  varNames?: string[][] // in Lean: `Array (Name × Name)`
 }
 
 export interface InteractiveGoalWithHints {
-  goal: InteractiveGoal;
-  hints: GameHint[];
+  goal: InteractiveGoal
+  hints: GameHint[]
 }
 
 export interface InteractiveGoalsWithHints {
-  goals: InteractiveGoalWithHints[];
-  command: string;
-  diags: any //InteractiveDiagnostic[];
+  goals: InteractiveGoalWithHints[]
+  command: string
+  diags: InteractiveDiagnostic[]
 }
 
 /**
@@ -74,11 +79,11 @@ export interface ProofState {
    *
    * In particular `step[i]` is the proof step at the beginning of line `i` in vscode.
    */
-  steps: InteractiveGoalsWithHints[];
+  steps: InteractiveGoalsWithHints[]
   /** The remaining diagnostics that are not in the steps. Usually this should only
    * be the "unsolved goals" message, I believe.
    */
-  diagnostics : any // InteractiveDiagnostic[];
-  completed : Boolean;
-  completedWithWarnings : Boolean;
+  diagnostics : InteractiveDiagnostic[]
+  completed : Boolean
+  completedWithWarnings : Boolean
 }
