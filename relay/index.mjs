@@ -52,6 +52,10 @@ const server = app
     req.url = filename;
     express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
+  .use('/data/stats', (req, res, next) => {
+    // stats file for server usage
+    express.static(path.join(__dirname, '..', 'games', 'stats.csv'))(req, res, next);
+  })
   .use('/', router)
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 

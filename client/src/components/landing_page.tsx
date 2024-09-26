@@ -95,6 +95,9 @@ function LandingPage() {
   const closePreferencesPopup = () => setPreferencesPopup(false);
   const togglePreferencesPopup = () => setPreferencesPopup(!preferencesPopup);
 
+  const [usageCPU, setUsageCPU] = React.useState<number>()
+  const [usageMem, setUsageMem] = React.useState<number>()
+
   const { t, i18n } = useTranslation()
 
   // Load the namespaces of all games
@@ -116,6 +119,30 @@ function LandingPage() {
 
     return q.data?.tile
   })
+
+  /** Parse `games/stats.csv` if present and display server capacity. */
+  React.useEffect(() => {
+    fetch('games/stats.csv')
+    .then(response => {if (response.ok) {
+      return response.text() } else {throw ""}})
+    .then(data => {
+      // Parse the CSV content
+      const lines = data.split('\n');
+      const [header, line2] = lines;
+      if (!(header.replace(' ', '').startsWith("CPU,Mem"))) {
+        console.warn("unexpected CSV `stats.csv`, expected 'CPU,Mem\\n0.2,0.2\\n', got", header)
+      }
+      if (line2) {
+        let values = line2.split(',')
+        setUsageCPU(100 * Number(values[0]));
+        setUsageMem(100 * Number(values[1]));
+      }
+    }).catch(err => {
+      console.info('games/stats.csv does not exist')
+    })
+
+
+  }, [])
 
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
@@ -155,6 +182,18 @@ function LandingPage() {
         ))
       }
     </div>
+    { // show server capacity from `games/stats.csv` if present
+      (usageMem >= 0 || usageCPU >= 0 ) &&
+      <section>
+        <div className="wrapper">
+          <h2>{t("Server capacity")}</h2>
+          <p>
+            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem} % </strong> {t("used")}.<br/></> }
+            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU} % </strong> {t("used")}. </> }
+          </p>
+        </div>
+      </section>
+    }
     <section>
       <div className="wrapper">
         <h2>{t("Development notes")}</h2>
