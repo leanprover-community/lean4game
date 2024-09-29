@@ -122,7 +122,7 @@ function LandingPage() {
 
   /** Parse `games/stats.csv` if present and display server capacity. */
   React.useEffect(() => {
-    fetch('games/stats.csv')
+    fetch(`${window.location.origin}/data/stats`)
     .then(response => {if (response.ok) {
       return response.text() } else {throw ""}})
     .then(data => {
@@ -138,8 +138,7 @@ function LandingPage() {
         setUsageMem(100 * Number(values[1]));
       }
     }).catch(err => {
-      console.info('games/stats.csv does not exist')
-      console.info(err)
+      console.info('stats.csv does not exist.')
     })
 
 
