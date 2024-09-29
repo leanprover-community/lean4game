@@ -33,7 +33,7 @@ If you would like to display the server capacity on the landing page,
 you can create a file `lean4game/games/stats.csv` of the following form:
 
 ```
-CPU,Mem
+CPU,MEM
 0.1,0.8
 ```
 

@@ -129,8 +129,8 @@ function LandingPage() {
       // Parse the CSV content
       const lines = data.split('\n');
       const [header, line2] = lines;
-      if (!(header.replace(' ', '').startsWith("CPU,Mem"))) {
-        console.warn("unexpected CSV `stats.csv`, expected 'CPU,Mem\\n0.2,0.2\\n', got", header)
+      if (!(header.replace(' ', '').startsWith("CPU,MEM"))) {
+        console.warn("unexpected CSV `stats.csv`, expected 'CPU,MEM\\n0.2,0.2\\n', got", header)
       }
       if (line2) {
         let values = line2.split(',')
@@ -139,6 +139,7 @@ function LandingPage() {
       }
     }).catch(err => {
       console.info('games/stats.csv does not exist')
+      console.info(err)
     })
 
 
