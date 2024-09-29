@@ -9,6 +9,8 @@ import os from 'os';
 import fs from 'fs';
 import anonymize from 'ip-anonymize';
 import { importTrigger, importStatus } from './import.mjs'
+import process from'process';
+import { spawn } from 'child_process'
 // import fs from 'fs'
 
 /**
@@ -53,8 +55,31 @@ const server = app
     express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
   .use('/data/stats', (req, res, next) => {
-    // stats file for server usage
-    express.static(path.join(__dirname, '..', 'games', 'stats.csv'))(req, res, next);
+    // Returns a CSV of the form
+    //
+    // CPU,Mem
+    // 0.21,0.65
+    //
+    // which contains the current server usage.
+
+    const statsProcess = spawn('/bin/bash', [path.join(__dirname, "stats.sh"), process.pid])
+
+    let outputData = ''
+    let errorData = ''
+    statsProcess.stdout.on('data', (data) => {
+      outputData += data.toString();
+    })
+    statsProcess.stderr.on('data', (data) => {
+      errorData += data.toString();
+    })
+    statsProcess.on('close', (code) => {
+      if (code === 0) {
+        res.send(outputData);
+      } else {
+        res.status(500).send(`Error executing script: ${errorData}`)
+        console.error(`stats.sh exited with code ${code}. Error: ${errorData}`)
+      }
+    })
   })
   .use('/', router)
   .listen(PORT, () => console.log(`Listening on ${PORT}`));

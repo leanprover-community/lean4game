@@ -130,7 +130,7 @@ function LandingPage() {
       const lines = data.split('\n');
       const [header, line2] = lines;
       if (!(header.replace(' ', '').startsWith("CPU,MEM"))) {
-        console.warn("unexpected CSV `stats.csv`, expected 'CPU,MEM\\n0.2,0.2\\n', got", header)
+        console.info("Not displaying server stats: received unexpected: ", header)
       }
       if (line2) {
         let values = line2.split(',')
@@ -138,10 +138,9 @@ function LandingPage() {
         setUsageMem(100 * Number(values[1]));
       }
     }).catch(err => {
-      console.info('stats.csv does not exist.')
+      console.info('server stats unavailable')
+      console.debug(err)
     })
-
-
   }, [])
 
   return <div className="landing-page">
