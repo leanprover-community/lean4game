@@ -43,6 +43,10 @@ const server = app
     const owner = req.params.owner;
     const repo = req.params.repo
     const lang = req.params.lang
+
+    const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
+    console.log(`[${new Date()}] ${ip} requested translation for ${owner}/${repo} in ${lang}`)
+
     const filename = req.params[0];
     req.url = filename;
     express.static(path.join(getGameDir(owner,repo),".i18n",lang))(req, res, next);
@@ -207,7 +211,9 @@ wss.addListener("connection", function(ws, req) {
 
     socketCounter += 1;
     const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
-    console.log(`[${new Date()}] Socket opened - ${ip}`)
+
+    // TODO (Matvey): extract further information from `req`, for example browser language.
+    console.log(`[${new Date()}] Socket opened - ${ip} - ${owner}/${repo}`)
 
     const socket = {
         onMessage: (cb) => { ws.on("message", cb) },
