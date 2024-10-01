@@ -1,10 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
+cores=$(nproc --all)
+cpu_measure=$(top -bn2 | grep '%Cpu' | tail -1)
+mem_measure=$(top -bn2 | grep 'Mem' | head -1)
 
-# first argument is the process ID
-pid="$1"
+cpu=$(echo $cpu_measure | awk -v cores=$cores '{print 1-($8/(cores*100))}')
+mem=$(echo $mem_measure | awk '{print $8/$4}') 
 
-# number of CPUs available
-nproc=$(nproc --all)
+printf "CPU, MEM\n%.2f, %.2f\n" $cpu $mem 
 
-# hacky way to print the content of a CSV file containing CPU/Mem usage of the process
-top -bn2 -p $pid | awk -v nproc=$nproc 'NR > 16 {$12=substr($0,72); printf "CPU, MEM\n%.2f, %.2f\n", $9/nproc, $10}'
+
+
