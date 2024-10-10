@@ -12,7 +12,7 @@ import { WorldTreePanel } from './world_tree'
 import i18next from 'i18next'
 import { ChatPanel } from './chat'
 import { NewLevel } from './level'
-import { GameHint, ProofState } from './infoview/rpc_api'
+import { GameHint, ProofState } from './editor/Defs'
 import { useSelector } from 'react-redux'
 import { Diagnostic } from 'vscode-languageserver-types'
 

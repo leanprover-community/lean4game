@@ -378,7 +378,7 @@ export function TypewriterInterFace() {
                       <Command proof={proof} i={i} deleteProof={deleteProof(i)} />
                       <Errors errors={step.diags} typewriterMode={true} />
                     </>}
-                    {mobile && i == 0 && props.data?.introduction &&
+                    {/* {mobile && i == 0 && props.data?.introduction &&
                       <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelectStep(0)}>
                         <Markdown>{props.data?.introduction}</Markdown>
                       </div>
@@ -386,7 +386,7 @@ export function TypewriterInterFace() {
                     {mobile &&
                       <Hints key={`hints-${i}`}
                         hints={filteredHints.map(hint => ({hint: hint, step: i}))} />
-                    }
+                    } */}
                     {/* <GoalsTabs proofStep={step} last={i == proof?.steps.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/> */}
                     {!(isLastStepWithErrors(proof, i)) &&
                       <GoalsTabs goals={step.goals} last={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) ? (n) => setDisableInput(n > 0) : (n) => {}}/>
@@ -418,7 +418,7 @@ export function TypewriterInterFace() {
               }
               {mobile && proof?.completed &&
                 <div className="button-row mobile">
-                  {props.level >= props.worldSize ?
+                  {/* {props.level >= props.worldSize ?
                     <Button to={`/${gameId}`}>
                       <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
                     </Button>
@@ -426,7 +426,7 @@ export function TypewriterInterFace() {
                     <Button to={`/${gameId}/world/${props.world}/level/${props.level + 1}`}>
                       Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
                     </Button>
-                  }
+                  } */}
                 </div>
               }
             </> : <CircularProgress variant="determinate" value={100*(1 - 1.024 ** (- loadingProgress))} />

@@ -11,7 +11,7 @@ import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions } from 'lean4monaco'
 import '../../css/editor.css'
 import { useSelector } from 'react-redux';
 import { selectTypewriterMode } from '../../state/progress';
-import { Typewriter } from './Typewriter';
+import { TypewriterInterFace } from './Typewriter';
 
 export function Editor() {
   let { t } = useTranslation()
@@ -98,7 +98,7 @@ export function Editor() {
         <div ref={editorRef} id="editor" />
         <div ref={infoviewRef} id="infoview" />
       </Split>
-      {typewriterMode && <Typewriter />}
+      {typewriterMode && <TypewriterInterFace />}
     </div>
   </MonacoEditorContext.Provider>
 }
