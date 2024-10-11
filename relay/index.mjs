@@ -45,6 +45,18 @@ const server = app
     const lang = req.params.lang
 
     const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
+    const log = `${process.env.HOME}/lean4game/logs/game-access.log`
+    const header = "date;anon-ip;game;lang\n"
+    const data = `${new Date()};${ip};${owner}/${repo};${lang}\n`
+
+    fs.writeFile(log, header.concat(data), { flag: 'ax' }, (file_exists) => {
+	    if (file_exists) {
+		fs.appendFile(log, data, (err) => {
+		  if (err) console.log("Failed to append to log!")
+		});
+	    } 
+    });
+
     console.log(`[${new Date()}] ${ip} requested translation for ${owner}/${repo} in ${lang}`)
 
     const filename = req.params[0];
