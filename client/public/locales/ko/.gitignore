@@ -1,0 +1,8 @@
+/ko-level1.tmx
+/ko-level2.tmx
+/ko-omegat.tmx
+/**/*.bak
+/omegat/last_entry.properties
+/omegat/files_order.txt
+/omegat/project_stats.txt
+/tm/*.tmx

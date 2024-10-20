@@ -1,0 +1,1009 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tmx SYSTEM "tmx11.dtd">
+<tmx version="1.1">
+  <header creationtool="OmegaT" o-tmf="OmegaT TMX" adminlang="EN-US" datatype="plaintext" creationtoolversion="6.0.1_0_42ef0143" segtype="sentence" srclang="en"/>
+  <body>
+<!-- Default translations -->
+    <tu>
+      <tuv lang="en">
+        <seg>&lt;0&gt;If you are considering writing your own game, you should use the &lt;1&gt;GameSkeleton Github Repo&lt;/1&gt; as a template and read &lt;3&gt;How to Create a Game&lt;/3&gt;.&lt;/0&gt;&lt;1&gt;You can directly load your games into the server and play it using the correct URL.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T095235Z" creationid="chabulhwi" creationdate="20241017T093040Z">
+        <seg>&lt;0&gt;여러분이 직접 게임을 작성할 생각이 있다면, &lt;1&gt;GameSkeleton 깃허브 저장소&lt;/1&gt;를 양식[템플릿]으로 이용하고 &lt;3&gt;'게임 만들기(Creating a Game)'&lt;/3&gt; 문서를 읽으십시오.&lt;/0&gt;&lt;1&gt;여러분이 작성한 게임을 직접 서버에서 불러오고, 정확한 URL을 이용해 그 게임을 하실 수 있습니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>&lt;p&gt;As this server runs lean on our university machines, it has a limited capacity.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T092446Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>&lt;p&gt;이 서버는 저희 대학의 여러 컴퓨터에서 린을 실행하므로 그 이용량이 제한돼 있습니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>&lt;p&gt;Do you want to delete your saved progress irreversibly?&lt;/p&gt;&lt;p&gt;(This deletes your proofs and your collected inventory.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>&lt;p&gt;저장된 진도를 불가역적으로 삭제하시겠습니까?&lt;/p&gt;&lt;p&gt;(이를 선택하시면 증명과 인벤토리 안의 수집 항목들이 삭제됩니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>&lt;p&gt;Game rules determine if it is allowed to skip levels and if the games runs checks to only allow unlocked tactics and theorems in proofs.&lt;/p&gt;&lt;1&gt;Note: "Unlocked" tactics (or theorems) are determined by two things: The set of minimal tactics needed to solve a level, plus any tactics you unlocked in another level.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T101714Z" creationid="chabulhwi" creationdate="20241017T044133Z">
+        <seg>&lt;p&gt;게임 규칙에 따라, 단계들을 건너뛰어도 되는지 그리고 증명을 작성할 때 잠금 해제가 된 전략과 정리만 이용할 수 있는지가 정해집니다.&lt;/p&gt;&lt;1&gt;
+
+참고: '잠금 해제'가 된 전략이나 정리는 다음 두 부류로 정해집니다. (1) 해당 단계를 푸는 데 필요한 최소한의 전략이나 정리의 모임, (2) 다른 단계에서 잠금 해제를 한 전략이나 정리.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>&lt;p&gt;Select a JSON file with the saved game progress to load your progress.&lt;/p&gt;&lt;1&gt;&lt;0&gt;Warning:&lt;/0&gt; This will delete your current game progress!</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>&lt;p&gt;저장된 게임 진도가 있는 JSON 파일을 선택해 진도를 불러오십시오.&lt;/p&gt;&lt;1&gt;&lt;0&gt;경고:&lt;/0&gt; 이를 실행하면 현재의 게임 진도가 삭제됩니다!</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>A repository of learning games for the proof assistant &lt;1&gt;Lean&lt;/1&gt; &lt;i&gt;(Lean 4)&lt;/i&gt; and its mathematical library &lt;5&gt;mathlib&lt;/5&gt;</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T094750Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>&lt;1&gt;린(Lean 4)&lt;/1&gt; 증명 보조기와 그 수학 라이브러리 &lt;5&gt;매스리브(mathlib)&lt;/5&gt;를 학습하기 위한 게임들의 저장소</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Active Goal</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T101948Z" creationid="chabulhwi" creationdate="20241017T101948Z">
+        <seg>활성화된 목표</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Adding new games</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>새 게임 추가하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Always visible</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T102408Z" creationid="chabulhwi" creationdate="20241017T102408Z">
+        <seg>항상 보임</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Assumptions</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>가정</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Auto</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>자동</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>CPU</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T050821Z" creationid="chabulhwi" creationdate="20241017T050821Z">
+        <seg>CPU</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Cancel</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>취소하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Character</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>문자</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Clear Progress</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044608Z" creationid="chabulhwi" creationdate="20241017T044528Z">
+        <seg>진도 없애기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Click somewhere in the Lean file to enable the infoview.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>린 파일의 아무 곳이나 눌러 정보창을 여십시오.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Consider &lt;2&gt;downloading your current progress&lt;/2&gt; first!&lt;/1&gt;</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>&lt;2&gt;현재의 게임 진도&lt;/2&gt;를 먼저 내려받을지 판단하십시오!&lt;/1&gt;</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Contributing</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T062914Z" creationid="chabulhwi" creationdate="20241014T062914Z">
+        <seg>기여하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Contributions to the Korean translation of &lt;g1&gt;lean4game&lt;/g1&gt; are always welcome!</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T062917Z" creationid="chabulhwi" creationdate="20241014T062917Z">
+        <seg>&lt;g1&gt;lean4game&lt;/g1&gt;의 한국어 번역에 기여하는 활동은 언제든지 환영합니다!</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Crashed!</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T102120Z" creationid="chabulhwi" creationdate="20241017T102039Z">
+        <seg>시스템 다운됨!</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Current Goal</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>현재 목표</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Definitions</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>정의</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Delete</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>삭제하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Delete Progress?</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>진도를 삭제하시겠습니까?</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Desktop</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>데스크톱</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Development notes</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>개발 노트</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Download</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>내려받기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Download &amp; Delete</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>내려받고 삭제하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Download Progress</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>진도 내려받기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Editor mode</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044128Z">
+        <seg>편집기 모드</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Editor mode is enforced!</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044128Z">
+        <seg>편집기 모드가 강제됐습니다!</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>English | &lt;g1&gt;한국어[Korean]&lt;/g1&gt;</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T063045Z" creationid="chabulhwi" creationdate="20241014T062908Z">
+        <seg>[English (영어)](./README.md) | 한국어</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Erase</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>지우기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Execute</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>실행하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Failed command</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>실패한 명령</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Feel free to file a &lt;1&gt;GitHub Issue&lt;/1&gt; about any problems you experience!&lt;/1&gt;</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T052536Z" creationid="chabulhwi" creationdate="20241017T052525Z">
+        <seg>문제를 겪으면 거리낌 없이 &lt;1&gt;깃허브 이슈&lt;/1&gt;를 제출해 주세요!&lt;/1&gt;</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Funding</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>재정 지원</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Further Goals</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>이후 목표</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Game Info</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>게임 정보</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Game Info &amp; Credits</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>게임 정보 및 제작자 명단</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Game Introduction</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044111Z" creationid="chabulhwi" creationdate="20241017T044111Z">
+        <seg>게임 소개</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Game Rules</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044051Z" creationid="chabulhwi" creationdate="20241017T044051Z">
+        <seg>게임 규칙</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Go to editor mode and fix your proof!</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T102148Z" creationid="chabulhwi" creationdate="20241017T102148Z">
+        <seg>편집기 모드에서 증명을 고치십시오!</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Goal</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>목표</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Home</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>홈</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>I (&lt;g1&gt;Bulhwi Cha&lt;/g1&gt;&lt;g2&gt;&lt;/g2&gt;&lt;e8/&gt;) use &lt;g3&gt;OmegaT&lt;/g3&gt;&lt;g4&gt;&lt;/g4&gt;&lt;e9/&gt; to translate English documentation into
+Korean.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T125828Z" creationid="chabulhwi" creationdate="20241014T125734Z">
+        <seg>저(&lt;g1&gt;차불휘&lt;/g1&gt;&lt;g2&gt;&lt;/g2&gt;&lt;e8/&gt;)는 &lt;g3&gt;오메가T(OmegaT)&lt;/g3&gt;&lt;g4&gt;&lt;/g4&gt;&lt;e9/&gt;를 이용해 영어 문서를 한국어로 번역합니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>I (&lt;g1&gt;Bulhwi Cha&lt;/g1&gt;&lt;g2&gt;&lt;/g2&gt;&lt;e9/&gt;) use &lt;g3&gt;OmegaT&lt;/g3&gt;&lt;g4&gt;&lt;/g4&gt;&lt;e10/&gt; to translate English documentation into Korean.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T062921Z" creationid="chabulhwi" creationdate="20241014T062921Z">
+        <seg>저(&lt;g1&gt;차불휘&lt;/g1&gt;&lt;g2&gt;&lt;/g2&gt;&lt;e9/&gt;)는 &lt;g3&gt;오메가T(OmegaT)&lt;/g3&gt;&lt;g4&gt;&lt;/g4&gt;&lt;e10/&gt;를 이용해 영어 문서를 한국어로 번역합니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Impressum</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T053306Z" creationid="chabulhwi" creationdate="20241017T053306Z">
+        <seg>관리자 정보</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Intro</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044109Z" creationid="chabulhwi" creationdate="20241017T044109Z">
+        <seg>소개</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Introduction</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>소개</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Inventory</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044116Z" creationid="chabulhwi" creationdate="20241017T044116Z">
+        <seg>인벤토리</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Korean Translation</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T062918Z" creationid="chabulhwi" creationdate="20241014T062918Z">
+        <seg>한국어 번역</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Language</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>언어</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Last server response:</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T102154Z" creationid="chabulhwi" creationdate="20241017T102154Z">
+        <seg>마지막 서버 응답:</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Layout</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>레이아웃</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Lean 4 Game</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T062910Z" creationid="chabulhwi" creationdate="20241014T062907Z">
+        <seg>린 4 게임</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Lean Game Server</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T062934Z" creationid="chabulhwi" creationdate="20241014T062934Z">
+        <seg>린 게임 서버</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Leave World</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044127Z">
+        <seg>세계에서 나가기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Level</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T094535Z" creationid="chabulhwi" creationdate="20241017T094535Z">
+        <seg>단계</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Level completed with warnings 🎭</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>경고 있는 채로 단계 완료 🎭</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Level completed!</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>단계 완료!</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Levels</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>단계</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Line</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>줄</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Load Progress from JSON</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>JSON에서 진도 불러오기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Load selected file</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>선택한 파일 열기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Loading goal…</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T102646Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>목표 불러오는 중…</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Loading messages…</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>메시지 불러오는 중…</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Mobile</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>모바일</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Next</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044120Z" creationid="chabulhwi" creationdate="20241017T044120Z">
+        <seg>다음</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>No Games loaded.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>불러온 게임 없음.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>No Goals</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>목표 없음</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Not available in this level</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>이 단계에서 쓸 수 없음</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Not unlocked yet</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T100323Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>아직 잠금 해제가 안 됨</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Objects</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>객체</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Our current estimate is about 70 simultaneous games.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T051327Z" creationid="chabulhwi" creationdate="20241017T051327Z">
+        <seg>현재 이 서버로 최대 70게임을 동시에 실행할 수 있는 것으로 추정됩니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Please get in contact and we'll happily add yours.&lt;/p&gt;</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T094411Z" creationid="chabulhwi" creationdate="20241017T094411Z">
+        <seg>저희에게 연락하시면 여러분의 게임을 기꺼이 추가하겠습니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Preferences</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>기본 설정</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Prerequisites</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T053111Z" creationid="chabulhwi" creationdate="20241017T053111Z">
+        <seg>선행 요건</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Previous</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044127Z">
+        <seg>이전</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>RAM</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T050815Z" creationid="chabulhwi" creationdate="20241017T050815Z">
+        <seg>램</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Retry</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>다시 시도하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Retry proof from here</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>여기부터 증명 다시 시도하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Rules</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044104Z" creationid="chabulhwi" creationdate="20241017T044104Z">
+        <seg>규칙</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Save my settings (in the browser store)</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>(브라우저에) 설정 저장하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Saves from other games are not deleted.)&lt;/p&gt;</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>다른 게임에 저장된 정보는 삭제되지 않습니다.)&lt;/p&gt;</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Server capacity</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T050824Z" creationid="chabulhwi" creationdate="20241017T050824Z">
+        <seg>서버 이용량</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Show more help!</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>도움말 더 보기!</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Start</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044114Z" creationid="chabulhwi" creationdate="20241017T044114Z">
+        <seg>시작하기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Tactics</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T062931Z" creationid="chabulhwi" creationdate="20241014T062931Z">
+        <seg>전략</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>That means if you unlock &lt;1&gt;simp&lt;/1&gt; in a level, you can use it henceforth in any level.&lt;/1&gt;&lt;p&gt;The options are:&lt;/p&gt;</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T101621Z" creationid="chabulhwi" creationdate="20241017T101453Z">
+        <seg>따라서 여러분이 &lt;1&gt;simp&lt;/1&gt; 전략을 잠금 해제 하면, 그 뒤로 어느 단계에서든 이 전략을 이용할 수 있습니다.&lt;/1&gt;&lt;p&gt;선택할 수 있는 게임 규칙은 다음과 같습니다.&lt;/p&gt;</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>The &lt;1&gt;instructions above&lt;/1&gt; also explain the details for how to load your game to the server.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T093906Z" creationid="chabulhwi" creationdate="20241017T093613Z">
+        <seg>여러분의 게임을 서버에서 불러오는 방법에 관한 세부 사항도 위의 &lt;1&gt;설명서&lt;/1&gt;에 나와 있습니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>The OmegaT project is in the &lt;g5&gt;&lt;g6&gt;omegat&lt;/g6&gt;&lt;/g5&gt; directory.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T062925Z" creationid="chabulhwi" creationdate="20241014T062925Z">
+        <seg>오메가T 프로젝트는 &lt;g5&gt;&lt;g6&gt;omegat&lt;/g6&gt;&lt;/g5&gt; 디렉터리에 있습니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>The OmegaT project is in this directory, that is,
+&lt;g5&gt;client/public/locales/ko&lt;/g5&gt;.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T125910Z" creationid="chabulhwi" creationdate="20241014T125910Z">
+        <seg>오메가T 프로젝트는 이 디렉터리, 다시 말해 &lt;g5&gt;client/public/locales/ko&lt;/g5&gt;에 있습니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Theorems</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>정리</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>This server has been developed as part of the project &lt;1&gt;ADAM : Anticipating the Digital Age of Mathematics&lt;/1&gt; at Heinrich-Heine-Universität in Düsseldorf.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T053050Z" creationid="chabulhwi" creationdate="20241017T052901Z">
+        <seg>이 서버는 뒤셀도르프의 하인리히-하이네 대학에서 진행하는 &lt;1&gt;'아담(ADAM): 수학의 디지털 시대 준비하기'&lt;/1&gt; 프로젝트의 일환으로 개발됐습니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Typewriter mode</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>타자기 모드</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Upload</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>업로드</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Upload Saved Progress</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044132Z">
+        <seg>저장된 진도 업로드</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Use &lt;1&gt;http://localhost:3000/#/g/local/FOLDER&lt;/1&gt; to open a game directly from a local folder.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>&lt;1&gt;http://localhost:3000/#/g/local/FOLDER&lt;/1&gt;를 이용해 지역[로컬] 폴더에서 게임을 직접 여십시오.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Waiting for Lean server to start…</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T102646Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>린 서버가 시작하기를 기다리는 중…</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>We hope to address and test this limitation better in the future.&lt;/p&gt;&lt;1&gt;Most aspects of the games and the infrastructure are still in development.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T095504Z" creationid="chabulhwi" creationdate="20241017T052016Z">
+        <seg>미래에 저희가 서버 이용량 한계에 더 잘 대처하고 그 값을 보다 정확히 측정할 수 있기를 바랍니다.&lt;/p&gt;&lt;1&gt;게임과 그 기반 시설의 상당 부분은 여전히 개발 중입니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>We'd like to encourage you to contact us if you have any questions.&lt;/1&gt;&lt;p&gt;Featured games on this page are added manually.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T095351Z" creationid="chabulhwi" creationdate="20241017T094104Z">
+        <seg>궁금한 점이 있으면 저희에게 연락해 주십시오.&lt;/1&gt;&lt;p&gt;이 페이지에 실린 게임들은 수동으로 추가됐습니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>World</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044130Z">
+        <seg>세계</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>World selection</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044113Z" creationid="chabulhwi" creationdate="20241017T044113Z">
+        <seg>세계 선택</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>Worlds</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044131Z">
+        <seg>세계</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>You need to install
+the &lt;g7&gt;Okapi filters plugin for OmegaT&lt;/g7&gt;&lt;g8&gt;&lt;/g8&gt;&lt;e11/&gt; to make OmegaT parse Markdown
+files.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T062927Z" creationid="chabulhwi" creationdate="20241014T062927Z">
+        <seg>오메가T로 마크다운 파일을 구문 분석 하려면 &lt;g7&gt;오메가T를 위한 오카피(Okapi) 필터 플러그인&lt;/g7&gt;&lt;g8&gt;&lt;/g8&gt;&lt;e11/&gt;을 설치해야 됩니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>You need to install the &lt;g6&gt;Okapi filters plugin for
+OmegaT&lt;/g6&gt;&lt;g7&gt;&lt;/g7&gt;&lt;e10/&gt; to make OmegaT parse JSON files.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T114035Z" creationid="chabulhwi" creationdate="20241017T114014Z">
+        <seg>오메가T로 JSON 파일을 구문 분석 하려면 &lt;g6&gt;오메가T를 위한 오카피(Okapi) 필터 플러그인&lt;/g6&gt;&lt;g7&gt;&lt;/g7&gt;&lt;e10/&gt;을 설치해야 됩니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>You need to install the &lt;g6&gt;Okapi filters plugin for
+OmegaT&lt;/g6&gt;&lt;g7&gt;&lt;/g7&gt;&lt;e10/&gt; to make OmegaT parse Markdown files.</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241014T130108Z" creationid="chabulhwi" creationdate="20241014T130004Z">
+        <seg>오메가T로 마크다운 파일을 구문 분석 하려면 &lt;g6&gt;오메가T를 위한 오카피(Okapi) 필터 플러그인&lt;/g6&gt;&lt;g7&gt;&lt;/g7&gt;&lt;e10/&gt;을 설치해야 됩니다.</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>back to games selection</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>게임 선택하러 돌아가기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>back to world selection</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044126Z">
+        <seg>세계 선택하러 돌아가기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>close inventory</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>인벤토리 닫기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>information, Impressum, privacy policy</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>정보, 관리자 정보, 사생활 정책</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>levels</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044053Z" creationid="chabulhwi" creationdate="20241017T044053Z">
+        <seg>단계</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>next level</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044119Z" creationid="chabulhwi" creationdate="20241017T044119Z">
+        <seg>다음 단계</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>none</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044059Z" creationid="chabulhwi" creationdate="20241017T044059Z">
+        <seg>없음</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>previous level</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044127Z">
+        <seg>이전 단계</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>regular</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044056Z" creationid="chabulhwi" creationdate="20241017T044056Z">
+        <seg>일반</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>relaxed</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044058Z" creationid="chabulhwi" creationdate="20241017T044058Z">
+        <seg>완화됨</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>show inventory</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044153Z" creationid="chabulhwi" creationdate="20241017T044129Z">
+        <seg>인벤토리 보기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>tactics</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T044055Z" creationid="chabulhwi" creationdate="20241017T044055Z">
+        <seg>전략</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>used</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T091702Z" creationid="chabulhwi" creationdate="20241017T091702Z">
+        <seg>쓰임</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>view the Lean game server on GitHub</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T091836Z" creationid="chabulhwi" creationdate="20241017T091836Z">
+        <seg>깃허브에서 린 게임 서버 보기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>view the Lean game server on Github</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T092242Z" creationid="chabulhwi" creationdate="20241017T092242Z">
+        <seg>깃허브에서 린 게임 서버 보기</seg>
+      </tuv>
+    </tu>
+    <tu>
+      <tuv lang="en">
+        <seg>🎉</seg>
+      </tuv>
+      <tuv lang="ko" changeid="chabulhwi" changedate="20241017T100801Z" creationid="chabulhwi" creationdate="20241017T100801Z">
+        <seg>🎉</seg>
+      </tuv>
+    </tu>
+<!-- Alternative translations -->
+  </body>
+</tmx>
