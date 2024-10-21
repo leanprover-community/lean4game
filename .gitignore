@@ -3,3 +3,4 @@ client/dist
 games/
 server/.lake
 **/.DS_Store
+logs/
