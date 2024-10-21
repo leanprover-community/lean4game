@@ -9,7 +9,7 @@ import os from 'os';
 import fs from 'fs';
 import anonymize from 'ip-anonymize';
 import { importTrigger, importStatus } from './import.mjs'
-import process from'process';
+import process from 'process';
 import { spawn } from 'child_process'
 // import fs from 'fs'
 
@@ -45,7 +45,7 @@ const server = app
     const lang = req.params.lang
 
     const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
-    const log = `${process.env.HOME}/lean4game/logs/game-access.log`
+    const log = `${process.cwd()}/logs/game-access.log`
     const header = "date;anon-ip;game;lang\n"
     const data = `${new Date()};${ip};${owner}/${repo};${lang}\n`
 
@@ -54,7 +54,7 @@ const server = app
 		fs.appendFile(log, data, (err) => {
 		  if (err) console.log("Failed to append to log!")
 		});
-	    } 
+	    }
     });
 
     console.log(`[${new Date()}] ${ip} requested translation for ${owner}/${repo} in ${lang}`)
