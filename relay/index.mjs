@@ -9,7 +9,7 @@ import os from 'os';
 import fs from 'fs';
 import anonymize from 'ip-anonymize';
 import { importTrigger, importStatus } from './import.mjs'
-import process from'process';
+import process from 'process';
 import { spawn } from 'child_process'
 // import fs from 'fs'
 
@@ -43,6 +43,22 @@ const server = app
     const owner = req.params.owner;
     const repo = req.params.repo
     const lang = req.params.lang
+
+    const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
+    const log = `${process.cwd()}/logs/game-access.log`
+    const header = "date;anon-ip;game;lang\n"
+    const data = `${new Date()};${ip};${owner}/${repo};${lang}\n`
+
+    fs.writeFile(log, header.concat(data), { flag: 'ax' }, (file_exists) => {
+	    if (file_exists) {
+		fs.appendFile(log, data, (err) => {
+		  if (err) console.log("Failed to append to log!")
+		});
+	    }
+    });
+
+    console.log(`[${new Date()}] ${ip} requested translation for ${owner}/${repo} in ${lang}`)
+
     const filename = req.params[0];
     req.url = filename;
     express.static(path.join(getGameDir(owner,repo),".i18n",lang))(req, res, next);
@@ -207,7 +223,9 @@ wss.addListener("connection", function(ws, req) {
 
     socketCounter += 1;
     const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
-    console.log(`[${new Date()}] Socket opened - ${ip}`)
+
+    // TODO (Matvey): extract further information from `req`, for example browser language.
+    console.log(`[${new Date()}] Socket opened - ${ip} - ${owner}/${repo}`)
 
     const socket = {
         onMessage: (cb) => { ws.on("message", cb) },
