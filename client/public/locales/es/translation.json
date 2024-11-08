@@ -1,4 +1,4 @@
- {
+{
   "Intro": "Introducción",
   "Game Introduction": "Introducción del juego",
   "World selection": "Seleccionar mundo",
@@ -44,7 +44,7 @@
   "Retry proof from here": "Reintentar la prueba desde aquí",
   "Retry": "Reintentar",
   "Active Goal": "Objetivo activo",
-  "Crashed! Go to editor mode and fix your proof! Last server response:": "¡Error! Vaya al modo editor y corrija su prueba. Última respuesta del servidor:",  
+  "Crashed! Go to editor mode and fix your proof! Last server response:": "¡Error! Vaya al modo editor y corrija su prueba. Última respuesta del servidor:",
   "Line": "Línea",
   "Character": "Carácter",
   "Loading messages…": "Cargando mensajes…",
@@ -56,9 +56,7 @@
   "Not available in this level": "No disponible en este nivel",
   "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "Un repositorio de juegos para aprender el asistente de demostración <1>Lean</1>, <i>(Lean 4)</i> y su biblioteca matemática <5>mathlib</5> ",
   "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder.": "No se ha cargado ningún juego. Use <1>http://localhost:3000/#/g/local/FOLDER</1> para abrir un juego directamente desde una carpeta local",
-  "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games. We hope to address and test this limitation better in the future.</p><1>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</1>": "<p>Como este servidor corre en máquinas de nuestra universidad, tiene una capacidad limitada. Nuestra estimación actual es de unos 70 juegos simultaneos. Esperamos afrontar y comprobar mejor esta limitación en el futuro.</p>. <1>Muchos aspectos de los juegos y la infrastructura están aún en desarrollo. No dude en abrir una <1>GitHub Issue</1> sobre cualquier problema que experimente.</1>",
   "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>Si está considerando escribir su propio juego, use el <1>GameSkeleton Github Repo</1> como plantilla y lea <3>How to Create a Game</3>.</0><1>Puede cargar directamente los juegos en el servidor y jugarlo usando la URL adecuada. Las <1>instrucciones anteriores</1> también explican los detalles sobre cómo cargar su juego en el servidor. Le animamos a ponerse en contacto con nosotros si tiene preguntas.</1><p>Los juegos incluidos en esta página son añadidos manualmente. Por favor, contactenos y añadiremos el suyo encantados.</p>",
-  "This server has been developed as part of the project <1>ADAM : Anticipating the Digital Age of Mathematics</1> at Heinrich-Heine-Universität in Düsseldorf.": "Este  servidor se ha desarrollado como parte del proyecto <1>ADAM : Anticipating the Digital Age of Mathematics</1> en la Heinrich-Heine-Universität de Düsseldorf.",
   "Prerequisites": "Requisitos previos",
   "Worlds": "Mundos",
   "Levels": "Niveles",
@@ -69,7 +67,7 @@
   "Funding": "Financiación",
   "Level": "Nivel",
   "Introduction": "Introducción",
-  "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>" : "<p>¿Desea eliminar su progreso guardado definitivamente?</p><p>(Esto elimina sus pruebas y su inventario recopilado. Los progresos guardados de otros juegos no se eliminan.)</p>",
+  "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>¿Desea eliminar su progreso guardado definitivamente?</p><p>(Esto elimina sus pruebas y su inventario recopilado. Los progresos guardados de otros juegos no se eliminan.)</p>",
   "Delete Progress?": "¿Borrar Progreso?",
   "Delete": "Borrar",
   "Download & Delete": "Descargar y Borrar",
@@ -90,5 +88,12 @@
   "<p>Select a JSON file with the saved game progress to load your progress.</p><1><0>Warning:</0> This will delete your current game progress! Consider <2>downloading your current progress</2> first!</1>": "<p>Seleccione un archivo JSON con el progreso del juego guardado para cargar su progreso.</p><1><0>Advertencia:</0> Esto borrará su progreso actual en el juego. Considere <2>descargar su progreso actual</2> antes</1>",
   "Upload Saved Progress": "Subir progreso guardado",
   "Load selected file": "Cargar archivo seleccionado",
-  "Rules": "Reglas"
+  "Rules": "Reglas",
+  "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>": "<p>Como este servidor corre en máquinas de nuestra universidad, tiene una capacidad limitada. Nuestra estimación actual es de unos 70 juegos simultaneos.</p>.",
+  "<0>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</0>": "<1>Muchos aspectos de los juegos y la infrastructura están aún en desarrollo. No dude en abrir una <1>GitHub Issue</1> sobre cualquier problema que experimente.</1>",
+  "This server has been developed as part of the project <1>ADAM: Anticipating the Digital Age of Mathematics</1> at Heinrich Heine University Düsseldorf.": "Este  servidor se ha desarrollado como parte del proyecto <1>ADAM: Anticipating the Digital Age of Mathematics</1> en la Heinrich-Heine-Universität de Düsseldorf.",
+  "Server capacity": "",
+  "RAM": "",
+  " used": "",
+  "CPU": ""
 }

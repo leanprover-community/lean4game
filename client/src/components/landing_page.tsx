@@ -186,9 +186,15 @@ function LandingPage() {
       <section>
         <div className="wrapper">
           <h2>{t("Server capacity")}</h2>
+          <Trans>
+            <p>
+              As this server runs lean on our university machines, it has a limited capacity.
+              Our current estimate is about 70 simultaneous games.
+            </p>
+          </Trans>
           <p>
-            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem} % </strong> {t("used")}.<br/></> }
-            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU} % </strong> {t("used")}. </> }
+            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem} %</strong>{t(" used")}.<br/></> }
+            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU} %</strong>{t(" used")}. </> }
           </p>
         </div>
       </section>
@@ -197,11 +203,6 @@ function LandingPage() {
       <div className="wrapper">
         <h2>{t("Development notes")}</h2>
         <Trans>
-          <p>
-            As this server runs lean on our university machines, it has a limited capacity.
-            Our current estimate is about 70 simultaneous games.
-            We hope to address and test this limitation better in the future.
-          </p>
           <p>
             Most aspects of the games and the infrastructure are still in development. Feel free to
             file a <a target="_blank" href="https://github.com/leanprover-community/lean4game/issues">GitHub Issue</a> about
@@ -239,8 +240,8 @@ function LandingPage() {
         <p>
           <Trans>
             This server has been developed as part of the
-            project <a target="_blank" href="https://hhu-adam.github.io">ADAM : Anticipating the Digital Age of Mathematics</a> at
-            Heinrich-Heine-Universität in Düsseldorf.
+            project <a target="_blank" href="https://hhu-adam.github.io">ADAM: Anticipating the Digital Age of Mathematics</a> at
+            Heinrich Heine University Düsseldorf.
           </Trans>
         </p>
       </div>

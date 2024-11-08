@@ -63,10 +63,7 @@
   "Not available in this level": "本关卡不提供",
   "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "这是一个为证明助手 <1>Lean</1> <i>(Lean 4)</i> 及其数学库 <5>mathlib</5> 设计的学习游戏库",
   "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder.": "未加载游戏。访问 <1>http://localhost:3000/#/g/local/FOLDER</1> 从本地文件夹打开游戏。",
-  "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games. We hope to address and test this limitation better in the future.</p><1>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</1>": "<p>这个服务器部署在我们大学的机器上，运行能力有限，目前估计最多可同时支持约 70 个游戏。我们希望将来能更有效地解决并测试这些限制。</p><1>游戏和基础设施的许多方面仍在开发之中。如果您遇到任何问题，欢迎在 <1>GitHub</1> 上提交问题反馈。</1>",
   "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>如果你打算编写自己的游戏，可以使用 <1>GameSkeleton Github Repo</1> 作为模板，并参阅 <3>如何创建游戏</3>。</0><1>你可以直接将游戏上传至服务器，并通过正确的 URL 进行游戏。上面的 <1>说明</1> 已详细介绍了如何将游戏加载到服务器的步骤。如果你有任何疑问，请随时联系我们。</1><p>本页上的精选游戏都是手动添加的。如果你想添加你的游戏，请与我们联系，我们非常欢迎。</p>",
-
-  "This server has been developed as part of the project <1>ADAM : Anticipating the Digital Age of Mathematics</1> at Heinrich-Heine-Universität in Düsseldorf.": "此服务器是 Heinrich-Heine-Universität Düsseldorf 项目 <1>ADAM：预见数学的数字时代</1> 的一部分。",
   "Prerequisites": "前置条件",
   "Worlds": "世界",
   "Levels": "关卡",
@@ -91,5 +88,12 @@
   "Level": "关卡",
   "Introduction": "介绍",
   "Retry": "重试",
-  "Failed command": "命令失败"
+  "Failed command": "命令失败",
+  "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>": "",
+  "<0>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</0>": "",
+  "This server has been developed as part of the project <1>ADAM: Anticipating the Digital Age of Mathematics</1> at Heinrich Heine University Düsseldorf.": "",
+  "Server capacity": "",
+  "RAM": "",
+  " used": "",
+  "CPU": ""
 }
