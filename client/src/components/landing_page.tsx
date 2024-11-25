@@ -134,8 +134,8 @@ function LandingPage() {
       }
       if (line2) {
         let values = line2.split(',')
-        setUsageCPU(100 * Number(values[0]));
-        setUsageMem(100 * Number(values[1]));
+        setUsageCPU(100 * parseInt(values[0]));
+        setUsageMem(100 * parseInt(values[1]));
       }
     }).catch(err => {
       console.info('server stats unavailable')
