@@ -20,9 +20,9 @@ import { spawn } from 'child_process'
 */
 const queueLength = {
   "g/hhu-adam/robo": 2,
-  "g/hhu-adam/nng4": 5,
-  "g/djvelleman/stg4": 0,
-  "g/trequetrum/lean4game-logic": 0,
+  "g/leanprover-community/nng4": 5,
+  "g/djvelleman/stg4": 2,
+  "g/trequetrum/lean4game-logic": 2,
 }
 
 const __filename = url.fileURLToPath(import.meta.url);
