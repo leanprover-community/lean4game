@@ -71,15 +71,7 @@ const server = app
     express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
   .use('/data/stats', (req, res, next) => {
-    // Returns a CSV of the form
-    //
-    // CPU,Mem
-    // 0.21,0.65
-    //
-    // which contains the current server usage.
-
     const statsProcess = spawn('/bin/bash', [path.join(__dirname, "stats.sh"), process.pid])
-
     let outputData = ''
     let errorData = ''
     statsProcess.stdout.on('data', (data) => {
