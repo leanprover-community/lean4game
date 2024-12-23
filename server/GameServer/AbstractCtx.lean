@@ -5,8 +5,8 @@ section AbstractCtx
 open Lean
 open Meta
 
-structure AbstractCtxResult :=
-  (abstractMVarsResult : AbstractMVarsResult)
+structure AbstractCtxResult where
+  abstractMVarsResult : AbstractMVarsResult
 
 /-- Abstract LCtx and MCtx to transport an expression into different contexts -/
 def abstractCtx (goal : MVarId) : MetaM AbstractCtxResult := do

@@ -32,7 +32,7 @@ end GameData
 
 open GameData in
 -- TODO: register all of this as ToJson instance?
-def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
+def saveGameData (allItemsByType : Std.HashMap InventoryType (Std.HashSet Name))
     (inventory : InventoryOverview): CommandElabM Unit := do
   let game ← getCurGame
   let env ← getEnv
@@ -52,7 +52,7 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
   IO.FS.writeFile (path / gameFileName) (toString (getGameJson game))
 
   for inventoryType in [InventoryType.Lemma, .Tactic, .Definition] do
-    for name in allItemsByType.findD inventoryType {} do
+    for name in allItemsByType.getD inventoryType {} do
       let some item ← getInventoryItem? name inventoryType
         | throwError "Expected item to exist: {name}"
       IO.FS.writeFile (path / docFileName inventoryType name) (toString (toJson item))

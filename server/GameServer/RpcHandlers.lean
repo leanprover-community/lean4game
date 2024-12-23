@@ -17,7 +17,7 @@ def levelIdFromFileName? (initParams : Lsp.InitializeParams) (fileName : String)
   let fileParts := fileName.splitOn "/"
   if fileParts.length == 3 then
     if let (some level, some game) := (fileParts[2]!.toNat?, initParams.rootUri?) then
-      return some {game, world := fileParts[1]!, level := level}
+      return some {game := .mkSimple game, world := .mkSimple fileParts[1]!, level := level}
   return none
 
 def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameLevel) := do
@@ -25,9 +25,9 @@ def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParam
     | return none
   return ← getLevel? levelId
 
-structure FVarBijection :=
-  (forward : HashMap FVarId FVarId)
-  (backward : HashMap FVarId FVarId)
+structure FVarBijection where
+  forward : Std.HashMap FVarId FVarId
+  backward : Std.HashMap FVarId FVarId
 
 instance : EmptyCollection FVarBijection := ⟨{},{}⟩
 
@@ -35,8 +35,8 @@ def FVarBijection.insert (bij : FVarBijection) (a b : FVarId) : FVarBijection :=
   ⟨bij.forward.insert a b, bij.backward.insert b a⟩
 
 def FVarBijection.insert? (bij : FVarBijection) (a b : FVarId) : Option FVarBijection :=
-  let a' := bij.forward.find? a
-  let b' := bij.forward.find? b
+  let a' := bij.forward.get? a
+  let b' := bij.forward.get? b
   if (a' == none || a' == some b) && (b' == none || b' == some a)
   then some $ bij.insert a b
   else none
@@ -123,13 +123,13 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
           let mut hintFVarsNames : Array Expr := #[]
           for fvar in hintFVars do
             let name₁ ← fvar.fvarId!.getUserName
-            hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
+            hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨.mkSimple s!"«\{{name₁}}»"⟩
 
           let lctx := (← goal.getDecl).lctx -- the player's local context
           if let some bij ← matchDecls hintFVars lctx.getFVars
             (strict := hint.strict) (initBij := fvarBij)
           then
-            let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
+            let userFVars := hintFVars.map fun v => bij.forward.getD v.fvarId! v.fvarId!
             -- Evaluate the text in the player's context to get the new variable names.
             let text := (← evalHintMessage hint.text) (userFVars.map Expr.fvar)
             let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := lctx, opts := {}}
@@ -312,7 +312,7 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
       -- Filter out the "unsolved goals" message
       diag := filterUnsolvedGoal diag
 
-      let lastPos := text.utf8PosToLspPos positionsWithSource.back.1
+      let lastPos := text.utf8PosToLspPos positionsWithSource.back!.1
       let remainingDiags : Array InteractiveDiagnostic :=
         diag.filter (fun d => lastPos ≤ d.range.start)
 

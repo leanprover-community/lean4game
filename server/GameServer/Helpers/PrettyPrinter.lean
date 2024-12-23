@@ -3,7 +3,7 @@ import Lean.PrettyPrinter.Delaborator.Builtins
 import Lean.PrettyPrinter
 import Lean
 
-import Std.Tactic.OpenPrivate
+import Batteries.Tactic.OpenPrivate
 
 namespace GameServer
 
