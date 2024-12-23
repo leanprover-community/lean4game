@@ -61,7 +61,8 @@ where
       -- pure type
       `(Command.declSig| $groups* : $type)
 
-@[inherit_doc Lean.PrettyPrinter.ppSignature]
+--@[inherit_doc Lean.PrettyPrinter.ppSignature]
+/-- Like `Lean.PrettyPrinter.ppSignature` but with a custom delaboration -/
 def ppSignature (c : Name) : MetaM FormatWithInfos := do
   let decl ← getConstInfo c
   let e := .const c (decl.levelParams.map mkLevelParam)
@@ -74,10 +75,9 @@ open Lean Meta Elab Command
 
 /-! ## Statement string -/
 
-def getStatement (name : Name) : CommandElabM MessageData := do
-  return ← addMessageContextPartial (.ofPPFormat { pp := fun
-    | some ctx => ctx.runMetaM <| GameServer.PrettyPrinter.ppSignature name
-    | none     => return "that's a bug." })
+@[inherit_doc Lean.MessageData.signature]
+def MessageData.signature (c : Name) : CommandElabM MessageData := do
+  return .ofFormatWithInfosM (PrettyPrinter.ppSignature c)
 
 -- Note: We use `String` because we can't send `MessageData` as json, but
 -- `MessageData` might be better for interactive highlighting.
@@ -87,7 +87,7 @@ Note: A statement like `theorem abc : ∀ x : Nat, x ≥ 0` would be turned into
 `theorem abc (x : Nat) : x ≥ 0` by `PrettyPrinter.ppSignature`. -/
 def getStatementString (name : Name) : CommandElabM String := do
   --try
-    return ← (← getStatement name).toString
+    return ← (← MessageData.signature name).toString
   --catch
   --| _ => throwError m!"Could not find {name} in context."
   -- TODO: I think it would be nicer to unresolve Namespaces as much as possible.

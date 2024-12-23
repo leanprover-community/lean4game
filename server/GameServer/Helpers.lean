@@ -71,22 +71,22 @@ syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
 TODO: Why are we not using graphs here but our own construct `HashMap Name (HashSet Name)`?
 -/
 
-partial def removeTransitiveAux (id : Name) (arrows : HashMap Name (HashSet Name))
-      (newArrows : HashMap Name (HashSet Name)) (decendants : HashMap Name (HashSet Name)) :
-    HashMap Name (HashSet Name) × HashMap Name (HashSet Name) := Id.run do
-  match (newArrows.find? id, decendants.find? id) with
+partial def removeTransitiveAux (id : Name) (arrows : Std.HashMap Name (Std.HashSet Name))
+      (newArrows : Std.HashMap Name (Std.HashSet Name)) (decendants : Std.HashMap Name (Std.HashSet Name)) :
+    Std.HashMap Name (Std.HashSet Name) × Std.HashMap Name (Std.HashSet Name) := Id.run do
+  match (newArrows.get? id, decendants.get? id) with
   | (some _, some _) => return (newArrows, decendants)
   | _ =>
     let mut newArr := newArrows
     let mut desc := decendants
     desc := desc.insert id {} -- mark as worked in case of loops
     newArr := newArr.insert id {} -- mark as worked in case of loops
-    let children := arrows.findD id {}
+    let children := arrows.getD id {}
     let mut trimmedChildren := children
     let mut theseDescs := children
     for child in children do
       (newArr, desc) := removeTransitiveAux child arrows newArr desc
-      let childDescs := desc.findD child {}
+      let childDescs := desc.getD child {}
       theseDescs := theseDescs.insertMany childDescs
       for d in childDescs do
         trimmedChildren := trimmedChildren.erase d
@@ -95,12 +95,12 @@ partial def removeTransitiveAux (id : Name) (arrows : HashMap Name (HashSet Name
     return (newArr, desc)
 
 
-def removeTransitive (arrows : HashMap Name (HashSet Name)) : CommandElabM (HashMap Name (HashSet Name)) := do
+def removeTransitive (arrows : Std.HashMap Name (Std.HashSet Name)) : CommandElabM (Std.HashMap Name (Std.HashSet Name)) := do
   let mut newArr := {}
   let mut desc := {}
   for id in arrows.toArray.map Prod.fst do
     (newArr, desc) := removeTransitiveAux id arrows newArr desc
-    if (desc.findD id {}).contains id then
+    if (desc.getD id {}).contains id then
       logError <| m!"Loop at {id}. " ++
         m!"This should not happen and probably means that `findLoops` has a bug."
       -- DEBUG:
@@ -115,16 +115,16 @@ def removeTransitive (arrows : HashMap Name (HashSet Name)) : CommandElabM (Hash
 For performance reason it returns a HashSet of visited
 nodes as well. This is filled with all nodes ever looked at as they cannot be
 part of a loop anymore. -/
-partial def findLoopsAux (arrows : HashMap Name (HashSet Name)) (node : Name)
-    (path : Array Name := #[]) (visited : HashSet Name := {}) :
-    Array Name × HashSet Name := Id.run do
+partial def findLoopsAux (arrows : Std.HashMap Name (Std.HashSet Name)) (node : Name)
+    (path : Array Name := #[]) (visited : Std.HashSet Name := {}) :
+    Array Name × Std.HashSet Name := Id.run do
   let mut visited := visited
   match path.getIdx? node with
   | some i =>
     -- Found a loop: `node` is already the iᵗʰ element of the path
     return (path.extract i path.size, visited.insert node)
   | none =>
-    for successor in arrows.findD node {} do
+    for successor in arrows.getD node {} do
       -- If we already visited the successor, it cannot be part of a loop anymore
       if visited.contains successor then
         continue
@@ -139,8 +139,8 @@ partial def findLoopsAux (arrows : HashMap Name (HashSet Name)) (node : Name)
   return (#[], visited.insert node)
 
 /-- Find a loop in the graph and return it. Returns `[]` if there are no loops. -/
-partial def findLoops (arrows : HashMap Name (HashSet Name)) : List Name := Id.run do
-  let mut visited : HashSet Name := {}
+partial def findLoops (arrows : Std.HashMap Name (Std.HashSet Name)) : List Name := Id.run do
+  let mut visited : Std.HashSet Name := {}
   for node in arrows.toArray.map (·.1) do
     -- Skip a node if it was already visited
     if visited.contains node then
