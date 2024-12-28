@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-cores=$(nproc --all)
-cpu_measure=$(top -bn2 | grep '%Cpu' | tail -1)
-mem_measure=$(top -bn2 | grep 'Mem' | head -1)
 
-cpu=$(echo $cpu_measure | awk -v cores=$cores '{print 1-($8/(cores*100))}')
-mem=$(echo $mem_measure | awk '{print $8/$4}') 
+# Load python interpreter
+python=/usr/bin/python3
+# Load python script
+cpu_usage=$L4G_DIR/lean4game/relay/cpu_usage.py
+# Execute python script
+cpu=$($python $cpu_usage)
+# Calculate memory usage by computing used_memory/total_memory
+mem=$(free | sed '2q;d' | awk '{print $3/$2*100}')
 
-printf "CPU, MEM\n%.2f, %.2f\n" $cpu $mem 
-
-
-
+printf "CPU, MEM\n%.2f, %.2f\n" $cpu $mem
