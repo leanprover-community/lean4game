@@ -39,5 +39,5 @@ if __name__ == "__main__":
   d_total = curr_total - prev_total
   d_idle = curr_idle - prev_idle
 
-  cpu_usage = ((d_total - d_idle)/d_total) * 100
-  print(round(cpu_usage, 20))
+  cpu_usage = ((d_total - d_idle)/d_total)
+  print(cpu_usage)
