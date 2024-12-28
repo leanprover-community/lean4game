@@ -74,9 +74,24 @@ async function doImport (owner, repo, id) {
       }
     })
     // choose latest artifact
+    currUsage, threshold = fs.statfs("/", (err, stats) => {
+      if (err) {
+        console.error("Failure getting filesystem statistics!")
+      }
+      usedBlocks = (stats.blocks - stats.bfree)
+      usedBytes = usedBlocks * stats.bsize
+      threshold = stats.blocks * stats.bsize * 0.95
+      return (usedBytes, threshold)
+    });
     const artifact = artifacts.data.artifacts
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
     artifactId = artifact.id
+    // Check that size of artifact does not exceed disc space maximum.
+    artifactSize = artifact.size_in_bytes
+    if (currUsage + artifactSize >= threshold) {
+      console.error(`File (${artifactSize}) is exceeding allocated game memory of ${threshold}`)
+      return
+    }
     const url = artifact.archive_download_url
     // Make sure the download folder exists
     if (!fs.existsSync(path.join(__dirname, "..", "games"))){
