@@ -193,8 +193,8 @@ function LandingPage() {
             </p>
           </Trans>
           <p>
-            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem} %</strong>{t(" used")}.<br/></> }
-            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU} %</strong>{t(" used")}. </> }
+            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem.toFixed(2)} %</strong>{t(" used")}.<br/></> }
+            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU.toFixed(2)} %</strong>{t(" used")}. </> }
           </p>
         </div>
       </section>
