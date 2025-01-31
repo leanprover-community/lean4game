@@ -1,11 +1,12 @@
 import { spawn } from 'child_process'
-import fs from 'fs';
+import fs, { stat } from 'fs';
 import request from 'request'
 import requestProgress from 'request-progress'
 import { Octokit } from 'octokit';
 
 import { fileURLToPath } from 'url';
-import path from 'path';
+import path, { resolve } from 'path';
+import { error } from 'console';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +18,7 @@ const octokit = new Octokit({
 })
 
 const progress = {}
+var exceedingMemoryLimit = false
 
 async function runProcess(id, cmd, args, cwd) {
   return new Promise((resolve, reject) => {
@@ -36,6 +38,28 @@ async function runProcess(id, cmd, args, cwd) {
   })
 }
 
+
+async function checkAgainstDiscMemory(artifact, maxPercentage) {
+  return new Promise((resolve, reject) => {
+  fs.statfs("/", (err, stats) => {
+    if (err) {
+      console.log(err);
+      reject()
+    }
+    let artifactBytes = artifact.size_in_bytes;
+    let totalBytes = stats.blocks * stats.bsize;
+    let freeBytes = stats.bfree * stats.bsize;
+    let usedBytes = totalBytes - freeBytes;
+    let maxUsedBytes = totalBytes * maxPercentage;
+    if (usedBytes + artifactBytes >= maxUsedBytes) {
+      exceedingMemoryLimit = true;
+    }
+    resolve()
+  });
+  })
+}
+
+
 async function download(id, url, dest) {
   return new Promise((resolve, reject) => {
     // The options argument is optional so you can omit it
@@ -49,7 +73,9 @@ async function download(id, url, dest) {
       }
     }))
     .on('progress', function (state) {
-      progress[id].output += `Downloaded ${Math.round(state.size.transferred/1024/1024)}MB\n`
+      console.log('progress', state);
+      transferredDataSize = Math.round(state.size.transferred/1024/1024)
+      progress[id].output += `Downloaded ${transferredDataSize}MB\n`
     })
     .on('error', function (err) {
       reject(err)
@@ -73,25 +99,15 @@ async function doImport (owner, repo, id) {
         'X-GitHub-Api-Version': '2022-11-28'
       }
     })
-    // choose latest artifact
-    currUsage, threshold = fs.statfs("/", (err, stats) => {
-      if (err) {
-        console.error("Failure getting filesystem statistics!")
-      }
-      usedBlocks = (stats.blocks - stats.bfree)
-      usedBytes = usedBlocks * stats.bsize
-      threshold = stats.blocks * stats.bsize * 0.95
-      return (usedBytes, threshold)
-    });
     const artifact = artifacts.data.artifacts
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
-    artifactId = artifact.id
-    // Check that size of artifact does not exceed disc space maximum.
-    artifactSize = artifact.size_in_bytes
-    if (currUsage + artifactSize >= threshold) {
-      console.error(`File (${artifactSize}) is exceeding allocated game memory of ${threshold}`)
-      return
+
+    await checkAgainstDiscMemory(artifact, 0.95);
+    if (exceedingMemoryLimit === true) {
+      throw new Error(`Uploading file of size ${Math.round(artifact.size_in_bytes / 1024 / 1024)} (MB) would exceed allocated memory on the server.`);
     }
+
+    artifactId = artifact.id
     const url = artifact.archive_download_url
     // Make sure the download folder exists
     if (!fs.existsSync(path.join(__dirname, "..", "games"))){
@@ -105,7 +121,6 @@ async function doImport (owner, repo, id) {
     progress[id].output += `Download finished.\n`
 
     await runProcess(id, "/bin/bash", [path.join(__dirname, "unpack.sh"), artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, ".."))
-
 
     // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
     // manifest = JSON.parse(manifest);
