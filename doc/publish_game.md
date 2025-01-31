@@ -24,7 +24,11 @@ You should see a white screen which shows import updates and eventually reports 
 
 Now you can immediately play the game at `adam.math.hhu.de/#/g/{USER}/{REPOSITORY}`!
 
-## 4. Main page
+## 4. Update
+
+To upload a new version of the game you will have to repeat 1. and 2. whenever you want to publish the updated version.
+
+## 5. Main page
 
 Adding games to the main page happens manually by the server maintainers. Tell us if you want us
 to add a tile for your game!
