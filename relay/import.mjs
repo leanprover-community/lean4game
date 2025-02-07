@@ -13,6 +13,8 @@ const __dirname = path.dirname(__filename);
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const USERNAME = process.env.LEAN4GAME_GITHUB_USER
+const MEM_THRESHOLD = process.env.RES_DISC_SPACE_PERCENTAGE
+const CONTACT = process.env.ISSUE_CONTACT
 const octokit = new Octokit({
   auth: TOKEN
 })
@@ -102,9 +104,11 @@ async function doImport (owner, repo, id) {
     const artifact = artifacts.data.artifacts
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
 
-    await checkAgainstDiscMemory(artifact, 0.95);
+    await checkAgainstDiscMemory(artifact, MEM_THRESHOLD);
+
     if (exceedingMemoryLimit === true) {
-      throw new Error(`Uploading file of size ${Math.round(artifact.size_in_bytes / 1024 / 1024)} (MB) would exceed allocated memory on the server.`);
+      throw new Error(`Uploading file of size ${Math.round(artifact.size_in_bytes / 1024 / 1024)} (MB) would exceed allocated memory on the server.\n
+      Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve this issue.`);
     }
 
     artifactId = artifact.id
