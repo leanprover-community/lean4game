@@ -109,6 +109,7 @@ async function doImport (owner, repo, id) {
 
     if (exceedingMemoryLimit === true) {
       const artifact_size_mb = Math.round(artifact.size_in_bytes / 1024 / 1024);
+      console.error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifact_size_mb} (MB) by ${owner} would exceed allocated memory on the server.`)
       throw new Error(`Uploading file of size ${artifact_size_mb} (MB) would exceed allocated memory on the server.\n
       Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve this issue.`);
     }
