@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const USERNAME = process.env.LEAN4GAME_GITHUB_USER
-const MEM_THRESHOLD = process.env.RES_DISC_SPACE_PERCENTAGE
+const RESERVED_MEMORY = process.env.RESERVED_DISC_SPACE_MB
 const CONTACT = process.env.ISSUE_CONTACT
 const octokit = new Octokit({
   auth: TOKEN
@@ -41,7 +41,7 @@ async function runProcess(id, cmd, args, cwd) {
 }
 
 
-async function checkAgainstDiscMemory(artifact, maxPercentage) {
+async function checkAgainstDiscMemory(artifact, reservedMemorySize) {
   return new Promise((resolve, reject) => {
   fs.statfs("/", (err, stats) => {
     if (err) {
@@ -52,8 +52,8 @@ async function checkAgainstDiscMemory(artifact, maxPercentage) {
     let totalBytes = stats.blocks * stats.bsize;
     let freeBytes = stats.bfree * stats.bsize;
     let usedBytes = totalBytes - freeBytes;
-    let maxUsedBytes = totalBytes * maxPercentage;
-    if (usedBytes + artifactBytes >= maxUsedBytes) {
+    const resMemoryBytes = reservedMemorySize * 1024 * 1024;
+    if (usedBytes + artifactBytes >= resMemoryBytes) {
       exceedingMemoryLimit = true;
     }
     resolve()
@@ -74,6 +74,7 @@ async function download(id, url, dest) {
         'Authorization': 'Bearer ' + TOKEN
       }
     }))
+    // choose latest artifact
     .on('progress', function (state) {
       console.log('progress', state);
       transferredDataSize = Math.round(state.size.transferred/1024/1024)
@@ -104,10 +105,12 @@ async function doImport (owner, repo, id) {
     const artifact = artifacts.data.artifacts
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
 
-    await checkAgainstDiscMemory(artifact, MEM_THRESHOLD);
+    await checkAgainstDiscMemory(artifact, RESERVED_MEMORY);
 
     if (exceedingMemoryLimit === true) {
-      throw new Error(`Uploading file of size ${Math.round(artifact.size_in_bytes / 1024 / 1024)} (MB) would exceed allocated memory on the server.\n
+      const artifact_size_mb = Math.round(artifact.size_in_bytes / 1024 / 1024);
+      console.error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifact_size_mb} (MB) by ${owner} would exceed allocated memory on the server.`)
+      throw new Error(`Uploading file of size ${artifact_size_mb} (MB) would exceed allocated memory on the server.\n
       Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve this issue.`);
     }
 
