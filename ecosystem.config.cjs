@@ -6,6 +6,8 @@ module.exports = {
     env: {
       LEAN4GAME_GITHUB_USER: "",
       LEAN4GAME_GITHUB_TOKEN: "",
+      RESERVED_DISC_SPACE_MB: 0,
+      ISSUE_CONTACT: "",
       NODE_ENV: "production",
       PORT: 8002
     },
