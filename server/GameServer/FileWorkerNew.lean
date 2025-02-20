@@ -1,34 +1,11 @@
-/-
-Copyright (c) 2020 Marc Huisinga. All rights reserved.
-Released under Apache 2.0 license as described in the file LICENSE.
-
-Authors: Marc Huisinga, Wojciech Nawrocki
--/
-prelude
-import Init.System.IO
-import Init.Data.Channel
-
-import Lean.Data.RBMap
-import Lean.Environment
-
-import Lean.Data.Lsp
-import Lean.Data.Json.FromToJson
-
-import Lean.Util.FileSetupInfo
-import Lean.LoadDynlib
-import Lean.Language.Lean
-
-import Lean.Server.Utils
-import Lean.Server.AsyncList
-import Lean.Server.References
-
-import Lean.Server.FileWorker.Utils
-import Lean.Server.FileWorker.RequestHandling
-import Lean.Server.FileWorker.WidgetRequests
-import Lean.Server.FileWorker.SetupFile
-import Lean.Server.Rpc.Basic
-import Lean.Widget.InteractiveDiagnostic
-import Lean.Server.ImportCompletion
+/- This file is adapted from `Lean/Server/FileWorker.lean`. -/
+import Lean.Server.FileWorker
+import GameServer.Game
+import GameServer.ImportModules
+import GameServer.SaveData
+import GameServer.EnvExtensions
+import GameServer.Tactic.LetIntros
+import GameServer.Helpers.Tmp
 
 /-!
 For general server architecture, see `README.md`. For details of IPC communication, see `Watchdog.lean`.
@@ -52,216 +29,254 @@ If a task that the request task waits for is terminated, a change occurred somew
 command that the request is looking for and the request sends a "content changed" error.
 -/
 
-namespace Lean.Server.FileWorker
+namespace GameServer.FileWorker
 
+open Lean Server FileWorker
 open Lsp
 open IO
 open Snapshots
 open JsonRpc
 
-open Widget in
+-- open Widget in
 
-structure WorkerContext where
-  /-- Synchronized output channel for LSP messages. Notifications for outdated versions are
-    discarded on read. -/
-  chanOut              : IO.Channel JsonRpc.Message
-  /--
-  Latest document version received by the client, used for filtering out notifications from
-  previous versions.
-  -/
-  maxDocVersionRef     : IO.Ref Int
-  freshRequestIdRef    : IO.Ref Int
-  /--
-  Channel that receives a message for every a `$/lean/fileProgress` notification, indicating whether
-  the notification suggests that the file is currently being processed.
-  -/
-  chanIsProcessing     : IO.Channel Bool
-  /--
-  Diagnostics that are included in every single `textDocument/publishDiagnostics` notification.
-  -/
-  stickyDiagnosticsRef : IO.Ref (Array InteractiveDiagnostic)
-  hLog                 : FS.Stream
-  initParams           : InitializeParams
-  processor            : Parser.InputContext → BaseIO Lean.Language.Lean.InitialSnapshot
-  clientHasWidgets     : Bool
-  /--
-  Options defined on the worker cmdline (i.e. not including options from `setup-file`), used for
-  context-free tasks such as editing delay.
-  -/
-  cmdlineOpts          : Options
+-- structure WorkerContext where
+--   /-- Synchronized output channel for LSP messages. Notifications for outdated versions are
+--     discarded on read. -/
+--   chanOut              : IO.Channel JsonRpc.Message
+--   /--
+--   Latest document version received by the client, used for filtering out notifications from
+--   previous versions.
+--   -/
+--   maxDocVersionRef     : IO.Ref Int
+--   freshRequestIdRef    : IO.Ref Int
+--   /--
+--   Channel that receives a message for every a `$/lean/fileProgress` notification, indicating whether
+--   the notification suggests that the file is currently being processed.
+--   -/
+--   chanIsProcessing     : IO.Channel Bool
+--   /--
+--   Diagnostics that are included in every single `textDocument/publishDiagnostics` notification.
+--   -/
+--   stickyDiagnosticsRef : IO.Ref (Array InteractiveDiagnostic)
+--   hLog                 : FS.Stream
+--   initParams           : InitializeParams
+--   processor            : Parser.InputContext → BaseIO Lean.Language.Lean.InitialSnapshot
+--   clientHasWidgets     : Bool
+--   /--
+--   Options defined on the worker cmdline (i.e. not including options from `setup-file`), used for
+--   context-free tasks such as editing delay.
+--   -/
+--   cmdlineOpts          : Options
 
-/-! # Asynchronous snapshot elaboration -/
+-- /-! # Asynchronous snapshot elaboration -/
 
-section Elab
-  -- Placed here instead of Lean.Server.Utils because of an import loop
-  private def mkIleanInfoNotification (method : String) (m : DocumentMeta)
-      (trees : Array Elab.InfoTree) : BaseIO (JsonRpc.Notification Lsp.LeanIleanInfoParams) := do
-    let references ← findModuleRefs m.text trees (localVars := true) |>.toLspModuleRefs
-    let param := { version := m.version, references }
-    return { method, param }
+-- section Elab
+--   -- Placed here instead of Lean.Server.Utils because of an import loop
+--   private def mkIleanInfoNotification (method : String) (m : DocumentMeta)
+--       (trees : Array Elab.InfoTree) : BaseIO (JsonRpc.Notification Lsp.LeanIleanInfoParams) := do
+--     let references ← findModuleRefs m.text trees (localVars := true) |>.toLspModuleRefs
+--     let param := { version := m.version, references }
+--     return { method, param }
 
-  private def mkIleanInfoUpdateNotification : DocumentMeta → Array Elab.InfoTree →
-      BaseIO (JsonRpc.Notification Lsp.LeanIleanInfoParams) :=
-    mkIleanInfoNotification "$/lean/ileanInfoUpdate"
+--   private def mkIleanInfoUpdateNotification : DocumentMeta → Array Elab.InfoTree →
+--       BaseIO (JsonRpc.Notification Lsp.LeanIleanInfoParams) :=
+--     mkIleanInfoNotification "$/lean/ileanInfoUpdate"
 
-  private def mkIleanInfoFinalNotification : DocumentMeta → Array Elab.InfoTree →
-      BaseIO (JsonRpc.Notification Lsp.LeanIleanInfoParams) :=
-    mkIleanInfoNotification "$/lean/ileanInfoFinal"
+--   private def mkIleanInfoFinalNotification : DocumentMeta → Array Elab.InfoTree →
+--       BaseIO (JsonRpc.Notification Lsp.LeanIleanInfoParams) :=
+--     mkIleanInfoNotification "$/lean/ileanInfoFinal"
 
-  /-- Yields a `$/lean/importClosure` notification. -/
-  private def mkImportClosureNotification (importClosure : Array DocumentUri)
-      : JsonRpc.Notification Lsp.LeanImportClosureParams := {
-    method := "$/lean/importClosure",
-    param := { importClosure : LeanImportClosureParams }
-  }
+--   /-- Yields a `$/lean/importClosure` notification. -/
+--   private def mkImportClosureNotification (importClosure : Array DocumentUri)
+--       : JsonRpc.Notification Lsp.LeanImportClosureParams := {
+--     method := "$/lean/importClosure",
+--     param := { importClosure : LeanImportClosureParams }
+--   }
 
-  /-- State of `reportSnapshots`. -/
-  private structure ReportSnapshotsState where
-    /-- Whether we have waited for a snapshot to finish at least once (see debouncing below). -/
-    hasBlocked := false
-    /-- All info trees encountered so far. -/
-    allInfoTrees : Array Elab.InfoTree := #[]
-    /-- New info trees encountered since we last sent a .ilean update notification. -/
-    newInfoTrees : Array Elab.InfoTree := #[]
-    /-- Whether we encountered any snapshot with `Snapshot.isFatal`. -/
-    hasFatal := false
-    /--
-    Last `Snapshot.range?` encountered that was not `none`, if any. We use this as a fallback when
-    reporting progress as we should always report *some* range when waiting on a task.
-    -/
-    lastRange? : Option String.Range := none
-  deriving Inhabited
+--   /-- State of `reportSnapshots`. -/
+--   private structure ReportSnapshotsState where
+--     /-- Whether we have waited for a snapshot to finish at least once (see debouncing below). -/
+--     hasBlocked := false
+--     /-- All info trees encountered so far. -/
+--     allInfoTrees : Array Elab.InfoTree := #[]
+--     /-- New info trees encountered since we last sent a .ilean update notification. -/
+--     newInfoTrees : Array Elab.InfoTree := #[]
+--     /-- Whether we encountered any snapshot with `Snapshot.isFatal`. -/
+--     hasFatal := false
+--     /--
+--     Last `Snapshot.range?` encountered that was not `none`, if any. We use this as a fallback when
+--     reporting progress as we should always report *some* range when waiting on a task.
+--     -/
+--     lastRange? : Option String.Range := none
+--   deriving Inhabited
 
-  register_builtin_option server.reportDelayMs : Nat := {
-    defValue := 200
-    group := "server"
-    descr := "(server) time in milliseconds to wait before reporting progress and diagnostics on \
-      document edit in order to reduce flickering
+--   register_builtin_option server.reportDelayMs : Nat := {
+--     defValue := 200
+--     group := "server"
+--     descr := "(server) time in milliseconds to wait before reporting progress and diagnostics on \
+--       document edit in order to reduce flickering
 
-This option can only be set on the command line, not in the lakefile or via `set_option`."
-  }
+-- This option can only be set on the command line, not in the lakefile or via `set_option`."
+--   }
 
-  /--
-  Type of state stored in `Snapshot.Diagnostics.cacheRef?`.
+--   /--
+--   Type of state stored in `Snapshot.Diagnostics.cacheRef?`.
 
-  See also section "Communication" in Lean/Server/README.md.
-  -/
-  structure MemorizedInteractiveDiagnostics where
-    diags : Array Widget.InteractiveDiagnostic
-  deriving TypeName
+--   See also section "Communication" in Lean/Server/README.md.
+--   -/
+--   structure MemorizedInteractiveDiagnostics where
+--     diags : Array Widget.InteractiveDiagnostic
+--   deriving TypeName
 
-  /--
-  Sends a `textDocument/publishDiagnostics` notification to the client that contains the diagnostics
-  in `ctx.stickyDiagnosticsRef` and `doc.diagnosticsRef`.
-  -/
-  private def publishDiagnostics (ctx : WorkerContext) (doc : EditableDocumentCore)
-      : BaseIO Unit := do
-    let stickyInteractiveDiagnostics ← ctx.stickyDiagnosticsRef.get
-    let docInteractiveDiagnostics ← doc.diagnosticsRef.get
-    let diagnostics :=
-      stickyInteractiveDiagnostics ++ docInteractiveDiagnostics
-      |>.map (·.toDiagnostic)
-    let notification := mkPublishDiagnosticsNotification doc.meta diagnostics
-    ctx.chanOut.send notification
+--   /--
+--   Sends a `textDocument/publishDiagnostics` notification to the client that contains the diagnostics
+--   in `ctx.stickyDiagnosticsRef` and `doc.diagnosticsRef`.
+--   -/
+--   private def publishDiagnostics (ctx : WorkerContext) (doc : EditableDocumentCore)
+--       : BaseIO Unit := do
+--     let stickyInteractiveDiagnostics ← ctx.stickyDiagnosticsRef.get
+--     let docInteractiveDiagnostics ← doc.diagnosticsRef.get
+--     let diagnostics :=
+--       stickyInteractiveDiagnostics ++ docInteractiveDiagnostics
+--       |>.map (·.toDiagnostic)
+--     let notification := mkPublishDiagnosticsNotification doc.meta diagnostics
+--     ctx.chanOut.send notification
 
-  open Language in
-  /--
-    Reports status of a snapshot tree incrementally to the user: progress,
-    diagnostics, .ilean reference information.
+--   open Language in
+--   /--
+--     Reports status of a snapshot tree incrementally to the user: progress,
+--     diagnostics, .ilean reference information.
 
-    See also section "Communication" in Lean/Server/README.md.
+--     See also section "Communication" in Lean/Server/README.md.
 
-    Debouncing: we only report information
-    * after first waiting for `reportDelayMs`, to give trivial tasks a chance to finish
-    * when first blocking, i.e. not before skipping over any unchanged snapshots and such trivial
-      tasks
-    * afterwards, each time new information is found in a snapshot
-    * at the very end, if we never blocked (e.g. emptying a file should make
-      sure to empty diagnostics as well eventually) -/
-  private partial def reportSnapshots (ctx : WorkerContext) (doc : EditableDocumentCore)
-      (cancelTk : CancelToken) : BaseIO (Task Unit) := do
-    let t ← BaseIO.asTask do
-      IO.sleep (server.reportDelayMs.get ctx.cmdlineOpts).toUInt32
-    BaseIO.bindTask t fun _ => do
-      BaseIO.bindTask (← go (toSnapshotTree doc.initSnap) {}) fun st => do
-        if (← cancelTk.isSet) then
-          return .pure ()
+--     Debouncing: we only report information
+--     * after first waiting for `reportDelayMs`, to give trivial tasks a chance to finish
+--     * when first blocking, i.e. not before skipping over any unchanged snapshots and such trivial
+--       tasks
+--     * afterwards, each time new information is found in a snapshot
+--     * at the very end, if we never blocked (e.g. emptying a file should make
+--       sure to empty diagnostics as well eventually) -/
+--   private partial def reportSnapshots (ctx : WorkerContext) (doc : EditableDocumentCore)
+--       (cancelTk : CancelToken) : BaseIO (Task Unit) := do
+--     let t ← BaseIO.asTask do
+--       IO.sleep (server.reportDelayMs.get ctx.cmdlineOpts).toUInt32
+--     BaseIO.bindTask t fun _ => do
+--       BaseIO.bindTask (← go (toSnapshotTree doc.initSnap) {}) fun st => do
+--         if (← cancelTk.isSet) then
+--           return .pure ()
 
-        -- callback at the end of reporting
-        if st.hasFatal then
-          ctx.chanOut.send <| mkFileProgressAtPosNotification doc.meta 0 .fatalError
-        else
-          ctx.chanOut.send <| mkFileProgressDoneNotification doc.meta
-        unless st.hasBlocked do
-          publishDiagnostics ctx doc
-        -- This will overwrite existing ilean info for the file, in case something
-        -- went wrong during the incremental updates.
-        ctx.chanOut.send (← mkIleanInfoFinalNotification doc.meta st.allInfoTrees)
-        return .pure ()
-  where
-    go (node : SnapshotTree) (st : ReportSnapshotsState) : BaseIO (Task ReportSnapshotsState) := do
-      if node.element.diagnostics.msgLog.hasUnreported then
-        let diags ←
-          if let some memorized ← node.element.diagnostics.interactiveDiagsRef?.bindM fun ref => do
-              return (← ref.get).bind (·.get? MemorizedInteractiveDiagnostics) then
-            pure memorized.diags
-          else
-            let diags ← node.element.diagnostics.msgLog.toArray.mapM
-              (Widget.msgToInteractiveDiagnostic doc.meta.text · ctx.clientHasWidgets)
-            if let some cacheRef := node.element.diagnostics.interactiveDiagsRef? then
-              cacheRef.set <| some <| .mk { diags : MemorizedInteractiveDiagnostics }
-            pure diags
-        doc.diagnosticsRef.modify (· ++ diags)
-        if st.hasBlocked then
-          publishDiagnostics ctx doc
+--         -- callback at the end of reporting
+--         if st.hasFatal then
+--           ctx.chanOut.send <| mkFileProgressAtPosNotification doc.meta 0 .fatalError
+--         else
+--           ctx.chanOut.send <| mkFileProgressDoneNotification doc.meta
+--         unless st.hasBlocked do
+--           publishDiagnostics ctx doc
+--         -- This will overwrite existing ilean info for the file, in case something
+--         -- went wrong during the incremental updates.
+--         ctx.chanOut.send (← mkIleanInfoFinalNotification doc.meta st.allInfoTrees)
+--         return .pure ()
+--   where
+--     go (node : SnapshotTree) (st : ReportSnapshotsState) : BaseIO (Task ReportSnapshotsState) := do
+--       if node.element.diagnostics.msgLog.hasUnreported then
+--         let diags ←
+--           if let some memorized ← node.element.diagnostics.interactiveDiagsRef?.bindM fun ref => do
+--               return (← ref.get).bind (·.get? MemorizedInteractiveDiagnostics) then
+--             pure memorized.diags
+--           else
+--             let diags ← node.element.diagnostics.msgLog.toArray.mapM
+--               (Widget.msgToInteractiveDiagnostic doc.meta.text · ctx.clientHasWidgets)
+--             if let some cacheRef := node.element.diagnostics.interactiveDiagsRef? then
+--               cacheRef.set <| some <| .mk { diags : MemorizedInteractiveDiagnostics }
+--             pure diags
+--         doc.diagnosticsRef.modify (· ++ diags)
+--         if st.hasBlocked then
+--           publishDiagnostics ctx doc
 
-      let mut st := { st with hasFatal := st.hasFatal || node.element.isFatal }
+--       let mut st := { st with hasFatal := st.hasFatal || node.element.isFatal }
 
-      if let some itree := node.element.infoTree? then
-        let mut newInfoTrees := st.newInfoTrees.push itree
-        if st.hasBlocked then
-          ctx.chanOut.send (← mkIleanInfoUpdateNotification doc.meta newInfoTrees)
-          newInfoTrees := #[]
-        st := { st with newInfoTrees, allInfoTrees := st.allInfoTrees.push itree }
+--       if let some itree := node.element.infoTree? then
+--         let mut newInfoTrees := st.newInfoTrees.push itree
+--         if st.hasBlocked then
+--           ctx.chanOut.send (← mkIleanInfoUpdateNotification doc.meta newInfoTrees)
+--           newInfoTrees := #[]
+--         st := { st with newInfoTrees, allInfoTrees := st.allInfoTrees.push itree }
 
-      goSeq st node.children.toList
+--       goSeq st node.children.toList
 
-    goSeq (st : ReportSnapshotsState) :
-        List (SnapshotTask SnapshotTree) → BaseIO (Task ReportSnapshotsState)
-      | [] => return .pure st
-      | t::ts => do
-        let mut st := st
-        st := { st with lastRange? := t.range? <|> st.lastRange? }
-        unless (← IO.hasFinished t.task) do
-          -- report *some* recent range even if `t.range?` is `none`; see also `State.lastRange?`
-          if let some range := st.lastRange? then
-            ctx.chanOut.send <| mkFileProgressAtPosNotification doc.meta range.start
-          if !st.hasBlocked then
-            publishDiagnostics ctx doc
-            st := { st with hasBlocked := true }
-        BaseIO.bindTask t.task fun t => do
-          BaseIO.bindTask (← go t st) (goSeq · ts)
-end Elab
+--     goSeq (st : ReportSnapshotsState) :
+--         List (SnapshotTask SnapshotTree) → BaseIO (Task ReportSnapshotsState)
+--       | [] => return .pure st
+--       | t::ts => do
+--         let mut st := st
+--         st := { st with lastRange? := t.range? <|> st.lastRange? }
+--         unless (← IO.hasFinished t.task) do
+--           -- report *some* recent range even if `t.range?` is `none`; see also `State.lastRange?`
+--           if let some range := st.lastRange? then
+--             ctx.chanOut.send <| mkFileProgressAtPosNotification doc.meta range.start
+--           if !st.hasBlocked then
+--             publishDiagnostics ctx doc
+--             st := { st with hasBlocked := true }
+--         BaseIO.bindTask t.task fun t => do
+--           BaseIO.bindTask (← go t st) (goSeq · ts)
+-- end Elab
 
--- Pending requests are tracked so they can be canceled
-abbrev PendingRequestMap := RBMap RequestID (Task (Except IO.Error Unit)) compare
+-- -- Pending requests are tracked so they can be canceled
+-- abbrev PendingRequestMap := RBMap RequestID (Task (Except IO.Error Unit)) compare
 
-structure AvailableImportsCache where
-  availableImports       : ImportCompletion.AvailableImports
-  lastRequestTimestampMs : Nat
+-- structure AvailableImportsCache where
+--   availableImports       : ImportCompletion.AvailableImports
+--   lastRequestTimestampMs : Nat
 
+/--
+Game-specific state to be packed on top of the `Server.FileWorker.WorkerState`
+used by the Lean server.
+-/
 structure WorkerState where
-  doc                : EditableDocument
-  /-- Token flagged for aborting `doc.reporter` when a new document version comes in. -/
-  reporterCancelTk   : CancelToken
-  srcSearchPathTask  : Task SearchPath
-  importCachingTask? : Option (Task (Except Error AvailableImportsCache))
-  pendingRequests    : PendingRequestMap
-  /-- A map of RPC session IDs. We allow asynchronous elab tasks and request handlers
-  to modify sessions. A single `Ref` ensures atomic transactions. -/
-  rpcSessions        : RBMap UInt64 (IO.Ref RpcSession) compare
+  /--
+  Collection of items which are considered unlocked.
+  Tactics and theorems are mixed together.
+  -/
+  inventory : Array String
+  /--
+  Difficulty determines whether tactics/theorems can be locked.
+  * 0: do not check
+  * 1: give warnings when locked items are used
+  * 2: give errors when locked items are used
+  -/
+  difficulty : Nat
+  /--
+  `levelInfo` contains all the (static) information about the level which is not influenced
+  by the user's progress.
+  -/
+  levelInfo : LevelInfo
+deriving ToJson, FromJson
 
-abbrev WorkerM := ReaderT WorkerContext <| StateRefT WorkerState IO
+/--
+Pack the our custom `WorkerState` on top of the normal worker monad
+`Server.FileWorker.WorkerM`.
+-/
+abbrev WorkerM := StateT WorkerState Server.FileWorker.WorkerM
+
+/-- TODO: this is written newly, I think -/
+def getGameWorkerState (gameDir : String) (initParams : Request Game.InitializeParams) (meta : DocumentMeta) : IO WorkerState := do
+
+  let game ← loadGameData gameDir
+  -- TODO: We misuse the `rootUri` field to the gameName
+  let rootUri? : Option String := some (toString game.name)
+  let initParams' := {initParams.param.toLeanInternal with rootUri?}
+  let some (levelId : LevelId) := GameServer.levelIdFromFileName?
+      initParams' meta.mkInputContext.fileName
+    | throwServerError s!"Could not determine level ID: {meta.mkInputContext.fileName}"
+  let levelInfo ← loadLevelData gameDir levelId.world levelId.level
+  let some initializationOptions := initParams.param.initializationOptions?
+    | throwServerError "no initialization options found"
+  let gameWorkerState : WorkerState := {
+    inventory := initializationOptions.inventory
+    difficulty := initializationOptions.difficulty
+    levelInfo
+  }
+  return gameWorkerState
 
 /-- Makes sure we load imports at most once per process as they cannot be unloaded. -/
 private builtin_initialize importsLoadedRef : IO.Ref Bool ← IO.mkRef false
@@ -332,8 +347,10 @@ def setupImports (meta : DocumentMeta) (cmdlineOpts : Options) (chanOut : Channe
 
 /- Worker initialization sequence. -/
 section Initialization
-  def initializeWorker (meta : DocumentMeta) (o e : FS.Stream) (initParams : InitializeParams) (opts : Options)
-      : IO (WorkerContext × WorkerState) := do
+  open private mkImportClosureNotification reportSnapshots from Lean.Server.FileWorker
+
+  def initializeWorker (meta : DocumentMeta) (o e : FS.Stream) (initParams : InitializeParams) (opts : Options) (gameDir : String) (gameWorkerState : WorkerState)
+      : IO (WorkerContext × Server.FileWorker.WorkerState) := do
     let clientHasWidgets := initParams.initializationOptions?.bind (·.hasWidgets?) |>.getD false
     let maxDocVersionRef ← IO.mkRef 0
     let freshRequestIdRef ← IO.mkRef (0 : Int)
@@ -414,25 +431,27 @@ section Initialization
 
 end Initialization
 
-section ServerRequests
-  def sendServerRequest [ToJson α]
-      (ctx    : WorkerContext)
-      (method : String)
-      (param  : α)
-      : IO Unit := do
-    let freshRequestId ← ctx.freshRequestIdRef.modifyGet fun freshRequestId =>
-      (freshRequestId, freshRequestId + 1)
-    let r : JsonRpc.Request α := ⟨freshRequestId, method, param⟩
-    ctx.chanOut.send r
-end ServerRequests
+-- section ServerRequests
+--   def sendServerRequest [ToJson α]
+--       (ctx    : WorkerContext)
+--       (method : String)
+--       (param  : α)
+--       : IO Unit := do
+--     let freshRequestId ← ctx.freshRequestIdRef.modifyGet fun freshRequestId =>
+--       (freshRequestId, freshRequestId + 1)
+--     let r : JsonRpc.Request α := ⟨freshRequestId, method, param⟩
+--     ctx.chanOut.send r
+-- end ServerRequests
 
 section Updates
-  def updatePendingRequests (map : PendingRequestMap → PendingRequestMap) : WorkerM Unit := do
-    modify fun st => { st with pendingRequests := map st.pendingRequests }
+  -- def updatePendingRequests (map : PendingRequestMap → PendingRequestMap) : WorkerM Unit := do
+  --   modify fun st => { st with pendingRequests := map st.pendingRequests }
+
+  open private reportSnapshots from Lean.Server.FileWorker
 
   /-- Given the new document, updates editable doc state. -/
   def updateDocument (meta : DocumentMeta) : WorkerM Unit := do
-    (← get).reporterCancelTk.set
+    (← StateT.lift get).reporterCancelTk.set
     let ctx ← read
     let initSnap ← ctx.processor meta.mkInputContext
     let doc : EditableDocumentCore := {
@@ -441,7 +460,7 @@ section Updates
     }
     let reporterCancelTk ← CancelToken.new
     let reporter ← reportSnapshots ctx doc reporterCancelTk
-    modify fun st => { st with doc := { doc with reporter }, reporterCancelTk }
+    StateT.lift <| modify fun st => { st with doc := { doc with reporter }, reporterCancelTk }
     -- we assume version updates are monotonous and that we are on the main thread
     ctx.maxDocVersionRef.set meta.version
 end Updates
@@ -449,71 +468,76 @@ end Updates
 /- Notifications are handled in the main thread. They may change global worker state
 such as the current file contents. -/
 section NotificationHandling
+  /-- Copied from `Lean.Server.FileWorker.handleDidChange` but with our custom `WorkerM` and
+  `updateDocument` -/
+  -- @[inherit_doc Lean.Server.FileWorker.handleDidChange]
   def handleDidChange (p : DidChangeTextDocumentParams) : WorkerM Unit := do
     let docId := p.textDocument
     let changes := p.contentChanges
-    let oldDoc := (←get).doc
+    let oldDoc := (←StateT.lift get).doc
     let newVersion := docId.version?.getD 0
     if ¬ changes.isEmpty then
       let newDocText := foldDocumentChanges changes oldDoc.meta.text
-      updateDocument ⟨docId.uri, newVersion, newDocText, oldDoc.meta.dependencyBuildMode⟩
+      -- modification: set the `DependencyBuildMode` from
+      -- `oldDoc.meta.dependencyBuildMode` to `.always`
+      updateDocument ⟨docId.uri, newVersion, newDocText, .always⟩
 
-  def handleCancelRequest (p : CancelParams) : WorkerM Unit := do
-    updatePendingRequests (fun pendingRequests => pendingRequests.erase p.id)
+--   def handleCancelRequest (p : CancelParams) : WorkerM Unit := do
+--     updatePendingRequests (fun pendingRequests => pendingRequests.erase p.id)
 
-  /--
-  Received from the watchdog when a dependency of this file is detected as being stale.
-  Issues a sticky diagnostic to the client that it should run "Restart File".
-  -/
-  def handleStaleDependency (_ : LeanStaleDependencyParams) : WorkerM Unit := do
-    let ctx ← read
-    let s ← get
-    let text := s.doc.meta.text
-    let importOutOfDataMessage := .text s!"Imports are out of date and should be rebuilt; \
-      use the \"Restart File\" command in your editor."
-    let diagnostic := {
-      range      := ⟨⟨0, 0⟩, ⟨1, 0⟩⟩
-      fullRange? := some ⟨⟨0, 0⟩, text.utf8PosToLspPos text.source.endPos⟩
-      severity?  := DiagnosticSeverity.information
-      message := importOutOfDataMessage
-    }
-    ctx.stickyDiagnosticsRef.modify fun stickyDiagnostics =>
-      let stickyDiagnostics := stickyDiagnostics.filter
-        (·.message.stripTags != importOutOfDataMessage.stripTags)
-      stickyDiagnostics.push diagnostic
-    publishDiagnostics ctx s.doc.toEditableDocumentCore
+--   /--
+--   Received from the watchdog when a dependency of this file is detected as being stale.
+--   Issues a sticky diagnostic to the client that it should run "Restart File".
+--   -/
+--   def handleStaleDependency (_ : LeanStaleDependencyParams) : WorkerM Unit := do
+--     let ctx ← read
+--     let s ← get
+--     let text := s.doc.meta.text
+--     let importOutOfDataMessage := .text s!"Imports are out of date and should be rebuilt; \
+--       use the \"Restart File\" command in your editor."
+--     let diagnostic := {
+--       range      := ⟨⟨0, 0⟩, ⟨1, 0⟩⟩
+--       fullRange? := some ⟨⟨0, 0⟩, text.utf8PosToLspPos text.source.endPos⟩
+--       severity?  := DiagnosticSeverity.information
+--       message := importOutOfDataMessage
+--     }
+--     ctx.stickyDiagnosticsRef.modify fun stickyDiagnostics =>
+--       let stickyDiagnostics := stickyDiagnostics.filter
+--         (·.message.stripTags != importOutOfDataMessage.stripTags)
+--       stickyDiagnostics.push diagnostic
+--     publishDiagnostics ctx s.doc.toEditableDocumentCore
 
-def handleRpcRelease (p : Lsp.RpcReleaseParams) : WorkerM Unit := do
-  -- NOTE(WN): when the worker restarts e.g. due to changed imports, we may receive `rpc/release`
-  -- for the previous RPC session. This is fine, just ignore.
-  if let some seshRef := (← get).rpcSessions.find? p.sessionId then
-    let monoMsNow ← IO.monoMsNow
-    let discardRefs : StateM RpcObjectStore Unit := do
-      for ref in p.refs do
-        discard do rpcReleaseRef ref
-    seshRef.modify fun st =>
-      let st := st.keptAlive monoMsNow
-      let ((), objects) := discardRefs st.objects
-      { st with objects }
+-- def handleRpcRelease (p : Lsp.RpcReleaseParams) : WorkerM Unit := do
+--   -- NOTE(WN): when the worker restarts e.g. due to changed imports, we may receive `rpc/release`
+--   -- for the previous RPC session. This is fine, just ignore.
+--   if let some seshRef := (← get).rpcSessions.find? p.sessionId then
+--     let monoMsNow ← IO.monoMsNow
+--     let discardRefs : StateM RpcObjectStore Unit := do
+--       for ref in p.refs do
+--         discard do rpcReleaseRef ref
+--     seshRef.modify fun st =>
+--       let st := st.keptAlive monoMsNow
+--       let ((), objects) := discardRefs st.objects
+--       { st with objects }
 
-def handleRpcKeepAlive (p : Lsp.RpcKeepAliveParams) : WorkerM Unit := do
-  match (← get).rpcSessions.find? p.sessionId with
-  | none => return
-  | some seshRef =>
-    seshRef.modify (·.keptAlive (← IO.monoMsNow))
+-- def handleRpcKeepAlive (p : Lsp.RpcKeepAliveParams) : WorkerM Unit := do
+--   match (← get).rpcSessions.find? p.sessionId with
+--   | none => return
+--   | some seshRef =>
+--     seshRef.modify (·.keptAlive (← IO.monoMsNow))
 
 end NotificationHandling
 
-/-! Requests here are handled synchronously rather than in the asynchronous `RequestM`. -/
-section RequestHandling
+-- /-! Requests here are handled synchronously rather than in the asynchronous `RequestM`. -/
+-- section RequestHandling
 
-def handleRpcConnect (_ : RpcConnectParams) : WorkerM RpcConnected := do
-  let (newId, newSesh) ← RpcSession.new
-  let newSeshRef ← IO.mkRef newSesh
-  modify fun st => { st with rpcSessions := st.rpcSessions.insert newId newSeshRef }
-  return { sessionId := newId }
+-- def handleRpcConnect (_ : RpcConnectParams) : WorkerM RpcConnected := do
+--   let (newId, newSesh) ← RpcSession.new
+--   let newSeshRef ← IO.mkRef newSesh
+--   modify fun st => { st with rpcSessions := st.rpcSessions.insert newId newSeshRef }
+--   return { sessionId := newId }
 
-end RequestHandling
+-- end RequestHandling
 
 section MessageHandling
   def parseParams (paramType : Type) [FromJson paramType] (params : Json) : WorkerM paramType :=
@@ -521,141 +545,154 @@ section MessageHandling
     | Except.ok parsed => pure parsed
     | Except.error inner => throwServerError s!"Got param with wrong structure: {params.compress}\n{inner}"
 
+  /--
+  Modified notification handler.
+
+  Compare to `Lean.Server.FileWorker.handleNotification`.
+  We use the modified `WorkerM` and use our custom `handleDidChange`.
+  -/
   def handleNotification (method : String) (params : Json) : WorkerM Unit := do
     let handle := fun paramType [FromJson paramType] (handler : paramType → WorkerM Unit) =>
       parseParams paramType params >>= handler
     match method with
+    -- modified `textDocument/didChange`, using a custom `handleDidChange`
     | "textDocument/didChange" => handle DidChangeTextDocumentParams handleDidChange
-    | "$/cancelRequest"        => handle CancelParams handleCancelRequest
-    | "$/lean/staleDependency" => handle Lsp.LeanStaleDependencyParams handleStaleDependency
-    | "$/lean/rpc/release"     => handle RpcReleaseParams handleRpcRelease
-    | "$/lean/rpc/keepAlive"   => handle RpcKeepAliveParams handleRpcKeepAlive
+    -- unmodified
+    | "$/cancelRequest"        => handle CancelParams (handleCancelRequest ·)
+    | "$/lean/staleDependency" => handle Lsp.LeanStaleDependencyParams (handleStaleDependency ·)
+    | "$/lean/rpc/release"     => handle RpcReleaseParams (handleRpcRelease ·)
+    | "$/lean/rpc/keepAlive"   => handle RpcKeepAliveParams (handleRpcKeepAlive ·)
     | _                        => throwServerError s!"Got unsupported notification method: {method}"
 
-  def queueRequest (id : RequestID) (requestTask : Task (Except IO.Error Unit))
-      : WorkerM Unit := do
-    updatePendingRequests (fun pendingRequests => pendingRequests.insert id requestTask)
+  -- def queueRequest (id : RequestID) (requestTask : Task (Except IO.Error Unit))
+  --     : WorkerM Unit := do
+  --   updatePendingRequests (fun pendingRequests => pendingRequests.insert id requestTask)
 
-  open Widget RequestM Language in
-  def handleGetInteractiveDiagnosticsRequest (params : GetInteractiveDiagnosticsParams) :
-      WorkerM (Array InteractiveDiagnostic) := do
-    let ctx ← read
-    let st ← get
-    -- NOTE: always uses latest document (which is the only one we can retrieve diagnostics for);
-    -- any race should be temporary as the client should re-request interactive diagnostics when
-    -- they receive the non-interactive diagnostics for the new document
-    let stickyDiags ← ctx.stickyDiagnosticsRef.get
-    let diags ← st.doc.diagnosticsRef.get
-    -- NOTE: does not wait for `lineRange?` to be fully elaborated, which would be problematic with
-    -- fine-grained incremental reporting anyway; instead, the client is obligated to resend the
-    -- request when the non-interactive diagnostics of this range have changed
-    return (stickyDiags ++ diags).filter fun diag =>
-      let r := diag.fullRange
-      let diagStartLine := r.start.line
-      let diagEndLine   :=
-        if r.end.character == 0 then
-          r.end.line
-        else
-          r.end.line + 1
-      params.lineRange?.all fun ⟨s, e⟩ =>
-        -- does [s,e) intersect [diagStartLine,diagEndLine)?
-        s ≤ diagStartLine ∧ diagStartLine < e ∨
-        diagStartLine ≤ s ∧ s < diagEndLine
+  -- open Widget RequestM Language in
+  -- def handleGetInteractiveDiagnosticsRequest (params : GetInteractiveDiagnosticsParams) :
+  --     WorkerM (Array InteractiveDiagnostic) := do
+  --   let ctx ← read
+  --   let st ← get
+  --   -- NOTE: always uses latest document (which is the only one we can retrieve diagnostics for);
+  --   -- any race should be temporary as the client should re-request interactive diagnostics when
+  --   -- they receive the non-interactive diagnostics for the new document
+  --   let stickyDiags ← ctx.stickyDiagnosticsRef.get
+  --   let diags ← st.doc.diagnosticsRef.get
+  --   -- NOTE: does not wait for `lineRange?` to be fully elaborated, which would be problematic with
+  --   -- fine-grained incremental reporting anyway; instead, the client is obligated to resend the
+  --   -- request when the non-interactive diagnostics of this range have changed
+  --   return (stickyDiags ++ diags).filter fun diag =>
+  --     let r := diag.fullRange
+  --     let diagStartLine := r.start.line
+  --     let diagEndLine   :=
+  --       if r.end.character == 0 then
+  --         r.end.line
+  --       else
+  --         r.end.line + 1
+  --     params.lineRange?.all fun ⟨s, e⟩ =>
+  --       -- does [s,e) intersect [diagStartLine,diagEndLine)?
+  --       s ≤ diagStartLine ∧ diagStartLine < e ∨
+  --       diagStartLine ≤ s ∧ s < diagEndLine
 
-  def handleImportCompletionRequest (id : RequestID) (params : CompletionParams)
-      : WorkerM (Task (Except Error AvailableImportsCache)) := do
-    let ctx ← read
-    let st ← get
-    let text := st.doc.meta.text
+  -- def handleImportCompletionRequest (id : RequestID) (params : CompletionParams)
+  --     : WorkerM (Task (Except Error AvailableImportsCache)) := do
+  --   let ctx ← read
+  --   let st ← get
+  --   let text := st.doc.meta.text
 
-    match st.importCachingTask? with
-    | none => IO.asTask (prio := Task.Priority.dedicated) do
-      let availableImports ← ImportCompletion.collectAvailableImports
-      let lastRequestTimestampMs ← IO.monoMsNow
-      let completions := ImportCompletion.find text st.doc.initSnap.stx params availableImports
-      ctx.chanOut.send <| .response id (toJson completions)
-      pure { availableImports, lastRequestTimestampMs : AvailableImportsCache }
+  --   match st.importCachingTask? with
+  --   | none => IO.asTask (prio := Task.Priority.dedicated) do
+  --     let availableImports ← ImportCompletion.collectAvailableImports
+  --     let lastRequestTimestampMs ← IO.monoMsNow
+  --     let completions := ImportCompletion.find text st.doc.initSnap.stx params availableImports
+  --     ctx.chanOut.send <| .response id (toJson completions)
+  --     pure { availableImports, lastRequestTimestampMs : AvailableImportsCache }
 
-    | some task => IO.mapTask (t := task) fun result => do
-      let mut ⟨availableImports, lastRequestTimestampMs⟩ ← IO.ofExcept result
-      let timestampNowMs ← IO.monoMsNow
-      if timestampNowMs - lastRequestTimestampMs >= 10000 then
-        availableImports ← ImportCompletion.collectAvailableImports
-      lastRequestTimestampMs := timestampNowMs
-      let completions := ImportCompletion.find text st.doc.initSnap.stx params availableImports
-      ctx.chanOut.send <| .response id (toJson completions)
-      pure { availableImports, lastRequestTimestampMs : AvailableImportsCache }
+  --   | some task => IO.mapTask (t := task) fun result => do
+  --     let mut ⟨availableImports, lastRequestTimestampMs⟩ ← IO.ofExcept result
+  --     let timestampNowMs ← IO.monoMsNow
+  --     if timestampNowMs - lastRequestTimestampMs >= 10000 then
+  --       availableImports ← ImportCompletion.collectAvailableImports
+  --     lastRequestTimestampMs := timestampNowMs
+  --     let completions := ImportCompletion.find text st.doc.initSnap.stx params availableImports
+  --     ctx.chanOut.send <| .response id (toJson completions)
+  --     pure { availableImports, lastRequestTimestampMs : AvailableImportsCache }
 
-  def handleRequest (id : RequestID) (method : String) (params : Json)
-      : WorkerM Unit := do
-    let ctx ← read
-    let st ← get
+  -- def handleRequest (id : RequestID) (method : String) (params : Json)
+  --     : WorkerM Unit := do
+  --   let ctx ← read
+  --   let st ← get
 
-    -- special cases
-    try
-      match method with
-      -- needs access to `WorkerState.rpcSessions`
-      | "$/lean/rpc/connect" =>
-        let ps ← parseParams RpcConnectParams params
-        let resp ← handleRpcConnect ps
-        ctx.chanOut.send <| .response id (toJson resp)
-        return
-      | "$/lean/rpc/call" =>
-        let params ← parseParams Lsp.RpcCallParams params
-        -- needs access to `EditableDocumentCore.diagnosticsRef`
-        if params.method == `Lean.Widget.getInteractiveDiagnostics then
-          let some seshRef := st.rpcSessions.find? params.sessionId
-            | ctx.chanOut.send <| .responseError id .rpcNeedsReconnect "Outdated RPC session" none
-          let params ← IO.ofExcept (fromJson? params.params)
-          let resp ← handleGetInteractiveDiagnosticsRequest params
+  --   -- special cases
+  --   try
+  --     match method with
+  --     -- needs access to `WorkerState.rpcSessions`
+  --     | "$/lean/rpc/connect" =>
+  --       let ps ← parseParams RpcConnectParams params
+  --       let resp ← handleRpcConnect ps
+  --       ctx.chanOut.send <| .response id (toJson resp)
+  --       return
+  --     | "$/lean/rpc/call" =>
+  --       let params ← parseParams Lsp.RpcCallParams params
+  --       -- needs access to `EditableDocumentCore.diagnosticsRef`
+  --       if params.method == `Lean.Widget.getInteractiveDiagnostics then
+  --         let some seshRef := st.rpcSessions.find? params.sessionId
+  --           | ctx.chanOut.send <| .responseError id .rpcNeedsReconnect "Outdated RPC session" none
+  --         let params ← IO.ofExcept (fromJson? params.params)
+  --         let resp ← handleGetInteractiveDiagnosticsRequest params
 
-          let resp ← seshRef.modifyGet fun st =>
-            rpcEncode resp st.objects |>.map (·) ({st with objects := ·})
-          ctx.chanOut.send <| .response id resp
-          return
-      | "textDocument/completion" =>
-        let params ← parseParams CompletionParams params
-        -- must not wait on import processing snapshot
-        if ImportCompletion.isImportCompletionRequest st.doc.meta.text st.doc.initSnap.stx params
-        then
-          let importCachingTask ← handleImportCompletionRequest id params
-          set { st with importCachingTask? := some importCachingTask }
-          return
-      | _ => pure ()
-    catch e =>
-      ctx.chanOut.send <| .responseError id .internalError (toString e) none
-      return
+  --         let resp ← seshRef.modifyGet fun st =>
+  --           rpcEncode resp st.objects |>.map (·) ({st with objects := ·})
+  --         ctx.chanOut.send <| .response id resp
+  --         return
+  --     | "textDocument/completion" =>
+  --       let params ← parseParams CompletionParams params
+  --       -- must not wait on import processing snapshot
+  --       if ImportCompletion.isImportCompletionRequest st.doc.meta.text st.doc.initSnap.stx params
+  --       then
+  --         let importCachingTask ← handleImportCompletionRequest id params
+  --         set { st with importCachingTask? := some importCachingTask }
+  --         return
+  --     | _ => pure ()
+  --   catch e =>
+  --     ctx.chanOut.send <| .responseError id .internalError (toString e) none
+  --     return
 
-    -- we assume that any other request requires at least the search path
-    -- TODO: move into language-specific request handling
-    let t ← IO.bindTask st.srcSearchPathTask fun srcSearchPath => do
-      let rc : RequestContext :=
-        { rpcSessions := st.rpcSessions
-          srcSearchPath
-          doc := st.doc
-          hLog := ctx.hLog
-          initParams := ctx.initParams }
-      let t? ← EIO.toIO' <| handleLspRequest method params rc
-      let t₁ ← match t? with
-        | Except.error e =>
-          IO.asTask do
-            ctx.chanOut.send <| e.toLspResponseError id
-        | Except.ok t => (IO.mapTask · t) fun
-          | Except.ok resp =>
-            ctx.chanOut.send <| .response id (toJson resp)
-          | Except.error e =>
-            ctx.chanOut.send <| e.toLspResponseError id
-    queueRequest id t
+  --   -- we assume that any other request requires at least the search path
+  --   -- TODO: move into language-specific request handling
+  --   let t ← IO.bindTask st.srcSearchPathTask fun srcSearchPath => do
+  --     let rc : RequestContext :=
+  --       { rpcSessions := st.rpcSessions
+  --         srcSearchPath
+  --         doc := st.doc
+  --         hLog := ctx.hLog
+  --         initParams := ctx.initParams }
+  --     let t? ← EIO.toIO' <| handleLspRequest method params rc
+  --     let t₁ ← match t? with
+  --       | Except.error e =>
+  --         IO.asTask do
+  --           ctx.chanOut.send <| e.toLspResponseError id
+  --       | Except.ok t => (IO.mapTask · t) fun
+  --         | Except.ok resp =>
+  --           ctx.chanOut.send <| .response id (toJson resp)
+  --         | Except.error e =>
+  --           ctx.chanOut.send <| e.toLspResponseError id
+  --   queueRequest id t
 
-  def handleResponse (_ : RequestID) (_ : Json) : WorkerM Unit :=
-    return -- The only response that we currently expect here is always empty
+  -- def handleResponse (_ : RequestID) (_ : Json) : WorkerM Unit :=
+  --   return -- The only response that we currently expect here is always empty
 
 end MessageHandling
 
 section MainLoop
   variable (hIn : FS.Stream) in
+  /--
+  The main-loop. Copied from `Lean.Server.FileWorker.mainLoop`. Use custom `WorkerM` as well
+  as custom `handleNotification`.
+  -/
+  --@[inherit_doc Lean.Server.FileWorker.mainLoop]
   partial def mainLoop : WorkerM Unit := do
-    let mut st ← get
+    let mut st ← StateT.lift get
     let msg ← hIn.readLspMessage
     let filterFinishedTasks (acc : PendingRequestMap) (id : RequestID) (task : Task (Except IO.Error Unit))
         : IO PendingRequestMap := do
@@ -695,43 +732,62 @@ section MainLoop
     | _ => throwServerError "Got invalid JSON-RPC message"
 end MainLoop
 
-def runRefreshTask : WorkerM (Task (Except IO.Error Unit)) := do
-  let ctx ← read
-  IO.asTask (prio := Task.Priority.dedicated) do
-    while ! (←IO.checkCanceled) do
-      let pastProcessingStates ← ctx.chanIsProcessing.recvAllCurrent
-      if pastProcessingStates.isEmpty then
-        -- Processing progress has not changed since we last sent out a refresh request
-        -- => do not send out another one for now so that we do not make the client spam
-        --    semantic token requests while idle and already having received an up-to-date state
-        IO.sleep 1000
-        continue
-      sendServerRequest ctx "workspace/semanticTokens/refresh" (none : Option Nat)
-      IO.sleep 2000
+-- def runRefreshTask : WorkerM (Task (Except IO.Error Unit)) := do
+--   let ctx ← read
+--   IO.asTask (prio := Task.Priority.dedicated) do
+--     while ! (←IO.checkCanceled) do
+--       let pastProcessingStates ← ctx.chanIsProcessing.recvAllCurrent
+--       if pastProcessingStates.isEmpty then
+--         -- Processing progress has not changed since we last sent out a refresh request
+--         -- => do not send out another one for now so that we do not make the client spam
+--         --    semantic token requests while idle and already having received an up-to-date state
+--         IO.sleep 1000
+--         continue
+--       sendServerRequest ctx "workspace/semanticTokens/refresh" (none : Option Nat)
+--       IO.sleep 2000
 
-def initAndRunWorker (i o e : FS.Stream) (opts : Options) : IO Unit := do
+/-- Modified from `Lean.Server.FileWorker.initAndRunWorker`.
+Added `gameDir` argument, -/
+-- @[inherit_doc Lean.Server.FileWorker.initAndRunWorker]
+def initAndRunWorker (i o e : FS.Stream) (opts : Options) (gameDir : String) : IO Unit := do
   let i ← maybeTee "fwIn.txt" false i
   let o ← maybeTee "fwOut.txt" true o
-  let initParams ← i.readLspRequestAs "initialize" InitializeParams
+  let initParams ← i.readLspRequestAs "initialize" Game.InitializeParams
+
+  -- BIG ADDITION
+  o.writeLspResponse {
+    id     := initParams.id
+    result := {
+      capabilities := Watchdog.mkLeanServerCapabilities
+      serverInfo?  := some {
+        name     := "Lean 4 Game Server"
+        version? := "0.1.1"
+      }
+      : InitializeResult
+    }
+  }
+  discard $ i.readLspNotificationAs "initialized" InitializedParams
+
   let ⟨_, param⟩ ← i.readLspNotificationAs "textDocument/didOpen" LeanDidOpenTextDocumentParams
   let doc := param.textDocument
-  -- LSP always refers to characters by (line, column),
-  -- so converting CRLF to LF preserves line and column numbers.
-  let meta : DocumentMeta := ⟨doc.uri, doc.version, doc.text.crlfToLf.toFileMap, param.dependencyBuildMode?.getD .always⟩
+  let meta : DocumentMeta := ⟨doc.uri, doc.version, doc.text.crlfToLf.toFileMap, .always⟩ -- modification: using `.always`
   let e := e.withPrefix s!"[{param.textDocument.uri}] "
   let _ ← IO.setStderr e
+
+  let gameWorkerState ← getGameWorkerState gameDir initParams meta
+
   let (ctx, st) ← try
-    initializeWorker meta o e initParams.param opts
+    initializeWorker meta o e initParams.param.toLeanInternal opts gameDir gameWorkerState
   catch err =>
     writeErrorDiag meta err
     throw err
-  StateRefT'.run' (s := st) <| ReaderT.run (r := ctx) do
+  StateRefT'.run' (s := st) <| ReaderT.run (r := ctx) <| StateT.run' (s := gameWorkerState) do
     try
-      let refreshTask ← runRefreshTask
+      let refreshTask ← StateT.lift runRefreshTask
       mainLoop i
       IO.cancel refreshTask
     catch err =>
-      let st ← get
+      let st ← StateT.lift get
       writeErrorDiag st.doc.meta err
       throw err
 where
@@ -742,16 +798,25 @@ where
       severity? := DiagnosticSeverity.error
       message := err.toString }]
 
-@[export lean_server_worker_main]
-def workerMain (opts : Options) : IO UInt32 := do
+/--
+The main function. Simply wrapping `initAndRunWorker`.
+
+Copied from `Lean.Server.FileWorker.workerMain`. We add `args` as an argument to pass on
+the `gameDir`.
+
+TODO: The first arg `args[0]` is always expected to be `--server`. We could drop this completely.
+-/
+-- @[inherit_doc Lean.Server.FileWorker.workerMain]
+def workerMain (opts : Options) (args : List String) : IO UInt32 := do
   let i ← IO.getStdin
   let o ← IO.getStdout
   let e ← IO.getStderr
   try
-    initAndRunWorker i o e opts
+    let some gameDir := args[1]? | throwServerError "Expected second argument: gameDir"
+    initAndRunWorker i o e opts gameDir
     IO.Process.exit 0 -- Terminate all tasks of this process
   catch err =>
     e.putStrLn err.toString
     IO.Process.exit 1 -- Terminate all tasks of this process
 
-end Lean.Server.FileWorker
+end GameServer.FileWorker

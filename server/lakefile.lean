@@ -18,6 +18,16 @@ lean_exe gameserver {
   supportInterpreter := true
 }
 
+@[default_target]
+lean_lib NewGameServer
+
+
+-- @[default_target]
+-- lean_exe newGameserver {
+--   root := `NewGameServer
+--   supportInterpreter := true
+-- }
+
 @[test_driver]
 lean_lib TestGameServer
 

@@ -229,7 +229,7 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
       -- Question: Is there a difference between the diags of this snap and the last snap?
       -- Should we get the diags from there?
       -- Answer: The last snap only copied the diags from the end of this snap
-      let mut diag : Array InteractiveDiagnostic := snap.interactiveDiags.toArray
+      let mut diag : Array InteractiveDiagnostic := #[] -- TODO: snap.interactiveDiags.toArray
 
       -- Level is completed if there are no errors or warnings
       let completedWithWarnings : Bool := ¬ diag.any (·.severity? == some .error)
