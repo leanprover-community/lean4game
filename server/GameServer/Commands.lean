@@ -17,14 +17,14 @@ set_option autoImplicit false
 
 /-- Switch to the specified `Game` (and create it if non-existent). Example: `Game "NNG"` -/
 elab "Game" n:str : command => do
-  let name := n.getString
+  let name := .mkSimple n.getString
   setCurGameId name
   if (← getGame? name).isNone then
     insertGame name {name}
 
 /-- Create a new world in the active game. Example: `World "Addition"` -/
 elab "World" n:str : command => do
-  let name := n.getString
+  let name := .mkSimple n.getString
   setCurWorldId name
   if ¬ (← getCurGame).worlds.nodes.contains name then
     addWorld {name}
@@ -119,7 +119,7 @@ elab "Languages" t:str* : command => do
   modifyCurGame fun game => pure {game with
     tile := {game.tile with languages := t.map (·.getString) |>.toList}}
 
-/-- The Image of the game (optional). TODO: Not impementeds -/
+/-- The Image of the game (optional). TODO: Not implemented -/
 elab "CoverImage" t:str : command => do
   let file := t.getString
   if not <| ← System.FilePath.pathExists file then
@@ -344,7 +344,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   -- The default name of the statement is `[Game].[World].level[no.]`, e.g. `NNG.Addition.level1`
   -- However, this should not be used when designing the game.
   let defaultDeclName : Ident := mkIdent <| (← getCurGame).name ++ (← getCurWorld).name ++
-    ("level" ++ toString lvlIdx : String)
+    (.mkSimple <| "level" ++ toString lvlIdx)
 
   -- Collect all used tactics/theorems in the sample proof:
   let usedInventory : UsedInventory ← match val with
@@ -364,7 +364,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     let env ← getEnv
     let fullName := (← getCurrNamespace) ++ name.getId
     if env.contains fullName then
-      let some orig := env.constants.map₁.find? fullName
+      let some orig := env.constants.map₁.get? fullName
         | throwError s!"error in \"Statement\": `{fullName}` not found."
       let origType := orig.type
       -- TODO: Check if `origType` agrees with `sig` and output `logInfo` instead of `logWarning`
@@ -387,7 +387,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   let msgs := (← get).messages
   let mut hints := #[]
   let mut nonHintMsgs := #[]
-  for msg in msgs.msgs do
+  for msg in msgs.toArray do
     -- Look for messages produced by the `Hint` tactic. They are used to pass information about the
     -- intermediate goal state
     if let MessageData.withNamingContext _ $ MessageData.withContext ctx $
@@ -410,7 +410,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
         let mut hintFVarsNames : Array Expr := #[]
         for fvar in fvars do
           let name₁ ← fvar.getUserName
-          hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
+          hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨.mkSimple s!"«\{{name₁}}»"⟩
 
         let text ← instantiateMVars (mkMVar text)
 
@@ -439,7 +439,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
 
   -- restore saved messages and non-hint messages
   modify fun st => { st with
-    messages := initMsgs ++ ⟨nonHintMsgs.toPArray'⟩
+    messages := initMsgs ++ {unreported := nonHintMsgs.toPArray'}
   }
 
   let scope ← getScope
@@ -573,7 +573,7 @@ where filterArgs (args : List Syntax) : List Syntax :=
     | Syntax.node _ `GameServer.Tactic.Hint _ :: _ :: r
     | Syntax.node _ `GameServer.Tactic.Branch _ :: _ :: r =>
       filterArgs r
-    -- delete `Hint` and `Branch` occurence at the end of the tactic sequence.
+    -- delete `Hint` and `Branch` occurrence at the end of the tactic sequence.
     | Syntax.node _ `GameServer.Tactic.Hint _ :: []
     | Syntax.node _ `GameServer.Tactic.Branch _ :: [] =>
         []
@@ -632,7 +632,7 @@ elab "Dependency" s:Parser.dependency : command => do
           source? := some stx.getId
           continue
     let target := stx.getId
-    match (← getCurGame).worlds.nodes.find? target with
+    match (← getCurGame).worlds.nodes.get? target with
     | some _ => pure ()
     | none => logErrorAt stx m!"World `{target}` seems not to exist"
 
@@ -677,13 +677,13 @@ elab "MakeGame" : command => do
       })
 
   -- For each `worldId` this contains a set of items used in this world
-  let mut usedItemsInWorld : HashMap Name (HashSet Name) := {}
+  let mut usedItemsInWorld : Std.HashMap Name (Std.HashSet Name) := {}
 
   -- For each `worldId` this contains a set of items newly defined in this world
-  let mut newItemsInWorld : HashMap Name (HashSet Name) := {}
+  let mut newItemsInWorld : Std.HashMap Name (Std.HashSet Name) := {}
 
   -- Items that should not be displayed in inventory
-  let mut hiddenItems : HashSet Name := {}
+  let mut hiddenItems : Std.HashSet Name := {}
 
   let allWorlds := game.worlds.nodes.toArray
   let nrWorlds := allWorlds.size
@@ -691,9 +691,9 @@ elab "MakeGame" : command => do
 
   -- Calculate which "items" are used/new in which world
   for (worldId, world) in allWorlds do
-    let mut usedItems : HashSet Name := {}
-    let mut newItems : HashSet Name := {}
-    for inventoryType in #[.Tactic, .Definition, .Theorem] do
+    let mut usedItems : Std.HashSet Name := {}
+    let mut newItems : Std.HashSet Name := {}
+    for inventoryType in #[.Tactic, .Definition, .Lemma] do
       for (levelId, level) in world.levels.toArray do
         usedItems := usedItems.insertMany (level.getInventory inventoryType).used
         newItems := newItems.insertMany (level.getInventory inventoryType).new
@@ -705,7 +705,7 @@ elab "MakeGame" : command => do
           | 0 => pure ()
           | 1 => pure () -- level ids start with 1, so we need to skip 1, too
           | i₀ + 1 =>
-            let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
+            let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
             match (idx).statementName with
             | .anonymous => pure ()
             | .num _ _ => panic "Did not expect to get a numerical statement name!"
@@ -718,7 +718,7 @@ elab "MakeGame" : command => do
       -- if the last level was named, we need to add it as a new theorem
       let i₀ := world.levels.size
 
-        let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
+        let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
         match (idx).statementName with
         | .anonymous => pure ()
         | .num _ _ => panic "Did not expect to get a numerical statement name!"
@@ -736,28 +736,28 @@ elab "MakeGame" : command => do
     nrLevels := nrLevels + world.levels.toArray.size
 
   /- for each "item" this is a HashSet of `worldId`s that introduce this item -/
-  let mut worldsWithNewItem : HashMap Name (HashSet Name) := {}
+  let mut worldsWithNewItem : Std.HashMap Name (Std.HashSet Name) := {}
   for (worldId, _world) in allWorlds do
-    for newItem in newItemsInWorld.findD worldId {} do
+    for newItem in newItemsInWorld.getD worldId {} do
       worldsWithNewItem := worldsWithNewItem.insert newItem $
-        (worldsWithNewItem.findD newItem {}).insert worldId
+        (worldsWithNewItem.getD newItem {}).insert worldId
 
   -- For each `worldId` this is a HashSet of `worldId`s that this world depends on.
-  let mut worldDependsOnWorlds : HashMap Name (HashSet Name) := {}
+  let mut worldDependsOnWorlds : Std.HashMap Name (Std.HashSet Name) := {}
 
   -- For a pair of `worldId`s `(id₁, id₂)` this is a HasSet of "items" why `id₁` depends on `id₂`.
-  let mut dependencyReasons : HashMap (Name × Name) (HashSet Name) := {}
+  let mut dependencyReasons : Std.HashMap (Name × Name) (Std.HashSet Name) := {}
 
   -- Calculate world dependency graph `game.worlds`
   for (dependentWorldId, _dependentWorld) in allWorlds do
-    let mut dependsOnWorlds : HashSet Name := {}
+    let mut dependsOnWorlds : Std.HashSet Name := {}
     -- Adding manual dependencies that were specified via the `Dependency` command.
     for (sourceId, targetId) in game.worlds.edges do
       if targetId = dependentWorldId then
         dependsOnWorlds := dependsOnWorlds.insert sourceId
 
-    for usedItem in usedItemsInWorld.findD dependentWorldId {} do
-      match worldsWithNewItem.find? usedItem with
+    for usedItem in usedItemsInWorld.getD dependentWorldId {} do
+      match worldsWithNewItem.get? usedItem with
       | none => logWarning m!"No world introducing {usedItem}, but required by {dependentWorldId}"
       | some worldIds =>
         -- Only need a new dependency if the world does not introduce an item itself
@@ -767,7 +767,7 @@ elab "MakeGame" : command => do
           dependsOnWorlds := dependsOnWorlds.insertMany worldIds
           -- Store the dependency reasons for debugging
           for worldId in worldIds do
-            let tmp := (dependencyReasons.findD (dependentWorldId, worldId) {}).insert usedItem
+            let tmp := (dependencyReasons.getD (dependentWorldId, worldId) {}).insert usedItem
             dependencyReasons := dependencyReasons.insert (dependentWorldId, worldId) tmp
     worldDependsOnWorlds := worldDependsOnWorlds.insert dependentWorldId dependsOnWorlds
 
@@ -779,7 +779,7 @@ elab "MakeGame" : command => do
       else
         let mut msg := m!"Dependencies of '{world}':"
         for dep in dependencies do
-          match dependencyReasons.find? (world, dep) with
+          match dependencyReasons.get? (world, dep) with
           | none =>
             msg := msg ++ m!"\n· '{dep}': no reason found (manually added?)"
           | some items =>
@@ -793,7 +793,7 @@ elab "MakeGame" : command => do
     for i in [:loop.length] do
       let w1 := loop[i]!
       let w2 := loop[if i == loop.length - 1 then 0 else i + 1]!
-      match dependencyReasons.find? (w1, w2) with
+      match dependencyReasons.get? (w1, w2) with
       -- This should not happen. Could use `find!` again...
       | none => logError m!"Did not find a reason why {w1} depends on {w2}."
       | some items =>
@@ -818,17 +818,17 @@ elab "MakeGame" : command => do
   -- Apparently we need to reload `game` to get the changes to `game.worlds` we just made
   let game ← getCurGame
 
-  let mut allItemsByType : HashMap InventoryType (HashSet Name) := {}
+  let mut allItemsByType : Std.HashMap InventoryType (Std.HashSet Name) := {}
   -- Compute which inventory items are available in which level:
   for inventoryType in #[.Tactic, .Definition, .Theorem] do
 
     -- Which items are introduced in which world?
-    let mut theoremStatements : HashMap (Name × Nat) Name := {}
+    let mut lemmaStatements : Std.HashMap (Name × Nat) Name := {}
     -- TODO: I believe `newItemsInWorld` has way to many elements in it which we iterate over
     -- e.g. we iterate over `ring` for `Theorem`s as well, but so far that seems to cause no problems
-    let mut allItems : HashSet Name := {}
+    let mut allItems : Std.HashSet Name := {}
     for (worldId, world) in game.worlds.nodes.toArray do
-      let mut newItems : HashSet Name := {}
+      let mut newItems : Std.HashSet Name := {}
       for (levelId, level) in world.levels.toArray do
         let newTheorems := (level.getInventory inventoryType).new
         newItems := newItems.insertMany newTheorems
@@ -841,14 +841,9 @@ elab "MakeGame" : command => do
           | 1 => pure () -- level ids start with 1, so we need to skip 1, too.
           | i₀ + 1 =>
             -- add named statement from previous level to the available theorems.
-            let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
-            match (idx).statementName with
-            | .anonymous => pure ()
-            | .num _ _ => panic "Did not expect to get a numerical statement name!"
-            | .str pre s =>
+            let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
               let name := Name.str pre s
               newItems := newItems.insert name
-              allItems := allItems.insert name
               theoremStatements := theoremStatements.insert (worldId, levelId) name
       if inventoryType == .Theorem then
         -- if named, add the theorem from the last level of the world to the inventory
@@ -856,7 +851,7 @@ elab "MakeGame" : command => do
         match i₀ with
         | 0 => logWarning m!"World `{worldId}` contains no levels."
         | i₀ =>
-          let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
+          let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
           match (idx).statementName with
           | .anonymous => pure ()
           | .num _ _ => panic "Did not expect to get a numerical statement name!"
@@ -867,8 +862,8 @@ elab "MakeGame" : command => do
       newItemsInWorld := newItemsInWorld.insert worldId newItems
 
     -- Basic inventory item availability: all locked.
-    let Availability₀ : HashMap Name InventoryTile :=
-      HashMap.ofList $
+    let Availability₀ : Std.HashMap Name InventoryTile :=
+      Std.HashMap.ofList $
         ← allItems.toList.mapM fun item => do
           -- Using a match statement because the error message of `Option.get!` is not helpful.
           match (← getInventoryItem? item inventoryType) with
@@ -888,14 +883,14 @@ elab "MakeGame" : command => do
 
 
     -- Availability after a given world
-    let mut itemsInWorld : HashMap Name (HashMap Name InventoryTile) := {}
+    let mut itemsInWorld : Std.HashMap Name (Std.HashMap Name InventoryTile) := {}
     for (worldId, _) in game.worlds.nodes.toArray do
       -- Unlock all items from previous worlds
       let mut items := Availability₀
       let predecessors := game.worlds.predecessors worldId
       -- logInfo m!"Predecessors: {predecessors.toArray.map fun (a) => (a)}"
       for predWorldId in predecessors do
-        for item in newItemsInWorld.findD predWorldId {} do
+        for item in newItemsInWorld.getD predWorldId {} do
           let data := (← getInventoryItem? item inventoryType).get!
           items := items.insert item {
             name := item
@@ -907,7 +902,7 @@ elab "MakeGame" : command => do
       itemsInWorld := itemsInWorld.insert worldId items
 
     for (worldId, world) in game.worlds.nodes.toArray do
-      let mut items := itemsInWorld.findD worldId {}
+      let mut items := itemsInWorld.getD worldId {}
 
       let levels := world.levels.toArray.insertionSort fun a b => a.1 < b.1
 
@@ -928,7 +923,7 @@ elab "MakeGame" : command => do
         -- add the exercise statement from the previous level
         -- if it was named
         if inventoryType == .Theorem then
-          match theoremStatements.find? (worldId, levelId) with
+          match theoremStatements.get? (worldId, levelId) with
           | none => pure ()
           | some name =>
             let data := (← getInventoryItem? name inventoryType).get!
@@ -963,7 +958,7 @@ elab "MakeGame" : command => do
     allItemsByType := allItemsByType.insert inventoryType allItems
 
   let getTiles (type : InventoryType) : CommandElabM (Array InventoryTile) := do
-    (allItemsByType.findD type {}).toArray.mapM (fun name => do
+    (allItemsByType.getD type {}).toArray.mapM (fun name => do
       let some item ← getInventoryItem? name type
         | throwError "Expected item to exist: {name}"
       return item.toTile)

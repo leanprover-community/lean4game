@@ -35,7 +35,7 @@ elab "#show_option" verbose:(ppSpace showOptArg)? id:(ppSpace Parser.rawIdent)? 
     | .ofNat val => s!"Nat := {repr val}"
     | .ofInt val => s!"Int := {repr val}"
     | .ofSyntax val => s!"Syntax := {repr val}"
-    if let some val := opts.find name then
+    if let some val := opts.find (.mkSimple name) then
       msg1 := s!"{msg1}  (currently: {val})"
     msg := match verbose with
     | some opt =>

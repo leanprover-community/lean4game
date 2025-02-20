@@ -7,7 +7,7 @@ open Lean Meta
 variable [inst : BEq α] [inst : Hashable α]
 
 structure Graph (α β : Type) [inst : BEq α] [inst : Hashable α] where
-  nodes: HashMap α β := {}
+  nodes: Std.HashMap α β := {}
   edges: Array (α × α) := {}
 deriving Inhabited
 
@@ -31,7 +31,7 @@ instance  : EmptyCollection (Graph α β) := ⟨default⟩
 def Graph.insertNode (g : Graph α β) (a : α) (b : β) :=
   {g with nodes := g.nodes.insert a b}
 
-partial def Graph.predecessors (g : Graph α β) (x : α) (acc : HashSet α := {}) : HashSet α := Id.run do
+partial def Graph.predecessors (g : Graph α β) (x : α) (acc : Std.HashSet α := {}) : Std.HashSet α := Id.run do
   let mut res := acc
   let directPredecessors := (g.edges.filter (·.2 == x)).map (·.1)
   for y in directPredecessors do

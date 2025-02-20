@@ -26,3 +26,22 @@ where you replace:
 Everything downloaded remains in the folder `lean4game/games`.
 The subfolder `tmp` contains downloaded artifacts and can be deleted without loss.
 The other folders should only contain the built lean-games, sorted by owner and repo.
+
+## Server capacity
+
+If you would like to display the server capacity on the landing page,
+you can create a file `lean4game/games/stats.csv` of the following form:
+
+```
+CPU,MEM
+0.1,0.8
+```
+
+These numbers will be displayed on the landing page ("CPU: 10 % used" and "RAM: 80 % used").
+
+If you only want one of the numbers, replace the number you don't want with `nan` (or anything
+else which does not parse as number).
+
+If you don't want to show either, simply do not create `stats.csv`
+
+Use your own script or cronjob to update the CSV file as desired.

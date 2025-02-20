@@ -54,7 +54,7 @@ Providing the use access to a Lean instance running on the server is a severe se
 
 ## Credits
 
-The project has pimarily been developed by Alexander Bentkamp and Jon Eugster.
+The project has primarily been developed by Alexander Bentkamp and Jon Eugster.
 
 It is based on ideas from the [Lean Game Maker](https://github.com/mpedramfar/Lean-game-maker) and the [Natural Number Game
 (NNG)](https://www.ma.imperial.ac.uk/~buzzard/xena/natural_number_game/)

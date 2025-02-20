@@ -21,6 +21,16 @@
       "iso": "zh",
       "flag": "CN",
       "name": "中文"
+    },
+    {
+      "iso": "es",
+      "flag": "ES",
+      "name": "Español"
+    },
+    {
+      "iso": "ko",
+      "flag": "KR",
+      "name": "한국어"
     }
   ],
   "newLanguages": {

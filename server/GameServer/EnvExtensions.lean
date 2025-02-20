@@ -46,7 +46,10 @@ mathlib or from parsing the theorem in question.
 -/
 
 /-- The game knows three different inventory types that contain slightly different information -/
-inductive InventoryType := | Tactic | Theorem | Definition
+inductive InventoryType where
+  | Tactic
+  | Lemma
+  | Definition
 deriving ToJson, FromJson, Repr, BEq, Hashable, Inhabited
 
 -- TODO: golf this?
@@ -124,7 +127,7 @@ initialize inventoryTemplateExt :
   registerSimplePersistentEnvExtension {
     name := `inventory_keys
     addEntryFn := Array.push
-    addImportedFn := Array.concatMap id }
+    addImportedFn := Array.flatMap id }
 
 /-- Receive the template with that matches `(name, type)` -/
 def getInventoryTemplate? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
@@ -137,7 +140,7 @@ initialize inventoryExt : SimplePersistentEnvExtension InventoryItem (Array Inve
   registerSimplePersistentEnvExtension {
     name := `inventory_doc
     addEntryFn := Array.push
-    addImportedFn := Array.concatMap id }
+    addImportedFn := Array.flatMap id }
 
 /-- Receive the item with that matches `(name, type)` -/
 def getInventoryItem? [Monad m] [MonadEnv m] (n : Name) (type : InventoryType) :
@@ -153,9 +156,9 @@ deriving ToJson, FromJson
 
 -- TODO: Reuse the following code for checking available tactics in user code:
 structure UsedInventory where
-(tactics : HashSet Name := {})
-(definitions : HashSet Name := {})
-(theorems : HashSet Name := {})
+(tactics : Std.HashSet Name := {})
+(definitions : Std.HashSet Name := {})
+(theorems : Std.HashSet Name := {})
 
 /-! ## Environment extensions for game specification -/
 
@@ -170,8 +173,10 @@ initialize curLevelExt : EnvExtension (Option Nat) ← registerEnvExtension (pur
 A game has three layers: Game, World, Levels. These are set with the commands
 `Game`, `World`, and `Level`. Commands like `Introduction` depend on the current level.
 -/
-inductive Layer :=
-| Game | World | Level
+inductive Layer where
+  | Game
+  | World
+  | Level
 
 variable {m: Type → Type} [Monad m] [MonadEnv m]
 
@@ -201,7 +206,7 @@ def getCurLayer [MonadError m] : m Layer := do
 def getCurGameId [Monad m] : m Name := do
   match curGameExt.getState (← getEnv) with
   | some game => return game
-  | none => return defaultGameName
+  | none => return .mkSimple defaultGameName
 
 /-- Get the current world -/
 def getCurWorldId [MonadError m] : m Name := do
@@ -347,7 +352,7 @@ structure World where
   /-- TODO: This is currently unused. -/
   conclusion : String := default
   /-- The levels of the world. -/
-  levels: HashMap Nat GameLevel := default
+  levels: Std.HashMap Nat GameLevel := default
   /-- The introduction image of the world. -/
   image: String := default
 deriving Inhabited
@@ -417,10 +422,10 @@ def getGameJson (game : «Game») : Json := Id.run do
 
 /-! ## Game environment extension -/
 
-def HashMap.merge [BEq α] [Hashable α] (old : HashMap α β) (new : HashMap α β) (merge : β → β → β) :
-  HashMap α β :=
+def HashMap.merge [BEq α] [Hashable α] (old : Std.HashMap α β) (new : Std.HashMap α β) (merge : β → β → β) :
+  Std.HashMap α β :=
 new.fold (fun acc a b =>
-  if let some bOld := acc.find? a
+  if let some bOld := acc.get? a
   then acc.insert a (merge bOld b)
   else acc.insert a b) old
 
@@ -443,7 +448,7 @@ def Game.merge (old : Game) (new : Game) : Game :=
       return res
   } }
 
-initialize gameExt : PersistentEnvExtension (Name × Game) (Name × Game) (HashMap Name Game) ←
+initialize gameExt : PersistentEnvExtension (Name × Game) (Name × Game) (Std.HashMap Name Game) ←
   do registerPersistentEnvExtension {
     name          := `gameExt,
     mkInitial     := pure {},
@@ -451,19 +456,19 @@ initialize gameExt : PersistentEnvExtension (Name × Game) (Name × Game) (HashM
       let mut games := {}
       for es in ess do
         for (name, game) in es do
-          match games.find? name with
+          match games.get? name with
           | some oldgame =>
             games := games.insert name (Game.merge oldgame game)
           | none =>
             games := games.insert name game
       return games
     addEntryFn    := (λ s n => s.insert n.1 n.2),
-    exportEntriesFn := HashMap.toArray,
+    exportEntriesFn := Std.HashMap.toArray,
     statsFn := fun s => format "number of local entries: " ++ format s.size
 }
 
 def getGame? (n : Name) : m (Option Game) := do
-  return (gameExt.getState (← getEnv)).find? n
+  return (gameExt.getState (← getEnv)).get? n
 
 def insertGame (n : Name) (g : Game) : m Unit := do
   modifyEnv (gameExt.addEntry · (n, g))
@@ -471,16 +476,16 @@ def insertGame (n : Name) (g : Game) : m Unit := do
 def getLevel? (levelId : LevelId) : m (Option GameLevel) := do
   let some game ← getGame? levelId.game
     | return none
-  let some world := game.worlds.nodes.find? levelId.world
+  let some world := game.worlds.nodes.get? levelId.world
     | return none
-  let some level := world.levels.find? levelId.level
+  let some level := world.levels.get? levelId.level
     | return none
   return level
 
 def getCurGame [Monad m] : m Game := do
   let some game ← getGame? (← getCurGameId)
-    | let game := {name := defaultGameName}
-      insertGame defaultGameName game
+    | let game := {name := .mkSimple defaultGameName}
+      insertGame (.mkSimple defaultGameName) game
       return game
   return game
 
@@ -493,7 +498,7 @@ def addWorld (world : World) [MonadError m] : m Unit := do
     return {game with worlds := game.worlds.insertNode world.name world}
 
 def getCurWorld [MonadError m] : m World := do
-  let some world := (← getCurGame).worlds.nodes.find? (← getCurWorldId)
+  let some world := (← getCurGame).worlds.nodes.get? (← getCurWorldId)
     | throwError m!"World {← getCurWorldId} does not exist"
   return world
 
@@ -512,7 +517,7 @@ def addLevel (level : GameLevel) [MonadError m] : m Unit := do
       return {world with levels := world.levels.insert level.index level}
 
 def getCurLevel [MonadError m] : m GameLevel := do
-  let some level := (← getCurWorld).levels.find? (← getCurLevelIdx)
+  let some level := (← getCurWorld).levels.get? (← getCurLevelIdx)
     | throwError m!"Level {← getCurLevelIdx} does not exist"
   return level
 
@@ -524,9 +529,9 @@ def modifyCurLevel (fn : GameLevel → m GameLevel) [MonadError m] : m Unit := d
 def modifyLevel (levelId : LevelId) (fn : GameLevel → m GameLevel) [MonadError m] : m Unit := do
   let some game ← getGame? levelId.game
     | throwError m!"Game {levelId.game} does not exist"
-  let some world := (← getCurGame).worlds.nodes.find? levelId.world
+  let some world := (← getCurGame).worlds.nodes.get? levelId.world
     | throwError m!"World {levelId.world} does not exist"
-  let some level := world.levels.find? levelId.level
+  let some level := world.levels.get? levelId.level
     | throwError m!"Level {levelId.level} does not exist"
   let level' ← fn level
   let world' := {world with levels := world.levels.insert levelId.level level'}

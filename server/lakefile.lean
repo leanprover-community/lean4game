@@ -6,11 +6,9 @@ package GameServer
 -- Using this assumes that each dependency has a tag of the form `v4.X.0`.
 def leanVersion : String := s!"v{Lean.versionString}"
 
-require std from git "https://github.com/leanprover/std4.git" @ leanVersion
-require i18n from git "https://github.com/hhu-adam/lean-i18n.git" @ leanVersion
-
-require importGraph from git "https://github.com/leanprover-community/import-graph" @ leanVersion
-
+require "leanprover-community" / batteries @ git leanVersion
+require "hhu-adam" / i18n @ git leanVersion
+require "leanprover-community" / importGraph  @ git leanVersion
 
 lean_lib GameServer
 
@@ -20,6 +18,19 @@ lean_exe gameserver {
   supportInterpreter := true
 }
 
+@[default_target]
+lean_lib NewGameServer
+
+
+-- @[default_target]
+-- lean_exe newGameserver {
+--   root := `NewGameServer
+--   supportInterpreter := true
+-- }
+
+@[test_driver]
+lean_lib TestGameServer
+
 /--
 When a package depending on GameServer updates its dependencies,
 build the `gameserver` executable.
@@ -28,4 +39,4 @@ post_update pkg do
   let rootPkg ← getRootPackage
   if rootPkg.name = pkg.name then
     return -- do not run in GameServer itself
-  discard <| runBuild gameserver.build >>= (·.await)
+  discard <| runBuild gameserver.fetch

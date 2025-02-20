@@ -6,11 +6,11 @@ This tutorial walks you through creating a new game for lean4. It covers from wr
 
 1. Use the [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton) to create a new github repo for your game: On github, click on "Use this template" > "Create a new repository".
 2. Clone the game repo.
-3. Call `lake update && lake exe cache get && lake build` to build the Lean project.
+3. Call `lake update -R && lake build` to build the Lean project.
 
-Note that you need to host your game's code on github to publish it online later on. If you only
-want to play it locally, you can simply clone the NNG repo and start modifying that one.
+### Running the game
 
+Now you can open the game in VSCode (`cd YourGame/` and `code .`), and start modifying it like a regular Lean project. To run the game consult the section "**5. Testing the Game Locally**" below.
 
 ## 2. Game.lean
 
@@ -210,7 +210,7 @@ You can but a `Statement` inside namespaces like you would with `theorem`.
 
 #### Doc String / Exercise statement
 
-Add a docstring that contains the exercise statement in natural language. If you do this, it will appear at the top of the exercise. It supports Latex.
+Add a docstring that contains the exercise statement in natural language. If you do this, it will appear at the top of the exercise. See [LaTeX in Games](latex.md) for more details on formatting.
 
 ```lean
 /-- The exercise statement in natural language using latex: $\iff$. -/
@@ -281,13 +281,21 @@ CoverImage "images/cover.png"
 * `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
 * `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
-## Further Notes
+## 10. Advanced Topics
 
-Here are some random further things you should consider designing a new game:
+### Escaping
 
-* Inside strings, you need to escape backslashes, but not inside doc-strings, therefore you
+Inside strings, you need to escape backslashes, but not inside doc-strings, therefore you
   would write `Introduction "some latex here: $\\iff$."` but
   `/-- some latex here: $\iff$. -/ Statement ...`
-* A world with more than 16 levels will be displayed with the levels spiraling outwards,
-  it might be desirable to stay below that bound. Above 22 levels the spiral starts getting out
-  of control.
+
+### LaTeX support
+
+LaTeX is rendered using the [KaTeX library](https://katex.org/),
+see [Using LaTeX in the Game](latex.md) for details.
+
+### Number Of Levels Limit
+
+A world with more than 16 levels will be displayed with the levels spiraling outwards,
+it might be desirable to stay below that bound. Above 22 levels the spiral starts getting out
+of control.

@@ -22,7 +22,7 @@ def levelIdFromFileName? (initParams : Lsp.InitializeParams) (fileName : String)
     -- the filename has the form `Level_01.lean` and we extract `01`.
     let some level := ((fileParts[2]!.splitOn ".")[0]!.splitOn "_")[1]!.toNat?
       | return none
-    return some {game := game, world := fileParts[1]!, level := level}
+    return some {game := .mkSimple game, world := fileParts[1]!, level := level}
   return none
 
 def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameLevel) := do
@@ -30,9 +30,9 @@ def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParam
     | return none
   return ← getLevel? levelId
 
-structure FVarBijection :=
-  (forward : HashMap FVarId FVarId)
-  (backward : HashMap FVarId FVarId)
+structure FVarBijection where
+  forward : Std.HashMap FVarId FVarId
+  backward : Std.HashMap FVarId FVarId
 
 instance : EmptyCollection FVarBijection := ⟨{},{}⟩
 
@@ -40,8 +40,8 @@ def FVarBijection.insert (bij : FVarBijection) (a b : FVarId) : FVarBijection :=
   ⟨bij.forward.insert a b, bij.backward.insert b a⟩
 
 def FVarBijection.insert? (bij : FVarBijection) (a b : FVarId) : Option FVarBijection :=
-  let a' := bij.forward.find? a
-  let b' := bij.forward.find? b
+  let a' := bij.forward.get? a
+  let b' := bij.forward.get? b
   if (a' == none || a' == some b) && (b' == none || b' == some a)
   then some $ bij.insert a b
   else none
@@ -133,13 +133,13 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
           let mut hintFVarsNames : Array Expr := #[]
           for fvar in hintFVars do
             let name₁ ← fvar.fvarId!.getUserName
-            hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
+            hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨.mkSimple s!"«\{{name₁}}»"⟩
 
           let lctx := (← goal.getDecl).lctx -- the player's local context
           if let some bij ← matchDecls hintFVars lctx.getFVars
             (strict := hint.strict) (initBij := fvarBij) (defeq := hint.defeq)
           then
-            let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
+            let userFVars := hintFVars.map fun v => bij.forward.getD v.fvarId! v.fvarId!
             -- Evaluate the text in the player's context to get the new variable names.
             let text := (← evalHintMessage hint.text) (userFVars.map Expr.fvar)
             let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := lctx, opts := {}}
@@ -239,9 +239,9 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
       -- Question: Is there a difference between the diags of this snap and the last snap?
       -- Should we get the diags from there?
       -- Answer: The last snap only copied the diags from the end of this snap
-      let mut diag : Array InteractiveDiagnostic := snap.interactiveDiags.toArray
+      let mut diag : Array InteractiveDiagnostic := #[] -- TODO: snap.interactiveDiags.toArray
 
-      -- Level is completed if there are no errrors or warnings
+      -- Level is completed if there are no errors or warnings
       let completedWithWarnings : Bool := ¬ diag.any (·.severity? == some .error)
       let completed : Bool := completedWithWarnings ∧ ¬ diag.any (·.severity? == some .warning)
 
@@ -322,7 +322,7 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
       -- Filter out the "unsolved goals" message
       diag := filterUnsolvedGoal diag
 
-      let lastPos := text.utf8PosToLspPos positionsWithSource.back.1
+      let lastPos := text.utf8PosToLspPos positionsWithSource.back!.1
       let remainingDiags : Array InteractiveDiagnostic :=
         diag.filter (fun d => lastPos ≤ d.range.start)
 

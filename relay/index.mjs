@@ -21,12 +21,10 @@ import { importTrigger, importStatus } from './import.mjs'
 */
 const queueLength = {
   "g/hhu-adam/robo": 2,
-  "g/hhu-adam/nng4": 5,
-  "g/djvelleman/stg4": 0,
-  "g/trequetrum/lean4game-logic": 0,
+  "g/leanprover-community/nng4": 5,
+  "g/djvelleman/stg4": 2,
+  "g/trequetrum/lean4game-logic": 2,
 }
-
-let socketCounter = 0
 
 function logStats() {
   console.log(`[${new Date()}] Number of open sockets - ${socketCounter}`)
@@ -36,6 +34,77 @@ function logStats() {
 const __filename = url.fileURLToPath(import.meta.url)
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
+var router = express.Router();
+
+router.get('/import/status/:owner/:repo', importStatus)
+router.get('/import/trigger/:owner/:repo', importTrigger)
+
+const server = app
+  .use(express.static(path.join(__dirname, '..', 'client', 'dist'))) // TODO: add a dist folder from inside the game
+  .use('/i18n/g/:owner/:repo/:lang/*', (req, res, next) => {
+    const owner = req.params.owner;
+    const repo = req.params.repo
+    const lang = req.params.lang
+
+    const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
+    const log = `${process.cwd()}/logs/game-access.log`
+    const header = "date;anon-ip;game;lang\n"
+    const data = `${new Date()};${ip};${owner}/${repo};${lang}\n`
+
+    fs.writeFile(log, header.concat(data), { flag: 'ax' }, (file_exists) => {
+	    if (file_exists) {
+		fs.appendFile(log, data, (err) => {
+		  if (err) console.log("Failed to append to log!")
+		});
+	    }
+    });
+
+    console.log(`[${new Date()}] ${ip} requested translation for ${owner}/${repo} in ${lang}`)
+
+    const filename = req.params[0];
+    req.url = filename;
+    express.static(path.join(getGameDir(owner,repo),".i18n",lang))(req, res, next);
+  })
+  .use('/data/g/:owner/:repo/*', (req, res, next) => {
+    const owner = req.params.owner;
+    const repo = req.params.repo
+    const filename = req.params[0];
+    req.url = filename;
+    express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
+  })
+  .use('/data/stats', (req, res, next) => {
+    // Returns a CSV of the form
+    //
+    // CPU,Mem
+    // 0.21,0.65
+    //
+    // which contains the current server usage.
+
+    const statsProcess = spawn('/bin/bash', [path.join(__dirname, "stats.sh"), process.pid])
+
+    let outputData = ''
+    let errorData = ''
+    statsProcess.stdout.on('data', (data) => {
+      outputData += data.toString();
+    })
+    statsProcess.stderr.on('data', (data) => {
+      errorData += data.toString();
+    })
+    statsProcess.on('close', (code) => {
+      if (code === 0) {
+        res.send(outputData);
+      } else {
+        res.status(500).send(`Error executing script: ${errorData}`)
+        console.error(`stats.sh exited with code ${code}. Error: ${errorData}`)
+      }
+    })
+  })
+  .use('/', router)
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+const wss = new WebSocketServer({ server })
+
+var socketCounter = 0
 
 const environment = process.env.NODE_ENV
 const isDevelopment = environment === 'development'

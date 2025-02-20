@@ -1,10 +1,12 @@
 import Lean.Environment
-import Std.Tactic.OpenPrivate
+import Batteries.Tactic.OpenPrivate
 import Lean.Data.Lsp.Communication
 
 open Lean
 
-inductive LoadingKind := | finalizeExtensions | loadConstants
+inductive LoadingKind where
+  | finalizeExtensions
+  | loadConstants
   deriving ToJson
 
 structure LoadingParams : Type where
@@ -64,8 +66,8 @@ where
 def finalizeImport' (s : ImportState) (imports : Array Import) (opts : Options) (trustLevel : UInt32 := 0) : IO Environment := do
   let numConsts := s.moduleData.foldl (init := 0) fun numConsts mod =>
     numConsts + mod.constants.size + mod.extraConstNames.size
-  let mut const2ModIdx : HashMap Name ModuleIdx := mkHashMap (capacity := numConsts)
-  let mut constantMap : HashMap Name ConstantInfo := mkHashMap (capacity := numConsts)
+  let mut const2ModIdx : Std.HashMap Name ModuleIdx := .empty (capacity := numConsts)
+  let mut constantMap : Std.HashMap Name ConstantInfo := .empty (capacity := numConsts)
   for h:modIdx in [0:s.moduleData.size] do
     if modIdx % 100 = 0 then
       let percentage := modIdx * 100 / s.moduleData.size
@@ -74,8 +76,8 @@ def finalizeImport' (s : ImportState) (imports : Array Import) (opts : Options) 
         param := {counter := percentage, kind := .loadConstants : LoadingParams} }
     let mod := s.moduleData[modIdx]'h.upper
     for cname in mod.constNames, cinfo in mod.constants do
-      match constantMap.insert' cname cinfo with
-      | (constantMap', replaced) =>
+      match constantMap.containsThenInsertIfNew cname cinfo with
+      | (replaced, constantMap') =>
         constantMap := constantMap'
         if replaced then
           throwAlreadyImported s const2ModIdx modIdx cname

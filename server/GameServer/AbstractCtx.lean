@@ -1,12 +1,11 @@
 import Lean
-import GameServer.Utils
 
 section AbstractCtx
 open Lean
 open Meta
 
-structure AbstractCtxResult :=
-  (abstractMVarsResult : AbstractMVarsResult)
+structure AbstractCtxResult where
+  abstractMVarsResult : AbstractMVarsResult
 
 /-- Abstract LCtx and MCtx to transport an expression into different contexts -/
 def abstractCtx (goal : MVarId) : MetaM AbstractCtxResult := do
@@ -21,7 +20,7 @@ def abstractCtx (goal : MVarId) : MetaM AbstractCtxResult := do
 def openAbstractCtxResult (res : AbstractCtxResult) (k : Array Expr → Expr → MetaM α) : MetaM α := do
   let (_mvars, _binderInfo, expr) ← openAbstractMVarsResult res.abstractMVarsResult
   lambdaLetTelescope (← instantiateMVars expr) k
-  -- TODO: Unfornately, lambdaLetTelescope does not allow us to provide the number of arguments.
+  -- TODO: Unfortunately, lambdaLetTelescope does not allow us to provide the number of arguments.
   -- If the goal is a function, this will not work.
 
 end AbstractCtx

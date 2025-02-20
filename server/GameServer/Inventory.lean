@@ -124,7 +124,7 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
     let allowed := GameServer.ALLOWED_KEYWORDS
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
-      return {acc with tactics := acc.tactics.insert val}
+      return {acc with tactics := acc.tactics.insert (.mkSimple val)}
     else
       return acc
   | .ident _info _rawVal val _preresolved =>
