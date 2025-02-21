@@ -1,6 +1,8 @@
-import GameServer.AbstractCtx
+import GameServer.Util.AbstractCtx
 
 /-!
+# Hint tactic
+
 This file contains anything related to the `Hint` tactic used to add hints to a game level.
 -/
 
@@ -36,20 +38,5 @@ unsafe def evalHintMessageUnsafe : Expr → MetaM (Array Expr → MessageData) :
     (.forallE default (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr))
       (mkConst ``MessageData) .default)
 
-@[implemented_by evalHintMessageUnsafe]
+@[implemented_by evalHintMessageUnsafe, inherit_doc evalHintMessageUnsafe]
 def evalHintMessage : Expr → MetaM (Array Expr → MessageData) := fun _ => pure (fun _ => "")
-
-/-- Remove any spaces at the beginning of a new line -/
-partial def removeIndentation (s : String) : String :=
-  let rec loop (i : String.Pos) (acc : String) (removeSpaces := false) : String :=
-    let c := s.get i
-    let i := s.next i
-    if s.atEnd i then
-      acc.push c
-    else if removeSpaces && c == ' ' then
-      loop i acc (removeSpaces := true)
-    else if c == '\n' then
-      loop i (acc.push c) (removeSpaces := true)
-    else
-      loop i (acc.push c)
-  loop ⟨0⟩ ""

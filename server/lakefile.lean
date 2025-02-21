@@ -6,27 +6,18 @@ package GameServer
 -- Using this assumes that each dependency has a tag of the form `v4.X.0`.
 def leanVersion : String := s!"v{Lean.versionString}"
 
-require "leanprover-community" / batteries @ git leanVersion
 require "hhu-adam" / i18n @ git leanVersion
+require "leanprover-community" / batteries @ git leanVersion
 require "leanprover-community" / importGraph  @ git leanVersion
 
+@[default_target]
 lean_lib GameServer
 
 @[default_target]
 lean_exe gameserver {
-  root := `GameServer
+  root := `GameServer.Backend
   supportInterpreter := true
 }
-
-@[default_target]
-lean_lib NewGameServer
-
-
--- @[default_target]
--- lean_exe newGameserver {
---   root := `NewGameServer
---   supportInterpreter := true
--- }
 
 @[test_driver]
 lean_lib TestGameServer

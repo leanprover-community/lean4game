@@ -1,6 +1,8 @@
 import GameServer.EnvExtensions
 import I18n
 
+namespace GameServer
+
 open Lean Meta Elab Command
 
 /-! ## Copy images -/
@@ -23,11 +25,19 @@ def copyImages : IO Unit := do
         writeBinFile outFile content
 
 namespace GameData
-  def gameDataPath : System.FilePath := ".lake" / "gamedata"
-  def gameFileName := s!"game.json"
-  def docFileName := fun (inventoryType : InventoryType) (name : Name) => s!"doc__{name}.json"
-  def levelFileName := fun (worldId : Name) (levelId : Nat) => s!"level__{worldId}__{levelId}.json"
-  def inventoryFileName := s!"inventory.json"
+
+def gameDataPath : System.FilePath := ".lake" / "gamedata"
+
+def gameFileName := s!"game.json"
+
+set_option linter.unusedVariables false in
+
+def docFileName := fun (inventoryType : InventoryType) (name : Name) => s!"doc__{name}.json"
+
+def levelFileName := fun (worldId : Name) (levelId : Nat) => s!"level__{worldId}__{levelId}.json"
+
+def inventoryFileName := s!"inventory.json"
+
 end GameData
 
 open GameData in

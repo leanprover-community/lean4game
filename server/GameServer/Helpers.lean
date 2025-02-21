@@ -1,5 +1,6 @@
 import Lean
-import GameServer.Helpers.PrettyPrinter
+import GameServer.Lean.PrettyPrinter
+import GameServer.Lean.DocComment
 
 /-! This document contains various things which cluttered `Commands.lean`. -/
 
@@ -8,25 +9,6 @@ open Lean Meta Elab Command
 /-! ## Doc Comment Parsing -/
 
 namespace GameServer
-
-/-- Read a doc comment and get its content. Return `""` if no doc comment available. -/
-def parseDocComment! (doc: Option (TSyntax `Lean.Parser.Command.docComment)) :
-    CommandElabM String := do
-  match doc with
-  | none =>
-    logWarning "Add a text to this command with `/-- yada yada -/ MyCommand`!"
-    pure ""
-  | some s => match s.raw[1] with
-    | .atom _ val => pure <| val.dropRight 2 |>.trim -- some (val.extract 0 (val.endPos - ⟨2⟩))
-    | _           => pure "" --panic "not implemented error message" --throwErrorAt s "unexpected doc string{indentD s.raw[1]}"
-
-/-- Read a doc comment and get its content. Return `none` if no doc comment available. -/
-def parseDocComment (doc: Option (TSyntax `Lean.Parser.Command.docComment)) :
-    CommandElabM <| Option String := do
-  match doc with
-  | none => pure none
-  | some _ => parseDocComment! doc
-
 
 /-- TODO: This is only used to provide some backwards compatibility and you can
 replace `parseDocCommentLegacy` with `parseDocComment` in the future. -/
@@ -119,7 +101,7 @@ partial def findLoopsAux (arrows : Std.HashMap Name (Std.HashSet Name)) (node : 
     (path : Array Name := #[]) (visited : Std.HashSet Name := {}) :
     Array Name × Std.HashSet Name := Id.run do
   let mut visited := visited
-  match path.getIdx? node with
+  match path.indexOf? node with
   | some i =>
     -- Found a loop: `node` is already the iᵗʰ element of the path
     return (path.extract i path.size, visited.insert node)

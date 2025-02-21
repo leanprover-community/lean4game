@@ -5,22 +5,12 @@ import Lean
 
 import Batteries.Tactic.OpenPrivate
 
-namespace GameServer
+namespace GameServer.PrettyPrinter
 
-namespace PrettyPrinter
+open Lean PrettyPrinter
 
-open Lean Meta
-open Lean.Parser Term
-open PrettyPrinter Delaborator SubExpr
-open TSyntax.Compat
-
-open private shouldGroupWithNext evalSyntaxConstant from Lean.PrettyPrinter.Delaborator.Builtins
-
--- def typeSpec := leading_parser " :\\n: " >> termParser
-
--- def declSig := leading_parser
---   many (ppSpace >> (Term.binderIdent <|> Term.bracketedBinder)) >> typeSpec
-
+open Meta Lean.Parser Term Delaborator SubExpr TSyntax.Compat in
+open private shouldGroupWithNext evalSyntaxConstant from Lean.PrettyPrinter.Delaborator.Builtins in
 
 @[inherit_doc Lean.PrettyPrinter.Delaborator.delabConstWithSignature]
 partial def delabConstWithSignature : Delab := do
@@ -57,12 +47,13 @@ where
         withBindingBody n <| delabParams idStx (groups.push group) #[]
     else
       let type ← delab
-
       -- pure type
       `(Command.declSig| $groups* : $type)
 
---@[inherit_doc Lean.PrettyPrinter.ppSignature]
-/-- Like `Lean.PrettyPrinter.ppSignature` but with a custom delaboration -/
+/--
+Like `Lean.PrettyPrinter.ppSignature` but with a custom delaboration `delabConstWithSignature`
+-/
+-- @[inherit_doc Lean.PrettyPrinter.ppSignature]
 def ppSignature (c : Name) : MetaM FormatWithInfos := do
   let decl ← getConstInfo c
   let e := .const c (decl.levelParams.map mkLevelParam)
@@ -79,15 +70,17 @@ open Lean Meta Elab Command
 def MessageData.signature (c : Name) : CommandElabM MessageData := do
   return .ofFormatWithInfosM (PrettyPrinter.ppSignature c)
 
--- Note: We use `String` because we can't send `MessageData` as json, but
--- `MessageData` might be better for interactive highlighting.
-/-- Get a string of the form `my_theorem (n : ℕ) : n + n = 2 * n`.
+/--
+Get a string of the form `my_lemma (n : ℕ) : n + n = 2 * n`.
 
 Note: A statement like `theorem abc : ∀ x : Nat, x ≥ 0` would be turned into
-`theorem abc (x : Nat) : x ≥ 0` by `PrettyPrinter.ppSignature`. -/
+`theorem abc (x : Nat) : x ≥ 0` by `GameServer.PrettyPrinter.ppSignature`.
+
+Note: We use `String` because we can't send `MessageData` as json, but
+`MessageData` might be better for interactive highlighting.
+-/
 def getStatementString (name : Name) : CommandElabM String := do
-  --try
-    return ← (← MessageData.signature name).toString
-  --catch
-  --| _ => throwError m!"Could not find {name} in context."
+  (← MessageData.signature name).toString
   -- TODO: I think it would be nicer to unresolve Namespaces as much as possible.
+
+end GameServer

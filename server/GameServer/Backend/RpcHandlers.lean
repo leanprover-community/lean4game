@@ -1,6 +1,6 @@
 import GameServer.EnvExtensions
-import GameServer.InteractiveGoal
-import GameServer.Hints
+import GameServer.Backend.InteractiveGoal
+import GameServer.Tactic.Hint.Defs
 import I18n
 
 open Lean
@@ -22,10 +22,10 @@ def levelIdFromFileName? (initParams : Lsp.InitializeParams) (fileName : String)
     -- the filename has the form `Level_01.lean` and we extract `01`.
     let some level := ((fileParts[2]!.splitOn ".")[0]!.splitOn "_")[1]!.toNat?
       | return none
-    return some {game := .mkSimple game, world := fileParts[1]!, level := level}
+    return some {game := .mkSimple game, world := .mkSimple fileParts[1]!, level := level}
   return none
 
-def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameLevel) := do
+def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameServer.Level) := do
   let some levelId := levelIdFromFileName? initParams fileName
     | return none
   return ← getLevel? levelId

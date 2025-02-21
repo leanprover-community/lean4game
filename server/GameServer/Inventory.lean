@@ -1,6 +1,8 @@
 import Lean
 import GameServer.EnvExtensions
 
+namespace GameServer
+
 open Lean Elab Command
 
 /-- Copied from `Mathlib.Tactic.HelpCmd`.
@@ -140,13 +142,13 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
 
 -- #check expandOptDocComment?
 
-def GameLevel.getInventory (level : GameLevel) : InventoryType → InventoryInfo
+def Level.getInventory (level : Level) : InventoryType → InventoryInfo
 | .Tactic => level.tactics
 | .Definition => level.definitions
 | .Theorem => level.theorems
 
-def GameLevel.setComputedInventory (level : GameLevel) :
-    InventoryType → Array InventoryTile → GameLevel
+def Level.setComputedInventory (level : Level) :
+    InventoryType → Array InventoryTile → Level
 | .Tactic, v =>     {level with tactics     := {level.tactics     with tiles := v}}
 | .Definition, v => {level with definitions := {level.definitions with tiles := v}}
 | .Theorem, v =>      {level with theorems      := {level.theorems      with tiles := v}}

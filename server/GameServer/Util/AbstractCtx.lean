@@ -1,8 +1,14 @@
 import Lean
 
-section AbstractCtx
-open Lean
-open Meta
+/-!
+# Abstract Context
+
+TODO: describe
+-/
+
+namespace GameServer
+
+open Lean Meta
 
 structure AbstractCtxResult where
   abstractMVarsResult : AbstractMVarsResult
@@ -22,5 +28,3 @@ def openAbstractCtxResult (res : AbstractCtxResult) (k : Array Expr → Expr →
   lambdaLetTelescope (← instantiateMVars expr) k
   -- TODO: Unfortunately, lambdaLetTelescope does not allow us to provide the number of arguments.
   -- If the goal is a function, this will not work.
-
-end AbstractCtx

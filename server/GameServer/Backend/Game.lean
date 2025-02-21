@@ -1,4 +1,4 @@
-import GameServer.RpcHandlers
+import GameServer.Backend.RpcHandlers
 
 open Lean
 
