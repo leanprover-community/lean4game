@@ -1,5 +1,7 @@
 import Lean
 import GameServer.EnvExtensions
+import GameServer.Inventory.Basic
+import GameServer.Inventory.Extension
 
 namespace GameServer
 

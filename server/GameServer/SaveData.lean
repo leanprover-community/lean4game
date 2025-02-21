@@ -1,3 +1,4 @@
+import GameServer.Config.SaveData
 import GameServer.EnvExtensions
 import I18n
 
@@ -5,7 +6,10 @@ namespace GameServer
 
 open Lean Meta Elab Command
 
-/-! ## Copy images -/
+/-! ## Save data
+
+Compare to `GameServer.Backend.LoadData`
+-/
 
 open IO.FS System FilePath in
 /-- Copies the folder `images/` to `.lake/gamedata/images/` -/
@@ -23,22 +27,6 @@ def copyImages : IO Unit := do
         -- copy file
         let content ← readBinFile file
         writeBinFile outFile content
-
-namespace GameData
-
-def gameDataPath : System.FilePath := ".lake" / "gamedata"
-
-def gameFileName := s!"game.json"
-
-set_option linter.unusedVariables false in
-
-def docFileName := fun (inventoryType : InventoryType) (name : Name) => s!"doc__{name}.json"
-
-def levelFileName := fun (worldId : Name) (levelId : Nat) => s!"level__{worldId}__{levelId}.json"
-
-def inventoryFileName := s!"inventory.json"
-
-end GameData
 
 open GameData in
 -- TODO: register all of this as ToJson instance?
@@ -71,21 +59,3 @@ def saveGameData (allItemsByType : Std.HashMap InventoryType (Std.HashSet Name))
 
   -- write file for translation
   I18n.createTemplate
-
-open GameData
-
-def loadData (f : System.FilePath) (α : Type) [FromJson α] : IO α := do
-  let str ← IO.FS.readFile f
-  let json ← match Json.parse str with
-  | .ok v => pure v
-  | .error e => throw (IO.userError e)
-  let data ← match fromJson? json with
-  | .ok v => pure v
-  | .error e => throw (IO.userError e)
-  return data
-
-def loadGameData (gameDir : System.FilePath) : IO Game :=
-  loadData (gameDir / gameDataPath / gameFileName) Game
-
-def loadLevelData (gameDir : System.FilePath) (worldId : Name) (levelId : Nat) : IO LevelInfo :=
-  loadData (gameDir / gameDataPath / levelFileName worldId levelId) LevelInfo
