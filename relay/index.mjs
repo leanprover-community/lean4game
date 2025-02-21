@@ -9,7 +9,7 @@ import os from 'os';
 import fs from 'fs';
 import anonymize from 'ip-anonymize';
 import { importTrigger, importStatus } from './import.mjs'
-import process from'process';
+import process from 'process';
 import { spawn } from 'child_process'
 // import fs from 'fs'
 
@@ -20,9 +20,9 @@ import { spawn } from 'child_process'
 */
 const queueLength = {
   "g/hhu-adam/robo": 2,
-  "g/hhu-adam/nng4": 5,
-  "g/djvelleman/stg4": 0,
-  "g/trequetrum/lean4game-logic": 0,
+  "g/leanprover-community/nng4": 5,
+  "g/djvelleman/stg4": 2,
+  "g/trequetrum/lean4game-logic": 2,
 }
 
 const __filename = url.fileURLToPath(import.meta.url);
@@ -43,6 +43,22 @@ const server = app
     const owner = req.params.owner;
     const repo = req.params.repo
     const lang = req.params.lang
+
+    const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
+    const log = `${process.cwd()}/logs/game-access.log`
+    const header = "date;anon-ip;game;lang\n"
+    const data = `${new Date()};${ip};${owner}/${repo};${lang}\n`
+
+    fs.writeFile(log, header.concat(data), { flag: 'ax' }, (file_exists) => {
+	    if (file_exists) {
+		fs.appendFile(log, data, (err) => {
+		  if (err) console.log("Failed to append to log!")
+		});
+	    }
+    });
+
+    console.log(`[${new Date()}] ${ip} requested translation for ${owner}/${repo} in ${lang}`)
+
     const filename = req.params[0];
     req.url = filename;
     express.static(path.join(getGameDir(owner,repo),".i18n",lang))(req, res, next);
@@ -55,15 +71,7 @@ const server = app
     express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
   .use('/data/stats', (req, res, next) => {
-    // Returns a CSV of the form
-    //
-    // CPU,Mem
-    // 0.21,0.65
-    //
-    // which contains the current server usage.
-
     const statsProcess = spawn('/bin/bash', [path.join(__dirname, "stats.sh"), process.pid])
-
     let outputData = ''
     let errorData = ''
     statsProcess.stdout.on('data', (data) => {
@@ -207,7 +215,9 @@ wss.addListener("connection", function(ws, req) {
 
     socketCounter += 1;
     const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
-    console.log(`[${new Date()}] Socket opened - ${ip}`)
+
+    // TODO (Matvey): extract further information from `req`, for example browser language.
+    console.log(`[${new Date()}] Socket opened - ${ip} - ${owner}/${repo}`)
 
     const socket = {
         onMessage: (cb) => { ws.on("message", cb) },

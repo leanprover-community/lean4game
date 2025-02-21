@@ -122,25 +122,10 @@ function LandingPage() {
 
   /** Parse `games/stats.csv` if present and display server capacity. */
   React.useEffect(() => {
-    fetch(`${window.location.origin}/data/stats`)
-    .then(response => {if (response.ok) {
-      return response.text() } else {throw ""}})
-    .then(data => {
-      // Parse the CSV content
-      const lines = data.split('\n');
-      const [header, line2] = lines;
-      if (!(header.replace(' ', '').startsWith("CPU,MEM"))) {
-        console.info("Not displaying server stats: received unexpected: ", header)
-      }
-      if (line2) {
-        let values = line2.split(',')
-        setUsageCPU(100 * Number(values[0]));
-        setUsageMem(100 * Number(values[1]));
-      }
-    }).catch(err => {
-      console.info('server stats unavailable')
-      console.debug(err)
-    })
+    const interval = setInterval(() => {
+      fetch_stats();
+    }, 2000)
+    return () => clearInterval(interval)
   }, [])
 
   return <div className="landing-page">
@@ -186,9 +171,15 @@ function LandingPage() {
       <section>
         <div className="wrapper">
           <h2>{t("Server capacity")}</h2>
+          <Trans>
+            <p>
+              As this server runs lean on our university machines, it has a limited capacity.
+              Our current estimate is about 70 simultaneous games.
+            </p>
+          </Trans>
           <p>
-            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem} % </strong> {t("used")}.<br/></> }
-            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU} % </strong> {t("used")}. </> }
+            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem.toFixed(2)} %</strong>{t(" used")}.<br/></> }
+            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU.toFixed(2)} %</strong>{t(" used")}. </> }
           </p>
         </div>
       </section>
@@ -197,11 +188,6 @@ function LandingPage() {
       <div className="wrapper">
         <h2>{t("Development notes")}</h2>
         <Trans>
-          <p>
-            As this server runs lean on our university machines, it has a limited capacity.
-            Our current estimate is about 70 simultaneous games.
-            We hope to address and test this limitation better in the future.
-          </p>
           <p>
             Most aspects of the games and the infrastructure are still in development. Feel free to
             file a <a target="_blank" href="https://github.com/leanprover-community/lean4game/issues">GitHub Issue</a> about
@@ -239,8 +225,8 @@ function LandingPage() {
         <p>
           <Trans>
             This server has been developed as part of the
-            project <a target="_blank" href="https://hhu-adam.github.io">ADAM : Anticipating the Digital Age of Mathematics</a> at
-            Heinrich-Heine-Universität in Düsseldorf.
+            project <a target="_blank" href="https://hhu-adam.github.io">ADAM: Anticipating the Digital Age of Mathematics</a> at
+            Heinrich Heine University Düsseldorf.
           </Trans>
         </p>
       </div>
@@ -253,6 +239,31 @@ function LandingPage() {
     </footer>
   </div>
 
+
+  function fetch_stats() {
+    fetch(`${window.location.origin}/data/stats`)
+      .then(response => {
+        if (response.ok) {
+          return response.text();
+        } else { throw ""; }
+      })
+      .then(data => {
+        // Parse the CSV content
+        const lines = data.split('\n');
+        const [header, line2] = lines;
+        if (!(header.replace(' ', '').startsWith("CPU,MEM"))) {
+          console.info("Not displaying server stats: received unexpected: ", header);
+        }
+        if (line2) {
+          let values = line2.split(',');
+          setUsageCPU(100 * parseFloat(values[0]));
+          setUsageMem(100 * parseFloat(values[1]));
+        }
+      }).catch(err => {
+        console.info('server stats unavailable');
+        console.debug(err);
+      });
+  }
 }
 
 export default LandingPage

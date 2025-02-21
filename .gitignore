@@ -3,3 +3,6 @@ client/dist
 games/
 server/.lake
 **/.DS_Store
+logs/
+relay/prev_cpu_metric
+test.ecosystem.config.cjs

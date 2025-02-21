@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-cores=$(nproc --all)
-cpu_measure=$(top -bn2 | grep '%Cpu' | tail -1)
-mem_measure=$(top -bn2 | grep 'Mem' | head -1)
 
-cpu=$(echo $cpu_measure | awk -v cores=$cores '{print 1-($8/(cores*100))}')
-mem=$(echo $mem_measure | awk '{print $8/$4}') 
+# Load python interpreter
+python=/usr/bin/python3
+# Load python script
+cpu_usage=relay/cpu_usage.py
+# Execute python script
+cpu=$($python $cpu_usage)
+# Calculate memory usage by computing 1 - %free_memory
+mem=$(free | sed '2q;d' | awk '{print 1 - ($4/$2)}')
 
-printf "CPU, MEM\n%.2f, %.2f\n" $cpu $mem 
-
-
-
+printf "CPU, MEM\n%f, %f\n" $cpu $mem

@@ -1,0 +1,167 @@
+# Glossary in tab-separated format -*- coding: utf-8 -*-
+St. Anselm	안셀무스
+ontological	존재론적
+argument	논증
+argument	인수
+Lean	린
+Lean community	린 커뮤니티
+God	신
+Alvin Plantinga	앨빈 플랜팅아
+exist	존재하다
+existence	존재
+the understanding	지성
+reality	현실
+assumption	가정
+reductio	귀류법
+great	큰
+premise	전제
+being	존재자
+conceive	생각하다
+definition	정의
+true	참
+true	참인
+false	거짓
+false	거짓인
+formulate	정식화하다
+formulation	정식화
+formalize	형식화하다
+formalization	형식화
+property	속성
+redundant	불필요한
+sentence	문장
+state	진술하다
+statement	진술
+proposition	명제
+negation	부정
+axiom	공리
+theorem	정리
+theory	이론
+conclude	결론하다
+prove	증명하다
+SEP	스탠퍼드 철학 백과사전
+Eric Wieser	에릭 비저
+Alistair Tucker	앨리스터 터커
+philosophy	철학
+Owl of Sogang	서강올빼미
+type theory	유형론
+universe level	유형 세계 변수
+type	유형
+type	입력하다
+type check	유형을 확인하다
+type check	유형이 확인되다
+type check	유형 확인이 잘되다
+type class	유형 클래스
+instance	사례
+category mistake	범주 실수
+class	클래스
+example	보기
+example	예
+inductive type	귀납형
+define	정의하다
+constructor	구성자
+Apache License, Version 2.0	아파치 라이선스, 버전 2.0
+under the terms of	의 조건에 따라
+OmegaT	오메가T
+symbolic link	심벌릭 링크
+directory	디렉터리
+root directory	최상위 디렉터리
+documentation	문서
+English	영어
+Korean	한국어
+chapter	장
+quiz	퀴즈
+question	문제
+command	명령어
+error	오류
+code	코드
+evaluate	계산하다
+keyword	핵심어
+declare	선언하다
+constant	상수
+reference	참고 문헌
+universe-polymorphic	세계 다형적
+parametrically polymorphic	매개 변수 다형적
+function	함수
+identifier	식별자
+definitionally equal	정의상 같은
+natural number	자연수
+input	입력값
+return	반환하다
+non-zero	영이 아닌
+zero	영
+alpha-equivalent	알파 동등한
+less-than-or-equal-to sign	작거나 같음 부호
+dependent function	의존 함수
+dependent function type	의존 함수형
+dependent product	의존곱
+dependent product type	의존곱형
+underscore	밑줄
+implicit	암시적
+explicit	명시적
+sigma type	시그마
+propositional logic	명제 논리
+term	항
+contemporary	동시대
+term	용어
+truth-value	진릿값
+bearer	담지자
+propositional attitudes	명제적 태도
+believe	믿다
+doubt	의심하다
+South Korea	한국
+school mathematics	학교 수학
+sentence	문장
+high school mathematics	고등학교 수학
+teacher	교사
+Stanford Encyclopedia of Philosophy	스탠퍼드 철학 백과사전
+ordered triple	순서세짝
+conjecture	추측
+Goldbach's conjecture	골드바흐의 추측
+interactive theorem prover	상호 작용 정리 증명기
+truth	참
+falsity	거짓
+rule of inference	추론 규칙
+introduction rule	도입 규칙
+elimination rule	제거 규칙
+ex falso quodlibet	엑스 팔소 세퀴투르 쿠오들리베트
+principle of explosion	폭발 원리
+propositional connective	명제 연결사
+symbol	기호
+refutation by contradiction	모순에 따른 부인
+contradiction	모순
+conjunction	연언
+disjunction	선언(選言)
+implication	함의
+material implication	내용적 함의
+conditional	조건문
+modus ponens	긍정 논법[모더스 포넨스]
+necessary condition	필요조건
+conversion	역
+inversion	이(裏)
+contraposition	대우(對偶)
+equivalence	동등
+biconditional	쌍조건문
+abbreviation	준말
+if and only if	…일 때 그리고 그럴 때만
+editor	편집기
+shortcut	단축키
+Theorem Proving in Lean 4	린 4로 하는 정리 증명
+exercise	연습 문제
+repository	저장소
+Jeremy Avigad	제러미 아비가드
+Leonardo de Moura	레오나르두 지 모라
+Soonho Kong	공순호
+Sebastian Ullrich	제바스티안 울리히
+file	파일
+Markdown	마크다운
+quiz	퀴즈
+translation	번역
+contribute	기여하다
+progress	진도
+capacity	이용량
+GitHub	깃허브
+repo	저장소
+game rule	게임 규칙
+unlocked	잠금 해제가 된
+unlock	잠금 해제를 하다
+Markdown	마크다운
