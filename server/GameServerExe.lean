@@ -1,4 +1,4 @@
-import GameServer.Backend.FileWorker
+import GameServerExe.FileWorker
 
 -- TODO: The only reason we import `Commands` is so that it gets built to on `lake build`
 -- should we have a different solution?

@@ -1,11 +1,11 @@
 /- This file is adapted from `Lean/Server/FileWorker.lean`. -/
 import Lean.Server.FileWorker
-import GameServer.Backend.Game
-import GameServer.Backend.ImportModules
+import GameServerExe.Game
+import GameServerExe.ImportModules
 import GameServer.SaveData
 import GameServer.EnvExtensions
 import GameServer.Tactic.LetIntros
-import GameServer.Backend.Tmp
+import GameServerExe.Tmp
 
 /-!
 For general server architecture, see `README.md`. For details of IPC communication, see `Watchdog.lean`.

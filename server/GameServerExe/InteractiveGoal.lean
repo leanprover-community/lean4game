@@ -1,4 +1,4 @@
-import GameServer.Backend.Structures
+import GameServerExe.Structures
 
 /-!
 This file is a modified copy of `Lean.Widget.InteractiveGoal`.

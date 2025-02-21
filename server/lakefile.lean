@@ -13,14 +13,16 @@ require "leanprover-community" / importGraph  @ git leanVersion
 @[default_target]
 lean_lib GameServer
 
+lean_lib GameServerExe
+
 @[default_target]
 lean_exe gameserver {
-  root := `GameServer.Backend
+  root := `GameServerExe
   supportInterpreter := true
 }
 
 @[test_driver]
-lean_lib TestGameServer
+lean_lib TestGame
 
 /--
 When a package depending on GameServer updates its dependencies,

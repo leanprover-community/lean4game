@@ -1,7 +1,7 @@
 import GameServer.Inventory.Basic
 
 /-!
-Used in `GameServer.SaveData` and `GameServer.Backend.LoadData`.
+Used in `GameServer.SaveData` and `GameServerExe.LoadData`.
 -/
 
 namespace GameServer

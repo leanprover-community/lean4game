@@ -2,6 +2,7 @@ import Lean
 import GameServer.EnvExtensions
 import GameServer.Inventory.Basic
 import GameServer.Inventory.Extension
+import GameServer.Tactic
 
 namespace GameServer
 
@@ -120,7 +121,9 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
   match stx with
   | .missing => return acc
   | .node _info kind args =>
-    if kind == `GameServer.Tactic.Hint || kind == `GameServer.Tactic.Branch then return acc
+    -- skip `Hint`
+    -- skip and `Branch` and its content
+    if kind == ``GameServer.Tactic.Hint || kind == ``GameServer.Tactic.Branch then return acc
     return ← args.foldlM (fun acc arg => collectUsedInventory arg acc) acc
   | .atom _info val =>
     -- ignore syntax elements that do not start with a letter

@@ -49,8 +49,11 @@ def getTacticDocstring (name: Name) : CommandElabM String := do
     m!"using `TacticDoc {name} \"some doc\"`"
   return ""
 
-#eval (getTacticDocstring `simp)
-
+/-- info: "The `simp` tactic" -/
+#guard_msgs in
+#eval do
+  let doc ← (getTacticDocstring `simp)
+  return doc.take 17
 
     -- TODO: Things we want:
     -- 1) Getting docstring this way is a problem if we want to "reprove" a mathlib theorem because

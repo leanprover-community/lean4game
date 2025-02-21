@@ -1,11 +1,11 @@
 -- /- This file is adapted from `Lean/Server/FileWorker.lean`. -/
 -- import Lean.Server.FileWorker
-import GameServer.Backend.Game
-import GameServer.Backend.ImportModules
-import GameServer.Backend.LoadData
+import GameServerExe.Game
+import GameServerExe.ImportModules
+import GameServerExe.LoadData
 import GameServer.EnvExtensions
 import GameServer.Tactic.LetIntros
-import GameServer.Backend.Tmp
+import GameServerExe.Tmp
 
 -- namespace MyModule
 

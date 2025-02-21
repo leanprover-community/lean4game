@@ -8,7 +8,7 @@ open Lean Meta Elab Command
 
 /-! ## Save data
 
-Compare to `GameServer.Backend.LoadData`
+Compare to `GameServerExe.LoadData`
 -/
 
 open IO.FS System FilePath in
