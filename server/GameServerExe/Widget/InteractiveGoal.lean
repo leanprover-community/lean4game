@@ -1,4 +1,5 @@
 import GameServerExe.Structures
+import Lean.Widget.InteractiveGoal
 
 /-!
 This file is a modified copy of `Lean.Widget.InteractiveGoal`.
@@ -9,8 +10,9 @@ to use the duplicated structures.
 -/
 
 namespace GameServer
+open Lean Lean.Widget
 
-open Lean Lean.Widget Lean.Server
+open Server
 
 -- duplicated with custom `InteractiveGoalCore`
 -- @[inherit_doc Lean.Widget.InteractiveGoalCore.pretty]

@@ -1,11 +1,9 @@
 import Lean.Parser.Types
 import Lean.Elab.Command
 
-open Lean Elab
+namespace Lean
 
-namespace GameServer
-
-/-- Add a message. use `(severity := .warning)` to specify the severity-/
+/-- Add a message. use `(severity := .warning)` to specify the severity. -/
 def addMessage (info : SourceInfo) (inputCtx : Parser.InputContext)
     (severity := MessageSeverity.warning) (s : MessageData) :
     Elab.Command.CommandElabM Unit := do

@@ -1,5 +1,5 @@
 import GameServer.EnvExtensions
-import GameServerExe.InteractiveGoal
+import GameServerExe.Widget.InteractiveGoal
 import GameServer.Tactic.Hint.Defs
 import I18n
 

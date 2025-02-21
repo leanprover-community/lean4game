@@ -1,6 +1,6 @@
-import Lean.Environment
 import Batteries.Tactic.OpenPrivate
 import Lean.Data.Lsp.Communication
+import Lean.Environment
 
 open Lean
 
