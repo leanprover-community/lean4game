@@ -1,18 +1,63 @@
-import GameServerExe.Structures
 import Lean.Widget.InteractiveGoal
 
 /-!
 This file is a modified copy of `Lean.Widget.InteractiveGoal`.
 
-Note that the structures have been moved to `Structures.lean`, but most of the
-functions here must be duplicated from `Lean.Widget.InteractiveGoal` in order
-to use the duplicated structures.
+We add a field `isAssumption?` to `InteractiveHypothesisBundle`, and
+`addInteractiveHypothesisBundle` populates this new field.
+
+Everything else is just copy-pasted in order to use the modified structure.
 -/
 
-namespace GameServer
-open Lean Lean.Widget
+namespace GameServer.Widget
+open Lean Widget
 
 open Server
+
+/-
+Extend the interactive hypothesis bundle with an option to distinguish
+"assumptions" from "objects". "Assumptions" are hypotheses of type `Prop`.
+-/
+@[inherit_doc Lean.Widget.InteractiveHypothesisBundle]
+structure InteractiveHypothesisBundle extends Lean.Widget.InteractiveHypothesisBundle where
+  /-- The hypothesis's type is of type `Prop` -/
+  isAssumption? : Option Bool := none
+deriving RpcEncodable
+
+-- duplicated but with custom `InteractiveHypothesisBundle`
+@[inherit_doc Lean.Widget.InteractiveGoalCore]
+structure InteractiveGoalCore where
+  /-- (GameServer) use custom `InteractiveHypothesisBundle` -/
+  hyps : Array InteractiveHypothesisBundle
+  /-- The target type. -/
+  type : CodeWithInfos
+  /-- Metavariable context that the goal is well-typed in. -/
+  ctx : WithRpcRef Elab.ContextInfo
+
+-- duplicated but with custom `InteractiveGoalCore`
+@[inherit_doc Lean.Widget.InteractiveGoal]
+structure InteractiveGoal extends InteractiveGoalCore where
+  /-- The name `foo` in `case foo`, if any. -/
+  userName? : Option String
+  /-- The symbol to display before the target type. Usually `⊢ ` but `conv` goals use `∣ `
+  and it could be extended. -/
+  goalPrefix : String
+  /-- Identifies the goal (ie with the unique name of the MVar that it is a goal for.) -/
+  mvarId : MVarId
+  /-- If true, the goal was not present on the previous tactic state. -/
+  isInserted? : Option Bool := none
+  /-- If true, the goal will be removed on the next tactic state. -/
+  isRemoved? : Option Bool := none
+  deriving RpcEncodable
+
+-- duplicated with custom `InteractiveGoalCore`
+@[inherit_doc Lean.Widget.InteractiveTermGoal]
+structure InteractiveTermGoal extends InteractiveGoalCore where
+  /-- Syntactic range of the term. -/
+  range : Lsp.Range
+  /-- Information about the term whose type is the term-mode goal. -/
+  term : WithRpcRef Elab.TermInfo
+  deriving RpcEncodable
 
 -- duplicated with custom `InteractiveGoalCore`
 -- @[inherit_doc Lean.Widget.InteractiveGoalCore.pretty]
@@ -84,22 +129,14 @@ def addInteractiveHypothesisBundle (hyps : Array InteractiveHypothesisBundle)
     val?        := (← value?.mapM ppExprTagged)
     isInstance? := if (← isClass? type).isSome then true else none
     isType?     := if (← instantiateMVars type).isSort then true else none
-    -- Added:
+    -- (GameServer) Added:
     isAssumption? := if (← inferType type).isProp then true else none
   }
 
-open Meta in
-variable [MonadControlT MetaM n] [Monad n] [MonadError n] [MonadOptions n] [MonadMCtx n] in
-def withGoalCtx (goal : MVarId) (action : LocalContext → MetavarDecl → n α) : n α := do
-  let mctx ← getMCtx
-  let some mvarDecl := mctx.findDecl? goal
-    | throwError "unknown goal {goal.name}"
-  let lctx := mvarDecl.lctx |>.sanitizeNames.run' {options := (← getOptions)}
-  withLCtx lctx mvarDecl.localInstances (action lctx mvarDecl)
-
-open Meta in
+-- `withGoalCtx` seems to be unmodified
 
 -- Duplicated from `Lean.Widget.goalToInteractive` with custom structures
+open Meta in
 @[inherit_doc Lean.Widget.goalToInteractive]
 def goalToInteractive (mvarId : MVarId) : MetaM InteractiveGoal := do
   let ppAuxDecls := pp.auxDecls.get (← getOptions)
@@ -154,4 +191,4 @@ def goalToInteractive (mvarId : MVarId) : MetaM InteractiveGoal := do
       mvarId
     }
 
-end GameServer
+end GameServer.Widget
