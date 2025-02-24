@@ -25,7 +25,7 @@ elab "MakeGame" : command => do
       let docstring ← getDocstring env name item.type
       match docstring with
       | some ds => pure s!"*(lean docstring)*\\\n{ds}"
-      | none => pure "(missing)"
+      | none => pure ""
     | template =>
       -- TODO: Process content template.
       -- TODO: Add information about inventory items

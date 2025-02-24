@@ -98,7 +98,7 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
       | none =>
         logWarningAt ref (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
         m!"somewhere above this statement.")
-        pure "(missing)"
+        pure ""
 
       -- We just add a dummy entry
       modifyEnv (inventoryTemplateExt.addEntry · {
