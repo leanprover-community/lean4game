@@ -77,7 +77,7 @@ async function download(id, url, dest) {
     // choose latest artifact
     .on('progress', function (state) {
       console.log('progress', state);
-      transferredDataSize = Math.round(state.size.transferred/1024/1024)
+      transferredDataSize = Math.round(state["size"]["transferred"]/1024/1024)
       progress[id].output += `Downloaded ${transferredDataSize}MB\n`
     })
     .on('error', function (err) {
