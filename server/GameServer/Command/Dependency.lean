@@ -23,6 +23,9 @@ elab "Dependency" s:Parser.dependency : command => do
     let some source := source?
       | do
           source? := some stx.getId
+          match (← getCurGame).worlds.nodes.get? stx.getId with
+          | some _ => pure ()
+          | none => logErrorAt stx m!"World `{stx.getId}` seems not to exist"
           continue
     let target := stx.getId
     match (← getCurGame).worlds.nodes.get? target with
