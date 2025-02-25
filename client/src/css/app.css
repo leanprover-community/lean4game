@@ -138,16 +138,6 @@ em {
 	margin:0 1.5em 1.5em 1.5em;
 }
 
-.modal-wrapper {
-  z-index: 10;
-}
-
-.modal hr {
-  margin-top: 3rem;
-  margin-bottom: 3rem;
-  border-color: var(--vscode-breadcrumb-foreground);
-}
-
 /* TODO: should not be #root */
 #root code {
   font-family: "JuliaMono", monospace;
@@ -161,4 +151,27 @@ em {
 @font-face {
   font-family: 'Roboto';
   src: local('Roboto'), url('/fonts/Roboto-Regular.ttf') format('truetype');
+}
+
+h1 {
+  font-size: 2em;
+  margin: .67em 0;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.3em;
+}
+
+h4 {
+  font-size: 1.1em;
+  font-style: italic;
+}
+
+h5, h6 {
+  font-size: 1em;
+  font-style: italic;
 }

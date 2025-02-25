@@ -11,7 +11,7 @@ import { WorldTreePanel } from './world_tree'
 
 import i18next from 'i18next'
 import { ChatPanel } from './chat'
-import { NewLevel } from './level'
+// import { NewLevel } from './level'
 import { GameHint, ProofState } from './editor/Defs'
 import { useSelector } from 'react-redux'
 import { Diagnostic } from 'vscode-languageserver-types'
@@ -82,8 +82,9 @@ function Game() {
         {<>
           <ChatPanel visible={worldId ? (levelId == 0 && page == 1) :(page == 0)} />
           { worldId ?
-            <NewLevel visible={page == 1} /> :
-            <WorldTreePanel visible={page == 1} />
+            <p>(Level)</p>
+            // <NewLevel visible={page == 1} />
+            : <WorldTreePanel visible={page == 1} />
           }
           <InventoryPanel visible={page == 2} />
         </>
@@ -95,7 +96,8 @@ function Game() {
         <div className="column">
           {/* Note: apparently without this `div` the split panel bugs out. */}
           {worldId ?
-            <NewLevel />
+            <p>(Level)</p>
+            // <NewLevel />
           : <WorldTreePanel /> }
         </div>
         <InventoryPanel />
@@ -103,7 +105,6 @@ function Game() {
     }
     </ProofContext.Provider>
   </ChatContext.Provider>
-
 }
 
 export default Game

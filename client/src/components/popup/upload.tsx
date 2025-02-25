@@ -70,6 +70,7 @@ export function UploadPopup () {
       <input type="file" onChange={handleFileChange}/>
     </p>
 
-    <Button to="" onClick={uploadProgress}>{t("Load selected file")}</Button>
+    {/* TODO: apperently clicking this redirects the user back to the landing page... */}
+    <Button to="" onClick={uploadProgress} disabled={!file}>{t("Load selected file")}</Button>
   </>
 }

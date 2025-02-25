@@ -274,15 +274,15 @@ export function Navigation () {
               <NavButton
                 key={`lang-selection-${iso}`}
                 iconElement={<Flag iso={iso} />}
-                text={lean4gameConfig.newLanguages[iso]?.name}
+                text={lean4gameConfig.languages[iso]?.name}
                 onClick={() => {setLanguage(iso)}}
                 inverted={true} />) :
             // Show all languages the interface is available in (e.g. landing page)
-            Object.entries(lean4gameConfig.newLanguages).map(([iso, val]) =>
+            Object.entries(lean4gameConfig.languages).map(([iso, val]) =>
               <NavButton
                 key={`lang-selection-${iso}`}
                 iconElement={<Flag iso={iso} />}
-                text={lean4gameConfig.newLanguages[iso]?.name}
+                text={lean4gameConfig.languages[iso]?.name}
                 onClick={() => {setLanguage(iso)}}
                 inverted={true} />)
           }

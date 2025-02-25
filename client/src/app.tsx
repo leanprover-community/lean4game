@@ -60,7 +60,7 @@ function App() {
   // option to pass language as `?lang=de` in the URL
   useEffect(() => {
     let urlLang = searchParams.get("lang")
-    let availableLangs = gameInfo.data?.tile?.languages
+    let availableLangs = gameInfo?.data?.tile?.languages
     if (gameId) {
       if (availableLangs?.includes(urlLang)) {
         setLanguage(urlLang)
@@ -69,18 +69,18 @@ function App() {
         setSearchParams(searchParams)
       }
     } else {
-      if (urlLang in lean4gameConfig.newLanguages) {
+      if (urlLang in lean4gameConfig.languages) {
         setLanguage(urlLang)
         // Delete the search param as we processed it.
         searchParams.delete('lang')
         setSearchParams(searchParams)
       }
     }
-  }, [gameId, gameInfo.data?.tile?.languages])
+  }, [gameId, gameInfo?.data?.tile?.languages])
 
   // set the correct language
   useEffect(() => {
-    let availableLangs = gameInfo.data?.tile?.languages
+let availableLangs = gameInfo.data?.tile?.languages
     if (gameId && availableLangs?.length > 0 && !(availableLangs.includes(language))) {
       // if the game is not available in the preferred language, display it in the original
       // language
@@ -90,7 +90,7 @@ function App() {
       console.debug(`using language: ${language}`)
       i18n.changeLanguage(language)
     }
-  }, [gameId, gameInfo.data?.tile?.languages, language])
+  }, [gameId, gameInfo?.data?.tile?.languages, language])
 
   return (
     <div className="app">

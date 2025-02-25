@@ -6,9 +6,8 @@ import { Provider } from 'react-redux'
 import type { RouteObject } from "react-router"
 import { createHashRouter, RouterProvider, Route, redirect } from "react-router-dom"
 import ErrorPage from './components/error_page'
-import Welcome from './components/welcome'
 import LandingPage from './components/landing_page'
-import './i18n';
+import './i18n'
 import Game from './components/game'
 
 
@@ -57,14 +56,14 @@ const router = createHashRouter([
       },
     ],
   },
-]);
+])
 
-const container = document.getElementById('root');
-const root = createRoot(container!);
+const container = document.getElementById('root')
+const root = createRoot(container!)
 root.render(
   <React.StrictMode>
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
   </React.StrictMode>
-);
+)

@@ -21,7 +21,8 @@ def FVarBijection.insert? (bij : FVarBijection) (a b : FVarId) : Option FVarBije
   else none
 
 /-- Checks if `pattern` and `e` are equal up to FVar identities. -/
-partial def matchExpr (pattern : Expr) (e : Expr) (bij : FVarBijection := {}) : Option FVarBijection :=
+partial def matchExpr (pattern : Expr) (e : Expr) (bij : FVarBijection := {}) :
+    Option FVarBijection :=
   match pattern, e with
   | .bvar i1, .bvar i2 => if i1 == i2 then bij else none
   | .fvar i1, .fvar i2 => bij.insert? i1 i2

@@ -19,9 +19,9 @@ import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/in
 import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { ChatContext, PageContext, MonacoEditorContext, ProofContext, GameIdContext } from '../../state/context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
-import { GameHint, ProofState } from './rpc_api'
+// import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
-import { InputAbbreviationRewriter } from '@leanprover/unicode-input-component'
+// import { InputAbbreviationRewriter } from '@leanprover/unicode-input-component'
 import ContentEditable from 'react-contenteditable'
 
 export interface GameDiagnosticsParams {

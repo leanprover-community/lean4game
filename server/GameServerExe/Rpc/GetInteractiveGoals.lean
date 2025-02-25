@@ -2,8 +2,6 @@ import GameServerExe.Widget.InteractiveGoalWithHints
 import GameServer.Tactic.Hint.Defs
 import GameServerExe.Util.FVarBijection
 import I18n
-
-/-! ## GameGoal -/
 namespace GameServer
 
 open Widget

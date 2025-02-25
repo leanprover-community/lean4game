@@ -100,7 +100,7 @@ module.exports = {
       //     sourceType: 'module', // defaults to 'module'
       // }
     },
-    lngs: lean4gameConfig.languages.map(e => e.iso),
+    lngs: lean4gameConfig.languages.keys(),
     ns: [],
     defaultLng: 'en',
     defaultNs: 'translation',

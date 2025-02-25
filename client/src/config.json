@@ -5,35 +5,7 @@
     "djvelleman/stg4",
     "trequetrum/lean4game-logic"
   ],
-
-  "languages": [
-    {
-      "iso": "en",
-      "flag": "GB",
-      "name": "English"
-    },
-    {
-      "iso": "de",
-      "flag": "DE",
-      "name": "Deutsch"
-    },
-    {
-      "iso": "zh",
-      "flag": "CN",
-      "name": "中文"
-    },
-    {
-      "iso": "es",
-      "flag": "ES",
-      "name": "Español"
-    },
-    {
-      "iso": "ko",
-      "flag": "KR",
-      "name": "한국어"
-    }
-  ],
-  "newLanguages": {
+  "languages": {
     "en": {
       "flag": "GB",
       "name": "English"
@@ -42,9 +14,17 @@
       "flag": "DE",
       "name": "Deutsch"
     },
+    "es": {
+      "flag": "ES",
+      "name": "Español"
+    },
     "zh": {
       "flag": "CN",
       "name": "中文"
+    },
+    "ko": {
+      "flag": "KR",
+      "name": "한국어"
     }
   },
   "useFlags": false

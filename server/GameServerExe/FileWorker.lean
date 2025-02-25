@@ -1,6 +1,8 @@
 -- /- This file is adapted from `Lean/Server/FileWorker.lean`. -/
 -- import Lean.Server.FileWorker
-import GameServerExe.Game
+import GameServerExe.Lsp
+import GameServerExe.Rpc
+import GameServerExe.State
 import GameServerExe.ImportModules
 import GameServerExe.LoadData
 import GameServer.EnvExtensions
@@ -875,14 +877,14 @@ namespace GameServer.FileWorker
 --       message := e.toString }] o
 --     return (1 : UInt32)
 
--- /--
--- The main function. Simply wrapping `initAndRunWorker`.
+/--
+The main function. Simply wrapping `initAndRunWorker`.
 
--- Copied from `Lean.Server.FileWorker.workerMain`. We add `args` as an argument to pass on
--- the `gameDir`.
+Copied from `Lean.Server.FileWorker.workerMain`. We add `args` as an argument to pass on
+the `gameDir`.
 
--- TODO: The first arg `args[0]` is always expected to be `--server`. We could drop this completely.
--- -/
+TODO: The first arg `args[0]` is always expected to be `--server`. We could drop this completely.
+-/
 -- @[inherit_doc Lean.Server.FileWorker.workerMain]
 def workerMain (opts : Options) (args : List String) : IO UInt32 := do
   IO.Process.exit 1
