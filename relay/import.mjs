@@ -31,7 +31,16 @@ async function runProcess(id, cmd, args, cwd) {
     });
 
     ls.stderr.on('data', (data) => {
-      progress[id].output += data.toString()
+      try {
+        if (args[0].includes("unpack.sh")){
+          throw new Error(".zip file of artifact could not be fetched. Make sure it exists and is not expired. \n")
+        } else {
+          progress[id].output += data.toString()
+        }
+      } catch(e){
+        progress[id].output += `Error: ${e.toString()}\n${e.stack}`
+      }
+
     });
 
     ls.on('close', (code) => {
