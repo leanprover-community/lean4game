@@ -62,6 +62,20 @@ const server = app
     req.url = filename
     express.static(path.join(getGameDir(owner,repo),".i18n",lang))(req, res, next)
   })
+  .use('/data/local_games', (req, res, next) => {
+    const directoryPath = path.join(__dirname, '..', '..')
+    console.error('here')
+    fs.readdir(directoryPath, (err, files) => {
+      if (err) {
+        return res.status(500).json({ error: "Unable to scan directory" })
+      }
+      let games = files
+        .map(file => path.join(directoryPath, file))
+        .filter(folderPath => fs.existsSync(path.join(folderPath, '.lake', 'gamedata')))
+        .map(folderPath => path.basename(folderPath))
+      res.json(games)
+    })
+  })
   .use('/data/g/:owner/:repo/*', (req, res, next) => {
     const owner = req.params.owner
     const repo = req.params.repo
@@ -115,7 +129,7 @@ function getTag(owner, repo) {
 
 function getGameDir(owner, repo) {
   owner = owner.toLowerCase()
-  if (owner == 'local') {
+  if (owner == 'local' || owner == 'test' ) {
     if(!isDevelopment) {
       console.error(`No local games in production mode.`)
       return ""
@@ -128,10 +142,11 @@ function getGameDir(owner, repo) {
     }
   }
 
-  let game_dir = (owner == 'local') ?
+  let game_dir =
     // note: in the local case we need `repo` to be case sensitive
-    path.join(__dirname, '..', '..', repo) :
-    path.join(__dirname, '..', 'games', `${owner}`, `${repo.toLowerCase()}`)
+    (owner == 'local') ? path.join(__dirname, '..', '..', repo) :
+    (owner == 'test') ? path.join(__dirname, '..', 'server') :
+      path.join(__dirname, '..', 'games', `${owner}`, `${repo.toLowerCase()}`)
 
   if(!fs.existsSync(game_dir)) {
     console.error(`Game '${game_dir}' does not exist!`)

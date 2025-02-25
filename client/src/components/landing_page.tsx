@@ -10,10 +10,10 @@ import '@fontsource/roboto/700.css';
 import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 
-import { GameTile, useGetGameInfoQuery } from '../state/api'
+import { GameTile } from '../state/api'
 import path from 'path';
 
-import ReactCountryFlag from 'react-country-flag';
+// import ReactCountryFlag from 'react-country-flag';
 import lean4gameConfig from '../config.json'
 import i18next from 'i18next';
 import { useContext } from 'react';
@@ -76,17 +76,58 @@ function LandingPage() {
 
   const [usageCPU, setUsageCPU] = React.useState<number>()
   const [usageMem, setUsageMem] = React.useState<number>()
+  const [gameTiles, setGameTiles] = React.useState<Array<JSX.Element>>([])
 
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   // Load the namespaces of all games
   // TODO: should `allGames` contain game-ids starting with `g/`?
   i18next.loadNamespaces(lean4gameConfig.allGames.map(id => `g/${id}`))
 
-  let allTiles = lean4gameConfig.allGames.map((gameId) => {
-    let q =  useGetGameInfoQuery({game: `g/${gameId}`})
-    return q.data?.tile
-  })
+  const devMode = process.env.NODE_ENV == "development"
+
+  /**
+   *
+   */
+  React.useEffect(() => {
+    let games = [...lean4gameConfig.allGames]
+    const fetchGameInfos = async () => {
+      try {
+        if (devMode) {
+          await fetch(`${window.location.origin}/data/local_games`)
+          .then(response => {if (response.ok) {return response.json()} else {throw ""}})
+          .then((localGames: string[]) => {
+            games = games.concat(localGames.map((game: string) => (`local/${game}`)))
+            games.push("test/Test")
+          })
+        }
+        const promises = games.map(async game => {
+          try {
+            const response = await fetch(`${window.location.origin}/data/g/${game}/Game.json`)
+            if (!response.ok) {return null}
+            let gameInfo = await response.json()
+            return [game, gameInfo.tile]
+          } catch (err) {
+            console.info(`game ${game} unavailable`)
+            console.debug(err)
+            return null
+          }
+        })
+        let response = await Promise.all(promises)
+        response = response.filter(tile => tile !== null)
+        let tiles = response.map(([id, tile]) => {
+          return <Tile
+            key={id}
+            gameId={`g/${id}`}
+            data={tile}
+          />})
+        setGameTiles(tiles)
+      } catch (error) {
+        console.error("Error fetching data:", error)
+      }
+    }
+    fetchGameInfos()
+  }, [])
 
   /** Parse `games/stats.csv` if present and display server capacity. */
   React.useEffect(() => {
@@ -126,22 +167,7 @@ function LandingPage() {
     </header>
     <React.Suspense>
       <div className="game-list">
-
-        {allTiles.filter(x => x != null).length == 0 ?
-          <p>
-            <Trans>
-              No Games loaded. Use <a>http://localhost:3000/#/g/local/FOLDER</a> to open a
-              game directly from a local folder.
-            </Trans>
-          </p>
-          : lean4gameConfig.allGames.map((id, i) => (
-            <Tile
-              key={id}
-              gameId={`g/${id}`}
-              data={allTiles[i]}
-            />
-          ))
-        }
+        { gameTiles }
       </div>
     </React.Suspense>
     { // show server capacity from `games/stats.csv` if present

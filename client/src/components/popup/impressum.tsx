@@ -17,7 +17,7 @@ export function ImpressumPopup () {
         40225 Düsseldorf<br />
         Germany<br />
         +49 211 81-14690<br />
-        <a href="https://www.math.hhu.de/en/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team">Contact Details</a>
+        <a href="https://www.math.hhu.de/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/prof-dr-marcus-zibrowius">Contact Details</a>
       </p>
       <p>
         <strong>Legal form:</strong><br />

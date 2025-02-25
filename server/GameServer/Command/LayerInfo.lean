@@ -95,7 +95,7 @@ elab "Languages" t:str* : command => do
   modifyCurGame fun game => pure {game with
     tile := {game.tile with languages := t.map (·.getString) |>.toList}}
 
-/-- The Image of the game (optional). TODO: Not implemented -/
+/-- The Image of the game (optional). The image should have ratio 500:200. -/
 elab "CoverImage" t:str : command => do
   let file := t.getString
   if not <| ← System.FilePath.pathExists file then
