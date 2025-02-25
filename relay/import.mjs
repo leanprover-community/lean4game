@@ -65,6 +65,8 @@ async function checkAgainstDiscMemory(artifact, reservedMemorySize) {
 async function download(id, url, dest) {
   return new Promise((resolve, reject) => {
     // The options argument is optional so you can omit it
+    progress[id].output += "Progress: " + "[" + "_".repeat(50) + "]"
+    let numProgressChars = 0
     requestProgress(request({
       url,
       headers: {
@@ -73,17 +75,24 @@ async function download(id, url, dest) {
         'X-GitHub-Api-Version': '2022-11-28',
         'Authorization': 'Bearer ' + TOKEN
       }
+
     }))
     // choose latest artifact
     .on('progress', function (state) {
-      console.log('progress', state);
-      transferredDataSize = Math.round(state.size.transferred/1024/1024)
-      progress[id].output += `Downloaded ${transferredDataSize}MB\n`
+      //let transferredDataSize = Math.round(state["size"]["transferred"]/1024/1024)
+      //let totalDataSize = Math.round(state["size"]["total"]/1024/1024)
+      let step = Math.round(state["percent"] * 100) / 2;
+      if (step > numProgressChars) {
+        progress[id].output = progress[id].output.replace(/\[[#_]*\]/, `[${'#'.repeat(numProgressChars) + "_".repeat(50 - numProgressChars)}] `)
+        numProgressChars = step
+        //progress[id].output += `|DOWNLOAD (${transferredDataSize}MB / ${totalDataSize}MB): [${'#'.repeat(numProgressChars)}]|`
+      }
     })
     .on('error', function (err) {
       reject(err)
     })
     .on('end', function () {
+      progress[id].output += "\n"
       resolve()
     })
     .pipe(fs.createWriteStream(dest));
