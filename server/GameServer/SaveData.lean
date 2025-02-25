@@ -52,7 +52,7 @@ def saveGameData (allItemsByType : Std.HashMap InventoryType (Std.HashSet Name))
   for inventoryType in [InventoryType.Theorem, .Tactic, .Definition] do
     for name in allItemsByType.getD inventoryType {} do
       let some item ← getInventoryItem? name inventoryType
-        | throwError "Expected item to exist: {name}"
+        | continue -- TODO: cleanup. Hidden items should also not appear in `allItemsByType`
       IO.FS.writeFile (path / docFileName inventoryType name) (toString (toJson item))
 
   IO.FS.writeFile (path / inventoryFileName) (toString (toJson inventory))

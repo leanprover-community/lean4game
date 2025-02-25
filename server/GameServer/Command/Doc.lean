@@ -94,8 +94,6 @@ elab "NewTactic" args:ident* : command => do
 /-- Declare tactics that are introduced by this level but do not show up in inventory. -/
 elab "NewHiddenTactic" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).tactics.hidden) "NewHiddenTactic"
-  for name in ↑args do
-    checkInventoryDoc .Tactic name (template := "")
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId),
                                    hidden := level.tactics.hidden ++ args.map (·.getId)}}
