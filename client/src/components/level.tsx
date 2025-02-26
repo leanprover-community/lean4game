@@ -89,7 +89,7 @@ export function NewLevel({visible = true}) {
     }
   }
 
-  return <div className="exercise">
+  return <div className={`exercise${visible ? '' : ' hidden'}`}>
     { // Display world image if it exists.
       gameInfo.data?.worlds.nodes[worldId].image &&
       <div className='world-image'>

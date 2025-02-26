@@ -10,7 +10,7 @@ import { useGetGameInfoQuery, useLoadLevelQuery } from '../state/api'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button, Markdown } from './utils'
 import { ChatContext, GameIdContext, PageContext, PreferencesContext, ProofContext } from '../state/context'
-import { GameHint, InteractiveGoalsWithHints } from './infoview/rpc_api'
+import { GameHint, InteractiveGoalsWithHints } from './editor/Defs'
 // import { lastStepHasErrors } from './infoview/goals'
 // import { AllMessages } from '../../../node_modules/@leanprover/infoview/dist/infoview/messages'
 // import { LeanDiagnostic, RpcErrorCode, getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api'
@@ -84,7 +84,6 @@ export function ChatButtons ({counter=undefined, setCounter=()=>{}, introMessage
   const { mobile } = useContext(PreferencesContext)
   const { gameId, worldId, levelId } = useContext(GameIdContext)
   const {setPage} = useContext(PageContext)
-  const dispatch = useAppDispatch()
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const { proof } = useContext(ProofContext)
 
@@ -99,12 +98,12 @@ export function ChatButtons ({counter=undefined, setCounter=()=>{}, introMessage
               title=""
               to={worldId ? `/${gameId}/world/${worldId}/level/1` : ''}
               onClick={() => {
-                if (!worldId) {
+                if (mobile) {
                   console.log('setting `readIntro` to true')
                   setPage(1)
                 }
               }} >
-            Start&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
+            {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
           </Button>
         </>
       )
@@ -114,9 +113,6 @@ export function ChatButtons ({counter=undefined, setCounter=()=>{}, introMessage
             title=""
             to=""
             onClick={() => {
-              if (counter + 1 >= introMessages.length) {
-                dispatch(changedReadIntro({game: gameId, world: worldId, readIntro: true}))
-              }
               setCounter(counter + 1)
             }} >
           {"Read"}
@@ -125,10 +121,9 @@ export function ChatButtons ({counter=undefined, setCounter=()=>{}, introMessage
             title=""
             to=""
             onClick={() => {
-              dispatch(changedReadIntro({game: gameId, world: worldId, readIntro: true}))
               setCounter(introMessages.length)
             }} >
-          Skip all
+          {t("Skip all")}
         </Button>
       </>
     )}
@@ -289,11 +284,19 @@ export function ChatPanel ({visible = true}) {
 
   const [counter, setCounter] = useState(1)
 
-  const [introText, setIntroText] = useState<Array<GameHintWithStep>>([])
+  const [introMessages, setIntroMessages] = useState<Array<GameHintWithStep>>([])
   const { chatRef, deletedChat, showHelp, selectedStep } = useContext(ChatContext)
   const { proof } = useContext(ProofContext)
 
   const readIntro = useSelector(selectReadIntro(gameId, worldId))
+
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    if(!levelId && counter >= introMessages.length) {
+      dispatch(changedReadIntro({game: gameId, world: worldId, readIntro: true}))
+    }
+  }, [counter, introMessages])
 
   useEffect(() => {
     setCounter(1)
@@ -307,11 +310,11 @@ export function ChatPanel ({visible = true}) {
 
       // playable level: show the level's intro
       if (levelInfo.data?.introduction) {
-        setIntroText([introHint])
+        setIntroMessages([introHint])
         // messages = messages.concat([introHint])
       }
       else {
-        setIntroText([])
+        setIntroMessages([])
       }
     } else {
       if (worldId) {
@@ -321,9 +324,9 @@ export function ChatPanel ({visible = true}) {
         // Level 0: show the world's intro
         if (gameInfo.data?.worlds.nodes[worldId].introduction) {
           // messages = messages.concat(introHints)
-          setIntroText(introHints)
+          setIntroMessages(introHints)
         } else {
-          setIntroText([])
+          setIntroMessages([])
         }
       } else {
         let introText = t(gameInfo.data?.introduction, {ns : gameId}).trim()
@@ -332,9 +335,9 @@ export function ChatPanel ({visible = true}) {
         // world overview: show the game's intro
         if (gameInfo.data?.introduction) {
           // messages = messages.concat(introHints)
-          setIntroText(introHints)
+          setIntroMessages(introHints)
         } else {
-          setIntroText([])
+          setIntroMessages([])
         }
       }
     }
@@ -365,7 +368,7 @@ export function ChatPanel ({visible = true}) {
       console.debug('scroll chat: down')
       chatRef.current!.lastElementChild?.scrollIntoView({block: "center"})
     }
-  }, [counter, introText, gameId, worldId, levelId])
+  }, [counter, introMessages, gameId, worldId, levelId])
 
   // Scroll down when new hidden hints are triggered
   useEffect(() => {
@@ -410,7 +413,7 @@ export function ChatPanel ({visible = true}) {
           Could not find the game!
         </div>
         }
-      <Hints hints={introText} counter={readIntro ? undefined : counter}/>
+      <Hints hints={introMessages} counter={readIntro ? undefined : counter}/>
       {proof?.steps.map((step, i) => {
         let x = [].concat(
           filterHints(step.goals[0]?.hints, proof.steps[i-1]?.goals[0]?.hints).map(hint => ({hint: hint, kind: HintKind.GameHint, step: i})),
@@ -445,6 +448,6 @@ export function ChatPanel ({visible = true}) {
         : <></>
       ))} */}
     </div>
-    { <ChatButtons counter={counter} setCounter={setCounter} introMessages={introText}/> }
+    { <ChatButtons counter={counter} setCounter={setCounter} introMessages={introMessages}/> }
   </div>
 }
