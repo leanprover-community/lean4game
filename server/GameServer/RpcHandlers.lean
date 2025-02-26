@@ -231,6 +231,11 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
       -- Answer: The last snap only copied the diags from the end of this snap
       let mut diag : Array InteractiveDiagnostic := snap.interactiveDiags.toArray
 
+      -- Increase the severity of `uses 'sorry'` warnings
+      diag := diag.map (fun d => if d.toDiagnostic.message == "declaration uses 'sorry'"
+        then { d with severity? := some Lsp.DiagnosticSeverity.error }
+        else d)
+
       -- Level is completed if there are no errors or warnings
       let completedWithWarnings : Bool := ¬ diag.any (·.severity? == some .error)
       let completed : Bool := completedWithWarnings ∧ ¬ diag.any (·.severity? == some .warning)
