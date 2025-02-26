@@ -127,7 +127,6 @@ partial def findForbiddenTactics (inputCtx : Parser.InputContext) (workerState :
     -- Ignore syntax elements that do not start with a letter or are listed above.
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
       -- Treat `simp?` and `simp!` like `simp`
-      let val := val.dropRightWhile (fun c => c == '!' || c == '?')
       match levelInfo.tactics.find? (·.name.toString == val) with
       | none =>
         -- Tactic will never be introduced in the game.
