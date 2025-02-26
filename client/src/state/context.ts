@@ -5,7 +5,7 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types'
-import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from '../components/infoview/rpc_api';
+import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from '../components/editor/Defs';
 import { PreferencesState } from './preferences';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
