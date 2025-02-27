@@ -81,7 +81,7 @@ export function Editor() {
         await _leanMonaco.start(options)
 
         // JE: how do I get the editorApi or an RPC session?
-        //let infoProvider = _leanMonaco.infoProvider.editorApi
+        // let infoProvider = _leanMonaco.infoProvider.editorApi
 
         console.warn('gameId', gameId)
         await leanMonacoEditor.start(editorRef.current!, `/${worldId}/L_${levelId}.lean`, code)
@@ -106,7 +106,7 @@ export function Editor() {
         <div ref={editorRef} id="editor" />
         <div ref={infoviewRef} id="infoview" />
         {/* TODO: */}
-        <GameInfoview editorApi={null}/>
+        {/* <GameInfoview editorApi={null}/> */}
       </Split>
       {editor && typewriterMode && <Typewriter />}
     </div>
