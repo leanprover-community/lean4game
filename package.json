@@ -62,6 +62,8 @@
     "@types/debounce": "^1.2.1",
     "concurrently": "^7.6.0",
     "css-loader": "^6.7.3",
+    "cypress": "^13.17.0",
+    "cypress-iframe": "^1.0.1",
     "file-loader": "^6.2.0",
     "i18next-scanner": "^4.4.0",
     "nodemon": "^3.0.1",
@@ -72,7 +74,8 @@
     "vite": "^6.1.1",
     "vite-plugin-node-polyfills": "^0.23.0",
     "vite-plugin-static-copy": "^2.2.0",
-    "vite-plugin-svgr": "^4.3.0"
+    "vite-plugin-svgr": "^4.3.0",
+    "wait-on": "^8.0.2"
   },
   "scripts": {
     "start": "concurrently -n server,client -c blue,green \"npm run start_server\" \"npm run start_client\"",
