@@ -3,18 +3,16 @@ import { useContext, useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GameIdContext, InputModeContext, MonacoEditorContext, ProofContext } from '../../state/context'
 import { useGetGameInfoQuery } from '../../state/api'
-import { AbbreviationRewriter, AbbreviationProvider, AbbreviationConfig, AbbreviationTextSource } from '@leanprover/unicode-input'
 
-import { RpcContext, WithRpcSessions, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
 import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import '../../css/typewriter.css'
 import * as monaco from 'monaco-editor'
+import { useRpcSession } from '@leanprover/infoview'
 
 /** The input field */
 function TypewriterInput({disabled}: {disabled?: boolean}) {
   let { t } = useTranslation()
-  const rpcSess = React.useContext(RpcContext)
   const [typewriterInput, setTypewriterInput] = useState("") // React.useContext(InputModeContext)
   const {proof, setProof, interimDiags, setInterimDiags, setCrashed} = React.useContext(ProofContext)
 
@@ -24,8 +22,8 @@ function TypewriterInput({disabled}: {disabled?: boolean}) {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
-  const model = editor.getModel()
-  const uri = model.uri.toString()
+
+  // const rpcSess = useRpcSession()
 
   /** Monaco editor requires the code to be set manually. */
   function setTypewriterContent (typewriterInput: string) {
@@ -43,6 +41,15 @@ function TypewriterInput({disabled}: {disabled?: boolean}) {
 
     // const pos = editor.getPosition()
     const pos = editor.getModel().getFullModelRange().getEndPosition()
+
+    // rpcSess.call('Game.test', pos).then((response) => {
+    //   console.debug('test Rpc call worked')
+    //   console.debug(response)
+    // }).catch((err) => {
+    //   console.error("failed")
+    //   console.error(err)
+    // })
+
     if (typewriterInput) {
       // setProcessing(true)
       editor.executeEdits("typewriter", [{
@@ -165,12 +172,7 @@ export function Typewriter() {
   const uri = model.uri.toString()
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
-  const rpcSess = useRpcSessionAtPos({uri: uri, line: 0, character: 0})
-
-  return <RpcContext.Provider value={rpcSess}>
-      <div className="typewriter">
-
-        <TypewriterInput />
-      </div>
-    </RpcContext.Provider>
+  return  <div className="typewriter">
+    <TypewriterInput />
+  </div>
 }

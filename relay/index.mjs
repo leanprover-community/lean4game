@@ -199,9 +199,12 @@ function startServerProcess(owner, repo) {
   let serverProcess
   if (isDevelopment) {
     console.warn("Running without Bubblewrap container!")
-    serverProcess = cp.spawn("lean", ["--server"], { cwd: gameDir })
 
-    // let args = ["--server", gameDir]
+    let args = ["--server", gameDir]
+
+    // serverProcess = cp.spawn("lean", ["--server"], { cwd: gameDir })
+    serverProcess = cp.spawn("lake", ["exe", "gameserver", ...args], { cwd: gameDir })
+
     // let binDir = path.join(gameDir, ".lake", "packages", "GameServer", "server", ".lake", "build", "bin")
     // // Note: `cwd` is important to be the `bin` directory as `Watchdog` calls `./gameserver` again
     // if (fs.existsSync(binDir)) {

@@ -12,7 +12,8 @@ import '../../css/editor.css'
 import { useSelector } from 'react-redux';
 import { selectTypewriterMode } from '../../state/progress';
 import { Typewriter } from './typewriter';
-import { GoalTabs } from './infoview/goal_tabs';
+import { GoalTabs } from './goal_tabs';
+import { GameInfoview } from './tmp';
 
 export function Editor() {
   let { t } = useTranslation()
@@ -22,6 +23,7 @@ export function Editor() {
 
   const editorRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
+  const gameInfoviewRef = useRef<HTMLDivElement>(null)
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>()
   const [leanMonaco, setLeanMonaco] = useState<LeanMonaco>()
   const [code, setCode] = useState<string>('')
@@ -71,11 +73,16 @@ export function Editor() {
   useEffect(() => {
     console.debug('[LeanGame] Restarting Editor!')
     var _leanMonaco = new LeanMonaco()
+
     var leanMonacoEditor = new LeanMonacoEditor()
 
     _leanMonaco.setInfoviewElement(infoviewRef.current!)
     ;(async () => {
         await _leanMonaco.start(options)
+
+        // JE: how do I get the editorApi or an RPC session?
+        //let infoProvider = _leanMonaco.infoProvider.editorApi
+
         console.warn('gameId', gameId)
         await leanMonacoEditor.start(editorRef.current!, `/${worldId}/L_${levelId}.lean`, code)
 
@@ -98,6 +105,8 @@ export function Editor() {
           className={`editor-split ${typewriterMode ? 'hidden' : ''}`} >
         <div ref={editorRef} id="editor" />
         <div ref={infoviewRef} id="infoview" />
+        {/* TODO: */}
+        <GameInfoview editorApi={null}/>
       </Split>
       {editor && typewriterMode && <Typewriter />}
     </div>
