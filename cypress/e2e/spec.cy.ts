@@ -12,10 +12,9 @@ describe('The world selection', () => {
 
   it('displays the world titles', () => {
     cy.visit('http://localhost:3000/#/g/test/Test')
-    cy.get('p.world-title').should(($p) => {
-      const titles = $p.map((_, el) => el.textContent).get()
-      expect(titles).to.have.members(['Demo World 1', 'Demo World 2'])
-    })
+    cy.get('p.world-title')
+        .map('textContent')
+        .should('have.members', ['Demo World 1', 'Demo World 2']);
   })
 
   it('displays the first world and its first level as selectable', () => {
