@@ -59,7 +59,7 @@ jobs:
           lake-package-directory: "server"
           use-mathlib-cache: false
           auto-config: false
-          build: false
+          build: true
           test: false
           lint: false
 
