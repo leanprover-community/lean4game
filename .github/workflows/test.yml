@@ -5,11 +5,9 @@ on:
   push:
     branches:
       - "main"
-      - "add-cypress"
   pull_request:
     branches:
       - "main"
-      - "add-cypress"
     paths:
       - ".github/workflows/test.yml"
 
