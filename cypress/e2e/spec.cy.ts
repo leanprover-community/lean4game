@@ -39,3 +39,47 @@ describe('The world selection', () => {
     )
   })
 })
+
+describe('The first level', () => {
+  it('can be navigated to from the world selection', () => {
+    cy.visit('http://localhost:3000/#/g/test/Test')
+    cy.contains('p.world-title', 'Demo World 1').click()
+    cy.location().its("hash").should('eq', '#/g/test/Test/world/DemoWorld1/level/0')
+  })
+
+  it('displays world and level title', () => {
+    cy.visit('http://localhost:3000/#/g/test/Test/world/DemoWorld1/level/0')
+    cy.contains('div.nav-content', 'Demo World 1')
+        .children()
+        .map((v) => v.textContent.trim())
+        .should('have.members', ['Demo World 1', 'Introduction', 'Start'])
+  })
+
+  it('displays the inventory tabs', () => {
+    cy.visit('http://localhost:3000/#/g/test/Test/world/DemoWorld1/level/0')
+    cy.get('div.tab')
+        .map((v) => v.textContent.trim())
+        .should('have.members', ['Theorems', 'Tactics', 'Definitions'])
+  })
+
+  it('displays the theorems inventory', () => {
+    cy.visit('http://localhost:3000/#/g/test/Test/world/DemoWorld1/level/0')
+    cy.contains('div.tab', 'Theorems').click()
+    cy.contains('div.inventory-list>div.item', 'demo_statement').click()
+    cy.contains('div.documentation>h1', 'demo_statement').should('exist')
+    cy.get('div.documentation>*>svg.fa-xmark').click()
+  })
+
+  it('displays the tactics inventory', () => {
+    cy.visit('http://localhost:3000/#/g/test/Test/world/DemoWorld1/level/0')
+    cy.contains('div.tab', 'Tactics').click()
+    cy.get('div.inventory-list>div.item')
+        .map((v) => v.textContent.trim())
+        .should('have.members', ['exact', 'rfl', 'rw'])
+    cy.contains('div.inventory-list>div.item', 'exact').click()
+    cy.contains('div.documentation>h1', 'exact').should('exist')
+    cy.get('div.documentation>div.markdown')
+        .contains('exact e closes the main goal if its target type matches that of e.')
+        .should('exist')
+  })
+})
