@@ -1,10 +1,11 @@
 import GameServerExe.Rpc
+import GameServerExe.Message
 import Lake.CLI.Main
 
 -- TODO: The only reason we import `Commands` is so that it gets built to on `lake build`
 -- should we have a different solution?
 
-open Lean System.FilePath JsonRpc IO
+open Lean System.FilePath IO
 
 open Lake
 
@@ -51,10 +52,10 @@ unsafe def main : List String → IO UInt32 := fun args => do
     while true do
       /- redirect message from the client to the server -/
 
-      let msgI : JsonRpc.Message ← i.readLspMessage
+      let msgI : JsonRpc.Message := GameServer.forwardMessage (← i.readLspMessage)
       i_lean.writeLspMessage msgI
 
-      let msgO : JsonRpc.Message ← o_lean.readLspMessage
+      let msgO : JsonRpc.Message := GameServer.returnMessage (← o_lean.readLspMessage)
       o.writeLspMessage msgO
 
       -- let msgE : JsonRpc.Message ← e_lean.readLspMessage

@@ -15,6 +15,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@leanprover/unicode-input-component": "=0.1.0",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.1",
     "@reduxjs/toolkit": "^1.9.1",
@@ -33,7 +34,7 @@
     "i18next-http-backend": "^2.5.0",
     "i18next-scanner-typescript": "^1.2.0",
     "ip-anonymize": "^0.1.0",
-    "lean4monaco": "^1.0.37",
+    "lean4monaco": "^1.0.42",
     "marked": "^4.3.0",
     "memfs": "^4.11.1",
     "octokit": "^4.1.2",
@@ -92,7 +93,7 @@
     "build_client": "cross-env NODE_ENV=production vite build",
     "production": "cross-env NODE_ENV=production node relay/index.mjs",
     "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs",
-    "test:bare": "wait-on http://localhost:8080 http://localhost:3000 && cypress run",
+    "test:bare": "wait-on --resources \"http://localhost:8080\" \"http://localhost:3000\" && cypress run",
     "test": "concurrently -k -n server,client,cypress -c blue,green,cyan \"npm run start_server\" \"npm run start_client\" \"npm run test:bare\""
   },
   "eslintConfig": {
