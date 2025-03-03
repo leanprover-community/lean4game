@@ -35,8 +35,10 @@ jobs:
           build: true
           test: false
           lint: false
-      - run: npm install
+      - name: Install dependencies
+        run: npm install
       - name: Build for production
         run: npm run build
-      - name: Run cypress tests
+      - name: Cypress tests
+        if: always()
         run: npm test
