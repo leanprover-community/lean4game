@@ -95,7 +95,7 @@
     "production": "cross-env NODE_ENV=production node relay/index.mjs",
     "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs",
     "test:bare": "wait-on --resources \"http://localhost:8080\" \"http://localhost:3000\" && cypress run",
-    "test": "concurrently -k -n server,client,cypress -c blue,green,cyan \"npm run start:server\" \"npm run start:client\" \"npm run test:bare\""
+    "test": "concurrently -k -s first -n server,client,cypress -c blue,green,cyan \"npm run start:server\" \"npm run start:client\" \"npm run test:bare\""
   },
   "eslintConfig": {
     "extends": [
