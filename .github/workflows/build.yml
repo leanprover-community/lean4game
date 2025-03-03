@@ -39,7 +39,9 @@ jobs:
           lint: false
       - name: Install dependencies
         run: npm install
-      - name: Build Lean & React
-        run: npm run build
+      - name: Build Lean
+        run: npm run build_server
+      # - name: Build for Production
+      #   run: npm run build_client
       - name: Cypress tests
         run: npm test
