@@ -5,7 +5,7 @@ The server is made out of two parts, named "relay" and "server".
 The former, "relay", is the server which
 sets up a socket connection to the client, starts the lean servers to work on files and
 relays messages between the lean server and the client. `index.mjs` is the file that needs to
-be run, which is done for example using `pm2` or by calling `npm run start_server` or
+be run, which is done for example using `pm2` or by calling `npm run start:server` or
 `npm run production`, see more later.
 
 The latter, "server", is the lean server which has two jobs. For one, it produces the "gameserver"
@@ -46,7 +46,7 @@ This way any changes to files in `client/` or `relay/` will cause the server to 
 Alternative, you can run `npm run build` followed by the commands
 
 ```
-npm run start_client
+npm run start:client
 npm run production
 ```
 
