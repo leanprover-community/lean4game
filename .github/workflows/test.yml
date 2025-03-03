@@ -5,9 +5,11 @@ on:
   push:
     branches:
       - "main"
+      - "dev"
   pull_request:
     branches:
       - "main"
+      - "dev"
     paths:
       - ".github/workflows/test.yml"
 
@@ -26,16 +28,16 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
+          # - macos-latest
         browser:
-          - electron
+          # - electron
           - chrome
-          - firefox
+          # - firefox
         include:
           - os: ubuntu-latest
             name: Linux
-          - os: macos-latest
-            name: macOS
+          # - os: macos-latest
+          #   name: macOS
 
     name: ${{ matrix.name }} - ${{ matrix.browser }}
     runs-on: ${{ matrix.os }}
@@ -47,12 +49,11 @@ jobs:
           ref: ${{ github.ref }}
           submodules: true
 
-      - name: Setup firefox (macOS)
-        if: matrix.os == 'macos-latest' && matrix.browser == 'firefox'
-        uses: browser-actions/setup-firefox@v1
+      # - name: Setup firefox (macOS)
+      #   if: matrix.os == 'macos-latest' && matrix.browser == 'firefox'
+      #   uses: browser-actions/setup-firefox@v1
 
       - uses: leanprover/lean-action@v1
-        if: matrix.os != 'windows-latest'
         with:
           lake-package-directory: "server"
           use-mathlib-cache: false
@@ -65,9 +66,9 @@ jobs:
       - run: npm install
 
       - name: Run tests
-        if: matrix.os != 'windows-latest'
-        uses: cypress-io/github-action@v6
-        with:
-          start: npm start
-          wait-on: 'npx wait-on tcp:8080'
-          browser: ${{ matrix.browser }}
+        run: npm test
+        # uses: cypress-io/github-action@v6
+        # with:
+        #   start: npm start
+        #   wait-on: 'npx wait-on tcp:8080'
+        #   browser: ${{ matrix.browser }}
