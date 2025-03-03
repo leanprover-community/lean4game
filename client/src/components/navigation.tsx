@@ -169,7 +169,7 @@ function DesktopNavigationLevel () {
         <NavButton
           icon={faArrowRight}
           text={levelId == 0 ? t("Start") : t("Next")} inverted={true}
-          disabled={levelId == 0 ? !readIntro : (difficulty == 2 && !completed)}
+          disabled={difficulty >= 1 && !(levelId == 0 ? readIntro : completed)}
           href={`#/${gameId}/world/${worldId}/level/${levelId + 1}`} />
       }
     </div>

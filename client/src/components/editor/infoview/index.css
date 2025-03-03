@@ -1,0 +1,266 @@
+/* Some styles specific to the infoview. */
+
+html,
+body {
+    height: 100%;
+}
+
+.font-code {
+    color: var(--vscode-editor-foreground);
+    font-family: var(--vscode-editor-font-family);
+    font-weight: var(--vscode-editor-font-weight);
+    font-size: var(--vscode-editor-font-size);
+    line-height: var(--vscode-editor-line-height);
+}
+
+.font-size-code-smaller {
+    font-size: calc(0.8 * var(--vscode-editor-font-size));
+    line-height: calc(0.8 * var(--vscode-editor-line-height));
+}
+
+.font-normal {
+    font-family: var(--vscode-font-family);
+    font-weight: var(--vscode-font-weight);
+    font-size: var(--vscode-font-size);
+}
+
+.codicon-blank {
+    width: 20px;
+    height: 16px;
+}
+
+/* These are syntax highlights for the string goal view. */
+.goal-goals {
+    color: var(--vscode-lean4-infoView\.goalCount);
+}
+.goal-vdash {
+    color: var(--vscode-lean4-infoView\.turnstile);
+}
+.goal-case {
+    color: var(--vscode-lean4-infoView\.caseLabel);
+}
+.goal-hyp {
+    color: var(--vscode-lean4-infoView\.hypothesisName);
+}
+.goal-inaccessible {
+    color: var(--vscode-lean4-infoView\.inaccessibleHypothesisName);
+    opacity: 0.7;
+    font-style: italic;
+    font-weight: normal;
+}
+
+.highlight-selected {
+    background-color: var(--vscode-editorOverviewRuler-rangeHighlightForeground) !important;
+}
+
+.highlight {
+    background-color: var(--vscode-editor-selectionBackground) !important;
+}
+
+/* Interactive traces */
+.trace-line:hover {
+    background-color: #dbeeff;
+}
+.vscode-dark .trace-line:hover {
+    background-color: #1a2c3c;
+}
+.trace-class {
+    opacity: 0.4;
+}
+
+.pre-wrap {
+    white-space: pre-wrap;
+}
+
+.error {
+    color: #e51400;
+}
+
+.warning {
+    color: #bf8803;
+}
+
+.information {
+    color: darkgreen;
+}
+
+.vscode-dark .error {
+    color: #f14c4c;
+}
+
+.vscode-dark .warning {
+    color: #cca700;
+}
+
+.vscode-dark .information {
+    color: #89d185;
+}
+
+.vscode-high-contrast .error {
+    color: lightpink;
+}
+
+.vscode-high-contrast .warning {
+    color: yellow;
+}
+
+.vscode-high-contrast .information {
+    color: lightgreen;
+}
+
+/* Headers for infoview */
+
+.restart-file-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 37;
+}
+
+select {
+    background-color: var(--vscode-dropdown-background);
+    color: var(--vscode-dropdown-foreground);
+    border-color: var(--vscode-dropdown-border);
+}
+
+/* Style for the rounded box that is the outermost div of every tooltip.
+ * We use more specific classes for styling tooltip contents. */
+.tooltip {
+    background-color: var(--vscode-editorHoverWidget-background);
+    border-radius: 4px;
+    border-color: var(--vscode-editorHoverWidget-border);
+    border-width: 1px;
+    border-style: solid;
+    box-shadow: 1px 1px 5px var(--vscode-widget-shadow);
+    box-sizing: border-box;
+    /* Note: max-height is set in JS. */
+    max-width: 70%;
+    /* Flexbox ensures that contents don't overflow. */
+    display: flex;
+}
+
+.tooltip-content {
+    padding: 4px 8px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+/* Contents of a list of selections shown as a tooltip. */
+.tooltip-menu-content {
+    color: var(--vscode-editorHoverWidget-foreground);
+}
+
+.tooltip-menu-content .tooltip-menu-text {
+    text-align: center;
+    padding: 5px;
+    vertical-align: top;
+    display: inline-block;
+}
+
+.tooltip-menu-content .tooltip-menu-icon {
+    padding: 0px;
+    margin-top: 6px;
+}
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* adapted from https://github.com/microsoft/vscode/blob/main/src/vs/base/browser/ui/hover/hover.css */
+
+/* Contents of a code tooltip showing a value, type, documentation, etc. */
+.tooltip-code-content {
+    color: var(--vscode-editorHoverWidget-foreground);
+    line-height: var(--vscode-editor-line-height);
+}
+
+.tooltip-code-content a:hover {
+    cursor: pointer;
+}
+
+.tooltip-code-content p,
+.tooltip-code-content .code,
+.tooltip-code-content ul {
+    margin: 8px 0;
+}
+
+.tooltip-code-content hr {
+    box-sizing: border-box;
+    border-left: -8px;
+    border-right: -8px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    height: 1px;
+    border-bottom-width: 0px;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--vscode-editorHoverWidget-border);
+}
+
+.tooltip-code-content p:first-child,
+.tooltip-code-content .code:first-child,
+.tooltip-code-content ul:first-child {
+    margin-top: 0;
+}
+
+.tooltip-code-content p:last-child,
+.tooltip-code-content .code:last-child,
+.tooltip-code-content ul:last-child {
+    margin-bottom: 0;
+}
+
+/* MarkupContent Layout */
+.tooltip-code-content ul {
+    padding-left: 20px;
+}
+.tooltip-code-content ol {
+    padding-left: 20px;
+}
+
+.tooltip-code-content li > p {
+    margin-bottom: 0;
+}
+
+.tooltip-code-content li > ul {
+    margin-top: 0;
+}
+
+.tooltip-code-content code {
+    border-radius: 3px;
+    padding: 0 0.4em;
+    background-color: var(--vscode-textCodeBlock-background);
+}
+
+.vscode-high-contrast .inserted-text {
+    border: thin solid var(--vscode-diffEditor-insertedTextBorder);
+}
+
+.vscode-high-contrast .removed-text {
+    border: thin solid var(--vscode-diffEditor-removedTextBorder);
+}
+
+.inserted-text {
+    background-color: var(--vscode-diffEditor-insertedTextBackground);
+    border-radius: 2pt;
+}
+
+.removed-text {
+    background-color: var(--vscode-diffEditor-removedTextBackground);
+    border-radius: 2pt;
+}
+
+.b--inserted {
+    border-color: var(--vscode-diffEditor-insertedTextBackground) !important;
+}
+
+.b--modified {
+    border-color: var(--vscode-diffEditor-insertedTextBackground) !important;
+}
+
+.b--removed {
+    border-color: var(--vscode-diffEditor-removedTextBackground) !important;
+}
+
+.b--transparent {
+    border-color: transparent;
+}

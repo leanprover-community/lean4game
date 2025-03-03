@@ -18,3 +18,13 @@ builtin_initialize
     Lsp.PlainGoalParams
     (Option ProofState)
     getProofState
+
+private def rpcTest (_ : Lsp.PlainGoalParams) : RequestM (RequestTask String) := do
+  return RequestTask.pure "Test RPC answer."
+
+builtin_initialize
+  registerBuiltinRpcProcedure
+    `Game.test
+    Lsp.PlainGoalParams
+    String
+    rpcTest
