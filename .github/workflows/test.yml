@@ -1,0 +1,73 @@
+name: Test
+run-name: Test end-to-end
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - ".github/workflows/test.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        browser:
+          - electron
+          - chrome
+          - firefox
+        include:
+          - os: ubuntu-latest
+            name: Linux
+          - os: macos-latest
+            name: macOS
+
+    name: ${{ matrix.name }} - ${{ matrix.browser }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          submodules: true
+
+      - name: Setup firefox (macOS)
+        if: matrix.os == 'macos-latest' && matrix.browser == 'firefox'
+        uses: browser-actions/setup-firefox@v1
+
+      - uses: leanprover/lean-action@v1
+        if: matrix.os != 'windows-latest'
+        with:
+          lake-package-directory: "server"
+          use-mathlib-cache: false
+          auto-config: false
+          build: true
+          test: false
+          lint: false
+
+      - uses: actions/setup-node@v4
+      - run: npm install
+
+      - name: Run tests
+        if: matrix.os != 'windows-latest'
+        uses: cypress-io/github-action@v6
+        with:
+          start: npm start
+          wait-on: 'npx wait-on tcp:8080'
+          browser: ${{ matrix.browser }}

@@ -6,3 +6,4 @@ server/.lake
 logs/
 relay/prev_cpu_metric
 **/.i18n
+.idea
