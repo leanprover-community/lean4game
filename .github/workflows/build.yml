@@ -31,6 +31,7 @@ jobs:
         with:
           lake-package-directory: "server"
           use-mathlib-cache: false
+          use-github-cache: false
           auto-config: false
           build: true
           test: false
