@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { InteractiveGoal, InteractiveHypothesisBundle } from '../Defs';
+import { InteractiveGoal, InteractiveHypothesisBundle } from './Defs';
 import { useTranslation } from 'react-i18next';
 import { InteractiveCode, InteractiveHypothesisBundle_nonAnonymousNames, LocationsContext, SubexprInfo, TaggedText } from '@leanprover/infoview';
-import { SelectableLocation } from '../../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
+// import { SelectableLocation } from '../../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {

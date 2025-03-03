@@ -6,7 +6,7 @@ import type { DidCloseTextDocumentParams, DocumentUri, Location } from 'vscode-l
 import '@vscode/codicons/dist/codicon.css'
 import '@vscode/codicons/dist/codicon.ttf'
 import 'tachyons/css/tachyons.css'
-import './index.css'
+// import './index.css'
 
 import {
     defaultInfoviewConfig,

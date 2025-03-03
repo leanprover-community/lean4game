@@ -11,7 +11,7 @@ import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions } from 'lean4monaco'
 import '../../css/editor.css'
 import { useSelector } from 'react-redux';
 import { selectTypewriterMode } from '../../state/progress';
-import { Typewriter } from './typewriter';
+import { Typewriter } from './Typewriter';
 import { GoalTabs } from './goal_tabs';
 import { GameInfoview } from './tmp';
 
@@ -24,7 +24,7 @@ export function Editor() {
   const editorRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
   const gameInfoviewRef = useRef<HTMLDivElement>(null)
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>()
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|undefined>(undefined)
   const [leanMonaco, setLeanMonaco] = useState<LeanMonaco>()
   const [code, setCode] = useState<string>('')
 
