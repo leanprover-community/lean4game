@@ -18,9 +18,16 @@ Note: we use the code from `Lake.serve` to create a child process `leanProcess`
 unsafe def main : List String → IO UInt32 := fun args => do
   Lean.enableInitializersExecution
 
+  let gameDir :: argsᵣ := args
+    | do
+      IO.eprintln "ERROR: expected at least one argument"
+      IO.Process.exit 1
+
   let i ← IO.getStdin
   let o ← IO.getStdout
   let e ← IO.getStderr
+
+  debug_msg s!"game directory: {gameDir}"
 
   try
     let (elanInstall?, leanInstall?, lakeInstall?) ← findInstall?
@@ -38,7 +45,7 @@ unsafe def main : List String → IO UInt32 := fun args => do
         pure (config.lakeEnv.baseVars.push (invalidConfigEnvVar, log.toString), #[])
     let leanProcess ← IO.Process.spawn {
       cmd := config.lakeEnv.lean.lean.toString
-      args := #["--server"] ++ moreServerArgs ++ args
+      args := #["--server"] ++ moreServerArgs ++ argsᵣ
       env := extraEnv
       stdin := IO.Process.Stdio.piped
       stdout := IO.Process.Stdio.piped

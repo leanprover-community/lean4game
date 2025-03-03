@@ -12,6 +12,9 @@ import { importTrigger, importStatus } from './import.mjs'
 import process from 'process'
 import { spawn } from 'child_process'
 
+const __filename = url.fileURLToPath(import.meta.url)
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+
 /**
  * Add a game here if the server should keep a queue of pre-loaded games ready at all times.
  *
@@ -79,9 +82,6 @@ function fillQueue(tag) {
     queue[tag].push(serverProcess)
   }
 }
-
-const __filename = url.fileURLToPath(import.meta.url)
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const environment = process.env.NODE_ENV
 const isDevelopment = environment === 'development'
@@ -200,7 +200,7 @@ function startServerProcess(owner, repo) {
   if (isDevelopment) {
     console.warn("Running without Bubblewrap container!")
 
-    let args = ["--server", gameDir]
+    let args = [gameDir]
 
     // serverProcess = cp.spawn("lean", ["--server"], { cwd: gameDir })
     serverProcess = cp.spawn("lake", ["exe", "gameserver", ...args], { cwd: gameDir })
@@ -286,7 +286,13 @@ wss.addListener("connection", function(ws, req) {
     return message
   })
   serverConnection.forward(socketConnection, message => {
-    if (isDevelopment) {console.log(`SERVER: ${JSON.stringify(message)}`)}
+    if (isDevelopment) {
+      if (message.method == "lean4game/debug") {
+        console.log(`DEBUG: ${message.params[0]}`)
+      } else {
+        console.log(`SERVER: ${JSON.stringify(message)}`)
+      }
+    }
     return message
   })
 
