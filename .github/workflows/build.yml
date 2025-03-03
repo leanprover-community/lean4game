@@ -27,19 +27,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-      - uses: leanprover/lean-action@v1
+      - name: Install elan
+        uses: leanprover/lean-action@v1
         with:
           lake-package-directory: "server"
           use-mathlib-cache: false
           use-github-cache: false
           auto-config: false
-          build: true
+          build: false
           test: false
           lint: false
       - name: Install dependencies
         run: npm install
-      - name: Build for production
+      - name: Build Lean & React
         run: npm run build
       - name: Cypress tests
-        if: always()
         run: npm test

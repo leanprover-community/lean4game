@@ -56,6 +56,7 @@
     "remark-math": "^5.1.1",
     "request": "^2.88.2",
     "request-progress": "^3.0.0",
+    "rollup": "^4.34.9",
     "vscode-ws-jsonrpc": "^2.0.1",
     "web-worker": "^1.2.0",
     "ws": "^8.11.0"
