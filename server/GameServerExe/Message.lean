@@ -13,6 +13,24 @@ open Lean
 def forwardMessage (msg : JsonRpc.Message) : JsonRpc.Message := Id.run do
   match msg with
     | .request id method params? =>
+      /-
+      monaco requests to modify:
+
+      * textDocument/didOpen: params.textDocument.text
+      * textDocument/codeAction: params.range
+      * textDocument/semanticTokens/range: params.range
+      * textDocument/didChange: params.contentChanges
+      * textDocument/completion: params.position
+      * textDocument/hover: params.position
+      * textDocument/documentHighlight: params.position
+      * ...
+      * $/lean/rpc/call
+        * Lean.Widget.getInteractiveGoals: params.position
+        * Lean.Widget.getInteractiveTermGoal: params.position
+        * Lean.Widget.getWidgets: params.position
+        * Lean.Widget.getInteractiveDiagnostics: params.lineRange, params.position
+        * ...
+      -/
       return msg
     | .notification method params? =>
       return msg
