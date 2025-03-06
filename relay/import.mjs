@@ -1,12 +1,9 @@
-import { spawn } from 'child_process'
-import fs, { stat } from 'fs';
-import request from 'request'
-import requestProgress from 'request-progress'
+import fs from 'fs';
+import got from 'got'
+import path from 'path';
 import { Octokit } from 'octokit';
-
+import { spawn } from 'child_process'
 import { fileURLToPath } from 'url';
-import path, { resolve } from 'path';
-import { error } from 'console';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,29 +69,24 @@ async function checkAgainstDiscMemory(artifact, reservedMemorySize) {
 
 
 async function download(id, url, dest) {
+  let numProgressChars = 0
   return new Promise((resolve, reject) => {
     // The options argument is optional so you can omit it
     progress[id].output += "Progress: " + "[" + "_".repeat(50) + "]"
-    let numProgressChars = 0
-    requestProgress(request({
-      url,
-      headers: {
-        'accept': 'application/vnd.github+json',
-        'User-Agent': USERNAME,
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Authorization': 'Bearer ' + TOKEN
-      }
-
-    }))
+    got.stream.get(url, {
+     headers: {
+       'accept': 'application/vnd.github+json',
+       'User-Agent': USERNAME,
+       'X-GitHub-Api-Version': '2022-11-28',
+       'Authorization': 'Bearer ' + TOKEN
+     }
+    })
     // choose latest artifact
-    .on('progress', function (state) {
-      //let transferredDataSize = Math.round(state["size"]["transferred"]/1024/1024)
-      //let totalDataSize = Math.round(state["size"]["total"]/1024/1024)
-      let step = Math.round(state["percent"] * 100) / 2;
-      if (step > numProgressChars) {
+    .on('downloadProgress', downloadProgress => {
+      let step = Math.round((downloadProgress.percent * 100) / 2);
+      if (step > numProgressChars && downloadProgress.transferred != 0) {
         progress[id].output = progress[id].output.replace(/\[[#_]*\]/, `[${'#'.repeat(numProgressChars) + "_".repeat(50 - numProgressChars)}] `)
         numProgressChars = step
-        //progress[id].output += `|DOWNLOAD (${transferredDataSize}MB / ${totalDataSize}MB): [${'#'.repeat(numProgressChars)}]|`
       }
     })
     .on('error', function (err) {
