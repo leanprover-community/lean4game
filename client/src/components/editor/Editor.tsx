@@ -84,7 +84,7 @@ export function Editor() {
         // let infoProvider = _leanMonaco.infoProvider.editorApi
 
         console.warn('gameId', gameId)
-        await leanMonacoEditor.start(editorRef.current!, `/${worldId}/L_${levelId}.lean`, code)
+        await leanMonacoEditor.start(editorRef.current!, `/${gameId}/${worldId}/L_${levelId}.lean`, code)
 
         setEditor(leanMonacoEditor.editor)
         setLeanMonaco(_leanMonaco)

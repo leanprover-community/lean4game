@@ -1,4 +1,5 @@
 import GameServerExe.Rpc
+import GameServer
 import GameServerExe.Message
 import Lake.CLI.Main
 
@@ -56,17 +57,27 @@ unsafe def main : List String → IO UInt32 := fun args => do
     let o_lean : IO.FS.Stream := .ofHandle leanProcess.stdout
     -- let e_lean : IO.FS.Stream := .ofHandle leanProcess.stderr
 
-    while true do
-      /- redirect message from the client to the server -/
+    -- Test: import game info from `Game`'s env
+    initSearchPath (← findSysroot)
+    unsafe Lean.withImportModules #[`TestGame] {} (trustLevel := 1024)
+      fun env => Prod.fst <$> Core.CoreM.toIO
+          ( ctx := { fileName := "<CoreM>", fileMap := default })
+          (s := { env := env }) do
 
-      let msgI : JsonRpc.Message := GameServer.forwardMessage (← i.readLspMessage)
-      i_lean.writeLspMessage msgI
+        -- get the game from the Env
+        let game ← GameServer.getCurGame
+        debug_msg s!"cwd: {(← IO.currentDir)}"
 
-      let msgO : JsonRpc.Message := GameServer.returnMessage (← o_lean.readLspMessage)
-      o.writeLspMessage msgO
+        while true do
+          /- redirect message from the client to the server -/
+          let msgI : JsonRpc.Message ← GameServer.forwardMessage (← i.readLspMessage)
+          i_lean.writeLspMessage msgI
 
-      -- let msgE : JsonRpc.Message ← e_lean.readLspMessage
-      -- e.writeLspMessage msgE
+          let msgO : JsonRpc.Message ← GameServer.returnMessage (← o_lean.readLspMessage)
+          o.writeLspMessage msgO
+
+          -- let msgE : JsonRpc.Message ← e_lean.readLspMessage
+          -- e.writeLspMessage msgE
 
     IO.Process.exit 0
   catch err =>
