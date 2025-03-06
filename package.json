@@ -33,7 +33,7 @@
     "i18next-scanner-typescript": "^1.2.0",
     "lean4-infoview": "https://gitpkg.now.sh/leanprover/vscode-lean4/lean4-infoview?de0062c",
     "lean4web": "github:hhu-adam/lean4web#414d9e62638a392fca278761b4c61a1d2e138bc7",
-    "octokit": "^3.1.2",
+    "octokit": "^4.1.2",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
     "react-country-flag": "^3.1.0",
@@ -48,8 +48,8 @@
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "vite": "^6.2.0",
-    "vite-plugin-svgr": "^4.3.0",
     "vite-plugin-static-copy": "2.3.0",
+    "vite-plugin-svgr": "^4.3.0",
     "vscode-ws-jsonrpc": "^2.0.1",
     "web-worker": "^1.2.0",
     "ws": "^8.18.1"
