@@ -19,24 +19,24 @@ describe('The world selection', () => {
 
   it('displays the first world and its first level as selectable', () => {
     cy.visit('http://localhost:3000/#/g/test/Test')
-    const world = cy.contains('svg.world-selection>a:not(.disabled)', 'Demo World 1')
-    const assertOn = [world, world.next('a.level')]
-
-    assertOn.forEach((value) => value
+    cy.contains('svg.world-selection>a:not(.disabled)', 'Demo World 1').as('world').next('a.level').as('level')
+    cy.get('@world')
         .should('have.attr', 'href', '#/g/test/Test/world/DemoWorld1/level/0')
         .and('have.css', 'cursor', 'pointer')
-    )
+    cy.get('@level')
+        .should('have.attr', 'href', '#/g/test/Test/world/DemoWorld1/level/0')
+        .and('have.css', 'cursor', 'pointer')
   })
 
   it('displays the second world and its first level as disabled', () => {
     cy.visit('http://localhost:3000/#/g/test/Test')
-    const world = cy.contains('svg.world-selection>a.disabled', 'Demo World 2')
-    const assertOn = [world, world.next('a.level.disabled')]
-
-    assertOn.forEach((value) => value
+    cy.contains('svg.world-selection>a.disabled', 'Demo World 2').as('world').next('a.level.disabled').as('level')
+    cy.get('@world')
         .should('have.attr', 'href', '#/g/test/Test')
         .and('have.css', 'cursor', 'default')
-    )
+    cy.get('@level')
+        .should('have.attr', 'href', '#/g/test/Test')
+        .and('have.css', 'cursor', 'default')
   })
 })
 
