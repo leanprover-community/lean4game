@@ -8,7 +8,9 @@ import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import '../../css/typewriter.css'
 import * as monaco from 'monaco-editor'
-import { useRpcSession } from '@leanprover/infoview'
+import { RpcConnectParams, useRpcSession } from '@leanprover/infoview'
+import { LeanClient } from 'lean4monaco/dist/vscode-lean4/vscode-lean4/src/leanclient'
+import { RpcSessionAtPos } from 'lean4monaco/dist/vscode-lean4/vscode-lean4/src/infoview'
 
 /** The input field */
 function TypewriterInput({disabled}: {disabled?: boolean}) {
@@ -21,9 +23,7 @@ function TypewriterInput({disabled}: {disabled?: boolean}) {
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
 
   /** Reference to the hidden multi-line editor */
-  const editor = React.useContext(MonacoEditorContext)
-
-  // const rpcSess = useRpcSession()
+  const {leanMonacoEditor, leanMonaco, rpcSess} = React.useContext(MonacoEditorContext)
 
   /** Monaco editor requires the code to be set manually. */
   function setTypewriterContent (typewriterInput: string) {
@@ -36,11 +36,94 @@ function TypewriterInput({disabled}: {disabled?: boolean}) {
     if (processing) {return}
     console.log('processing typewriter input')
 
+    rpcSess.client.sendRequest('$/lean/rpc/call',
+      { method: "Lean.Widget.getInteractiveTermGoal",
+        params: {
+          textDocument: {
+            uri: rpcSess.uri.toString(),
+            // position: {line: 0, character: 1}
+          },
+          position: {line: 0, character: 1},
+          sessionId: rpcSess.sessionId
+        }
+      }
+    ).then(result => {
+      console.log("Got an answer to the Rpc request!")
+      console.debug(result)
+    }).catch(reason => {
+      console.error(`Rpc request failed!`)
+      console.debug(reason)
+    })
+
+  rpcSess.client.sendRequest('$/lean/rpc/call',
+    { method: "lean4game.test",
+      textDocument: {uri: rpcSess.uri},
+      position: {line: 0, character: 0},
+      sessionId: rpcSess.sessionId
+    }
+  ).then(
+  result =>
+    console.log(`Got a RPC answer: ${result}`)
+  ).catch(
+  reason =>
+    console.log(`RPC failed: ${reason}`)
+  )
+
+
+
+    // let uri = leanMonacoEditor?.editor?.getModel()?.uri.toString()
+    // let client = leanMonaco?.clientProvider?.getClients()[0]
+
+
+    // client.sendRequest('$/lean/rpc/connect', {uri: uri.toString()} as RpcConnectParams).then(result => {
+    //     const sessionId = result.sessionId
+    //     console.debug(`session id: ${sessionId}`)
+    //     let rpcSess = new RpcSessionAtPos(client, sessionId, uri.toString())
+
+
+
+    //     rpcSess.client.sendRequest('$/lean/rpc/call',
+    //         { method: "Lean.Widget.getInteractiveTermGoal",
+    //           params: {
+    //             textDocument: {
+    //               uri: rpcSess.uri.toString(),
+    //               // position: {line: 0, character: 1}
+    //             },
+    //             position: {line: 0, character: 1},
+    //             sessionId: rpcSess.sessionId
+    //           }
+    //         }
+    //       ).then(result => {
+    //         console.log("Got an answer to the Rpc request!")
+    //         console.debug(result)
+    //       }).catch(reason => {
+    //         console.error(`Rpc request failed!`)
+    //         console.debug(reason)
+    //       })
+
+    //     rpcSess.client.sendRequest('$/lean/rpc/call',
+    //       { method: "lean4game.test",
+    //         textDocument: {uri: rpcSess.uri},
+    //         position: {line: 0, character: 0},
+    //         sessionId: rpcSess.sessionId
+    //       }
+    //     ).then(
+    //     result =>
+    //       console.log(`Got a RPC answer: ${result}`)
+    //     ).catch(
+    //     reason =>
+    //       console.log(`RPC failed: ${reason}`)
+    //     )
+
+    //   }).catch(
+    //     reason => {console.error(`failed: ${reason}`)}
+    //   )
+
     // // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
     // setDeletedChat([])
 
     // const pos = editor.getPosition()
-    const pos = editor.getModel().getFullModelRange().getEndPosition()
+    const pos = leanMonacoEditor.editor.getModel().getFullModelRange().getEndPosition()
 
     // rpcSess.call('Game.test', pos).then((response) => {
     //   console.debug('test Rpc call worked')
@@ -52,10 +135,10 @@ function TypewriterInput({disabled}: {disabled?: boolean}) {
 
     if (typewriterInput) {
       // setProcessing(true)
-      editor.executeEdits("typewriter", [{
+      leanMonacoEditor.editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           pos,
-          editor.getModel().getFullModelRange().getEndPosition()
+          leanMonacoEditor.editor.getModel().getFullModelRange().getEndPosition()
         ),
         text: typewriterInput.trim() + "\n",
         forceMoveMarkers: false
@@ -65,8 +148,8 @@ function TypewriterInput({disabled}: {disabled?: boolean}) {
       // loadGoals(rpcSess, uri, setProof, setCrashed)
     }
 
-    editor.setPosition(pos)
-  }, [editor, typewriterInput])
+    leanMonacoEditor.editor.setPosition(pos)
+  }, [leanMonacoEditor.editor, typewriterInput, leanMonaco, rpcSess])
 
   /*
   Keep `typewriterInput` up-to-date with editor content and
@@ -168,9 +251,9 @@ export function Typewriter() {
   const {gameId, worldId, levelId} = useContext(GameIdContext)
   const editor = useContext(MonacoEditorContext)
 
-  const model = editor.getModel()
-  const uri = model.uri.toString()
-  const gameInfo = useGetGameInfoQuery({game: gameId})
+  // const model = editor.getModel()
+  // const uri = model.uri.toString()
+  // const gameInfo = useGetGameInfoQuery({game: gameId})
 
   return  <div className="typewriter">
     <TypewriterInput />

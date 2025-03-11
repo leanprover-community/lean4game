@@ -59,7 +59,7 @@ unsafe def main : List String → IO UInt32 := fun args => do
 
     -- Test: import game info from `Game`'s env
     initSearchPath (← findSysroot)
-    unsafe Lean.withImportModules #[`TestGame] {} (trustLevel := 1024)
+    unsafe Lean.withImportModules #[`TestGame] {} (trustLevel := 1024) -- TODO: What's the correct module?
       fun env => Prod.fst <$> Core.CoreM.toIO
           ( ctx := { fileName := "<CoreM>", fileMap := default })
           (s := { env := env }) do

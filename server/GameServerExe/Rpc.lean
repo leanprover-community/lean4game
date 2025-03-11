@@ -24,7 +24,7 @@ private def rpcTest (_ : Lsp.PlainGoalParams) : RequestM (RequestTask String) :=
 
 builtin_initialize
   registerBuiltinRpcProcedure
-    `Game.test
+    `lean4game.test
     Lsp.PlainGoalParams
     String
     rpcTest

@@ -5,11 +5,16 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types'
-import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from '../components/editor/Defs';
+import { GameHint, InteractiveGoal, InteractiveTermGoal, InteractiveGoalsWithHints, ProofState } from '../components/editor/Defs';
 import { PreferencesState } from './preferences';
+import { LeanMonaco, LeanMonacoEditor } from 'lean4monaco';
+import { RpcSessionAtPos } from 'lean4monaco/dist/vscode-lean4/vscode-lean4/src/infoview';
 
-export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
-  null as any)
+export const MonacoEditorContext = React.createContext<{
+  leanMonacoEditor: LeanMonacoEditor
+  leanMonaco: LeanMonaco
+  rpcSess: RpcSessionAtPos
+}>(null)
 
 export type InfoStatus = 'updating' | 'error' | 'ready';
 
