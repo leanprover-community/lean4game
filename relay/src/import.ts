@@ -20,7 +20,7 @@ const progress = {}
 var exceedingMemoryLimit = false
 
 async function runProcess(id, cmd, args, cwd) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const ls = spawn(cmd, args, {cwd});
 
     ls.stdout.on('data', (data) => {
@@ -48,7 +48,7 @@ async function runProcess(id, cmd, args, cwd) {
 
 
 async function checkAgainstDiscMemory(artifact, reservedMemorySize) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
   fs.statfs("/", (err, stats) => {
     if (err) {
       console.log(err);
@@ -70,7 +70,7 @@ async function checkAgainstDiscMemory(artifact, reservedMemorySize) {
 
 async function download(id, url, dest) {
   let numProgressChars = 0
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     // The options argument is optional so you can omit it
     progress[id].output += "Progress: " + "[" + "_".repeat(50) + "]"
     got.stream.get(url, {

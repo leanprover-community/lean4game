@@ -8,7 +8,7 @@ import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 import os from 'os';
 import fs from 'fs';
 import anonymize from 'ip-anonymize';
-import { importTrigger, importStatus } from './import.mjs'
+import { importTrigger, importStatus } from './import.js'
 import process from 'process';
 import { spawn } from 'child_process'
 // import fs from 'fs'
