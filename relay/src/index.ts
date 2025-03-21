@@ -39,8 +39,9 @@ var router = express.Router();
 router.get('/import/status/:owner/:repo', importStatus)
 router.get('/import/trigger/:owner/:repo', importTrigger)
 
+const clientDistPath = path.join(__dirname, '..', '..', 'client', 'dist');
 const server = app
-  .use(express.static(path.join(__dirname, '..', 'client', 'dist'))) // TODO: add a dist folder from inside the game
+  .use(express.static(clientDistPath)) // TODO: add a dist folder from inside the game
   .use('/i18n/g/:owner/:repo/:lang/*', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
@@ -79,7 +80,8 @@ const server = app
     express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
   .use('/data/stats', (req, res, next) => {
-    const statsProcess = spawn('/bin/bash', [path.join(__dirname, "stats.sh"), process.pid.toString()])
+    const statsScriptPath = path.join(__dirname, "..", "src", "stats.sh");
+    const statsProcess = spawn('/bin/bash', [statsScriptPath, process.pid.toString()])
     let outputData = ''
     let errorData = ''
     statsProcess.stdout.on('data', (data) => {
@@ -122,16 +124,18 @@ function getGameDir(owner, repo) {
       return ""
     }
   } else {
-    if(!fs.existsSync(path.join(__dirname, '..', 'games'))) {
-      console.error(`Did not find the following folder: ${path.join(__dirname, '..', 'games')}`)
+    const gamesPath = path.join(__dirname, '..', '..', 'games');
+    if(!fs.existsSync(gamesPath)) {
+      console.error(`Did not find the following folder: ${gamesPath}`)
       console.error('Did you already import any games?')
       return ""
     }
   }
 
+  const gamePath = path.join(__dirname, '..', '..', 'games', `${owner}`, `${repo.toLowerCase()}`);
   let game_dir = (owner == 'local') ?
     path.join(__dirname, '..', '..', repo) : // note: here we need `repo` to be case sensitive
-    path.join(__dirname, '..', 'games', `${owner}`, `${repo.toLowerCase()}`)
+    gamePath
 
   if(!fs.existsSync(game_dir)) {
     console.error(`Game '${game_dir}' does not exist!`)
@@ -160,7 +164,7 @@ function startServerProcess(owner, repo) {
         { cwd: path.join(__dirname, "..", "server", ".lake", "build", "bin") })
     }
   } else {
-    serverProcess =  cp.spawn("./bubblewrap.sh",
+    serverProcess =  cp.spawn("../src/bubblewrap.sh",
       [ game_dir, path.join(__dirname, '..')],
       { cwd: __dirname })
   }
