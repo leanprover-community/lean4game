@@ -19,6 +19,7 @@
     "@mui/material": "^5.11.1",
     "@reduxjs/toolkit": "^1.9.1",
     "@types/cytoscape": "^3.19.9",
+    "@types/got": "^9.6.12",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react-swc": "^3.4.0",
     "cross-env": "^7.0.3",
