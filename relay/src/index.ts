@@ -13,6 +13,8 @@ import process from 'process';
 import { spawn } from 'child_process'
 // import fs from 'fs'
 
+type Tag = {owner: string, repo: string}
+
 /**
  * Add a game here if the server should keep a queue of pre-loaded games ready at all times.
  *
@@ -77,7 +79,7 @@ const server = app
     express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
   .use('/data/stats', (req, res, next) => {
-    const statsProcess = spawn('/bin/bash', [path.join(__dirname, "stats.sh"), process.pid])
+    const statsProcess = spawn('/bin/bash', [path.join(__dirname, "stats.sh"), process.pid.toString()])
     let outputData = ''
     let errorData = ''
     statsProcess.stdout.on('data', (data) => {
@@ -108,8 +110,8 @@ const isDevelopment = environment === 'development'
 /** We keep queues of started Lean Server processes to be ready when a user arrives */
 const queue = {}
 
-function getTag(owner, repo) {
-  return `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
+function getTagString(tag: Tag) {
+  return `g/${tag.owner.toLowerCase()}/${tag.repo.toLowerCase()}`
 }
 
 function getGameDir(owner, repo) {
@@ -175,15 +177,16 @@ function startServerProcess(owner, repo) {
 }
 
 /** start Lean Server processes to refill the queue */
-function fillQueue(tag) {
-  while (queue[tag].length < queueLength[tag]) {
+function fillQueue(tag: {owner: string, repo: string}) {
+  const tagString = getTagString(tag)
+  while (queue[tagString].length < queueLength[tagString]) {
     let serverProcess
-    serverProcess = startServerProcess(tag)
+    serverProcess = startServerProcess(tag.owner, tag.repo)
     if (serverProcess == null) {
       console.error('serverProcess was undefined/null')
       return
     }
-    queue[tag].push(serverProcess)
+    queue[tagString].push(serverProcess)
   }
 }
 
@@ -200,10 +203,11 @@ const urlRegEx = /^\/websocket\/g\/([\w.-]+)\/([\w.-]+)$/
 wss.addListener("connection", function(ws, req) {
     const reRes = urlRegEx.exec(req.url)
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
-    const owner = reRes[1]
-    const repo = reRes[2]
+    const reResTag: Tag = {owner: reRes[1], repo: reRes[2]}
+    const owner = reResTag.owner
+    const repo = reResTag.repo
 
-    const tag = getTag(owner, repo)
+    const tag = getTagString(reResTag)
 
     let ps
     if (!queue[tag] || queue[tag].length == 0) {
@@ -211,7 +215,7 @@ wss.addListener("connection", function(ws, req) {
     } else {
         console.info('Got process from the queue')
         ps = queue[tag].shift() // Pick the first Lean process; it's likely to be ready immediately
-        fillQueue(tag)
+        fillQueue(reResTag)
     }
 
     if (ps == null) {
@@ -225,12 +229,14 @@ wss.addListener("connection", function(ws, req) {
     // TODO (Matvey): extract further information from `req`, for example browser language.
     console.log(`[${new Date()}] Socket opened - ${ip} - ${owner}/${repo}`)
 
-    const socket = {
+    const socket: rpc.IWebSocket = {
         onMessage: (cb) => { ws.on("message", cb) },
         onError: (cb) => { ws.on("error", cb) },
         onClose: (cb) => { ws.on("close", cb) },
-        send: (data, cb) => { ws.send(data,cb) }
-    }
+        //send: (data, cb) => { ws.send(data, cb); }
+        send: (data) => { ws.send(data); },
+        dispose: () => {}
+      }
     const reader = new rpc.WebSocketMessageReader(socket)
     const writer = new rpc.WebSocketMessageWriter(socket)
     const socketConnection = jsonrpcserver.createConnection(reader, writer, () => ws.close())
