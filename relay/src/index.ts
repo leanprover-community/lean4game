@@ -80,7 +80,7 @@ const server = app
     express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
   .use('/data/stats', (req, res, next) => {
-    const statsScriptPath = path.join(__dirname, "..", "src", "stats.sh");
+    const statsScriptPath = path.join(__dirname, "..", "scripts", "stats.sh");
     const statsProcess = spawn('/bin/bash', [statsScriptPath, process.pid.toString()])
     let outputData = ''
     let errorData = ''
@@ -164,7 +164,7 @@ function startServerProcess(owner, repo) {
         { cwd: path.join(__dirname, "..", "server", ".lake", "build", "bin") })
     }
   } else {
-    serverProcess =  cp.spawn("../src/bubblewrap.sh",
+    serverProcess =  cp.spawn("../scripts/bubblewrap.sh",
       [ game_dir, path.join(__dirname, '..')],
       { cwd: __dirname })
   }

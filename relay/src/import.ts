@@ -126,7 +126,7 @@ async function doImport (owner, repo, id) {
 
     artifactId = artifact.id
     const url = artifact.archive_download_url
-    const unpackingScript = path.join(__dirname, "..", "src", "unpack.sh")
+    const unpackingScript = path.join(__dirname, "..", "scripts", "unpack.sh")
     const gamesPath = path.join(__dirname, "..", "..", "games");
     const gamesTmpPath = path.join(__dirname, "..", "..", "games", "tmp");
 
