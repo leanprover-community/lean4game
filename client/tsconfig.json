@@ -15,8 +15,7 @@
     "lib": [
       "ES2021.String",
       "DOM"
-    ],
-    "skipLibCheck": true
+    ]
   },
   "include": ["./src/"]
 }
