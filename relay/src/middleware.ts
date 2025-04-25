@@ -7,18 +7,18 @@ import { Octokit } from 'octokit'
 export { safeImport as default }
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
-const RESERVED_DISK_SPACE_MB = process.env.RESERVED_DISC_SPACE_MB
+const RESERVED_DISK_SPACE_MB: number = parseInt(process.env.RESERVED_DISC_SPACE_MB)
 const DISK_INFO_CMD_MB = 'df -BM'
 const octokit = new Octokit({auth: TOKEN})
 
 function checkDiskSpace(path) {
-  return new Promise((resolve, reject) => {
+  return new Promise<number>((resolve, reject) => {
     exec(DISK_INFO_CMD_MB, path, (error, stdout, stderr) => {
       if (error) {
         return reject(new Error(`Error checking disk space: ${error.message}`))
       }
 
-      const lines = stdout.trim().split('\n')
+      const lines = stdout.toString().trim().split('\n')
       if (lines.length < 2){
         return reject(new Error(`Invalid disk information output`))
       }
@@ -53,7 +53,7 @@ function safeImport(owner, repo, id, importFunc) {
       const artifactMB = getGitHubArtifactInformation(owner, repo) / 1024^2
 
       if (usedDiskSpace + artifactMB >= RESERVED_DISK_SPACE_MB) {
-        return reject(new Error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifact_size_mb} (MB) by ${owner} would exceed allocated memory on the server.`))
+        return reject(new Error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifactMB} (MB) by ${owner} would exceed allocated memory on the server.`))
       }
 
       importFunc(owner, repo, id)
