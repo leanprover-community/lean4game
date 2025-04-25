@@ -1,6 +1,7 @@
 import fs from 'fs';
 import got from 'got'
 import path from 'path';
+import { safeImport } from './middleware'
 import { Octokit } from 'octokit';
 import { spawn } from 'child_process'
 import { fileURLToPath } from 'url';
@@ -17,7 +18,6 @@ const octokit = new Octokit({
 })
 
 const progress = {}
-var exceedingMemoryLimit = false
 
 async function runProcess(id, cmd, args, cwd) {
   return new Promise<void>((resolve, reject) => {
@@ -45,28 +45,6 @@ async function runProcess(id, cmd, args, cwd) {
     });
   })
 }
-
-
-async function checkAgainstDiscMemory(artifact, reservedMemorySize) {
-  return new Promise<void>((resolve, reject) => {
-  fs.statfs("/", (err, stats) => {
-    if (err) {
-      console.log(err);
-      reject()
-    }
-    let artifactBytes = artifact.size_in_bytes;
-    let totalBytes = stats.blocks * stats.bsize;
-    let freeBytes = stats.bfree * stats.bsize;
-    let usedBytes = totalBytes - freeBytes;
-    const resMemoryBytes = reservedMemorySize * 1024 * 1024;
-    if (usedBytes + artifactBytes >= resMemoryBytes) {
-      exceedingMemoryLimit = true;
-    }
-    resolve()
-  });
-  })
-}
-
 
 async function download(id, url, dest) {
   let numProgressChars = 0
@@ -114,15 +92,6 @@ async function doImport (owner, repo, id) {
     })
     const artifact = artifacts.data.artifacts
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
-
-    await checkAgainstDiscMemory(artifact, RESERVED_MEMORY);
-
-    if (exceedingMemoryLimit === true) {
-      const artifact_size_mb = Math.round(artifact.size_in_bytes / 1024 / 1024);
-      console.error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifact_size_mb} (MB) by ${owner} would exceed allocated memory on the server.`)
-      throw new Error(`Uploading file of size ${artifact_size_mb} (MB) would exceed allocated memory on the server.\n
-      Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve this issue.`);
-    }
 
     artifactId = artifact.id
     const url = artifact.archive_download_url
@@ -178,7 +147,10 @@ export const importTrigger = (req, res) => {
 
   if(!progress[id] || progress[id].done) {
     progress[id] = {output: "", done: false}
-    doImport(owner, repo, id)
+    safeImport(owner, repo, id, doImport).catch((err) => {
+      throw new Error(`Uploading of file would exceed allocated memory on the server.\n
+      Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve
+      this issue.`) })
   }
 
   res.redirect(`/import/status/${owner}/${repo}`)

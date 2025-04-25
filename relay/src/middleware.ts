@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-import util from 'util'
 import { exec } from 'child_process'
 import { Octokit } from 'octokit'
 
@@ -46,8 +43,8 @@ function getGitHubArtifactInformation(owner, repo){
   return artifact.size_in_bytes
 }
 
-function safeImport(owner, repo, id, importFunc) {
-  return new Promise((resolve, reject) => {
+export function safeImport(owner, repo, id, importFunc) {
+  return new Promise<void>((resolve, reject) => {
     const rootPath = '/'
     checkDiskSpace(rootPath).then(usedDiskSpace => {
       const artifactMB = getGitHubArtifactInformation(owner, repo) / 1024^2
