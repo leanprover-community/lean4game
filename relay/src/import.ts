@@ -20,7 +20,7 @@ const progress = {}
 var exceedingMemoryLimit = false
 
 async function runProcess(id, cmd, args, cwd) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const ls = spawn(cmd, args, {cwd});
 
     ls.stdout.on('data', (data) => {
@@ -48,7 +48,7 @@ async function runProcess(id, cmd, args, cwd) {
 
 
 async function checkAgainstDiscMemory(artifact, reservedMemorySize) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
   fs.statfs("/", (err, stats) => {
     if (err) {
       console.log(err);
@@ -70,7 +70,7 @@ async function checkAgainstDiscMemory(artifact, reservedMemorySize) {
 
 async function download(id, url, dest) {
   let numProgressChars = 0
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     // The options argument is optional so you can omit it
     progress[id].output += "Progress: " + "[" + "_".repeat(50) + "]"
     got.stream.get(url, {
@@ -126,18 +126,23 @@ async function doImport (owner, repo, id) {
 
     artifactId = artifact.id
     const url = artifact.archive_download_url
+    const unpackingScript = path.join(__dirname, "..", "scripts", "unpack.sh")
+    const gamesPath = path.join(__dirname, "..", "..", "games");
+    const gamesTmpPath = path.join(__dirname, "..", "..", "games", "tmp");
+
     // Make sure the download folder exists
-    if (!fs.existsSync(path.join(__dirname, "..", "games"))){
-      fs.mkdirSync(path.join(__dirname, "..", "games"));
+    if (!fs.existsSync(gamesPath)){
+      fs.mkdirSync(gamesPath);
     }
-    if (!fs.existsSync(path.join(__dirname, "..", "games", "tmp"))){
-      fs.mkdirSync(path.join(__dirname, "..", "games", "tmp"));
+    if (!fs.existsSync(gamesTmpPath)){
+      fs.mkdirSync(gamesTmpPath);
     }
     progress[id].output += `Download from ${url}\n`
-    await download(id, url, path.join(__dirname, "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
+    await download(id, url, path.join(__dirname, "..", "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
     progress[id].output += `Download finished.\n`
 
-    await runProcess(id, "/bin/bash", [path.join(__dirname, "unpack.sh"), artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, ".."))
+
+    await runProcess(id, "/bin/bash", [unpackingScript, gamesPath, artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
 
     // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
     // manifest = JSON.parse(manifest);
