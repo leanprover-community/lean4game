@@ -1,7 +1,6 @@
 import { exec } from 'child_process'
 import { Octokit } from 'octokit'
-
-export { safeImport as default }
+import { resolve } from 'path'
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const RESERVED_DISK_SPACE_MB: number = parseInt(process.env.RESERVED_DISC_SPACE_MB)
@@ -28,32 +27,37 @@ function checkDiskSpace(path) {
   })
 }
 
+// TODO: Resolve issue of pending artifact information retrival
 function getGitHubArtifactInformation(owner, repo){
-  const artifacts =  octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
-    owner,
-    repo,
-    headers: {
-      'X-GitHub-Api-Version': '2022-11-28'
-    }
+  return new Promise<number>((resolve, reject) =>{
+    const artifacts =  octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
+      owner,
+      repo,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    })
+
+    const artifact = artifacts.data.artifacts.reduce(
+      (acc, cur) => acc.created_at < cur.created_at ? cur : acc)
+
+    resolve(artifact.size_in_bytes)
   })
-
-  const artifact = artifacts.data.artifacts.reduce(
-    (acc, cur) => acc.created_at < cur.created_at ? cur : acc)
-
-  return artifact.size_in_bytes
 }
 
 export function safeImport(owner, repo, id, importFunc) {
   return new Promise<void>((resolve, reject) => {
     const rootPath = '/'
-    checkDiskSpace(rootPath).then(usedDiskSpace => {
-      const artifactMB = getGitHubArtifactInformation(owner, repo) / 1024^2
+    checkDiskSpace(rootPath).then(async usedDiskSpace => {
+      const artifactMB = await getGitHubArtifactInformation(owner, repo) / 1024^2
 
       if (usedDiskSpace + artifactMB >= RESERVED_DISK_SPACE_MB) {
         return reject(new Error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifactMB} (MB) by ${owner} would exceed allocated memory on the server.`))
       }
 
       importFunc(owner, repo, id)
+      console.log(`[${new Date()}] ${owner} uploaded file of size ${artifactMB}.
+      Remaining reserved memory amounts to ${RESERVED_DISK_SPACE_MB - usedDiskSpace + artifactMB}`)
     })
   })
 }
