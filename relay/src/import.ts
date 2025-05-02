@@ -11,8 +11,8 @@ const __dirname = path.dirname(__filename);
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const USERNAME = process.env.LEAN4GAME_GITHUB_USER
-const RESERVED_MEMORY = process.env.RESERVED_DISC_SPACE_MB
 const CONTACT = process.env.ISSUE_CONTACT
+
 const octokit = new Octokit({
   auth: TOKEN
 })
@@ -147,10 +147,13 @@ export const importTrigger = (req, res) => {
 
   if(!progress[id] || progress[id].done) {
     progress[id] = {output: "", done: false}
-    safeImport(owner, repo, id, doImport).catch((err) => {
-      throw new Error(`Uploading of file would exceed allocated memory on the server.\n
+    safeImport(owner, repo, id, doImport)
+    .catch((err: Error) => {
+      progress[id].output += `Upload of file would exceed allocated memory on the server.\n
       Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve
-      this issue.`) })
+      this issue.`
+      throw err
+    })
   }
 
   res.redirect(`/import/status/${owner}/${repo}`)

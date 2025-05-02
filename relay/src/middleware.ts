@@ -27,9 +27,8 @@ function checkDiskSpace(path) {
   })
 }
 
-// TODO: Resolve issue of pending artifact information retrival
 function getGitHubArtifactInformation(owner, repo){
-  return new Promise<number>((resolve, reject) =>{
+  return new Promise<number>(async (resolve, reject) =>{
     const artifacts =  octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
       owner,
       repo,
@@ -38,13 +37,14 @@ function getGitHubArtifactInformation(owner, repo){
       }
     })
 
-    const artifact = artifacts.data.artifacts.reduce(
+    const artifact = (await artifacts).data.artifacts.reduce(
       (acc, cur) => acc.created_at < cur.created_at ? cur : acc)
 
     resolve(artifact.size_in_bytes)
   })
 }
 
+// TODO: Game directory has to be set correctly. Currently games are sourced from dist/games which is not correct
 export function safeImport(owner, repo, id, importFunc) {
   return new Promise<void>((resolve, reject) => {
     const rootPath = '/'
@@ -52,12 +52,12 @@ export function safeImport(owner, repo, id, importFunc) {
       const artifactMB = await getGitHubArtifactInformation(owner, repo) / 1024^2
 
       if (usedDiskSpace + artifactMB >= RESERVED_DISK_SPACE_MB) {
-        return reject(new Error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifactMB} (MB) by ${owner} would exceed allocated memory on the server.`))
+        return reject(new Error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifactMB} (MB) by ${owner} would exceed allocated memory of ${RESERVED_DISK_SPACE_MB} on the server.`))
       }
 
       importFunc(owner, repo, id)
-      console.log(`[${new Date()}] ${owner} uploaded file of size ${artifactMB}.
-      Remaining reserved memory amounts to ${RESERVED_DISK_SPACE_MB - usedDiskSpace + artifactMB}`)
+      return resolve(console.log(`[${new Date()}] ${owner} uploaded file of size ${artifactMB}.
+      Remaining reserved memory amounts to ${RESERVED_DISK_SPACE_MB - usedDiskSpace + artifactMB}`))
     })
   })
 }
