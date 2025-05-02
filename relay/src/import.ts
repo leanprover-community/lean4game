@@ -1,7 +1,7 @@
 import fs from 'fs';
 import got from 'got'
 import path from 'path';
-import { safeImport } from './middleware'
+import { safeImport } from './middleware.js'
 import { Octokit } from 'octokit';
 import { spawn } from 'child_process'
 import { fileURLToPath } from 'url';
