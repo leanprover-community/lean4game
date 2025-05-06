@@ -123,7 +123,6 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
     -- and ignore some standard keywords
     let allowed := GameServer.ALLOWED_KEYWORDS
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
-      let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
       return {acc with tactics := acc.tactics.insert val}
     else
       return acc
