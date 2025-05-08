@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "composite": true,
-    "module": "esnext",
+    "outDir": "./dist/",
+    "module": "NodeNext",
     "target": "es5",
     "allowJs": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "jsx": "react",
     "downlevelIteration": true,
     "experimentalDecorators": true,
@@ -14,8 +15,8 @@
     "lib": [
       "ES2021.String",
       "DOM"
-    ]
+    ],
+    "skipLibCheck": true
   },
-  "references": [{"path": "./relay"}, {"path": "./client"}],
-  "exclude": ["./server/"]
+  "include": ["./src/"]
 }

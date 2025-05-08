@@ -1,6 +1,7 @@
 import fs from 'fs';
 import got from 'got'
 import path from 'path';
+import { safeImport } from './middleware.js'
 import { Octokit } from 'octokit';
 import { spawn } from 'child_process'
 import { fileURLToPath } from 'url';
@@ -10,17 +11,16 @@ const __dirname = path.dirname(__filename);
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const USERNAME = process.env.LEAN4GAME_GITHUB_USER
-const RESERVED_MEMORY = process.env.RESERVED_DISC_SPACE_MB
 const CONTACT = process.env.ISSUE_CONTACT
+
 const octokit = new Octokit({
   auth: TOKEN
 })
 
 const progress = {}
-var exceedingMemoryLimit = false
 
 async function runProcess(id, cmd, args, cwd) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const ls = spawn(cmd, args, {cwd});
 
     ls.stdout.on('data', (data) => {
@@ -46,31 +46,9 @@ async function runProcess(id, cmd, args, cwd) {
   })
 }
 
-
-async function checkAgainstDiscMemory(artifact, reservedMemorySize) {
-  return new Promise((resolve, reject) => {
-  fs.statfs("/", (err, stats) => {
-    if (err) {
-      console.log(err);
-      reject()
-    }
-    let artifactBytes = artifact.size_in_bytes;
-    let totalBytes = stats.blocks * stats.bsize;
-    let freeBytes = stats.bfree * stats.bsize;
-    let usedBytes = totalBytes - freeBytes;
-    const resMemoryBytes = reservedMemorySize * 1024 * 1024;
-    if (usedBytes + artifactBytes >= resMemoryBytes) {
-      exceedingMemoryLimit = true;
-    }
-    resolve()
-  });
-  })
-}
-
-
 async function download(id, url, dest) {
   let numProgressChars = 0
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     // The options argument is optional so you can omit it
     progress[id].output += "Progress: " + "[" + "_".repeat(50) + "]"
     got.stream.get(url, {
@@ -115,34 +93,30 @@ async function doImport (owner, repo, id) {
     const artifact = artifacts.data.artifacts
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
 
-    await checkAgainstDiscMemory(artifact, RESERVED_MEMORY);
-
-    if (exceedingMemoryLimit === true) {
-      const artifact_size_mb = Math.round(artifact.size_in_bytes / 1024 / 1024);
-      console.error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifact_size_mb} (MB) by ${owner} would exceed allocated memory on the server.`)
-      throw new Error(`Uploading file of size ${artifact_size_mb} (MB) would exceed allocated memory on the server.\n
-      Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve this issue.`);
-    }
-
     artifactId = artifact.id
     const url = artifact.archive_download_url
+    const unpackingScript = path.join(__dirname, "..", "..", "scripts", "unpack.sh")
+    const gamesPath = path.join(__dirname, "..", "..", "..", "games");
+    const gamesTmpPath = path.join(__dirname, "..", "..", "..", "games", "tmp");
+
     // Make sure the download folder exists
-    if (!fs.existsSync(path.join(__dirname, "..", "games"))){
-      fs.mkdirSync(path.join(__dirname, "..", "games"));
+    if (!fs.existsSync(gamesPath)){
+      fs.mkdirSync(gamesPath);
     }
-    if (!fs.existsSync(path.join(__dirname, "..", "games", "tmp"))){
-      fs.mkdirSync(path.join(__dirname, "..", "games", "tmp"));
+    if (!fs.existsSync(gamesTmpPath)){
+      fs.mkdirSync(gamesTmpPath);
     }
     progress[id].output += `Download from ${url}\n`
-    await download(id, url, path.join(__dirname, "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
+    await download(id, url, path.join(__dirname, "..", "..", "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
     progress[id].output += `Download finished.\n`
 
-    await runProcess(id, "/bin/bash", [path.join(__dirname, "unpack.sh"), artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, ".."))
+
+    await runProcess(id, "/bin/bash", [unpackingScript, gamesPath, artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
 
     // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
     // manifest = JSON.parse(manifest);
     // if (manifest.length !== 1) {
-    //   throw `Unexpected manifest: ${JSON.stringify(manifest)}`
+    //   throw `Unexpected manifest: ${JSON.status(manifest)}`
     // }
     // manifest[0].RepoTags = [`g/${owner.toLowerCase()}/${repo.toLowerCase()}:latest`]
     // fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
@@ -173,7 +147,13 @@ export const importTrigger = (req, res) => {
 
   if(!progress[id] || progress[id].done) {
     progress[id] = {output: "", done: false}
-    doImport(owner, repo, id)
+    safeImport(owner, repo, id, doImport)
+    .catch((err: Error) => {
+      progress[id].output += `Upload of file would exceed allocated memory on the server.\n
+      Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve
+      this issue.`
+      throw err
+    })
   }
 
   res.redirect(`/import/status/${owner}/${repo}`)

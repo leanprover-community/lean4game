@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "composite": true,
+    "outDir": "./dist/",
     "module": "esnext",
     "target": "es5",
     "allowJs": true,
@@ -16,6 +17,5 @@
       "DOM"
     ]
   },
-  "references": [{"path": "./relay"}, {"path": "./client"}],
-  "exclude": ["./server/"]
+  "include": ["./src/"]
 }

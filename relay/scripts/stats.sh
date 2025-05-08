@@ -3,7 +3,7 @@
 # Load python interpreter
 python=/usr/bin/python3
 # Load python script
-cpu_usage=relay/cpu_usage.py
+cpu_usage=./cpu_usage.py
 # Execute python script
 cpu=$($python $cpu_usage)
 # Calculate memory usage by computing 1 - %free_memory

@@ -1,5 +1,4 @@
 import { WebSocketServer } from 'ws';
-import { v4 as uuidv4 } from 'uuid';
 import express from 'express'
 import path from 'path'
 import * as cp from 'child_process';
@@ -9,10 +8,12 @@ import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 import os from 'os';
 import fs from 'fs';
 import anonymize from 'ip-anonymize';
-import { importTrigger, importStatus } from './import.mjs'
+import { importTrigger, importStatus } from './import.js'
 import process from 'process';
 import { spawn } from 'child_process'
 // import fs from 'fs'
+
+type Tag = {owner: string, repo: string}
 
 /**
  * Add a game here if the server should keep a queue of pre-loaded games ready at all times.
@@ -38,18 +39,18 @@ var router = express.Router();
 router.get('/import/status/:owner/:repo', importStatus)
 router.get('/import/trigger/:owner/:repo', importTrigger)
 
+const clientDistPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
 const server = app
-  .use(express.static(path.join(__dirname, '..', 'client', 'dist'))) // TODO: add a dist folder from inside the game
+  .use(express.static(clientDistPath)) // TODO: add a dist folder from inside the game
   .use('/i18n/g/:owner/:repo/:lang/*', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
     const lang = req.params.lang
 
     const anon_ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
-    const uuid = uuidv4()
     const log = path.join(process.cwd(), 'logs', 'game-access.log')
-    const header = "date;anon-ip;UUID;game;lang\n"
-    const data = `${new Date()};${anon_ip};${uuid};${owner}/${repo};${lang}\n`
+    const header = "date;anon-ip;game;lang\n"
+    const data = `${new Date()};${anon_ip};${owner}/${repo};${lang}\n`
 
     fs.mkdir(path.join(process.cwd(), 'logs'), { recursive: true }, (err) => {
       if (err) console.log("Failed to create logs directory!")
@@ -79,7 +80,8 @@ const server = app
     express.static(path.join(getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
   .use('/data/stats', (req, res, next) => {
-    const statsProcess = spawn('/bin/bash', [path.join(__dirname, "stats.sh"), process.pid])
+    const statsScriptPath = path.join(__dirname, "..", "..", "scripts", "stats.sh");
+    const statsProcess = spawn('/bin/bash', [statsScriptPath, process.pid.toString()])
     let outputData = ''
     let errorData = ''
     statsProcess.stdout.on('data', (data) => {
@@ -110,8 +112,8 @@ const isDevelopment = environment === 'development'
 /** We keep queues of started Lean Server processes to be ready when a user arrives */
 const queue = {}
 
-function getTag(owner, repo) {
-  return `g/${owner.toLowerCase()}/${repo.toLowerCase()}`
+function getTagString(tag: Tag) {
+  return `g/${tag.owner.toLowerCase()}/${tag.repo.toLowerCase()}`
 }
 
 function getGameDir(owner, repo) {
@@ -122,16 +124,18 @@ function getGameDir(owner, repo) {
       return ""
     }
   } else {
-    if(!fs.existsSync(path.join(__dirname, '..', 'games'))) {
-      console.error(`Did not find the following folder: ${path.join(__dirname, '..', 'games')}`)
+    const gamesPath = path.join(__dirname, '..', '..', '..', 'games');
+    if(!fs.existsSync(gamesPath)) {
+      console.error(`Did not find the following folder: ${gamesPath}`)
       console.error('Did you already import any games?')
       return ""
     }
   }
 
+  const gamePath = path.join(__dirname, '..', '..', '..', 'games', `${owner}`, `${repo.toLowerCase()}`);
   let game_dir = (owner == 'local') ?
     path.join(__dirname, '..', '..', repo) : // note: here we need `repo` to be case sensitive
-    path.join(__dirname, '..', 'games', `${owner}`, `${repo.toLowerCase()}`)
+    gamePath
 
   if(!fs.existsSync(game_dir)) {
     console.error(`Game '${game_dir}' does not exist!`)
@@ -160,7 +164,7 @@ function startServerProcess(owner, repo) {
         { cwd: path.join(__dirname, "..", "server", ".lake", "build", "bin") })
     }
   } else {
-    serverProcess =  cp.spawn("./bubblewrap.sh",
+    serverProcess =  cp.spawn("../../scripts/bubblewrap.sh",
       [ game_dir, path.join(__dirname, '..')],
       { cwd: __dirname })
   }
@@ -177,15 +181,16 @@ function startServerProcess(owner, repo) {
 }
 
 /** start Lean Server processes to refill the queue */
-function fillQueue(tag) {
-  while (queue[tag].length < queueLength[tag]) {
+function fillQueue(tag: {owner: string, repo: string}) {
+  const tagString = getTagString(tag)
+  while (queue[tagString].length < queueLength[tagString]) {
     let serverProcess
-    serverProcess = startServerProcess(tag)
+    serverProcess = startServerProcess(tag.owner, tag.repo)
     if (serverProcess == null) {
       console.error('serverProcess was undefined/null')
       return
     }
-    queue[tag].push(serverProcess)
+    queue[tagString].push(serverProcess)
   }
 }
 
@@ -202,10 +207,11 @@ const urlRegEx = /^\/websocket\/g\/([\w.-]+)\/([\w.-]+)$/
 wss.addListener("connection", function(ws, req) {
     const reRes = urlRegEx.exec(req.url)
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
-    const owner = reRes[1]
-    const repo = reRes[2]
+    const reResTag: Tag = {owner: reRes[1], repo: reRes[2]}
+    const owner = reResTag.owner
+    const repo = reResTag.repo
 
-    const tag = getTag(owner, repo)
+    const tag = getTagString(reResTag)
 
     let ps
     if (!queue[tag] || queue[tag].length == 0) {
@@ -213,7 +219,7 @@ wss.addListener("connection", function(ws, req) {
     } else {
         console.info('Got process from the queue')
         ps = queue[tag].shift() // Pick the first Lean process; it's likely to be ready immediately
-        fillQueue(tag)
+        fillQueue(reResTag)
     }
 
     if (ps == null) {
@@ -227,12 +233,14 @@ wss.addListener("connection", function(ws, req) {
     // TODO (Matvey): extract further information from `req`, for example browser language.
     console.log(`[${new Date()}] Socket opened - ${ip} - ${owner}/${repo}`)
 
-    const socket = {
+    const socket: rpc.IWebSocket = {
         onMessage: (cb) => { ws.on("message", cb) },
         onError: (cb) => { ws.on("error", cb) },
         onClose: (cb) => { ws.on("close", cb) },
-        send: (data, cb) => { ws.send(data,cb) }
-    }
+        //send: (data, cb) => { ws.send(data, cb); }
+        send: (data) => { ws.send(data); },
+        dispose: () => {}
+      }
     const reader = new rpc.WebSocketMessageReader(socket)
     const writer = new rpc.WebSocketMessageWriter(socket)
     const socketConnection = jsonrpcserver.createConnection(reader, writer, () => ws.close())
