@@ -1,6 +1,11 @@
 import { exec } from 'child_process'
 import { Octokit } from 'octokit'
-import { resolve } from 'path'
+import { UAParser } from 'ua-parser-js';
+import fs from 'fs';
+import anonymize from 'ip-anonymize';
+import path from 'path'
+import crypto from 'crypto'
+
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const RESERVED_DISK_SPACE_MB: number = parseInt(process.env.RESERVED_DISC_SPACE_MB)
@@ -44,7 +49,86 @@ function getGitHubArtifactInformation(owner, repo){
   })
 }
 
-// TODO: Game directory has to be set correctly. Currently games are sourced from dist/games which is not correct
+function generateFingerprint(req): string {
+  const signals: Array<string> = []
+
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+  const acceptLanguage = req.headers['accept-language'] || "unknown-language"
+  const width = req.headers['sec-ch-viewport-width'] || 'unknonwn-width';
+  const height = req.headers['sec-ch-viewport-height'] || 'unknown-height';
+  const dpr = req.headers['sec-ch-device-pixel-ratio'] || 'unknown-dpr'
+  const platform = req.headers['sec-ch-ua-platform'] || 'unknown-platform';
+  const mobile = req.headers['sec-ch-ua-mobile'] || 'unknown-mobile';
+  const model = req.headers['sec-ch-ua-model'] || 'unknown-model';
+
+  // Parse user agent for additional signals
+  const parser = new UAParser(req.headers['user-agent'] || "")
+  const browserName: string = parser.getBrowser().name || "unknown-browser-name"
+  const browserVersion: string = parser.getBrowser().version || "unknown-browser-version"
+  const browserMajor: string = parser.getBrowser().major || "unknown-browser-major"
+  const browsertype: string = parser.getBrowser().type || "unknown-browser-type"
+  const osName: string = parser.getOS().name || "unknown-os-name"
+  const osVersion: string = parser.getOS().version || "unknown-os-version"
+  const deviceModel: string = parser.getDevice().model || "unknown-device-model"
+  const deviceType: string = parser.getDevice().type || "unknown-device-type"
+  const deviceVendor: string = parser.getDevice().vendor || "unknown-device-vendor"
+
+
+
+  signals.push(
+    ip,
+    acceptLanguage,
+    width,
+    height,
+    dpr,
+    platform,
+    mobile,
+    model,
+    browserName,
+    browserVersion,
+    browserMajor,
+    browsertype,
+    osName,
+    osVersion,
+    deviceModel,
+    deviceType,
+    deviceVendor)
+
+  console.log(signals.join('+'))
+  return crypto.createHash('sha256').update(signals.join('+')).digest('hex')
+}
+
+export function logAccess(req) {
+  const owner = req.params.owner;
+  const repo = req.params.repo;
+  const lang = req.params.lang;
+
+  const fingerprint: string = generateFingerprint(req)
+
+  const anon_ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress);
+  const log = path.join(process.cwd(), 'logs', 'game-access.log');
+  const header = "date;anon-ip;fingerprint;game;lang\n";
+  const data = `${new Date()};${anon_ip};${fingerprint};${owner}/${repo};${lang}\n`;
+
+  fs.mkdir(path.join(process.cwd(), 'logs'), { recursive: true }, (err) => {
+    if (err) console.log("Failed to create logs directory!");
+    else {
+      // 'ax' fails if the file already exists: https://nodejs.org/api/fs.html#file-system-flags
+      fs.writeFile(log, header.concat(data), { flag: 'ax' }, (file_exists) => {
+        if (file_exists) {
+          fs.appendFile(log, data, (err) => {
+            if (err) console.log(`Failed to append to log: ${err}`);
+          });
+        }
+      });
+    }
+  });
+
+  console.log(`[${new Date()}] ${anon_ip} requested translation for ${owner}/${repo} in ${lang}`);
+  return { owner, repo, lang };
+}
+
+
 export function safeImport(owner, repo, id, importFunc) {
   return new Promise<void>((resolve, reject) => {
     const rootPath = '/'

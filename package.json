@@ -48,6 +48,7 @@
     "rehype-katex": "^6.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
+    "ua-parser-js": "^2.0.3",
     "uuid": "^11.1.0",
     "vite": "^6.2.0",
     "vite-plugin-static-copy": "2.3.0",
@@ -80,7 +81,7 @@
     "preview": "vite preview",
     "build_server": "cd server && lake build",
     "build_client": "cross-env NODE_ENV=production vite build",
-    "build_relay" : "tsc -b ./relay",
+    "build_relay": "tsc -b ./relay",
     "production": "cross-env NODE_ENV=production node relay/index.mjs",
     "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs"
   },

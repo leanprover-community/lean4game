@@ -9,6 +9,7 @@ import os from 'os';
 import fs from 'fs';
 import anonymize from 'ip-anonymize';
 import { importTrigger, importStatus } from './import.js'
+import { logAccess } from './middleware.js';
 import process from 'process';
 import { spawn } from 'child_process'
 // import fs from 'fs'
@@ -43,31 +44,7 @@ const clientDistPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
 const server = app
   .use(express.static(clientDistPath)) // TODO: add a dist folder from inside the game
   .use('/i18n/g/:owner/:repo/:lang/*', (req, res, next) => {
-    const owner = req.params.owner;
-    const repo = req.params.repo
-    const lang = req.params.lang
-
-    const anon_ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
-    const log = path.join(process.cwd(), 'logs', 'game-access.log')
-    const header = "date;anon-ip;game;lang\n"
-    const data = `${new Date()};${anon_ip};${owner}/${repo};${lang}\n`
-
-    fs.mkdir(path.join(process.cwd(), 'logs'), { recursive: true }, (err) => {
-      if (err) console.log("Failed to create logs directory!")
-      else {
-        // 'ax' fails if the file already exists: https://nodejs.org/api/fs.html#file-system-flags
-        fs.writeFile(log, header.concat(data), { flag: 'ax' }, (file_exists) => {
-          if (file_exists) {
-            fs.appendFile(log, data, (err) => {
-              if (err) console.log(`Failed to append to log: ${err}`)
-            });
-          }
-        });
-      }
-    });
-
-    console.log(`[${new Date()}] ${anon_ip} requested translation for ${owner}/${repo} in ${lang}`)
-
+    const { owner, repo, lang } = logAccess(req);
     const filename = req.params[0];
     req.url = filename;
     express.static(path.join(getGameDir(owner,repo),".i18n",lang))(req, res, next);
