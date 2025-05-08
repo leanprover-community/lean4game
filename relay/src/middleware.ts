@@ -49,15 +49,16 @@ export function safeImport(owner, repo, id, importFunc) {
   return new Promise<void>((resolve, reject) => {
     const rootPath = '/'
     checkDiskSpace(rootPath).then(async usedDiskSpace => {
-      const artifactMB = await getGitHubArtifactInformation(owner, repo) / 1024^2
+      const artifactByte = await getGitHubArtifactInformation(owner, repo)
+      const artifactMB = Math.ceil(artifactByte / Math.pow(1024, 2))
 
       if (usedDiskSpace + artifactMB >= RESERVED_DISK_SPACE_MB) {
         return reject(new Error(`[${new Date()}] ABORT IMPORT: Uploading file of size ${artifactMB} (MB) by ${owner} would exceed allocated memory of ${RESERVED_DISK_SPACE_MB} on the server.`))
       }
 
       importFunc(owner, repo, id)
-      return resolve(console.log(`[${new Date()}] ${owner} uploaded file of size ${artifactMB}.
-      Remaining reserved memory amounts to ${RESERVED_DISK_SPACE_MB - usedDiskSpace + artifactMB}`))
+      return resolve(console.log(`[${new Date()}] ${owner} uploaded file of size ${artifactMB} (MB).
+      Remaining reserved memory amounts to ${RESERVED_DISK_SPACE_MB - usedDiskSpace + artifactMB} (MB)`))
     })
   })
 }
