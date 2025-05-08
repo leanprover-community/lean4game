@@ -94,7 +94,6 @@ function generateFingerprint(req): string {
     deviceType,
     deviceVendor)
 
-  console.log(signals.join('+'))
   return crypto.createHash('sha256').update(signals.join('+')).digest('hex')
 }
 
