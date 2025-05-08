@@ -75,7 +75,7 @@ async function download(id, url, dest) {
       resolve()
     })
     .pipe(fs.createWriteStream(dest));
-  })games/tmp
+  })
 }
 
 async function doImport (owner, repo, id) {
