@@ -1,5 +1,4 @@
 import { WebSocketServer } from 'ws';
-import { v4 as uuidv4 } from 'uuid';
 import express from 'express'
 import path from 'path'
 import * as cp from 'child_process';
@@ -49,10 +48,9 @@ const server = app
     const lang = req.params.lang
 
     const anon_ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
-    const uuid = uuidv4()
     const log = path.join(process.cwd(), 'logs', 'game-access.log')
-    const header = "date;anon-ip;UUID;game;lang\n"
-    const data = `${new Date()};${anon_ip};${uuid};${owner}/${repo};${lang}\n`
+    const header = "date;anon-ip;game;lang\n"
+    const data = `${new Date()};${anon_ip};${owner}/${repo};${lang}\n`
 
     fs.mkdir(path.join(process.cwd(), 'logs'), { recursive: true }, (err) => {
       if (err) console.log("Failed to create logs directory!")
