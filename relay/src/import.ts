@@ -75,7 +75,7 @@ async function download(id, url, dest) {
       resolve()
     })
     .pipe(fs.createWriteStream(dest));
-  })
+  })games/tmp
 }
 
 async function doImport (owner, repo, id) {
@@ -95,9 +95,9 @@ async function doImport (owner, repo, id) {
 
     artifactId = artifact.id
     const url = artifact.archive_download_url
-    const unpackingScript = path.join(__dirname, "..", "scripts", "unpack.sh")
-    const gamesPath = path.join(__dirname, "..", "..", "games");
-    const gamesTmpPath = path.join(__dirname, "..", "..", "games", "tmp");
+    const unpackingScript = path.join(__dirname, "..", "..", "scripts", "unpack.sh")
+    const gamesPath = path.join(__dirname, "..", "..", "..", "games");
+    const gamesTmpPath = path.join(__dirname, "..", "..", "..", "games", "tmp");
 
     // Make sure the download folder exists
     if (!fs.existsSync(gamesPath)){
@@ -107,7 +107,7 @@ async function doImport (owner, repo, id) {
       fs.mkdirSync(gamesTmpPath);
     }
     progress[id].output += `Download from ${url}\n`
-    await download(id, url, path.join(__dirname, "..", "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
+    await download(id, url, path.join(__dirname, "..", "..", "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
     progress[id].output += `Download finished.\n`
 
 
@@ -116,7 +116,7 @@ async function doImport (owner, repo, id) {
     // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
     // manifest = JSON.parse(manifest);
     // if (manifest.length !== 1) {
-    //   throw `Unexpected manifest: ${JSON.stringify(manifest)}`
+    //   throw `Unexpected manifest: ${JSON.status(manifest)}`
     // }
     // manifest[0].RepoTags = [`g/${owner.toLowerCase()}/${repo.toLowerCase()}:latest`]
     // fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
