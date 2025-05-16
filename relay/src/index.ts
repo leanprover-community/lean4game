@@ -1,4 +1,4 @@
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
 import express from 'express'
 import path from 'path'
 import * as cp from 'child_process';
@@ -11,6 +11,11 @@ import anonymize from 'ip-anonymize';
 import { importTrigger, importStatus } from './import.js'
 import process from 'process';
 import { spawn } from 'child_process'
+import { logGameAccess, logConnection, getActiveConnections } from './middleware.js';
+import { IncomingMessage } from 'http';
+import { runInNewContext } from 'vm';
+import { v4 as uuidv4 } from 'uuid'
+
 // import fs from 'fs'
 
 type Tag = {owner: string, repo: string}
@@ -43,31 +48,8 @@ const clientDistPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
 const server = app
   .use(express.static(clientDistPath)) // TODO: add a dist folder from inside the game
   .use('/i18n/g/:owner/:repo/:lang/*', (req, res, next) => {
-    const owner = req.params.owner;
-    const repo = req.params.repo
-    const lang = req.params.lang
-
-    const anon_ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
-    const log = path.join(process.cwd(), 'logs', 'game-access.log')
-    const header = "date;anon-ip;game;lang\n"
-    const data = `${new Date()};${anon_ip};${owner}/${repo};${lang}\n`
-
-    fs.mkdir(path.join(process.cwd(), 'logs'), { recursive: true }, (err) => {
-      if (err) console.log("Failed to create logs directory!")
-      else {
-        // 'ax' fails if the file already exists: https://nodejs.org/api/fs.html#file-system-flags
-        fs.writeFile(log, header.concat(data), { flag: 'ax' }, (file_exists) => {
-          if (file_exists) {
-            fs.appendFile(log, data, (err) => {
-              if (err) console.log(`Failed to append to log: ${err}`)
-            });
-          }
-        });
-      }
-    });
-
-    console.log(`[${new Date()}] ${anon_ip} requested translation for ${owner}/${repo} in ${lang}`)
-
+    const { owner, repo, lang } = logGameAccess(req);
+    logConnection(req, res)
     const filename = req.params[0];
     req.url = filename;
     express.static(path.join(getGameDir(owner,repo),".i18n",lang))(req, res, next);
@@ -204,7 +186,16 @@ function fillQueue(tag: {owner: string, repo: string}) {
 
 const urlRegEx = /^\/websocket\/g\/([\w.-]+)\/([\w.-]+)$/
 
+interface Connection {
+  anonIp: string,
+  game: string
+}
+
+const connections = new Map<String, Connection>
+
 wss.addListener("connection", function(ws, req) {
+    setInterval(() => {connections.forEach(conn => console.log(`${conn.anonIp};${conn.game}`))}, 1000)
+
     const reRes = urlRegEx.exec(req.url)
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
     const reResTag: Tag = {owner: reRes[1], repo: reRes[2]}
@@ -227,8 +218,10 @@ wss.addListener("connection", function(ws, req) {
       return
     }
 
-    socketCounter += 1;
-    const ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
+
+    const ip = anonymize(req.headers['x-forwarded-for'] as string || req.socket.remoteAddress)
+    const id = uuidv4()
+    connections.set(id, {anonIp: ip, game: tag})
 
     // TODO (Matvey): extract further information from `req`, for example browser language.
     console.log(`[${new Date()}] Socket opened - ${ip} - ${owner}/${repo}`)
@@ -259,6 +252,7 @@ wss.addListener("connection", function(ws, req) {
 
     ws.on('close', () => {
       console.log(`[${new Date()}] Socket closed - ${ip}`)
+      connections.delete(id)
       socketCounter -= 1
     })
 
