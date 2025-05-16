@@ -14,11 +14,12 @@ import './i18n';
 
 
 // If `VITE_LEAN4GAME_SINGLE` is set to true, then `/` should be redirected to
-// `/g/local/game`. This is used for the devcontainer setup
-let single_game = (import.meta.env.VITE_LEAN4GAME_SINGLE == "true")
+// `/g/local/game` or customized VITE_LEAN4GAME_SINGLE_NAME. This is used for the devcontainer setup
+let single_game = (import.meta.env.VITE_LEAN4GAME_SINGLE === "true")
+let single_game_name = (import.meta.env.VITE_LEAN4GAME_SINGLE_NAME === undefined) ? "game" : import.meta.env.VITE_LEAN4GAME_SINGLE_NAME
 let root_object: RouteObject = single_game ? {
   path: "/",
-  loader: () => redirect("/g/local/game")
+  loader: () => redirect("/g/local/${ single_game_name }")
 } : {
   path: "/",
   element: <App />,
