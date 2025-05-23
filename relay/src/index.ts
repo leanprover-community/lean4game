@@ -7,7 +7,7 @@ import { importTrigger, importStatus } from './import.js'
 import process from 'process';
 import { spawn } from 'child_process'
 import { GameManager } from './serverProcess.js';
-import { SocketListener } from './websocket.js';
+import { GameSessionsObserver } from './websocket.js';
 import { WebSocketServer } from 'ws';
 // import fs from 'fs'
 // const __filename = url.fileURLToPath(import.meta.url);
@@ -84,6 +84,17 @@ const server = app
   .use('/', router)
   .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
-const webSocketServer = new WebSocketServer({ server });
-const listener = new SocketListener(gameManager)
-webSocketServer.addListener("connection", (ws, req) => { listener.startObservedProcess(ws, req) })
+const webSocketServer: WebSocketServer = new WebSocketServer({ server });
+const observerService = new GameSessionsObserver(gameManager, webSocketServer)
+const observer = express()
+webSocketServer.addListener("connection", (ws, req) => { observerService.startObservedGame(ws, req) })
+//webSocketServer.on("connection", (ws, req) => { observerService.startObservedGame(ws, req) })
+
+/**
+ * Start local express instance that provides API for server statistics
+ */
+observer.use('/api/game-sessions', (req, res) => {
+    const measurement = observerService.getAllConnectedPlayers()
+    res.status(200).send(measurement)
+  })
+.listen(8010, () => console.log(`Listening on ${8010}`));

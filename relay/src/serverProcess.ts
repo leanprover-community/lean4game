@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 type Tag = { owner: string; repo: string; };
+export type GameSession = { process: ChildProcess, game: string}
 const environment = process.env.NODE_ENV;
 const isDevelopment = environment === 'development';
 
@@ -33,17 +34,19 @@ export class GameManager {
     this.dir = directory
   }
 
-  startLeanServerProcessByRequest(req: IncomingMessage, ip: string) : cp.ChildProcessWithoutNullStreams{
+  startGame(req: IncomingMessage, ip: string): GameSession{
     let ps: ChildProcess
     const reRes = this.urlRegEx.exec(req.url);
+
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
     const reResTag: Tag = { owner: reRes[1], repo: reRes[2] };
     const tag = this.getTagString(reResTag);
+    const game = `${reResTag.owner}/${reResTag.repo}`
 
     if (!this.queue[tag] || this.queue[tag].length == 0) {
-      ps = this.startServerProcess(reResTag.owner, reResTag.repo);
+      ps = this.createGameProcess(reResTag.owner, reResTag.repo);
       // TODO (Matvey): extract further information from `req`, for example browser language.
-      console.log(`[${new Date()}] Socket opened - ${ip} - ${reResTag.owner}/${reResTag.repo}`);
+      console.log(`[${new Date()}] Socket opened by ${ip} on ${game}`);
     } else {
       console.info('Got process from the queue');
       ps = this.queue[tag].shift(); // Pick the first Lean process; it's likely to be ready immediately
@@ -55,10 +58,10 @@ export class GameManager {
       return;
     }
 
-    return ps
+    return {process: ps, game: game}
   }
 
-  startServerProcess(owner, repo) {
+  createGameProcess(owner, repo) {
     let game_dir = this.getGameDir(owner, repo);
     if (!game_dir) return;
 
@@ -97,7 +100,7 @@ export class GameManager {
     const tagString = this.getTagString(tag);
     while (this.queue[tagString].length < this.queueLength[tagString]) {
       let serverProcess: cp.ChildProcessWithoutNullStreams;
-      serverProcess = this.startServerProcess(tag.owner, tag.repo);
+      serverProcess = this.createGameProcess(tag.owner, tag.repo);
       if (serverProcess == null) {
         console.error('serverProcess was undefined/null');
         return;
