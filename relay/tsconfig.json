@@ -16,7 +16,8 @@
       "ES2021.String",
       "DOM"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "sourceMap": true
   },
   "include": ["./src/"]
 }
