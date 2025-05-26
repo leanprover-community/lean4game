@@ -1,11 +1,18 @@
 import { exec } from 'child_process'
+import fs from 'fs'
+import anonymize from 'ip-anonymize'
 import { Octokit } from 'octokit'
+import path from 'path'
 import { resolve } from 'path'
+import process from 'process'
+import { AccessLogger, Connection } from './services/AccessLogger.js'
+import { Request, Response } from 'express'
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const RESERVED_DISK_SPACE_MB: number = parseInt(process.env.RESERVED_DISC_SPACE_MB)
 const DISK_INFO_CMD_MB = 'df -BM'
 const octokit = new Octokit({auth: TOKEN})
+const accessLogger = new AccessLogger()
 
 function checkDiskSpace(path) {
   return new Promise<number>((resolve, reject) => {
@@ -61,4 +68,40 @@ export function safeImport(owner, repo, id, importFunc) {
       Remaining reserved memory amounts to ${RESERVED_DISK_SPACE_MB - usedDiskSpace + artifactMB} (MB)`))
     })
   })
+}
+
+export function logConnection(req: Request, res: Response): void {
+  accessLogger.logConnections(req, res)
+}
+
+export function getActiveConnections(): Connection[] {
+  return accessLogger.getActiveConnections()
+}
+
+export function logGameAccess(req) {
+  const owner = req.params.owner;
+  const repo = req.params.repo;
+  const lang = req.params.lang;
+
+  const anon_ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress);
+  const log = path.join(process.cwd(), 'logs', 'game-access.log');
+  const header = "date;anon-ip;game;lang\n";
+  const data = `${new Date()};${anon_ip};${owner}/${repo};${lang}\n`;
+
+  fs.mkdir(path.join(process.cwd(), 'logs'), { recursive: true }, (err) => {
+    if (err) console.log("Failed to create logs directory!");
+    else {
+      // 'ax' fails if the file already exists: https://nodejs.org/api/fs.html#file-system-flags
+      fs.writeFile(log, header.concat(data), { flag: 'ax' }, (file_exists) => {
+        if (file_exists) {
+          fs.appendFile(log, data, (err) => {
+            if (err) console.log(`Failed to append to log: ${err}`);
+          });
+        }
+      });
+    }
+  });
+
+  console.log(`[${new Date()}] ${anon_ip} requested translation for ${owner}/${repo} in ${lang}`);
+  return { owner, repo, lang };
 }
