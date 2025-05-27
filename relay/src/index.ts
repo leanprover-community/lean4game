@@ -16,7 +16,8 @@ const __dirname: string = url.fileURLToPath(new URL('.', import.meta.url));
 const clientDistPath: string = path.join(__dirname, '..', '..', '..', 'client', 'dist');
 const app = express()
 const gameManager = new GameManager(__dirname)
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8080
+const API = process.env.API_PORT
 
 let router = express.Router();
 router.get('/import/status/:owner/:repo', importStatus)
@@ -82,7 +83,7 @@ const server = app
     })
   })
   .use('/', router)
-  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+  .listen(PORT, () => console.log(`Server listening on ${PORT}`));
 
 const webSocketServer: WebSocketServer = new WebSocketServer({ server });
 const observerService = new GameSessionsObserver(gameManager, webSocketServer)
@@ -97,4 +98,4 @@ observer.use('/api/game-sessions', (req, res) => {
     const measurement = observerService.getAllConnectedPlayers()
     res.status(200).send(measurement)
   })
-.listen(8010, () => console.log(`Listening on ${8010}`));
+.listen(API, () => console.log(`API listening on ${API}`));
