@@ -9,7 +9,8 @@ module.exports = {
       RESERVED_DISC_SPACE_MB: 0,
       ISSUE_CONTACT: "",
       NODE_ENV: "production",
-      PORT: 8002
+      PORT: 8002,
+      API_PORT: 8010,
     },
   }]
 }
