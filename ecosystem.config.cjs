@@ -11,6 +11,7 @@ module.exports = {
       NODE_ENV: "production",
       PORT: 8002,
       API_PORT: 8010,
+      CPU_SCRIPT: ""
     },
   }]
 }
