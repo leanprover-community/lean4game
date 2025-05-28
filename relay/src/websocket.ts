@@ -80,7 +80,11 @@ export class GameSessionsObserver {
     let ps = gameSession.process
     let game = gameSession.game
     const langRegex: RegExp = /^[a-zA-Z-]+(?=,)/
-    const lang = langRegex.exec(req.headers['accept-language'])[0]
+    let lang = "en-US"
+
+    if(langRegex.exec(req.headers['accept-language']) !== null) {
+      lang = langRegex.exec(req.headers['accept-language'])[0]
+    }
 
     this.addPlayerConnection(ws, game, ip, ps, lang);
 
