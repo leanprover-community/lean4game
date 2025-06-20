@@ -77,7 +77,7 @@
   },
   "scripts": {
     "start": "concurrently -n server,client -c blue,green \"npm run start_server\" \"npm run start_client\"",
-    "start_server": "(cd server && lake build) && (cd relay && cross-env NODE_ENV=development nodemon -e mjs --exec \"node ./index.mjs\")",
+    "start_server": "(cd server && lake build) && (cd relay && cross-env NODE_ENV=development nodemon -e mjs --exec \"node ./dist/src/index.js\")",
     "start_client": "cross-env NODE_ENV=development vite --host",
     "build": "npm run build_server && npm run build_relay && npm run build_client",
     "preview": "vite preview",
