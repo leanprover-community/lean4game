@@ -6,24 +6,29 @@
     "trequetrum/lean4game-logic",
     "jadabouhawili/knightsandknaves-lean4game"
   ],
-  "languages": {
-    "en": {
+  "languages": [
+    {
+      "iso": "en",
       "flag": "GB",
       "name": "English"
     },
-    "de": {
+    {
+      "iso": "de",
       "flag": "DE",
       "name": "Deutsch"
     },
-    "es": {
+    {
+      "iso": "es",
       "flag": "ES",
       "name": "Español"
     },
-    "zh": {
+    {
+      "iso": "zh",
       "flag": "CN",
       "name": "中文"
     },
-    "ko": {
+    {
+      "iso": "ko",
       "flag": "KR",
       "name": "한국어"
     },
@@ -37,6 +42,6 @@
       "flag": "IT",
       "name": "Italiano"
     }
-  },
+  ],
   "useFlags": false
 }
