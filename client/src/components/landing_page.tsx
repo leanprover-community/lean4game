@@ -131,25 +131,10 @@ function LandingPage() {
 
   /** Parse `games/stats.csv` if present and display server capacity. */
   React.useEffect(() => {
-    fetch(`${window.location.origin}/data/stats`)
-    .then(response => {if (response.ok) {
-      return response.text() } else {throw ""}})
-    .then(data => {
-      // Parse the CSV content
-      const lines = data.split('\n');
-      const [header, line2] = lines;
-      if (!(header.replace(' ', '').startsWith("CPU,MEM"))) {
-        console.info("Not displaying server stats: received unexpected: ", header)
-      }
-      if (line2) {
-        let values = line2.split(',')
-        setUsageCPU(100 * parseInt(values[0]));
-        setUsageMem(100 * parseInt(values[1]));
-      }
-    }).catch(err => {
-      console.info('server stats unavailable')
-      console.debug(err)
-    })
+    const interval = setInterval(() => {
+      fetch_stats();
+    }, 2000)
+    return () => clearInterval(interval)
   }, [])
 
   return <div className="landing-page">
@@ -182,8 +167,8 @@ function LandingPage() {
             </p>
           </Trans>
           <p>
-            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem} %</strong>{t(" used")}.<br/></> }
-            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU} %</strong>{t(" used")}. </> }
+            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem.toFixed(2)} %</strong>{t(" used")}.<br/></> }
+            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU.toFixed(2)} %</strong>{t(" used")}. </> }
           </p>
         </div>
       </section>
@@ -242,6 +227,31 @@ function LandingPage() {
     </footer>
   </div>
 
+
+  function fetch_stats() {
+    fetch(`${window.location.origin}/data/stats`)
+      .then(response => {
+        if (response.ok) {
+          return response.text();
+        } else { throw ""; }
+      })
+      .then(data => {
+        // Parse the CSV content
+        const lines = data.split('\n');
+        const [header, line2] = lines;
+        if (!(header.replace(' ', '').startsWith("CPU,MEM"))) {
+          console.info("Not displaying server stats: received unexpected: ", header);
+        }
+        if (line2) {
+          let values = line2.split(',');
+          setUsageCPU(100 * parseFloat(values[0]));
+          setUsageMem(100 * parseFloat(values[1]));
+        }
+      }).catch(err => {
+        console.info('server stats unavailable');
+        console.debug(err);
+      });
+  }
 }
 
 export default LandingPage

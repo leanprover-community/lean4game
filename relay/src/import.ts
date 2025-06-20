@@ -1,17 +1,18 @@
-import { spawn } from 'child_process'
 import fs from 'fs';
-import request from 'request'
-import requestProgress from 'request-progress'
-import { Octokit } from 'octokit';
-
-import { fileURLToPath } from 'url';
+import got from 'got'
 import path from 'path';
+import { safeImport } from './middleware.js'
+import { Octokit } from 'octokit';
+import { spawn } from 'child_process'
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const USERNAME = process.env.LEAN4GAME_GITHUB_USER
+const CONTACT = process.env.ISSUE_CONTACT
+
 const octokit = new Octokit({
   auth: TOKEN
 })
@@ -19,7 +20,7 @@ const octokit = new Octokit({
 const progress = {}
 
 async function runProcess(id, cmd, args, cwd) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const ls = spawn(cmd, args, {cwd});
 
     ls.stdout.on('data', (data) => {
@@ -27,7 +28,16 @@ async function runProcess(id, cmd, args, cwd) {
     });
 
     ls.stderr.on('data', (data) => {
-      progress[id].output += data.toString()
+      try {
+        if (args[0].includes("unpack.sh")){
+          throw new Error(".zip file of artifact could not be fetched. Make sure it exists and is not expired. \n")
+        } else {
+          progress[id].output += data.toString()
+        }
+      } catch(e){
+        progress[id].output += `Error: ${e.toString()}\n${e.stack}`
+      }
+
     });
 
     ls.on('close', (code) => {
@@ -37,24 +47,31 @@ async function runProcess(id, cmd, args, cwd) {
 }
 
 async function download(id, url, dest) {
-  return new Promise((resolve, reject) => {
+  let numProgressChars = 0
+  return new Promise<void>((resolve, reject) => {
     // The options argument is optional so you can omit it
-    requestProgress(request({
-      url,
-      headers: {
-        'accept': 'application/vnd.github+json',
-        'User-Agent': USERNAME,
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Authorization': 'Bearer ' + TOKEN
+    progress[id].output += "Progress: " + "[" + "_".repeat(50) + "]"
+    got.stream.get(url, {
+     headers: {
+       'accept': 'application/vnd.github+json',
+       'User-Agent': USERNAME,
+       'X-GitHub-Api-Version': '2022-11-28',
+       'Authorization': 'Bearer ' + TOKEN
+     }
+    })
+    // choose latest artifact
+    .on('downloadProgress', downloadProgress => {
+      let step = Math.round((downloadProgress.percent * 100) / 2);
+      if (step > numProgressChars && downloadProgress.transferred != 0) {
+        progress[id].output = progress[id].output.replace(/\[[#_]*\]/, `[${'#'.repeat(numProgressChars) + "_".repeat(50 - numProgressChars)}] `)
+        numProgressChars = step
       }
-    }))
-    .on('progress', function (state) {
-      progress[id].output += `Downloaded ${Math.round(state.size.transferred/1024/1024)}MB\n`
     })
     .on('error', function (err) {
       reject(err)
     })
     .on('end', function () {
+      progress[id].output += "\n"
       resolve()
     })
     .pipe(fs.createWriteStream(dest));
@@ -73,29 +90,33 @@ async function doImport (owner, repo, id) {
         'X-GitHub-Api-Version': '2022-11-28'
       }
     })
-    // choose latest artifact
     const artifact = artifacts.data.artifacts
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
+
     artifactId = artifact.id
     const url = artifact.archive_download_url
+    const unpackingScript = path.join(__dirname, "..", "..", "scripts", "unpack.sh")
+    const gamesPath = path.join(__dirname, "..", "..", "..", "games");
+    const gamesTmpPath = path.join(__dirname, "..", "..", "..", "games", "tmp");
+
     // Make sure the download folder exists
-    if (!fs.existsSync(path.join(__dirname, "..", "games"))){
-      fs.mkdirSync(path.join(__dirname, "..", "games"));
+    if (!fs.existsSync(gamesPath)){
+      fs.mkdirSync(gamesPath);
     }
-    if (!fs.existsSync(path.join(__dirname, "..", "games", "tmp"))){
-      fs.mkdirSync(path.join(__dirname, "..", "games", "tmp"));
+    if (!fs.existsSync(gamesTmpPath)){
+      fs.mkdirSync(gamesTmpPath);
     }
     progress[id].output += `Download from ${url}\n`
-    await download(id, url, path.join(__dirname, "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
+    await download(id, url, path.join(__dirname, "..", "..", "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
     progress[id].output += `Download finished.\n`
 
-    await runProcess(id, "/bin/bash", [path.join(__dirname, "unpack.sh"), artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, ".."))
 
+    await runProcess(id, "/bin/bash", [unpackingScript, gamesPath, artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
 
     // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
     // manifest = JSON.parse(manifest);
     // if (manifest.length !== 1) {
-    //   throw `Unexpected manifest: ${JSON.stringify(manifest)}`
+    //   throw `Unexpected manifest: ${JSON.status(manifest)}`
     // }
     // manifest[0].RepoTags = [`g/${owner.toLowerCase()}/${repo.toLowerCase()}:latest`]
     // fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
@@ -126,7 +147,13 @@ export const importTrigger = (req, res) => {
 
   if(!progress[id] || progress[id].done) {
     progress[id] = {output: "", done: false}
-    doImport(owner, repo, id)
+    safeImport(owner, repo, id, doImport)
+    .catch((err: Error) => {
+      progress[id].output += `Upload of file would exceed allocated memory on the server.\n
+      Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve
+      this issue.`
+      throw err
+    })
   }
 
   res.redirect(`/import/status/${owner}/${repo}`)

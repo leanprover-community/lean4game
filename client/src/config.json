@@ -3,7 +3,8 @@
     "leanprover-community/nng4",
     "hhu-adam/robo",
     "djvelleman/stg4",
-    "trequetrum/lean4game-logic"
+    "trequetrum/lean4game-logic",
+    "jadabouhawili/knightsandknaves-lean4game"
   ],
   "languages": {
     "en": {
@@ -25,6 +26,16 @@
     "ko": {
       "flag": "KR",
       "name": "한국어"
+    },
+    {
+      "iso": "uk",
+      "flag": "UA",
+      "name": "Українська"
+    },
+    {
+      "iso": "it",
+      "flag": "IT",
+      "name": "Italiano"
     }
   },
   "useFlags": false

@@ -1,5 +1,6 @@
 node_modules
 client/dist
+relay/dist
 games/
 server/.lake
 **/.DS_Store

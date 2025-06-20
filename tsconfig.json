@@ -1,11 +1,16 @@
 {
   "compilerOptions": {
-    "outDir": "./client/dist/",
     "composite": true,
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2021",
-
-    "useDefineForClassFields": true,
+    "module": "esnext",
+    "target": "es5",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "jsx": "react",
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
     "lib": [
       "ES2021.String",
       "DOM",
@@ -35,9 +40,6 @@
     // "experimentalDecorators": true,
     // "allowSyntheticDefaultImports": true,
   },
-  "exclude": [
-    "server",
-    "relay",
-    "node_modules"
-  ]
+  "references": [{"path": "./relay"}, {"path": "./client"}],
+  "exclude": ["./server/"]
 }
