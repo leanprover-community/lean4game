@@ -9,10 +9,6 @@ html {
   font-size: 16px;
 }
 
-body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
 a {
   text-decoration: none;
 }
@@ -165,12 +161,12 @@ header {
   font-style: italic;
 }
 
-header nav {
+/* header nav {
   display: flex;
   justify-content: flex-end;
   padding: 8px;
   background-color: rgba(0, 133, 162, .7);
-}
+} */
 
 footer {
   background-color: rgba(0, 133, 162, 1);
@@ -230,4 +226,8 @@ footer .link {
     margin-left: calc(50% - 650px);
     margin-right: calc(50% - 650px);
   }
+}
+
+.info .languages span + span {
+  margin-left: .5em;
 }

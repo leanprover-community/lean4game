@@ -1,17 +1,15 @@
-import GameServer.FileWorker
-import GameServer.Commands
-
--- TODO: The only reason we import `Commands` is so that it gets built to on `lake build`
--- should we have a different solution?
-
-unsafe def main : List String → IO UInt32 := fun args => do
-  let e ← IO.getStderr
-
-  Lean.enableInitializersExecution
-
-  -- TODO: remove this argument
-  if args[0]? == some "--server" then
-    GameServer.FileWorker.workerMain {} args
-  else
-    e.putStrLn s!"Expected `--server`"
-    return 1
+import GameServer.Command
+import GameServer.Config.SaveData
+import GameServer.EnvExtensions
+import GameServer.Frontend
+import GameServer.Helpers
+import GameServer.Inventory
+import GameServer.Layer
+import GameServer.Lean.DocComment
+import GameServer.Lean.HashMap
+import GameServer.Lean.PrettyPrinter
+import GameServer.Lean.String
+import GameServer.Options
+import GameServer.SaveData
+import GameServer.Tactic
+import GameServer.Util

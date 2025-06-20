@@ -1,28 +1,4 @@
 
-.message {
-  margin: 10px 0;
-  padding: 5px 10px;
-  border-radius: 3px 3px 3px 3px;
-}
-.message.information, .message.info {
-  /* color: #059; */
-  color: #000;
-  background-color: #DDF6FF;
-}
-.message.warning {
-  color: #9F6000;
-  background-color: #FEEFB3;
-}
-.message.error {
-  color: #D8000C;
-  background-color: #FFBABA;
-}
-
-.message.deleted-hint {
-  background-color: #eee;
-  color: #777;
-  box-shadow: .0em .0em .5em .2em #eee;
- }
 
 .hyp-group {
   margin-bottom: 0.3em;
@@ -50,69 +26,6 @@
 
 }
 
-.typewriter {
-  background: var(--clr-primary);
-  padding: 0.5em;
-  font-family: var(--ff-primary);
-  border-radius: 0.2em;
-  /* margin: 0.2em 0 0; */
-}
-
-.typewriter.disabled{
-  background: #bbb;
-}
-
-.typewriter.disabled .btn-inverted,
-.typewriter.disabled .mtk1 {
-  color: #777;
-}
-
-.typewriter.disabled .typewriter-input-wrapper,
-.typewriter.disabled .monaco-editor,
-.typewriter.disabled .monaco-editor-background,
-.typewriter.disabled .btn-inverted {
-  background-color: #eee;
-}
-
-.typewriter form {
-  display: flex;
-}
-
-.typewriter button, .undo-button {
-  display: block;
-  white-space: nowrap;
-  flex: 0;
-}
-
-.typewriter .typewriter-input-wrapper{
-  min-width: 0;
-  flex: 1;
-  padding: 0.4em .6em 0;
-  font-size: 1rem;
-  background: white;
-  display: flex;
-  flex-direction: column;
-}
-
-.typewriter-interface .proof .MuiCircularProgress-root {
-  left: 50%;
-  position: relative;
-  margin-left: -20px;
-  margin-bottom: 0.6em;
-}
-
-.typewriter .typewriter-input {
-  flex: 1;
-}
-
-/* Turn off some monaco decorations: */
-.typewriter-input .monaco-editor .view-overlays .current-line {
-  border: 0;
-}
-.typewriter-input .monaco-editor .scroll-decoration {
-  box-shadow: none;
-}
-
 .other-goals .goals-section-title, .other-goals summary, .other-goals summary .font-code {
   color: #5191d1;
 }
@@ -122,8 +35,8 @@
   flex-direction: row;
 }
 
-.goals-section div {
-  flex-grow: 1;
+.goal-tabs {
+  width: 100%;
 }
 
 #current-proof, #main-assumptions {
@@ -167,20 +80,10 @@
 }
 
 
-/* Push the goals to the bottom for now, until we insert the proof history above. */
-.typewriter-interface .content {
-  display: flex;
-  flex-direction: column;
-  scroll-behavior: smooth;
-}
 
 /* TODO this is in the wrong file */
 .chat {
   scroll-behavior: smooth;
-}
-
-.typewriter-interface .content .tmp-pusher {
-  flex: 1;
 }
 
 .exercise .command {
@@ -210,8 +113,8 @@
 .exercise .command-text {
   flex: 1;
   background-color: #fff;
-  font-family: "Droid Sans Mono", "monospace", monospace;
   font-size: 14px;
+  font-family: "JuliaMono", monospace;
   padding: 0.4em .6em 0;
 }
 
@@ -224,4 +127,44 @@
   font-weight: bold;
   padding-left: .5em;
   padding-right: .5em;
+}
+
+/* Apparently this prevents the layout from jumping around when hovering over expressions. */
+.tooltip-arrow {
+  display: none;
+}
+
+
+.goal-tab {
+  /* border: 2px dotted darkgreen; */
+  padding: .2rem;
+  display: flex;
+  flex-direction: row;
+  font-family: "JuliaMono", monospace;
+}
+
+.goal-tab .hyp-group-title {
+  font-family: "Roboto", sans-serif;
+}
+
+.goal-tab .goal, .goal-tab .hypotheses {
+  /* border: 1px solid lightblue; */
+  display: inline-block;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.goal-sign {
+  /* border: 1px solid lightblue; */
+  width: 1rem;
+  margin-left: .5rem;
+  margin-right: .5rem;
+  display: inline-block;
+}
+
+.goal-sign line {
+  stroke: var(--clr-dark-gray);
+  stroke-width: 2;
 }

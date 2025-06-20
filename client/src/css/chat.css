@@ -1,0 +1,99 @@
+.chat {
+  flex: 1;
+  overflow-y: scroll;
+  margin-left: .5em;
+  margin-right: .5em;
+}
+
+.chat-panel {
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.button-row {
+  /* width:100%; */
+  /* margin-left: .5em;
+  margin-right: .5em; */
+  min-height: 2.5em;
+  border-top:  0.1em solid #aaa;
+  display: flex;
+  padding-top: .2rem;
+  margin: .5rem;
+
+}
+
+.button-row > .btn:not(:last-child), .button-row > .btn-placeholder:not(:last-child) {
+  /* display: block; */
+  margin-right: .2rem;
+}
+
+.button-row .btn-placeholder {
+  display: inline-block;
+  flex: 1;
+  margin: 0;
+}
+
+.button-row .btn {
+  flex: 1;
+  /* margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-left: .5rem;
+  margin-right: .5rem; */
+  text-align: center;
+  margin: 0;
+  padding: .5em;
+}
+
+
+.message {
+  margin: 10px 0;
+  padding: 5px 10px;
+  border-radius: 3px 3px 3px 3px;
+}
+
+.message.information, .message.info, .message.kind-5, .message.kind-3, .message.kind-4 {
+  /* color: #059; */
+  color: #000;
+  background-color: #DDF6FF;
+}
+
+.message.warning, .message.kind-2 {
+  color: #9F6000;
+  background-color: #FEEFB3;
+}
+
+.message.error, .message.kind-1 {
+  color: #D8000C;
+  background-color: #FFBABA;
+}
+
+.message.deleted-hint {
+  background-color: #EEE;
+  color: #777;
+  box-shadow: .0em .0em .5em .2em #EEE;
+ }
+
+.message.success, , .message.kind-6 {
+  color: #000;
+  background-color: #E5FFDD;
+}
+
+.chat .message {
+  margin-left: .5em;
+  margin-right: .5em;
+  overflow-x: auto;
+}
+
+.chat .recent {
+  box-shadow: .0em .0em .4em .1em #8cbbe9;
+}
+
+.chat .selected {
+  /* border: 3px solid #5191d1; */
+
+  box-shadow: .0em .0em .4em .1em var(--clr-primary);
+}

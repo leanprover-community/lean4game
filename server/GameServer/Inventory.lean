@@ -1,5 +1,10 @@
 import Lean
 import GameServer.EnvExtensions
+import GameServer.Inventory.Basic
+import GameServer.Inventory.Extension
+import GameServer.Tactic
+
+namespace GameServer
 
 open Lean Elab Command
 
@@ -59,7 +64,7 @@ def getDocstring (env : Environment) (name : Name) (type : InventoryType) :
   match type with
   -- for tactics it's a lookup following mathlib's `#help`. not guaranteed to be the correct one.
   | .Tactic => getTacticDocstring env name
-  | .Lemma => findDocString? env name
+  | .Theorem => findDocString? env name
   -- TODO: for definitions not implemented yet, does it work?
   | .Definition => findDocString? env name
 
@@ -93,20 +98,20 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
       | none =>
         logWarningAt ref (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
         m!"somewhere above this statement.")
-        pure "(missing)"
+        pure ""
 
       -- We just add a dummy entry
       modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
         name := name
-        category := if type == .Lemma then s!"{n.getPrefix}" else ""
+        category := if type == .Theorem then s!"{n.getPrefix}" else ""
         content := docstring})
     -- Add the default documentation
     | some s =>
       modifyEnv (inventoryTemplateExt.addEntry · {
         type := type
         name := name
-        category := if type == .Lemma then s!"{n.getPrefix}" else ""
+        category := if type == .Theorem then s!"{n.getPrefix}" else ""
         content := s })
       logInfoAt ref (m!"Missing {type} Documentation: {name}, used default (e.g. provided " ++
         m!"docstring) instead. If you want to write a different description, add " ++
@@ -116,7 +121,9 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
   match stx with
   | .missing => return acc
   | .node _info kind args =>
-    if kind == `GameServer.Tactic.Hint || kind == `GameServer.Tactic.Branch then return acc
+    -- skip `Hint`
+    -- skip and `Branch` and its content
+    if kind == ``GameServer.Tactic.Hint || kind == ``GameServer.Tactic.Branch then return acc
     return ← args.foldlM (fun acc arg => collectUsedInventory arg acc) acc
   | .atom _info val =>
     -- ignore syntax elements that do not start with a letter
@@ -124,7 +131,7 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
     let allowed := GameServer.ALLOWED_KEYWORDS
     if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
       let val := val.dropRightWhile (fun c => c == '!' || c == '?') -- treat `simp?` and `simp!` like `simp`
-      return {acc with tactics := acc.tactics.insert val}
+      return {acc with tactics := acc.tactics.insert (.mkSimple val)}
     else
       return acc
   | .ident _info _rawVal val _preresolved =>
@@ -133,20 +140,20 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
         catch | _ => pure [] -- catch "unknown constant" error
       return ← ns.foldlM (fun acc n => do
         if let some (.thmInfo ..) := (← getEnv).find? n then
-          return {acc with lemmas := acc.lemmas.insertMany ns}
+          return {acc with theorems := acc.theorems.insertMany ns}
         else
           return {acc with definitions := acc.definitions.insertMany ns}
       ) acc
 
 -- #check expandOptDocComment?
 
-def GameLevel.getInventory (level : GameLevel) : InventoryType → InventoryInfo
+def Level.getInventory (level : Level) : InventoryType → InventoryInfo
 | .Tactic => level.tactics
 | .Definition => level.definitions
-| .Lemma => level.lemmas
+| .Theorem => level.theorems
 
-def GameLevel.setComputedInventory (level : GameLevel) :
-    InventoryType → Array InventoryTile → GameLevel
+def Level.setComputedInventory (level : Level) :
+    InventoryType → Array InventoryTile → Level
 | .Tactic, v =>     {level with tactics     := {level.tactics     with tiles := v}}
 | .Definition, v => {level with definitions := {level.definitions with tiles := v}}
-| .Lemma, v =>      {level with lemmas      := {level.lemmas      with tiles := v}}
+| .Theorem, v =>      {level with theorems      := {level.theorems      with tiles := v}}

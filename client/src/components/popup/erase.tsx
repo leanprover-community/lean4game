@@ -1,18 +1,18 @@
-/**
- * @fileOverview
-*/
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { GameIdContext } from '../../app'
 import { useAppDispatch } from '../../hooks'
-import { deleteProgress, selectProgress } from '../../state/progress'
+import { deleteLevelProgress, deleteProgress, deleteWorldProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
-import { Button } from '../button'
+import { Button } from '../utils'
 import { Trans, useTranslation } from 'react-i18next'
+import { useContext } from 'react'
+import { PopupContext } from './popup'
+import { GameIdContext, PageContext } from '../../state/context'
 
 /** download the current progress (i.e. what's saved in the browser store) */
-export function downloadProgress(gameId: string, gameProgress: any, ev: React.MouseEvent) {
-  ev.preventDefault()
+export function downloadProgress(gameId: string, gameProgress) {
+
+  // ev.preventDefault()
   downloadFile({
     data: JSON.stringify(gameProgress, null, 2),
     fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
@@ -25,37 +25,60 @@ export function downloadProgress(gameId: string, gameProgress: any, ev: React.Mo
  * `handleClose` is the function to close it again because it's open/closed state is
  * controlled by the containing element.
  */
-export function ErasePopup ({handleClose}) {
+export function ErasePopup () {
   let { t } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const { gameId, worldId, levelId } = React.useContext(GameIdContext)
+  const { setPage } = useContext(PageContext)
   const gameProgress = useSelector(selectProgress(gameId))
   const dispatch = useAppDispatch()
+  const { setPopupContent } = useContext(PopupContext)
 
-  const eraseProgress = () => {
+  const eraseProgress = (ev) => {
     dispatch(deleteProgress({game: gameId}))
-    handleClose()
+    setPopupContent(null)
+    setPage(0)
+    // ev.preventDefault() // TODO: this is a hack to prevent the buttons below from opening a link
+  }
+
+  function eraseLevel (ev) {
+    dispatch(deleteLevelProgress({game: gameId, world: worldId, level: levelId}))
+    setPopupContent(null)
+    ev.preventDefault()
+  }
+
+  function eraseWorld (ev) {
+    dispatch(deleteWorldProgress({game: gameId, world: worldId}))
+    setPopupContent(null)
+    ev.preventDefault()
   }
 
   const downloadAndErase = (ev) => {
-    downloadProgress(gameId, gameProgress, ev)
-    eraseProgress()
+    downloadProgress(gameId, gameProgress)
+    eraseProgress(ev)
   }
 
-  return <div className="modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+  return <>
     <h2>{t("Delete Progress?")}</h2>
     <Trans>
       <p>Do you want to delete your saved progress irreversibly?</p>
+    </Trans>
+    <div className='settings-buttons'>
+      <Button onClick={levelId && eraseLevel} to="" disabled={!levelId} >{t("Delete this Level")}</Button>
+      <Button onClick={worldId && eraseWorld} to="" disabled={!worldId} >{t("Delete this World")}</Button>
+      <Button onClick={eraseProgress} to={`/${gameId}/`}>{t("Delete Everything")}</Button>
+    </div>
+    <Trans>
       <p>
-        (This deletes your proofs and your collected inventory.
-        Saves from other games are not deleted.)
+        Deleting everything will delete all your proofs and your collected inventory! It's recommended
+        to download your progress first.
+      </p>
+      <p>
+        (Saves from other games are not deleted.)
       </p>
     </Trans>
-    <Button onClick={eraseProgress} to="">{t("Delete")}</Button>
-    <Button onClick={downloadAndErase} to="">{t("Download & Delete")}</Button>
-    <Button onClick={handleClose} to="">{t("Cancel")}</Button>
-  </div>
-</div>
+    <div className='settings-buttons'>
+      <Button onClick={downloadAndErase} to={`/${gameId}/`}>{t("Download & Delete everything")}</Button>
+      <Button onClick={(ev) => {setPopupContent(null); ev.preventDefault()}} to="">{t("Cancel")}</Button>
+    </div>
+  </>
 }

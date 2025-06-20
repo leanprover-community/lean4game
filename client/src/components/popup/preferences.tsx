@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Input, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
-import Markdown from '../markdown'
+import { Markdown } from '../utils'
 import { Switch, Button, ButtonGroup } from '@mui/material';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
@@ -8,13 +8,14 @@ import lean4gameConfig from '../../config.json'
 
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { IPreferencesContext, PreferencesContext } from "../infoview/context"
+import { IPreferencesContext, PreferencesContext } from "../../state/context"
 import ReactCountryFlag from 'react-country-flag';
 import { useTranslation } from 'react-i18next';
 
-export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
+export function PreferencesPopup () {
   let { t } = useTranslation()
   const {layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
+
 
   const marks = [
     {
@@ -34,7 +35,7 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
     },
   ];
 
-  const handlerChangeLayout = (_: Event, value: number) => {
+  const handlerChangeLayout = (_: Event, value: any) => {
     setLayout(marks[value].key as IPreferencesContext["layout"])
   }
 
@@ -42,10 +43,7 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
     setLanguage(ev.target.value as IPreferencesContext["language"])
   }
 
-  return <div className="modal-wrapper">
-    <div className="modal-backdrop" onClick={handleClose} />
-    <div className="modal">
-      <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+  return <>
       <Typography variant="body1" component="div" className="settings">
         <div className='preferences-category'>
           <div className='category-title'>
@@ -59,12 +57,23 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
                     value={language}
                     label={t("Language")}
                     onChange={handlerChangeLanguage}>
-                      {lean4gameConfig.languages.map(lang => {return <MenuItem key={`menu-item-lang-${lang.iso}`} value={lang.iso}><ReactCountryFlag countryCode={lang.flag}/>&nbsp;{lang.name}</MenuItem>})}
+                      {Object.entries(lean4gameConfig.languages).map(([iso, val]) => {
+                        return <MenuItem key={`menu-item-lang-${iso}`} value={iso}>
+                          {lean4gameConfig.useFlags && <ReactCountryFlag countryCode={val.flag}/>}
+                          &nbsp;
+                          {val.name}
+                        </MenuItem>
+                      })}
                   </Select>
                 </Box>
               }
               label=""
             />
+            <p>
+              If a game does not exist in the language selected, this setting has no effect
+              and the game's default language is used.
+            </p>
+
           </div>
         </div>
         <div className='preferences-category'>
@@ -77,7 +86,7 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
                 <Box sx={{ width: 300 }}>
                   <Slider
                     aria-label={t("Always visible")}
-                    value={marks.find(item => item.key === layout).value}
+                    value={marks.find(item => item.key === layout)?.value}
                     step={1}
                     marks={marks}
                     max={2}
@@ -110,6 +119,5 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
           </div>
         </div>
       </Typography>
-    </div>
-  </div>
+  </>
 }

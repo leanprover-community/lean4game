@@ -3,21 +3,18 @@
 */
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { useStore, useSelector } from 'react-redux'
-import { Slider } from '@mui/material'
+import { useSelector } from 'react-redux'
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
-import { GameIdContext } from '../app'
-import { useAppDispatch } from '../hooks'
-import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
+import { selectDifficulty, selectCompleted } from '../state/progress'
 import { store } from '../state/store'
 
 import '../css/world_tree.css'
-import { PreferencesContext } from './infoview/context'
+import { GameIdContext } from '../state/context'
 import { useTranslation } from 'react-i18next'
+import { useGetGameInfoQuery } from '../state/api'
+import { LoadingIcon } from './utils'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -65,7 +62,7 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
   // Sinus-Satz: (1.1*r) / sin(β/2) = R / sin(π/2)
   let R = 1.1 * r / Math.sin(beta/2)
 
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const levelDisabled = (difficulty >= 2 && !(unlocked || completed))
 
@@ -137,7 +134,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
     nextLevel = 0
   }
   let playable = difficulty <= 1 || completed || unlocked
-  const gameId = React.useContext(GameIdContext)
+  const {gameId} = React.useContext(GameIdContext)
 
   return <Link
       to={playable ? `/${gameId}/world/${world}/level/${nextLevel}` : ''}
@@ -195,47 +192,6 @@ export const downloadFile = ({ data, fileName, fileType } :
   a.remove()
 }
 
-/** The menu that is shown next to the world selection graph */
-export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
-  const { t, i18n } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
-  const difficulty = useSelector(selectDifficulty(gameId))
-  const dispatch = useAppDispatch()
-  const { mobile } = React.useContext(PreferencesContext)
-
-
-  function label(x : number) {
-    return x == 0 ? t("none") : x == 1 ? t("relaxed") : t("regular")
-  }
-
-
-  return <nav className={`world-selection-menu${mobile ? '' : ' desktop'}`}>
-    <div className="slider-wrap">
-      <span className="difficulty-label">{t("Rules")}
-        <FontAwesomeIcon icon={rulesHelp ? faXmark : faCircleQuestion} className='helpButton' onClick={() => (setRulesHelp(!rulesHelp))}/>
-      </span>
-      <Slider
-        orientation="vertical"
-        title={t("Game Rules")}
-        min={0} max={2}
-        aria-label={t("Game Rules")}
-        value={difficulty}
-        marks={[
-          {value: 0, label: label(0)},
-          {value: 1, label: label(1)},
-          {value: 2, label: label(2)}
-        ]}
-        valueLabelFormat={label}
-        getAriaValueText={label}
-        valueLabelDisplay="off"
-        onChange={(ev, val: number) => {
-          dispatch(changedDifficulty({game: gameId, difficulty: val}))
-        }}
-        ></Slider>
-    </div>
-  </nav>
-}
-
 export function computeWorldLayout(worlds) {
   let elements = []
   for (let id in worlds.nodes) {
@@ -271,15 +227,14 @@ export function computeWorldLayout(worlds) {
 }
 
 
-export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
-  { worlds: any,
-    worldSize: any,
-    rulesHelp: boolean,
-    setRulesHelp: any,
-  }) {
-  const gameId = React.useContext(GameIdContext)
+export function WorldTreePanel ({visible = true}) {
+  const {gameId} = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
-  const {nodes, bounds}: any = worlds ? computeWorldLayout(worlds) : {nodes: []}
+  const gameInfo = useGetGameInfoQuery({game: gameId})
+
+
+  const {nodes, bounds}: any = gameInfo.data?.worlds ? computeWorldLayout(gameInfo.data?.worlds) : {nodes: []}
+
 
   // scroll to playable world
   React.useEffect(() => {
@@ -292,7 +247,7 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
       console.debug(`scrolling to ${elem.textContent}`)
       elem.scrollIntoView({block: "center"})
     }
-  }, [worlds, worldSize])
+  }, [gameInfo])
 
   let svgElements = []
 
@@ -301,18 +256,18 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
   // Indices `1, …, n` indicate if the corresponding level is completed
   var completed = {}
 
-  if (worlds && worldSize) {
+  if (gameInfo.data?.worlds && gameInfo.data?.worldSize) {
     // Fill `completed` with the level data.
     for (let worldId in nodes) {
-      completed[worldId] = Array.from({ length: worldSize[worldId] + 1 }, (_, i) => {
+      completed[worldId] = Array.from({ length: gameInfo.data?.worldSize[worldId] + 1 }, (_, i) => {
         // index `0` starts off as `true` but can be set to `false` by any edge with non-completed source
         return i == 0 || selectCompleted(gameId, worldId, i)(store.getState())
       })
     }
 
     // draw all connecting paths
-    for (let i in worlds.edges) {
-      const edge = worlds.edges[i]
+    for (let i in gameInfo.data?.worlds.edges) {
+      const edge = gameInfo.data?.worlds.edges[i]
       let sourceCompleted = completed[edge[0]].slice(1).every(Boolean)
       // if the origin world is not completed, mark the target world as non-playable
       if (!sourceCompleted) {completed[edge[1]][0] = false}
@@ -332,11 +287,11 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
           completedLevels={completed[worldId]}
           difficulty={difficulty}
           key={`${gameId}-${worldId}`}
-          worldSize={worldSize[worldId]}
+          worldSize={gameInfo.data?.worldSize[worldId]}
         />
       )
 
-      for (let i = 1; i <= worldSize[worldId]; i++) {
+      for (let i = 1; i <= gameInfo.data?.worldSize[worldId]; i++) {
         svgElements.push(
           <LevelIcon
             world={worldId}
@@ -345,7 +300,7 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
             completed={completed[worldId][i]}
             unlocked={completed[worldId][i-1]}
             key={`${gameId}-${worldId}-${i}`}
-            worldSize={worldSize[worldId]}
+            worldSize={gameInfo.data?.worldSize[worldId]}
           />
         )
       }
@@ -359,13 +314,14 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
 
   let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : null
 
-  return <div className="column">
-      <WorldSelectionMenu rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
+  return <div className={`${visible ? '' : 'hidden'}`}>
+      {/* <WorldSelectionMenu rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} /> */}
+      { gameInfo.data ?
       <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
           width={bounds ? `${ds * dx}` : ''}
           viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
           className="world-selection" >
         {svgElements}
-      </svg>
+      </svg> : <LoadingIcon/> }
   </div>
 }

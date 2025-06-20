@@ -5,31 +5,12 @@
   /* display: flex; */
 }
 
-.hidden {
-  display: none;
-}
-
-.gutter {
-  background-color: #eee;
-
-  background-repeat: no-repeat;
-  background-position: 50%;
-}
-
-.gutter.gutter-vertical {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
-}
-
-.gutter.gutter-horizontal {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
-}
-
-.inventory-panel, .exercise-panel, .doc-panel, .introduction-panel {
+/* .inventory-panel, .exercise-panel, .doc-panel, .introduction-panel {
   height: 100%;
   width: 100%;
   overflow: auto;
   position: relative;
-}
+} */
 
 .infoview {
   padding-top: 1em;
@@ -63,11 +44,11 @@
   padding-top: 0em;
 }
 
-.exercise {
+/* .exercise {
   flex: 1 1 auto;
   display: flex;
   flex-flow: column;
-}
+} */
 
 .codeview {
   flex: 1 1 auto;
@@ -193,70 +174,21 @@ td code  {
 
 .exercise {
   height: 100%;
-}
-
-.chat {
-  flex: 1;
-  overflow-y: scroll;
-  margin-left: .5em;
-  margin-right: .5em;
-}
-
-.chat-panel {
-  padding-top: 0;
-  padding-bottom: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-
-}
-
-.chat-panel .button-row {
-  /* width:100%; */
-  margin-left: .5em;
-  margin-right: .5em;
-  min-height: 2.5em;
-  border-top:  0.1em solid #aaa;
-}
-
-.chat-panel .btn {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  margin-left: .5rem;
-  margin-right: .5rem;
-}
-
-/* .exercise-panel {
-  display: flex;
-  flex-flow: column;
-  height: 100%;
-} */
-
-.button-row.mobile {
-  margin: .5rem;
-  padding-top: .2rem;
-}
-
-.button-row.mobile .btn {
-  padding: .5em;
-  border-radius: .2em;
   width: 100%;
-  margin: 0;
-  text-align: center;
 }
 
-
-.typewriter-interface {
+.exercise-content {
   display: flex;
   flex-flow: column;
   height: 100%;
+  z-index: 1;
 }
 
 .typewriter {
   flex: 0 1 auto;
 }
 
-.typewriter-interface .content {
+.exercise-content {
   flex: 1 1 auto;
   overflow-y: scroll;
   padding: 0;
@@ -276,16 +208,7 @@ td code  {
   margin-top: 10px;
 }
 
-.chat .message {
-  margin-left: .5em;
-  margin-right: .5em;
-}
-
-.chat .recent {
-  box-shadow: .0em .0em .4em .1em #8cbbe9;
-}
-
-.exercise .step.selected .goal-tabs, .chat .selected {
+.exercise .step.selected .goal-tab {
   /* border: 3px solid #5191d1; */
   box-shadow: .0em .0em .4em .1em var(--clr-primary);
 }
@@ -314,7 +237,7 @@ td code  {
   right: 0;
   top: 100%;
   background-color: #fff;
-  z-index: 1;
+  z-index: 10;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: -.1rem .3rem .3rem 0 rgba(0, 0, 0, 0.1);
@@ -341,22 +264,31 @@ td code  {
   justify-content: center;
 }
 
-.typewriter-interface .content, .world-image-container.empty {
+.exercise {
   background-color: #eee;
+  position: relative;
 }
 
-.world-image-container {
+.world-image {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 0px; /* somehow this has a desired affect, but why? */
-  overflow: hidden;
+  position: absolute;
+  z-index: 0;
+  /* min-height: 0px;*/ /* somehow this has a desired affect, but why? */
 }
 
-.world-image-container img.contain {
+.world-image img.contain {
+  height: 100%;
+  width: 100%;
   object-fit: contain;
+  object-position: top center;
+  pointer-events: none;
 }
 
-.world-image-container.center {
+.world-image.center {
   justify-content: center;
 }
 
@@ -366,8 +298,41 @@ td code  {
   object-fit: cover;
 }
 
-.typewriter-interface .proof {
+.proof {
+  z-index: 2;
   background-color: #fff;
+}
+
+.exercise-content .tmp-pusher {
+  flex: 1;
+}
+
+.exercise-content {
+  background: none;
+}
+
+.editor-mode .proof {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-mode .tmp-pusher {
+  height: 0;
+}
+
+/* Push the goals to the bottom for now, until we insert the proof history above. */
+.exercise-content {
+  display: flex;
+  flex-direction: column;
+  scroll-behavior: smooth;
+}
+
+.exercise-content .proof .MuiCircularProgress-root {
+  left: 50%;
+  position: relative;
+  margin-left: -20px;
+  margin-bottom: 0.6em;
 }
 
 .toggle-width {
@@ -392,4 +357,17 @@ td code  {
 .nav-btns .language-btn {
   background: #DDF6FF;
   text-align: center;
+}
+
+#unicode-input, .lean-abbrev-input {
+  min-width: 0;
+  white-space: pre;
+  flex: 1;
+  /* padding: 0.4em .6em 0; */
+  font-size: var(--vscode-editor-font-size);
+  background-color: white;
+  border: 2px solid orange;
+  display: flex;
+  flex-direction: column;
+  font-family: JuliaMono, monospace;
 }

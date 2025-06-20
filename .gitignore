@@ -6,4 +6,7 @@ server/.lake
 **/.DS_Store
 logs/
 relay/prev_cpu_metric
+relay/dist
+**/.i18n
+.idea
 test.ecosystem.config.cjs

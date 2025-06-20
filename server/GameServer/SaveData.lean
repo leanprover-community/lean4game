@@ -1,9 +1,15 @@
+import GameServer.Config.SaveData
 import GameServer.EnvExtensions
 import I18n
 
+namespace GameServer
+
 open Lean Meta Elab Command
 
-/-! ## Copy images -/
+/-! ## Save data
+
+Compare to `GameServerExe.LoadData`
+-/
 
 open IO.FS System FilePath in
 /-- Copies the folder `images/` to `.lake/gamedata/images/` -/
@@ -22,17 +28,9 @@ def copyImages : IO Unit := do
         let content ← readBinFile file
         writeBinFile outFile content
 
-namespace GameData
-  def gameDataPath : System.FilePath := ".lake" / "gamedata"
-  def gameFileName := s!"game.json"
-  def docFileName := fun (inventoryType : InventoryType) (name : Name) => s!"doc__{inventoryType}__{name}.json"
-  def levelFileName := fun (worldId : Name) (levelId : Nat) => s!"level__{worldId}__{levelId}.json"
-  def inventoryFileName := s!"inventory.json"
-end GameData
-
 open GameData in
 -- TODO: register all of this as ToJson instance?
-def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
+def saveGameData (allItemsByType : Std.HashMap InventoryType (Std.HashSet Name))
     (inventory : InventoryOverview): CommandElabM Unit := do
   let game ← getCurGame
   let env ← getEnv
@@ -51,31 +49,13 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
 
   IO.FS.writeFile (path / gameFileName) (toString (getGameJson game))
 
-  for inventoryType in [InventoryType.Lemma, .Tactic, .Definition] do
-    for name in allItemsByType.findD inventoryType {} do
+  for inventoryType in [InventoryType.Theorem, .Tactic, .Definition] do
+    for name in allItemsByType.getD inventoryType {} do
       let some item ← getInventoryItem? name inventoryType
-        | throwError "Expected item to exist: {name}"
+        | continue -- TODO: cleanup. Hidden items should also not appear in `allItemsByType`
       IO.FS.writeFile (path / docFileName inventoryType name) (toString (toJson item))
 
   IO.FS.writeFile (path / inventoryFileName) (toString (toJson inventory))
 
   -- write file for translation
   I18n.createTemplate
-
-open GameData
-
-def loadData (f : System.FilePath) (α : Type) [FromJson α] : IO α := do
-  let str ← IO.FS.readFile f
-  let json ← match Json.parse str with
-  | .ok v => pure v
-  | .error e => throw (IO.userError e)
-  let data ← match fromJson? json with
-  | .ok v => pure v
-  | .error e => throw (IO.userError e)
-  return data
-
-def loadGameData (gameDir : System.FilePath) : IO Game :=
-  loadData (gameDir / gameDataPath / gameFileName) Game
-
-def loadLevelData (gameDir : System.FilePath) (worldId : Name) (levelId : Nat) : IO LevelInfo :=
-  loadData (gameDir / gameDataPath / levelFileName worldId levelId) LevelInfo

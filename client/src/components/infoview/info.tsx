@@ -13,10 +13,11 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-i
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation'
 
 import { AllMessages, lspDiagToInteractive } from './messages'
-import { goalsToString, Goal, MainAssumptions, OtherGoals } from './goals'
+// import { goalsToString, Goal, MainAssumptions, OtherGoals } from './goals'
 import { InteractiveTermGoal, InteractiveGoalsWithHints, InteractiveGoals, ProofState } from './rpc_api'
-import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext } from './context'
+import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext } from '../../state/context'
 import { useTranslation } from 'react-i18next'
+import { GoalsTabs } from './main'
 
 // TODO: All about pinning could probably be removed
 type InfoKind = 'cursor' | 'pin'
@@ -123,37 +124,39 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
                 Error updating:{' '}{error}.
                 <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate() }}>{' '}Try again.</a>
             </div>}
+        <AllMessages /> {/* TODO: Move error messages to Chat instead */}
         <LocationsContext.Provider value={locs}>
           <div className="goals-section">
+
             { goals &&  goals.goals.length > 0 && <>
-              <MainAssumptions filter={goalFilter} key='mainGoal' goals={goals.goals} />
-              <OtherGoals filter={goalFilter} goals={goals.goals} />
+              <GoalsTabs goals={goals.goals.map(goal => ({goal: goal, hints: []}))} last={false} onClick={() => {}} onGoalChange={() => {}}/>
+              {/* <MainAssumptions filter={goalFilter} key='mainGoal' goals={goals.goals} />
+              <OtherGoals filter={goalFilter} goals={goals.goals} /> */}
             </>}
           </div>
-          <div>
+          {/* <div>
             { goals && (goals.goals.length > 0
               ? <Goal typewriter={true} filter={goalFilter} key='mainGoal' goal={goals.goals[0]} showHints={true} />
               : <div className="goals-section-title">{t("No Goals")}</div>
             )}
-          </div>
+          </div> */}
         </LocationsContext.Provider>
-        {userWidgets.map(widget =>
+        {/* {userWidgets.map(widget =>
           <details key={`widget::${widget.id}::${widget.range?.toString()}`} open>
             <summary className='mv2 pointer'>{widget.name}</summary>
             <PanelWidgetDisplay pos={pos} goals={goals ? goals.goals : []}
               termGoal={termGoal} selectedLocations={selectedLocs} widget={widget}/>
           </details>
-        )}
-        {nothingToShow && (
+        )} */}
+        {/* {nothingToShow && (
             isPaused ?
-                /* Adding {' '} to manage string literals properly: https://reactjs.org/docs/jsx-in-depth.html#string-literals-1 */
+                /* Adding {' '} to manage string literals properly: https://reactjs.org/docs/jsx-in-depth.html#string-literals-1 * /
                 <span>Updating is paused.{' '}
                     <a className='link pointer dim' onClick={e => { e.preventDefault(); void triggerUpdate() }}>Refresh</a>
                     {' '}or <a className='link pointer dim' onClick={e => { e.preventDefault(); setPaused(false) }}>resume updating</a>
                     {' '}to see information.
                 </span> :
-                <><CircularProgress /><div>{t("Loading goal…")}</div></>)}
-        <AllMessages />
+                <><CircularProgress /><div>{t("Loading goal…")}</div></>)} */}
         {/* <LocationsContext.Provider value={locs}>
             {goals && goals.goals.length > 1 && <div className="goals-section other-goals">
                     <div className="goals-section-title">Weitere Goals</div>

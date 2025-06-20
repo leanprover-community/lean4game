@@ -10,6 +10,7 @@
 
 .documentation h1 {
   font-weight: 900;
+  font-family: "JuliaMono", monospace;
 }
 
 .documentation.hidden {
@@ -33,9 +34,15 @@
   position: relative;
 }
 
+.inventory .item, .inventory .tab-bar:not(.major) .tab {
+  font-family: "JuliaMono", monospace;
+  font-size: .9rem;
+}
+
 .inventory .item.locked {
   border: solid 1px #ccc;
   color: #ccc;
+  background-color: #f2f2f2;
 }
 
 .inventory .item.disabled {
@@ -46,13 +53,21 @@
   background-color: rgb(255, 242, 190);
 }
 
-.inventory .item:not(.locked), .inventory .item.enabled {
+.inventory .item.current-world {
+  background-color: rgb(250, 231, 255);
+}
+
+.inventory .item.recent {
+  background-color: rgb(242, 190, 255);
+}
+
+.inventory .item, .inventory .item.enabled {
   cursor: pointer;
 }
 
 .tab-bar {
   border-bottom: 0.1em solid var(--clr-dark-gray);
-  margin-bottom: 0.5em;
+  margin-bottom: 1em;
 }
 
 .tab {
@@ -67,9 +82,41 @@
   display: inline-block;
 }
 
+.tab-bar.major {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding-top: .5em;
+  font-weight: bold;
+}
+
+.tab-bar.major .tab {
+  flex: 1;
+  text-align: center;
+  font-size: 1.2em;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .tab-bar.current .tab.active {
   color: black;
   border-bottom: 0.3em solid var(--clr-primary);
+}
+
+.inventory .tab.recent {
+  background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(242, 190, 255));
+}
+
+.inventory .tab.recent:not(.active) {
+  border-bottom: 0.3em solid rgb(242, 190, 255);
+}
+
+.inventory .tab.new {
+  background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(255, 242, 190));
+}
+
+.inventory .tab.new:not(.active) {
+  border-bottom: 0.3em solid rgb(255, 242, 190);
 }
 
 .tab.active {
@@ -93,4 +140,14 @@
 	width: 1rem;
 	align-items: end;
 	text-align: end;
+}
+
+.documentation .nav-button {
+  float: right;
+  font-size: 1.5rem;
+}
+
+.documentation .nav-button.lock {
+  float: left;
+  font-size: .7rem;
 }

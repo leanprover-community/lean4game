@@ -1,0 +1,86 @@
+--import Lean
+import Lean.PrettyPrinter.Delaborator.Builtins
+import Lean.PrettyPrinter
+import Lean
+
+import Batteries.Tactic.OpenPrivate
+
+namespace GameServer.PrettyPrinter
+
+open Lean PrettyPrinter
+
+open Meta Lean.Parser Term Delaborator SubExpr TSyntax.Compat in
+open private shouldGroupWithNext evalSyntaxConstant from Lean.PrettyPrinter.Delaborator.Builtins in
+
+@[inherit_doc Lean.PrettyPrinter.Delaborator.delabConstWithSignature]
+partial def delabConstWithSignature : Delab := do
+  let e ← getExpr
+  -- use virtual expression node of arity 2 to separate name and type info
+  let idStx ← descend e 0 <|
+    withOptions (pp.universes.set · true |> (pp.fullNames.set · true)) <|
+      delabConst
+  descend (← inferType e) 1 <|
+    delabParams idStx #[] #[]
+where
+  -- follows `delabBinders`, but does not uniquify binder names and accumulates all binder groups
+  delabParams (idStx : Ident) (groups : TSyntaxArray ``bracketedBinder) (curIds : Array Ident) := do
+    if let .forallE n d _ i ← getExpr then
+      let stxN ← annotateCurPos (mkIdent n)
+      let curIds := curIds.push ⟨stxN⟩
+      if ← shouldGroupWithNext then
+        withBindingBody n <| delabParams idStx groups curIds
+      else
+        let delabTy := withOptions (pp.piBinderTypes.set · false) delab
+        let group ← withBindingDomain do
+          match i with
+          | .implicit       => `(bracketedBinderF|{$curIds*})
+          | .strictImplicit => `(bracketedBinderF|⦃$curIds*⦄)
+          | .instImplicit   => `(bracketedBinderF|[$(← delabTy)])
+          | _ =>
+            if d.isOptParam then
+              `(bracketedBinderF|($curIds* : $(← withAppFn <| withAppArg delabTy) := $(← withAppArg delabTy)))
+            else if let some (.const tacticDecl _) := d.getAutoParamTactic? then
+              let tacticSyntax ← ofExcept <| evalSyntaxConstant (← getEnv) (← getOptions) tacticDecl
+              `(bracketedBinderF|($curIds* : $(← withAppFn <| withAppArg delabTy) := by $tacticSyntax))
+            else
+              `(bracketedBinderF|($curIds* : $(← delabTy)))
+        withBindingBody n <| delabParams idStx (groups.push group) #[]
+    else
+      let type ← delab
+      -- pure type
+      `(Command.declSig| $groups* : $type)
+
+/--
+Like `Lean.PrettyPrinter.ppSignature` but with a custom delaboration `delabConstWithSignature`
+-/
+-- @[inherit_doc Lean.PrettyPrinter.ppSignature]
+def ppSignature (c : Name) : MetaM FormatWithInfos := do
+  let decl ← getConstInfo c
+  let e := .const c (decl.levelParams.map mkLevelParam)
+  let (stx, infos) ← delabCore e (delab := delabConstWithSignature)
+  return ⟨← ppTerm ⟨stx⟩, infos⟩  -- HACK: not a term
+
+end PrettyPrinter
+
+open Lean Meta Elab Command
+
+/-! ## Statement string -/
+
+@[inherit_doc Lean.MessageData.signature]
+def MessageData.signature (c : Name) : CommandElabM MessageData := do
+  return .ofFormatWithInfosM (PrettyPrinter.ppSignature c)
+
+/--
+Get a string of the form `my_lemma (n : ℕ) : n + n = 2 * n`.
+
+Note: A statement like `theorem abc : ∀ x : Nat, x ≥ 0` would be turned into
+`theorem abc (x : Nat) : x ≥ 0` by `GameServer.PrettyPrinter.ppSignature`.
+
+Note: We use `String` because we can't send `MessageData` as json, but
+`MessageData` might be better for interactive highlighting.
+-/
+def getStatementString (name : Name) : CommandElabM String := do
+  (← MessageData.signature name).toString
+  -- TODO: I think it would be nicer to unresolve Namespaces as much as possible.
+
+end GameServer

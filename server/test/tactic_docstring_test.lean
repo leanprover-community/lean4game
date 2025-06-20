@@ -49,13 +49,16 @@ def getTacticDocstring (name: Name) : CommandElabM String := do
     m!"using `TacticDoc {name} \"some doc\"`"
   return ""
 
-#eval (getTacticDocstring `simp)
-
+/-- info: "The `simp` tactic" -/
+#guard_msgs in
+#eval do
+  let doc ← (getTacticDocstring `simp)
+  return doc.take 17
 
     -- TODO: Things we want:
-    -- 1) Getting docstring this way is a problem if we want to "reprove" a mathlib lemma because
+    -- 1) Getting docstring this way is a problem if we want to "reprove" a mathlib theorem because
     -- either it would not be imported from mathlib or have a different name in `Statement`
-    -- 3) is the lemma a simp lemma? (are there other attributes on it? --> hard/impossible)
+    -- 3) is the theorem a simp theorem? (are there other attributes on it? --> hard/impossible)
     -- 4) which mathlib file is it imported from?
     -- 5) namespace
     -- 6) tactics: are there alternative variations like `ext`, `ext?`, `ext1?`, …

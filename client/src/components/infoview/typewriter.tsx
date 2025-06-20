@@ -3,24 +3,26 @@ import { useRef, useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { Registry } from 'monaco-textmate' // peer dependency
-import { wireTmGrammars } from 'monaco-editor-textmate'
+// import { Registry } from 'monaco-textmate' // peer dependency
+// import { wireTmGrammars } from 'monaco-editor-textmate'
 import { DiagnosticSeverity, PublishDiagnosticsParams, DocumentUri } from 'vscode-languageserver-protocol';
 import { useServerNotificationEffect } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
-import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
-import * as leanSyntax from 'lean4web/client/src/syntaxes/lean.json'
-import * as leanMarkdownSyntax from 'lean4web/client/src/syntaxes/lean-markdown.json'
-import * as codeblockSyntax from 'lean4web/client/src/syntaxes/codeblock.json'
-import languageConfig from 'lean4/language-configuration.json';
+// import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
+// import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
+// import * as leanSyntax from 'lean4web/client/src/syntaxes/lean.json'
+// import * as leanMarkdownSyntax from 'lean4web/client/src/syntaxes/lean-markdown.json'
+// import * as codeblockSyntax from 'lean4web/client/src/syntaxes/codeblock.json'
+// import languageConfig from 'lean4/language-configuration.json';
 import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext } from './context'
+import { ChatContext, PageContext, MonacoEditorContext, ProofContext, GameIdContext } from '../../state/context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
-import { GameHint, ProofState } from './rpc_api'
+// import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
+// import { InputAbbreviationRewriter } from '@leanprover/unicode-input-component'
+import ContentEditable from 'react-contenteditable'
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;
@@ -33,6 +35,12 @@ export interface GameDiagnosticsParams {
 monaco.languages.register({
   id: 'lean4cmd',
   extensions: ['.leancmd']
+})
+
+// register Monaco languages // TODO: JE. I dont understand why I suddenly had to add this when it worked without before.
+monaco.languages.register({
+  id: 'lean4',
+  extensions: ['.lean']
 })
 
 // map of monaco "language id's" to TextMate scopeNames
@@ -75,21 +83,23 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
-  const model = editor.getModel()
-  const uri = model.uri.toString()
+  const model = editor?.getModel()
+  const uri = model?.uri.toString()
 
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
-  const {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
+  const {typewriterInput, setTypewriterInput} = React.useContext(PageContext)
 
   const inputRef = useRef()
 
   // The context storing all information about the current proof
   const {proof, setProof, interimDiags, setInterimDiags, setCrashed} = React.useContext(ProofContext)
 
+  const {gameId, worldId, levelId} = React.useContext(GameIdContext)
+
   // state to store the last batch of deleted messages
-  const {setDeletedChat} = React.useContext(DeletedChatContext)
+  const {setDeletedChat} = React.useContext(ChatContext)
 
   const rpcSess = React.useContext(RpcContext)
 
@@ -100,13 +110,13 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
     setDeletedChat([])
 
-    const pos = editor.getPosition()
+    const pos = editor?.getPosition()
     if (typewriterInput) {
       setProcessing(true)
-      editor.executeEdits("typewriter", [{
+      editor?.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           pos,
-          editor.getModel().getFullModelRange().getEndPosition()
+          editor?.getModel()?.getFullModelRange()?.getEndPosition()
         ),
         text: typewriterInput.trim() + "\n",
         forceMoveMarkers: false
@@ -116,7 +126,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       loadGoals(rpcSess, uri, setProof, setCrashed)
     }
 
-    editor.setPosition(pos)
+    editor?.setPosition(pos)
   }, [typewriterInput, editor])
 
   useEffect(() => {
@@ -127,8 +137,9 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   /* Load proof on start/switching to typewriter */
   useEffect(() => {
+    setProof(null)
     loadGoals(rpcSess, uri, setProof, setCrashed)
-  }, [])
+  }, [gameId, worldId, levelId])
 
   /** If the last step has an error, add the command to the typewriter. */
   useEffect(() => {
@@ -151,7 +162,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       // TODO: loadAllGoals()
       if (!hasErrors(params.diagnostics)) {
         //setTypewriterInput("")
-        editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
+        editor?.setPosition(editor?.getModel()?.getFullModelRange()?.getEndPosition())
       }
     } else {
       // console.debug(`expected uri: ${uri}, got: ${params.uri}`)
@@ -169,7 +180,6 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   //   console.log(params.diagnostics)
 
   // }, [uri]);
-
 
   useEffect(() => {
     const myEditor = monaco.editor.create(inputRef.current!, {
@@ -201,6 +211,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       },
       overviewRulerBorder: false,
       theme: 'vs-code-theme-converted',
+      fontFamily: "JuliaMono",
       contextmenu: false
     })
 
@@ -229,7 +240,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     if (!oneLineEditor) return
     // Run command when pressing enter
     const l = oneLineEditor.onKeyUp((ev) => {
-      if (ev.code === "Enter") {
+      if (ev.code === "Enter" || ev.code === "NumpadEnter") {
         runCommand()
       }
     })

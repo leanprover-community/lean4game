@@ -36,6 +36,9 @@ export interface InventoryTile {
   new: boolean,
   hidden: boolean
   altTitle: string,
+  world : string|null,
+  level : number|null,
+  proven : boolean
 }
 
 export interface LevelInfo {
@@ -44,11 +47,11 @@ export interface LevelInfo {
   conclusion: null|string,
   index: number,
   tactics: InventoryTile[],
-  lemmas: InventoryTile[],
+  theorems: InventoryTile[],
   definitions: InventoryTile[],
   descrText: null|string,
   descrFormat: null|string,
-  lemmaTab: null|string,
+  theoremTab: null|string,
   statementName: null|string,
   displayName: null|string,
   template: null|string,
@@ -58,9 +61,9 @@ export interface LevelInfo {
 /** Used to display the inventory on the welcome page */
 export interface InventoryOverview {
   tactics: InventoryTile[],
-  lemmas: InventoryTile[],
+  theorems: InventoryTile[],
   definitions: InventoryTile[],
-  lemmaTab: null,
+  theoremTab: null,
 }
 
 interface Doc {
@@ -81,13 +84,19 @@ export const apiSlice = createApi({
       query: ({game}) => `${game}/game.json`,
     }),
     loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
-      query: ({game, world, level}) => `${game}/level__${world}__${level}.json`,
+      query: ({game, world, level}) => {
+        if (world && level > 0) {
+          return `${game}/level__${world}__${level}.json`
+        } else {
+          return `${game}/inventory.json`
+        }
+      },
     }),
     loadInventoryOverview: builder.query<InventoryOverview, {game: string}>({
       query: ({game}) => `${game}/inventory.json`,
     }),
-    loadDoc: builder.query<Doc, {game: string, name: string, type: "lemma"|"tactic"}>({
-      query: ({game, type, name}) => `${game}/doc__${type}__${name}.json`,
+    loadDoc: builder.query<Doc, {game: string, name: string }>({
+      query: ({game, name}) => `${game}/doc__${name}.json`,
     }),
   }),
 })

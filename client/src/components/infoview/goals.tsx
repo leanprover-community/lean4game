@@ -4,15 +4,15 @@
  * Mostly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/goals.tsx
  */
 import * as React from 'react'
-import { InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_stripTags } from '@leanprover/infoview-api'
-import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
-import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
-import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
-import { InputModeContext } from './context';
+// import { InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_stripTags } from '@leanprover/infoview-api'
+// import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
+// import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
+// import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
+// import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
+import { PageContext } from '../../state/context';
 import { InteractiveGoal, InteractiveGoals, InteractiveGoalsWithHints, InteractiveHypothesisBundle, ProofState } from './rpc_api';
-import { RpcSessionAtPos } from '@leanprover/infoview/*';
-import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+// import { RpcSessionAtPos } from '@leanprover/infoview/*';
+// import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageserver-protocol';
 import { useTranslation } from 'react-i18next';
 
@@ -76,7 +76,7 @@ function getFilteredHypotheses(hyps: InteractiveHypothesisBundle[], filter: Goal
 
 interface HypProps {
     hyp: InteractiveHypothesisBundle
-    mvarId?: MVarId
+    mvarId?: any // MVarId
 }
 
 function Hyp({ hyp: h, mvarId }: HypProps) {
@@ -133,13 +133,14 @@ interface GoalProps {
     filter: GoalFilterState
     showHints?: boolean
     typewriter: boolean
+    unbundle?: boolean /** unbundle `x y : Nat` into `x : Nat` and `y : Nat` */
 }
 
 /**
  * Displays the hypotheses, target type and optional case label of a goal according to the
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
-    const { goal, filter, showHints, typewriter } = props
+    const { goal, filter, showHints, typewriter, unbundle } = props
     let { t } = useTranslation()
 
     // TODO: Apparently `goal` can be `undefined`
@@ -153,8 +154,8 @@ export const Goal = React.memo((props: GoalProps) => {
             { ...locs, subexprTemplate: { mvarId: goal.mvarId, loc: { target: '' }}} :
             undefined,
         [locs, goal.mvarId])
-    const goalLi = <div key={'goal'}>
-        <div className="goal-title">{t("Goal")}:</div>
+    const goalLi = <div key={'goal'} className="goal">
+        {/* <div className="goal-title">{t("Goal")}:</div> */}
         <LocationsContext.Provider value={goalLocs}>
             <InteractiveCode fmt={goal.type} />
         </LocationsContext.Provider>
@@ -164,22 +165,38 @@ export const Goal = React.memo((props: GoalProps) => {
     // if (props.goal.isInserted) cn += 'b--inserted '
     // if (props.goal.isRemoved) cn += 'b--removed '
 
-    // const hints = <Hints hints={goal.hints} key={goal.mvarId} />
-    const objectHyps = hyps.filter(hyp => !hyp.isAssumption)
-    const assumptionHyps = hyps.filter(hyp => hyp.isAssumption)
+    function unbundleHyps (hyps: InteractiveHypothesisBundle[]) : InteractiveHypothesisBundle[] {
+        return hyps.flatMap(hyp => (
+            unbundle ? hyp.names.map(name => {return {...hyp, names: [name]}}) : [hyp]
+        ))
+    }
 
-    return <div>
+    // const hints = <Hints hints={goal.hints} key={goal.mvarId} />
+    const objectHyps = unbundleHyps(hyps.filter(hyp => !hyp.isAssumption))
+    const assumptionHyps = unbundleHyps(hyps.filter(hyp => hyp.isAssumption))
+
+    return <>
         {/* {goal.userName && <div><strong className="goal-case">case </strong>{goal.userName}</div>} */}
         {filter.reverse && goalLi}
+        <div className="hypotheses">
         {! typewriter && objectHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">{t("Objects")}:</div>
             {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {!typewriter && assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">{t("Assumptions")}:</div>
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
-        {!filter.reverse && goalLi}
+        </div>
+        {!filter.reverse && <>
+            <div className='goal-sign'>
+                <svg width="100%" height="100%">
+                    <line x1="0%" y1="0%" x2="0%" y2="100%" />
+                    <line x1="0%" y1="50%" x2="100%" y2="50%" />
+                </svg>
+            </div>
+            {goalLi}
+        </>}
         {/* {showHints && hints} */}
-    </div>
+    </>
 })
 
 export const MainAssumptions = React.memo((props: GoalProps2) => {

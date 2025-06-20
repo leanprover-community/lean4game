@@ -1,0 +1,55 @@
+.typewriter {
+  background: var(--clr-primary);
+  padding: 0.5em;
+  font-family: var(--ff-primary);
+  border-radius: 0.2em;
+  /* margin: 0.2em 0 0; */
+}
+
+.typewriter.disabled{
+  background: #bbb;
+}
+
+.typewriter.disabled .btn-inverted,
+.typewriter.disabled .mtk1 {
+  color: #777;
+}
+
+.typewriter.disabled .typewriter-input-wrapper,
+.typewriter.disabled .monaco-editor,
+.typewriter.disabled .monaco-editor-background,
+.typewriter.disabled .btn-inverted {
+  background-color: #eee;
+}
+
+.typewriter form {
+  display: flex;
+}
+
+.typewriter button, .undo-button {
+  display: block;
+  white-space: nowrap;
+  flex: 0;
+}
+
+.typewriter .typewriter-input-wrapper{
+  min-width: 0;
+  flex: 1;
+  padding: 0.4em .6em 0;
+  font-size: 1rem;
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.typewriter .typewriter-input {
+  flex: 1;
+}
+
+/* Turn off some monaco decorations: */
+.typewriter-input .monaco-editor .view-overlays .current-line {
+  border: 0;
+}
+.typewriter-input .monaco-editor .scroll-decoration {
+  box-shadow: none;
+}
