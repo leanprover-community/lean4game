@@ -136,10 +136,12 @@ export class GameManager {
       }
     }
 
-    const gamePath = path.join(this.dir, '..', '..', '..', 'games', `${owner}`, `${repo.toLowerCase()}`);
-    let game_dir = (owner == 'local') ?
-      path.join(this.dir, '..', '..', repo) : // note: here we need `repo` to be case sensitive
-      gamePath;
+    let game_dir: string
+    if(owner == 'local') {
+      game_dir = path.join(this.dir, '..', '..', '..', '..', repo)
+    } else {
+      game_dir = path.join(this.dir, '..', '..', '..', 'games', `${owner}`, `${repo.toLowerCase()}`);
+    }
 
     if (!fs.existsSync(game_dir)) {
       console.error(`Game '${game_dir}' does not exist!`);
