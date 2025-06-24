@@ -76,7 +76,7 @@ export class GameManager {
       } else {
         // If the game is built with `-Klean4game.local` there is no copy in the lake packages.
         serverProcess = cp.spawn("./gameserver", args,
-          { cwd: path.join(this.dir, "..", "server", ".lake", "build", "bin") });
+          { cwd: path.join(this.dir, "..", "..", "..", "server", ".lake", "build", "bin") });
       }
     } else {
       serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
