@@ -28,3 +28,12 @@ For games written in a language different than English, you should set the corre
 The server has a set number of languages one can select.
 If your game has been translated to a language not selectable, [open an issue at lean4game](https://github.com/leanprover-community/lean4game/issues) requesting this new language.
 Or, even better, create a PR to translate the [server interface](https://github.com/leanprover-community/lean4game/tree/main/client/public/locales) into that new language.
+
+## Review
+
+If you send your translation for review to person who don't know about Lean4Game here followwing recomendations based on experience:
+
+1. Explicitly specify what file to review. Sometimes people go to JSON file in presence of PO file, even if that's in PR description
+2. Make sure that you let your reviewer know that formatting should be preserved during translation. That's not obvious. For example `` ` `` maye be translated as `"`, That's unlikely what you want to miss. Reviewer should be aware about such mistakes coming from automatic translation tools.
+3. Let know reviewer about list of words which can be incorrectly interpreted. That's usually tactics - `intro`, `induction`, `case`.
+4. Explicitly suggest use [POEdit](https://poedit.net/) or other translation tool for PO manipulation, since that allow you speak about sentence ranges, and ask for review for example translations in range from 200-299. That allow you to recruit multiple pair of eyes, if people are busy. Also it's much easier find time to review 50-100 sentences in one go. Less likely to have fatigue from that activity.
