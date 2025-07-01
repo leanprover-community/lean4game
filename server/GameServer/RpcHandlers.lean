@@ -360,20 +360,14 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
       else
         return none
 
-builtin_initialize
-  registerBuiltinRpcProcedure
-    `Game.getInteractiveGoals
-    Lsp.PlainGoalParams
-    (Option <| InteractiveGoals
-    )
-    getInteractiveGoals
-
-builtin_initialize
-  registerBuiltinRpcProcedure
-    `Game.getProofState
-    Lsp.PlainGoalParams
-    (Option ProofState)
-    getProofState
-
-
 end GameServer
+
+
+
+@[server_rpc_method]
+def Game.getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Widget.InteractiveGoals)) :=
+  FileWorker.getInteractiveGoals p
+
+@[server_rpc_method]
+def Game.getProofState (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option GameServer.ProofState)) :=
+  GameServer.getProofState p
