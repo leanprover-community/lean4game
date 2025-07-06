@@ -110,13 +110,30 @@ export class GameManager {
   }
 
   devConnectionLog(socketConnection: jsonrpcserver.IConnection, serverConnection: jsonrpcserver.IConnection) {
+
+    let shiftLines = (p : any, offset : number) => {
+      if (p.hasOwnProperty("line")) {
+        p.line += offset
+      }
+      if (p.hasOwnProperty("lineRange")) {
+        p.lineRange.start += offset
+        p.lineRange.end += offset
+      }
+      for (let key in p) {
+        if (typeof p[key] === 'object' && p[key] !== null) {
+          p[key] = shiftLines(p[key], offset);
+        }
+      }
+      return p;
+    }
+
     socketConnection.forward(serverConnection, message => {
       if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
-      return message;
+      return shiftLines(message, +1);
     });
     serverConnection.forward(socketConnection, message => {
       if (isDevelopment) { console.log(`SERVER: ${JSON.stringify(message)}`); }
-      return message;
+      return shiftLines(message, -1);
     });
   }
 

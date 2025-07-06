@@ -25,29 +25,49 @@ def _root_.debug_msg (msg : String) : IO Unit := do
   let o ← IO.getStdout
   o.writeLspMessage (createDebugNotification msg)
 
-/--
-Takes the JSON of an element of `contentChanges` in the rpc notif. `textDocument/didChange`
-and applies the `shift` to all ranges.
--/
-def shiftRange (shift : Nat → Nat) (change : Json) : Json := Id.run do
-  let mut range := change.getObjValD "range"
-  let mut start := range.getObjValD "start"
-  let mut «end» := range.getObjValD "end"
-  let .ok startLine := start.getObjValAs? Nat "line"
-    | panic! "[GameServer] unhandled"
-  let .ok endLine := end.getObjValAs? Nat "line"
-    | panic! "[GameServer] unhandled"
-  start := start.setObjValAs! "line" (shift startLine)
-  «end» := «end».setObjValAs! "line" (shift endLine)
-  range := range.setObjVal! "start" start
-  range := range.setObjVal! "end" «end»
-  change.setObjVal! "range" range
-
 def parseParams (paramType : Type) [FromJson paramType] (params : Json) : IO paramType :=
 match fromJson? params with
 | Except.ok parsed => pure parsed
 | Except.error inner => panic! s!"Got param with wrong structure: {params.compress}\n{inner}"
 
+inductive JsonKey where
+| mandatory (k : String)
+| optional (k : String)
+| allInArray
+
+instance : Coe String JsonKey := ⟨JsonKey.mandatory⟩
+instance : ToString JsonKey := ⟨fun k => match k with | .mandatory s => s | .optional s => "?" ++ s | .allInArray => "*"⟩
+
+#check Lean.RBMap.contains
+
+def modifyJson {α : Type} [FromJson α] [ToJson α] (p : Json) (key : List JsonKey) (mod : α → α) : IO Json := do
+  match key with
+  | [] => match fromJson? p with
+    | .ok v => return toJson (mod v)
+    | .error e => throw (IO.userError e)
+  | .mandatory k :: ks =>
+    match p.getObjVal? k with
+    | .ok v => return p.setObjVal! k (← modifyJson v ks mod)
+    | .error e => throw (IO.userError s!"[GameServer] (key: {key}): {e}")
+  | .optional k :: ks =>
+    match p.getObj? with
+    | .ok v =>
+      if (v.find compare k).isSome then
+        match p.getObjVal? k with
+        | .ok v => return p.setObjVal! k (← modifyJson v ks mod)
+        | .error e => throw (IO.userError s!"[GameServer] (key: {key}): {e}")
+      else return p
+    | .error e => throw (IO.userError s!"[GameServer] (key: {key}): {e}")
+  | .allInArray :: ks =>
+    match p.getArr? with
+    | .ok v => return Json.arr (← Array.mapM (modifyJson · ks mod) v)
+    | .error e => throw (IO.userError s!"[GameServer] (key: {key}): {e}")
+
+
+def toStructured (p : Json) : IO Json.Structured := do
+  let .ok params := Json.toStructured? p
+    | panic! "[GameServer] Cannot convert to Structured"
+  return params
 
 /-- Redirect message from the client to the Lean server. -/
 def forwardMessage (msg : JsonRpc.Message) : IO JsonRpc.Message := do
@@ -74,7 +94,7 @@ def forwardMessage (msg : JsonRpc.Message) : IO JsonRpc.Message := do
       -- let some level ← getLevel? levelId
       --   | panic! "[GameServer] Level not found"
 
-      let template := s!"import GameServer.RpcHandlers example (h : x = 2) (g: y = 4) : x + x = y := by\n{content}\ndone"
+      let template := s!"import Game.Levels.DemoWorld.L01_HelloWorld import GameServer.RpcHandlers example (h : x = 2) (g: y = 4) : x + x = y := by\n{content}\ndone"
 
       params := params.setObjVal! "textDocument" (textDocument.setObjVal! "text" template)
       let .ok paramsStructured := Json.toStructured? params
@@ -83,36 +103,34 @@ def forwardMessage (msg : JsonRpc.Message) : IO JsonRpc.Message := do
       return .notification method paramsStructured
     -- textDocument/didChange
 
-    | .notification method@("textDocument/didChange") (some params') =>
-      let mut params : Json := ToJson.toJson params'
-      let textDocument := params.getObjValD "textDocument"
-      let .ok contentChanges := (params.getObjValD "contentChanges").getArr?
-        | panic! "[GameServer] unhandled"
+    | .notification method@("textDocument/didChange") (some params) =>
+      let params : Json := ToJson.toJson params
+      -- let params ← modifyJson params ["params","contentChanges", .allInArray, "range", "start", "line"] (· + 1)
+      -- let params ← modifyJson params ["params","contentChanges", .allInArray, "range", "end", "line"] (· + 1)
+      return .notification method (← toStructured params)
 
-      let contentChangeNew : Json := .arr <| contentChanges.map (shiftRange (·+1))
-
-      params := params.setObjVal! "contentChanges" contentChangeNew
-      let .ok paramsStructured := Json.toStructured? params
-        | panic! "[GameServer] unhandled"
-      debug_msg s!"{params}"
-      return .notification method paramsStructured
-
-
-    | .request id method@("$/lean/rpc/call") params? =>
+    | .request id method@("$/lean/rpc/call") params? => do
       let some params := params?
         | panic! "[GameServer] unhandled"
-      let params : RpcCallParams ← parseParams RpcCallParams (toJson params)
-      debug_msg s!"Method: {params.method} {params.method == `Game.getInteractiveGoals}"
-      if params.method == `Game.getInteractiveGoals || params.method == `Game.getProofState then
-        let p := params.params
-        let p : TextDocumentPositionParams ← parseParams TextDocumentPositionParams (toJson p)
-        let p : TextDocumentPositionParams := {p with position := {p.position with line := p.position.line + 1}}
-        let params := {params with params := toJson p, position := {params.position with line := params.position.line + 1}}
-        let .ok params := Json.toStructured? params
-          | panic! "[GameServer] unhandled"
-        return .request id method (some params)
-      else
-        return .request id method params?
+      let params := toJson params
+      match params.getObjValAs? String "method" with
+      | .error e => panic! s!"[GameServer] Missing method in rpc call: {e}"
+      | .ok "Lean.Widget.getInteractiveTermGoal"
+      | .ok "Game.getInteractiveGoals"
+      | .ok "Game.getProofState" => do
+        -- let params ← modifyJson params ["params","position", "line"] (· + 1)
+        -- let params ← modifyJson params ["position", "line"] (· + 1)
+        return .request id method (some (← toStructured params))
+      | .ok "Lean.Widget.getWidgets" => do
+        -- let params ← modifyJson params ["params", "line"] (· + 1)
+        -- let params ← modifyJson params ["position", "line"] (· + 1)
+        return .request id method (some (← toStructured params))
+      | .ok "Lean.Widget.getInteractiveDiagnostics" => do
+        -- let params ← modifyJson params ["params", .optional "lineRange", "start"] (· + 1)
+        -- let params ← modifyJson params ["params", .optional "lineRange", "end"] (· + 1)
+        -- let params ← modifyJson params ["position", "line"] (· + 1)
+        return .request id method (some (← toStructured params))
+      | .ok _ => return .request id method params?
 
     | .request id method params? =>
       -- debug_msg s!"TODO client request {method} not implemented!"

@@ -220,12 +220,11 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
     -- TODO (Alex): I couldn't find a good condition to find the correct snap. So we are looking
     -- for the first snap with goals here.
     -- NOTE (Jon): The entire proof is in one snap, so hoped that Position `0` is good enough.
-    (fun snap => ¬ (snap.infoTree.goalsAt? doc.meta.text 0).isEmpty)
+    (fun snap => ¬ (snap.infoTree.goalsAt? doc.meta.text doc.meta.text.positions.back).isEmpty)
     (notFoundX := return none)
     fun snap => do
       -- `snap` is the one snapshot containing the entire proof.
       let mut steps : Array <| InteractiveGoalsWithHints := #[]
-
       -- Question: Is there a difference between the diags of this snap and the last snap?
       -- Should we get the diags from there?
       -- Answer: The last snap only copied the diags from the end of this snap
@@ -237,18 +236,16 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
 
       let mut intermediateGoalCount := 0
 
-      -- only the positions that have non-whitespace characters since the last position
-      -- should add a new proof step.
-      let positionsWithSource : Array (String.Pos × String) :=
-        text.positions.zipWithIndex.filterMap (
-          fun (pos, i) => match i with
-          | 0 => some (pos, "")
-          | i' + 1 =>
-            let source : String := Substring.toString ⟨text.source, text.positions.get! i', pos⟩
-            if source.trim.length == 0 then
-              none
-            else
-              some (pos, source))
+      let positionsWithSource : Array (String.Pos × String) := Id.run do
+        let mut res := #[]
+        for i in [0:text.positions.size] do
+          let source : String :=
+            Substring.toString ⟨text.source, text.positions.get! i, text.positions.get! (i + 1)⟩
+          if i < 1 then continue -- skip problem statement
+          if i >= text.positions.size - 2 then continue -- skip final `done`
+          if source.trim.length == 0 then continue -- skip empty lines
+          res := res.push (text.positions.get! i, source)
+        return res
 
       -- Drop the last position as we ensured that there is always a newline at the end
       for ((pos, source), i) in positionsWithSource.zipWithIndex do
@@ -284,7 +281,7 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
 
               let interactiveGoals : List InteractiveGoalWithHints ← ci.runMetaM {} do
                 goalMvars.mapM fun goal => do
-                  let hints ← findHints goal doc.meta rc.initParams
+                  let hints := #[] -- TODO: HINTS← findHints goal doc.meta rc.initParams
                   let interactiveGoal ← goalToInteractive goal
                   return ⟨interactiveGoal, hints⟩
               -- TODO: This code is way old, can it be deleted?
