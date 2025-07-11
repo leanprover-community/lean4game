@@ -67,7 +67,7 @@
   "Funding": "Financiación",
   "Level": "Nivel",
   "Introduction": "Introducción",
-  "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>¿Deseas borrar tu progreso para siempre?</p><p>(Esto eliminará tus pruebas y tu inventario recopilado. El progreso de otros juegos no se elimina.)</p>",
+  "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>¿Deseas borrar tu progreso para siempre?</p><p>(Esto eliminará tus pruebas y tu inventario recopilado. El progreso de otros juegos no se eliminará.)</p>",
   "Delete Progress?": "¿Borrar Progreso?",
   "Delete": "Borrar",
   "Download & Delete": "Descargar y Borrar",
