@@ -79,6 +79,8 @@ export class GameSessionsObserver {
     let gameSession: GameSession = this.gameManager.startGame(req, ip)
     let ps = gameSession.process
     let game = gameSession.game
+    let gameDir = gameSession.gameDir
+
     const langRegex: RegExp = /^[a-zA-Z-]+(?=,)/
     let lang = "en-US"
 
@@ -104,7 +106,9 @@ export class GameSessionsObserver {
       ws.close()
     });
     const serverConnection = jsonrpcserver.createProcessStreamConnection(this.players.get(ws).process);
-    this.gameManager.devConnectionLog(socketConnection, serverConnection)
+
+    this.gameManager.messageTranslation(socketConnection, serverConnection, gameDir)
+
     socketConnection.onClose(() => {
       serverConnection.dispose()
     })

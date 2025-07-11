@@ -239,10 +239,10 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
       let positionsWithSource : Array (String.Pos × String) := Id.run do
         let mut res := #[]
         for i in [0:text.positions.size] do
-          let source : String :=
-            Substring.toString ⟨text.source, text.positions.get! i, text.positions.get! (i + 1)⟩
           if i < 1 then continue -- skip problem statement
           if i >= text.positions.size - 2 then continue -- skip final `done`
+          let source : String :=
+            Substring.toString ⟨text.source, text.positions.get! i, text.positions.get! (i + 1)⟩
           if source.trim.length == 0 then continue -- skip empty lines
           res := res.push (text.positions.get! i, source)
         return res
@@ -255,7 +255,7 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
         -- positions by `1`.
         let lspPosAt := text.utf8PosToLspPos pos
 
-        let mut diagsAtPos : Array InteractiveDiagnostic := filterUnsolvedGoal <|
+        let diagsAtPos : Array InteractiveDiagnostic :=
           -- `+1` for getting the errors after the line.
           match i with
           | 0 =>
@@ -265,6 +265,8 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
             diag.filter (fun d =>
               ((text.utf8PosToLspPos <| (positionsWithSource.get! i').1) ≤ d.range.start) ∧
               d.range.start < lspPosAt )
+
+        let diagsAtPos := filterUnsolvedGoal diagsAtPos
 
         if let goalsAtResult@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text pos then
           let goalsAtPos' : List <| List InteractiveGoalWithHints ← goalsAtResult.mapM
@@ -296,7 +298,7 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
               return interactiveGoals
           let goalsAtPos : Array InteractiveGoalWithHints := ⟨goalsAtPos'.foldl (· ++ ·) []⟩
 
-          diagsAtPos ← completionDiagnostics goalsAtPos.size intermediateGoalCount
+          let diagsAtPos ← completionDiagnostics goalsAtPos.size intermediateGoalCount
             completed completedWithWarnings lspPosAt diagsAtPos
 
           intermediateGoalCount := goalsAtPos.size

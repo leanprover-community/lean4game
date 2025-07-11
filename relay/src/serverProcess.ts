@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 type Tag = { owner: string; repo: string; };
-export type GameSession = { process: ChildProcess, game: string}
+export type GameSession = { process: ChildProcess, game: string, gameDir: string}
 const environment = process.env.NODE_ENV;
 const isDevelopment = environment === 'development';
 
@@ -58,7 +58,9 @@ export class GameManager {
       return;
     }
 
-    return {process: ps, game: game}
+    const gameDir = this.getGameDir(reResTag.owner, reResTag.repo)
+
+    return {process: ps, game: game, gameDir: gameDir}
   }
 
   createGameProcess(owner, repo) {
@@ -75,8 +77,8 @@ export class GameManager {
         serverProcess = cp.spawn("./gameserver", args, { cwd: binDir });
       } else {
         // If the game is built with `-Klean4game.local` there is no copy in the lake packages.
-        serverProcess = cp.spawn("./gameserver", args,
-          { cwd: path.join(this.dir, "..", "..", "..", "server", ".lake", "build", "bin") });
+        serverProcess = cp.spawn("lake", ["serve", "--"],
+          { cwd: path.join(this.dir, "..", "..", "..", "..", "GameSkeleton") });
       }
     } else {
       serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
@@ -109,7 +111,11 @@ export class GameManager {
     }
   }
 
-  devConnectionLog(socketConnection: jsonrpcserver.IConnection, serverConnection: jsonrpcserver.IConnection) {
+  messageTranslation(
+    socketConnection: jsonrpcserver.IConnection,
+    serverConnection: jsonrpcserver.IConnection,
+    gameDir: string
+  ) {
 
     let shiftLines = (p : any, offset : number) => {
       if (p.hasOwnProperty("line")) {
@@ -127,8 +133,39 @@ export class GameManager {
       return p;
     }
 
-    socketConnection.forward(serverConnection, message => {
+    let difficulty: number
+    let inventory: string[]
+
+    socketConnection.forward(serverConnection, (message: any) => {
+
       if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
+
+      if (message.method === "initialize") {
+        difficulty = message.params.initializationOptions.difficulty
+        inventory = message.params.initializationOptions.inventory
+      }
+
+      if (message.method === "textDocument/didOpen") {
+        // Parse the URI to get world and level
+        const uri = new URL(message.params.textDocument.uri)
+        const pathParts = path.parse(uri.pathname)
+        const worldId = path.basename(pathParts.dir)
+        const levelId = pathParts.name
+
+        // Read game data from JSON file
+        const gameDataPath = path.join(gameDir, '.lake', 'gamedata', `game.json`)
+        const levelDataPath = path.join(gameDir, '.lake', 'gamedata', `level__${worldId}__${levelId}.json`)
+        const gameData = JSON.parse(fs.readFileSync(gameDataPath, 'utf8'))
+        const levelData = JSON.parse(fs.readFileSync(levelDataPath, 'utf8'))
+
+        let content = message.params.textDocument.text;
+        message.params.textDocument.text =
+          `import ${levelData.module} import GameServer.Runner Runner `+
+          `${JSON.stringify(gameData.name)} ${JSON.stringify(worldId)} ${levelId} ` +
+          `${difficulty} ${JSON.stringify(inventory)} `+
+          `:= by\n${content}\ndone`
+      }
+
       return shiftLines(message, +1);
     });
     serverConnection.forward(socketConnection, message => {
