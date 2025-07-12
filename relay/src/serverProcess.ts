@@ -160,10 +160,11 @@ export class GameManager {
 
         let content = message.params.textDocument.text;
         message.params.textDocument.text =
-          `import ${levelData.module} import GameServer.Runner Runner `+
+          `import ${levelData.module} import GameServer.Runner Runner ` +
           `${JSON.stringify(gameData.name)} ${JSON.stringify(worldId)} ${levelId} ` +
-          `${difficulty} ${JSON.stringify(inventory)} `+
-          `:= by\n${content}\ndone`
+          `(difficulty := ${difficulty}) ` +
+          `(inventory := [${inventory.map(s => JSON.stringify(s)).join(',')}]) ` +
+          `:= by\n${content}`
       }
 
       return shiftLines(message, +1);

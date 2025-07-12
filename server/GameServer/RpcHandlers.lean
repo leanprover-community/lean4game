@@ -236,6 +236,7 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
 
       let mut intermediateGoalCount := 0
 
+      -- TODO(Alex): for some reason, the client expects an empty tactic in the beginning
       let positionsWithSource : Array (String.Pos × String) := Id.run do
         let mut res := #[]
         for i in [0:text.positions.size] do
