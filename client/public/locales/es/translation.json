@@ -52,7 +52,7 @@
   "Tactics": "Tácticas",
   "Definitions": "Definiciones",
   "Theorems": "Teoremas",
-  "Not unlocked yet": "No desbloqueado aún",
+  "Not unlocked yet": "Aún no desbloqueado",
   "Not available in this level": "No disponible en este nivel",
   "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "Un repositorio de juegos educativos sobre el asistente de demostración <1>Lean</1>, <i>(Lean 4)</i> y su librería matemática <5>mathlib</5> ",
   "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder.": "No se ha cargado ningún juego. Usa <1>http://localhost:3000/#/g/local/FOLDER</1> para abrir un juego directamente desde una carpeta local",
