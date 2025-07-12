@@ -236,16 +236,20 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
 
       let mut intermediateGoalCount := 0
 
-      -- TODO(Alex): for some reason, the client expects an empty tactic in the beginning
       let positionsWithSource : Array (String.Pos × String) := Id.run do
         let mut res := #[]
         for i in [0:text.positions.size] do
-          if i < 1 then continue -- skip problem statement
-          if i >= text.positions.size - 2 then continue -- skip final `done`
+          --TODO(ALEX): Generalize for other start positions
+          let PROOF_START_LINE := 2
+          if i < PROOF_START_LINE then continue -- skip problem statement
+          -- for some reason, the client expects an empty tactic in the beginning
+          if i == PROOF_START_LINE then
+            res := res.push (text.positions.get! i, "")
+          if i >= text.positions.size - 2 then continue -- skip final linebreak
           let source : String :=
             Substring.toString ⟨text.source, text.positions.get! i, text.positions.get! (i + 1)⟩
           if source.trim.length == 0 then continue -- skip empty lines
-          res := res.push (text.positions.get! i, source)
+          res := res.push (text.positions.get! (i + 1), source)
         return res
 
       -- Drop the last position as we ensured that there is always a newline at the end
@@ -287,15 +291,6 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
                   let hints := #[] -- TODO: HINTS← findHints goal doc.meta rc.initParams
                   let interactiveGoal ← goalToInteractive goal
                   return ⟨interactiveGoal, hints⟩
-              -- TODO: This code is way old, can it be deleted?
-              -- compute the goal diff
-              -- let goals ← ciAfter.runMetaM {} (do
-              --     try
-              --       Widget.diffInteractiveGoals useAfter ti goals
-              --     catch _ =>
-              --       -- fail silently, since this is just a bonus feature
-              --       return goals
-              -- )
               return interactiveGoals
           let goalsAtPos : Array InteractiveGoalWithHints := ⟨goalsAtPos'.foldl (· ++ ·) []⟩
 

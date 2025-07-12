@@ -119,11 +119,11 @@ export class GameManager {
 
     let shiftLines = (p : any, offset : number) => {
       if (p.hasOwnProperty("line")) {
-        p.line += offset
+        p.line = Math.max(0, p.line + offset)
       }
       if (p.hasOwnProperty("lineRange")) {
-        p.lineRange.start += offset
-        p.lineRange.end += offset
+        p.lineRange.start = Math.max(0, p.lineRange.start + offset)
+        p.lineRange.end = Math.max(0, p.lineRange.end + offset)
       }
       for (let key in p) {
         if (typeof p[key] === 'object' && p[key] !== null) {
@@ -133,8 +133,11 @@ export class GameManager {
       return p;
     }
 
+    // These values will be set by the initialize message
     let difficulty: number
     let inventory: string[]
+
+    const PROOF_START_LINE = 2
 
     socketConnection.forward(serverConnection, (message: any) => {
 
@@ -164,14 +167,14 @@ export class GameManager {
           `${JSON.stringify(gameData.name)} ${JSON.stringify(worldId)} ${levelId} ` +
           `(difficulty := ${difficulty}) ` +
           `(inventory := [${inventory.map(s => JSON.stringify(s)).join(',')}]) ` +
-          `:= by\n${content}`
+          `:= by\nskip\n${content}\n`
       }
 
-      return shiftLines(message, +1);
+      return shiftLines(message, +PROOF_START_LINE);
     });
     serverConnection.forward(socketConnection, message => {
       if (isDevelopment) { console.log(`SERVER: ${JSON.stringify(message)}`); }
-      return shiftLines(message, -1);
+      return shiftLines(message, -PROOF_START_LINE);
     });
   }
 
