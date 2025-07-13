@@ -107,7 +107,9 @@ export class GameSessionsObserver {
     });
     const serverConnection = jsonrpcserver.createProcessStreamConnection(this.players.get(ws).process);
 
-    this.gameManager.messageTranslation(socketConnection, serverConnection, gameDir)
+    this.gameManager.messageTranslation(
+      socketConnection, serverConnection, gameDir, gameSession.usesCustomLeanServer
+    )
 
     socketConnection.onClose(() => {
       serverConnection.dispose()

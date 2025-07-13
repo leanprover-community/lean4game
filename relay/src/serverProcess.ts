@@ -6,7 +6,12 @@ import fs from 'fs';
 import path from 'path';
 
 type Tag = { owner: string; repo: string; };
-export type GameSession = { process: ChildProcess, game: string, gameDir: string}
+export type GameSession = {
+  process: ChildProcess,
+  game: string,
+  gameDir: string,
+  usesCustomLeanServer: boolean
+}
 const environment = process.env.NODE_ENV;
 const isDevelopment = environment === 'development';
 
@@ -42,9 +47,10 @@ export class GameManager {
     const reResTag: Tag = { owner: reRes[1], repo: reRes[2] };
     const tag = this.getTagString(reResTag);
     const game = `${reResTag.owner}/${reResTag.repo}`
+    const customLeanServer = this.getCustomLeanServer(reResTag.owner, reResTag.repo)
 
     if (!this.queue[tag] || this.queue[tag].length == 0) {
-      ps = this.createGameProcess(reResTag.owner, reResTag.repo);
+      ps = this.createGameProcess(reResTag.owner, reResTag.repo, customLeanServer);
       // TODO (Matvey): extract further information from `req`, for example browser language.
       console.log(`[${new Date()}] Socket opened by ${ip} on ${game}`);
     } else {
@@ -60,29 +66,40 @@ export class GameManager {
 
     const gameDir = this.getGameDir(reResTag.owner, reResTag.repo)
 
-    return {process: ps, game: game, gameDir: gameDir}
+    return {process: ps, game: game, gameDir: gameDir, usesCustomLeanServer: customLeanServer !== null }
   }
 
-  createGameProcess(owner, repo) {
+  getCustomLeanServer(owner, repo) : string | null {
+    let gameDir = this.getGameDir(owner, repo);
+    let binary = path.join(gameDir, ".lake", "packages", "GameServer", "server", ".lake", "build", "bin", "gameserver");
+    if (fs.existsSync(binary)) {
+      return binary
+    } else {
+      return null
+    }
+  }
+
+  createGameProcess(owner: string, repo: string, customLeanServer: string | null) {
     let game_dir = this.getGameDir(owner, repo);
     if (!game_dir) return;
 
     let serverProcess: cp.ChildProcessWithoutNullStreams;
     if (isDevelopment) {
-      let args = ["--server", game_dir];
-      let binDir = path.join(game_dir, ".lake", "packages", "GameServer", "server", ".lake", "build", "bin");
-      // Note: `cwd` is important to be the `bin` directory as `Watchdog` calls `./gameserver` again
-      if (fs.existsSync(binDir)) {
-        // Try to use the game's own copy of `gameserver`.
-        serverProcess = cp.spawn("./gameserver", args, { cwd: binDir });
+      if (customLeanServer) {
+        // If the game still uses a custom Lean server, use it.
+        // Note: `cwd` is important to be the `bin` directory as `Watchdog` calls `./gameserver` again
+        serverProcess = cp.spawn(
+          path.join(".", path.basename(customLeanServer)),
+          ["--server", game_dir],
+          { cwd: path.dirname(customLeanServer) }
+        );
       } else {
-        // If the game is built with `-Klean4game.local` there is no copy in the lake packages.
-        serverProcess = cp.spawn("lake", ["serve", "--"],
-          { cwd: path.join(this.dir, "..", "..", "..", "..", "GameSkeleton") });
+        serverProcess = cp.spawn("lake", ["serve", "--"], { cwd: game_dir });
       }
     } else {
+      console.log(path.dirname(customLeanServer))
       serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
-        [game_dir, path.join(this.dir, '..')],
+        [game_dir, path.join(this.dir, '..', '..', '..'), customLeanServer ? "true" : "false"],
         { cwd: this.dir });
     }
 
@@ -102,7 +119,10 @@ export class GameManager {
     const tagString = this.getTagString(tag);
     while (this.queue[tagString].length < this.queueLength[tagString]) {
       let serverProcess: cp.ChildProcessWithoutNullStreams;
-      serverProcess = this.createGameProcess(tag.owner, tag.repo);
+      serverProcess = this.createGameProcess(
+        tag.owner, tag.repo,
+        this.getCustomLeanServer(tag.owner, tag.repo)
+      );
       if (serverProcess == null) {
         console.error('serverProcess was undefined/null');
         return;
@@ -114,7 +134,8 @@ export class GameManager {
   messageTranslation(
     socketConnection: jsonrpcserver.IConnection,
     serverConnection: jsonrpcserver.IConnection,
-    gameDir: string
+    gameDir: string,
+    usesCustomLeanServer: boolean
   ) {
 
     let shiftLines = (p : any, offset : number) => {
@@ -145,6 +166,8 @@ export class GameManager {
     socketConnection.forward(serverConnection, (message: any) => {
 
       if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
+
+      if (usesCustomLeanServer) return message
 
       if (message.method === "initialize") {
         difficulty = message.params.initializationOptions.difficulty
@@ -177,6 +200,9 @@ export class GameManager {
     });
     serverConnection.forward(socketConnection, message => {
       if (isDevelopment) { console.log(`SERVER: ${JSON.stringify(message)}`); }
+
+      if (usesCustomLeanServer) return message
+
       return shiftLines(message, -PROOF_START_LINE);
     });
   }
