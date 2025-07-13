@@ -139,6 +139,9 @@ export class GameManager {
 
     const PROOF_START_LINE = 2
 
+    const gameDataPath = path.join(gameDir, '.lake', 'gamedata', `game.json`)
+    const gameData = JSON.parse(fs.readFileSync(gameDataPath, 'utf8'))
+
     socketConnection.forward(serverConnection, (message: any) => {
 
       if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
@@ -146,6 +149,8 @@ export class GameManager {
       if (message.method === "initialize") {
         difficulty = message.params.initializationOptions.difficulty
         inventory = message.params.initializationOptions.inventory
+        // We abuse the rootUri field to pass the game name to the server
+        message.params.rootUri = gameData.name
       }
 
       if (message.method === "textDocument/didOpen") {
@@ -155,10 +160,8 @@ export class GameManager {
         const worldId = path.basename(pathParts.dir)
         const levelId = pathParts.name
 
-        // Read game data from JSON file
-        const gameDataPath = path.join(gameDir, '.lake', 'gamedata', `game.json`)
+        // Read level data from JSON file
         const levelDataPath = path.join(gameDir, '.lake', 'gamedata', `level__${worldId}__${levelId}.json`)
-        const gameData = JSON.parse(fs.readFileSync(gameDataPath, 'utf8'))
         const levelData = JSON.parse(fs.readFileSync(levelDataPath, 'utf8'))
 
         let content = message.params.textDocument.text;

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useContext } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
@@ -17,7 +17,7 @@ import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } fro
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext } from './context'
+import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, WorldLevelIdContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
@@ -78,6 +78,8 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const model = editor.getModel()
   const uri = model.uri.toString()
 
+  const {worldId, levelId} = useContext(WorldLevelIdContext)
+
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
@@ -113,7 +115,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       }])
       setTypewriterInput('')
       // Load proof after executing edits
-      loadGoals(rpcSess, uri, setProof, setCrashed)
+      loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
     }
 
     editor.setPosition(pos)
@@ -127,7 +129,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   /* Load proof on start/switching to typewriter */
   useEffect(() => {
-    loadGoals(rpcSess, uri, setProof, setCrashed)
+    loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
   }, [])
 
   /** If the last step has an error, add the command to the typewriter. */

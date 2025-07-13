@@ -13,18 +13,6 @@ open Meta
 
 namespace GameServer
 
-def levelIdFromFileName? (initParams : Lsp.InitializeParams) (fileName : String) : Option LevelId := Id.run do
-  let fileParts := fileName.splitOn "/"
-  if fileParts.length == 3 then
-    if let (some level, some game) := (fileParts[2]!.toNat?, initParams.rootUri?) then
-      return some {game, world := fileParts[1]!, level := level}
-  return none
-
-def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameLevel) := do
-  let some levelId := levelIdFromFileName? initParams fileName
-    | return none
-  return ← getLevel? levelId
-
 structure FVarBijection :=
   (forward : HashMap FVarId FVarId)
   (backward : HashMap FVarId FVarId)
@@ -106,10 +94,8 @@ def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true) (in
 
 open Meta in
 /-- Find all hints whose trigger matches the current goal -/
-def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializeParams) : MetaM (Array GameHint) := do
+def findHints (goal : MVarId) (level : GameLevel) : MetaM (Array GameHint) := do
   goal.withContext do
-    let some level ← getLevelByFileName? initParams m.mkInputContext.fileName
-      | throwError "Level not found: {m.mkInputContext.fileName}"
     let hints ← level.hints.filterMapM fun hint => do
       openAbstractCtxResult hint.goal fun hintFVars hintGoal => do
         if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
@@ -206,11 +192,15 @@ def completionDiagnostics (goalCount : Nat) (prevGoalCount : Nat) (completed : B
 
   return out
 
+structure ProofStateParams extends Lsp.PlainGoalParams where
+  worldId: String
+  levelId: Nat
+  deriving FromJson, ToJson
 
 /-- Request that returns the goals at the end of each line of the tactic proof
 plus the diagnostics (i.e. warnings/errors) for the proof.
  -/
-def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option ProofState)) := do
+def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofState)) := do
   let doc ← readDoc
   let rc ← readThe RequestContext
   let text := doc.meta.text
@@ -288,7 +278,11 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
 
               let interactiveGoals : List InteractiveGoalWithHints ← ci.runMetaM {} do
                 goalMvars.mapM fun goal => do
-                  let hints := #[] -- TODO: HINTS← findHints goal doc.meta rc.initParams
+                  let some game := rc.initParams.rootUri?
+                    | throwError "GameId not found"
+                  let some level ← getLevel? {game := game, world := p.worldId, level := p.levelId}
+                    | throwError "Level not found"
+                  let hints ← findHints goal level
                   let interactiveGoal ← goalToInteractive goal
                   return ⟨interactiveGoal, hints⟩
               return interactiveGoals
@@ -364,5 +358,5 @@ def Game.getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (
   FileWorker.getInteractiveGoals p
 
 @[server_rpc_method]
-def Game.getProofState (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option GameServer.ProofState)) :=
+def Game.getProofState (p : GameServer.ProofStateParams) : RequestM (RequestTask (Option GameServer.ProofState)) :=
   GameServer.getProofState p

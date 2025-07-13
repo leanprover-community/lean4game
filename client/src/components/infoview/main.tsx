@@ -452,7 +452,7 @@ export function TypewriterInterface({props}) {
       setSelectedStep(undefined)
       setTypewriterInput(proof?.steps[line].command)
       // Reload proof on deleting
-      loadGoals(rpcSess, uri, setProof, setCrashed)
+      loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
       ev.stopPropagation()
     }
   }
