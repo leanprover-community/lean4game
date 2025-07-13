@@ -207,9 +207,7 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
 
   withWaitFindSnap
     doc
-    -- TODO (Alex): I couldn't find a good condition to find the correct snap. So we are looking
-    -- for the first snap with goals here.
-    -- NOTE (Jon): The entire proof is in one snap, so hoped that Position `0` is good enough.
+    -- TODO(Alex): I couldn't find a good condition to find the correct snap.
     (fun snap => ¬ (snap.infoTree.goalsAt? doc.meta.text doc.meta.text.positions.back).isEmpty)
     (notFoundX := return none)
     fun snap => do
