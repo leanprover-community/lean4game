@@ -89,7 +89,7 @@ export class GameManager {
         // If the game still uses a custom Lean server, use it.
         // Note: `cwd` is important to be the `bin` directory as `Watchdog` calls `./gameserver` again
         serverProcess = cp.spawn(
-          path.join(".", path.basename(customLeanServer)),
+          "./" + path.basename(customLeanServer),
           ["--server", game_dir],
           { cwd: path.dirname(customLeanServer) }
         );
@@ -97,14 +97,12 @@ export class GameManager {
         serverProcess = cp.spawn("lake", ["serve", "--"], { cwd: game_dir });
       }
     } else {
-      console.log(path.dirname(customLeanServer))
       serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
         [game_dir, path.join(this.dir, '..', '..', '..'), customLeanServer ? "true" : "false"],
         { cwd: this.dir });
     }
 
-    serverProcess.on('error', error => console.error(`Launching Lean Server failed: ${error}`)
-    );
+    serverProcess.on('error', error => console.error(`Launching Lean Server failed: ${error}`));
     if (serverProcess.stderr !== null) {
       serverProcess.stderr.on('data', data => console.error(`Lean Server: ${data}`)
       );
