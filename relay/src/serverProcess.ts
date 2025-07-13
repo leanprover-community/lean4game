@@ -80,7 +80,7 @@ export class GameManager {
       }
     } else {
       serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
-        [game_dir, path.join(this.dir, '..')],
+        [game_dir, path.join(this.dir, '..', '..', '..')],
         { cwd: this.dir });
     }
 

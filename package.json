@@ -85,7 +85,7 @@
     "build_server": "cd server && lake build",
     "build_client": "cross-env NODE_ENV=production vite build",
     "build_relay": "tsc -b ./relay",
-    "production": "cross-env NODE_ENV=production node relay/index.mjs",
+    "production": "cross-env NODE_ENV=production node relay/dist/src/index.js",
     "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs"
   },
   "eslintConfig": {
