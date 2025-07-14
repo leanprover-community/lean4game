@@ -122,7 +122,7 @@ export class GameManager {
 
   getGameDir(owner: string, repo: string) {
     owner = owner.toLowerCase();
-    if (owner == 'local') {
+    if (owner == 'local' || owner == 'test') {
       if (!isDevelopment) {
         console.error(`No local games in production mode.`);
         return "";
@@ -139,6 +139,8 @@ export class GameManager {
     let game_dir: string
     if(owner == 'local') {
       game_dir = path.join(this.dir, '..', '..', '..', '..', repo)
+    } else if (owner == 'test') {
+      game_dir = path.join(this.dir, '..', '..', '..', 'cypress', repo)
     } else {
       game_dir = path.join(this.dir, '..', '..', '..', 'games', `${owner}`, `${repo.toLowerCase()}`);
     }

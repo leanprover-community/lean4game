@@ -66,6 +66,7 @@
     "@types/ws": "^8.18.1",
     "concurrently": "^7.6.0",
     "css-loader": "^6.7.3",
+    "cypress": "^14.5.0",
     "file-loader": "^6.2.0",
     "i18next-scanner": "^4.4.0",
     "nodemon": "^3.0.1",
@@ -85,8 +86,10 @@
     "build_server": "cd server && lake build",
     "build_client": "cross-env NODE_ENV=production vite build",
     "build_relay": "tsc -b ./relay",
+    "build_test": "cd cypress/TestGame && lake build",
     "production": "cross-env NODE_ENV=production node relay/index.mjs",
-    "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs"
+    "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs",
+    "test": "concurrently -n server,cypress -c blue,green \"npm start\" \"cypress run\" -k -s first"
   },
   "eslintConfig": {
     "extends": [

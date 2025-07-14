@@ -1,23 +1,32 @@
-name: Build
-run-name: Build the project
+name: Test
+run-name: Test the project
 on:
   workflow_dispatch:
   push:
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: install elan
+      - name: Install elan
         run: |
           set -o pipefail
           curl -sSfL https://github.com/leanprover/elan/releases/download/v3.0.0/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
           ./elan-init -y
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
-      - name: print lean and lake versions
+
+      - name: Print lean and lake versions
         run: |
           lean --version
           lake --version
-      - run: npm install
-      - run: npm run build
+
+      - name: Build the project
+        run: |
+          npm install
+          npm run build
+          npm run build_test
+
+      - name: Run Cypress tests
+        run: npm run test
