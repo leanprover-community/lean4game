@@ -79,8 +79,9 @@ export class GameManager {
           { cwd: path.join(this.dir, "..", "..", "..", "server", ".lake", "build", "bin") });
       }
     } else {
+      const lean4GameFolder = path.join(this.dir, '..', '..', '..')
       serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
-        [game_dir, path.join(this.dir, '..', '..', '..')],
+        [game_dir, lean4GameFolder],
         { cwd: this.dir });
     }
 
