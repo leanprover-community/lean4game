@@ -8,14 +8,15 @@ open Server
 open Widget
 open RequestM
 open Meta
+open Std
 
 /-! ## GameGoal -/
 
 namespace GameServer
 
-structure FVarBijection :=
-  (forward : HashMap FVarId FVarId)
-  (backward : HashMap FVarId FVarId)
+structure FVarBijection where
+  forward : HashMap FVarId FVarId
+  backward : HashMap FVarId FVarId
 
 instance : EmptyCollection FVarBijection := ⟨{},{}⟩
 
@@ -23,8 +24,8 @@ def FVarBijection.insert (bij : FVarBijection) (a b : FVarId) : FVarBijection :=
   ⟨bij.forward.insert a b, bij.backward.insert b a⟩
 
 def FVarBijection.insert? (bij : FVarBijection) (a b : FVarId) : Option FVarBijection :=
-  let a' := bij.forward.find? a
-  let b' := bij.forward.find? b
+  let a' := bij.forward.get? a
+  let b' := bij.forward.get? b
   if (a' == none || a' == some b) && (b' == none || b' == some a)
   then some $ bij.insert a b
   else none
@@ -115,7 +116,7 @@ def findHints (goal : MVarId) (level : GameLevel) : MetaM (Array GameHint) := do
           if let some bij ← matchDecls hintFVars lctx.getFVars
             (strict := hint.strict) (initBij := fvarBij)
           then
-            let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
+            let userFVars := hintFVars.map fun v => bij.forward.getD v.fvarId! v.fvarId!
             -- Evaluate the text in the player's context to get the new variable names.
             let text := (← evalHintMessage hint.text) (userFVars.map Expr.fvar)
             let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := lctx, opts := {}}
@@ -205,18 +206,12 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
   let rc ← readThe RequestContext
   let text := doc.meta.text
 
-  withWaitFindSnap
-    doc
-    -- TODO(Alex): I couldn't find a good condition to find the correct snap.
-    (fun snap => ¬ (snap.infoTree.goalsAt? doc.meta.text doc.meta.text.positions.back).isEmpty)
-    (notFoundX := return none)
-    fun snap => do
-      -- `snap` is the one snapshot containing the entire proof.
+
+  let hoverPos := doc.meta.text.positions.back?.getD 0
+
+  mapTaskCostly doc.cmdSnaps.waitAll fun (snaps, _) => do
       let mut steps : Array <| InteractiveGoalsWithHints := #[]
-      -- Question: Is there a difference between the diags of this snap and the last snap?
-      -- Should we get the diags from there?
-      -- Answer: The last snap only copied the diags from the end of this snap
-      let mut diag : Array InteractiveDiagnostic := snap.interactiveDiags.toArray
+      let mut diag : Array InteractiveDiagnostic ← doc.diagnosticsRef.get
 
       -- Level is completed if there are no errors or warnings
       let completedWithWarnings : Bool := ¬ diag.any (·.severity? == some .error)
@@ -232,16 +227,16 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
           if i < PROOF_START_LINE then continue -- skip problem statement
           -- for some reason, the client expects an empty tactic in the beginning
           if i == PROOF_START_LINE then
-            res := res.push (text.positions.get! i, "")
+            res := res.push (text.positions[i]!, "")
           if i >= text.positions.size - 2 then continue -- skip final linebreak
           let source : String :=
-            Substring.toString ⟨text.source, text.positions.get! i, text.positions.get! (i + 1)⟩
+            Substring.toString ⟨text.source, text.positions[i]!, text.positions[i + 1]!⟩
           if source.trim.length == 0 then continue -- skip empty lines
-          res := res.push (text.positions.get! (i + 1), source)
+          res := res.push (text.positions[i + 1]!, source)
         return res
 
       -- Drop the last position as we ensured that there is always a newline at the end
-      for ((pos, source), i) in positionsWithSource.zipWithIndex do
+      for ((pos, source), i) in positionsWithSource.zipIdx do
         -- iterate over all steps in the proof and get the goals and hints at each position
 
         -- diags are labeled in Lsp-positions, which differ from the lean-internal
@@ -256,50 +251,51 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
             diag.filter (fun d => d.range.start == lspPosAt )
           | i' + 1 =>
             diag.filter (fun d =>
-              ((text.utf8PosToLspPos <| (positionsWithSource.get! i').1) ≤ d.range.start) ∧
+              ((text.utf8PosToLspPos <| (positionsWithSource[i']!).1) ≤ d.range.start) ∧
               d.range.start < lspPosAt )
 
         let diagsAtPos := filterUnsolvedGoal diagsAtPos
 
-        if let goalsAtResult@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text pos then
-          let goalsAtPos' : List <| List InteractiveGoalWithHints ← goalsAtResult.mapM
-            fun { ctxInfo := ci, tacticInfo := tacticInfo, useAfter := useAfter, .. } => do
-              -- TODO: What does this function body do?
-              -- let ciAfter := { ci with mctx := ti.mctxAfter }
-              let ci := if useAfter then
-                  { ci with mctx := tacticInfo.mctxAfter }
-                else
-                  { ci with mctx := tacticInfo.mctxBefore }
-              -- compute the interactive goals
-              let goalMvars : List MVarId ← ci.runMetaM {} do
-                return if useAfter then tacticInfo.goalsAfter else tacticInfo.goalsBefore
+        for snap in snaps do
+          if let goalsAtResult@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text pos then
+            let goalsAtPos' : List <| List InteractiveGoalWithHints ← goalsAtResult.mapM
+              fun { ctxInfo := ci, tacticInfo := tacticInfo, useAfter := useAfter, .. } => do
+                -- TODO: What does this function body do?
+                -- let ciAfter := { ci with mctx := ti.mctxAfter }
+                let ci := if useAfter then
+                    { ci with mctx := tacticInfo.mctxAfter }
+                  else
+                    { ci with mctx := tacticInfo.mctxBefore }
+                -- compute the interactive goals
+                let goalMvars : List MVarId ← ci.runMetaM {} do
+                  return if useAfter then tacticInfo.goalsAfter else tacticInfo.goalsBefore
 
-              let interactiveGoals : List InteractiveGoalWithHints ← ci.runMetaM {} do
-                goalMvars.mapM fun goal => do
-                  let some game := rc.initParams.rootUri?
-                    | throwError "GameId not found"
-                  let some level ← getLevel? {game := game, world := p.worldId, level := p.levelId}
-                    | throwError "Level not found"
-                  let hints ← findHints goal level
-                  let interactiveGoal ← goalToInteractive goal
-                  return ⟨interactiveGoal, hints⟩
-              return interactiveGoals
-          let goalsAtPos : Array InteractiveGoalWithHints := ⟨goalsAtPos'.foldl (· ++ ·) []⟩
+                let interactiveGoals : List InteractiveGoalWithHints ← ci.runMetaM {} do
+                  goalMvars.mapM fun goal => do
+                    let some game := rc.initParams.rootUri?
+                      | throwError "GameId not found"
+                    let some level ← getLevel? {game := game, world := p.worldId, level := p.levelId}
+                      | throwError "Level not found"
+                    let hints ← findHints goal level
+                    let interactiveGoal ← goalToInteractive goal
+                    return ⟨interactiveGoal, hints⟩
+                return interactiveGoals
+            let goalsAtPos : Array InteractiveGoalWithHints := ⟨goalsAtPos'.foldl (· ++ ·) []⟩
 
-          let diagsAtPos ← completionDiagnostics goalsAtPos.size intermediateGoalCount
-            completed completedWithWarnings lspPosAt diagsAtPos
+            let diagsAtPos ← completionDiagnostics goalsAtPos.size intermediateGoalCount
+              completed completedWithWarnings lspPosAt diagsAtPos
 
-          intermediateGoalCount := goalsAtPos.size
+            intermediateGoalCount := goalsAtPos.size
 
-          steps := steps.push ⟨goalsAtPos, source, diagsAtPos, lspPosAt.line, lspPosAt.character⟩
-        else
-          -- No goals present
-          steps := steps.push ⟨#[], source, diagsAtPos, lspPosAt.line, none⟩
+            steps := steps.push ⟨goalsAtPos, source, diagsAtPos, lspPosAt.line, lspPosAt.character⟩
+          --else
+            -- No goals present
+            -- steps := steps.push ⟨#[], source, diagsAtPos, lspPosAt.line, none⟩
 
       -- Filter out the "unsolved goals" message
       diag := filterUnsolvedGoal diag
 
-      let lastPos := text.utf8PosToLspPos positionsWithSource.back.1
+      let lastPos := text.utf8PosToLspPos positionsWithSource.back!.1
       let remainingDiags : Array InteractiveDiagnostic :=
         diag.filter (fun d => lastPos ≤ d.range.start)
 

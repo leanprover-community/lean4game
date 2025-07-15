@@ -1,6 +1,7 @@
 import Lean
+import Std.Data.HashMap.Basic
 
-open Lean Meta
+open Lean Std
 
 /-! ## Graph -/
 

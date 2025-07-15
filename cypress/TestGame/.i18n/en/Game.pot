@@ -1,59 +1,23 @@
 msgid ""
-msgstr "Project-Id-Version: Game v4.7.0\n"
+msgstr "Project-Id-Version: Game v4.21.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: Sat Jul 12 23:40:50 2025\n"
+"POT-Creation-Date: 2025-07-15\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
 
-#: GameServer.RpcHandlers
-msgid "level completed! 🎉"
-msgstr ""
-
-#: GameServer.RpcHandlers
-msgid "level completed with warnings… 🎭"
-msgstr ""
-
-#: GameServer.RpcHandlers
-msgid "intermediate goal solved! 🎉"
+#: Game.Levels.DemoWorld
+msgid "Test World"
 msgstr ""
 
 #: Game.Levels.DemoWorld.L01_HelloWorld
 msgid "Test Level"
 msgstr ""
 
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "This is a test level."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "You can either start using `«{h}»` or `«{g}»`."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "You should use `«{h}»` now."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "You should use `«{g}»` now."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "This last message appears if the level is solved."
-msgstr ""
-
-#: Game.Levels.DemoWorld
-msgid "Test World"
-msgstr ""
-
-#: Game.Levels.DemoWorld
-msgid "This is the introduction of Test World."
-msgstr ""
-
-#: Game
-msgid "Test Game"
+#: GameServer.RpcHandlers
+msgid "level completed with warnings… 🎭"
 msgstr ""
 
 #: Game
@@ -61,11 +25,32 @@ msgid "This is the introduction text of the game."
 msgstr ""
 
 #: Game
-msgid "This is additional information about the game."
+#: Game
+msgid "Test Game"
+msgstr ""
+
+#: GameServer.RpcHandlers
+msgid "level completed! 🎉"
+msgstr ""
+
+#: GameServer.RpcHandlers
+msgid "intermediate goal solved! 🎉"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "This is a test level."
 msgstr ""
 
 #: Game
-msgid "Test Game"
+msgid "This is additional information about the game."
+msgstr ""
+
+#: Game.Levels.DemoWorld
+msgid "This is the introduction of Test World."
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "This last message appears if the level is solved."
 msgstr ""
 
 #: Game
