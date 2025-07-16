@@ -33,13 +33,15 @@ export function PrivacyPolicyPopup ({handleClose}: {handleClose: () => void}) {
     <p>Our server is located in Germany.</p>
     <p>
       <strong>Contact information:</strong><br />
-      Alexander Bentkamp, Jon Eugster<br />
-      Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br />
-      Universitätsstr. 1<br />
-      40225 Düsseldorf<br />
-      Germany<br />
-      +49 211 81-12173<br />
-      <a href="https://www.math.hhu.de/en/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/jon-eugster">Contact Details</a>
+        <strong>Impressum:</strong><br />
+        Marcus Zibrowius<br />
+        Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br />
+        Universitätsstr. 1<br />
+        40225 Düsseldorf<br />
+        Germany<br />
+        +49 211 81 13858<br />
+        <a href="https://www.math.uni-duesseldorf.de/~zibrowius/">Contact Details</a><br />
+        <a href="mailto:matvey.lorkish@hhu.de?subject=Lean4Game: <Your%20Question>">Technical Contact</a>
     </p>
     <h2>Development &amp; Funding</h2>
     <p>
