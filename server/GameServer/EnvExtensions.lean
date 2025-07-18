@@ -448,7 +448,8 @@ initialize gameExt : PersistentEnvExtension (Name × Game) (Name × Game) (HashM
       return games
     addEntryFn    := (λ s n => s.insert n.1 n.2),
     exportEntriesFn := HashMap.toArray,
-    statsFn := fun s => format "number of local entries: " ++ format s.size
+    statsFn := fun s => format "number of local entries: " ++ format s.size,
+    asyncMode := .sync
 }
 
 def getGame? (n : Name) : m (Option Game) := do

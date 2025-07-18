@@ -427,62 +427,6 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
     elabCommand thmStatement
 
-  let msgs := (← get).messages
-  let mut hints := #[]
-  let mut nonHintMsgs := #[]
-  for msg in msgs.unreported do
-    -- Look for messages produced by the `Hint` tactic. They are used to pass information about the
-    -- intermediate goal state
-    if let MessageData.withNamingContext _ $ MessageData.withContext ctx $
-        .tagged `Hint $
-        .nest strict $
-        .nest hidden $
-        .compose (.ofGoal text) (.ofGoal goal) := msg.data then
-      let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
-
-        let goalDecl ← goal.getDecl
-        let fvars := goalDecl.lctx.decls.toArray.filterMap id |> Array.map (·.fvarId)
-
-        -- NOTE: This code about `hintFVarsNames` is duplicated from `RpcHandlers`
-        -- where the variable bijection is constructed, and they
-        -- need to be matching.
-        -- NOTE: This is a bit a hack of somebody who does not know how meta-programming works.
-        -- All we want here is a list of `userNames` for the `FVarId`s in `hintFVars`...
-        -- and we wrap them in `«{}»` here since I don't know how to do it later.
-        let mut hintFVarsNames : Array Expr := #[]
-        for fvar in fvars do
-          let name₁ ← fvar.getUserName
-          hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
-
-        let text ← instantiateMVars (mkMVar text)
-
-        -- Evaluate the text in the `Hint`'s context to get the old variable names.
-        let rawText := (← GameServer.evalHintMessage text) hintFVarsNames
-        let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
-        let rawText : String ← (MessageData.withContext ctx₂ rawText).toString
-
-        return {
-          goal := ← abstractCtx goal
-          text := text
-          rawText := rawText
-          strict := strict == 1
-          hidden := hidden == 1
-        }
-
-      -- Note: The current setup for hints is a bit convoluted, but for now we need to
-      -- send the text once through i18n to register it in the env extension.
-      -- This could probably be rewritten once i18n works fully.
-      let _ ← hint.rawText.translate
-
-      hints := hints.push hint
-    else
-      nonHintMsgs := nonHintMsgs.push msg
-
-  -- restore saved messages and non-hint messages
-  modify fun st => { st with
-    messages := initMsgs ++ {unreported := nonHintMsgs.toPArray'}
-  }
-
   let scope ← getScope
   let env ← getEnv
 
@@ -506,7 +450,6 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     | none => default
     | some name => currNamespace ++ name.getId
     descrFormat := descrFormat
-    hints := hints
     tactics := {level.tactics with used := usedInventory.tactics.toArray}
     definitions := {level.definitions with used := usedInventory.definitions.toArray}
     lemmas := {level.lemmas with used := usedInventory.lemmas.toArray}
@@ -528,7 +471,7 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
     match m with
     | Syntax.node info k args =>
       if k == interpolatedStrLitKind && args.size == 1 then
-        match args.get! 0 with
+        match args[0]! with
         | (Syntax.atom info' val) =>
           let val := removeIndentation val
           return Syntax.node info k #[Syntax.atom info' val]
@@ -547,6 +490,7 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
 
   let goal ← Tactic.getMainGoal
   goal.withContext do
+    let abstractedGoal ← abstractCtx goal
     -- We construct an expression that can produce the hint text. The difficulty is that we
     -- want the text to possibly contain quotation of the local variables which might have been
     -- named differently by the player.
@@ -558,15 +502,36 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
       for i in [:decls.size] do
         text ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $text)
       return ← mkLambdaFVars #[vars] $ ← Term.elabTermAndSynthesize text none
-    let textmvar ← mkFreshExprMVar none
-    guard $ ← isDefEq textmvar text -- Store the text in a mvar.
-    -- The information about the hint is logged as a message using `logInfo` to transfer it to the
-    -- `Statement` command:
-    logInfo $
-      .tagged `Hint $
-      .nest (if strict then 1 else 0) $
-      .nest (if hidden then 1 else 0) $
-      .compose (.ofGoal textmvar.mvarId!) (.ofGoal goal)
+
+
+    let goalDecl ← goal.getDecl
+    let fvars := goalDecl.lctx.decls.toArray.filterMap id |> Array.map (·.fvarId)
+
+    -- NOTE: This code about `hintFVarsNames` is duplicated from `RpcHandlers`
+    -- where the variable bijection is constructed, and they
+    -- need to be matching.
+    -- NOTE: This is a bit a hack of somebody who does not know how meta-programming works.
+    -- All we want here is a list of `userNames` for the `FVarId`s in `hintFVars`...
+    -- and we wrap them in `«{}»` here since I don't know how to do it later.
+    let mut hintFVarsNames : Array Expr := #[]
+    for fvar in fvars do
+      let name₁ ← fvar.getUserName
+      hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
+
+    -- Evaluate the text in the `Hint`'s context to get the old variable names.
+    let rawText := (← GameServer.evalHintMessage text) hintFVarsNames
+    let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
+    let rawText : String ← (MessageData.withContext ctx₂ rawText).toString
+
+
+    modifyCurLevel fun level => pure {level with hints := level.hints.push {
+      text := text,
+      hidden := hidden,
+      strict := strict,
+      goal := abstractedGoal,
+      rawText := rawText
+    }}
+
 
 /-- This tactic allows us to execute an alternative sequence of tactics, but without affecting the
 proof state. We use it to define Hints for alternative proof methods or dead ends. -/
