@@ -206,10 +206,8 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
   let rc ← readThe RequestContext
   let text := doc.meta.text
 
-
-  let hoverPos := doc.meta.text.positions.back?.getD 0
-
-  mapTaskCostly doc.cmdSnaps.waitAll fun (snaps, _) => do
+  bindTaskCostly doc.cmdSnaps.waitAll fun (snaps, _) => do
+    mapTaskCostly doc.reporter fun () => do
       let mut steps : Array <| InteractiveGoalsWithHints := #[]
       let mut diag : Array InteractiveDiagnostic ← doc.diagnosticsRef.get
 
@@ -256,41 +254,43 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
 
         let diagsAtPos := filterUnsolvedGoal diagsAtPos
 
-        for snap in snaps do
-          if let goalsAtResult@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text pos then
-            let goalsAtPos' : List <| List InteractiveGoalWithHints ← goalsAtResult.mapM
-              fun { ctxInfo := ci, tacticInfo := tacticInfo, useAfter := useAfter, .. } => do
-                -- TODO: What does this function body do?
-                -- let ciAfter := { ci with mctx := ti.mctxAfter }
-                let ci := if useAfter then
-                    { ci with mctx := tacticInfo.mctxAfter }
-                  else
-                    { ci with mctx := tacticInfo.mctxBefore }
-                -- compute the interactive goals
-                let goalMvars : List MVarId ← ci.runMetaM {} do
-                  return if useAfter then tacticInfo.goalsAfter else tacticInfo.goalsBefore
 
-                let interactiveGoals : List InteractiveGoalWithHints ← ci.runMetaM {} do
-                  goalMvars.mapM fun goal => do
-                    let some game := rc.initParams.rootUri?
-                      | throwError "GameId not found"
-                    let some level ← getLevel? {game := game, world := p.worldId, level := p.levelId}
-                      | throwError "Level not found"
-                    let hints ← findHints goal level
-                    let interactiveGoal ← goalToInteractive goal
-                    return ⟨interactiveGoal, hints⟩
-                return interactiveGoals
-            let goalsAtPos : Array InteractiveGoalWithHints := ⟨goalsAtPos'.foldl (· ++ ·) []⟩
+        let some snap := snaps.find? (fun snap => snap.endPos >= pos)
+          | panic! "No snap found"
+        if let goalsAtResult@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text pos then
+          let goalsAtPos' : List <| List InteractiveGoalWithHints ← goalsAtResult.mapM
+            fun { ctxInfo := ci, tacticInfo := tacticInfo, useAfter := useAfter, .. } => do
+              -- TODO: What does this function body do?
+              -- let ciAfter := { ci with mctx := ti.mctxAfter }
+              let ci := if useAfter then
+                  { ci with mctx := tacticInfo.mctxAfter }
+                else
+                  { ci with mctx := tacticInfo.mctxBefore }
+              -- compute the interactive goals
+              let goalMvars : List MVarId ← ci.runMetaM {} do
+                return if useAfter then tacticInfo.goalsAfter else tacticInfo.goalsBefore
 
-            let diagsAtPos ← completionDiagnostics goalsAtPos.size intermediateGoalCount
-              completed completedWithWarnings lspPosAt diagsAtPos
+              let interactiveGoals : List InteractiveGoalWithHints ← ci.runMetaM {} do
+                goalMvars.mapM fun goal => do
+                  let some game := rc.initParams.rootUri?
+                    | throwError "GameId not found"
+                  let some level ← getLevel? {game := game, world := p.worldId, level := p.levelId}
+                    | throwError "Level not found"
+                  let hints ← findHints goal level
+                  let interactiveGoal ← goalToInteractive goal
+                  return ⟨interactiveGoal, hints⟩
+              return interactiveGoals
+          let goalsAtPos : Array InteractiveGoalWithHints := ⟨goalsAtPos'.foldl (· ++ ·) []⟩
 
-            intermediateGoalCount := goalsAtPos.size
+          let diagsAtPos ← completionDiagnostics goalsAtPos.size intermediateGoalCount
+            completed completedWithWarnings lspPosAt diagsAtPos
 
-            steps := steps.push ⟨goalsAtPos, source, diagsAtPos, lspPosAt.line, lspPosAt.character⟩
-          --else
-            -- No goals present
-            -- steps := steps.push ⟨#[], source, diagsAtPos, lspPosAt.line, none⟩
+          intermediateGoalCount := goalsAtPos.size
+
+          steps := steps.push ⟨goalsAtPos, source, diagsAtPos, lspPosAt.line, lspPosAt.character⟩
+        else
+          -- No goals present
+          steps := steps.push ⟨#[], source, diagsAtPos, lspPosAt.line, none⟩
 
       -- Filter out the "unsolved goals" message
       diag := filterUnsolvedGoal diag
@@ -305,7 +305,7 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
         completed := completed,
         completedWithWarnings := completedWithWarnings,
         lastPos := lastPos.line
-        }
+      }
 
 open RequestM in
 

@@ -147,7 +147,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       console.log('Received lean diagnostics')
       console.log(params.diagnostics)
       setInterimDiags(params.diagnostics)
-      loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
+      // loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
 
       // TODO: loadAllGoals()
       if (!hasErrors(params.diagnostics)) {
