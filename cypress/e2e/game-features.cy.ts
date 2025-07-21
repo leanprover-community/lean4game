@@ -36,7 +36,7 @@ describe('Basic Lean4Game Features', () => {
   describe('Navigation and UI Structure', () => {
     it('should navigate to world introduction via Test World button', () => {
       navigateToIntroduction()
-      
+
       // Check we're on the introduction page with correct title
       cy.contains('Introduction').should('be.visible')
       cy.contains('This is the introduction of Test World.')
@@ -47,14 +47,14 @@ describe('Basic Lean4Game Features', () => {
       cy.contains('1').click({ force: true })
       cy.url().should('include', '/level/0')  // Wait for navigation
 
-      // Check we're on the introduction page with correct title  
+      // Check we're on the introduction page with correct title
       cy.contains('Introduction').should('be.visible')
       cy.contains('This is the introduction of Test World.')
     })
 
     it('should navigate from introduction to level', () => {
       navigateToLevel()
-      
+
       // Verify we're in the level with Monaco editor and goal
       cy.get('.monaco-editor').should('be.visible')
       cy.contains('Active Goal').should('be.visible')
@@ -67,7 +67,7 @@ describe('Basic Lean4Game Features', () => {
 
       // Check for the initial hint (should be the only hint visible)
       cy.contains('You can either start using').should('be.visible')
-      
+
       // Verify no other hints are shown initially
       cy.contains('You should use g now').should('not.exist')
     })
@@ -78,7 +78,7 @@ describe('Basic Lean4Game Features', () => {
       // Enter first tactic
       cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
       cy.focused().type('rw [h]{enter}')
-      
+
       // Wait for the goal state to update after first tactic
       cy.contains('2 + 2 = y', { timeout: 10000 }).should('be.visible')
 
@@ -109,9 +109,8 @@ describe('Basic Lean4Game Features', () => {
         cy.contains('rfl').click()
       })
 
-      // Check for the rfl docstring content
-      cy.contains('rfl tries to close the current goal using reflexivity').should('be.visible')
-      cy.contains('This is supposed to be an extensible tactic').should('be.visible')
+      // Check for the rfl docstring (We don't check for the exact text, because it can change)
+      cy.contains('reflexivity').should('be.visible')
       cy.contains('(lean docstring)').should('be.visible')
     })
   })
