@@ -12,6 +12,7 @@ import { store } from '../state/store';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
+import { InputModeContext, PreferencesContext } from "./infoview/context"
 
 export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=false} :
   {
@@ -108,10 +109,17 @@ function InventoryItem({item, name, displayName, locked, disabled, newly, showDo
 
   const [copied, setCopied] = useState(false)
 
-  const handleClick = () => {
-    if (enableAll || !locked) {
-      showDoc()
+  const {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
+  const {isSuggestionsMobileMode} = React.useContext(PreferencesContext)
+  const handleClick = (ev) => {
+    if (!enableAll && locked) {
+      return
     }
+    if (isSuggestionsMobileMode || ev.shiftKey) {
+      setTypewriterInput(`${typewriterInput}${displayName} `)
+      return
+    }
+    showDoc()
   }
 
   const copyItemName = (ev) => {
