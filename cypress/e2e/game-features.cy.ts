@@ -149,6 +149,19 @@ describe('Basic Lean4Game Features', () => {
     })
   })
 
+  describe('Hypothesis Names', () => {
+    it('Should use player\'s hypothesis names in hints', () => {
+      cy.visit('/#/g/test/TestGame/world/TestWorld/level/2')
+      cy.contains('Goal:', { timeout: 60000 })
+
+      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
+      cy.focused().type('have myname : x + z = y + z := by rw [h]{enter}')
+
+      // Check that the hint uses the player's hypothesis name `myname`
+      cy.contains('You should use myname now')
+    })
+  })
+
   describe('Settings and Preferences', () => {
     it('should open preferences popup', () => {
       // Click menu button to open dropdown
