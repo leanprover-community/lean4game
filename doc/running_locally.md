@@ -102,11 +102,11 @@ npm start
 
 You should see a message like this:
 ```bash
-[server] > lean4-game@0.1.0 start_server
+[server] > lean4-game@0.1.0 start:server
 [server] > (cd server && lake build) && (cd relay && cross-env NODE_ENV=development nodemon -e mjs --exec "node ./index.mjs")
 [server]
 [client]
-[client] > lean4-game@0.1.0 start_client
+[client] > lean4-game@0.1.0 start:client
 [client] > cross-env NODE_ENV=development vite --host
 [client]
 [server] [nodemon] 3.0.#
