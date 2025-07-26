@@ -1,0 +1,67 @@
+msgid ""
+msgstr "Project-Id-Version: Game v4.21.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-22\n"
+"Last-Translator: \n"
+"Language-Team: none\n"
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit"
+
+#: GameServer.RpcHandlers
+msgid "level completed with warnings… 🎭"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "Test Level"
+msgstr ""
+
+#: Game.Levels.DemoWorld
+msgid "Test World"
+msgstr ""
+
+#: GameServer.RpcHandlers
+msgid "level completed! 🎉"
+msgstr ""
+
+#: GameServer.RpcHandlers
+msgid "intermediate goal solved! 🎉"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L02_HypothesisNames
+msgid "Done!"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+#: Game.Levels.DemoWorld.L02_HypothesisNames
+msgid "This is a test level."
+msgstr ""
+
+#: Game
+msgid "This is additional information about the game."
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "This last message appears if the level is solved."
+msgstr ""
+
+#: Game
+msgid "This is a test game."
+msgstr ""
+
+#: Game
+msgid "This is the introduction text of the game."
+msgstr ""
+
+#: Game.Levels.DemoWorld.L02_HypothesisNames
+msgid "Hypothesis Names"
+msgstr ""
+
+#: Game
+#: Game
+msgid "Test Game"
+msgstr ""
+
+#: Game.Levels.DemoWorld
+msgid "This is the introduction of Test World."
+msgstr ""

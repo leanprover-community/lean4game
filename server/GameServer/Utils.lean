@@ -4,6 +4,9 @@ open Lean Meta Elab Tactic Command
 
 syntax showOptArg := atomic(" (" (&"strict" <|> &"verbose") " := " withoutPosition(term) ")")
 
+instance : Coe String Name where
+  coe s := Name.mkSimple s
+
 /--
 Lists all available options that can be used with `set_option`.
 

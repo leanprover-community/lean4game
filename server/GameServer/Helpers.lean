@@ -3,7 +3,7 @@ import GameServer.Helpers.PrettyPrinter
 
 /-! This document contains various things which cluttered `Commands.lean`. -/
 
-open Lean Meta Elab Command
+open Lean Meta Elab Command Std
 
 /-! ## Doc Comment Parsing -/
 
@@ -74,19 +74,19 @@ TODO: Why are we not using graphs here but our own construct `HashMap Name (Hash
 partial def removeTransitiveAux (id : Name) (arrows : HashMap Name (HashSet Name))
       (newArrows : HashMap Name (HashSet Name)) (decendants : HashMap Name (HashSet Name)) :
     HashMap Name (HashSet Name) × HashMap Name (HashSet Name) := Id.run do
-  match (newArrows.find? id, decendants.find? id) with
+  match (newArrows.get? id, decendants.get? id) with
   | (some _, some _) => return (newArrows, decendants)
   | _ =>
     let mut newArr := newArrows
     let mut desc := decendants
     desc := desc.insert id {} -- mark as worked in case of loops
     newArr := newArr.insert id {} -- mark as worked in case of loops
-    let children := arrows.findD id {}
+    let children := arrows.getD id {}
     let mut trimmedChildren := children
     let mut theseDescs := children
     for child in children do
       (newArr, desc) := removeTransitiveAux child arrows newArr desc
-      let childDescs := desc.findD child {}
+      let childDescs := desc.getD child {}
       theseDescs := theseDescs.insertMany childDescs
       for d in childDescs do
         trimmedChildren := trimmedChildren.erase d
@@ -100,7 +100,7 @@ def removeTransitive (arrows : HashMap Name (HashSet Name)) : CommandElabM (Hash
   let mut desc := {}
   for id in arrows.toArray.map Prod.fst do
     (newArr, desc) := removeTransitiveAux id arrows newArr desc
-    if (desc.findD id {}).contains id then
+    if (desc.getD id {}).contains id then
       logError <| m!"Loop at {id}. " ++
         m!"This should not happen and probably means that `findLoops` has a bug."
       -- DEBUG:
@@ -119,12 +119,12 @@ partial def findLoopsAux (arrows : HashMap Name (HashSet Name)) (node : Name)
     (path : Array Name := #[]) (visited : HashSet Name := {}) :
     Array Name × HashSet Name := Id.run do
   let mut visited := visited
-  match path.getIdx? node with
+  match path.idxOf? node with
   | some i =>
     -- Found a loop: `node` is already the iᵗʰ element of the path
     return (path.extract i path.size, visited.insert node)
   | none =>
-    for successor in arrows.findD node {} do
+    for successor in arrows.getD node {} do
       -- If we already visited the successor, it cannot be part of a loop anymore
       if visited.contains successor then
         continue

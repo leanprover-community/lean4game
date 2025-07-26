@@ -325,11 +325,18 @@ export const FilteredGoals = React.memo(({ headerChildren, goals }: FilteredGoal
 export function loadGoals(
   rpcSess: RpcSessionAtPos,
   uri: string,
+  worldId: string,
+  levelId: number,
   setProof: React.Dispatch<React.SetStateAction<ProofState>>,
   setCrashed: React.Dispatch<React.SetStateAction<Boolean>>) {
 console.info('sending rpc request to load the proof state')
 
-rpcSess.call('Game.getProofState', DocumentPosition.toTdpp({line: 0, character: 0, uri: uri})).then(
+rpcSess.call('Game.getProofState',
+    {
+        ...DocumentPosition.toTdpp({line: 0, character: 0, uri: uri}),
+        worldId, levelId
+    }
+).then(
   (proof : ProofState) => {
     if (typeof proof !== 'undefined') {
       console.info(`received a proof state!`)

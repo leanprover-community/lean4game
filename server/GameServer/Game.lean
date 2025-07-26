@@ -2,12 +2,12 @@ import GameServer.RpcHandlers
 
 open Lean
 
-structure GameServerState :=
-(env : Lean.Environment)
-(game : Name)
-(gameDir : String)
-(inventory : Array String)
-(difficulty : Nat)
+structure GameServerState where
+  env : Lean.Environment
+  game : Name
+  gameDir : String
+  inventory : Array String
+  difficulty : Nat
 
 abbrev GameServerM := StateT GameServerState Server.Watchdog.ServerM
 
@@ -27,7 +27,7 @@ open IO
 
 /- Game-specific version of `InitializeParams` that allows for extra options: -/
 
-structure InitializationOptions extends Lean.Lsp.InitializationOptions :=
+structure InitializationOptions extends Lean.Lsp.InitializationOptions where
   difficulty : Nat
   inventory : Array String
   deriving ToJson, FromJson

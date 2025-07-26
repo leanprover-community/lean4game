@@ -15,8 +15,9 @@ import { GoalsLocation, Locations, LocationsContext } from '../../../../node_mod
 import { AllMessages, lspDiagToInteractive } from './messages'
 import { goalsToString, Goal, MainAssumptions, OtherGoals } from './goals'
 import { InteractiveTermGoal, InteractiveGoalsWithHints, InteractiveGoals, ProofState } from './rpc_api'
-import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext } from './context'
+import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext, WorldLevelIdContext } from './context'
 import { useTranslation } from 'react-i18next'
+import { useContext } from 'react'
 
 // TODO: All about pinning could probably be removed
 type InfoKind = 'cursor' | 'pin'
@@ -260,6 +261,8 @@ function InfoAux(props: InfoProps) {
 
     const config = React.useContext(ConfigContext)
 
+    const {worldId, levelId} = useContext(WorldLevelIdContext)
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const pos = props.pos!
     const rpcSess = useRpcSessionAtPos(pos)
@@ -295,9 +298,12 @@ function InfoAux(props: InfoProps) {
     type InfoRequestResult = Omit<InfoDisplayProps, 'triggerUpdate'>
     const [state, triggerUpdateCore] = useAsyncWithTrigger(() => new Promise<InfoRequestResult>((resolve, reject) => {
 
-        const proofReq = rpcSess.call('Game.getProofState', DocumentPosition.toTdpp(pos)).catch((error) => {
+        const proofReq = rpcSess.call('Game.getProofState', {
+            ...DocumentPosition.toTdpp(pos),
+            worldId, levelId
+        }).catch((error) => {
             console.warn(error)
-          })
+        })
         const goalsReq = rpcSess.call('Game.getInteractiveGoals', DocumentPosition.toTdpp(pos))
         const termGoalReq = getInteractiveTermGoal(rpcSess, DocumentPosition.toTdpp(pos))
         const widgetsReq = Widget_getWidgets(rpcSess, pos).catch(discardMethodNotFound)
