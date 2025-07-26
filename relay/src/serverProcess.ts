@@ -97,8 +97,9 @@ export class GameManager {
         serverProcess = cp.spawn("lake", ["serve", "--"], { cwd: game_dir });
       }
     } else {
+      const lean4GameFolder = path.join(this.dir, '..', '..', '..')
       serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
-        [game_dir, path.join(this.dir, '..', '..', '..'), customLeanServer ? "true" : "false"],
+        [game_dir, lean4GameFolder, customLeanServer ? "true" : "false"],
         { cwd: this.dir });
     }
 
