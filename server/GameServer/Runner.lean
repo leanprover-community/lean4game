@@ -98,8 +98,8 @@ where addMessageByDifficulty (s : MessageData) :=
 /-- Run a game level -/
 elab "Runner" gameId:str worldId:str levelId:num
  "(" &"difficulty" ":=" difficulty:num ")"
- "(" &"inventory" ":=" "[" inventory:str,* "]" ")"
- val:declVal : command => do
+ "(" &"inventory" ":=" "[" inventory:str,* "]" ")" ":=" byStx:&"by"
+ tacticStx:tacticSeq ? : command => do
 
   let levelId := {game := gameId.getString, world := worldId.getString, level := levelId.getNat}
   let difficulty := difficulty.getNat
@@ -110,16 +110,33 @@ elab "Runner" gameId:str worldId:str levelId:num
 
   let scope := level.scope
 
-  -- extract the `tacticSeq` from `val`
-  let tacticStx : TSyntax `Lean.Parser.Tactic.tacticSeq ←
-    match val with
-    | `(Parser.Command.declVal| := by $proof) => pure proof
-    | _ => do
-      logErrorAt val m!"expected `:= by`"
-      throwUnsupportedSyntax
+  -- Position before first tactic and any prepended whitespace
+  let startPos := byStx.getTailInfo.getRange?.getD (String.Range.mk 0 0) |>.stop
 
-  -- Check for forbidden tactics
-  findForbiddenTactics levelId inventory difficulty tacticStx
+  -- Position behind the last tactic
+  let endPos := (tacticStx.map TSyntax.raw).getD byStx
+    |>.getTailInfo |>.getRangeWithTrailing? |>.getD (String.Range.mk 0 0) |>.stop
+  -- Adjust endPos to be one character earlier (probably the end of file character?)
+  let endPos := ⟨endPos.byteIdx-1⟩
+
+  let tacticStx : Array (TSyntax `tactic) ← (do
+    match tacticStx with
+    | some ⟨tacticStx⟩ =>
+      -- Check for forbidden tactics
+      findForbiddenTactics levelId inventory difficulty tacticStx
+      return tacticStx.getArgs.map (⟨.⟩)
+    | none => -- empty tactic sequence
+      -- Insert invisible `skip` command to make sure we always display the initial goal
+      let skip := Syntax.node (.original default startPos default endPos)
+        ``Lean.Parser.Tactic.skip #[]
+      return #[⟨skip⟩]
+  )
+
+  -- Insert final `done` command to display unsolved goal error in the end
+  let done := Syntax.node (.synthetic endPos endPos) ``Lean.Parser.Tactic.done #[]
+  let tacticStx := tacticStx ++ #[⟨done⟩]
+
+  let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
 
   -- use open namespaces and options as in the level file
   Elab.Command.withScope (fun _ => scope) do
@@ -131,5 +148,5 @@ elab "Runner" gameId:str worldId:str levelId:num
 
     -- Run the proof
     let thmStatement ← `(command|
-      theorem the_theorem $(level.goal) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩); done} )
+      theorem the_theorem $(level.goal) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩)} )
     elabCommand thmStatement

@@ -137,13 +137,15 @@ export class GameManager {
     usesCustomLeanServer: boolean
   ) {
 
+    let shift = (line: number, offset: number) => Math.max(0, line + offset)
+
     let shiftLines = (p : any, offset : number) => {
       if (p.hasOwnProperty("line")) {
-        p.line = Math.max(0, p.line + offset)
+        p.line = shift(p.line, offset)
       }
       if (p.hasOwnProperty("lineRange")) {
-        p.lineRange.start = Math.max(0, p.lineRange.start + offset)
-        p.lineRange.end = Math.max(0, p.lineRange.end + offset)
+        p.lineRange.start = shift(p.lineRange.start, offset)
+        p.lineRange.end = shift(p.lineRange.end, offset)
       }
       for (let key in p) {
         if (typeof p[key] === 'object' && p[key] !== null) {
@@ -188,11 +190,11 @@ export class GameManager {
 
         let content = message.params.textDocument.text;
         message.params.textDocument.text =
-          `import ${levelData.module} import GameServer.Runner Runner ` +
+          `import ${levelData.module} import GameServer.Runner \nRunner ` +
           `${JSON.stringify(gameData.name)} ${JSON.stringify(worldId)} ${levelId} ` +
           `(difficulty := ${difficulty}) ` +
           `(inventory := [${inventory.map(s => JSON.stringify(s)).join(',')}]) ` +
-          `:= by\nskip\n${content}\n`
+          `:= by\n${content}\n`
       }
 
       return shiftLines(message, +PROOF_START_LINE);

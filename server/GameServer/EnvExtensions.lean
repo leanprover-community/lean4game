@@ -7,7 +7,7 @@ open GameServer Std
 -- TODO: Is there a better place?
 /-- Keywords that the server should not consider as tactics. -/
 def GameServer.ALLOWED_KEYWORDS : List String :=
-  ["with", "fun", "at", "only", "by", "generalizing", "skip"]
+  ["with", "fun", "at", "only", "by", "generalizing"]
 
 /-- The default game name if `Game "MyGame"` is not used. -/
 def defaultGameName: String := "MyGame"
