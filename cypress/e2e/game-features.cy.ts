@@ -85,6 +85,30 @@ describe('Basic Lean4Game Features', () => {
       // Check that the progressive hint appears
       cy.contains('You should use g now').should('be.visible')
     })
+
+    it('should show goal and hint in editor mode', () => {
+      navigateToLevel()
+
+      cy.get(".fa-code").click()
+
+      cy.contains('Current Goal')
+      cy.contains('unsolved goals')
+      cy.get('.infoview').contains('x + x = y')
+      cy.get('.infoview').contains('You can either start using h or g.')
+
+      cy.focused().type('rw [h]{enter}')
+
+      cy.contains('2 + 2 = y')
+      cy.get('.infoview').contains('2 + 2 = y')
+      cy.contains('Current Goal')
+      cy.contains('unsolved goals')
+      cy.get('.infoview').contains('You should use g now.')
+
+      cy.focused().type('{uparrow}')
+      cy.get('.infoview').contains('x + x = y')
+      cy.get('.infoview').contains('You can either start using h or g.')
+
+    })
   })
 
   describe('Tactics Panel and Documentation', () => {
@@ -146,6 +170,24 @@ describe('Basic Lean4Game Features', () => {
 
       // Look for the completion message from the Lean file
       cy.contains('This last message appears if the level is solved.', { timeout: 60000 })
+    })
+  })
+
+
+  describe('Unsolved Goals', () => {
+    it('should show unsolved goals only in editor mode', () => {
+      navigateToLevel()
+
+      // Solve the level step by step (based on the Lean file)
+      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
+      cy.focused().type('rw [h]{enter}')
+
+      // Wait for the goal state to update after first tactic
+      cy.contains('2 + 2 = y', { timeout: 10000 }).should('be.visible')
+      cy.contains('unsolved goals').should('not.exist')
+
+      cy.get(".fa-code").click()
+      cy.contains('unsolved goals').should('be.visible')
     })
   })
 
