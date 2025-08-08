@@ -1,5 +1,4 @@
-import GameServer.Commands
---import
+import GameServer
 
 Game "Test"
 World "TestW"

@@ -1,18 +1,20 @@
-import GameServer.Commands
+import GameServer.Helpers
+import GameServer.Utils
 
-open Lean
+open GameServer Lean Std
 
 -- E → A → B → C → A and
 -- F → G → F
 open HashMap in
 def testArrows : HashMap Name (HashSet Name) :=
-  ofList [("a", (HashSet.empty.insert "b": HashSet Name).insert "d"),
-          ("b", (HashSet.empty.insert "c": HashSet Name)),
-          ("c", (HashSet.empty.insert "a": HashSet Name)),
+  ofList [("a", (HashSet.emptyWithCapacity.insert "b": HashSet Name).insert "d"),
+          ("b", (HashSet.emptyWithCapacity.insert "c": HashSet Name)),
+          ("c", (HashSet.emptyWithCapacity.insert "a": HashSet Name)),
           ("d", {}),
-          ("f", (HashSet.empty.insert "g": HashSet Name)),
-          ("g", (HashSet.empty.insert "f": HashSet Name)),
-          ("e", (HashSet.empty.insert "a": HashSet Name).insert "f")]
+          ("f", (HashSet.emptyWithCapacity.insert "g": HashSet Name)),
+          ("g", (HashSet.emptyWithCapacity.insert "f": HashSet Name)),
+          ("e", (HashSet.emptyWithCapacity.insert "a": HashSet Name).insert "f")]
 
--- some permutation of ``[`c, `a, `b]`` or ``[`f, `g]``
+/-- info: [`a, `b, `c] -/
+#guard_msgs in
 #eval findLoops testArrows
