@@ -55,7 +55,7 @@ A minimal level file looks like the following. There are many options to add, wh
 into in a later section
 
 ```lean
-import GameServer.Commands
+import GameServer
 
 World "MyWorld"
 Level 1
@@ -109,8 +109,8 @@ introduced anywhere.
 
 ## 5. Refactoring an existing world
 
-The [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton)  contains a bash script `sofi.sh` 
-(`s`ort `o`ut `f`ilnames and `i`mports), 
+The [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton)  contains a bash script `sofi.sh`
+(`s`ort `o`ut `f`ilnames and `i`mports),
 which can help restructure existing worlds, for example if you want to reorder or rename existing levels,
 or add additional levels in the middle.  Say, for example, you have an “Arithmetic World” in the
 folder

@@ -13,3 +13,6 @@ require importGraph from git "https://github.com/leanprover-community/import-gra
 
 @[default_target]
 lean_lib GameServer
+
+@[test_driver]
+lean_lib test

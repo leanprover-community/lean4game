@@ -155,20 +155,37 @@ export class GameManager {
       return p;
     }
 
+    function replaceUri(obj: object, val: string) {
+      for (const key in obj) {
+        if (key === 'uri') {
+          obj[key] = val;
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          replaceUri(obj[key], val);
+        }
+      }
+      return obj
+    }
+
+
     // These values will be set by the initialize message
     let difficulty: number
     let inventory: string[]
+    let worldId: string
+    let levelId: string
 
     const PROOF_START_LINE = 2
 
     const gameDataPath = path.join(gameDir, '.lake', 'gamedata', `game.json`)
     const gameData = JSON.parse(fs.readFileSync(gameDataPath, 'utf8'))
 
+    /** Sending messages from the client to the server */
     socketConnection.forward(serverConnection, (message: any) => {
 
-      if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
-
-      if (usesCustomLeanServer) return message
+      // backwards compatibility for versions ≤ v4.7.0
+      if (usesCustomLeanServer) {
+        if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
+        return message
+      }
 
       if (message.method === "initialize") {
         difficulty = message.params.initializationOptions.difficulty
@@ -181,8 +198,10 @@ export class GameManager {
         // Parse the URI to get world and level
         const uri = new URL(message.params.textDocument.uri)
         const pathParts = path.parse(uri.pathname)
-        const worldId = path.basename(pathParts.dir)
-        const levelId = pathParts.name
+        worldId = path.basename(pathParts.dir)
+        levelId = pathParts.name
+
+        replaceUri(message, `file://${gameDir}/Game/Metadata.lean`)
 
         // Read level data from JSON file
         const levelDataPath = path.join(gameDir, '.lake', 'gamedata', `level__${worldId}__${levelId}.json`)
@@ -195,16 +214,32 @@ export class GameManager {
           `(difficulty := ${difficulty}) ` +
           `(inventory := [${inventory.map(s => JSON.stringify(s)).join(',')}]) ` +
           `:= by\n${content}\n`
+      } else {
+        replaceUri(message, `file://${gameDir}/Game/Metadata.lean`)
       }
 
-      return shiftLines(message, +PROOF_START_LINE);
+      shiftLines(message, +PROOF_START_LINE)
+
+      // Print the message as the server will receive it
+      if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
+
+      return message
     });
+
+
+    /** Sending messages from the server to the client */
     serverConnection.forward(socketConnection, message => {
+
+      // Print the message as the server sends it
       if (isDevelopment) { console.log(`SERVER: ${JSON.stringify(message)}`); }
 
+      // backwards compatibility for versions ≤ v4.7.0
       if (usesCustomLeanServer) return message
 
-      return shiftLines(message, -PROOF_START_LINE);
+      shiftLines(message, -PROOF_START_LINE);
+      replaceUri(message, `file:///${worldId}/${levelId}`) // as defined in `level.tsx`
+
+      return message
     });
   }
 
