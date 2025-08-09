@@ -77,13 +77,13 @@ describe('Basic Lean4Game Features', () => {
 
       // Enter first tactic
       cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
-      cy.focused().type('rw [h]{enter}')
+      cy.focused().type('rw [g]{enter}')
 
       // Wait for the goal state to update after first tactic
-      cy.contains('2 + 2 = y', { timeout: 10000 }).should('be.visible')
+      cy.contains('x + x = 4', { timeout: 10000 }).should('be.visible')
 
       // Check that the progressive hint appears
-      cy.contains('You should use g now').should('be.visible')
+      cy.contains('You should use h now').should('be.visible')
     })
 
     it('should show goal and hint in editor mode', () => {
