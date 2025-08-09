@@ -523,6 +523,8 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
     let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
     let rawText : String ← (MessageData.withContext ctx₂ rawText).toString
 
+    -- i18n
+    rawText.markForTranslation
 
     modifyCurLevel fun level => pure {level with hints := level.hints.push {
       text := text,
