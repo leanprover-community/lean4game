@@ -151,6 +151,17 @@ describe('Basic Lean4Game Features', () => {
       // Should show updated goal state (proving the tactic was processed)
       cy.contains('2 + 2 = y', { timeout: 10000 }).should('be.visible')
     })
+
+    it('should show error message when using invalid tactic call', () => {
+      navigateToLevel()
+
+      // Use typewriter interface to enter an invalid tactic
+      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
+      cy.focused().type('rw [x]{enter}')
+
+      // Wait for the error message to appear
+      cy.contains("tactic 'rewrite' failed")
+    })
   })
 
   describe('Level Completion', () => {
