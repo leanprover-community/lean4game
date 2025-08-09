@@ -31,5 +31,8 @@ jobs:
       - name: Run Cypress tests (Development mode)
         run: npm run test
 
+      - name: Install Bubblewrap
+        run: sudo apt-get install bubblewrap
+
       - name: Run Cypress tests (Production mode)
         run: npm run test_prod
