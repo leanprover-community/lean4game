@@ -548,8 +548,13 @@ elab (name := GameServer.Tactic.Branch) "Branch" t:tacticSeq : tactic => do
     trace[debug] "This branch leaves open goals."
 
   let msgs ← Core.getMessageLog
+  let gameExtState := gameExt.getState (← getEnv)
+
   b.restore
+
   Core.setMessageLog msgs
+  modifyEnv (fun env => gameExt.setState env gameExtState)
+
 
 /-- A hole inside a template proof that will be replaced by `sorry`. -/
 elab (name := GameServer.Tactic.Hole) "Hole" t:tacticSeq : tactic => do
