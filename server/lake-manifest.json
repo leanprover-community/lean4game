@@ -15,7 +15,7 @@
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "7dc27b87606f94ad0931a09f63330028d653d325",
+   "rev": "443d04399e9df1e47ae8a70b558a8fa049ab9d8b",
    "name": "i18n",
    "manifestFile": "lake-manifest.json",
    "inputRev": "v4.21.0",
