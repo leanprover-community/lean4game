@@ -380,9 +380,6 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   | none => pure none
   | some d => d.translate
 
-  -- Save the messages before evaluation of the proof.
-  let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
-
   -- The default name of the statement is `[Game].[World].level[no.]`, e.g. `NNG.Addition.level1`
   -- However, this should not be used when designing the game.
   let defaultDeclName : Ident := mkIdent <| (← getCurGame).name ++ (← getCurWorld).name ++
