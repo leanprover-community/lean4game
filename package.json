@@ -89,7 +89,8 @@
     "build_test": "cd cypress/TestGame && lake build",
     "production": "cross-env NODE_ENV=production node relay/dist/src/index.js",
     "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs",
-    "test": "concurrently -n server,cypress -c blue,green \"npm start\" \"cypress run\" -k -s first --hide server"
+    "test": "concurrently -n server,cypress -c blue,green \"npm start\" \"cypress run\" -k -s first --hide server",
+    "test_prod": "npm run build && concurrently -n server,cypress -c blue,green \"PORT=3000 npm run production\" \"cypress run\" -k -s first --hide server"
   },
   "eslintConfig": {
     "extends": [

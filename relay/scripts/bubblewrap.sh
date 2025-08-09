@@ -4,10 +4,10 @@
 ELAN_HOME=$(lake env printenv ELAN_HOME)
 
 # $1 : the game directory
-# $2 : the lean4game folder
-# $3 : does the game use a custom Lean server?
+# $2 : does the game use a custom Lean server?
+# $3 : additional bwrap options
 
-if [ "$3" = "true" ]; then
+if [ "$2" = "true" ]; then
   GAMESERVER_PATH="/game/.lake/packages/GameServer/server/.lake/build/bin/"
   GAMESERVER_CMD="./gameserver --server /game"
 else
@@ -16,7 +16,6 @@ else
 fi
 
 (exec bwrap\
-  --bind $2 /lean4game \
   --bind $1 /game \
   --bind $ELAN_HOME /elan \
   --bind /usr /usr \
@@ -36,5 +35,6 @@ fi
   --unshare-cgroup \
   --die-with-parent \
   --chdir "$GAMESERVER_PATH" \
+  $3 \
   $GAMESERVER_CMD
 )

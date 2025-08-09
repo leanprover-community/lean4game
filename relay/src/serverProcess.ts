@@ -97,9 +97,15 @@ export class GameManager {
         serverProcess = cp.spawn("lake", ["serve", "--"], { cwd: game_dir });
       }
     } else {
-      const lean4GameFolder = path.join(this.dir, '..', '..', '..')
-      serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
-        [game_dir, lean4GameFolder, customLeanServer ? "true" : "false"],
+      let cmd = "../../scripts/bubblewrap.sh"
+      let options = [game_dir, customLeanServer ? "true" : "false"]
+      if (owner == "test") {
+        // TestGame doesn't have its own copy of the server and needs lean4game as a local dependency
+        const lean4GameFolder = path.join(this.dir, '..', '..', '..', 'server')
+        options.push(`--bind ${lean4GameFolder} /server`)
+      }
+
+      serverProcess = cp.spawn(cmd, options,
         { cwd: this.dir });
     }
 
@@ -245,7 +251,7 @@ export class GameManager {
 
   getGameDir(owner: string, repo: string) {
     owner = owner.toLowerCase();
-    if (owner == 'local' || owner == 'test') {
+    if (owner == 'local') {
       if (!isDevelopment) {
         console.error(`No local games in production mode.`);
         return "";
