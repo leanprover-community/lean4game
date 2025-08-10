@@ -77,8 +77,7 @@
     "url-loader": "^4.1.1"
   },
   "scripts": {
-    "start": "concurrently -n server,relay,client -c blue,yellow,green \"npm run start_server\" \"npm run start_relay\" \"npm run start_client\"",
-    "start_server": "(cd server && lake build)",
+    "start": "concurrently -n relay,client -c yellow,green \"npm run start_relay\" \"npm run start_client\"",
     "start_relay": "(tsc -b ./relay) && (cd relay && cross-env NODE_ENV=development nodemon -e mjs --exec \"node ./dist/src/index.js\")",
     "start_client": "cross-env NODE_ENV=development vite --host",
     "build": "npm run build_server && npm run build_relay && npm run build_client",
