@@ -97,9 +97,15 @@ export class GameManager {
         serverProcess = cp.spawn("lake", ["serve", "--"], { cwd: game_dir });
       }
     } else {
-      const lean4GameFolder = path.join(this.dir, '..', '..', '..')
-      serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
-        [game_dir, lean4GameFolder, customLeanServer ? "true" : "false"],
+      let cmd = "../../scripts/bubblewrap.sh"
+      let options = [game_dir, customLeanServer ? "true" : "false"]
+      if (owner == "test") {
+        // TestGame doesn't have its own copy of the server and needs lean4game as a local dependency
+        const lean4GameFolder = path.join(this.dir, '..', '..', '..', 'server')
+        options.push(`--bind ${lean4GameFolder} /server`)
+      }
+
+      serverProcess = cp.spawn(cmd, options,
         { cwd: this.dir });
     }
 
@@ -245,18 +251,9 @@ export class GameManager {
 
   getGameDir(owner: string, repo: string) {
     owner = owner.toLowerCase();
-    if (owner == 'local' || owner == 'test') {
-      if (!isDevelopment) {
-        console.error(`No local games in production mode.`);
-        return "";
-      }
-    } else {
-      const gamesPath = path.join(this.dir, '..', '..', '..', 'games');
-      if (!fs.existsSync(gamesPath)) {
-        console.error(`Did not find the following folder: ${gamesPath}`);
-        console.error('Did you already import any games?');
-        return "";
-      }
+    if (owner == 'local' && !isDevelopment) {
+      console.error(`No local games in production mode.`);
+      return "";
     }
 
     let game_dir: string
@@ -265,7 +262,13 @@ export class GameManager {
     } else if (owner == 'test') {
       game_dir = path.join(this.dir, '..', '..', '..', 'cypress', repo)
     } else {
-      game_dir = path.join(this.dir, '..', '..', '..', 'games', `${owner}`, `${repo.toLowerCase()}`);
+      const gamesPath = path.join(this.dir, '..', '..', '..', 'games');
+      if (!fs.existsSync(gamesPath)) {
+        console.error(`Did not find the following folder: ${gamesPath}`);
+        console.error('Did you already import any games?');
+        return "";
+      }
+      game_dir = path.join(gamesPath, `${owner}`, `${repo.toLowerCase()}`);
     }
 
     if (!fs.existsSync(game_dir)) {
