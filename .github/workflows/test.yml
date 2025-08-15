@@ -12,6 +12,9 @@ jobs:
 
       - uses: leanprover/lean-action@v1
         with:
+          build: true
+          test: true
+          lint: false
           use-github-cache: false
           use-mathlib-cache: false
           check-reservoir-eligibility: false
