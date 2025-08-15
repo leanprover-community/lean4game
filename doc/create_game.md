@@ -26,7 +26,7 @@ The file `Game.lean` is the backbone of the game putting everything together.
 So the `Game.lean` has the following structure:
 
 ```lean
-import GameServer.Commands
+import GameServer
 
 -- import all worlds
 import Game.Levels.Tutorial
