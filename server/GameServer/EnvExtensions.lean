@@ -2,7 +2,9 @@ import GameServer.AbstractCtx
 import GameServer.Graph
 import GameServer.Hints
 
-open GameServer Std
+namespace GameServer
+
+open Std
 
 -- TODO: Is there a better place?
 /-- Keywords that the server should not consider as tactics. -/

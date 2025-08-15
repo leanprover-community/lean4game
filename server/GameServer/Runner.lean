@@ -3,6 +3,7 @@ import GameServer.RpcHandlers
 import GameServer.SaveData
 import GameServer.Tactic.LetIntros
 
+namespace GameServer
 
 open Lean Meta Elab Command
 

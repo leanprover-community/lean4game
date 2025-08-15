@@ -9,7 +9,7 @@ import I18n
 
 open Lean Meta Elab Command Std
 
-open GameServer
+namespace GameServer
 
 set_option autoImplicit false
 

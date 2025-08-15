@@ -1,6 +1,8 @@
 import Lean
 import GameServer.EnvExtensions
 
+namespace GameServer
+
 open Lean Elab Command
 
 /-- Copied from `Mathlib.Tactic.HelpCmd`.
