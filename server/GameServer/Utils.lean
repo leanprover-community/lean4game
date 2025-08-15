@@ -1,5 +1,7 @@
 import Lean
 
+namespace GameServer
+
 open Lean Meta Elab Tactic Command
 
 syntax showOptArg := atomic(" (" (&"strict" <|> &"verbose") " := " withoutPosition(term) ")")

@@ -1,6 +1,8 @@
 import Lean
 import GameServer.Utils
 
+namespace GameServer
+
 section AbstractCtx
 open Lean
 open Meta
