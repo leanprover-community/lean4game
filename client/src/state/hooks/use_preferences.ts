@@ -5,6 +5,7 @@ import {
     setLayout as setPreferencesLayout,
     setIsSavePreferences as setPreferencesIsSavePreferences,
     setLanguage as setLanguagePreferences,
+    setIsSuggestionsMobileMode as setIsSuggestionsMobileModePreferences,
     getWindowDimensions,
     AUTO_SWITCH_THRESHOLD
 } from "../preferences";
@@ -23,6 +24,9 @@ const UsePreferences = () => {
     const language = useAppSelector((state) => state.preferences.language);
     const setLanguage = (lang: string) => dispatch(setLanguagePreferences(lang))
 
+    const isSuggestionsMobileMode = useAppSelector((state) => state.preferences.isSuggestionsMobileMode);
+    const setIsSuggestionsMobileMode = (isSuggestionsMobileMode: boolean) => dispatch(setIsSuggestionsMobileModePreferences(isSuggestionsMobileMode))
+
     const automaticallyAdjustLayout = () => {
         const {width} = getWindowDimensions()
         setMobile(width < AUTO_SWITCH_THRESHOLD)
@@ -39,7 +43,7 @@ const UsePreferences = () => {
         }
     }, [layout])
 
-    return {mobile, layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage}
+    return {mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}
 }
 
 export default UsePreferences;
