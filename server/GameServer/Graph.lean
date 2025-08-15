@@ -2,7 +2,7 @@ import Lean
 import Std.Data.HashMap.Basic
 
 open Lean Std
-
+namespace GameServer
 /-! ## Graph -/
 
 variable [inst : BEq α] [inst : Hashable α]
