@@ -20,6 +20,8 @@ jobs:
           check-reservoir-eligibility: false
           lake-package-directory: "server"
 
+      - run: elan default stable
+
       - name: Build the project
         run: |
           npm install
