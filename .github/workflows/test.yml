@@ -13,6 +13,8 @@ jobs:
       - uses: leanprover/lean-action@v1
         with:
           use-github-cache: false
+          use-mathlib-cache: false
+          check-reservoir-eligibility: false
           lake-package-directory: "server"
 
       - name: Build the project
