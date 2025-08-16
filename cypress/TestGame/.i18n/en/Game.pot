@@ -1,7 +1,7 @@
 msgid ""
-msgstr "Project-Id-Version: Game v4.21.0\n"
+msgstr "Project-Id-Version: Game v4.22.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-22\n"
+"POT-Creation-Date: 2025-08-15\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
@@ -43,6 +43,15 @@ msgstr ""
 
 #: Game.Levels.DemoWorld.L01_HelloWorld
 msgid "This last message appears if the level is solved."
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+#: Game.Levels.DemoWorld.L02_HypothesisNames
+msgid "You should use `«{g}»` now."
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "You can either start using `«{h}»` or `«{g}»`."
 msgstr ""
 
 #: Game

@@ -7,20 +7,20 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Install elan
-        run: |
-          set -o pipefail
-          curl -sSfL https://github.com/leanprover/elan/releases/download/v3.0.0/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          ./elan-init -y
-          echo "$HOME/.elan/bin" >> $GITHUB_PATH
-
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
 
-      - name: Print lean and lake versions
-        run: |
-          lean --version
-          lake --version
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: true
+          lint: false
+          use-github-cache: false
+          use-mathlib-cache: false
+          check-reservoir-eligibility: false
+          lake-package-directory: "server"
+
+      - run: elan default stable
 
       - name: Build the project
         run: |
