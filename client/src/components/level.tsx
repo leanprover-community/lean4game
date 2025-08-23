@@ -55,6 +55,7 @@ import { InfoPopup } from './popup/game_info'
 import { PreferencesPopup } from './popup/preferences'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
+import { useGameTranslation } from '../utils/translation'
 
 
 monacoSetup()
@@ -97,6 +98,7 @@ function Level() {
 
 function ChatPanel({lastLevel, visible = true}) {
   let { t } = useTranslation()
+  const { t : gT } = useGameTranslation()
   const chatRef = useRef<HTMLDivElement>(null)
   const {mobile} = useContext(PreferencesContext)
   const gameId = useContext(GameIdContext)
@@ -143,7 +145,7 @@ function ChatPanel({lastLevel, visible = true}) {
   //   // chatRef.current!.scrollTo(0,0)
   // }, [gameId, worldId, levelId])
 
-  let introText: Array<string> = t(level?.data?.introduction, {ns: gameId}).split(/\n(\s*\n)+/)
+  let introText: Array<string> = gT(level?.data?.introduction ?? "").split(/\n(\s*\n)+/)
 
   return <div className={`chat-panel ${visible ? '' : 'hidden'}`}>
     <div ref={chatRef} className="chat">
@@ -179,7 +181,7 @@ function ChatPanel({lastLevel, visible = true}) {
           </div>
           {level?.data?.conclusion?.trim() &&
             <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
-              <Markdown>{t(level?.data?.conclusion, {ns: gameId})}</Markdown>
+              <Markdown>{gT(level?.data?.conclusion ?? "")}</Markdown>
             </div>
           }
         </>
@@ -214,6 +216,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
 
 function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPopup}) {
   let { t } = useTranslation()
+  const { t : gT } = useGameTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
@@ -418,7 +421,7 @@ function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPo
                   pageNumber={pageNumber} setPageNumber={setPageNumber}
                   isLoading={level.isLoading}
                   levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
-                    (level?.data?.title && ` : ${t(level?.data?.title, {ns: gameId})}`)}
+                    (level?.data?.title && ` : ${gT(level?.data?.title ?? "")}`)}
                   toggleImpressum={toggleImpressum}
                   toggleInfo={toggleInfo}
                   togglePreferencesPopup={togglePreferencesPopup}
@@ -452,11 +455,12 @@ function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPo
 
 function IntroductionPanel({gameInfo}) {
   let { t } = useTranslation()
+  const { t : gT } = useGameTranslation()
   const gameId = React.useContext(GameIdContext)
   const {worldId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
 
-  let text: Array<string> = t(gameInfo.data?.worlds.nodes[worldId].introduction, {ns: gameId}).split(/\n(\s*\n)+/)
+  let text: Array<string> = gT(gameInfo.data?.worlds.nodes[worldId].introduction).split(/\n(\s*\n)+/)
 
   return <div className="chat-panel">
     <div className="chat">
