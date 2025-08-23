@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/",
+    "module": "NodeNext",
+    "target": "es5",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "moduleResolution": "nodenext",
+    "jsx": "react",
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "ES2021.String",
+      "DOM"
+    ],
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["./src/"]
+}

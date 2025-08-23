@@ -7,9 +7,9 @@ import GameServer.Tactic.LetIntros
 import GameServer.RpcHandlers -- only needed to collect the translations of "level completed" msgs
 import I18n
 
-open Lean Meta Elab Command
+open Lean Meta Elab Command Std
 
-open GameServer
+namespace GameServer
 
 set_option autoImplicit false
 
@@ -220,7 +220,7 @@ def checkCommandNotDuplicated (items : Array Name) (cmd := "Command") : CommandE
 /-- Declare tactics that are introduced by this level. -/
 elab "NewTactic" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).tactics.new) "NewTactic"
-  for name in ↑args do
+  for name in args do
     checkInventoryDoc .Tactic name -- TODO: Add (template := "[docstring]")
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId)}}
@@ -228,7 +228,7 @@ elab "NewTactic" args:ident* : command => do
 /-- Declare tactics that are introduced by this level but do not show up in inventory. -/
 elab "NewHiddenTactic" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).tactics.hidden) "NewHiddenTactic"
-  for name in ↑args do
+  for name in args do
     checkInventoryDoc .Tactic name (template := "")
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId),
@@ -237,7 +237,7 @@ elab "NewHiddenTactic" args:ident* : command => do
 /-- Declare theorems that are introduced by this level. -/
 elab "NewTheorem" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).lemmas.new) "NewTheorem"
-  for name in ↑args do
+  for name in args do
     try let _decl ← getConstInfo name.getId catch
       | _ => logErrorAt name m!"unknown identifier '{name}'."
     checkInventoryDoc .Lemma name -- TODO: Add (template := "[mathlib]")
@@ -247,7 +247,7 @@ elab "NewTheorem" args:ident* : command => do
 /-- Declare definitions that are introduced by this level. -/
 elab "NewDefinition" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).definitions.new) "NewDefinition"
-  for name in ↑args do checkInventoryDoc .Definition name -- TODO: Add (template := "[mathlib]")
+  for name in args do checkInventoryDoc .Definition name -- TODO: Add (template := "[mathlib]")
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with new := args.map (·.getId)}}
 
@@ -255,7 +255,7 @@ elab "NewDefinition" args:ident* : command => do
 This is ignored if `OnlyTactic` is set. -/
 elab "DisabledTactic" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).tactics.disabled) "DisabledTactic"
-  for name in ↑args do checkInventoryDoc .Tactic name
+  for name in args do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with disabled := args.map (·.getId)}}
 
@@ -263,28 +263,28 @@ elab "DisabledTactic" args:ident* : command => do
 This is ignored if `OnlyTheorem` is set. -/
 elab "DisabledTheorem" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).lemmas.disabled) "DisabledTheorem"
-  for name in ↑args  do checkInventoryDoc .Lemma name
+  for name in args do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with disabled := args.map (·.getId)}}
 
 /-- Declare definitions that are temporarily disabled in this level -/
 elab "DisabledDefinition" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).definitions.disabled) "DisabledDefinition"
-  for name in ↑args do checkInventoryDoc .Definition name
+  for name in args do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with disabled := args.map (·.getId)}}
 
 /-- Temporarily disable all tactics except the ones declared here -/
 elab "OnlyTactic" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).tactics.only) "OnlyTactic"
-  for name in ↑args do checkInventoryDoc .Tactic name
+  for name in args do checkInventoryDoc .Tactic name
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with only := args.map (·.getId)}}
 
 /-- Temporarily disable all theorems except the ones declared here -/
 elab "OnlyTheorem" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).lemmas.only) "OnlyTheorem"
-  for name in ↑args do checkInventoryDoc .Lemma name
+  for name in args do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with only := args.map (·.getId)}}
 
@@ -292,7 +292,7 @@ elab "OnlyTheorem" args:ident* : command => do
 This is ignored if `OnlyDefinition` is set. -/
 elab "OnlyDefinition" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).definitions.only) "OnlyDefinition"
-  for name in ↑args do checkInventoryDoc .Definition name
+  for name in args do checkInventoryDoc .Definition name
   modifyCurLevel fun level => pure {level with
     definitions := {level.definitions with only := args.map (·.getId)}}
 
@@ -318,7 +318,7 @@ elab doc:docComment ? "LemmaDoc" name:ident "as" displayName:str "in" category:s
 elab "NewLemma" args:ident* : command => do
   logWarning "Deprecated. Has been renamed to `NewTheorem`"
   checkCommandNotDuplicated ((←getCurLevel).lemmas.new) "NewLemma"
-  for name in ↑args do
+  for name in args do
     try let _decl ← getConstInfo name.getId catch
       | _ => logErrorAt name m!"unknown identifier '{name}'."
     checkInventoryDoc .Lemma name -- TODO: Add (template := "[mathlib]")
@@ -328,14 +328,14 @@ elab "NewLemma" args:ident* : command => do
 elab "DisabledLemma" args:ident* : command => do
   logWarning "Deprecated. Has been renamed to `DisabledTheorem`"
   checkCommandNotDuplicated ((←getCurLevel).lemmas.disabled) "DisabledLemma"
-  for name in ↑args  do checkInventoryDoc .Lemma name
+  for name in args  do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with disabled := args.map (·.getId)}}
 
 elab "OnlyLemma" args:ident* : command => do
   logWarning "Deprecated. Has been renamed to `OnlyTheorem`"
   checkCommandNotDuplicated ((←getCurLevel).lemmas.only) "OnlyLemma"
-  for name in ↑args do checkInventoryDoc .Lemma name
+  for name in args do checkInventoryDoc .Lemma name
   modifyCurLevel fun level => pure {level with
     lemmas := {level.lemmas with only := args.map (·.getId)}}
 
@@ -361,7 +361,7 @@ For example in "Show that all matrices with first column zero form a submodule",
 you could provide the set of all these matrices as `carrier` and the player will receive
 all the `Prop`-valued fields as goals.
 -/
-syntax preambleArg := atomic(" (preamble := " withoutPosition(tacticSeq) ")")
+syntax preambleArg := atomic("(" &"preamble" ":=" withoutPosition(tacticSeq) ")")
 
 /-- Define the statement of the current level. -/
 elab doc:docComment ? attrs:Parser.Term.attributes ?
@@ -379,9 +379,6 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   let docContent ← match docContent with
   | none => pure none
   | some d => d.translate
-
-  -- Save the messages before evaluation of the proof.
-  let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
 
   -- The default name of the statement is `[Game].[World].level[no.]`, e.g. `NNG.Addition.level1`
   -- However, this should not be used when designing the game.
@@ -407,7 +404,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     let env ← getEnv
     let fullName := (← getCurrNamespace) ++ name.getId
     if env.contains fullName then
-      let some orig := env.constants.map₁.find? fullName
+      let some orig := env.constants.map₁.get? fullName
         | throwError s!"error in \"Statement\": `{fullName}` not found."
       let origType := orig.type
       -- TODO: Check if `origType` agrees with `sig` and output `logInfo` instead of `logWarning`
@@ -426,62 +423,6 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   | none =>
     let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
     elabCommand thmStatement
-
-  let msgs := (← get).messages
-  let mut hints := #[]
-  let mut nonHintMsgs := #[]
-  for msg in msgs.msgs do
-    -- Look for messages produced by the `Hint` tactic. They are used to pass information about the
-    -- intermediate goal state
-    if let MessageData.withNamingContext _ $ MessageData.withContext ctx $
-        .tagged `Hint $
-        .nest strict $
-        .nest hidden $
-        .compose (.ofGoal text) (.ofGoal goal) := msg.data then
-      let hint ← liftTermElabM $ withMCtx ctx.mctx $ withLCtx ctx.lctx #[] $ withEnv ctx.env do
-
-        let goalDecl ← goal.getDecl
-        let fvars := goalDecl.lctx.decls.toArray.filterMap id |> Array.map (·.fvarId)
-
-        -- NOTE: This code about `hintFVarsNames` is duplicated from `RpcHandlers`
-        -- where the variable bijection is constructed, and they
-        -- need to be matching.
-        -- NOTE: This is a bit a hack of somebody who does not know how meta-programming works.
-        -- All we want here is a list of `userNames` for the `FVarId`s in `hintFVars`...
-        -- and we wrap them in `«{}»` here since I don't know how to do it later.
-        let mut hintFVarsNames : Array Expr := #[]
-        for fvar in fvars do
-          let name₁ ← fvar.getUserName
-          hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
-
-        let text ← instantiateMVars (mkMVar text)
-
-        -- Evaluate the text in the `Hint`'s context to get the old variable names.
-        let rawText := (← GameServer.evalHintMessage text) hintFVarsNames
-        let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
-        let rawText : String ← (MessageData.withContext ctx₂ rawText).toString
-
-        return {
-          goal := ← abstractCtx goal
-          text := text
-          rawText := rawText
-          strict := strict == 1
-          hidden := hidden == 1
-        }
-
-      -- Note: The current setup for hints is a bit convoluted, but for now we need to
-      -- send the text once through i18n to register it in the env extension.
-      -- This could probably be rewritten once i18n works fully.
-      let _ ← hint.rawText.translate
-
-      hints := hints.push hint
-    else
-      nonHintMsgs := nonHintMsgs.push msg
-
-  -- restore saved messages and non-hint messages
-  modify fun st => { st with
-    messages := initMsgs ++ ⟨nonHintMsgs.toPArray'⟩
-  }
 
   let scope ← getScope
   let env ← getEnv
@@ -506,7 +447,6 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     | none => default
     | some name => currNamespace ++ name.getId
     descrFormat := descrFormat
-    hints := hints
     tactics := {level.tactics with used := usedInventory.tactics.toArray}
     definitions := {level.definitions with used := usedInventory.definitions.toArray}
     lemmas := {level.lemmas with used := usedInventory.lemmas.toArray}
@@ -528,7 +468,7 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
     match m with
     | Syntax.node info k args =>
       if k == interpolatedStrLitKind && args.size == 1 then
-        match args.get! 0 with
+        match args[0]! with
         | (Syntax.atom info' val) =>
           let val := removeIndentation val
           return Syntax.node info k #[Syntax.atom info' val]
@@ -547,6 +487,7 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
 
   let goal ← Tactic.getMainGoal
   goal.withContext do
+    let abstractedGoal ← abstractCtx goal
     -- We construct an expression that can produce the hint text. The difficulty is that we
     -- want the text to possibly contain quotation of the local variables which might have been
     -- named differently by the player.
@@ -558,15 +499,38 @@ elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(t
       for i in [:decls.size] do
         text ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $text)
       return ← mkLambdaFVars #[vars] $ ← Term.elabTermAndSynthesize text none
-    let textmvar ← mkFreshExprMVar none
-    guard $ ← isDefEq textmvar text -- Store the text in a mvar.
-    -- The information about the hint is logged as a message using `logInfo` to transfer it to the
-    -- `Statement` command:
-    logInfo $
-      .tagged `Hint $
-      .nest (if strict then 1 else 0) $
-      .nest (if hidden then 1 else 0) $
-      .compose (.ofGoal textmvar.mvarId!) (.ofGoal goal)
+
+
+    let goalDecl ← goal.getDecl
+    let fvars := goalDecl.lctx.decls.toArray.filterMap id |> Array.map (·.fvarId)
+
+    -- NOTE: This code about `hintFVarsNames` is duplicated from `RpcHandlers`
+    -- where the variable bijection is constructed, and they
+    -- need to be matching.
+    -- NOTE: This is a bit a hack of somebody who does not know how meta-programming works.
+    -- All we want here is a list of `userNames` for the `FVarId`s in `hintFVars`...
+    -- and we wrap them in `«{}»` here since I don't know how to do it later.
+    let mut hintFVarsNames : Array Expr := #[]
+    for fvar in fvars do
+      let name₁ ← fvar.getUserName
+      hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
+
+    -- Evaluate the text in the `Hint`'s context to get the old variable names.
+    let rawText := (← GameServer.evalHintMessage text) hintFVarsNames
+    let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
+    let rawText : String ← (MessageData.withContext ctx₂ rawText).toString
+
+    -- i18n
+    rawText.markForTranslation
+
+    modifyCurLevel fun level => pure {level with hints := level.hints.push {
+      text := text,
+      hidden := hidden,
+      strict := strict,
+      goal := abstractedGoal,
+      rawText := rawText
+    }}
+
 
 /-- This tactic allows us to execute an alternative sequence of tactics, but without affecting the
 proof state. We use it to define Hints for alternative proof methods or dead ends. -/
@@ -583,8 +547,13 @@ elab (name := GameServer.Tactic.Branch) "Branch" t:tacticSeq : tactic => do
     trace[debug] "This branch leaves open goals."
 
   let msgs ← Core.getMessageLog
+  let gameExtState := gameExt.getState (← getEnv)
+
   b.restore
+
   Core.setMessageLog msgs
+  modifyEnv (fun env => gameExt.setState env gameExtState)
+
 
 /-- A hole inside a template proof that will be replaced by `sorry`. -/
 elab (name := GameServer.Tactic.Hole) "Hole" t:tacticSeq : tactic => do
@@ -669,7 +638,7 @@ elab "Dependency" s:Parser.dependency : command => do
           source? := some stx.getId
           continue
     let target := stx.getId
-    match (← getCurGame).worlds.nodes.find? target with
+    match (← getCurGame).worlds.nodes.get? target with
     | some _ => pure ()
     | none => logErrorAt stx m!"World `{target}` seems not to exist"
 
@@ -742,7 +711,7 @@ elab "MakeGame" : command => do
           | 0 => pure ()
           | 1 => pure () -- level ids start with 1, so we need to skip 1, too
           | i₀ + 1 =>
-            let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
+            let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
             match (idx).statementName with
             | .anonymous => pure ()
             | .num _ _ => panic "Did not expect to get a numerical statement name!"
@@ -755,7 +724,7 @@ elab "MakeGame" : command => do
       -- if the last level was named, we need to add it as a new lemma
       let i₀ := world.levels.size
 
-        let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
+        let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
         match (idx).statementName with
         | .anonymous => pure ()
         | .num _ _ => panic "Did not expect to get a numerical statement name!"
@@ -775,9 +744,9 @@ elab "MakeGame" : command => do
   /- for each "item" this is a HashSet of `worldId`s that introduce this item -/
   let mut worldsWithNewItem : HashMap Name (HashSet Name) := {}
   for (worldId, _world) in allWorlds do
-    for newItem in newItemsInWorld.findD worldId {} do
+    for newItem in newItemsInWorld.getD worldId {} do
       worldsWithNewItem := worldsWithNewItem.insert newItem $
-        (worldsWithNewItem.findD newItem {}).insert worldId
+        (worldsWithNewItem.getD newItem {}).insert worldId
 
   -- For each `worldId` this is a HashSet of `worldId`s that this world depends on.
   let mut worldDependsOnWorlds : HashMap Name (HashSet Name) := {}
@@ -793,8 +762,8 @@ elab "MakeGame" : command => do
       if targetId = dependentWorldId then
         dependsOnWorlds := dependsOnWorlds.insert sourceId
 
-    for usedItem in usedItemsInWorld.findD dependentWorldId {} do
-      match worldsWithNewItem.find? usedItem with
+    for usedItem in usedItemsInWorld.getD dependentWorldId {} do
+      match worldsWithNewItem.get? usedItem with
       | none => logWarning m!"No world introducing {usedItem}, but required by {dependentWorldId}"
       | some worldIds =>
         -- Only need a new dependency if the world does not introduce an item itself
@@ -804,7 +773,7 @@ elab "MakeGame" : command => do
           dependsOnWorlds := dependsOnWorlds.insertMany worldIds
           -- Store the dependency reasons for debugging
           for worldId in worldIds do
-            let tmp := (dependencyReasons.findD (dependentWorldId, worldId) {}).insert usedItem
+            let tmp := (dependencyReasons.getD (dependentWorldId, worldId) {}).insert usedItem
             dependencyReasons := dependencyReasons.insert (dependentWorldId, worldId) tmp
     worldDependsOnWorlds := worldDependsOnWorlds.insert dependentWorldId dependsOnWorlds
 
@@ -816,7 +785,7 @@ elab "MakeGame" : command => do
       else
         let mut msg := m!"Dependencies of '{world}':"
         for dep in dependencies do
-          match dependencyReasons.find? (world, dep) with
+          match dependencyReasons.get? (world, dep) with
           | none =>
             msg := msg ++ m!"\n· '{dep}': no reason found (manually added?)"
           | some items =>
@@ -830,7 +799,7 @@ elab "MakeGame" : command => do
     for i in [:loop.length] do
       let w1 := loop[i]!
       let w2 := loop[if i == loop.length - 1 then 0 else i + 1]!
-      match dependencyReasons.find? (w1, w2) with
+      match dependencyReasons.get? (w1, w2) with
       -- This should not happen. Could use `find!` again...
       | none => logError m!"Did not find a reason why {w1} depends on {w2}."
       | some items =>
@@ -878,7 +847,7 @@ elab "MakeGame" : command => do
           | 1 => pure () -- level ids start with 1, so we need to skip 1, too.
           | i₀ + 1 =>
             -- add named statement from previous level to the available lemmas.
-            let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
+            let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
             match (idx).statementName with
             | .anonymous => pure ()
             | .num _ _ => panic "Did not expect to get a numerical statement name!"
@@ -893,7 +862,7 @@ elab "MakeGame" : command => do
         match i₀ with
         | 0 => logWarning m!"World `{worldId}` contains no levels."
         | i₀ =>
-          let some idx := world.levels.find? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
+          let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
           match (idx).statementName with
           | .anonymous => pure ()
           | .num _ _ => panic "Did not expect to get a numerical statement name!"
@@ -932,7 +901,7 @@ elab "MakeGame" : command => do
       let predecessors := game.worlds.predecessors worldId
       -- logInfo m!"Predecessors: {predecessors.toArray.map fun (a) => (a)}"
       for predWorldId in predecessors do
-        for item in newItemsInWorld.findD predWorldId {} do
+        for item in newItemsInWorld.getD predWorldId {} do
           let data := (← getInventoryItem? item inventoryType).get!
           items := items.insert item {
             name := item
@@ -944,7 +913,7 @@ elab "MakeGame" : command => do
       itemsInWorld := itemsInWorld.insert worldId items
 
     for (worldId, world) in game.worlds.nodes.toArray do
-      let mut items := itemsInWorld.findD worldId {}
+      let mut items := itemsInWorld.getD worldId {}
 
       let levels := world.levels.toArray.insertionSort fun a b => a.1 < b.1
 
@@ -965,7 +934,7 @@ elab "MakeGame" : command => do
         -- add the exercise statement from the previous level
         -- if it was named
         if inventoryType == .Lemma then
-          match lemmaStatements.find? (worldId, levelId) with
+          match lemmaStatements.get? (worldId, levelId) with
           | none => pure ()
           | some name =>
             let data := (← getInventoryItem? name inventoryType).get!
@@ -994,7 +963,7 @@ elab "MakeGame" : command => do
     allItemsByType := allItemsByType.insert inventoryType allItems
 
   let getTiles (type : InventoryType) : CommandElabM (Array InventoryTile) := do
-    (allItemsByType.findD type {}).toArray.mapM (fun name => do
+    (allItemsByType.getD type {}).toArray.mapM (fun name => do
       let some item ← getInventoryItem? name type
         | throwError "Expected item to exist: {name}"
       return item.toTile)

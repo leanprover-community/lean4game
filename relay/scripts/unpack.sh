@@ -1,11 +1,12 @@
 #/bin/bash
 
-ARTIFACT_ID=$1
-OWNER=$2
-REPO=$3
+GAMES=$1
+ARTIFACT_ID=$2
+OWNER=$3
+REPO=$4
 
 # mkdir -p games
-cd games
+cd ${GAMES}
 
 # mkdir -p tmp
 mkdir -p ${OWNER}

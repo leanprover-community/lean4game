@@ -1,0 +1,11 @@
+name = "Game"
+version = "0.1.0"
+defaultTargets = ["Game"]
+weakLeanArgs = []
+
+[[lean_lib]]
+name = "Game"
+
+[[require]]
+name = "GameServer"
+path = "../../server"

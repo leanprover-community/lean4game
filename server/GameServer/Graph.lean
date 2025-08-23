@@ -1,6 +1,9 @@
 import Lean
+import Std.Data.HashMap.Basic
 
-open Lean Meta
+namespace GameServer
+
+open Lean Std
 
 /-! ## Graph -/
 

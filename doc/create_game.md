@@ -26,7 +26,7 @@ The file `Game.lean` is the backbone of the game putting everything together.
 So the `Game.lean` has the following structure:
 
 ```lean
-import GameServer.Commands
+import GameServer
 
 -- import all worlds
 import Game.Levels.Tutorial
@@ -55,7 +55,7 @@ A minimal level file looks like the following. There are many options to add, wh
 into in a later section
 
 ```lean
-import GameServer.Commands
+import GameServer
 
 World "MyWorld"
 Level 1
@@ -107,19 +107,63 @@ No world introducing sorry, but required by MyWorld
 which means that the world `MyWorld` uses the tactic `sorry` in a proof, but `sorry` has not been
 introduced anywhere.
 
-## 5. Testing the Game Locally
+## 5. Refactoring an existing world
+
+The [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton)  contains a bash script `sofi.sh`
+(`s`ort `o`ut `f`ilnames and `i`mports),
+which can help restructure existing worlds, for example if you want to reorder or rename existing levels,
+or add additional levels in the middle.  Say, for example, you have an “Arithmetic World” in the
+folder
+
+    Game/Levels/Arithmetic
+
+consisting of the three levels listed in the leftmost column of the table below. Suppose you want to
+switch the order of multiplication and addition, and insert an additional level on subtraction in
+between.  Then you can simply edit the *file names* as in the second column, and add the additional
+file for the level on substraction, so that the files are in the intended order when sorted
+alphabetically (as displayed in the third column).
+
+| existing levels    | manual changes           | files in alphabetical order | end result          |
+|--------------------|--------------------------|-----------------------------|---------------------|
+| L01\_hello.lean    | L01\_hello.lean          | L01\_hello.lean             | L01\_hello.lean     |
+| L02\_multiply.lean | **L03**\_multiply.lean   | L02a\_add.lean              | L02\_add.lean       |
+| L03\_add.lean      | **L02a**\_add.lean       | L02b\_substract.lean        | L03\_substract.lean |
+|                    | **L02b\_substract.lean** | L03\_multiply.lean          | L04\_multiply.lean  |
+
+Calling
+
+    ./sofi.sh Game/Levels/Arithmetic
+
+will then
+
+- rename the files as in the last column,
+- update the level number in each file,
+- make a reasonable attempt to update the `import` statements in each of the
+  level files, and
+- update the imports in the base file `Game/Levels/Arithmetic.lean`.
+
+More details are documented in the script itself.
+
+Don't forget to add all your new/renamed files to git with
+
+    git add Game/Levels/Arithmetic/
+
+at the end.
+
+
+## 6. Testing the Game Locally
 
 Now it's time to test the game locally and play it.
 
 There are multiple ways how you can start the game locally to test-play it described at [How to Run the Game Locally](running_locally.md). If you have problems getting one of the setups to work, please get in contact!
 
 
-## 6. Dive into Level creation
+## 7. Dive into Level creation
 
 Now that you have a running game, we have a closer look at the level files and all the options
 you have to design your game.
 
-### 6. a) Inventory
+### 8. a) Inventory
 
 The player has an inventory with tactics, theorems, and definitions that unlock during the game. You can unlock/introduce such items in a Level by adding one of the following below the `Statement`.
 
