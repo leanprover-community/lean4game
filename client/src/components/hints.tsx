@@ -1,6 +1,6 @@
 import { GameHint, InteractiveGoalsWithHints, ProofState } from "./infoview/rpc_api";
 import * as React from 'react';
-import Markdown from './markdown';
+import { Markdown } from './markdown';
 import { DeletedChatContext, ProofContext } from "./infoview/context";
 import { lastStepHasErrors } from "./infoview/goals";
 import { Button } from "./button";

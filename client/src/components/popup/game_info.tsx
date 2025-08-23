@@ -3,7 +3,7 @@
 */
 import * as React from 'react'
 import { Typography } from '@mui/material'
-import Markdown from '../markdown'
+import { Markdown } from '../markdown'
 import { useTranslation } from 'react-i18next'
 import { GameIdContext } from '../../app'
 

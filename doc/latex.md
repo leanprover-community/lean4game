@@ -9,6 +9,9 @@ This means for example you'd write `/-- $\iff$ -/` but `"$\\iff$"`.
 
 Furthermore, inside `Hint` you need to escape all opening curly brackets as `\{` since `{h}` is syntax for inserting a variable name `h`.
 
+# Images
+
+
 # KaTeX
 
 LaTeX syntax is provided trough the [KaTeX library](https://katex.org). KateX supports most but not all of latex and its packages.

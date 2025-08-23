@@ -5,7 +5,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 import { Button, Dialog, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import Markdown from './markdown';
+import { Markdown } from './markdown';
 
 function Message({ isOpen, content, close }) {
 

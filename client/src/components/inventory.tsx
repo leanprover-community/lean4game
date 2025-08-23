@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faBan, faCheck } from '@fortawesome/free-solid-svg-icons'
 import { faClipboard } from '@fortawesome/free-regular-svg-icons'
 import { GameIdContext } from '../app';
-import Markdown from './markdown';
+import { Markdown } from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery } from '../state/api';
 import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';

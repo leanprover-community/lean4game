@@ -10,7 +10,7 @@ import '@fontsource/roboto/700.css';
 import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 
-import Markdown from './markdown';
+import { Markdown } from './markdown';
 import {PrivacyPolicyPopup} from './popup/privacy_policy'
 import { GameTile, useGetGameInfoQuery } from '../state/api'
 import path from 'path';

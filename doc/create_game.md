@@ -311,6 +311,13 @@ CoverImage "images/cover.png"
 
 ## 10. Advanced Topics
 
+### Markdown
+
+Texts should generally support markdown. For some tips on how to use markdown, see
+[Markdown styling](markdown.md).
+
+
+
 ### Escaping
 
 Inside strings, you need to escape backslashes, but not inside doc-strings, therefore you

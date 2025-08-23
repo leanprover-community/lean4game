@@ -25,7 +25,7 @@ import { changedSelection, codeEdited, selectCode, selectSelections, selectCompl
   selectHelp, selectDifficulty, selectInventory, selectTypewriterMode, changeTypewriterMode } from '../state/progress'
 import { store } from '../state/store'
 import { Button } from './button'
-import Markdown from './markdown'
+import { Markdown } from './markdown'
 import {InventoryPanel} from './inventory'
 import { hasInteractiveErrors } from './infoview/typewriter'
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
