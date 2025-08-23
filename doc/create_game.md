@@ -282,6 +282,8 @@ in one of the files you created in 2), 3), or 4) (i.e. game/world/level).
 
 NOTE: At present, only the images for a world are displayed. They appear in the introduction of the world.
 
+You can also embed images in the text as descriped in [Markdown](markdown.md).
+
 ## 7. Update your game
 
 In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](update_game.md).
@@ -315,6 +317,8 @@ CoverImage "images/cover.png"
 
 Texts should generally support markdown. For some tips on how to use markdown, see
 [Markdown styling](markdown.md).
+
+In particular, you can embed images in texts, see the specific instructions in that file.
 
 
 
