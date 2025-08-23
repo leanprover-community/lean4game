@@ -1,5 +1,5 @@
-import Lean
-import GameServer.EnvExtensions
+import GameServer.Tactic.Branch
+import GameServer.Tactic.Hint
 
 namespace GameServer
 
@@ -117,8 +117,9 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
 partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : CommandElabM UsedInventory := do
   match stx with
   | .missing => return acc
-  | .node _info kind args =>
-    if kind == `GameServer.Tactic.Hint || kind == `GameServer.Tactic.Branch then return acc
+  | .node _info ``GameServer.Tactic.Branch _args => return acc
+  | .node _info ``GameServer.Tactic.Hint _args => return acc
+  | .node _info _kind args =>
     return ← args.foldlM (fun acc arg => collectUsedInventory arg acc) acc
   | .atom _info val =>
     -- ignore syntax elements that do not start with a letter
