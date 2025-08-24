@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
 import { useTranslation } from 'react-i18next'
+import { useGameTranslation } from '../utils/translation'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -221,6 +222,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
   togglePreferencesPopup: () => void;
 }) {
   const { t } = useTranslation()
+  const { t: gT } = useGameTranslation()
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useAppSelector(selectProgress(gameId))
   const {mobile} = React.useContext(PreferencesContext)
@@ -232,7 +234,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
       <span className="app-bar-title"></span>
     </div>
     <div>
-      {!mobile && <span className="app-bar-title">{t(gameInfo?.title, {ns: gameId})}</span>}
+      {!mobile && <span className="app-bar-title">{gT(gameInfo?.title)}</span>}
     </div>
     <div className="nav-btns">
       {mobile && <MobileNavButtons pageNumber={pageNumber} setPageNumber={setPageNumber} />}
@@ -262,6 +264,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, togglePriva
   setPageNumber?: any,
 }) {
   const { t } = useTranslation()
+  const { t: gT } = useGameTranslation()
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
@@ -298,7 +301,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, togglePriva
         {/* DESKTOP VERSION */}
         <div className='app-bar-left'>
           <HomeButton isDropdown={false} />
-          <span className="app-bar-title">{worldTitle && `${t("World")}: ${t(worldTitle, {ns: gameId})}`}</span>
+          <span className="app-bar-title">{worldTitle && `${t("World")}: ${gT(worldTitle)}`}</span>
         </div>
         <div>
           <span className="app-bar-title">{levelTitle}</span>

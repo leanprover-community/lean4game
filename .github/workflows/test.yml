@@ -7,20 +7,20 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Install elan
-        run: |
-          set -o pipefail
-          curl -sSfL https://github.com/leanprover/elan/releases/download/v3.0.0/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          ./elan-init -y
-          echo "$HOME/.elan/bin" >> $GITHUB_PATH
-
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
 
-      - name: Print lean and lake versions
-        run: |
-          lean --version
-          lake --version
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: true
+          lint: false
+          use-github-cache: false
+          use-mathlib-cache: false
+          check-reservoir-eligibility: false
+          lake-package-directory: "server"
+
+      - run: elan default stable
 
       - name: Build the project
         run: |
@@ -28,5 +28,26 @@ jobs:
           npm run build
           npm run build_test
 
-      - name: Run Cypress tests
+      - name: Run Cypress tests (Development mode)
         run: npm run test
+
+      - name: Install Bubblewrap
+        run: sudo apt-get install bubblewrap
+
+      - name: Configure AppArmor for Bubblewrap (https://etbe.coker.com.au/2024/04/24/ubuntu-24-04-bubblewrap/)
+        run: |
+          sudo tee /etc/apparmor.d/bwrap > /dev/null << 'EOF'
+          abi <abi/4.0>,
+          include <tunables/global>
+
+          profile bwrap /usr/bin/bwrap flags=(unconfined) {
+            userns,
+
+            # Site-specific additions and overrides. See local/README for details.
+            include if exists <local/bwrap>
+          }
+          EOF
+          sudo systemctl reload apparmor
+
+      - name: Run Cypress tests (Production mode)
+        run: npm run test_prod

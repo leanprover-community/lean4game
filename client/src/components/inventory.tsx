@@ -5,13 +5,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faBan, faCheck } from '@fortawesome/free-solid-svg-icons'
 import { faClipboard } from '@fortawesome/free-regular-svg-icons'
 import { GameIdContext } from '../app';
-import Markdown from './markdown';
+import { Markdown } from './markdown';
 import { useLoadDocQuery, InventoryTile, LevelInfo, InventoryOverview, useLoadInventoryOverviewQuery } from '../state/api';
 import { selectDifficulty, selectInventory } from '../state/progress';
 import { store } from '../state/store';
 import { useSelector } from 'react-redux';
+import { useGameTranslation } from '../utils/translation';
 import { useTranslation } from 'react-i18next';
-import { t } from 'i18next';
 
 export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=false} :
   {
@@ -99,6 +99,8 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
 }
 
 function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc, enableAll=false}) {
+  const { t } = useTranslation()
+
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : item.st
   const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""
@@ -135,13 +137,14 @@ return <div className={`item ${className}${enableAll ? ' enabled' : ''}`} onClic
 export function Documentation({name, type, handleClose}) {
   const gameId = React.useContext(GameIdContext)
   const doc = useLoadDocQuery({game: gameId, type: type, name: name})
+  const { t : gT } = useGameTranslation()
 
   return <div className="documentation">
     <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
     <h1 className="doc">{doc.data?.displayName}</h1>
     <p><code>{doc.data?.statement}</code></p>
     {/* <code>docstring: {doc.data?.docstring}</code> */}
-    <Markdown>{t(doc.data?.content, {ns: gameId})}</Markdown>
+    <Markdown>{gT(doc.data?.content)}</Markdown>
   </div>
 }
 

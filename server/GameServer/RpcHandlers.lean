@@ -145,7 +145,7 @@ def findHints (goal : MVarId) (level : GameLevel) : MetaM (Array GameHint) := do
 def filterUnsolvedGoal (a : Array InteractiveDiagnostic) :
     Array InteractiveDiagnostic :=
   a.filter (fun d => match d.message with
-  | .append ⟨(.text x) :: _⟩ => x != "unsolved goals"
+  | .append ⟨(.tag (.expr (.text x)) _) :: _⟩ => x != "unsolved goals"
   | _ => true)
 
 -- TODO: no need to have `RequestM`, just anything where `mut` works

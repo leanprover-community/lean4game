@@ -4,12 +4,13 @@ import GameServer.Options
 import GameServer.SaveData
 import GameServer.Hints
 import GameServer.Tactic.LetIntros
+import GameServer.Tactic.Template
 import GameServer.RpcHandlers -- only needed to collect the translations of "level completed" msgs
 import I18n
 
 open Lean Meta Elab Command Std
 
-open GameServer
+namespace GameServer
 
 set_option autoImplicit false
 
@@ -380,9 +381,6 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   | none => pure none
   | some d => d.translate
 
-  -- Save the messages before evaluation of the proof.
-  let initMsgs ← modifyGet fun st => (st.messages, { st with messages := {} })
-
   -- The default name of the statement is `[Game].[World].level[no.]`, e.g. `NNG.Addition.level1`
   -- However, this should not be used when designing the game.
   let defaultDeclName : Ident := mkIdent <| (← getCurGame).name ++ (← getCurWorld).name ++
@@ -454,146 +452,6 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     definitions := {level.definitions with used := usedInventory.definitions.toArray}
     lemmas := {level.lemmas with used := usedInventory.lemmas.toArray}
     }
-
-/-! # Hints -/
-
-open GameServer in
-
-/-- A tactic that can be used inside `Statement`s to indicate in which proof states players should
-see hints. The tactic does not affect the goal state.
--/
-elab (name := GameServer.Tactic.Hint) "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => do
-  let mut strict := false
-  let mut hidden := false
-
-  -- remove spaces at the beginning of new lines
-  let msg := TSyntax.mk $ msg.raw.setArgs $ ← msg.raw.getArgs.mapM fun m => do
-    match m with
-    | Syntax.node info k args =>
-      if k == interpolatedStrLitKind && args.size == 1 then
-        match args[0]! with
-        | (Syntax.atom info' val) =>
-          let val := removeIndentation val
-          return Syntax.node info k #[Syntax.atom info' val]
-        | _ => return m
-      else
-        return m
-    | _ => return m
-
-  for arg in args do
-    match arg with
-    | `(hintArg| (strict := true)) => strict := true
-    | `(hintArg| (strict := false)) => strict := false
-    | `(hintArg| (hidden := true)) => hidden := true
-    | `(hintArg| (hidden := false)) => hidden := false
-    | _ => throwUnsupportedSyntax
-
-  let goal ← Tactic.getMainGoal
-  goal.withContext do
-    let abstractedGoal ← abstractCtx goal
-    -- We construct an expression that can produce the hint text. The difficulty is that we
-    -- want the text to possibly contain quotation of the local variables which might have been
-    -- named differently by the player.
-    let varsName := `vars
-    let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
-      let mut text ← `(m! $msg)
-      let goalDecl ← goal.getDecl
-      let decls := goalDecl.lctx.decls.toArray.filterMap id
-      for i in [:decls.size] do
-        text ← `(let $(mkIdent decls[i]!.userName) := $(mkIdent varsName)[$(quote i)]!; $text)
-      return ← mkLambdaFVars #[vars] $ ← Term.elabTermAndSynthesize text none
-
-
-    let goalDecl ← goal.getDecl
-    let fvars := goalDecl.lctx.decls.toArray.filterMap id |> Array.map (·.fvarId)
-
-    -- NOTE: This code about `hintFVarsNames` is duplicated from `RpcHandlers`
-    -- where the variable bijection is constructed, and they
-    -- need to be matching.
-    -- NOTE: This is a bit a hack of somebody who does not know how meta-programming works.
-    -- All we want here is a list of `userNames` for the `FVarId`s in `hintFVars`...
-    -- and we wrap them in `«{}»` here since I don't know how to do it later.
-    let mut hintFVarsNames : Array Expr := #[]
-    for fvar in fvars do
-      let name₁ ← fvar.getUserName
-      hintFVarsNames := hintFVarsNames.push <| Expr.fvar ⟨s!"«\{{name₁}}»"⟩
-
-    -- Evaluate the text in the `Hint`'s context to get the old variable names.
-    let rawText := (← GameServer.evalHintMessage text) hintFVarsNames
-    let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
-    let rawText : String ← (MessageData.withContext ctx₂ rawText).toString
-
-
-    modifyCurLevel fun level => pure {level with hints := level.hints.push {
-      text := text,
-      hidden := hidden,
-      strict := strict,
-      goal := abstractedGoal,
-      rawText := rawText
-    }}
-
-
-/-- This tactic allows us to execute an alternative sequence of tactics, but without affecting the
-proof state. We use it to define Hints for alternative proof methods or dead ends. -/
-elab (name := GameServer.Tactic.Branch) "Branch" t:tacticSeq : tactic => do
-  let b ← saveState
-  Tactic.evalTactic t
-
-  -- Show an info whether the branch proofs all remaining goals.
-  let gs ← Tactic.getUnsolvedGoals
-  if gs.isEmpty then
-    -- trace[debug] "This branch finishes the proof."
-    pure ()
-  else
-    trace[debug] "This branch leaves open goals."
-
-  let msgs ← Core.getMessageLog
-  b.restore
-  Core.setMessageLog msgs
-
-/-- A hole inside a template proof that will be replaced by `sorry`. -/
-elab (name := GameServer.Tactic.Hole) "Hole" t:tacticSeq : tactic => do
-  Tactic.evalTactic t
-
-/--
-Iterate recursively through the Syntax, replace `Hole` with `sorry` and remove all
-`Hint`/`Branch` occurrences.
--/
-def replaceHoles (tacs : Syntax) : Syntax :=
-  match tacs with
-  | Syntax.node info kind ⟨args⟩ =>
-    let newArgs := filterArgs args
-    Syntax.node info kind ⟨newArgs⟩
-  | other => other
-where filterArgs (args : List Syntax) : List Syntax :=
-  match args with
-    | [] => []
-    -- replace `Hole` with `sorry`.
-    | Syntax.node info `GameServer.Tactic.Hole _ :: r =>
-      Syntax.node info `Lean.Parser.Tactic.tacticSorry #[Syntax.atom info "sorry"] :: filterArgs r
-    -- delete all `Hint` and `Branch` occurrences in the middle.
-    | Syntax.node _ `GameServer.Tactic.Hint _ :: _ :: r
-    | Syntax.node _ `GameServer.Tactic.Branch _ :: _ :: r =>
-      filterArgs r
-    -- delete `Hint` and `Branch` occurrence at the end of the tactic sequence.
-    | Syntax.node _ `GameServer.Tactic.Hint _ :: []
-    | Syntax.node _ `GameServer.Tactic.Branch _ :: [] =>
-        []
-    -- Recurse on all other Syntax.
-    | a :: rest =>
-      replaceHoles a :: filterArgs rest
-
-/-- The tactic block inside `Template` will be copied into the users editor.
-Use `Hole` inside the template for a part of the proof that should be replaced
-with `sorry`. -/
-elab "Template" tacs:tacticSeq : tactic => do
-  Tactic.evalTactic tacs
-  let newTacs : TSyntax `Lean.Parser.Tactic.tacticSeq := ⟨replaceHoles tacs.raw⟩
-  let template ← PrettyPrinter.ppCategory `Lean.Parser.Tactic.tacticSeq newTacs
-  trace[debug] s!"Template:\n{template}"
-  modifyLevel (←getCurLevelId) fun level => do
-    return {level with template := s!"{template}"}
-
 
 -- TODO: Notes for testing if a declaration has the simp attribute
 

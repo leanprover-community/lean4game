@@ -52,6 +52,10 @@ For translating games, see [Translating a game](doc/translate.md).
 
 Providing the use access to a Lean instance running on the server is a severe security risk. That is why we start the Lean server with bubblewrap.
 
+## Contact
+
+In case of technical problems with ```adam.math.hhu.de``` please contact us via <a href="mailto:matvey.lorkish@hhu.de?subject=Lean4Game: <Your%20Question>">e-mail</a>.
+
 ## Credits
 
 The project has primarily been developed by Alexander Bentkamp and Jon Eugster.

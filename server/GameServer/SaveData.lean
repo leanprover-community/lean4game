@@ -1,6 +1,8 @@
 import GameServer.EnvExtensions
 import I18n
 
+namespace GameServer
+
 open Lean Meta Elab Command Std
 
 /-! ## Copy images -/

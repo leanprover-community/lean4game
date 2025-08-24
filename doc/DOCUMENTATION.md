@@ -18,7 +18,7 @@ is to provide the lean commands which are used when creating a game. These are l
 
 Games need the "server" as a lake-dependency, which is done in the game's lakefile.
 
-A game imports `GameServer.Commands` which provides to all the API required to
+A game imports `GameServer` which provides to all the API required to
 create a game.
 
 In particular the lean command `MakeGame` compiles the entire game. Static information is

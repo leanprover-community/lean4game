@@ -2,7 +2,9 @@ import GameServer.AbstractCtx
 import GameServer.Graph
 import GameServer.Hints
 
-open GameServer Std
+namespace GameServer
+
+open Std
 
 -- TODO: Is there a better place?
 /-- Keywords that the server should not consider as tactics.
@@ -12,7 +14,7 @@ Note: Added `clear` tactic because currently it is very useful in combination wi
 hypotheses).
 -/
 def GameServer.ALLOWED_KEYWORDS : List String :=
-  ["with", "fun", "at", "only", "by", "generalizing", "skip", "if", "then", "else", "clear"]
+  ["with", "fun", "at", "only", "by", "generalizing", "using", "skip", "if", "then", "else", "clear"]
 
 /-- The default game name if `Game "MyGame"` is not used. -/
 def defaultGameName: String := "MyGame"

@@ -97,8 +97,15 @@ export class GameManager {
         serverProcess = cp.spawn("lake", ["serve", "--"], { cwd: game_dir });
       }
     } else {
-      serverProcess = cp.spawn("../../scripts/bubblewrap.sh",
-        [game_dir, path.join(this.dir, '..', '..', '..'), customLeanServer ? "true" : "false"],
+      let cmd = "../../scripts/bubblewrap.sh"
+      let options = [game_dir, customLeanServer ? "true" : "false"]
+      if (owner == "test") {
+        // TestGame doesn't have its own copy of the server and needs lean4game as a local dependency
+        const lean4GameFolder = path.join(this.dir, '..', '..', '..', 'server')
+        options.push(`--bind ${lean4GameFolder} /server`)
+      }
+
+      serverProcess = cp.spawn(cmd, options,
         { cwd: this.dir });
     }
 
@@ -136,13 +143,15 @@ export class GameManager {
     usesCustomLeanServer: boolean
   ) {
 
+    let shift = (line: number, offset: number) => Math.max(0, line + offset)
+
     let shiftLines = (p : any, offset : number) => {
       if (p.hasOwnProperty("line")) {
-        p.line = Math.max(0, p.line + offset)
+        p.line = shift(p.line, offset)
       }
       if (p.hasOwnProperty("lineRange")) {
-        p.lineRange.start = Math.max(0, p.lineRange.start + offset)
-        p.lineRange.end = Math.max(0, p.lineRange.end + offset)
+        p.lineRange.start = shift(p.lineRange.start, offset)
+        p.lineRange.end = shift(p.lineRange.end, offset)
       }
       for (let key in p) {
         if (typeof p[key] === 'object' && p[key] !== null) {
@@ -152,20 +161,37 @@ export class GameManager {
       return p;
     }
 
+    function replaceUri(obj: object, val: string) {
+      for (const key in obj) {
+        if (key === 'uri') {
+          obj[key] = val;
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          replaceUri(obj[key], val);
+        }
+      }
+      return obj
+    }
+
+
     // These values will be set by the initialize message
     let difficulty: number
     let inventory: string[]
+    let worldId: string
+    let levelId: string
 
     const PROOF_START_LINE = 2
 
     const gameDataPath = path.join(gameDir, '.lake', 'gamedata', `game.json`)
     const gameData = JSON.parse(fs.readFileSync(gameDataPath, 'utf8'))
 
+    /** Sending messages from the client to the server */
     socketConnection.forward(serverConnection, (message: any) => {
 
-      if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
-
-      if (usesCustomLeanServer) return message
+      // backwards compatibility for versions ≤ v4.7.0
+      if (usesCustomLeanServer) {
+        if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
+        return message
+      }
 
       if (message.method === "initialize") {
         difficulty = message.params.initializationOptions.difficulty
@@ -178,8 +204,10 @@ export class GameManager {
         // Parse the URI to get world and level
         const uri = new URL(message.params.textDocument.uri)
         const pathParts = path.parse(uri.pathname)
-        const worldId = path.basename(pathParts.dir)
-        const levelId = pathParts.name
+        worldId = path.basename(pathParts.dir)
+        levelId = pathParts.name
+
+        replaceUri(message, `file://${gameDir}/Game/Metadata.lean`)
 
         // Read level data from JSON file
         const levelDataPath = path.join(gameDir, '.lake', 'gamedata', `level__${worldId}__${levelId}.json`)
@@ -187,38 +215,45 @@ export class GameManager {
 
         let content = message.params.textDocument.text;
         message.params.textDocument.text =
-          `import ${levelData.module} import GameServer.Runner Runner ` +
+          `import ${levelData.module} import GameServer.Runner \nRunner ` +
           `${JSON.stringify(gameData.name)} ${JSON.stringify(worldId)} ${levelId} ` +
           `(difficulty := ${difficulty}) ` +
           `(inventory := [${inventory.map(s => JSON.stringify(s)).join(',')}]) ` +
-          `:= by\nskip\n${content}\n`
+          `:= by\n${content}\n`
+      } else {
+        replaceUri(message, `file://${gameDir}/Game/Metadata.lean`)
       }
 
-      return shiftLines(message, +PROOF_START_LINE);
+      shiftLines(message, +PROOF_START_LINE)
+
+      // Print the message as the server will receive it
+      if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
+
+      return message
     });
+
+
+    /** Sending messages from the server to the client */
     serverConnection.forward(socketConnection, message => {
+
+      // Print the message as the server sends it
       if (isDevelopment) { console.log(`SERVER: ${JSON.stringify(message)}`); }
 
+      // backwards compatibility for versions ≤ v4.7.0
       if (usesCustomLeanServer) return message
 
-      return shiftLines(message, -PROOF_START_LINE);
+      shiftLines(message, -PROOF_START_LINE);
+      replaceUri(message, `file:///${worldId}/${levelId}`) // as defined in `level.tsx`
+
+      return message
     });
   }
 
   getGameDir(owner: string, repo: string) {
     owner = owner.toLowerCase();
-    if (owner == 'local' || owner == 'test') {
-      if (!isDevelopment) {
-        console.error(`No local games in production mode.`);
-        return "";
-      }
-    } else {
-      const gamesPath = path.join(this.dir, '..', '..', '..', 'games');
-      if (!fs.existsSync(gamesPath)) {
-        console.error(`Did not find the following folder: ${gamesPath}`);
-        console.error('Did you already import any games?');
-        return "";
-      }
+    if (owner == 'local' && !isDevelopment) {
+      console.error(`No local games in production mode.`);
+      return "";
     }
 
     let game_dir: string
@@ -227,7 +262,13 @@ export class GameManager {
     } else if (owner == 'test') {
       game_dir = path.join(this.dir, '..', '..', '..', 'cypress', repo)
     } else {
-      game_dir = path.join(this.dir, '..', '..', '..', 'games', `${owner}`, `${repo.toLowerCase()}`);
+      const gamesPath = path.join(this.dir, '..', '..', '..', 'games');
+      if (!fs.existsSync(gamesPath)) {
+        console.error(`Did not find the following folder: ${gamesPath}`);
+        console.error('Did you already import any games?');
+        return "";
+      }
+      game_dir = path.join(gamesPath, `${owner}`, `${repo.toLowerCase()}`);
     }
 
     if (!fs.existsSync(game_dir)) {
