@@ -6,9 +6,9 @@ This is the source code for a Lean game platform hosted at [adam.math.hhu.de](ht
 
 Please follow the tutorial [Creating a Game](doc/create_game.md). In particular, the following steps might be of interest:
 
-* Step 5: [How to Run Games Locally](doc/running_locally.md)
-* Step 7: [How to Update an existing Game](doc/update_game.md)
-* Step 9: [How to Publish a Game](doc/publish_game.md)
+* Step 6: [How to Run Games Locally](doc/running_locally.md)
+* Step 8: [How to Update an existing Game](doc/update_game.md)
+* Step 10: [How to Publish a Game](doc/publish_game.md)
 * [Troubleshooting](doc/troubleshoot.md)
 
 ## Documentation
