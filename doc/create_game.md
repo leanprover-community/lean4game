@@ -163,7 +163,7 @@ There are multiple ways how you can start the game locally to test-play it descr
 Now that you have a running game, we have a closer look at the level files and all the options
 you have to design your game.
 
-### 8. a) Inventory
+### 7. a) Inventory
 
 The player has an inventory with tactics, theorems, and definitions that unlock during the game. You can unlock/introduce such items in a Level by adding one of the following below the `Statement`.
 
@@ -227,7 +227,7 @@ NewHiddenTactic rewrite nth_rewrite rwa
 
 and only `rw` would show up in the inventory.
 
-### 6. b) Statement
+### 7. b) Statement
 
 The statement is the exercise of the level. The basics work the same as they would in `example` or `theorem`. Note however, that you **must** do a tactic proof, i.e. the `:= by` is a hard-coded part of the syntax
 
@@ -248,7 +248,7 @@ Statement ...
 
 For more details and features, read [Writing Exercises](writing_exercises.md)
 
-### 6. c) Proof
+### 7. c) Proof
 
 The proof must always be a tactic proof, i.e. `:= by` is a mandatory part of the syntax.
 
@@ -265,7 +265,7 @@ There are a few extra tactics that help you with structuring the proof:
 
 One thing to keep in mind is that the game will look at the main proof to figure out which tactics and theorems are needed, but it ignores any `Branch`es.
 
-### 6. d) Hints
+### 7. d) Hints
 
 Most important for game development are probably the `Hints`.
 
@@ -274,7 +274,7 @@ placed at inside the sample proof. You can use `Branch` to place hints in dead e
 
 Read [More about Hints](hints.md) for how they work and what the options are.
 
-### 6. e) Extra: Images
+### 7. e) Extra: Images
 You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
 
 The images need to be placed in `images/` and you need to add a command like `Image "images/path/to/myWorldImage.png"`
@@ -284,15 +284,15 @@ NOTE: At present, only the images for a world are displayed. They appear in the 
 
 You can also embed images in the text as descriped in [Markdown](markdown.md).
 
-## 7. Update your game
+## 8. Update your game
 
 In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](update_game.md).
 
-## 8. Add translation
+## 9. Add translation
 
 See [Translating a game](translate.md).
 
-## 9. Publish your game
+## 10. Publish your game
 
 To publish your game on the official server, see [Publishing a game](publish_game.md)
 
@@ -311,7 +311,7 @@ CoverImage "images/cover.png"
 * `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
 * `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
-## 10. Advanced Topics
+## 11. Advanced Topics
 
 ### Markdown
 
