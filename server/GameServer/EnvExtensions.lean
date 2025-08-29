@@ -14,7 +14,7 @@ Note: Added `clear` tactic because currently it is very useful in combination wi
 hypotheses).
 -/
 def GameServer.ALLOWED_KEYWORDS : List String :=
-  ["with", "fun", "at", "only", "by", "generalizing", "using", "skip", "if", "then", "else", "clear"]
+  [ "with", "fun", "at", "only", "by", "generalizing", "using", "if", "then", "else" ]
 
 /-- The default game name if `Game "MyGame"` is not used. -/
 def defaultGameName: String := "MyGame"
