@@ -261,6 +261,7 @@ export class GameManager {
       game_dir = path.join(this.dir, '..', '..', '..', '..', repo)
     } else if (owner == 'test') {
       game_dir = path.join(this.dir, '..', '..', '..', 'cypress', repo)
+      console.debug(game_dir)
     } else {
       const gamesPath = path.join(this.dir, '..', '..', '..', 'games');
       if (!fs.existsSync(gamesPath)) {
