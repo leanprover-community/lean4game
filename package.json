@@ -102,7 +102,7 @@
     "start": "concurrently -n server,relay,client -c blue,yellow,green \"npm run build:server\" \"npm run start:relay\" \"npm run start:client\"",
     "start:relay": "(tsc -b ./relay) && (cd relay && cross-env NODE_ENV=development nodemon -e mjs --exec \"node ./dist/src/index.js\")",
     "start:client": "cross-env NODE_ENV=development vite --host",
-    "build": "npm run build:server && npm run build:relay && npm run build:client",
+    "build": "npm run build:server && npm run build:relay && npm run build:client && npm run build:test",
     "preview": "vite preview",
     "build:server": "cd server && lake build",
     "build:client": "cross-env NODE_ENV=production vite build",
@@ -110,8 +110,8 @@
     "build:test": "cd cypress/TestGame && lake build",
     "production": "cross-env NODE_ENV=production node relay/dist/src/index.js",
     "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs",
-    "test:bare": "wait-on --resources \"http://localhost:8080\" \"http://localhost:3000\" && cypress run",
-    "test": "concurrently -k -s first -n server,client,cypress -c blue,green,cyan \"npm run build:server\" \"npm run start:client\" \"npm run test:bare\""
+    "test": "concurrently -n server,cypress -c blue,green \"npm start\" \"cypress run\" -k -s first --hide server",
+    "test:prod": "npm run build && concurrently -n server,cypress -c blue,green \"PORT=3000 npm run production\" \"cypress run\" -k -s first"
   },
   "eslintConfig": {
     "extends": [

@@ -254,6 +254,9 @@ structure GameLevel where
   /-- The name of the exercise proven. If provided this lemma will be available in
   future levels. -/
   statementName: Name := default
+  /-- True if the statement is a `Prop`. Used to add the statement correctly as
+  `theorem` or as `def`. -/
+  isProp: Bool := true
   hints: Array GoalHintEntry := default
   /-- The statement in Lean. -/
   goal : TSyntax `Lean.Parser.Command.declSig := default
