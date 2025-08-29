@@ -42,6 +42,11 @@
       "iso": "it",
       "flag": "IT",
       "name": "Italiano"
+    },
+    {
+      "iso": "fr",
+      "flag": "FR",
+      "name": "Français"
     }
   ],
   "useFlags": false
