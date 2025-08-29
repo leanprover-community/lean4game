@@ -33,7 +33,7 @@ import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorC
 import { DualEditor } from './infoview/main'
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
-import { PrivacyPolicyPopup } from './popup/privacy_policy'
+import { ImpressumPopup, PrivacyPolicyPopup } from './popup/privacy_policy'
 import path from 'path';
 
 import '@fontsource/roboto/300.css'
@@ -75,10 +75,12 @@ function Level() {
 
   // pop-ups
   const [impressum, setImpressum] = React.useState(false)
+  const [privacy, setPrivacy] = React.useState(false)
   const [info, setInfo] = React.useState(false)
   const [preferencesPopup, setPreferencesPopup] = React.useState(false)
 
   function closeImpressum()   {setImpressum(false)}
+  function closePrivacy()   {setPrivacy(false)}
   function closeInfo()        {setInfo(false)}
   function closePreferencesPopup() {setPreferencesPopup(false)}
   function toggleImpressum()  {setImpressum(!impressum)}
@@ -87,9 +89,10 @@ function Level() {
 
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
     {levelId == 0 ?
-      <Introduction impressum={impressum} setImpressum={setImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup} /> :
-      <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>}
-    {impressum ? <PrivacyPolicyPopup handleClose={closeImpressum} /> : null}
+      <Introduction impressum={impressum} setImpressum={setImpressum} privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup} /> :
+      <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>}
+    {impressum ? <ImpressumPopup handleClose={closeImpressum} /> : null}
+    {privacy ? <PrivacyPolicyPopup handleClose={closePrivacy} /> : null}
     {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
     {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </WorldLevelIdContext.Provider>
@@ -212,7 +215,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
   </div>
 }
 
-function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPopup}) {
+function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
   let { t } = useTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
@@ -251,6 +254,7 @@ function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPo
 
   // impressum pop-up
   function toggleImpressum() {setImpressum(!impressum)}
+  function togglePrivacy() {setPrivacy(!privacy)}
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
   // If this state is set to a pair `(name, type)` then the according doc will be open.
@@ -421,6 +425,7 @@ function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPo
                     (level?.data?.title && ` : ${t(level?.data?.title, {ns: gameId})}`)}
                   toggleImpressum={toggleImpressum}
                   toggleInfo={toggleInfo}
+                  togglePrivacy={togglePrivacy}
                   togglePreferencesPopup={togglePreferencesPopup}
                   />
                 {mobile?
@@ -479,7 +484,7 @@ function IntroductionPanel({gameInfo}) {
 export default Level
 
 /** The site with the introduction text of a world */
-function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPopup}) {
+function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
   let { t } = useTranslation()
 
   const gameId = React.useContext(GameIdContext)
@@ -497,9 +502,11 @@ function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPop
   const toggleImpressum = () => {
     setImpressum(!impressum)
   }
-
+  const togglePrivacy = () => {
+    setPrivacy(!privacy)
+  }
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?

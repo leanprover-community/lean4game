@@ -46,6 +46,22 @@ This game has been developed by me.
 MakeGame
 ```
 
+### Local notations
+
+**Important**: If you use any local notations in your game, you need to open these
+namespaces manually before `MakeGame` in order to see the notation in the inventory.
+
+For example (using mathlib), write
+
+```
+open BigOperators
+
+MakeGame
+```
+
+in order to see `∑ x in s, f x` instead of `Finset.sum s fun x => f x`.
+
+
 ## 3. Creating a Level
 
 In this tutorial we first learn about Levels. A game consists of a tree of worlds, each world has

@@ -76,9 +76,10 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
   return <>
     {categories.length > 1 &&
       <div className="tab-bar">
-        {categories.map((cat) =>
-          <div key={`category-${cat}`} className={`tab ${cat == (tab ?? categories[0]) ? "active": ""}`}
-            onClick={() => { setTab(cat) }}>{cat}</div>)}
+        {categories.map((cat) => {
+          let hasNew = modifiedItems.filter(item => item.new && (cat == item.category)).length > 0
+          return <div key={`category-${cat}`} className={`tab${cat == (tab ?? categories[0]) ? " active": ""}${hasNew ? " new": ""}`}
+            onClick={() => { setTab(cat) }}>{cat}</div>})}
       </div>}
     <div className="inventory-list">
       {[...modifiedItems].sort(

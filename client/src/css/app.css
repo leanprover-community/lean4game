@@ -145,3 +145,9 @@ em {
 .privacy-policy {
   z-index: 10;
 }
+
+.modal hr {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+  border-color: var(--vscode-breadcrumb-foreground);
+}

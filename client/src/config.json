@@ -43,5 +43,6 @@
       "flag": "IT",
       "name": "Italiano"
     }
-  ]
+  ],
+  "useFlags": false
 }

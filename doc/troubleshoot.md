@@ -27,7 +27,7 @@ Here are known issues/pitfalls with the local setup using `npm`.
 * If `CDPATH` is set on your mac/linux system, it might provide issues with `npm start` resulting in a server crash or blank screen. In particular `npm start` will display
   ```
   [server] sh: line 0: cd: server: No such file or directory
-  [server] npm run start_server exited with code 1
+  [server] npm run start:server exited with code 1
   ```
   As a fix you might need to delete your manually set `CDPATH` environment variable.
 
