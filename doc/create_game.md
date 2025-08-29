@@ -10,7 +10,7 @@ This tutorial walks you through creating a new game for lean4. It covers from wr
 
 ### Running the game
 
-Now you can open the game in VSCode (`cd YourGame/` and `code .`), and start modifying it like a regular Lean project. To run the game consult the section "**5. Testing the Game Locally**" below.
+Now you can open the game in VSCode (`cd YourGame/` and `code .`), and start modifying it like a regular Lean project. To run the game consult the section "**6. Testing the Game Locally**" below.
 
 ## 2. Game.lean
 
@@ -26,7 +26,7 @@ The file `Game.lean` is the backbone of the game putting everything together.
 So the `Game.lean` has the following structure:
 
 ```lean
-import GameServer.Commands
+import GameServer
 
 -- import all worlds
 import Game.Levels.Tutorial
@@ -46,6 +46,22 @@ This game has been developed by me.
 MakeGame
 ```
 
+### Local notations
+
+**Important**: If you use any local notations in your game, you need to open these
+namespaces manually before `MakeGame` in order to see the notation in the inventory.
+
+For example (using mathlib), write
+
+```
+open BigOperators
+
+MakeGame
+```
+
+in order to see `∑ x in s, f x` instead of `Finset.sum s fun x => f x`.
+
+
 ## 3. Creating a Level
 
 In this tutorial we first learn about Levels. A game consists of a tree of worlds, each world has
@@ -55,7 +71,7 @@ A minimal level file looks like the following. There are many options to add, wh
 into in a later section
 
 ```lean
-import GameServer.Commands
+import GameServer
 
 World "MyWorld"
 Level 1
@@ -109,8 +125,8 @@ introduced anywhere.
 
 ## 5. Refactoring an existing world
 
-The [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton)  contains a bash script `sofi.sh` 
-(`s`ort `o`ut `f`ilnames and `i`mports), 
+The [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton)  contains a bash script `sofi.sh`
+(`s`ort `o`ut `f`ilnames and `i`mports),
 which can help restructure existing worlds, for example if you want to reorder or rename existing levels,
 or add additional levels in the middle.  Say, for example, you have an “Arithmetic World” in the
 folder
@@ -163,7 +179,7 @@ There are multiple ways how you can start the game locally to test-play it descr
 Now that you have a running game, we have a closer look at the level files and all the options
 you have to design your game.
 
-### 8. a) Inventory
+### 7. a) Inventory
 
 The player has an inventory with tactics, theorems, and definitions that unlock during the game. You can unlock/introduce such items in a Level by adding one of the following below the `Statement`.
 
@@ -227,7 +243,7 @@ NewHiddenTactic rewrite nth_rewrite rwa
 
 and only `rw` would show up in the inventory.
 
-### 6. b) Statement
+### 7. b) Statement
 
 The statement is the exercise of the level. The basics work the same as they would in `example` or `theorem`. Note however, that you **must** do a tactic proof, i.e. the `:= by` is a hard-coded part of the syntax
 
@@ -248,7 +264,7 @@ Statement ...
 
 For more details and features, read [Writing Exercises](writing_exercises.md)
 
-### 6. c) Proof
+### 7. c) Proof
 
 The proof must always be a tactic proof, i.e. `:= by` is a mandatory part of the syntax.
 
@@ -265,7 +281,7 @@ There are a few extra tactics that help you with structuring the proof:
 
 One thing to keep in mind is that the game will look at the main proof to figure out which tactics and theorems are needed, but it ignores any `Branch`es.
 
-### 6. d) Hints
+### 7. d) Hints
 
 Most important for game development are probably the `Hints`.
 
@@ -274,7 +290,7 @@ placed at inside the sample proof. You can use `Branch` to place hints in dead e
 
 Read [More about Hints](hints.md) for how they work and what the options are.
 
-### 6. e) Extra: Images
+### 7. e) Extra: Images
 You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
 
 The images need to be placed in `images/` and you need to add a command like `Image "images/path/to/myWorldImage.png"`
@@ -282,15 +298,17 @@ in one of the files you created in 2), 3), or 4) (i.e. game/world/level).
 
 NOTE: At present, only the images for a world are displayed. They appear in the introduction of the world.
 
-## 7. Update your game
+You can also embed images in the text as descriped in [Markdown](markdown.md).
+
+## 8. Update your game
 
 In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](update_game.md).
 
-## 8. Add translation
+## 9. Add translation
 
 See [Translating a game](translate.md).
 
-## 9. Publish your game
+## 10. Publish your game
 
 To publish your game on the official server, see [Publishing a game](publish_game.md)
 
@@ -309,7 +327,16 @@ CoverImage "images/cover.png"
 * `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
 * `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
-## 10. Advanced Topics
+## 11. Advanced Topics
+
+### Markdown
+
+Texts should generally support markdown. For some tips on how to use markdown, see
+[Markdown styling](markdown.md).
+
+In particular, you can embed images in texts, see the specific instructions in that file.
+
+
 
 ### Escaping
 

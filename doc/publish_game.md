@@ -33,4 +33,4 @@ To upload a new version of the game you will have to repeat 1. and 2. whenever y
 Adding games to the main page happens manually by the server maintainers. Tell us if you want us
 to add a tile for your game!
 
-For example, you can [contact Jon on Zulip](https://leanprover.zulipchat.com/#narrow/dm/385895-Jon-Eugster). Or [via Email](https://www.math.hhu.de/en/lehrstuehle-/-personen-/-ansprechpartner/innen/lehrstuehle-des-mathematischen-instituts/lehrstuhl-fuer-algebraische-geometrie/team/jon-eugster).
+For example, you can [contact Jon on Zulip](https://leanprover.zulipchat.com/#narrow/dm/385895-Jon-Eugster).

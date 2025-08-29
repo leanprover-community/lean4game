@@ -54,11 +54,11 @@ only evaluated at the beginning of the proof.
 
 ## Attributes
 
-You can add attributes as you would for a `theorem`. Most notably, you can make your named exercise a `simp` lemma:
+You can add attributes as you would for a `theorem`. Most notably, you can make your named exercise a `simp` theorem:
 
 ```lean
 @[simp]
-Statement my_simp_lemma ...
+Statement my_simp_theorem ...
 ```
 
 ## Formatting

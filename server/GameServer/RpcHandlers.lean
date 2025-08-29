@@ -8,26 +8,15 @@ open Server
 open Widget
 open RequestM
 open Meta
+open Std
 
 /-! ## GameGoal -/
 
 namespace GameServer
 
-def levelIdFromFileName? (initParams : Lsp.InitializeParams) (fileName : String) : Option LevelId := Id.run do
-  let fileParts := fileName.splitOn "/"
-  if fileParts.length == 3 then
-    if let (some level, some game) := (fileParts[2]!.toNat?, initParams.rootUri?) then
-      return some {game, world := fileParts[1]!, level := level}
-  return none
-
-def getLevelByFileName? [Monad m] [MonadEnv m] (initParams : Lsp.InitializeParams) (fileName : String) : m (Option GameLevel) := do
-  let some levelId := levelIdFromFileName? initParams fileName
-    | return none
-  return ← getLevel? levelId
-
-structure FVarBijection :=
-  (forward : HashMap FVarId FVarId)
-  (backward : HashMap FVarId FVarId)
+structure FVarBijection where
+  forward : HashMap FVarId FVarId
+  backward : HashMap FVarId FVarId
 
 instance : EmptyCollection FVarBijection := ⟨{},{}⟩
 
@@ -35,8 +24,8 @@ def FVarBijection.insert (bij : FVarBijection) (a b : FVarId) : FVarBijection :=
   ⟨bij.forward.insert a b, bij.backward.insert b a⟩
 
 def FVarBijection.insert? (bij : FVarBijection) (a b : FVarId) : Option FVarBijection :=
-  let a' := bij.forward.find? a
-  let b' := bij.forward.find? b
+  let a' := bij.forward.get? a
+  let b' := bij.forward.get? b
   if (a' == none || a' == some b) && (b' == none || b' == some a)
   then some $ bij.insert a b
   else none
@@ -106,10 +95,8 @@ def matchDecls (patterns : Array Expr) (fvars : Array Expr) (strict := true) (in
 
 open Meta in
 /-- Find all hints whose trigger matches the current goal -/
-def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializeParams) : MetaM (Array GameHint) := do
+def findHints (goal : MVarId) (level : GameLevel) : MetaM (Array GameHint) := do
   goal.withContext do
-    let some level ← getLevelByFileName? initParams m.mkInputContext.fileName
-      | throwError "Level not found: {m.mkInputContext.fileName}"
     let hints ← level.hints.filterMapM fun hint => do
       openAbstractCtxResult hint.goal fun hintFVars hintGoal => do
         if let some fvarBij := matchExpr (← instantiateMVars $ hintGoal) (← instantiateMVars $ ← inferType $ mkMVar goal)
@@ -129,7 +116,7 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
           if let some bij ← matchDecls hintFVars lctx.getFVars
             (strict := hint.strict) (initBij := fvarBij)
           then
-            let userFVars := hintFVars.map fun v => bij.forward.findD v.fvarId! v.fvarId!
+            let userFVars := hintFVars.map fun v => bij.forward.getD v.fvarId! v.fvarId!
             -- Evaluate the text in the player's context to get the new variable names.
             let text := (← evalHintMessage hint.text) (userFVars.map Expr.fvar)
             let ctx := {env := ← getEnv, mctx := ← getMCtx, lctx := lctx, opts := {}}
@@ -158,7 +145,7 @@ def findHints (goal : MVarId) (m : DocumentMeta) (initParams : Lsp.InitializePar
 def filterUnsolvedGoal (a : Array InteractiveDiagnostic) :
     Array InteractiveDiagnostic :=
   a.filter (fun d => match d.message with
-  | .append ⟨(.text x) :: _⟩ => x != "unsolved goals"
+  | .append ⟨(.tag (.expr (.text x)) _) :: _⟩ => x != "unsolved goals"
   | _ => true)
 
 -- TODO: no need to have `RequestM`, just anything where `mut` works
@@ -206,30 +193,23 @@ def completionDiagnostics (goalCount : Nat) (prevGoalCount : Nat) (completed : B
 
   return out
 
+structure ProofStateParams extends Lsp.PlainGoalParams where
+  worldId: String
+  levelId: Nat
+  deriving FromJson, ToJson
 
 /-- Request that returns the goals at the end of each line of the tactic proof
 plus the diagnostics (i.e. warnings/errors) for the proof.
  -/
-def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option ProofState)) := do
+def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofState)) := do
   let doc ← readDoc
   let rc ← readThe RequestContext
   let text := doc.meta.text
 
-  withWaitFindSnap
-    doc
-    -- TODO (Alex): I couldn't find a good condition to find the correct snap. So we are looking
-    -- for the first snap with goals here.
-    -- NOTE (Jon): The entire proof is in one snap, so hoped that Position `0` is good enough.
-    (fun snap => ¬ (snap.infoTree.goalsAt? doc.meta.text 0).isEmpty)
-    (notFoundX := return none)
-    fun snap => do
-      -- `snap` is the one snapshot containing the entire proof.
+  bindTaskCostly doc.cmdSnaps.waitAll fun (snaps, _) => do
+    mapTaskCostly doc.reporter fun () => do
       let mut steps : Array <| InteractiveGoalsWithHints := #[]
-
-      -- Question: Is there a difference between the diags of this snap and the last snap?
-      -- Should we get the diags from there?
-      -- Answer: The last snap only copied the diags from the end of this snap
-      let mut diag : Array InteractiveDiagnostic := snap.interactiveDiags.toArray
+      let mut diag : Array InteractiveDiagnostic ← doc.diagnosticsRef.get
 
       -- Level is completed if there are no errors or warnings
       let completedWithWarnings : Bool := ¬ diag.any (·.severity? == some .error)
@@ -237,28 +217,31 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
 
       let mut intermediateGoalCount := 0
 
-      -- only the positions that have non-whitespace characters since the last position
-      -- should add a new proof step.
-      let positionsWithSource : Array (String.Pos × String) :=
-        text.positions.zipWithIndex.filterMap (
-          fun (pos, i) => match i with
-          | 0 => some (pos, "")
-          | i' + 1 =>
-            let source : String := Substring.toString ⟨text.source, text.positions.get! i', pos⟩
-            if source.trim.length == 0 then
-              none
-            else
-              some (pos, source))
+      let positionsWithSource : Array (String.Pos × String) := Id.run do
+        let mut res := #[]
+        for i in [0:text.positions.size] do
+          --TODO(ALEX): Generalize for other start positions
+          let PROOF_START_LINE := 2
+          if i < PROOF_START_LINE then continue -- skip problem statement
+          -- for some reason, the client expects an empty tactic in the beginning
+          if i == PROOF_START_LINE then
+            res := res.push (text.positions[i]!, "")
+          if i >= text.positions.size - 2 then continue -- skip final linebreak
+          let source : String :=
+            Substring.toString ⟨text.source, text.positions[i]!, text.positions[i + 1]!⟩
+          if source.trim.length == 0 then continue -- skip empty lines
+          res := res.push (text.positions[i + 1]!, source)
+        return res
 
       -- Drop the last position as we ensured that there is always a newline at the end
-      for ((pos, source), i) in positionsWithSource.zipWithIndex do
+      for ((pos, source), i) in positionsWithSource.zipIdx do
         -- iterate over all steps in the proof and get the goals and hints at each position
 
         -- diags are labeled in Lsp-positions, which differ from the lean-internal
         -- positions by `1`.
         let lspPosAt := text.utf8PosToLspPos pos
 
-        let mut diagsAtPos : Array InteractiveDiagnostic := filterUnsolvedGoal <|
+        let diagsAtPos : Array InteractiveDiagnostic :=
           -- `+1` for getting the errors after the line.
           match i with
           | 0 =>
@@ -266,9 +249,14 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
             diag.filter (fun d => d.range.start == lspPosAt )
           | i' + 1 =>
             diag.filter (fun d =>
-              ((text.utf8PosToLspPos <| (positionsWithSource.get! i').1) ≤ d.range.start) ∧
+              ((text.utf8PosToLspPos <| (positionsWithSource[i']!).1) ≤ d.range.start) ∧
               d.range.start < lspPosAt )
 
+        let diagsAtPos := filterUnsolvedGoal diagsAtPos
+
+
+        let some snap := snaps.find? (fun snap => snap.endPos >= pos)
+          | panic! "No snap found"
         if let goalsAtResult@(_ :: _) := snap.infoTree.goalsAt? doc.meta.text pos then
           let goalsAtPos' : List <| List InteractiveGoalWithHints ← goalsAtResult.mapM
             fun { ctxInfo := ci, tacticInfo := tacticInfo, useAfter := useAfter, .. } => do
@@ -284,22 +272,17 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
 
               let interactiveGoals : List InteractiveGoalWithHints ← ci.runMetaM {} do
                 goalMvars.mapM fun goal => do
-                  let hints ← findHints goal doc.meta rc.initParams
+                  let some game := rc.initParams.rootUri?
+                    | throwError "GameId not found"
+                  let some level ← getLevel? {game := game, world := p.worldId, level := p.levelId}
+                    | throwError "Level not found"
+                  let hints ← findHints goal level
                   let interactiveGoal ← goalToInteractive goal
                   return ⟨interactiveGoal, hints⟩
-              -- TODO: This code is way old, can it be deleted?
-              -- compute the goal diff
-              -- let goals ← ciAfter.runMetaM {} (do
-              --     try
-              --       Widget.diffInteractiveGoals useAfter ti goals
-              --     catch _ =>
-              --       -- fail silently, since this is just a bonus feature
-              --       return goals
-              -- )
               return interactiveGoals
           let goalsAtPos : Array InteractiveGoalWithHints := ⟨goalsAtPos'.foldl (· ++ ·) []⟩
 
-          diagsAtPos ← completionDiagnostics goalsAtPos.size intermediateGoalCount
+          let diagsAtPos ← completionDiagnostics goalsAtPos.size intermediateGoalCount
             completed completedWithWarnings lspPosAt diagsAtPos
 
           intermediateGoalCount := goalsAtPos.size
@@ -312,7 +295,7 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
       -- Filter out the "unsolved goals" message
       diag := filterUnsolvedGoal diag
 
-      let lastPos := text.utf8PosToLspPos positionsWithSource.back.1
+      let lastPos := text.utf8PosToLspPos positionsWithSource.back!.1
       let remainingDiags : Array InteractiveDiagnostic :=
         diag.filter (fun d => lastPos ≤ d.range.start)
 
@@ -322,7 +305,7 @@ def getProofState (_ : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Proo
         completed := completed,
         completedWithWarnings := completedWithWarnings,
         lastPos := lastPos.line
-        }
+      }
 
 open RequestM in
 
@@ -360,20 +343,14 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
       else
         return none
 
-builtin_initialize
-  registerBuiltinRpcProcedure
-    `Game.getInteractiveGoals
-    Lsp.PlainGoalParams
-    (Option <| InteractiveGoals
-    )
-    getInteractiveGoals
-
-builtin_initialize
-  registerBuiltinRpcProcedure
-    `Game.getProofState
-    Lsp.PlainGoalParams
-    (Option ProofState)
-    getProofState
-
-
 end GameServer
+
+
+
+@[server_rpc_method]
+def Game.getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Widget.InteractiveGoals)) :=
+  FileWorker.getInteractiveGoals p
+
+@[server_rpc_method]
+def Game.getProofState (p : GameServer.ProofStateParams) : RequestM (RequestTask (Option GameServer.ProofState)) :=
+  GameServer.getProofState p

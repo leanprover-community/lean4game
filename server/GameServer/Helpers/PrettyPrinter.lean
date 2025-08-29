@@ -1,9 +1,9 @@
---import Lean
+import Lean
 import Lean.PrettyPrinter.Delaborator.Builtins
 import Lean.PrettyPrinter
 import Lean
 
-import Std.Tactic.OpenPrivate
+import Batteries.Tactic.OpenPrivate
 
 namespace GameServer
 
@@ -75,9 +75,8 @@ open Lean Meta Elab Command
 /-! ## Statement string -/
 
 def getStatement (name : Name) : CommandElabM MessageData := do
-  return ← addMessageContextPartial (.ofPPFormat { pp := fun
-    | some ctx => ctx.runMetaM <| GameServer.PrettyPrinter.ppSignature name
-    | none     => return "that's a bug." })
+  return ← addMessageContextPartial
+    (.ofFormatWithInfosM <| GameServer.PrettyPrinter.ppSignature name)
 
 -- Note: We use `String` because we can't send `MessageData` as json, but
 -- `MessageData` might be better for interactive highlighting.
