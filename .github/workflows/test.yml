@@ -26,7 +26,7 @@ jobs:
         run: |
           npm install
           npm run build
-          npm run build_test
+          npm run build:test
 
       - name: Run Cypress tests (Development mode)
         run: npm run test
@@ -50,4 +50,4 @@ jobs:
           sudo systemctl reload apparmor
 
       - name: Run Cypress tests (Production mode)
-        run: npm run test_prod
+        run: npm run test:prod

@@ -279,6 +279,7 @@ td code  {
 .chat .message {
   margin-left: .5em;
   margin-right: .5em;
+  overflow-x: auto;
 }
 
 .chat .recent {

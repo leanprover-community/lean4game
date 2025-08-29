@@ -35,6 +35,12 @@ monaco.languages.register({
   extensions: ['.leancmd']
 })
 
+// register Monaco languages // TODO: JE. I dont understand why I suddenly had to add this when it worked without before.
+monaco.languages.register({
+  id: 'lean4',
+  extensions: ['.lean']
+})
+
 // map of monaco "language id's" to TextMate scopeNames
 const grammars = new Map()
 grammars.set('lean4', 'source.lean')
@@ -241,7 +247,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     if (!oneLineEditor) return
     // Run command when pressing enter
     const l = oneLineEditor.onKeyUp((ev) => {
-      if (ev.code === "Enter" || ev.code == "NumpadEnter") {
+      if (ev.code === "Enter" || ev.code === "NumpadEnter") {
         runCommand()
       }
     })

@@ -100,6 +100,18 @@ For remote images, simply add:
 <img src=\"https://url.com/to/image\"/>
 ```
 
+See https://www.jmilne.org/not/Mamscd.pdf
+
+### Images
+
+Hints and introductions/conclusions can also contain images.
+
+For remote images, simply add:
+
+```
+<img src=\"https://url.com/to/image\"/>
+```
+
 Local images can currently only be included with a hack:
 
 Images in the game's `images/` folder will be accessible at `data/g/[user]/[repo]/[image].[png|jpg|…]` and thus can be included as if they were external images.

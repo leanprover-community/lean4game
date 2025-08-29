@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Input, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
-import Markdown from '../markdown'
+import { Markdown } from '../markdown'
 import { Switch, Button, ButtonGroup } from '@mui/material';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
@@ -15,6 +15,8 @@ import { useTranslation } from 'react-i18next';
 export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
   let { t } = useTranslation()
   const {layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = React.useContext(PreferencesContext)
+
+
 
   const marks = [
     {
@@ -59,7 +61,13 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
                     value={language}
                     label={t("Language")}
                     onChange={handlerChangeLanguage}>
-                      {lean4gameConfig.languages.map(lang => {return <MenuItem key={`menu-item-lang-${lang.iso}`} value={lang.iso}><ReactCountryFlag countryCode={lang.flag}/>&nbsp;{lang.name}</MenuItem>})}
+                      {lean4gameConfig.languages.map(lang => {
+                        return <MenuItem key={`menu-item-lang-${lang.iso}`} value={lang.iso}>
+                          {lean4gameConfig.useFlags && <ReactCountryFlag countryCode={lang.flag}/>}
+                          &nbsp;
+                          {lang.name}
+                        </MenuItem>
+                      })}
                   </Select>
                 </Box>
               }

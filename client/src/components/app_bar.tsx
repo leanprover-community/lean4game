@@ -123,16 +123,21 @@ function InputModeButton({setNavOpen, isDropdown}) {
   </Button>
 }
 
-/** button to toggle iimpressum popup
- *
- * Note: Do not translate the word "Impressum"! German GDPR needs this.
-*/
 export function ImpressumButton({setNavOpen, toggleImpressum, isDropdown}) {
   const { t } = useTranslation()
   return <Button className="btn btn-inverted"
-    title={t("information, Impressum, privacy policy")} inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
+    title={t("Impressum")} inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faCircleInfo} />
-    {isDropdown && <>&nbsp;Impressum</>}
+    {isDropdown && <>&nbsp;{t("Impressum")}</>}
+  </Button>
+}
+
+export function PrivacyButton({setNavOpen, togglePrivacy, isDropdown}) {
+  const { t } = useTranslation()
+  return <Button className="btn btn-inverted"
+    title={t("Privacy Policy")} inverted="true" to="" onClick={(ev) => {togglePrivacy(ev); setNavOpen(false)}}>
+    <FontAwesomeIcon icon={faCircleInfo} />
+    {isDropdown && <>&nbsp;{t("Privacy Policy")}</>}
   </Button>
 }
 
@@ -204,11 +209,12 @@ function InventoryButton({pageNumber, setPageNumber}) {
 }
 
 /** the navigation bar on the welcome page */
-export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpressum, toggleEraseMenu, toggleUploadMenu, toggleInfo, togglePreferencesPopup} : {
+export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpressum, togglePrivacy, toggleEraseMenu, toggleUploadMenu, toggleInfo, togglePreferencesPopup} : {
   pageNumber: number,
   setPageNumber: any,
   gameInfo: GameInfo,
   toggleImpressum: any,
+  togglePrivacy: any,
   toggleEraseMenu: any,
   toggleUploadMenu: any,
   toggleInfo: any,
@@ -238,16 +244,18 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
       <DownloadButton setNavOpen={setNavOpen} gameId={gameId} gameProgress={gameProgress}/>
       <UploadButton setNavOpen={setNavOpen} toggleUploadMenu={toggleUploadMenu}/>
       <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+      <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
       <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
     </div>
   </div>
 }
 
 /** the navigation bar in a level */
-export function LevelAppBar({isLoading, levelTitle, toggleImpressum, toggleInfo, togglePreferencesPopup, pageNumber=undefined, setPageNumber=undefined} : {
+export function LevelAppBar({isLoading, levelTitle, toggleImpressum, togglePrivacy, toggleInfo, togglePreferencesPopup, pageNumber=undefined, setPageNumber=undefined} : {
   isLoading: boolean,
   levelTitle: string,
   toggleImpressum: any,
+  togglePrivacy: any,
   toggleInfo: any,
   togglePreferencesPopup: any,
   pageNumber?: number,
@@ -282,6 +290,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, toggleInfo,
           <InputModeButton setNavOpen={setNavOpen} isDropdown={true}/>
           <GameInfoButton setNavOpen={setNavOpen} toggleInfo={toggleInfo}/>
           <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+          <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
           <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
       </> :
@@ -303,6 +312,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, toggleInfo,
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
           <GameInfoButton setNavOpen={setNavOpen} toggleInfo={toggleInfo}/>
           <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+          <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
           <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
       </>
