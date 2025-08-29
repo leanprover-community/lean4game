@@ -3,8 +3,6 @@ import GameServer.Tactic.Hint
 
 namespace GameServer
 
-namespace GameServer
-
 open Lean Elab Command
 
 /-- Copied from `Mathlib.Tactic.HelpCmd`.
