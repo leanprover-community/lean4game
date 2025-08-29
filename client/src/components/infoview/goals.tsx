@@ -9,7 +9,7 @@ import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infov
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
-import { InputModeContext } from './context';
+import { useAppendTypewriterInput } from './context';
 import { InteractiveGoal, InteractiveGoals, InteractiveGoalsWithHints, InteractiveHypothesisBundle, ProofState } from './rpc_api';
 import { RpcSessionAtPos } from '@leanprover/infoview/*';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
@@ -86,8 +86,13 @@ function Hyp({ hyp: h, mvarId }: HypProps) {
         (h.isInserted ? 'inserted-text ' : '') +
         (h.isRemoved ? 'removed-text ' : '')
 
+    const appendTypewriterInput = useAppendTypewriterInput()
     const names = InteractiveHypothesisBundle_nonAnonymousNames(h).map((n, i) =>
-        <span className={namecls + (isInaccessibleName(n) ? 'goal-inaccessible ' : '')} key={i}>
+        <span
+            className={namecls + (isInaccessibleName(n) ? 'goal-inaccessible ' : '')}
+            key={i}
+            onClick={ev => void appendTypewriterInput(ev.shiftKey, n, h.isAssumption, h.isAssumption) }
+        >
             <SelectableLocation
                 locs={locs}
                 loc={mvarId && h.fvarIds && h.fvarIds.length > i ?

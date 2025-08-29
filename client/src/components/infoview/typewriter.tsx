@@ -17,7 +17,7 @@ import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } fro
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, WorldLevelIdContext } from './context'
+import { DeletedChatContext, InputModeContext, MonacoEditorContext, PreferencesContext, ProofContext, WorldLevelIdContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
@@ -127,11 +127,22 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     editor.setPosition(pos)
   }, [typewriterInput, editor])
 
+  const {isSuggestionsMobileMode} = React.useContext(PreferencesContext)
+
   useEffect(() => {
     if (oneLineEditor && oneLineEditor.getValue() !== typewriterInput) {
       oneLineEditor.setValue(typewriterInput)
+      oneLineEditor.setPosition({ column: typewriterInput.length + 1, lineNumber: 1 })
+      isSuggestionsMobileMode || oneLineEditor.focus()
     }
   }, [typewriterInput])
+
+  useEffect(() => {
+    if (oneLineEditor) {
+      oneLineEditor.setPosition({ column: editor.getValue().length + 1, lineNumber: 1 })
+      isSuggestionsMobileMode || oneLineEditor.focus()
+    }
+  }, [oneLineEditor])
 
   /* Load proof on start/switching to typewriter */
   useEffect(() => {

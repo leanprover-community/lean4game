@@ -138,3 +138,73 @@ export const InputModeContext = React.createContext<{
   lockEditorMode: false,
   setLockEditorMode: () => {},
 });
+
+
+const SUFFIX_OVERRIDES: Record<string, string> = {
+  "induction": "generalizing",
+  "left": ".left",
+  "rewrite": "←",
+  "right": ".right",
+  "rw": "←",
+}
+const PREFIX_OVERRIDES: Record<string, string> = {
+  "by_cases": "by_cases this :",
+  "contrapose": "contrapose!",
+  "have": "have :",
+  "obtain": "obtain ⟨⟩ :=",
+  "rewrite": "rw []",
+  "rw": "rw []",
+  "simp": "simp only []",
+}
+export function useAppendTypewriterInput() {
+  let {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
+  const {isSuggestionsMobileMode} = React.useContext(PreferencesContext)
+  return (shiftKey: boolean, suffix: string, isTheorem: boolean, isAssumption: boolean) => {
+    if (!isSuggestionsMobileMode && !shiftKey) {
+      return false
+    }
+    // Automagically detect and adjust punctuation for mobile keyboardless usage
+    typewriterInput = typewriterInput.trim()
+    if (!typewriterInput.length) {
+      typewriterInput = Object.hasOwn(PREFIX_OVERRIDES, suffix) ? PREFIX_OVERRIDES[suffix] : isTheorem ? `rw [${suffix}]` : suffix
+      setTypewriterInput(typewriterInput + " ")
+      return true
+    }
+    suffix = !isAssumption && Object.hasOwn(SUFFIX_OVERRIDES, suffix) ? SUFFIX_OVERRIDES[suffix] : suffix
+    if (suffix === "ℕ") {
+      if (/ \d$/.test(typewriterInput)) {
+        suffix = ((+typewriterInput.slice(-2) + 1) % 10).toString()
+        typewriterInput = typewriterInput.slice(0, -2)
+      } else {
+        suffix = "0"
+      }
+      suffix = " " + suffix
+    } else if (suffix === "∈" && typewriterInput.endsWith("∈")) {
+      suffix = " {} "
+    } else if (isAssumption && /^apply |^symm|^push_neg/.test(typewriterInput)) {
+      suffix = " at " + suffix
+    } else if (suffix === "have") {
+      suffix = typewriterInput === "have :" ? "=" : " :="
+    } else if (/[\]}]$/.test(typewriterInput)) {
+      if (isAssumption) {
+        suffix = " at " + suffix
+      } else {
+        const closing = typewriterInput.slice(-1)
+        typewriterInput = typewriterInput.slice(0, -1)
+        if (suffix === "←") {
+          const imbalance = (typewriterInput.match(/\(/)?.length ?? 0) - (typewriterInput.match(/\)/)?.length ?? 0)
+          suffix = /[[,({]$/.test(typewriterInput) ? "←" : /\([^)]*$/.test(typewriterInput) ? ")" : " ("
+        } else {
+          if (!/[[,({]$/.test(typewriterInput)) {
+            suffix = (isTheorem && !typewriterInput.endsWith("←") && closing === "]" ? ", " : /^[ᶜ.]/.test(suffix) ? "" : " ") + suffix
+          }
+        }
+        suffix = suffix + closing
+      }
+    } else if (!/^[ᶜ.]/.test(suffix)) {
+      suffix = " " + suffix
+    }
+    setTypewriterInput(`${typewriterInput}${suffix} `.trimLeft())
+    return true
+  }
+}

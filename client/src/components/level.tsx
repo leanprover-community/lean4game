@@ -148,6 +148,13 @@ function ChatPanel({lastLevel, visible = true}) {
 
   let introText: Array<string> = t(level?.data?.introduction, {ns: gameId}).split(/\n(\s*\n)+/)
 
+  const focusRef = useRef()
+  useEffect(() => {
+   if (proof?.completed) {
+     focusRef.current.focus()
+   }
+  }, [!!proof?.completed])
+
   return <div className={`chat-panel ${visible ? '' : 'hidden'}`}>
     <div ref={chatRef} className="chat">
       {introText?.filter(t => t.trim()).map(((t, i) =>
@@ -190,10 +197,10 @@ function ChatPanel({lastLevel, visible = true}) {
     </div>
     <div className="button-row">
       {proof?.completed && (lastLevel ?
-        <Button to={`/${gameId}`}>
+        <Button ref={focusRef} to={`/${gameId}`}>
           <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
         </Button> :
-        <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+        <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
           {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>)
         }
@@ -463,6 +470,11 @@ function IntroductionPanel({gameInfo}) {
 
   let text: Array<string> = t(gameInfo.data?.worlds.nodes[worldId].introduction, {ns: gameId}).split(/\n(\s*\n)+/)
 
+  const focusRef = useRef()
+  useEffect(() => {
+   focusRef.current?.focus()
+  }, [])
+
   return <div className="chat-panel">
     <div className="chat">
       {text?.filter(t => t.trim()).map(((t, i) =>
@@ -473,7 +485,7 @@ function IntroductionPanel({gameInfo}) {
     <div className={`button-row${mobile ? ' mobile' : ''}`}>
       {gameInfo.data?.worldSize[worldId] == 0 ?
         <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
-        <Button to={`/${gameId}/world/${worldId}/level/1`}>
+        <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/1`}>
           {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>
       }

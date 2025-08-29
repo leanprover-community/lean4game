@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 
 export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
   let { t } = useTranslation()
-  const {layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
+  const {layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = React.useContext(PreferencesContext)
 
 
 
@@ -100,7 +100,25 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
             />
           </div>
         </div>
-
+        <div className='preferences-category'>
+          <div className='category-title'>
+            <h3>{t("Controls")}</h3>
+          </div>
+          <div className='preferences-item'>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isSuggestionsMobileMode}
+                  onChange={() => setIsSuggestionsMobileMode(!isSuggestionsMobileMode)}
+                  name="checked"
+                  color="primary"
+                />
+              }
+              label={t("Click on tactics/assumptions like mobile keyboard suggestions i.e. without autofocus or requiring Shift key")}
+              labelPlacement="end"
+            />
+          </div>
+        </div>
         <div className='preferences-category tail-category'>
           <div className='preferences-item'>
             <FormControlLabel

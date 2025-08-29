@@ -19,7 +19,7 @@ function App() {
   const params = useParams()
   const gameId = "g/" + params.owner + "/" + params.repo
 
-  const {mobile, layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = UsePreferences()
+  const {mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = UsePreferences()
 
   React.useEffect(() => {
     i18n.changeLanguage(language)
@@ -28,7 +28,7 @@ function App() {
   return (
     <div className="app">
       <GameIdContext.Provider value={gameId}>
-          <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage}}>
+          <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}}>
             <React.Suspense>
               <Outlet />
             </React.Suspense>
