@@ -338,6 +338,15 @@ In particular, you can embed images in texts, see the specific instructions in t
 
 
 
+### Markdown
+
+Texts should generally support markdown. For some tips on how to use markdown, see
+[Markdown styling](markdown.md).
+
+In particular, you can embed images in texts, see the specific instructions in that file.
+
+
+
 ### Escaping
 
 Inside strings, you need to escape backslashes, but not inside doc-strings, therefore you
