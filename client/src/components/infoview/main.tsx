@@ -39,7 +39,6 @@ import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/in
 import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
-import { useGameTranslation } from '../../utils/translation';
 
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
@@ -137,7 +136,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
  * If `showLeanStatement` is true, it will additionally display the lean code.
  */
 function ExerciseStatement({ data, showLeanStatement = false }) {
-  const { t : gT } = useGameTranslation()
+  let { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
 
   if (!(data?.descrText || data?.descrFormat)) { return <></> }
@@ -145,7 +144,7 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
     <div className="exercise-statement">
       {data?.descrText &&
         <Markdown>
-          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + gT(data?.descrText)}
+          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + t(data?.descrText, {ns: gameId})}
         </Markdown>
       }
       {data?.descrFormat && showLeanStatement &&

@@ -18,7 +18,6 @@ import { store } from '../state/store'
 import '../css/world_tree.css'
 import { PreferencesContext } from './infoview/context'
 import { useTranslation } from 'react-i18next'
-import { useGameTranslation } from '../utils/translation'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -114,7 +113,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
     difficulty: number,
     worldSize: number
   }) {
-  const { t : gT } = useGameTranslation()
+  const { t } = useTranslation()
 
   // See level icons. Match radius computed there minus `1.2*r`
   const N = Math.max(worldSize, NMIN)
@@ -153,7 +152,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
           width={1.42*R} height={1.42*R} transform={"translate("+ -.71*R +","+ -.71*R +")"}>
         <div className={unlocked && !completed ? "playable-world" : ''}>
           <p className="world-title" style={{fontSize: fontSize + "px"}}>
-            {title ? gT(title) : world}
+            {title ? t(title, {ns: gameId}) : world}
           </p>
         </div>
       </foreignObject>
@@ -164,7 +163,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
           >
         <div className='world-label' style={{backgroundColor: completed ? darkgreen : unlocked ? darkblue : darkgrey}}>
           <p className='world-title' style={{fontSize: MINFONT + "px"}}>
-            {title ? gT(title) : world}
+            {title ? t(title, {ns: gameId}) : world}
           </p>
         </div>
       </foreignObject>}

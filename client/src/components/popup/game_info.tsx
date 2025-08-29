@@ -6,7 +6,6 @@ import { Typography } from '@mui/material'
 import { Markdown } from '../markdown'
 import { Trans, useTranslation } from 'react-i18next'
 import { GameIdContext } from '../../app'
-import { useGameTranslation } from '../../utils/translation'
 
 /** Pop-up that is displaying the Game Info.
  *
@@ -14,7 +13,7 @@ import { useGameTranslation } from '../../utils/translation'
  * controlled by the containing element.
  */
 export function InfoPopup ({info, handleClose}: {info: string, handleClose: () => void}) {
-  const { t : gT } = useGameTranslation()
+  let { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
 
   return <div className="modal-wrapper">
@@ -22,7 +21,7 @@ export function InfoPopup ({info, handleClose}: {info: string, handleClose: () =
   <div className="modal">
     <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
     <Typography variant="body1" component="div" className="welcome-text">
-      <Markdown>{gT(info)}</Markdown>
+      <Markdown>{t(info)}</Markdown>
       <hr />
       <Trans>
         <h2>Progress saving</h2>

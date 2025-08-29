@@ -25,7 +25,6 @@ import { WelcomeAppBar } from './app_bar'
 import { Hint } from './hints'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
-import { useGameTranslation } from '../utils/translation'
 
 
 /** the panel showing the game's introduction text */
@@ -33,7 +32,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
   const {mobile} = React.useContext(PreferencesContext)
   const gameId = React.useContext(GameIdContext)
 
-  const { t : gT } = useGameTranslation()
+  let { t } = useTranslation()
 
   const dispatch = useAppDispatch()
 
@@ -41,7 +40,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
   // then this can be simplified.
 
   // let text: Array<string> = introduction.split(/\n(\s*\n)+/)
-  let text: Array<string> = introduction ? [gT(introduction)] : []
+  let text: Array<string> = introduction ? [t(introduction, {ns : gameId})] : []
 
   return <div className="column chat-panel">
     <div className="chat">

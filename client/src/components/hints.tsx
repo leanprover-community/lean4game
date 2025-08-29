@@ -4,9 +4,8 @@ import { Markdown } from './markdown';
 import { DeletedChatContext, ProofContext } from "./infoview/context";
 import { lastStepHasErrors } from "./infoview/goals";
 import { Button } from "./button";
-import { useGameTranslation } from "../utils/translation";
-import { GameIdContext } from "../app";
 import { useTranslation } from "react-i18next";
+import { GameIdContext } from "../app";
 
 /** Plug-in the variable names in a hint. We do this client-side to prepare
  * for i18n in the future. i.e. one should be able translate the `rawText`
@@ -14,17 +13,17 @@ import { useTranslation } from "react-i18next";
  */
 function getHintText(hint: GameHint): string {
   const gameId = React.useContext(GameIdContext)
-  let { t: gT } = useGameTranslation()
+  let { t } = useTranslation()
   if (hint.rawText) {
     // Replace the variable names used in the hint with the ones used by the player
     // variable names are marked like `«{g}»` inside the text.
-    return gT(hint.rawText).replaceAll(/«\{(.*?)\}»/g, ((_, v) =>
+    return t(hint.rawText, {ns: gameId}).replaceAll(/«\{(.*?)\}»/g, ((_, v) =>
       // `hint.varNames` contains tuples `[oldName, newName]`
       (hint.varNames.find(x => x[0] == v))[1]))
   } else {
     // hints created in the frontend do not have a `rawText`
     // TODO: `hint.text` could be removed in theory.
-    return gT(hint.text)
+    return t(hint.text, {ns: gameId})
   }
 }
 
