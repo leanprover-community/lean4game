@@ -13,10 +13,7 @@ import { Button } from './button'
 import { PreferencesContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
 import { ErasePopup } from './popup/erase'
-import { InfoPopup } from './popup/game_info'
-import { ImpressumPopup, PrivacyPolicyPopup } from './popup/privacy_policy'
 import { RulesHelpPopup } from './popup/rules_help'
-import { UploadPopup } from './popup/upload'
 import { PreferencesPopup} from "./popup/preferences"
 import { WorldTreePanel } from './world_tree'
 
@@ -85,24 +82,16 @@ function Welcome() {
 
   // pop-ups
   const [eraseMenu, setEraseMenu] = React.useState(false)
-  const [impressum, setImpressum] = React.useState(false)
-  const [privacy, setPrivacy] = React.useState(false)
   const [info, setInfo] = React.useState(false)
   const [rulesHelp, setRulesHelp] = React.useState(false)
   const [uploadMenu, setUploadMenu] = React.useState(false)
   const [preferencesPopup, setPreferencesPopup] = React.useState(false)
 
   function closeEraseMenu()   {setEraseMenu(false)}
-  function closeImpressum()   {setImpressum(false)}
-  function closePrivacy()   {setPrivacy(false)}
-  function closeInfo()        {setInfo(false)}
   function closeRulesHelp()   {setRulesHelp(false)}
   function closeUploadMenu()  {setUploadMenu(false)}
   function closePreferencesPopup() {setPreferencesPopup(false)}
   function toggleEraseMenu()  {setEraseMenu(!eraseMenu)}
-  function toggleImpressum()  {setImpressum(!impressum)}
-  function togglePrivacy()  {setPrivacy(!privacy)}
-  function toggleInfo()       {setInfo(!info)}
   function toggleUploadMenu() {setUploadMenu(!uploadMenu)}
   function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
 
@@ -118,9 +107,8 @@ function Welcome() {
       <CircularProgress />
     </Box>
   : <>
-    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy}
-      toggleEraseMenu={toggleEraseMenu} toggleUploadMenu={toggleUploadMenu}
-      toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
+    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data}
+      toggleEraseMenu={toggleEraseMenu} toggleUploadMenu={toggleUploadMenu} togglePreferencesPopup={togglePreferencesPopup}/>
     <div className="app-content">
       { mobile ?
           <div className="welcome mobile">
@@ -142,12 +130,8 @@ function Welcome() {
           </Split>
       }
     </div>
-    {impressum ? <ImpressumPopup handleClose={closeImpressum} /> : null}
-    {privacy ? <PrivacyPolicyPopup handleClose={closePrivacy} /> : null}
     {rulesHelp ? <RulesHelpPopup handleClose={closeRulesHelp} /> : null}
     {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
-    {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
-    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
     {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </>
 }

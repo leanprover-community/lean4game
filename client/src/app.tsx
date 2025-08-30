@@ -11,6 +11,7 @@ import './css/app.css';
 import { PreferencesContext} from './components/infoview/context';
 import UsePreferences from "./state/hooks/use_preferences"
 import i18n from './i18n';
+import { Popup } from './components/popup/popup';
 
 export const GameIdContext = React.createContext<string>(undefined);
 
@@ -32,6 +33,7 @@ function App() {
             <React.Suspense>
               <Outlet />
             </React.Suspense>
+            <Popup />
           </PreferencesContext.Provider>
       </GameIdContext.Provider>
     </div>

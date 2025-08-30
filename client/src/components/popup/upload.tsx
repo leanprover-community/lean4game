@@ -3,25 +3,29 @@
 */
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { GameIdContext } from '../../app'
 import { useAppDispatch } from '../../hooks'
 import { GameProgressState, loadProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
-import { Button } from '../button'
+import { Button } from '../utils'
 import { Trans, useTranslation } from 'react-i18next'
+import { GameIdContext } from '../../app'
+import { popupAtom } from '../../store/popup-atoms'
+import { useAtom } from 'jotai'
 
 /** Pop-up that is displaying the Game Info.
  *
  * `handleClose` is the function to close it again because it's open/closed state is
  * controlled by the containing element.
  */
-export function UploadPopup ({handleClose}) {
+export function UploadPopup () {
   let { t } = useTranslation()
 
   const [file, setFile] = React.useState<File>();
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useSelector(selectProgress(gameId))
   const dispatch = useAppDispatch()
+
+  const [, setPopup] = useAtom(popupAtom)
 
   const handleFileChange = (e) => {
     if (e.target.files) {
@@ -39,7 +43,7 @@ export function UploadPopup ({handleClose}) {
       console.debug("Json Data", data)
       dispatch(loadProgress({game: gameId, data: data}))
     }
-    handleClose()
+    setPopup(null) // close the popup
   }
 
   /** Download the current progress (i.e. what's saved in the browser store) */
@@ -53,10 +57,7 @@ export function UploadPopup ({handleClose}) {
   }
 
 
-  return <div className="modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+  return <>
     <h2>{t("Upload Saved Progress")}</h2>
     <Trans>
       <p>Select a JSON file with the saved game progress to load your progress.</p>
@@ -69,7 +70,7 @@ export function UploadPopup ({handleClose}) {
       <input type="file" onChange={handleFileChange}/>
     </p>
 
-    <Button to="" onClick={uploadProgress}>{t("Load selected file")}</Button>
-  </div>
-</div>
+    {/* TODO: apperently clicking this redirects the user back to the landing page... */}
+    <Button to="" onClick={uploadProgress} disabled={!file}>{t("Load selected file")}</Button>
+  </>
 }
