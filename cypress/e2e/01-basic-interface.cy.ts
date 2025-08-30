@@ -13,7 +13,6 @@ describe('Basic Lean4Game Interface', () => {
         .should('have.attr', 'target', '_blank')
         .then($a => {
           const href = $a.prop('href')
-          // Check that the link returns a 200 status
           cy.request(href).its('status').should('eq', 200)
         })
     })
@@ -31,5 +30,20 @@ describe('Basic Lean4Game Interface', () => {
           cy.request(absoluteUrl).its('status').should('eq', 200)
         })
     })
+  })
+
+  describe('Popup', () => {
+    describe('Impressum', () => {
+      it('landing page footer', () => {
+        cy.visit('/#/')
+        cy.get('footer').contains('a', 'Impressum').should('be.visible').click()
+        cy.contains('a', 'Contact Details').should('have.attr', 'target', '_blank')
+        .then($a => {
+          const href = $a.prop('href')
+          cy.request(href).its('status').should('eq', 200)
+        })
+      })
+    })
+
   })
 })

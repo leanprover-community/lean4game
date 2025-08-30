@@ -1,0 +1,42 @@
+import * as React from 'react'
+import { ImpressumPopup } from './impressum'
+import '../../css/popup.css'
+import { popupAtom, PopupType } from '../../store/popup-atoms'
+import { useAtom } from 'jotai'
+
+/**
+ * To create a new popup on needs add a option to `PopupType`,
+ * and then define its content in `getPopupContent` below.
+ *
+ * Popups can be opened by setting the `popupAtom` to the popup's type.
+ */
+
+/** The content of the current popup. */
+function getPopupContent(popup: PopupType) {
+  switch(popup) {
+    case PopupType.impressum:
+      return <ImpressumPopup />
+    default:
+      // Hack: this throws a TS error when cases are missed.
+      const _exhaustive: never = popup
+  }
+}
+
+/** A popup displayed over the entire page. */
+export function Popup () {
+  const [popup, setPopup] = useAtom(popupAtom)
+
+  function closePopup() {
+    setPopup(null)
+  }
+
+  if (!popup) {return null}
+
+  return <div className="modal-wrapper">
+  <div className="modal-backdrop" onClick={closePopup} />
+  <div className="modal">
+    <div className="codicon codicon-close modal-close" onClick={closePopup}></div>
+    {getPopupContent(popup)}
+  </div>
+</div>
+}

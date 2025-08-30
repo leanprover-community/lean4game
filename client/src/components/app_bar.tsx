@@ -14,6 +14,8 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
 import { useTranslation } from 'react-i18next'
+import { useAtom } from 'jotai'
+import { popupAtom, PopupType } from '../store/popup-atoms'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -123,10 +125,12 @@ function InputModeButton({setNavOpen, isDropdown}) {
   </Button>
 }
 
-export function ImpressumButton({setNavOpen, toggleImpressum, isDropdown}) {
+export function ImpressumButton({setNavOpen, isDropdown}) {
+  const [, setPopup] = useAtom(popupAtom)
+
   const { t } = useTranslation()
   return <Button className="btn btn-inverted"
-    title={t("Impressum")} inverted="true" to="" onClick={(ev) => {toggleImpressum(ev); setNavOpen(false)}}>
+    title={t("Impressum")} inverted="true" to="" onClick={(ev) => {setPopup(PopupType.impressum); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faCircleInfo} />
     {isDropdown && <>&nbsp;{t("Impressum")}</>}
   </Button>
@@ -209,11 +213,10 @@ function InventoryButton({pageNumber, setPageNumber}) {
 }
 
 /** the navigation bar on the welcome page */
-export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpressum, togglePrivacy, toggleEraseMenu, toggleUploadMenu, toggleInfo, togglePreferencesPopup} : {
+export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, togglePrivacy, toggleEraseMenu, toggleUploadMenu, toggleInfo, togglePreferencesPopup} : {
   pageNumber: number,
   setPageNumber: any,
   gameInfo: GameInfo,
-  toggleImpressum: any,
   togglePrivacy: any,
   toggleEraseMenu: any,
   toggleUploadMenu: any,
@@ -243,7 +246,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
       <EraseButton setNavOpen={setNavOpen} toggleEraseMenu={toggleEraseMenu}/>
       <DownloadButton setNavOpen={setNavOpen} gameId={gameId} gameProgress={gameProgress}/>
       <UploadButton setNavOpen={setNavOpen} toggleUploadMenu={toggleUploadMenu}/>
-      <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+      <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
       <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
       <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
     </div>
@@ -251,10 +254,9 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleImpres
 }
 
 /** the navigation bar in a level */
-export function LevelAppBar({isLoading, levelTitle, toggleImpressum, togglePrivacy, toggleInfo, togglePreferencesPopup, pageNumber=undefined, setPageNumber=undefined} : {
+export function LevelAppBar({isLoading, levelTitle, togglePrivacy, toggleInfo, togglePreferencesPopup, pageNumber=undefined, setPageNumber=undefined} : {
   isLoading: boolean,
   levelTitle: string,
-  toggleImpressum: any,
   togglePrivacy: any,
   toggleInfo: any,
   togglePreferencesPopup: any,
@@ -289,7 +291,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, togglePriva
           <HomeButton isDropdown={true} />
           <InputModeButton setNavOpen={setNavOpen} isDropdown={true}/>
           <GameInfoButton setNavOpen={setNavOpen} toggleInfo={toggleInfo}/>
-          <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+          <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
           <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
           <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
@@ -311,7 +313,7 @@ export function LevelAppBar({isLoading, levelTitle, toggleImpressum, togglePriva
         </div>
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
           <GameInfoButton setNavOpen={setNavOpen} toggleInfo={toggleInfo}/>
-          <ImpressumButton setNavOpen={setNavOpen} toggleImpressum={toggleImpressum} isDropdown={true} />
+          <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
           <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
           <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
