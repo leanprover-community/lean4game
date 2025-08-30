@@ -5,6 +5,7 @@ import { ImpressumPopup } from '../components/popup/impressum'
 export enum PopupType {
   impressum = 'impressum',
   info = 'info',
+  preferences = 'preferences',
   privacy = 'privacy',
   upload = 'upload',
 }

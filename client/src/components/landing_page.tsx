@@ -93,10 +93,7 @@ function LandingPage() {
 
   const [, setPopup] = useAtom(popupAtom)
 
-  const [preferencesPopup, setPreferencesPopup] = React.useState(false);
   const [navOpen, setNavOpen] = React.useState(false);
-  const closePreferencesPopup = () => setPreferencesPopup(false);
-  const togglePreferencesPopup = () => setPreferencesPopup(!preferencesPopup);
 
   const [usageCPU, setUsageCPU] = React.useState<number>()
   const [usageMem, setUsageMem] = React.useState<number>()
@@ -139,7 +136,7 @@ function LandingPage() {
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
             <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
             <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
-            <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
+            <PreferencesButton setNavOpen={setNavOpen} />
         </div>
       </nav>
       <div id="main-title">
@@ -239,10 +236,8 @@ function LandingPage() {
       {/* Do not translate "Impressum", it's needed for German GDPR */}
       <a className="link" onClick={() => {setPopup(PopupType.impressum)}}>Impressum</a>
       <a className="link" onClick={() => {setPopup(PopupType.privacy)}}>{t("Privacy Policy")}</a>
-      {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
     </footer>
   </div>
-
 
   function fetch_stats() {
     fetch(`${window.location.origin}/data/stats`)

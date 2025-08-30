@@ -145,10 +145,10 @@ export function PrivacyButton({setNavOpen, isDropdown}) {
   </Button>
 }
 
-export function PreferencesButton({setNavOpen, togglePreferencesPopup}) {
+export function PreferencesButton({setNavOpen}) {
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
-  return <Button title={t("Preferences")} inverted="true" to="" onClick={() => {togglePreferencesPopup(); setNavOpen(false)}}>
+  return <Button title={t("Preferences")} inverted="true" to="" onClick={() => {setPopup(PopupType.preferences); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faGear} />&nbsp;{t("Preferences")}
   </Button>
 }
@@ -250,7 +250,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleEraseM
       <UploadButton setNavOpen={setNavOpen} />
       <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
       <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
-      <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
+      <PreferencesButton setNavOpen={setNavOpen} />
     </div>
   </div>
 }
@@ -293,7 +293,7 @@ export function LevelAppBar({isLoading, levelTitle, togglePreferencesPopup, page
           <GameInfoButton setNavOpen={setNavOpen} />
           <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
           <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
-          <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
+          <PreferencesButton setNavOpen={setNavOpen} />
         </div>
       </> :
       <>
@@ -315,7 +315,7 @@ export function LevelAppBar({isLoading, levelTitle, togglePreferencesPopup, page
           <GameInfoButton setNavOpen={setNavOpen} />
           <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
           <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
-          <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
+          <PreferencesButton setNavOpen={setNavOpen} />
         </div>
       </>
     }
