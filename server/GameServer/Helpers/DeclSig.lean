@@ -16,6 +16,7 @@ def declSig.isProp (sig: TSyntax ``declSig) : CommandElabM Bool := do
       let type ← inferType statement
       return type.isProp
 
+/-- Manual repacking of `declSig` into `optDeclSig`. -/
 def declSig.toOptDeclSig (sig: TSyntax ``declSig): TSyntax ``optDeclSig :=
   match sig.raw with
   | .node info ``declSig #[binders, typeStx] =>

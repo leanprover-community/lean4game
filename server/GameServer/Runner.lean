@@ -147,7 +147,7 @@ elab "Runner" gameId:str worldId:str levelId:num
     activateScoped scope.currNamespace
 
     let isProp := level.isProp
-    let optDeclSig := GameServer.declSig.toOptDeclSig level.goal
+    let optDeclSig := declSig.toOptDeclSig level.goal
 
     -- Run the proof
     let thmStatement ← match isProp with

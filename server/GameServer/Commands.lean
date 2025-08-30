@@ -369,8 +369,8 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     "Statement" statementName:ident ? preamble:preambleArg ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
-  let optSig := GameServer.declSig.toOptDeclSig sig
-  let isProp ← GameServer.declSig.isProp sig
+  let optSig := declSig.toOptDeclSig sig
+  let isProp ← declSig.isProp sig
 
   -- add an optional tactic sequence that the engine executes before the game starts
   let preambleSeq : TSyntax ``Lean.Parser.Tactic.tacticSeq ← match preamble with
