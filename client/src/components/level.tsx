@@ -51,7 +51,6 @@ import { IConnectionProvider } from 'monaco-languageclient'
 import { monacoSetup } from 'lean4web/client/src/monacoSetup'
 import { onigasmH } from 'onigasm/lib/onigasmH'
 import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
-import { InfoPopup } from './popup/game_info'
 import { PreferencesPopup } from './popup/preferences'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
@@ -75,21 +74,17 @@ function Level() {
 
   // pop-ups
   const [privacy, setPrivacy] = React.useState(false)
-  const [info, setInfo] = React.useState(false)
   const [preferencesPopup, setPreferencesPopup] = React.useState(false)
 
   function closePrivacy()   {setPrivacy(false)}
-  function closeInfo()        {setInfo(false)}
   function closePreferencesPopup() {setPreferencesPopup(false)}
-  function toggleInfo()       {setInfo(!info)}
   function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
 
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
     {levelId == 0 ?
-      <Introduction privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup} /> :
-      <PlayableLevel key={`${worldId}/${levelId}`} privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>}
+      <Introduction privacy={privacy} setPrivacy={setPrivacy} togglePreferencesPopup={togglePreferencesPopup} /> :
+      <PlayableLevel key={`${worldId}/${levelId}`} privacy={privacy} setPrivacy={setPrivacy} togglePreferencesPopup={togglePreferencesPopup}/>}
     {privacy ? <PrivacyPolicyPopup handleClose={closePrivacy} /> : null}
-    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
     {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </WorldLevelIdContext.Provider>
 }
@@ -218,7 +213,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
   </div>
 }
 
-function PlayableLevel({ privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
+function PlayableLevel({ privacy, setPrivacy, togglePreferencesPopup }) {
   let { t } = useTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
@@ -424,7 +419,6 @@ function PlayableLevel({ privacy, setPrivacy, toggleInfo, togglePreferencesPopup
                   isLoading={level.isLoading}
                   levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${t(level?.data?.title, {ns: gameId})}`)}
-                  toggleInfo={toggleInfo}
                   togglePrivacy={togglePrivacy}
                   togglePreferencesPopup={togglePreferencesPopup}
                   />
@@ -489,7 +483,7 @@ function IntroductionPanel({gameInfo}) {
 export default Level
 
 /** The site with the introduction text of a world */
-function Introduction({privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
+function Introduction({privacy, setPrivacy, togglePreferencesPopup}) {
   let { t } = useTranslation()
 
   const gameId = React.useContext(GameIdContext)
@@ -507,7 +501,7 @@ function Introduction({privacy, setPrivacy, toggleInfo, togglePreferencesPopup})
     setPrivacy(!privacy)
   }
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} togglePrivacy={togglePrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} togglePrivacy={togglePrivacy} togglePreferencesPopup={togglePreferencesPopup}/>
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?

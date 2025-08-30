@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { ImpressumPopup } from './impressum'
-import '../../css/popup.css'
-import { popupAtom, PopupType } from '../../store/popup-atoms'
 import { useAtom } from 'jotai'
+import { popupAtom, PopupType } from '../../store/popup-atoms'
+import { ImpressumPopup } from './impressum'
+import { InfoPopup } from './info'
+import '../../css/popup.css'
 
 /**
  * To create a new popup on needs add a option to `PopupType`,
@@ -16,6 +17,8 @@ function getPopupContent(popup: PopupType) {
   switch(popup) {
     case PopupType.impressum:
       return <ImpressumPopup />
+    case PopupType.info:
+      return <InfoPopup />
     default:
       // Hack: this throws a TS error when cases are missed.
       const _exhaustive: never = popup

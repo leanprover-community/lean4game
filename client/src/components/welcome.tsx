@@ -13,7 +13,6 @@ import { Button } from './button'
 import { PreferencesContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
 import { ErasePopup } from './popup/erase'
-import { InfoPopup } from './popup/game_info'
 import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import { RulesHelpPopup } from './popup/rules_help'
 import { UploadPopup } from './popup/upload'
@@ -143,7 +142,6 @@ function Welcome() {
     {rulesHelp ? <RulesHelpPopup handleClose={closeRulesHelp} /> : null}
     {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
     {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
-    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
     {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </>
 }
