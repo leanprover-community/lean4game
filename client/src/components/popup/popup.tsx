@@ -4,6 +4,7 @@ import { popupAtom, PopupType } from '../../store/popup-atoms'
 import { ImpressumPopup } from './impressum'
 import { InfoPopup } from './info'
 import '../../css/popup.css'
+import { PrivacyPolicyPopup } from './privacy'
 
 /**
  * To create a new popup on needs add a option to `PopupType`,
@@ -19,6 +20,8 @@ function getPopupContent(popup: PopupType) {
       return <ImpressumPopup />
     case PopupType.info:
       return <InfoPopup />
+    case PopupType.privacy:
+      return <PrivacyPolicyPopup />
     default:
       // Hack: this throws a TS error when cases are missed.
       const _exhaustive: never = popup

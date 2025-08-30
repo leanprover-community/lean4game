@@ -5,6 +5,7 @@ import { ImpressumPopup } from '../components/popup/impressum'
 export enum PopupType {
   impressum = 'impressum',
   info = 'info',
+  privacy = 'privacy',
 }
 
 /** Currently open popup. Set to `null` to close all. */

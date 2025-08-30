@@ -135,11 +135,11 @@ export function ImpressumButton({setNavOpen, isDropdown}) {
   </Button>
 }
 
-export function PrivacyButton({setNavOpen, togglePrivacy, isDropdown}) {
+export function PrivacyButton({setNavOpen, isDropdown}) {
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
   return <Button className="btn btn-inverted"
-    title={t("Privacy Policy")} inverted="true" to="" onClick={(ev) => {togglePrivacy(ev); setNavOpen(false)}}>
+    title={t("Privacy Policy")} inverted="true" to="" onClick={(ev) => {setPopup(PopupType.privacy); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faCircleInfo} />
     {isDropdown && <>&nbsp;{t("Privacy Policy")}</>}
   </Button>
@@ -217,14 +217,12 @@ function InventoryButton({pageNumber, setPageNumber}) {
 }
 
 /** the navigation bar on the welcome page */
-export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, togglePrivacy, toggleEraseMenu, toggleUploadMenu, toggleInfo, togglePreferencesPopup} : {
+export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleEraseMenu, toggleUploadMenu, togglePreferencesPopup} : {
   pageNumber: number,
   setPageNumber: any,
   gameInfo: GameInfo,
-  togglePrivacy: any,
   toggleEraseMenu: any,
   toggleUploadMenu: any,
-  toggleInfo: any,
   togglePreferencesPopup: () => void;
 }) {
   const { t } = useTranslation()
@@ -251,17 +249,16 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, togglePrivac
       <DownloadButton setNavOpen={setNavOpen} gameId={gameId} gameProgress={gameProgress}/>
       <UploadButton setNavOpen={setNavOpen} toggleUploadMenu={toggleUploadMenu}/>
       <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
-      <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
+      <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
       <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
     </div>
   </div>
 }
 
 /** the navigation bar in a level */
-export function LevelAppBar({isLoading, levelTitle, togglePrivacy, togglePreferencesPopup, pageNumber=undefined, setPageNumber=undefined} : {
+export function LevelAppBar({isLoading, levelTitle, togglePreferencesPopup, pageNumber=undefined, setPageNumber=undefined} : {
   isLoading: boolean,
   levelTitle: string,
-  togglePrivacy: any,
   togglePreferencesPopup: any,
   pageNumber?: number,
   setPageNumber?: any,
@@ -295,7 +292,7 @@ export function LevelAppBar({isLoading, levelTitle, togglePrivacy, togglePrefere
           <InputModeButton setNavOpen={setNavOpen} isDropdown={true}/>
           <GameInfoButton setNavOpen={setNavOpen} />
           <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
-          <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
+          <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
           <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
       </> :
@@ -317,7 +314,7 @@ export function LevelAppBar({isLoading, levelTitle, togglePrivacy, togglePrefere
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
           <GameInfoButton setNavOpen={setNavOpen} />
           <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
-          <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
+          <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
           <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
       </>

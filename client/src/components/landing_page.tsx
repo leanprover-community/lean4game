@@ -11,7 +11,6 @@ import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 
 import { Markdown } from './markdown';
-import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import { GameTile, useGetGameInfoQuery } from '../state/api'
 import path from 'path';
 
@@ -94,12 +93,8 @@ function LandingPage() {
 
   const [, setPopup] = useAtom(popupAtom)
 
-  const [privacyPopup, setPrivacyPopup] = React.useState(false);
   const [preferencesPopup, setPreferencesPopup] = React.useState(false);
   const [navOpen, setNavOpen] = React.useState(false);
-  const openPrivacy = () => setPrivacyPopup(true);
-  const closePrivacy = () => setPrivacyPopup(false);
-  const togglePrivacy = () => setPrivacyPopup(!privacyPopup);
   const closePreferencesPopup = () => setPreferencesPopup(false);
   const togglePreferencesPopup = () => setPreferencesPopup(!preferencesPopup);
 
@@ -143,7 +138,7 @@ function LandingPage() {
         <MenuButton navOpen={navOpen} setNavOpen={setNavOpen}/>
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
             <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
-            <PrivacyButton setNavOpen={setNavOpen} togglePrivacy={togglePrivacy} isDropdown={true} />
+            <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
             <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>
         </div>
       </nav>
@@ -243,8 +238,7 @@ function LandingPage() {
     <footer>
       {/* Do not translate "Impressum", it's needed for German GDPR */}
       <a className="link" onClick={() => {setPopup(PopupType.impressum)}}>Impressum</a>
-      <a className="link" onClick={openPrivacy}>{t("Privacy Policy")}</a>
-      {privacyPopup? <PrivacyPolicyPopup handleClose={closePrivacy} />: null}
+      <a className="link" onClick={() => {setPopup(PopupType.privacy)}}>{t("Privacy Policy")}</a>
       {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
     </footer>
   </div>
