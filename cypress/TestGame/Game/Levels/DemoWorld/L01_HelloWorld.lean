@@ -7,9 +7,9 @@ Title "Test Level"
 
 Introduction "This is a test level."
 
--- TODO: I think #362 broke autoimplicits, so I've added `(x y : Nat)`
--- as a workaround for now
-Statement (x y : Nat) (h : x = 2) (g: y = 4) : x + x = y := by
+variable (x y : Nat)
+
+Statement (h : x = 2) (g: y = 4) : x + x = y := by
   Hint "You can either start using `{h}` or `{g}`."
   Branch
     rw [g]

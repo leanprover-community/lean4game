@@ -215,6 +215,18 @@ describe('Basic Lean4Game Features', () => {
     })
   })
 
+  describe('Non-Prop Level', () => {
+    it('Non-prop statements should be allowed', () => {
+      cy.visit('/#/g/test/TestGame/world/TestWorld/level/3')
+      cy.contains('Goal:', { timeout: 60000 })
+      cy.contains('intro first!')
+      cy.focused().type('intro x{enter}')
+      cy.contains('now apply!', { timeout: 10000 })
+      cy.focused().type('apply x{enter}')
+      cy.contains('Done!', { timeout: 10000 })
+    })
+  })
+
   describe('Settings and Preferences', () => {
     it('should open preferences popup', () => {
       // Click menu button to open dropdown

@@ -2,6 +2,7 @@ import Lean
 import GameServer.RpcHandlers
 import GameServer.SaveData
 import GameServer.Tactic.LetIntros
+import GameServer.Helpers.DeclSig
 
 namespace GameServer
 
@@ -145,7 +146,12 @@ elab "Runner" gameId:str worldId:str levelId:num
       activateScoped ns
     activateScoped scope.currNamespace
 
+    let isProp := level.isProp
+    let optDeclSig := GameServer.declSig.toOptDeclSig level.goal
+
     -- Run the proof
-    let thmStatement ← `(command|
-      theorem the_theorem $(level.goal) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩)} )
+    let thmStatement ← match isProp with
+    | true => `(command| theorem the_theorem $(level.goal) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩)} )
+    | false => `(command| def the_theorem $(optDeclSig) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩)} )
+
     elabCommand thmStatement

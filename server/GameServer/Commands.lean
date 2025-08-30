@@ -369,21 +369,8 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     "Statement" statementName:ident ? preamble:preambleArg ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
-  -- repack because apparently `declSig` isn't recognised as `optDeclSig`
-  let optSig: TSyntax ``Lean.Parser.Command.optDeclSig := match sig.raw with
-  | .node info ``Lean.Parser.Command.declSig #[binders, typeStx] =>
-    let optType : TSyntax `optType := ⟨Syntax.node info ``Lean.Parser.Term.optType #[typeStx]⟩
-    ⟨.node info ``Lean.Parser.Command.optDeclSig #[binders, optType]⟩
-  | _ => unreachable!
-
-  -- Is the statement a `theorem` or a `def`?
-  -- TODO: is this correct?
-  let (binders, typeStx) := expandDeclSig sig
-  let isProp ← liftTermElabM <|
-    Term.elabBinders binders.getArgs fun _ => do
-      let statement ← Term.elabType typeStx
-      let type ← inferType statement
-      return type.isProp
+  let optSig := GameServer.declSig.toOptDeclSig sig
+  let isProp ← GameServer.declSig.isProp sig
 
   -- add an optional tactic sequence that the engine executes before the game starts
   let preambleSeq : TSyntax ``Lean.Parser.Tactic.tacticSeq ← match preamble with
