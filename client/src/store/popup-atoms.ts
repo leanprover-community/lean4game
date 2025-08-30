@@ -6,6 +6,7 @@ export enum PopupType {
   impressum = 'impressum',
   info = 'info',
   privacy = 'privacy',
+  upload = 'upload',
 }
 
 /** Currently open popup. Set to `null` to close all. */

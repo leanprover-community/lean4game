@@ -177,10 +177,10 @@ function DownloadButton ({setNavOpen, gameId, gameProgress}) {
   </Button>
 }
 
-function UploadButton ({setNavOpen, toggleUploadMenu}) {
+function UploadButton ({setNavOpen}) {
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
-  return <Button title={t("Load Progress from JSON")} inverted="true" to="" onClick={() => {toggleUploadMenu(); setNavOpen(false)}}>
+  return <Button title={t("Load Progress from JSON")} inverted="true" to="" onClick={() => {setPopup(PopupType.upload); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faUpload} />&nbsp;{t("Upload")}
   </Button>
 }
@@ -247,7 +247,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleEraseM
       <GameInfoButton setNavOpen={setNavOpen} />
       <EraseButton setNavOpen={setNavOpen} toggleEraseMenu={toggleEraseMenu}/>
       <DownloadButton setNavOpen={setNavOpen} gameId={gameId} gameProgress={gameProgress}/>
-      <UploadButton setNavOpen={setNavOpen} toggleUploadMenu={toggleUploadMenu}/>
+      <UploadButton setNavOpen={setNavOpen} />
       <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
       <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
       <PreferencesButton setNavOpen={setNavOpen} togglePreferencesPopup={togglePreferencesPopup}/>

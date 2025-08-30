@@ -14,7 +14,6 @@ import { PreferencesContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
 import { ErasePopup } from './popup/erase'
 import { RulesHelpPopup } from './popup/rules_help'
-import { UploadPopup } from './popup/upload'
 import { PreferencesPopup} from "./popup/preferences"
 import { WorldTreePanel } from './world_tree'
 
@@ -133,7 +132,6 @@ function Welcome() {
     </div>
     {rulesHelp ? <RulesHelpPopup handleClose={closeRulesHelp} /> : null}
     {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
-    {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
     {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </>
 }

@@ -5,6 +5,7 @@ import { ImpressumPopup } from './impressum'
 import { InfoPopup } from './info'
 import '../../css/popup.css'
 import { PrivacyPolicyPopup } from './privacy'
+import { UploadPopup } from './upload'
 
 /**
  * To create a new popup on needs add a option to `PopupType`,
@@ -22,6 +23,8 @@ function getPopupContent(popup: PopupType) {
       return <InfoPopup />
     case PopupType.privacy:
       return <PrivacyPolicyPopup />
+    case PopupType.upload:
+      return <UploadPopup />
     default:
       // Hack: this throws a TS error when cases are missed.
       const _exhaustive: never = popup
