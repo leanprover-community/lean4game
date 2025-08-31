@@ -4,9 +4,6 @@ namespace GameServer
 
 open Lean Meta Elab Parser Command
 
-set_option Elab.inServer true
-set_option autoImplicit false
-
 /-- Is the statement a `theorem` or a `def` -/
 def declSig.isProp (sig: TSyntax ``declSig) : CommandElabM Bool := do
   let (binders, typeStx) := expandDeclSig sig
