@@ -2,6 +2,7 @@
  * @fileOverview Define API of the server-client communication
 */
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { InventoryTab } from '../store/inventory-atoms'
 
 
 export interface GameTile {
@@ -89,8 +90,8 @@ export const apiSlice = createApi({
     loadInventoryOverview: builder.query<InventoryOverview, {game: string}>({
       query: ({game}) => `${game}/inventory.json`,
     }),
-    loadDoc: builder.query<Doc, {game: string, name: string, type: "lemma"|"tactic"}>({
-      query: ({game, type, name}) => `${game}/doc__${type}__${name}.json`,
+    loadDoc: builder.query<Doc, {game: string, name: string, type: InventoryTab}>({
+      query: ({game, type, name}) => `${game}/doc__${type.toUpperCase()}__${name}.json`,
     }),
   }),
 })

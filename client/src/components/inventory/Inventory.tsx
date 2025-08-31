@@ -1,40 +1,52 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { InventoryOverview, LevelInfo } from "../../state/api"
+import { InventoryOverview, InventoryTile, LevelInfo } from "../../state/api"
+// import { InventoryList } from "./InventoryList"
+import { inventorySubtabAtom, InventoryTab, inventoryTabAtom, inventoryTilesAtoms, selectedDocTileAtom } from "../../store/inventory-atoms"
+import { useAtom } from "jotai"
+import { Tab } from "@mui/material"
+import { InventorySubTabBar, InventoryTabBar } from "./TabBars"
 import { InventoryList } from "./InventoryList"
+import { Documentation } from "./Documentation"
 
-export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=false} :
+
+function TabContent(type: InventoryTab, levelInfo: LevelInfo | InventoryOverview | undefined): InventoryTile[] {
+  switch(type) {
+    case InventoryTab.theorem: return levelInfo?.lemmas ?? []
+    case InventoryTab.tactic: return levelInfo?.tactics ?? []
+    case InventoryTab.definition: return levelInfo?.definitions ?? []
+    default:
+      const _exhaustive: never = type
+  }
+}
+
+export function Inventory({levelInfo, enableAll=false} :
   {
-    levelInfo: LevelInfo|InventoryOverview,
-    openDoc: (props: {name: string, type: string}) => void,
-    lemmaTab: any,
-    setLemmaTab: any,
+    levelInfo: LevelInfo | InventoryOverview | undefined,
     enableAll?: boolean,
   }) {
   const { t } = useTranslation()
+  const [tab, setTab] = useAtom(inventoryTabAtom)
+  const [doc] = useAtom(selectedDocTileAtom)
+  const [, setTheoremInventory] = useAtom(inventoryTilesAtoms[InventoryTab.theorem])
+  const [, setTacticInventory] = useAtom(inventoryTilesAtoms[InventoryTab.tactic])
+  const [, setDefinitionInventory] = useAtom(inventoryTilesAtoms[InventoryTab.definition])
 
-  // TODO: this state should be preserved when loading a different level.
-  const [tab, setTab] = useState<"tactic"|"theorem"|"definition">("theorem")
+  const subTabs = [...new Set(TabContent(tab, levelInfo).map(item => item.category))]
 
-  let newTheorems = levelInfo?.lemmas?.filter(item => item.new).length > 0
-  let newTactics = levelInfo?.tactics?.filter(item => item.new).length > 0
-  let newDefinitions = levelInfo?.definitions?.filter(item => item.new).length > 0
+  // TODO: this is some glue since no everything is in jotai yet
+  useEffect(() => {
+    setTheoremInventory(levelInfo?.lemmas ?? [])
+    setTacticInventory(levelInfo?.tactics ?? [])
+    setDefinitionInventory(levelInfo?.definitions ?? [])
+  }, [levelInfo])
 
   return (
     <div className="inventory">
-      <div className="tab-bar major">
-        <div className={`tab${(tab == "theorem") ? " active": ""}${newTheorems ? " new" : ""}`} onClick={() => { setTab("theorem") }}>{t("Theorems")}</div>
-        <div className={`tab${(tab == "tactic") ? " active": ""}${newTactics ? " new" : ""}`} onClick={() => { setTab("tactic") }}>{t("Tactics")}</div>
-        <div className={`tab${(tab == "definition") ? " active": ""}${newDefinitions ? " new" : ""}`} onClick={() => { setTab("definition") }}>{t("Definitions")}</div>
-      </div>
-      { (tab == "theorem") && levelInfo?.lemmas &&
-        <InventoryList items={levelInfo?.lemmas} docType="Lemma" openDoc={openDoc} level={levelInfo} enableAll={enableAll} tab={lemmaTab} setTab={setLemmaTab}/>
-      }
-      { (tab == "tactic") && levelInfo?.tactics &&
-        <InventoryList items={levelInfo?.tactics} docType="Tactic" openDoc={openDoc} enableAll={enableAll}/>
-      }
-      { (tab == "definition") && levelInfo?.definitions &&
-        <InventoryList items={levelInfo?.definitions} docType="Definition" openDoc={openDoc} enableAll={enableAll}/>
+      <InventoryTabBar />
+      <InventorySubTabBar />
+      {levelInfo &&
+        <InventoryList tiles={TabContent(tab, levelInfo)} docType={tab} enableAll={enableAll} />
       }
     </div>
   )
