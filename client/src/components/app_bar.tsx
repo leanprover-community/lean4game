@@ -162,10 +162,10 @@ function GameInfoButton({ setNavOpen }) {
   </Button>
 }
 
-function EraseButton ({setNavOpen, toggleEraseMenu}) {
+function EraseButton ({ setNavOpen }) {
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
-  return <Button title={t("Clear Progress")} inverted="true" to="" onClick={() => {toggleEraseMenu(); setNavOpen(false)}}>
+  return <Button title={t("Clear Progress")} inverted="true" to="" onClick={() => {setPopup(PopupType.erase); setNavOpen(false)}}>
     <FontAwesomeIcon icon={faEraser} />&nbsp;{t("Erase")}
   </Button>
 }
@@ -217,13 +217,10 @@ function InventoryButton({pageNumber, setPageNumber}) {
 }
 
 /** the navigation bar on the welcome page */
-export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleEraseMenu, toggleUploadMenu, togglePreferencesPopup} : {
+export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
   pageNumber: number,
   setPageNumber: any,
   gameInfo: GameInfo,
-  toggleEraseMenu: any,
-  toggleUploadMenu: any,
-  togglePreferencesPopup: () => void;
 }) {
   const { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
@@ -245,7 +242,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleEraseM
     </div>
     <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
       <GameInfoButton setNavOpen={setNavOpen} />
-      <EraseButton setNavOpen={setNavOpen} toggleEraseMenu={toggleEraseMenu}/>
+      <EraseButton setNavOpen={setNavOpen} />
       <DownloadButton setNavOpen={setNavOpen} gameId={gameId} gameProgress={gameProgress}/>
       <UploadButton setNavOpen={setNavOpen} />
       <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />

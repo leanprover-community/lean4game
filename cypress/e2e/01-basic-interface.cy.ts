@@ -7,7 +7,6 @@ describe('Basic Lean4Game Interface', () => {
       cy.visit('/#/not-found')
       cy.get('#error-page').should('be.visible')
     })
-
     it('contains a valid link', () => {
       cy.get('#error-page a')
         .should('have.attr', 'target', '_blank')
@@ -16,7 +15,6 @@ describe('Basic Lean4Game Interface', () => {
           cy.request(href).its('status').should('eq', 200)
         })
     })
-
     it('background image exists', () => {
       cy.get('#error-page')
         .should('have.css', 'background-image')
@@ -31,8 +29,8 @@ describe('Basic Lean4Game Interface', () => {
         })
     })
   })
-
   describe('Popup', () => {
+    describe('Erase', () => {})
     describe('Impressum', () => {
       it('landing page footer', () => {
         cy.visit('/#/')
@@ -44,6 +42,20 @@ describe('Basic Lean4Game Interface', () => {
         })
       })
     })
-
+    describe('Info', () => {})
+    describe('Preferences', () => {})
+    describe('Privacy', () => {
+      it('landing page footer', () => {
+        cy.visit('/#/')
+        cy.get('footer').contains('a', 'Privacy Policy').should('be.visible').click()
+        cy.contains('a', 'Contact Details').should('have.attr', 'target', '_blank')
+        .then($a => {
+          const href = $a.prop('href')
+          cy.request(href).its('status').should('eq', 200)
+        })
+      })
+    })
+    describe('Rules', () => {})
+    describe('Upload', () => {})
   })
 })

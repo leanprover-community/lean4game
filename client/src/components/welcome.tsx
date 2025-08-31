@@ -80,21 +80,6 @@ function Welcome() {
   const readIntro = useAppSelector(selectReadIntro(gameId, null))
   const [pageNumber, setPageNumber] = React.useState(readIntro ? 1 : 0)
 
-  // pop-ups
-  const [eraseMenu, setEraseMenu] = React.useState(false)
-  const [info, setInfo] = React.useState(false)
-  const [rulesHelp, setRulesHelp] = React.useState(false)
-  const [uploadMenu, setUploadMenu] = React.useState(false)
-  const [preferencesPopup, setPreferencesPopup] = React.useState(false)
-
-  function closeEraseMenu()   {setEraseMenu(false)}
-  function closeRulesHelp()   {setRulesHelp(false)}
-  function closeUploadMenu()  {setUploadMenu(false)}
-  function closePreferencesPopup() {setPreferencesPopup(false)}
-  function toggleEraseMenu()  {setEraseMenu(!eraseMenu)}
-  function toggleUploadMenu() {setUploadMenu(!uploadMenu)}
-  function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
-
   // set the window title
   useEffect(() => {
     if (gameInfo.data?.title) {
@@ -107,16 +92,14 @@ function Welcome() {
       <CircularProgress />
     </Box>
   : <>
-    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data}
-      toggleEraseMenu={toggleEraseMenu} toggleUploadMenu={toggleUploadMenu} togglePreferencesPopup={togglePreferencesPopup}/>
+    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data} />
     <div className="app-content">
       { mobile ?
           <div className="welcome mobile">
             {(pageNumber == 0 ?
               <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
             : pageNumber == 1 ?
-              <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
-                rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
+              <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
             :
               <InventoryPanel levelInfo={inventory?.data} />
             )}
@@ -124,15 +107,11 @@ function Welcome() {
         :
           <Split className="welcome" minSize={0} snapOffset={200}  sizes={[25, 50, 25]}>
             <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
-            <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
-              rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
+            <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
             <InventoryPanel levelInfo={inventory?.data} />
           </Split>
       }
     </div>
-    {rulesHelp ? <RulesHelpPopup handleClose={closeRulesHelp} /> : null}
-    {eraseMenu? <ErasePopup /> : null}
-    {preferencesPopup ? <PreferencesPopup /> : null}
   </>
 }
 

@@ -1,5 +1,4 @@
 import { atom } from 'jotai'
-import { ImpressumPopup } from '../components/popup/impressum'
 
 /** Type of valid popups. */
 export enum PopupType {

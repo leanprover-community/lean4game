@@ -18,6 +18,8 @@ import { store } from '../state/store'
 import '../css/world_tree.css'
 import { PreferencesContext } from './infoview/context'
 import { useTranslation } from 'react-i18next'
+import { useAtom } from 'jotai'
+import { popupAtom, PopupType } from '../store/popup-atoms'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -196,12 +198,13 @@ export const downloadFile = ({ data, fileName, fileType } :
 }
 
 /** The menu that is shown next to the world selection graph */
-export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
+export function WorldSelectionMenu() {
   const { t, i18n } = useTranslation()
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
   const dispatch = useAppDispatch()
   const { mobile } = React.useContext(PreferencesContext)
+  const [popup] = useAtom(popupAtom)
 
 
   function label(x : number) {
@@ -212,7 +215,7 @@ export function WorldSelectionMenu({rulesHelp, setRulesHelp}) {
   return <nav className={`world-selection-menu${mobile ? '' : ' desktop'}`}>
     <div className="slider-wrap">
       <span className="difficulty-label">{t("Rules")}
-        <FontAwesomeIcon icon={rulesHelp ? faXmark : faCircleQuestion} className='helpButton' onClick={() => (setRulesHelp(!rulesHelp))}/>
+        <FontAwesomeIcon icon={(popup == PopupType.rules) ? faXmark : faCircleQuestion} className='helpButton' />
       </span>
       <Slider
         orientation="vertical"
@@ -271,11 +274,9 @@ export function computeWorldLayout(worlds) {
 }
 
 
-export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
+export function WorldTreePanel({worlds, worldSize}:
   { worlds: any,
     worldSize: any,
-    rulesHelp: boolean,
-    setRulesHelp: any,
   }) {
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
@@ -360,7 +361,7 @@ export function WorldTreePanel({worlds, worldSize, rulesHelp, setRulesHelp}:
   let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : null
 
   return <div className="column">
-      <WorldSelectionMenu rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
+      <WorldSelectionMenu />
       <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
           width={bounds ? `${ds * dx}` : ''}
           viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
