@@ -1,20 +1,59 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect } from "react"
 import { GameIdContext } from "../../app"
-import { Inventory } from "./Inventory"
 import "../../css/inventory.css"
-import { inventoryTabAtom, selectedDocTileAtom, theoremSubtabAtom } from "../../store/inventory-atoms"
+import { InventoryTab, inventoryTabAtom, inventoryTilesAtoms, selectedDocTileAtom, theoremSubtabAtom, userInventoryAtom } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
-import { InventoryOverview, LevelInfo } from "../../state/api"
+import { InventoryOverview, InventoryTile, LevelInfo } from "../../state/api"
 import { Documentation } from "./Documentation"
+import { selectDifficulty, selectInventory } from "../../state/progress"
+import { store } from "../../state/store"
+import { WorldLevelIdContext } from "../infoview/context"
+import { gameIdAtom, levelIdAtom, worldIdAtom } from "../../store/game-atoms"
+import { InventorySubTabBar, InventoryTabBar } from "./TabBars"
+import { InventoryList } from "./InventoryList"
+import { useSelector } from "react-redux"
 
 /** The panel (on the welcome page) showing the user's inventory with tactics, definitions, and lemmas */
 export function InventoryPanel({levelInfo, visible = true} : {
-  levelInfo? : LevelInfo | InventoryOverview,
-  visible: boolean
+  levelInfo : LevelInfo | InventoryOverview | undefined,
+  visible?: boolean
 }) {
-  const [tab, setTab] = useAtom(inventoryTabAtom)
+  const [tab] = useAtom(inventoryTabAtom)
   const [, setSubtab] = useAtom(theoremSubtabAtom)
   const [doc] = useAtom(selectedDocTileAtom)
+
+  const [, setTheoremInventory] = useAtom(inventoryTilesAtoms[InventoryTab.theorem])
+  const [, setTacticInventory] = useAtom(inventoryTilesAtoms[InventoryTab.tactic])
+  const [, setDefinitionInventory] = useAtom(inventoryTilesAtoms[InventoryTab.definition])
+
+  const gameId = React.useContext(GameIdContext)
+  const difficulty = useSelector(selectDifficulty(gameId))
+
+  // TODO: this is some glue since no everything is in jotai yet
+  useEffect(() => {
+    setTheoremInventory(levelInfo?.lemmas ?? [])
+    setTacticInventory(levelInfo?.tactics ?? [])
+    setDefinitionInventory(levelInfo?.definitions ?? [])
+  }, [levelInfo])
+
+
+  // Some glue as the user inventory isn't fully in jotai yet
+  const [, setUserInventory] = useAtom(userInventoryAtom)
+  let inventory: string[] = selectInventory(gameId)(store.getState())
+  useEffect(() => {
+    setUserInventory(inventory)
+  }, [inventory])
+
+  // Some glue as the game/world/level-ID is not in jotai yet
+  const { worldId, levelId } = useContext(WorldLevelIdContext)
+  const [, setGameId] = useAtom(gameIdAtom)
+  const [, setWorldId] = useAtom(worldIdAtom)
+  const [, setLevelId] = useAtom(levelIdAtom)
+  useEffect(() => {
+    setGameId(gameId)
+    setWorldId(worldId)
+    setLevelId(levelId)
+  }, [gameId, worldId, levelId])
 
   // If the level specifies `TheoremTab "Nat"`, we switch to this tab on loading.
   // `defaultTab` is `null` or `undefined` otherwise, in which case we don't want to switch.
@@ -25,8 +64,24 @@ export function InventoryPanel({levelInfo, visible = true} : {
   }, [levelInfo])
 
   return <div className={`column inventory-panel ${visible ? '' : 'hidden'}`}>
-    {levelInfo && <Inventory levelInfo={levelInfo} enableAll={true} />}
+    <div className="inventory">
+      <InventoryTabBar />
+      <InventorySubTabBar />
+      {levelInfo &&
+        <InventoryList tiles={TabContent(tab, levelInfo)} docType={tab} enableAll={difficulty == 0} />
+      }
+    </div>
     { doc && <Documentation type={tab} />}
 
   </div>
+}
+
+function TabContent(type: InventoryTab, levelInfo: LevelInfo | InventoryOverview | undefined): InventoryTile[] {
+  switch(type) {
+    case InventoryTab.theorem: return levelInfo?.lemmas ?? []
+    case InventoryTab.tactic: return levelInfo?.tactics ?? []
+    case InventoryTab.definition: return levelInfo?.definitions ?? []
+    default:
+      const _exhaustive: never = type
+  }
 }

@@ -16,7 +16,7 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
   const { t } = useTranslation()
   const [, setDoc] = useAtom(selectedDocTileAtom)
   const icon = tile.locked ? <FontAwesomeIcon icon={faLock} /> :
-               tile.disabled ? <FontAwesomeIcon icon={faBan} /> : tile.st
+               tile.disabled ? <FontAwesomeIcon icon={faBan} /> : null
   const className = tile.locked ? "locked" : tile.disabled ? "disabled" : tile.new ? "new" : ""
   // Note: This is somewhat a hack as the statement of lemmas comes currently in the form
   // `Namespace.statement_name (x y : Nat) : some type`

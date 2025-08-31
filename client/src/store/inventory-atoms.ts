@@ -1,5 +1,6 @@
 import { Atom, atom } from "jotai";
 import { InventoryTile } from "../state/api";
+import { levelIdAtom, worldIdAtom } from "./game-atoms";
 
 /** Valid inventory tabs */
 export enum InventoryTab {
@@ -21,9 +22,9 @@ export const inventoryTabAtom = atom(InventoryTab.tactic)
  * accessed through `inventorySubtabAtom` below.
  */
 export const inventorySubtabAtoms: Record<InventoryTab, ReturnType<typeof atom<string>>> = {
-  [InventoryTab.theorem]: atom(""),
-  [InventoryTab.tactic]: atom(""),
-  [InventoryTab.definition]: atom(""),
+  [InventoryTab.theorem]: atom(null as string | null),
+  [InventoryTab.tactic]: atom(null as string | null),
+  [InventoryTab.definition]: atom(null as string | null),
 };
 
 /** Change the subtab for theorems */
@@ -55,17 +56,36 @@ export const inventoryTabNewTilesAtom: Atom<Record<InventoryTab, InventoryTile[]
   [InventoryTab.definition]: get(inventoryTilesAtoms[InventoryTab.definition]).filter(it => it.new),
 }))
 
+/** Recent items per tab */
+export const inventoryTabRecentTilesAtom: Atom<Record<InventoryTab, InventoryTile[]>> = atom( get => {
+  const worldId = get(worldIdAtom)
+  const levelId = get(levelIdAtom)
+  return {
+    [InventoryTab.theorem]: get(inventoryTilesAtoms[InventoryTab.theorem]).filter(it => it.world == worldId && it.level == levelId - 1),
+    [InventoryTab.tactic]: get(inventoryTilesAtoms[InventoryTab.tactic]).filter(it => it.world == worldId && it.level == levelId - 1),
+    [InventoryTab.definition]: get(inventoryTilesAtoms[InventoryTab.definition]).filter(it => it.world == worldId && it.level == levelId - 1),
+  }
+})
+
+// .filter(x => x.world == worldId && x.level == levelId - 1)
+
 /** New items in the current tab */
 export const inventoryCurrentTabNewTilesAtom = atom(get => {
   const tab = get(inventoryTabAtom)
   return get(inventoryTabNewTilesAtom)[tab]
 })
 
+/** Recent items in the current tab */
+export const inventoryCurrentTabRecentTilesAtom = atom(get => {
+  const tab = get(inventoryTabAtom)
+  return get(inventoryTabRecentTilesAtom)[tab]
+})
+
 /** All subtabs of current tab */
 export const inventorySubtabOptionsAtom = atom(get => {
   const tab = get(inventoryTabAtom)
   const tiles = get(inventoryTilesAtoms[tab])
-  return new Set(tiles.map(item => item.category))
+  return [...new Set(tiles.map(item => item.category))]
 })
 
 /** Currently selected subtab */
@@ -73,7 +93,8 @@ export const inventorySubtabAtom = atom(
   get => {
     const tab = get(inventoryTabAtom)
     const options = get(inventorySubtabOptionsAtom)
-    return get(inventorySubtabAtoms[tab]) ?? options[0]
+    const subtab = get(inventorySubtabAtoms[tab])
+    return subtab ?? options[0]
   },
   (get, set, val: string) => {
     const tab = get(inventoryTabAtom)
@@ -90,29 +111,3 @@ export const currentInventoryTilesAtom = atom(get => {
     .filter(it => !it.hidden && it.category == subtab)
     .map(tile => userInventory.includes(tile.name) ? {...tile, locked: false} : tile)
 })
-
-
-
-
-// /** Tab contains new items */
-// export const inventorySubTabHasNewAtom: Atom<Record<InventoryTab, boolean>> = atom( get => ({
-//   [InventoryTab.theorem]: get(inventoryTilesAtoms[InventoryTab.theorem]).filter(it => it.new).length > 0,
-//   [InventoryTab.tactic]: get(inventoryTilesAtoms[InventoryTab.tactic]).filter(it => it.new).length > 0,
-//   [InventoryTab.definition]: get(inventoryTilesAtoms[InventoryTab.definition]).filter(it => it.new).length > 0,
-// }))
-
-// /** For each inventory type, contains `true` if there are any items inside
-//  * this tab labelled as `new`.
-//  */
-// export const inventoryRecentItemsAtom: Atom<Record<InventoryTab, boolean>> = atom( get => ({
-//   [InventoryTab.theorem]: get(inventoryTilesAtoms[InventoryTab.theorem]).filter(it => it.new).length > 0,
-//   [InventoryTab.tactic]: get(inventoryTilesAtoms[InventoryTab.tactic]).filter(it => it.new).length > 0,
-//   [InventoryTab.definition]: get(inventoryTilesAtoms[InventoryTab.definition]).filter(it => it.new).length > 0,
-// }))
-
-// export const visibleInventoryAtom = atom(get => {
-//   const tab = get(inventoryTabAtom)
-//   const subtab = get(inventorySubtabAtom)
-//   const items = get(inventoryTilesAtoms[tab])
-//   return items.filter(it => it.category == subtab)
-// })

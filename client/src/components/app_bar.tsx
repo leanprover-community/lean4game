@@ -238,7 +238,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useAppSelector(selectProgress(gameId))
   const {mobile} = React.useContext(PreferencesContext)
-  const [navOpen, setNavOpen] = React.useState(false)
+  const [navOpen, setNavOpen] = useAtom(navOpenAtom)
 
   return <div className="app-bar">
     <div className='app-bar-left'>

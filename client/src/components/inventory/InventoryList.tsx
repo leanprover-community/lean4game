@@ -21,15 +21,9 @@ export function InventoryList({tiles, docType, enableAll=false} : {
   const [currentTiles] = useAtom(currentInventoryTilesAtom)
 
   const gameId = React.useContext(GameIdContext)
+
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
 
-  const difficulty = useSelector(selectDifficulty(gameId))
-
-  const categorySet = new Set<string>()
-  for (let tile of tiles) {
-    categorySet.add(tile.category)
-  }
-  const categories = Array.from(categorySet).sort()
 
   // Add inventory items from local store as unlocked.
   // Items are unlocked if they are in the local store, or if the server says they should be
