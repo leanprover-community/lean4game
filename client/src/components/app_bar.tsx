@@ -16,6 +16,7 @@ import { downloadProgress } from './popup/erase'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { popupAtom, PopupType } from '../store/popup-atoms'
+import { closeNavAtom, navOpenAtom } from '../store/navigation-atoms'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -57,7 +58,8 @@ function MobileNavButtons({pageNumber, setPageNumber}:
 }
 
 /** button to toggle dropdown menu. */
-export function MenuButton({navOpen, setNavOpen}) {
+export function MenuButton() {
+  const [navOpen, setNavOpen] = useAtom(navOpenAtom)
   return <Button to="" className="btn toggle-width" id="menu-btn" onClick={(ev) => {setNavOpen(!navOpen)}}>
     {navOpen ? <FontAwesomeIcon icon={faXmark} /> : <FontAwesomeIcon icon={faBars} />}
   </Button>
@@ -66,7 +68,8 @@ export function MenuButton({navOpen, setNavOpen}) {
 /** button to go one level futher.
  * for the last level, this button turns into a button going back to the welcome page.
  */
-function NextButton({worldSize, difficulty, completed, setNavOpen}) {
+function NextButton({worldSize, difficulty, completed}) {
+  const [, closeNav] = useAtom(closeNavAtom)
   const { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
@@ -74,7 +77,7 @@ function NextButton({worldSize, difficulty, completed, setNavOpen}) {
     <Button inverted="true"
         to={`/${gameId}/world/${worldId}/level/${levelId + 1}`} title={t("next level")}
         disabled={difficulty >= 2 && !(completed || levelId == 0)}
-        onClick={() => setNavOpen(false)}>
+        onClick={closeNav}>
       <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? t("Next") : t("Start")}
     </Button>
     :
@@ -87,7 +90,8 @@ function NextButton({worldSize, difficulty, completed, setNavOpen}) {
 /** button to go one level back.
  * only renders if the current level id is > 0.
  */
-function PreviousButton({setNavOpen}) {
+function PreviousButton() {
+  const [, closeNav] = useAtom(closeNavAtom)
   const { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
@@ -95,14 +99,15 @@ function PreviousButton({setNavOpen}) {
     <Button disabled={levelId <= 0} inverted="true"
         to={`/${gameId}/world/${worldId}/level/${levelId - 1}`}
         title={t("previous level")}
-        onClick={() => setNavOpen(false)}>
+        onClick={closeNav}>
       <FontAwesomeIcon icon={faArrowLeft} />&nbsp;{t("Previous")}
     </Button>
   </>)
 }
 
 /** button to toggle between editor and typewriter */
-function InputModeButton({setNavOpen, isDropdown}) {
+function InputModeButton({isDropdown}) {
+  const [, closeNav] = useAtom(closeNavAtom)
   const { t } = useTranslation()
   const {levelId} = React.useContext(WorldLevelIdContext)
   const {typewriterMode, setTypewriterMode, lockEditorMode} = React.useContext(InputModeContext)
@@ -111,7 +116,7 @@ function InputModeButton({setNavOpen, isDropdown}) {
   function toggleInputMode(ev: React.MouseEvent) {
     if (!lockEditorMode){
       setTypewriterMode(!typewriterMode)
-      setNavOpen(false)
+      closeNav()
     }
   }
 
@@ -125,62 +130,69 @@ function InputModeButton({setNavOpen, isDropdown}) {
   </Button>
 }
 
-export function ImpressumButton({setNavOpen, isDropdown}) {
+export function ImpressumButton({isDropdown}) {
+  const [, closeNav] = useAtom(closeNavAtom)
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
   return <Button className="btn btn-inverted"
-    title={t("Impressum")} inverted="true" to="" onClick={(ev) => {setPopup(PopupType.impressum); setNavOpen(false)}}>
+    title={t("Impressum")} inverted="true" to="" onClick={(ev) => {setPopup(PopupType.impressum); closeNav()}}>
     <FontAwesomeIcon icon={faCircleInfo} />
     {isDropdown && <>&nbsp;{t("Impressum")}</>}
   </Button>
 }
 
-export function PrivacyButton({setNavOpen, isDropdown}) {
+export function PrivacyButton({isDropdown}) {
+  const [, closeNav] = useAtom(closeNavAtom)
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
   return <Button className="btn btn-inverted"
-    title={t("Privacy Policy")} inverted="true" to="" onClick={(ev) => {setPopup(PopupType.privacy); setNavOpen(false)}}>
+    title={t("Privacy Policy")} inverted="true" to="" onClick={(ev) => {setPopup(PopupType.privacy); closeNav()}}>
     <FontAwesomeIcon icon={faCircleInfo} />
     {isDropdown && <>&nbsp;{t("Privacy Policy")}</>}
   </Button>
 }
 
-export function PreferencesButton({setNavOpen}) {
+export function PreferencesButton() {
+  const [, closeNav] = useAtom(closeNavAtom)
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
-  return <Button title={t("Preferences")} inverted="true" to="" onClick={() => {setPopup(PopupType.preferences); setNavOpen(false)}}>
+  return <Button title={t("Preferences")} inverted="true" to="" onClick={() => {setPopup(PopupType.preferences); closeNav()}}>
     <FontAwesomeIcon icon={faGear} />&nbsp;{t("Preferences")}
   </Button>
 }
 
-function GameInfoButton({ setNavOpen }) {
+function GameInfoButton() {
+  const [, closeNav] = useAtom(closeNavAtom)
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
   return <Button className="btn btn-inverted"
-    title={t("Game Info & Credits")} inverted="true" to="" onClick={() => {setPopup(PopupType.info); setNavOpen(false)}}>
+    title={t("Game Info & Credits")} inverted="true" to="" onClick={() => {setPopup(PopupType.info); closeNav()}}>
     <FontAwesomeIcon icon={faCircleInfo} />&nbsp;{t("Game Info")}
   </Button>
 }
 
-function EraseButton ({ setNavOpen }) {
+function EraseButton () {
+  const [, closeNav] = useAtom(closeNavAtom)
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
-  return <Button title={t("Clear Progress")} inverted="true" to="" onClick={() => {setPopup(PopupType.erase); setNavOpen(false)}}>
+  return <Button title={t("Clear Progress")} inverted="true" to="" onClick={() => {setPopup(PopupType.erase); closeNav()}}>
     <FontAwesomeIcon icon={faEraser} />&nbsp;{t("Erase")}
   </Button>
 }
 
-function DownloadButton ({setNavOpen, gameId, gameProgress}) {
+function DownloadButton ({gameId, gameProgress}) {
+  const [, closeNav] = useAtom(closeNavAtom)
   const { t } = useTranslation()
-  return <Button title={t("Download Progress")} inverted="true" to="" onClick={(ev) => {downloadProgress(gameId, gameProgress, ev); setNavOpen(false)}}>
+  return <Button title={t("Download Progress")} inverted="true" to="" onClick={(ev) => {downloadProgress(gameId, gameProgress, ev); closeNav()}}>
     <FontAwesomeIcon icon={faDownload} />&nbsp;{t("Download")}
   </Button>
 }
 
-function UploadButton ({setNavOpen}) {
+function UploadButton () {
+  const [, closeNav] = useAtom(closeNavAtom)
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
-  return <Button title={t("Load Progress from JSON")} inverted="true" to="" onClick={() => {setPopup(PopupType.upload); setNavOpen(false)}}>
+  return <Button title={t("Load Progress from JSON")} inverted="true" to="" onClick={() => {setPopup(PopupType.upload); closeNav()}}>
     <FontAwesomeIcon icon={faUpload} />&nbsp;{t("Upload")}
   </Button>
 }
@@ -238,16 +250,16 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
     </div>
     <div className="nav-btns">
       {mobile && <MobileNavButtons pageNumber={pageNumber} setPageNumber={setPageNumber} />}
-      <MenuButton navOpen={navOpen} setNavOpen={setNavOpen} />
+      <MenuButton />
     </div>
     <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
-      <GameInfoButton setNavOpen={setNavOpen} />
-      <EraseButton setNavOpen={setNavOpen} />
-      <DownloadButton setNavOpen={setNavOpen} gameId={gameId} gameProgress={gameProgress}/>
-      <UploadButton setNavOpen={setNavOpen} />
-      <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
-      <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
-      <PreferencesButton setNavOpen={setNavOpen} />
+      <GameInfoButton />
+      <EraseButton />
+      <DownloadButton gameId={gameId} gameProgress={gameProgress}/>
+      <UploadButton />
+      <ImpressumButton isDropdown={true} />
+      <PrivacyButton isDropdown={true} />
+      <PreferencesButton />
     </div>
   </div>
 }
@@ -263,7 +275,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
-  const [navOpen, setNavOpen] = React.useState(false)
+  const [navOpen, setNavOpen] = useAtom(navOpenAtom)
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
   const difficulty = useAppSelector(selectDifficulty(gameId))
@@ -279,17 +291,17 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
         </div>
         <div className="nav-btns">
           <InventoryButton pageNumber={pageNumber} setPageNumber={setPageNumber}/>
-          <MenuButton navOpen={navOpen} setNavOpen={setNavOpen}/>
+          <MenuButton />
         </div>
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
-          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} setNavOpen={setNavOpen} />
-          <PreviousButton setNavOpen={setNavOpen} />
+          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} />
+          <PreviousButton />
           <HomeButton isDropdown={true} />
-          <InputModeButton setNavOpen={setNavOpen} isDropdown={true}/>
-          <GameInfoButton setNavOpen={setNavOpen} />
-          <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
-          <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
-          <PreferencesButton setNavOpen={setNavOpen} />
+          <InputModeButton isDropdown={true}/>
+          <GameInfoButton />
+          <ImpressumButton isDropdown={true} />
+          <PrivacyButton isDropdown={true} />
+          <PreferencesButton />
         </div>
       </> :
       <>
@@ -302,16 +314,16 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
           <span className="app-bar-title">{levelTitle}</span>
         </div>
         <div className="nav-btns">
-          <PreviousButton setNavOpen={setNavOpen} />
-          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} setNavOpen={setNavOpen} />
-          <InputModeButton setNavOpen={setNavOpen} isDropdown={false}/>
-          <MenuButton navOpen={navOpen} setNavOpen={setNavOpen}/>
+          <PreviousButton  />
+          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} />
+          <InputModeButton isDropdown={false}/>
+          <MenuButton  />
         </div>
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
-          <GameInfoButton setNavOpen={setNavOpen} />
-          <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
-          <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
-          <PreferencesButton setNavOpen={setNavOpen} />
+          <GameInfoButton />
+          <ImpressumButton isDropdown={true} />
+          <PrivacyButton isDropdown={true} />
+          <PreferencesButton />
         </div>
       </>
     }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Trans, useTranslation } from 'react-i18next';
 
 import '@fontsource/roboto/300.css';
@@ -10,28 +10,22 @@ import '@fontsource/roboto/700.css';
 import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 
-import { Markdown } from './markdown';
-import { GameTile, useGetGameInfoQuery } from '../state/api'
-import path from 'path';
+import { useGetGameInfoQuery } from '../state/api'
 
 import { ImpressumButton, MenuButton, PreferencesButton, PrivacyButton } from './app_bar';
-import ReactCountryFlag from 'react-country-flag';
 import lean4gameConfig from '../config.json'
 import i18next from 'i18next';
 import { popupAtom, PopupType } from '../store/popup-atoms';
 import { useAtom } from 'jotai';
 import { GithubIcon } from './navigation/github_icon';
 import { Tile } from './landing_page/tile';
+import { navOpenAtom } from '../store/navigation-atoms';
 
 
 
 function LandingPage() {
-
-  const navigate = useNavigate();
-
   const [, setPopup] = useAtom(popupAtom)
-
-  const [navOpen, setNavOpen] = React.useState(false);
+  const [navOpen, setNavOpen] = useAtom(navOpenAtom)
 
   const [usageCPU, setUsageCPU] = React.useState<number>()
   const [usageMem, setUsageMem] = React.useState<number>()
@@ -70,11 +64,11 @@ function LandingPage() {
     <header style={{backgroundImage: `url(${bgImage})`}}>
       <nav className="landing-page-nav">
         <GithubIcon url="https://github.com/leanprover-community/lean4game"/>
-        <MenuButton navOpen={navOpen} setNavOpen={setNavOpen}/>
+        <MenuButton />
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
-            <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
-            <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
-            <PreferencesButton setNavOpen={setNavOpen} />
+            <ImpressumButton isDropdown={true} />
+            <PrivacyButton isDropdown={true} />
+            <PreferencesButton />
         </div>
       </nav>
       <div id="main-title">
