@@ -12,11 +12,9 @@ import { IPreferencesContext, PreferencesContext } from "../infoview/context"
 import ReactCountryFlag from 'react-country-flag';
 import { useTranslation } from 'react-i18next';
 
-export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
+export function PreferencesPopup() {
   let { t } = useTranslation()
   const {layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = React.useContext(PreferencesContext)
-
-
 
   const marks = [
     {
@@ -44,11 +42,7 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
     setLanguage(ev.target.value as IPreferencesContext["language"])
   }
 
-  return <div className="modal-wrapper">
-    <div className="modal-backdrop" onClick={handleClose} />
-    <div className="modal">
-      <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
-      <Typography variant="body1" component="div" className="settings">
+  return <Typography variant="body1" component="div" className="settings">
         <div className='preferences-category'>
           <div className='category-title'>
             <h3>{t("Language")}</h3>
@@ -73,6 +67,10 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
               }
               label=""
             />
+            <p>
+              If a game does not exist in the language selected, this setting has no effect
+              and the game's default language is used.
+            </p>
           </div>
         </div>
         <div className='preferences-category'>
@@ -136,6 +134,4 @@ export function PreferencesPopup({ handleClose }: { handleClose: () => void }) {
           </div>
         </div>
       </Typography>
-    </div>
-  </div>
 }

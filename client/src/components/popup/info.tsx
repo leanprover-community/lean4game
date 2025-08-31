@@ -1,27 +1,23 @@
-/**
- * @fileOverview
-*/
 import * as React from 'react'
 import { Typography } from '@mui/material'
-import { Markdown } from '../markdown'
 import { Trans, useTranslation } from 'react-i18next'
+import { useGetGameInfoQuery } from '../../state/api'
 import { GameIdContext } from '../../app'
+import { Markdown } from '../markdown'
 
 /** Pop-up that is displaying the Game Info.
  *
  * `handleClose` is the function to close it again because it's open/closed state is
  * controlled by the containing element.
  */
-export function InfoPopup ({info, handleClose}: {info: string, handleClose: () => void}) {
+export function InfoPopup () {
   let { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
+  const gameInfo = useGetGameInfoQuery({game: gameId})
 
-  return <div className="modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+  return <>
     <Typography variant="body1" component="div" className="welcome-text">
-      <Markdown>{t(info)}</Markdown>
+      <Markdown>{t(gameInfo.data?.info, {ns: gameId})}</Markdown>
       <hr />
       <Trans>
         <h2>Progress saving</h2>
@@ -29,6 +25,11 @@ export function InfoPopup ({info, handleClose}: {info: string, handleClose: () =
           The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br />
           Warning: In most browsers, deleting cookies will also clear the local storage (or "local site data").
           Make sure to download your game progress first!
+        </p>
+        <h2>Accessibility</h2>
+        <p>
+          If you experience any accessibilty barriers, please get in contact with us!
+          We are dedicated to address such barriers to the best of our abilities.
         </p>
         <h2>Development</h2>
         <p>The game engine has been created by <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>.
@@ -51,6 +52,5 @@ export function InfoPopup ({info, handleClose}: {info: string, handleClose: () =
         </p>
       </Trans>
     </Typography>
-  </div>
-</div>
+  </>
 }

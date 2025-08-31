@@ -19,13 +19,13 @@ interface LevelProgressState {
   help: number[], // A set of rows where hidden hints have been displayed
 }
 interface WorldProgressState {
-  [world: string] : {[level: number]: LevelProgressState},
+  [world: string] : {[level: number]: LevelProgressState, readIntro: boolean},
 }
 
 export interface GameProgressState {
   inventory: string[],
   difficulty: number,
-  openedIntro: boolean,
+  readIntro: boolean,
   data: WorldProgressState,
   typewriterMode?: boolean
 }
@@ -54,19 +54,24 @@ const initalLevelProgressState: LevelProgressState = {code: "", completed: false
 /** Add an empty skeleton with progress for the current game */
 function addGameProgress (state: ProgressState, action: PayloadAction<{game: string}>) {
   if (!state.games[action.payload.game.toLowerCase()]) {
-    state.games[action.payload.game.toLowerCase()] = {inventory: [], openedIntro: true, data: {}, difficulty: DEFAULT_DIFFICULTY}
+    state.games[action.payload.game.toLowerCase()] = {inventory: [], readIntro: false, data: {}, difficulty: DEFAULT_DIFFICULTY}
   }
   if (!state.games[action.payload.game.toLowerCase()].data) {
     state.games[action.payload.game.toLowerCase()].data = {}
   }
 }
 
+function addWorldProgress(state: ProgressState, action: PayloadAction<{game: string, world: string}>) {
+  addGameProgress(state, action)
+  if (!state.games[action.payload.game.toLowerCase()].data[action.payload.world]) {
+    state.games[action.payload.game.toLowerCase()].data[action.payload.world] = {readIntro: false}
+  }
+}
+
 /** Add an empty skeleton with progress for the current level */
 function addLevelProgress(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
   addGameProgress(state, action)
-  if (!state.games[action.payload.game.toLowerCase()].data[action.payload.world]) {
-    state.games[action.payload.game.toLowerCase()].data[action.payload.world] = {}
-  }
+  addWorldProgress(state, action)
   if (!state.games[action.payload.game.toLowerCase()].data[action.payload.world][action.payload.level]) {
     state.games[action.payload.game.toLowerCase()].data[action.payload.world][action.payload.level] = {...initalLevelProgressState}
   }
@@ -80,7 +85,7 @@ export const progressSlice = createSlice({
     codeEdited(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number, code: string}>) {
       addLevelProgress(state, action)
       state.games[action.payload.game.toLowerCase()].data[action.payload.world][action.payload.level].code = action.payload.code
-      state.games[action.payload.game.toLowerCase()].data[action.payload.world][action.payload.level].completed = false
+      // state.games[action.payload.game.toLowerCase()].data[action.payload.world][action.payload.level].completed = false
     },
     /** TODO: docstring */
     changedSelection(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number, selections: Selection[]}>) {
@@ -100,11 +105,16 @@ export const progressSlice = createSlice({
     },
     /** delete all progress for this game */
     deleteProgress(state: ProgressState, action: PayloadAction<{game: string}>) {
-      state.games[action.payload.game.toLowerCase()] = {inventory: [], data: {}, openedIntro: true, difficulty: DEFAULT_DIFFICULTY}
+      state.games[action.payload.game.toLowerCase()] = {inventory: [], data: {}, readIntro: false, difficulty: DEFAULT_DIFFICULTY}
+    },
+    /** delete progress for this world */
+    deleteWorldProgress(state: ProgressState, action: PayloadAction<{game: string, world: string}>) {
+      // addWorldProgress(state, action)
+      state.games[action.payload.game.toLowerCase()].data[action.payload.world] = {readIntro: false}
     },
     /** delete progress for this level */
     deleteLevelProgress(state: ProgressState, action: PayloadAction<{game: string, world: string, level: number}>) {
-      addLevelProgress(state, action)
+      // addLevelProgress(state, action)
       state.games[action.payload.game.toLowerCase()].data[action.payload.world][action.payload.level] = initalLevelProgressState
     },
     /** load progress, e.g. from external import */
@@ -123,9 +133,13 @@ export const progressSlice = createSlice({
       state.games[action.payload.game.toLowerCase()].difficulty = action.payload.difficulty
     },
     /** set the difficulty */
-    changedOpenedIntro(state: ProgressState, action: PayloadAction<{game: string, openedIntro: boolean}>) {
-      addGameProgress(state, action)
-      state.games[action.payload.game.toLowerCase()].openedIntro = action.payload.openedIntro
+    changedReadIntro(state: ProgressState, action: PayloadAction<{game: string, world: string, readIntro: boolean}>) {
+      addWorldProgress(state, action)
+      if (action.payload.world) {
+        state.games[action.payload.game.toLowerCase()].data[action.payload.world].readIntro = action.payload.readIntro
+      } else {
+        state.games[action.payload.game.toLowerCase()].readIntro = action.payload.readIntro
+      }
     },
     /** set the typewriter mode */
     changeTypewriterMode(state: ProgressState, action: PayloadAction<{game: string, typewriterMode: boolean}>) {
@@ -137,79 +151,82 @@ export const progressSlice = createSlice({
 
 /** if the level does not exist, return default values */
 export function selectLevel(game: string, world: string, level: number) {
-  return (state) =>{
-    if (!state.progress.games[game.toLowerCase()]) { return initalLevelProgressState }
-    if (!state.progress.games[game.toLowerCase()].data[world]) { return initalLevelProgressState }
-    if (!state.progress.games[game.toLowerCase()].data[world][level]) { return initalLevelProgressState }
-    return state.progress.games[game.toLowerCase()].data[world][level]
+  return (state) => {
+    if (!state.progress.games[game?.toLowerCase()]) { return initalLevelProgressState }
+    if (!state.progress.games[game?.toLowerCase()]?.data[world]) { return initalLevelProgressState }
+    if (!state.progress.games[game?.toLowerCase()]?.data[world][level]) { return initalLevelProgressState }
+    return state.progress.games[game?.toLowerCase()]?.data[world][level]
   }
 }
 
 /** return the code of the current level */
 export function selectCode(game: string, world: string, level: number) {
   return (state) => {
-    return selectLevel(game.toLowerCase(), world, level)(state).code
+    return selectLevel(game?.toLowerCase(), world, level)(state).code
   }
 }
 
 /** return the current inventory */
 export function selectInventory(game: string) {
   return (state) => {
-    if (!state.progress.games[game.toLowerCase()]) { return [] }
-    return state.progress.games[game.toLowerCase()].inventory
+    if (!state.progress.games[game?.toLowerCase()]) { return [] }
+    return state.progress.games[game?.toLowerCase()]?.inventory
   }
 }
 
 /** return the code of the current level */
 export function selectHelp(game: string, world: string, level: number) {
   return (state) => {
-    return selectLevel(game.toLowerCase(), world, level)(state).help
+    return selectLevel(game?.toLowerCase(), world, level)(state).help
   }
 }
 
 /** return the selections made in the current level */
 export function selectSelections(game: string, world: string, level: number) {
   return (state) => {
-    return selectLevel(game.toLowerCase(), world, level)(state).selections
+    return selectLevel(game?.toLowerCase(), world, level)(state).selections
   }
 }
 
 /** return whether the current level is clompleted */
 export function selectCompleted(game: string, world: string, level: number) {
   return (state) => {
-    return selectLevel(game.toLowerCase(), world, level)(state).completed
+    return selectLevel(game?.toLowerCase(), world, level)(state).completed
   }
 }
 
 /** return progress for the current game if it exists */
 export function selectProgress(game: string) {
   return (state) => {
-    return state.progress.games[game.toLowerCase()] ?? null
+    return state.progress.games[game?.toLowerCase()] ?? null
   }
 }
 
 /** return difficulty for the current game if it exists */
 export function selectDifficulty(game: string) {
   return (state) => {
-    return state.progress.games[game.toLowerCase()]?.difficulty ?? DEFAULT_DIFFICULTY
+    return state.progress.games[game?.toLowerCase()]?.difficulty ?? DEFAULT_DIFFICULTY
   }
 }
 
 /** return whether the intro has been read */
-export function selectOpenedIntro(game: string) {
+export function selectReadIntro(game: string, worldId: string | null) {
   return (state) => {
-    return state.progress.games[game.toLowerCase()]?.openedIntro
+    if (worldId) {
+      return state.progress.games[game?.toLowerCase()]?.data[worldId]?.readIntro
+    }
+    return state.progress.games[game?.toLowerCase()]?.readIntro
   }
 }
 
 /** return typewriter mode for the current game if it exists */
 export function selectTypewriterMode(game: string) {
   return (state) => {
-    return state.progress.games[game.toLowerCase()]?.typewriterMode ?? true
+    return state.progress.games[game?.toLowerCase()]?.typewriterMode ?? true
   }
 }
 
 /** Export actions to modify the progress */
 export const { changedSelection, codeEdited, levelCompleted, deleteProgress,
-  deleteLevelProgress, loadProgress, helpEdited, changedInventory, changedOpenedIntro,
+  deleteLevelProgress, deleteWorldProgress, loadProgress, helpEdited, changedInventory, changedReadIntro,
   changedDifficulty, changeTypewriterMode} = progressSlice.actions

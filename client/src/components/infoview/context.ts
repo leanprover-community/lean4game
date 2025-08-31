@@ -81,6 +81,7 @@ export interface IPreferencesContext extends PreferencesState{
   setLayout: React.Dispatch<React.SetStateAction<PreferencesState["layout"]>>;
   setIsSavePreferences: React.Dispatch<React.SetStateAction<PreferencesState["isSavePreferences"]>>;
   setLanguage: React.Dispatch<React.SetStateAction<PreferencesState["language"]>>;
+  setIsSuggestionsMobileMode: any;
 }
 
 export const PreferencesContext = React.createContext<IPreferencesContext>({
@@ -88,9 +89,11 @@ export const PreferencesContext = React.createContext<IPreferencesContext>({
   layout: "auto",
   isSavePreferences: false,
   language: "en",
+  isSuggestionsMobileMode: false,
   setLayout: () => {},
   setIsSavePreferences: () => {},
   setLanguage: () => {},
+  setIsSuggestionsMobileMode: () => {},
 })
 
 export const WorldLevelIdContext = React.createContext<{

@@ -33,7 +33,6 @@ import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorC
 import { DualEditor } from './infoview/main'
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
-import { ImpressumPopup, PrivacyPolicyPopup } from './popup/privacy_policy'
 import path from 'path';
 
 import '@fontsource/roboto/300.css'
@@ -51,7 +50,6 @@ import { IConnectionProvider } from 'monaco-languageclient'
 import { monacoSetup } from 'lean4web/client/src/monacoSetup'
 import { onigasmH } from 'onigasm/lib/onigasmH'
 import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
-import { InfoPopup } from './popup/game_info'
 import { PreferencesPopup } from './popup/preferences'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
@@ -73,28 +71,10 @@ function Level() {
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
-  // pop-ups
-  const [impressum, setImpressum] = React.useState(false)
-  const [privacy, setPrivacy] = React.useState(false)
-  const [info, setInfo] = React.useState(false)
-  const [preferencesPopup, setPreferencesPopup] = React.useState(false)
-
-  function closeImpressum()   {setImpressum(false)}
-  function closePrivacy()   {setPrivacy(false)}
-  function closeInfo()        {setInfo(false)}
-  function closePreferencesPopup() {setPreferencesPopup(false)}
-  function toggleImpressum()  {setImpressum(!impressum)}
-  function toggleInfo()       {setInfo(!info)}
-  function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
-
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
     {levelId == 0 ?
-      <Introduction impressum={impressum} setImpressum={setImpressum} privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup} /> :
-      <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} privacy={privacy} setPrivacy={setPrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>}
-    {impressum ? <ImpressumPopup handleClose={closeImpressum} /> : null}
-    {privacy ? <PrivacyPolicyPopup handleClose={closePrivacy} /> : null}
-    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
-    {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
+      <Introduction /> :
+      <PlayableLevel key={`${worldId}/${levelId}`} />}
   </WorldLevelIdContext.Provider>
 }
 
@@ -222,7 +202,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
   </div>
 }
 
-function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
+function PlayableLevel() {
   let { t } = useTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
@@ -258,10 +238,6 @@ function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo
   const [lockEditorMode, setLockEditorMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
-
-  // impressum pop-up
-  function toggleImpressum() {setImpressum(!impressum)}
-  function togglePrivacy() {setPrivacy(!privacy)}
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
   // If this state is set to a pair `(name, type)` then the according doc will be open.
@@ -430,10 +406,6 @@ function PlayableLevel({impressum, setImpressum, privacy, setPrivacy, toggleInfo
                   isLoading={level.isLoading}
                   levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${t(level?.data?.title, {ns: gameId})}`)}
-                  toggleImpressum={toggleImpressum}
-                  toggleInfo={toggleInfo}
-                  togglePrivacy={togglePrivacy}
-                  togglePreferencesPopup={togglePreferencesPopup}
                   />
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
@@ -496,7 +468,7 @@ function IntroductionPanel({gameInfo}) {
 export default Level
 
 /** The site with the introduction text of a world */
-function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo, togglePreferencesPopup}) {
+function Introduction() {
   let { t } = useTranslation()
 
   const gameId = React.useContext(GameIdContext)
@@ -510,15 +482,8 @@ function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo,
 
   let image: string = gameInfo.data?.worlds.nodes[worldId].image
 
-
-  const toggleImpressum = () => {
-    setImpressum(!impressum)
-  }
-  const togglePrivacy = () => {
-    setPrivacy(!privacy)
-  }
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} togglePrivacy={togglePrivacy} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} />
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?
@@ -544,8 +509,6 @@ function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo,
 //   <>
 //     <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
 //       <ExercisePanel
-//         impressum={impressum}
-//         closeImpressum={closeImpressum}
 //         codeviewRef={codeviewRef}
 //         visible={pageNumber == 0} />
 //       <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
@@ -555,8 +518,6 @@ function Introduction({impressum, setImpressum, privacy, setPrivacy, toggleInfo,
 //   <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
 //     <ChatPanel lastLevel={lastLevel}/>
 //     <ExercisePanel
-//       impressum={impressum}
-//       closeImpressum={closeImpressum}
 //       codeviewRef={codeviewRef} />
 //     <InventoryPanel levelInfo={level?.data} />
 //   </Split>
