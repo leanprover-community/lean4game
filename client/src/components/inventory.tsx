@@ -82,7 +82,7 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
       <div className="tab-bar">
         {categories.map((cat) => {
           let hasNew = modifiedItems.filter(item => item.new && (cat == item.category)).length > 0
-          return <div key={`category-${cat}`} className={`tab${cat == (tab ?? categories[0]) ? " active": ""}${hasNew ? ' new': ''}${recentItems.map(x => x.category).includes(cat) ? ' recent': ''}`}
+          return <div key={`category-${cat}`} className={`tab${cat == (tab ?? categories[0]) ? " active": ""}${hasNew ? ' new': ''}${recentItems.map(it => it.category).includes(cat) ? ' recent': ''}`}
             onClick={() => { setTab(cat) }}>{cat}</div>})}
       </div>}
     <div className="inventory-list">
@@ -95,14 +95,18 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
               item={item}
               showDoc={() => {openDoc({name: item.name, type: docType})}}
               name={item.name} displayName={item.displayName} locked={difficulty > 0 ? item.locked : false}
-              disabled={item.disabled} newly={item.new} isTheorem={docType === "Lemma"} enableAll={enableAll} />
+              disabled={item.disabled}
+              recent={recentItems.map(it => it.name).includes(item.name)}
+              newly={item.new}
+              isTheorem={docType === "Lemma"}
+              enableAll={enableAll} />
         })
       }
     </div>
     </>
 }
 
-function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc, isTheorem, enableAll=false}) {
+function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc, isTheorem, recent=false, enableAll=false}) {
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
                disabled ? <FontAwesomeIcon icon={faBan} /> : item.st
   const className = locked ? "locked" : disabled ? "disabled" : newly ? "new" : ""

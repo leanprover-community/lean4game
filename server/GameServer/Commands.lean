@@ -809,7 +809,7 @@ elab "MakeGame" : command => do
               displayName := data.displayName
               category := data.category
               world := worldId
-              -- from the previous level. This is fine b/c in practise levels start at 1
+              -- from the previous level. This is fine b/c in practice levels start at 1
               level := (levelId - 1 : Nat)
               proven := true
               altTitle := data.statement
