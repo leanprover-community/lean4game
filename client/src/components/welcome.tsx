@@ -7,7 +7,7 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { changedOpenedIntro, selectOpenedIntro } from '../state/progress'
+import { changedReadIntro, selectReadIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { PreferencesContext } from './infoview/context'
@@ -54,7 +54,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
         <Button className="btn" to=""
           title="" onClick={() => {
             setPageNumber(1);
-            dispatch(changedOpenedIntro({game: gameId, openedIntro: true}))
+            dispatch(changedReadIntro({game: gameId, world: null, readIntro: true}))
           }}>
           Start&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
         </Button>
@@ -77,8 +77,8 @@ function Welcome() {
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   // For mobile only
-  const openedIntro = useAppSelector(selectOpenedIntro(gameId))
-  const [pageNumber, setPageNumber] = React.useState(openedIntro ? 1 : 0)
+  const readIntro = useAppSelector(selectReadIntro(gameId, null))
+  const [pageNumber, setPageNumber] = React.useState(readIntro ? 1 : 0)
 
   // pop-ups
   const [eraseMenu, setEraseMenu] = React.useState(false)
@@ -131,8 +131,8 @@ function Welcome() {
       }
     </div>
     {rulesHelp ? <RulesHelpPopup handleClose={closeRulesHelp} /> : null}
-    {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
-    {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
+    {eraseMenu? <ErasePopup /> : null}
+    {preferencesPopup ? <PreferencesPopup /> : null}
   </>
 }
 

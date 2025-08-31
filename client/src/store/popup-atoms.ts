@@ -3,10 +3,12 @@ import { ImpressumPopup } from '../components/popup/impressum'
 
 /** Type of valid popups. */
 export enum PopupType {
+  erase = 'erase',
   impressum = 'impressum',
   info = 'info',
   preferences = 'preferences',
   privacy = 'privacy',
+  rules = 'rules',
   upload = 'upload',
 }
 

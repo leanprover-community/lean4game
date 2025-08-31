@@ -9,7 +9,7 @@ import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
 import { GameIdContext } from "../app"
 import { InputModeContext, PreferencesContext, WorldLevelIdContext } from "./infoview/context"
 import { GameInfo, useGetGameInfoQuery } from '../state/api'
-import { changedOpenedIntro, selectCompleted, selectDifficulty, selectProgress } from '../state/progress'
+import { changedReadIntro, selectCompleted, selectDifficulty, selectProgress } from '../state/progress'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
@@ -48,7 +48,7 @@ function MobileNavButtons({pageNumber, setPageNumber}:
           title={nextTitle} onClick={() => {
             console.log(`page number: ${pageNumber}`)
             setPageNumber(pageNumber+1);
-            dispatch(changedOpenedIntro({game: gameId, openedIntro: true}))}}>
+            dispatch(changedReadIntro({game: gameId, world: null, readIntro: true}))}}>
         {nextText && `${nextText}`}
         {nextIcon && <FontAwesomeIcon icon={nextIcon} />}
       </Button>
@@ -256,10 +256,9 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo, toggleEraseM
 }
 
 /** the navigation bar in a level */
-export function LevelAppBar({isLoading, levelTitle, togglePreferencesPopup, pageNumber=undefined, setPageNumber=undefined} : {
+export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPageNumber=undefined} : {
   isLoading: boolean,
   levelTitle: string,
-  togglePreferencesPopup: any,
   pageNumber?: number,
   setPageNumber?: any,
 }) {

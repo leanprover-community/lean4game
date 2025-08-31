@@ -18,16 +18,20 @@ import { PreferencesPopup } from './preferences'
 /** The content of the current popup. */
 function getPopupContent(popup: PopupType) {
   switch(popup) {
+    case PopupType.erase:
+      return <></>
     case PopupType.impressum:
       return <ImpressumPopup />
     case PopupType.info:
       return <InfoPopup />
-    case PopupType.privacy:
-      return <PrivacyPolicyPopup />
-    case PopupType.upload:
-      return <UploadPopup />
     case PopupType.preferences:
       return <PreferencesPopup />
+    case PopupType.privacy:
+      return <PrivacyPolicyPopup />
+    case PopupType.rules:
+      return <></>
+    case PopupType.upload:
+      return <UploadPopup />
     default:
       // Hack: this throws a TS error when cases are missed.
       const _exhaustive: never = popup

@@ -71,17 +71,10 @@ function Level() {
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
-  // pop-ups
-  const [preferencesPopup, setPreferencesPopup] = React.useState(false)
-
-  function closePreferencesPopup() {setPreferencesPopup(false)}
-  function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
-
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
     {levelId == 0 ?
-      <Introduction togglePreferencesPopup={togglePreferencesPopup} /> :
-      <PlayableLevel key={`${worldId}/${levelId}`}  togglePreferencesPopup={togglePreferencesPopup}/>}
-    {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
+      <Introduction /> :
+      <PlayableLevel key={`${worldId}/${levelId}`} />}
   </WorldLevelIdContext.Provider>
 }
 
@@ -209,7 +202,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
   </div>
 }
 
-function PlayableLevel({ togglePreferencesPopup }) {
+function PlayableLevel() {
   let { t } = useTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
@@ -413,7 +406,6 @@ function PlayableLevel({ togglePreferencesPopup }) {
                   isLoading={level.isLoading}
                   levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${t(level?.data?.title, {ns: gameId})}`)}
-                  togglePreferencesPopup={togglePreferencesPopup}
                   />
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
@@ -476,7 +468,7 @@ function IntroductionPanel({gameInfo}) {
 export default Level
 
 /** The site with the introduction text of a world */
-function Introduction({ togglePreferencesPopup}) {
+function Introduction() {
   let { t } = useTranslation()
 
   const gameId = React.useContext(GameIdContext)
@@ -491,7 +483,7 @@ function Introduction({ togglePreferencesPopup}) {
   let image: string = gameInfo.data?.worlds.nodes[worldId].image
 
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} togglePreferencesPopup={togglePreferencesPopup}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} />
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?
