@@ -1,5 +1,6 @@
 import Lean
 import GameServer.Helpers.PrettyPrinter
+import GameServer.Helpers.DeclSig
 
 /-! This document contains various things which cluttered `Commands.lean`. -/
 
