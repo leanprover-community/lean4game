@@ -27,7 +27,7 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
 
   const appendTypewriterInput = useAppendTypewriterInput()
   const handleClick = (ev) => {
-    if (!enableAll && tile.locked || appendTypewriterInput(ev.shiftKey, tile.displayName, isTheorem, false)) {
+    if (appendTypewriterInput(ev.shiftKey, tile.displayName, isTheorem, false)) {
       return
     }
     setDoc(tile)

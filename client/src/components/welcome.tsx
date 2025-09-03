@@ -11,9 +11,6 @@ import { changedReadIntro, selectReadIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { PreferencesContext } from './infoview/context'
-import { ErasePopup } from './popup/erase'
-import { RulesHelpPopup } from './popup/rules_help'
-import { PreferencesPopup} from "./popup/preferences"
 import { WorldTreePanel } from './world_tree'
 
 import '../css/welcome.css'
