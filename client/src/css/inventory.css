@@ -61,7 +61,7 @@
   position: relative;
 }
 
-.inventory .item.locked {
+.inventory .item.locked:not(.enabled) {
   border: solid 1px #ccc;
   color: #ccc;
 }
