@@ -55,7 +55,13 @@ describe('Basic Lean4Game Interface', () => {
         })
       })
     })
-    describe('Rules', () => {})
+    describe('Rules', () => {
+      it('can be opened from world tree', () => {
+        cy.visit('/#/g/test/TestGame')
+        cy.get('.difficulty-label').find('.helpButton').should('be.visible').click()
+        cy.contains('🔐').contains('🔓')
+      })
+    })
     describe('Upload', () => {})
   })
 })
