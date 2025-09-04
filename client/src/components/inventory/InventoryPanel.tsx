@@ -36,7 +36,6 @@ export function InventoryPanel({levelInfo, visible = true} : {
     setDefinitionInventory(levelInfo?.definitions ?? [])
   }, [levelInfo])
 
-
   // Some glue as the user inventory isn't fully in jotai yet
   const [, setUserInventory] = useAtom(userInventoryAtom)
   let inventory: string[] = selectInventory(gameId)(store.getState())
