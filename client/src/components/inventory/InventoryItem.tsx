@@ -44,8 +44,8 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
 
 return <div className={`item ${className}${enableAll ? ' enabled' : ''}${recent ? ' recent' : ''}`} onClick={handleClick} title={title}>
     {icon} {tile.displayName}
-    <div className="copy-button" onClick={copyItemName}>
+    {/* <div className="copy-button" onClick={copyItemName}>
       {copied ? <FontAwesomeIcon icon={faCheck} /> : <FontAwesomeIcon icon={faClipboard} />}
-    </div>
+    </div> */}
   </div>
 }
