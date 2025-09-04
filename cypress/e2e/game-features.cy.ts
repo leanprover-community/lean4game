@@ -130,6 +130,10 @@ describe('Basic Lean4Game Features', () => {
 
       // Click on rfl button in tactics panel
       cy.get('.inventory').within(() => {
+        cy.contains('Tactics').click()
+      })
+
+      cy.get('.inventory').within(() => {
         cy.contains('rfl').click()
       })
 
