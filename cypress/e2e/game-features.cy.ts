@@ -115,8 +115,10 @@ describe('Basic Lean4Game Features', () => {
     it('should display tactics panel with rfl and rw buttons', () => {
       navigateToLevel()
 
-      // Check that tactics section exists
-      cy.contains('Tactics').should('be.visible')
+      // Check that tactics section exists, open it
+      cy.get('.inventory').within(() => {
+        cy.contains('Tactics').should('be.visible').click()
+      })
 
       // Check for the specific tactics buttons
       cy.get('.inventory').within(() => {
@@ -129,10 +131,6 @@ describe('Basic Lean4Game Features', () => {
       navigateToLevel()
 
       // Click on rfl button in tactics panel
-      cy.get('.inventory').within(() => {
-        cy.contains('Tactics').click()
-      })
-
       cy.get('.inventory').within(() => {
         cy.contains('rfl').click()
       })
