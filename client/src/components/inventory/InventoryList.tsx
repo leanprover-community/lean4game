@@ -14,16 +14,9 @@ export function InventoryList({tiles, docType, enableAll=false} : {
   docType: string,
   enableAll?: boolean,
 }) {
-
-    // TODO: `level` is only used in the `useEffect` below to check if a new level has
-  // been loaded. Is there a better way to observe this?
-
   const [currentTiles] = useAtom(currentInventoryTilesAtom)
-
   const gameId = React.useContext(GameIdContext)
-
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
-
 
   // Add inventory items from local store as unlocked.
   // Items are unlocked if they are in the local store, or if the server says they should be
