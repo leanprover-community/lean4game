@@ -1,7 +1,7 @@
 // cypress/e2e/basic-game-features.cy.ts
 // Tests for basic game functionality using the simple TestGame
 
-describe('Basic Lean4Game Interface', () => {
+describe('Basic Lean4game Interface', () => {
   describe('Error Page', () => {
     beforeEach(() => {
       cy.visit('/#/not-found')
@@ -55,7 +55,14 @@ describe('Basic Lean4Game Interface', () => {
         })
       })
     })
-    describe('Rules', () => {})
+    describe('Rules', () => {
+      it('can be opened from world tree', () => {
+        cy.visit('/#/g/test/TestGame')
+        cy.get('.difficulty-label').find('.helpButton').should('be.visible').click()
+        cy.contains('🔐')
+        cy.contains('🔓')
+      })
+    })
     describe('Upload', () => {})
   })
 })

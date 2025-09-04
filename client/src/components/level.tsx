@@ -26,7 +26,6 @@ import { changedSelection, codeEdited, selectCode, selectSelections, selectCompl
 import { store } from '../state/store'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import {InventoryPanel} from './inventory'
 import { hasInteractiveErrors } from './infoview/typewriter'
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
   ProofContext, SelectionContext, WorldLevelIdContext } from './infoview/context'
@@ -53,6 +52,7 @@ import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
 import { PreferencesPopup } from './popup/preferences'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
+import { InventoryPanel } from './inventory/InventoryPanel'
 
 
 monacoSetup()

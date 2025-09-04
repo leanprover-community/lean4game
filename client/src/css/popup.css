@@ -1,0 +1,22 @@
+/* For the "Rules" popup. */
+.slider-wrapper {
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-top: 1rem;
+}
+.modal-close {
+  float: right;
+  scale: 2;
+  color: var(--vscode-breadcrumb-foreground);
+  cursor: pointer;
+}
+.modal-close:hover {
+  float: right;
+  scale: 2;
+  color: var(--vscode-breadcrumb-focusForeground);
+}
+
+.modal .nav-button {
+  float: right;
+  font-size: 1.5rem;
+}

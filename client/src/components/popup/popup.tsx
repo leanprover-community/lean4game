@@ -7,6 +7,7 @@ import '../../css/popup.css'
 import { PrivacyPolicyPopup } from './privacy'
 import { UploadPopup } from './upload'
 import { PreferencesPopup } from './preferences'
+import { RulesHelpPopup } from './rules_help'
 
 /**
  * To create a new popup on needs add a option to `PopupType`,
@@ -29,7 +30,7 @@ function getPopupContent(popup: PopupType) {
     case PopupType.privacy:
       return <PrivacyPolicyPopup />
     case PopupType.rules:
-      return <></>
+      return <RulesHelpPopup />
     case PopupType.upload:
       return <UploadPopup />
     default:
