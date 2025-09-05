@@ -14,7 +14,7 @@ open Lean.Parser Term
 open PrettyPrinter Delaborator SubExpr
 open TSyntax.Compat
 
-open private shouldGroupWithNext evalSyntaxConstant from Lean.PrettyPrinter.Delaborator.Builtins
+open private Lean.PrettyPrinter.Delaborator.shouldGroupWithNext evalSyntaxConstant from Lean.PrettyPrinter.Delaborator.Builtins
 
 -- def typeSpec := leading_parser " :\\n: " >> termParser
 
@@ -37,7 +37,7 @@ where
     if let .forallE n d _ i ← getExpr then
       let stxN ← annotateCurPos (mkIdent n)
       let curIds := curIds.push ⟨stxN⟩
-      if ← shouldGroupWithNext then
+      if ← Lean.PrettyPrinter.Delaborator.shouldGroupWithNext then
         withBindingBody n <| delabParams idStx groups curIds
       else
         let delabTy := withOptions (pp.piBinderTypes.set · false) delab
