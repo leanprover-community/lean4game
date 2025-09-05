@@ -60,7 +60,7 @@ export class GameManager {
     }
 
     if (ps == null) {
-      console.error('server process is undefined/null');
+      console.error(`[${new Date()}]server process is undefined/null`);
       return;
     }
 
@@ -109,9 +109,9 @@ export class GameManager {
         { cwd: this.dir });
     }
 
-    serverProcess.on('error', error => console.error(`Launching Lean Server failed: ${error}`));
+    serverProcess.on('error', error => console.error(`[${new Date()}] Launching Lean Server failed: ${error}`));
     if (serverProcess.stderr !== null) {
-      serverProcess.stderr.on('data', data => console.error(`Lean Server: ${data}`)
+      serverProcess.stderr.on('data', data => console.error(`[${new Date()}] Lean Server: ${data}`)
       );
     }
     return serverProcess;
@@ -129,7 +129,7 @@ export class GameManager {
         this.getCustomLeanServer(tag.owner, tag.repo)
       );
       if (serverProcess == null) {
-        console.error('serverProcess was undefined/null');
+        console.error(`[${new Date()}] serverProcess was undefined/null`);
         return;
       }
       this.queue[tagString].push(serverProcess);
@@ -252,7 +252,7 @@ export class GameManager {
   getGameDir(owner: string, repo: string) {
     owner = owner.toLowerCase();
     if (owner == 'local' && !isDevelopment) {
-      console.error(`No local games in production mode.`);
+      console.error(`[${new Date()}] No local games in production mode.`);
       return "";
     }
 
@@ -265,15 +265,22 @@ export class GameManager {
     } else {
       const gamesPath = path.join(this.dir, '..', '..', '..', 'games');
       if (!fs.existsSync(gamesPath)) {
-        console.error(`Did not find the following folder: ${gamesPath}`);
-        console.error('Did you already import any games?');
+        console.error(`[${new Date()}] Did not find the following folder: ${gamesPath}`);
+        console.error('[${new Date()}] Did you already import any games?');
         return "";
       }
       game_dir = path.join(gamesPath, `${owner}`, `${repo.toLowerCase()}`);
     }
 
     if (!fs.existsSync(game_dir)) {
-      console.error(`Game '${game_dir}' does not exist!`);
+      console.error(`[${new Date()}] Game '${game_dir}' does not exist!`);
+      return "";
+    }
+
+    let game_json: string = path.join(game_dir, ".lake", "gamedata", "game.json")
+
+    if (!fs.existsSync(game_json)) {
+      console.error(`[${new Date()}] game.json file does not exist for ${owner}/${repo}!`);
       return "";
     }
 
