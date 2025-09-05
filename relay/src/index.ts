@@ -79,7 +79,7 @@ const server = app
         res.send(outputData);
       } else {
         res.status(500).send(`Error executing script: ${errorData}`)
-        console.error(`stats.sh exited with code ${code}. Error: ${errorData}`)
+        console.error(`[${new Date()}] stats.sh exited with code ${code}. Error: ${errorData}`)
       }
     })
   })
