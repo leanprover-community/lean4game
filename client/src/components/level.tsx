@@ -128,7 +128,7 @@ function ChatPanel({lastLevel, visible = true}) {
 
   let introText: Array<string> = t(level?.data?.introduction, {ns: gameId}).split(/\n(\s*\n)+/)
 
-  const focusRef = useRef()
+  const focusRef = useRef<HTMLAnchorElement>()
   useEffect(() => {
    if (proof?.completed) {
      focusRef.current.focus()
@@ -442,7 +442,7 @@ function IntroductionPanel({gameInfo}) {
 
   let text: Array<string> = t(gameInfo.data?.worlds.nodes[worldId].introduction, {ns: gameId}).split(/\n(\s*\n)+/)
 
-  const focusRef = useRef()
+  const focusRef = useRef<HTMLAnchorElement>()
   useEffect(() => {
    focusRef.current?.focus()
   }, [])
