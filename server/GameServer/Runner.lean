@@ -108,43 +108,42 @@ elab "Runner" gameId:str worldId:str levelId:num
   let some level ← getLevel? levelId
     | logError m!"Level not found: {levelId}"
 
-  let scope := level.scope
-
-  -- Position before first tactic and any prepended whitespace
-  let startPos := byStx.getTailInfo.getRange?.getD (String.Range.mk 0 0) |>.stop
-
-  -- Position behind the last tactic
-  let endPos := (tacticStx.map TSyntax.raw).getD byStx
-    |>.getTailInfo |>.getRangeWithTrailing? |>.getD (String.Range.mk 0 0) |>.stop
-  -- Adjust endPos to be one character earlier (probably the end of file character?)
-  let endPos := ⟨endPos.byteIdx-1⟩
-
-  let tacticStx : Array (TSyntax `tactic) ← (do
-    match tacticStx with
-    | some ⟨tacticStx⟩ =>
-      -- Check for forbidden tactics
-      findForbiddenTactics levelId inventory difficulty tacticStx
-      return tacticStx.getArgs.map (⟨.⟩)
-    | none => -- empty tactic sequence
-      -- Insert invisible `skip` command to make sure we always display the initial goal
-      let skip := Syntax.node (.original default startPos default endPos)
-        ``Lean.Parser.Tactic.skip #[]
-      return #[⟨skip⟩]
-  )
-
-  -- Insert final `done` command to display unsolved goal error in the end
-  let done := Syntax.node (.synthetic endPos endPos) ``Lean.Parser.Tactic.done #[]
-  let tacticStx := tacticStx ++ #[⟨done⟩]
-
-  let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
-
   -- use open namespaces and options as in the level file
+  let scope := level.scope
   Elab.Command.withScope (fun _ => scope) do
     for od in scope.openDecls do
       let .simple ns _ := od
         | pure ()
       activateScoped ns
     activateScoped scope.currNamespace
+
+    -- Position before first tactic and any prepended whitespace
+    let startPos := byStx.getTailInfo.getRange?.getD (String.Range.mk 0 0) |>.stop
+
+    -- Position behind the last tactic
+    let endPos := (tacticStx.map TSyntax.raw).getD byStx
+      |>.getTailInfo |>.getRangeWithTrailing? |>.getD (String.Range.mk 0 0) |>.stop
+    -- Adjust endPos to be one character earlier (probably the end of file character?)
+    let endPos := ⟨endPos.byteIdx-1⟩
+
+    let tacticStx : Array (TSyntax `tactic) ← (do
+      match tacticStx with
+      | some ⟨tacticStx⟩ =>
+        -- Check for forbidden tactics
+        findForbiddenTactics levelId inventory difficulty tacticStx
+        return tacticStx.getArgs.map (⟨.⟩)
+      | none => -- empty tactic sequence
+        -- Insert invisible `skip` command to make sure we always display the initial goal
+        let skip := Syntax.node (.original default startPos default endPos)
+          ``Lean.Parser.Tactic.skip #[]
+        return #[⟨skip⟩]
+    )
+
+    -- Insert final `done` command to display unsolved goal error in the end
+    let done := Syntax.node (.synthetic endPos endPos) ``Lean.Parser.Tactic.done #[]
+    let tacticStx := tacticStx ++ #[⟨done⟩]
+
+    let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
 
     let isProp := level.isProp
     let optDeclSig := declSig.toOptDeclSig level.goal

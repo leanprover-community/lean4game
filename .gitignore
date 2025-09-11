@@ -7,4 +7,5 @@ server/.lake
 logs/
 relay/prev_cpu_metric
 test.ecosystem.config.cjs
+prod.ecosystem.config.cjs
 cypress/screenshots
