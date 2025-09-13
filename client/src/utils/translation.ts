@@ -25,7 +25,7 @@ function extractCodeBlocks(input: string): {
   key: string,
   codeBlocks: string[],
 } {
-  const regex = /((`+|\${1,2})([\s\S]*?)\2)/g;
+  const regex = /((?<!\\)(`+|\${1,2})([\s\S]*?)\2)/g;
   const blocks: string[] = []
   let modified = input
   let index = 0
@@ -47,14 +47,12 @@ function extractCodeBlocks(input: string): {
 export function useGameTranslation(): UseTranslationResponse<'translation', undefined> {
   const gameId = useContext(GameIdContext)
   const { t, ...rest } = useTranslation()
+  const pattern = /(?<!\\)§(\d+)/g;
   const modifiedT = ((key: string | undefined) => {
     if (!key) return ""
     const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
     let translatedKey = t(keyWithoutBlocks, {ns: gameId})
-    codeBlocks.forEach((block, n) => {
-      translatedKey = translatedKey.replaceAll(`§${n}`, block)
-    })
-    return translatedKey
+    return translatedKey.replace(pattern, (_, num: string) => codeBlocks[Number(num)] ?? num);
   }) as typeof t
   return { t: modifiedT, ...rest }
 }
