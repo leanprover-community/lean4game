@@ -59,8 +59,7 @@ monacoSetup()
 
 function Level() {
   const params = useParams()
-  const levelId = parseInt(params.levelId)
-  const worldId = params.worldId
+  const { levelId, worldId } = useContext(WorldLevelIdContext)
 
   const gameId = React.useContext(GameIdContext)
 
@@ -71,11 +70,8 @@ function Level() {
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
-  return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
-    {levelId == 0 ?
-      <Introduction /> :
-      <PlayableLevel key={`${worldId}/${levelId}`} />}
-  </WorldLevelIdContext.Provider>
+  if (levelId == 0) return <Introduction />
+  return <PlayableLevel key={`${worldId}/${levelId}`} />
 }
 
 function ChatPanel({lastLevel, visible = true}) {
