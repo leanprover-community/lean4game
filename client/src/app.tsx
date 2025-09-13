@@ -8,7 +8,7 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
-import { PreferencesContext} from './components/infoview/context';
+import { PreferencesContext, WorldLevelIdContext} from './components/infoview/context';
 import UsePreferences from "./state/hooks/use_preferences"
 import i18n from './i18n';
 import { Popup } from './components/popup/popup';
@@ -19,6 +19,8 @@ function App() {
 
   const params = useParams()
   const gameId = "g/" + params.owner + "/" + params.repo
+  const levelId = parseInt(params.levelId)
+  const worldId = params.worldId
 
   const {mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = UsePreferences()
 
@@ -29,12 +31,14 @@ function App() {
   return (
     <div className="app">
       <GameIdContext.Provider value={gameId}>
+          <WorldLevelIdContext.Provider value={{worldId, levelId}}>
           <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}}>
             <React.Suspense>
               <Outlet />
             </React.Suspense>
             <Popup />
           </PreferencesContext.Provider>
+          </WorldLevelIdContext.Provider>
       </GameIdContext.Provider>
     </div>
   )

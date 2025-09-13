@@ -12,7 +12,7 @@ import { Trans, useTranslation } from 'react-i18next'
 export function RulesHelpPopup () {
   const { t } = useTranslation()
 
-  return <div>
+  return <>
     <h2>{t("Game Rules")}</h2>
     <Trans>
       <p>
@@ -52,5 +52,5 @@ export function RulesHelpPopup () {
         </tr>
       </tbody>
     </table>
-  </div>
+  </>
 }

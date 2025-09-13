@@ -7,6 +7,7 @@ import '../../css/popup.css'
 import { PrivacyPolicyPopup } from './privacy'
 import { UploadPopup } from './upload'
 import { PreferencesPopup } from './preferences'
+import { ErasePopup } from './erase'
 import { RulesHelpPopup } from './rules_help'
 
 /**
@@ -20,7 +21,7 @@ import { RulesHelpPopup } from './rules_help'
 function getPopupContent(popup: PopupType) {
   switch(popup) {
     case PopupType.erase:
-      return <></>
+      return <ErasePopup />
     case PopupType.impressum:
       return <ImpressumPopup />
     case PopupType.info:

@@ -18,6 +18,7 @@ import { WelcomeAppBar } from './app_bar'
 import { Hint } from './hints'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
+import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/InventoryPanel'
 
 
@@ -26,7 +27,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
   const {mobile} = React.useContext(PreferencesContext)
   const gameId = React.useContext(GameIdContext)
 
-  let { t } = useTranslation()
+  const { t : gT } = useGameTranslation()
 
   const dispatch = useAppDispatch()
 
@@ -34,7 +35,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
   // then this can be simplified.
 
   // let text: Array<string> = introduction.split(/\n(\s*\n)+/)
-  let text: Array<string> = introduction ? [t(introduction, {ns : gameId})] : []
+  let text: Array<string> = introduction ? [gT(introduction)] : []
 
   return <div className="column chat-panel">
     <div className="chat">
