@@ -9,7 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
-
       - uses: leanprover/lean-action@v1
         with:
           build: true
@@ -19,9 +18,8 @@ jobs:
           use-mathlib-cache: false
           check-reservoir-eligibility: false
           lake-package-directory: "server"
-      - run: lake test
 
-      - run: elan default stable
+      - run: lake test
 
       - name: Build the project
         run: |
