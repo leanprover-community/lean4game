@@ -1,4 +1,4 @@
-import { faBan, faCheck, faClipboard, faLock } from "@fortawesome/free-solid-svg-icons"
+import { faBan, faLock } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"

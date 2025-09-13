@@ -19,7 +19,7 @@ import { Hint } from './hints'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useGameTranslation } from '../utils/translation'
-import { InventoryPanel } from './inventory/InventoryPanel'
+import { InventoryPanel } from './inventory/inventory_panel'
 
 
 /** the panel showing the game's introduction text */

@@ -53,7 +53,7 @@ import { PreferencesPopup } from './popup/preferences'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
 import { useGameTranslation } from '../utils/translation'
-import { InventoryPanel } from './inventory/InventoryPanel'
+import { InventoryPanel } from './inventory/inventory_panel'
 
 
 monacoSetup()

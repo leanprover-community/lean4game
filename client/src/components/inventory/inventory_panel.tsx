@@ -4,14 +4,14 @@ import "../../css/inventory.css"
 import { InventoryTab, inventoryTabAtom, inventoryTilesAtoms, selectedDocTileAtom, theoremSubtabAtom, userInventoryAtom } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
 import { InventoryOverview, InventoryTile, LevelInfo } from "../../state/api"
-import { Documentation } from "./Documentation"
 import { selectDifficulty, selectInventory } from "../../state/progress"
 import { store } from "../../state/store"
 import { WorldLevelIdContext } from "../infoview/context"
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "../../store/game-atoms"
-import { InventorySubTabBar, InventoryTabBar } from "./TabBars"
-import { InventoryList } from "./InventoryList"
+import { InventorySubTabBar, InventoryTabBar } from "./tab_bars"
+import { InventoryList } from "./inventory_list"
 import { useSelector } from "react-redux"
+import { Documentation } from "./documentation"
 
 /** The panel (on the welcome page) showing the user's inventory with tactics, definitions, and lemmas */
 export function InventoryPanel({levelInfo, visible = true} : {
