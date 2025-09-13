@@ -33,7 +33,6 @@ import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorC
 import { DualEditor } from './infoview/main'
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
-import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import path from 'path';
 
 import '@fontsource/roboto/300.css'
@@ -51,7 +50,6 @@ import { IConnectionProvider } from 'monaco-languageclient'
 import { monacoSetup } from 'lean4web/client/src/monacoSetup'
 import { onigasmH } from 'onigasm/lib/onigasmH'
 import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
-import { InfoPopup } from './popup/game_info'
 import { PreferencesPopup } from './popup/preferences'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
@@ -74,25 +72,10 @@ function Level() {
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
-  // pop-ups
-  const [impressum, setImpressum] = React.useState(false)
-  const [info, setInfo] = React.useState(false)
-  const [preferencesPopup, setPreferencesPopup] = React.useState(false)
-
-  function closeImpressum()   {setImpressum(false)}
-  function closeInfo()        {setInfo(false)}
-  function closePreferencesPopup() {setPreferencesPopup(false)}
-  function toggleImpressum()  {setImpressum(!impressum)}
-  function toggleInfo()       {setInfo(!info)}
-  function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
-
   return <WorldLevelIdContext.Provider value={{worldId, levelId}}>
     {levelId == 0 ?
-      <Introduction impressum={impressum} setImpressum={setImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup} /> :
-      <PlayableLevel key={`${worldId}/${levelId}`} impressum={impressum} setImpressum={setImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>}
-    {impressum ? <PrivacyPolicyPopup handleClose={closeImpressum} /> : null}
-    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
-    {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
+      <Introduction /> :
+      <PlayableLevel key={`${worldId}/${levelId}`} />}
   </WorldLevelIdContext.Provider>
 }
 
@@ -147,12 +130,19 @@ function ChatPanel({lastLevel, visible = true}) {
 
   let introText: Array<string> = gT(level?.data?.introduction ?? "").split(/\n(\s*\n)+/)
 
+  const focusRef = useRef<HTMLAnchorElement>()
+  useEffect(() => {
+   if (proof?.completed) {
+     focusRef.current.focus()
+   }
+  }, [!!proof?.completed])
+
   return <div className={`chat-panel ${visible ? '' : 'hidden'}`}>
     <div ref={chatRef} className="chat">
-      {introText?.filter(t => t.trim()).map(((t, i) =>
+      {introText?.filter(it => it.trim()).map(((it, i) =>
         // Show the level's intro text as hints, too
         <Hint key={`intro-p-${i}`}
-          hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
+          hint={{text: it, hidden: false, rawText: it, varNames: []}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
       ))}
       {proof?.steps.map((step, i) => {
         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
@@ -189,10 +179,10 @@ function ChatPanel({lastLevel, visible = true}) {
     </div>
     <div className="button-row">
       {proof?.completed && (lastLevel ?
-        <Button to={`/${gameId}`}>
+        <Button ref={focusRef} to={`/${gameId}`}>
           <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
         </Button> :
-        <Button to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+        <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
           {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>)
         }
@@ -214,7 +204,7 @@ function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableR
   </div>
 }
 
-function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPopup}) {
+function PlayableLevel() {
   let { t } = useTranslation()
   const { t : gT } = useGameTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
@@ -251,9 +241,6 @@ function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPo
   const [lockEditorMode, setLockEditorMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
-
-  // impressum pop-up
-  function toggleImpressum() {setImpressum(!impressum)}
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
   // If this state is set to a pair `(name, type)` then the according doc will be open.
@@ -422,9 +409,6 @@ function PlayableLevel({impressum, setImpressum, toggleInfo, togglePreferencesPo
                   isLoading={level.isLoading}
                   levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${gT(level?.data?.title ?? "")}`)}
-                  toggleImpressum={toggleImpressum}
-                  toggleInfo={toggleInfo}
-                  togglePreferencesPopup={togglePreferencesPopup}
                   />
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
@@ -462,6 +446,11 @@ function IntroductionPanel({gameInfo}) {
 
   let text: Array<string> = gT(gameInfo.data?.worlds.nodes[worldId].introduction).split(/\n(\s*\n)+/)
 
+  const focusRef = useRef<HTMLAnchorElement>()
+  useEffect(() => {
+   focusRef.current?.focus()
+  }, [])
+
   return <div className="chat-panel">
     <div className="chat">
       {text?.filter(t => t.trim()).map(((t, i) =>
@@ -472,7 +461,7 @@ function IntroductionPanel({gameInfo}) {
     <div className={`button-row${mobile ? ' mobile' : ''}`}>
       {gameInfo.data?.worldSize[worldId] == 0 ?
         <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
-        <Button to={`/${gameId}/world/${worldId}/level/1`}>
+        <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/1`}>
           {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>
       }
@@ -483,7 +472,7 @@ function IntroductionPanel({gameInfo}) {
 export default Level
 
 /** The site with the introduction text of a world */
-function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPopup}) {
+function Introduction() {
   let { t } = useTranslation()
 
   const gameId = React.useContext(GameIdContext)
@@ -497,13 +486,8 @@ function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPop
 
   let image: string = gameInfo.data?.worlds.nodes[worldId].image
 
-
-  const toggleImpressum = () => {
-    setImpressum(!impressum)
-  }
-
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} toggleImpressum={toggleImpressum} toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
+    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} />
     {gameInfo.isLoading ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?
@@ -529,8 +513,6 @@ function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPop
 //   <>
 //     <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
 //       <ExercisePanel
-//         impressum={impressum}
-//         closeImpressum={closeImpressum}
 //         codeviewRef={codeviewRef}
 //         visible={pageNumber == 0} />
 //       <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
@@ -540,8 +522,6 @@ function Introduction({impressum, setImpressum, toggleInfo, togglePreferencesPop
 //   <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
 //     <ChatPanel lastLevel={lastLevel}/>
 //     <ExercisePanel
-//       impressum={impressum}
-//       closeImpressum={closeImpressum}
 //       codeviewRef={codeviewRef} />
 //     <InventoryPanel levelInfo={level?.data} />
 //   </Split>

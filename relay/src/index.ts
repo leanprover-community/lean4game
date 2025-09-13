@@ -60,6 +60,7 @@ const server = app
     const repo = req.params.repo
     const filename = req.params[0];
     req.url = filename;
+    console.debug(gameManager.getGameDir(owner,repo))
     express.static(path.join(gameManager.getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
   .use('/data/stats', (req, res, next) => {
@@ -78,7 +79,7 @@ const server = app
         res.send(outputData);
       } else {
         res.status(500).send(`Error executing script: ${errorData}`)
-        console.error(`stats.sh exited with code ${code}. Error: ${errorData}`)
+        console.error(`[${new Date()}] stats.sh exited with code ${code}. Error: ${errorData}`)
       }
     })
   })

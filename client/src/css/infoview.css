@@ -225,3 +225,8 @@
   padding-left: .5em;
   padding-right: .5em;
 }
+
+/* Apparently this prevents the layout from jumping around when hovering over expressions. */
+.tooltip-arrow {
+  display: none;
+}

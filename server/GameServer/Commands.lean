@@ -369,8 +369,11 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     "Statement" statementName:ident ? preamble:preambleArg ? sig:declSig val:declVal : command => do
   let lvlIdx ← getCurLevelIdx
 
+  let optSig := declSig.toOptDeclSig sig
+  let isProp ← declSig.isProp sig
+
   -- add an optional tactic sequence that the engine executes before the game starts
-  let preambleSeq : TSyntax `Lean.Parser.Tactic.tacticSeq ← match preamble with
+  let preambleSeq : TSyntax ``Lean.Parser.Tactic.tacticSeq ← match preamble with
   | none => `(Parser.Tactic.tacticSeq|skip)
   | some x => match x with
     | `(preambleArg| (preamble := $tac)) => pure tac
@@ -404,6 +407,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   | some name =>
     let env ← getEnv
     let fullName := (← getCurrNamespace) ++ name.getId
+    let inventoryType : InventoryType := if isProp then .Lemma else .Definition
     if env.contains fullName then
       let some orig := env.constants.map₁.get? fullName
         | throwError s!"error in \"Statement\": `{fullName}` not found."
@@ -412,17 +416,23 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
       -- in that case.
       logWarningAt name (m!"Environment already contains {fullName}! Only the existing " ++
       m!"statement will be available in later levels:\n\n{origType}")
-      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
+      let thmStatement ← match isProp with
+        | true => `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
+        | false => `(command| $[$doc]? $[$attrs:attributes]? def $defaultDeclName $optSig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
+      checkInventoryDoc inventoryType name (name := fullName) (template := docContent)
     else
-      let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
+      let thmStatement ← match isProp with
+        | true => `(command| $[$doc]? $[$attrs:attributes]? theorem $name $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
+        | false => `(command| $[$doc]? $[$attrs:attributes]? def $name $optSig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
       elabCommand thmStatement
       -- Check that statement has a docs entry.
-      checkInventoryDoc .Lemma name (name := fullName) (template := docContent)
+      checkInventoryDoc inventoryType name (name := fullName) (template := docContent)
   | none =>
-    let thmStatement ← `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
+    let thmStatement ← match isProp with
+      | true => `(command| $[$doc]? $[$attrs:attributes]? theorem $defaultDeclName $sig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
+      | false => `(command| $[$doc]? $[$attrs:attributes]? def $defaultDeclName $optSig := by {let_intros; $(⟨preambleSeq⟩); $(⟨tacticStx⟩)})
     elabCommand thmStatement
 
   let scope ← getScope
@@ -434,16 +444,18 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
 
   -- Format theorem statement for displaying
   let sigString := sig.raw.reprint.getD ""
-  let descrFormat : String := match statementName with
-  | some name =>  s!"theorem {name.getId} {sigString} := by"
-  | none => s!"example {sigString} := by"
+  let descrFormat : String := match statementName, isProp with
+  | some name, true =>  s!"theorem {name.getId} {sigString} := by"
+  | some name, false =>  s!"def {name.getId} {sigString} := by"
+  | none, _ => s!"example {sigString} := by" -- TODO: is this correct?
 
   modifyCurLevel fun level => pure { level with
     module := env.header.mainModule
-    goal := sig,
+    goal := sig
     preamble := preambleSeq
-    scope := scope,
+    scope := scope
     descrText := docContent
+    isProp := isProp
     statementName := match statementName with
     | none => default
     | some name => currNamespace ++ name.getId

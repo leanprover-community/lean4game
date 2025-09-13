@@ -7,9 +7,14 @@ namespace GameServer
 open Std
 
 -- TODO: Is there a better place?
-/-- Keywords that the server should not consider as tactics. -/
+/-- Keywords that the server should not consider as tactics.
+
+Note: Added `clear` tactic because currently it is very useful in combination with
+`Branch` and `Hint` (i.e. using `clear` before a `Hint` in order to remove any irrelevant
+hypotheses).
+-/
 def GameServer.ALLOWED_KEYWORDS : List String :=
-  [ "with", "fun", "at", "only", "by", "generalizing", "using", "if", "then", "else" ]
+  ["with", "fun", "at", "only", "by", "generalizing", "using", "skip", "if", "then", "else", "clear"]
 
 /-- The default game name if `Game "MyGame"` is not used. -/
 def defaultGameName: String := "MyGame"
@@ -249,6 +254,9 @@ structure GameLevel where
   /-- The name of the exercise proven. If provided this lemma will be available in
   future levels. -/
   statementName: Name := default
+  /-- True if the statement is a `Prop`. Used to add the statement correctly as
+  `theorem` or as `def`. -/
+  isProp: Bool := true
   hints: Array GoalHintEntry := default
   /-- The statement in Lean. -/
   goal : TSyntax `Lean.Parser.Command.declSig := default

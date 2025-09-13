@@ -7,6 +7,8 @@ Title "Test Level"
 
 Introduction "This is a test level."
 
+variable (x y : Nat)
+
 Statement (h : x = 2) (g: y = 4) : x + x = y := by
   Hint "You can either start using `{h}` or `{g}`."
   Branch

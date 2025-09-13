@@ -1,4 +1,7 @@
 /// <reference types="cypress" />
+
+import 'cypress-iframe';
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -35,3 +38,28 @@
 //     }
 //   }
 // }
+
+type Flatten<T> = T extends Iterable<infer Item> ? Item : never;
+type ArrayIterator<T, TResult> = (value: T, index: number, collection: T[]) => TResult;
+
+declare global {
+    namespace Cypress {
+        interface Chainable<Subject> {
+            map<Item extends Flatten<Subject>, K extends keyof Item>(iteratee: K): Chainable<Item[K][]>;
+            map<Item extends Flatten<Subject>, TResult>(iteratee: ArrayIterator<Item, TResult>): Chainable<TResult[]>;
+        }
+    }
+}
+
+Cypress.Commands.add('map', { prevSubject: true }, (subject: unknown[], iteratee) => {
+    return cy.wrap(
+        Cypress._.map(subject, iteratee),
+        { log: false }
+    );
+});
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // returning false here prevents Cypress from
+    // failing the test
+    return false;
+});

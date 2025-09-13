@@ -7,16 +7,13 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 import { GameIdContext } from '../app'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { changedOpenedIntro, selectOpenedIntro } from '../state/progress'
+import { changedReadIntro, selectReadIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { PreferencesContext } from './infoview/context'
 import { InventoryPanel } from './inventory'
 import { ErasePopup } from './popup/erase'
-import { InfoPopup } from './popup/game_info'
-import { PrivacyPolicyPopup } from './popup/privacy_policy'
 import { RulesHelpPopup } from './popup/rules_help'
-import { UploadPopup } from './popup/upload'
 import { PreferencesPopup} from "./popup/preferences"
 import { WorldTreePanel } from './world_tree'
 
@@ -58,7 +55,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
         <Button className="btn" to=""
           title="" onClick={() => {
             setPageNumber(1);
-            dispatch(changedOpenedIntro({game: gameId, openedIntro: true}))
+            dispatch(changedReadIntro({game: gameId, world: null, readIntro: true}))
           }}>
           Start&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
         </Button>
@@ -81,28 +78,8 @@ function Welcome() {
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   // For mobile only
-  const openedIntro = useAppSelector(selectOpenedIntro(gameId))
-  const [pageNumber, setPageNumber] = React.useState(openedIntro ? 1 : 0)
-
-  // pop-ups
-  const [eraseMenu, setEraseMenu] = React.useState(false)
-  const [impressum, setImpressum] = React.useState(false)
-  const [info, setInfo] = React.useState(false)
-  const [rulesHelp, setRulesHelp] = React.useState(false)
-  const [uploadMenu, setUploadMenu] = React.useState(false)
-  const [preferencesPopup, setPreferencesPopup] = React.useState(false)
-
-  function closeEraseMenu()   {setEraseMenu(false)}
-  function closeImpressum()   {setImpressum(false)}
-  function closeInfo()        {setInfo(false)}
-  function closeRulesHelp()   {setRulesHelp(false)}
-  function closeUploadMenu()  {setUploadMenu(false)}
-  function closePreferencesPopup() {setPreferencesPopup(false)}
-  function toggleEraseMenu()  {setEraseMenu(!eraseMenu)}
-  function toggleImpressum()  {setImpressum(!impressum)}
-  function toggleInfo()       {setInfo(!info)}
-  function toggleUploadMenu() {setUploadMenu(!uploadMenu)}
-  function togglePreferencesPopup() {setPreferencesPopup(!preferencesPopup)}
+  const readIntro = useAppSelector(selectReadIntro(gameId, null))
+  const [pageNumber, setPageNumber] = React.useState(readIntro ? 1 : 0)
 
   // set the window title
   useEffect(() => {
@@ -116,17 +93,14 @@ function Welcome() {
       <CircularProgress />
     </Box>
   : <>
-    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data} toggleImpressum={toggleImpressum}
-      toggleEraseMenu={toggleEraseMenu} toggleUploadMenu={toggleUploadMenu}
-      toggleInfo={toggleInfo} togglePreferencesPopup={togglePreferencesPopup}/>
+    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data} />
     <div className="app-content">
       { mobile ?
           <div className="welcome mobile">
             {(pageNumber == 0 ?
               <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
             : pageNumber == 1 ?
-              <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
-                rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
+              <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
             :
               <InventoryPanel levelInfo={inventory?.data} />
             )}
@@ -134,18 +108,11 @@ function Welcome() {
         :
           <Split className="welcome" minSize={0} snapOffset={200}  sizes={[25, 50, 25]}>
             <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
-            <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize}
-              rulesHelp={rulesHelp} setRulesHelp={setRulesHelp} />
+            <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
             <InventoryPanel levelInfo={inventory?.data} />
           </Split>
       }
     </div>
-    {impressum ? <PrivacyPolicyPopup handleClose={closeImpressum} /> : null}
-    {rulesHelp ? <RulesHelpPopup handleClose={closeRulesHelp} /> : null}
-    {eraseMenu? <ErasePopup handleClose={closeEraseMenu}/> : null}
-    {uploadMenu? <UploadPopup handleClose={closeUploadMenu}/> : null}
-    {info ? <InfoPopup info={gameInfo.data?.info} handleClose={closeInfo}/> : null}
-    {preferencesPopup ? <PreferencesPopup handleClose={closePreferencesPopup} /> : null}
   </>
 }
 

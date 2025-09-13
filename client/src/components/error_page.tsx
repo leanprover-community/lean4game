@@ -1,17 +1,24 @@
 import * as React from 'react'
 import { useRouteError } from "react-router-dom";
+import '../css/error_page.css'
 
+/** The fallback error page */
 export default function ErrorPage() {
-  const error: any = useRouteError();
-  console.error(error);
+  const error: any = useRouteError()
+  console.error(error)
 
   return (
     <div id="error-page">
-      <h1>Oops!</h1>
-      <p>Sorry, an unexpected error has occurred.</p>
-      <p>
-        <i>{error.statusText || error.message}</i>
-      </p>
+      <div className="error-message">
+        <h1>Oops!</h1>
+        <p>Something unexpected happened:</p>
+        <p><code>({error.status}) {error.statusText || error.message}<br/>{error.data}</code></p>
+        <p>Please create an issue at the <a href="https://github.com/leanprover-community/lean4game/issues" target="_blank">lean4game repo</a>.</p>
+        <div className="thought-bubble" />
+        <div className="thought-bubble" />
+        <div className="thought-bubble" />
+        <div className="thought-bubble" />
+      </div>
     </div>
-  );
+  )
 }

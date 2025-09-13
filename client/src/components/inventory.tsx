@@ -12,6 +12,7 @@ import { store } from '../state/store';
 import { useSelector } from 'react-redux';
 import { useGameTranslation } from '../utils/translation';
 import { useTranslation } from 'react-i18next';
+import { useAppendTypewriterInput } from "./infoview/context"
 
 export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=false} :
   {
@@ -25,8 +26,6 @@ export function Inventory({levelInfo, openDoc, lemmaTab, setLemmaTab, enableAll=
 
   return (
     <div className="inventory">
-    {/* TODO: Click on Tactic: show info
-      TODO: click on paste icon -> paste into command line */}
       <h2>{t("Tactics")}</h2>
       {levelInfo?.tactics &&
         <InventoryList items={levelInfo?.tactics} docType="Tactic" openDoc={openDoc} enableAll={enableAll}/>
@@ -76,28 +75,29 @@ function InventoryList({items, docType, openDoc, tab=null, setTab=undefined, lev
   return <>
     {categories.length > 1 &&
       <div className="tab-bar">
-        {categories.map((cat) =>
-          <div key={`category-${cat}`} className={`tab ${cat == (tab ?? categories[0]) ? "active": ""}`}
-            onClick={() => { setTab(cat) }}>{cat}</div>)}
+        {categories.map((cat) => {
+          let hasNew = modifiedItems.filter(item => item.new && (cat == item.category)).length > 0
+          return <div key={`category-${cat}`} className={`tab${cat == (tab ?? categories[0]) ? " active": ""}${hasNew ? " new": ""}`}
+            onClick={() => { setTab(cat) }}>{cat}</div>})}
       </div>}
     <div className="inventory-list">
       {[...modifiedItems].sort(
           // For lemas, sort entries `available > disabled > locked`
           // otherwise alphabetically
-          (x, y) => +(docType == "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled) || x.displayName.localeCompare(y.displayName)
+          (x, y) => +(docType === "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled) || x.displayName.localeCompare(y.displayName)
         ).filter(item => !item.hidden && ((tab ?? categories[0]) == item.category)).map((item, i) => {
             return <InventoryItem key={`${item.category}-${item.name}`}
               item={item}
               showDoc={() => {openDoc({name: item.name, type: docType})}}
               name={item.name} displayName={item.displayName} locked={difficulty > 0 ? item.locked : false}
-              disabled={item.disabled} newly={item.new} enableAll={enableAll} />
+              disabled={item.disabled} newly={item.new} isTheorem={docType === "Lemma"} enableAll={enableAll} />
         })
       }
     </div>
     </>
 }
 
-function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc, enableAll=false}) {
+function InventoryItem({item, name, displayName, locked, disabled, newly, showDoc, isTheorem, enableAll=false}) {
   const { t } = useTranslation()
 
   const icon = locked ? <FontAwesomeIcon icon={faLock} /> :
@@ -110,10 +110,12 @@ function InventoryItem({item, name, displayName, locked, disabled, newly, showDo
 
   const [copied, setCopied] = useState(false)
 
-  const handleClick = () => {
-    if (enableAll || !locked) {
-      showDoc()
+  const appendTypewriterInput = useAppendTypewriterInput()
+  const handleClick = (ev) => {
+    if (!enableAll && locked || appendTypewriterInput(ev.shiftKey, displayName, isTheorem, false)) {
+      return
     }
+    showDoc()
   }
 
   const copyItemName = (ev) => {
