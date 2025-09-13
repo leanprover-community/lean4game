@@ -22,3 +22,9 @@ msgstr "Ein Testlevel. Der Text kann §0 beinhalten"
 #: Game.Levels.DemoWorld.L01_HelloWorld
 msgid "You can either start using §0 or §1. Single newlines are stripped."
 msgstr "Du kannst mit §0 oder §1 starten. Einzelne Zeilenumbrüche werden rausgefiltert."
+
+# Fallback for backwards compatibility
+#: Game.Levels.DemoWorld.L01_HelloWorld
+#: Game.Levels.DemoWorld.L02_HypothesisNames
+msgid "You should use `«{g}»` now."
+msgstr "Jetzt `«{g}»` verwenden."
