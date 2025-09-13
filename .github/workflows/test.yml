@@ -21,7 +21,10 @@ jobs:
 
       - run: elan default stable
 
-      - run: lake test
+      - name: Run server tests
+        run: |
+          cd server
+          lake test
 
       - name: Build the project
         run: |
