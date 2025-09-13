@@ -50,13 +50,13 @@ msgstr ""
 msgid "Done!"
 msgstr ""
 
+#: Game.Levels.DemoWorld.L03_NonProp
+msgid "Non-Prop-Valued"
+msgstr ""
+
 #: Game.Levels.DemoWorld.L02_HypothesisNames
 #: Game.Levels.DemoWorld.L03_NonProp
 msgid "This is a test level."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "Non-Prop-Valued"
 msgstr ""
 
 #: Game
@@ -65,6 +65,10 @@ msgstr ""
 
 #: Game.Levels.DemoWorld.L01_HelloWorld
 msgid "This last message appears if the level is solved."
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "Addition"
 msgstr ""
 
 #: Game
@@ -86,6 +90,10 @@ msgstr ""
 
 #: Game.Levels.DemoWorld.L03_NonProp
 msgid "now apply!"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "An equality"
 msgstr ""
 
 #: Game.Levels.DemoWorld

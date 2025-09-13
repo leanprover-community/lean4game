@@ -142,25 +142,35 @@ in the first level and get enabled during the game.
 /-- Documentation entry of a tactic. Example:
 
 ```
-TacticDoc rw "`rw` stands for rewrite, etc. "
+/-- `rw` stands for rewrite, etc. -/
+TacticDoc rw
+
+/-- `rw` stands for rewrite, etc. -/
+TacticDoc rw in "Equalities"
 ```
 
 * The identifier is the tactics name. Some need to be escaped like `«have»`.
 * The description is a string supporting Markdown.
  -/
-elab doc:docComment ? "TacticDoc" name:ident content:str ? : command => do
+elab doc:docComment ? "TacticDoc" name:ident inArg?:((" in " str)?) content:str ? : command => do
   let doc ← parseDocCommentLegacy doc content
   let doc ← doc.dropSingleNewlines.translate
+  let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else default
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Tactic
     name := name.getId
     displayName := name.getId.toString
+    category := cat
     content := doc })
 
 /-- Documentation entry of a theorem. Example:
 
 ```
-TheoremDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
+/-- says `0 < n.succ`, etc. -/
+TheoremDoc Nat.succ_pos as "succ_pos"
+
+/-- says `0 < n.succ`, etc. -/
+TheoremDoc Nat.succ_pos as "succ_pos" in "Nat"
 ```
 
 * The first identifier is used in the commands `[New/Only/Disabled]Theorem`.
@@ -172,14 +182,15 @@ TheoremDoc Nat.succ_pos as "succ_pos" in "Nat" "says `0 < n.succ`, etc."
 Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requires
 The theorem/definition to have the same fully qualified name as in mathlib.
  -/
-elab doc:docComment ? "TheoremDoc" name:ident "as" displayName:str "in" category:str content:str ? :
+elab doc:docComment ? "TheoremDoc" name:ident "as" displayName:str inArg?:((" in " str)?) content:str ? :
     command => do
   let doc ← parseDocCommentLegacy doc content
   let doc ← doc.dropSingleNewlines.translate
+  let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else default
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Lemma
     name := name.getId
-    category := category.getString
+    category := cat
     displayName := displayName.getString
     content := doc })
 -- TODO: Catch the following behaviour.
@@ -192,7 +203,11 @@ elab doc:docComment ? "TheoremDoc" name:ident "as" displayName:str "in" category
 /-- Documentation entry of a definition. Example:
 
 ```
-DefinitionDoc Function.Bijective as "Bijective" "defined as `Injective f ∧ Surjective`, etc."
+/-- defined as `Injective f ∧ Surjective`, etc. -/
+DefinitionDoc Function.Bijective as "Bijective"
+
+/-- defined as `Injective f ∧ Surjective`, etc. -/
+DefinitionDoc Function.Bijective as "Bijective" in "Fun"
 ```
 
 * The first identifier is used in the commands `[New/Only/Disabled]Definition`.
@@ -203,13 +218,15 @@ DefinitionDoc Function.Bijective as "Bijective" "defined as `Injective f ∧ Sur
 Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requires
 The theorem/definition to have the same fully qualified name as in mathlib.
  -/
-elab doc:docComment ? "DefinitionDoc" name:ident "as" displayName:str template:str ? : command => do
+elab doc:docComment ? "DefinitionDoc" name:ident "as" displayName:str inArg?:((" in " str)?) template:str ? : command => do
   let doc ← parseDocCommentLegacy doc template
   let doc ← doc.dropSingleNewlines.translate
+  let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else default
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Definition
-    name := name.getId,
-    displayName := displayName.getString,
+    name := name.getId
+    displayName := displayName.getString
+    category := cat
     content := doc })
 
 /-! ## Add inventory items -/

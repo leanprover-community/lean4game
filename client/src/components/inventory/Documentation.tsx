@@ -11,10 +11,12 @@ import { useAtom } from "jotai"
 import { faLock, faXmark } from "@fortawesome/free-solid-svg-icons"
 import { NavButton } from "../navigation/nav_button"
 import { store } from "../../state/store"
+import { useGameTranslation } from "../../utils/translation"
 
 /** The `documentation` */
 export function Documentation({ type } : {type : InventoryTab}) {
   const { t } = useTranslation()
+  const { t: gT } = useGameTranslation()
   const dispatch = useAppDispatch()
   const gameId = useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
@@ -50,7 +52,7 @@ export function Documentation({ type } : {type : InventoryTab}) {
     }
     <h1 className="doc">{docTile.displayName}</h1>
     <p><code>{docEntry.data?.statement}</code></p>
-    <Markdown>{t(docEntry.data?.content, {ns: gameId})}</Markdown>
+    <Markdown>{gT(docEntry.data?.content)}</Markdown>
     {/* TODO: The condition below should be updated so that the section
     is displayed whenever it's non-empty. */}
     {docTile.proven && <>
