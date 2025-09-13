@@ -117,4 +117,5 @@ svg .disabled {
   right: .5em;
   top: .5em;
   color: var(--clr-primary);
+  cursor: pointer;
 }

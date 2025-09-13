@@ -242,11 +242,11 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
     </div>
     <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
       <GameInfoButton setNavOpen={setNavOpen} />
-      <EraseButton setNavOpen={setNavOpen} />
       <DownloadButton setNavOpen={setNavOpen} gameId={gameId} gameProgress={gameProgress}/>
       <UploadButton setNavOpen={setNavOpen} />
       <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
       <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
+      <EraseButton setNavOpen={setNavOpen} />
       <PreferencesButton setNavOpen={setNavOpen} />
     </div>
   </div>
@@ -289,6 +289,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
           <GameInfoButton setNavOpen={setNavOpen} />
           <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
           <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
+          <EraseButton setNavOpen={setNavOpen} />
           <PreferencesButton setNavOpen={setNavOpen} />
         </div>
       </> :
@@ -311,6 +312,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
           <GameInfoButton setNavOpen={setNavOpen} />
           <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
           <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
+          <EraseButton setNavOpen={setNavOpen} />
           <PreferencesButton setNavOpen={setNavOpen} />
         </div>
       </>

@@ -9,13 +9,10 @@ import { Trans, useTranslation } from 'react-i18next'
  * `handleClose` is the function to close it again because it's open/closed state is
  * controlled by the containing element.
  */
-export function RulesHelpPopup ({handleClose}: {handleClose: () => void}) {
+export function RulesHelpPopup () {
   const { t } = useTranslation()
 
-  return <div className="privacy-policy modal-wrapper">
-  <div className="modal-backdrop" onClick={handleClose} />
-  <div className="modal">
-    <div className="codicon codicon-close modal-close" onClick={handleClose}></div>
+  return <>
     <h2>{t("Game Rules")}</h2>
     <Trans>
       <p>
@@ -55,6 +52,5 @@ export function RulesHelpPopup ({handleClose}: {handleClose: () => void}) {
         </tr>
       </tbody>
     </table>
-  </div>
-</div>
+  </>
 }

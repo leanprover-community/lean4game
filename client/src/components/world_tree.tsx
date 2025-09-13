@@ -204,7 +204,7 @@ export function WorldSelectionMenu() {
   const difficulty = useSelector(selectDifficulty(gameId))
   const dispatch = useAppDispatch()
   const { mobile } = React.useContext(PreferencesContext)
-  const [popup] = useAtom(popupAtom)
+  const [popup, setPopup] = useAtom(popupAtom)
 
 
   function label(x : number) {
@@ -214,8 +214,12 @@ export function WorldSelectionMenu() {
 
   return <nav className={`world-selection-menu${mobile ? '' : ' desktop'}`}>
     <div className="slider-wrap">
-      <span className="difficulty-label">{t("Rules")}
-        <FontAwesomeIcon icon={(popup == PopupType.rules) ? faXmark : faCircleQuestion} className='helpButton' />
+      <span className="difficulty-label">
+        {t("Rules")}
+        <FontAwesomeIcon
+          onClick={() => {setPopup(PopupType.rules)}}
+          icon={(popup == PopupType.rules) ? faXmark : faCircleQuestion}
+          className='helpButton' />
       </span>
       <Slider
         orientation="vertical"
