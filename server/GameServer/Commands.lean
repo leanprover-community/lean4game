@@ -155,7 +155,7 @@ TacticDoc rw in "Equalities"
 elab doc:docComment ? "TacticDoc" name:ident inArg?:((" in " str)?) content:str ? : command => do
   let doc ← parseDocCommentLegacy doc content
   let doc ← doc.dropSingleNewlines.translate
-  let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else default
+  let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else "📖︎"
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Tactic
     name := name.getId
@@ -186,7 +186,7 @@ elab doc:docComment ? "TheoremDoc" name:ident "as" displayName:str inArg?:((" in
     command => do
   let doc ← parseDocCommentLegacy doc content
   let doc ← doc.dropSingleNewlines.translate
-  let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else default
+  let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else "📖︎"
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Lemma
     name := name.getId
@@ -221,7 +221,7 @@ The theorem/definition to have the same fully qualified name as in mathlib.
 elab doc:docComment ? "DefinitionDoc" name:ident "as" displayName:str inArg?:((" in " str)?) template:str ? : command => do
   let doc ← parseDocCommentLegacy doc template
   let doc ← doc.dropSingleNewlines.translate
-  let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else default
+  let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else "📖︎"
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Definition
     name := name.getId
