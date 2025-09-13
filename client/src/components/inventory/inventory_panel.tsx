@@ -13,7 +13,7 @@ import { InventoryList } from "./inventory_list"
 import { useSelector } from "react-redux"
 import { Documentation } from "./documentation"
 
-/** The panel (on the welcome page) showing the user's inventory with tactics, definitions, and lemmas */
+/** The panel showing the user's inventory with tactics, definitions, and lemmas */
 export function InventoryPanel({levelInfo, visible = true} : {
   levelInfo : LevelInfo | InventoryOverview | undefined,
   visible?: boolean
