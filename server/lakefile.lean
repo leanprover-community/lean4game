@@ -16,4 +16,5 @@ require importGraph from git "https://github.com/leanprover-community/import-gra
 lean_lib GameServer
 
 @[test_driver]
-lean_lib test
+lean_lib test where
+  globs := #[.submodules `Test]
