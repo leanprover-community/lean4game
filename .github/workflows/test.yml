@@ -9,7 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
-
       - uses: leanprover/lean-action@v1
         with:
           build: true

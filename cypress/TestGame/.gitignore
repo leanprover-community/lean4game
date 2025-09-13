@@ -3,3 +3,6 @@ lake-packages/
 .lake/
 **/.DS_Store
 .i18n/**/*.mo
+
+# ensures the lake-manifest is always recreated when running the tests
+lake-manifest.json
