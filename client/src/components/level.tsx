@@ -128,7 +128,7 @@ function ChatPanel({lastLevel, visible = true}) {
 
   let introText: Array<string> = t(level?.data?.introduction, {ns: gameId}).split(/\n(\s*\n)+/)
 
-  const focusRef = useRef()
+  const focusRef = useRef<HTMLAnchorElement>()
   useEffect(() => {
    if (proof?.completed) {
      focusRef.current.focus()
@@ -137,10 +137,10 @@ function ChatPanel({lastLevel, visible = true}) {
 
   return <div className={`chat-panel ${visible ? '' : 'hidden'}`}>
     <div ref={chatRef} className="chat">
-      {introText?.filter(t => t.trim()).map(((t, i) =>
+      {introText?.filter(it => it.trim()).map(((it, i) =>
         // Show the level's intro text as hints, too
         <Hint key={`intro-p-${i}`}
-          hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
+          hint={{text: it, hidden: false, rawText: it, varNames: []}} step={0} selected={selectedStep} toggleSelection={toggleSelection(0)} />
       ))}
       {proof?.steps.map((step, i) => {
         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
@@ -442,7 +442,7 @@ function IntroductionPanel({gameInfo}) {
 
   let text: Array<string> = t(gameInfo.data?.worlds.nodes[worldId].introduction, {ns: gameId}).split(/\n(\s*\n)+/)
 
-  const focusRef = useRef()
+  const focusRef = useRef<HTMLAnchorElement>()
   useEffect(() => {
    focusRef.current?.focus()
   }, [])
