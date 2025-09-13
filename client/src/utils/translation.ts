@@ -40,7 +40,7 @@ function extractCodeBlocks(input: string): {
 }
 
 /**
- * Wrapper around the hook optained from `useTranslation`.
+ * Wrapper around the hook obtained from `useTranslation`.
  * Add the game-ID namespace and replace code blocks according to
  * the translation keys received from `lean-i18n`.
  */
