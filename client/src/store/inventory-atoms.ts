@@ -67,8 +67,6 @@ export const inventoryTabRecentTilesAtom: Atom<Record<InventoryTab, InventoryTil
   }
 })
 
-// .filter(x => x.world == worldId && x.level == levelId - 1)
-
 /** New items in the current tab */
 export const inventoryCurrentTabNewTilesAtom = atom(get => {
   const tab = get(inventoryTabAtom)

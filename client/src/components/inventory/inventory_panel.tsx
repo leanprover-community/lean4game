@@ -29,19 +29,20 @@ export function InventoryPanel({levelInfo, visible = true} : {
   const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
 
-  // TODO: this is some glue since no everything is in jotai yet
+  // TODO: this is some glue since not everything is in jotai yet
   useEffect(() => {
     setTheoremInventory(levelInfo?.lemmas ?? [])
     setTacticInventory(levelInfo?.tactics ?? [])
     setDefinitionInventory(levelInfo?.definitions ?? [])
   }, [levelInfo])
 
-  // Some glue as the user inventory isn't fully in jotai yet
+  // // Some glue as the user inventory isn't fully in jotai yet
   const [, setUserInventory] = useAtom(userInventoryAtom)
-  let inventory: string[] = selectInventory(gameId)(store.getState())
-  useEffect(() => {
-    setUserInventory(inventory)
-  }, [inventory])
+  const inventory: string[] = useSelector(selectInventory(gameId))
+  // TODO!
+  // useEffect(() => {
+  //   setUserInventory(inventory)
+  // }, [inventory])
 
   // Some glue as the game/world/level-ID is not in jotai yet
   const { worldId, levelId } = useContext(WorldLevelIdContext)

@@ -28,7 +28,7 @@ export function Documentation({ type } : {type : InventoryTab}) {
   // let { docTile, setDocTile } = useContext(InventoryContext)
 
   const docEntry = useLoadDocQuery({game: gameId, name: docTile.name, type: type })
-  let inv: string[] = selectInventory(gameId)(store.getState())
+  let inv: string[] = useSelector(selectInventory(gameId))
 
   // Set `inventoryDoc` to `null` to close the doc
 

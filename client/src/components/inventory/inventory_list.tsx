@@ -5,12 +5,13 @@ import { GameIdContext } from "../../app"
 import { WorldLevelIdContext } from "../infoview/context"
 import { store } from "../../state/store"
 import { InventoryItem } from "./inventory_item"
-import { currentInventoryTilesAtom, inventoryTabAtom } from "../../store/inventory-atoms"
+import { currentInventoryTilesAtom, InventoryTab, inventoryTabAtom } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
+import { useSelector } from "react-redux"
 
 export function InventoryList({tiles, docType, enableAll=false} : {
   tiles: InventoryTile[],
-  docType: string,
+  docType: InventoryTab,
   enableAll?: boolean,
 }) {
   const [currentTiles] = useAtom(currentInventoryTilesAtom)
@@ -21,7 +22,7 @@ export function InventoryList({tiles, docType, enableAll=false} : {
   // Items are unlocked if they are in the local store, or if the server says they should be
   // given the dependency graph. (OR-connection) (TODO: maybe add different logic for different
   // modi)
-  let inv: string[] = selectInventory(gameId)(store.getState())
+  let inv: string[] = useSelector(selectInventory(gameId))
   let modifiedItems : InventoryTile[] = tiles.map(tile => inv.includes(tile.name) ? {...tile, locked: false} : tile)
 
   // Item(s) proved in the preceeding level
@@ -31,14 +32,14 @@ export function InventoryList({tiles, docType, enableAll=false} : {
     <div className="inventory-list">
 
       {currentTiles.sort(
-          // For lemas, sort entries `available > disabled > locked`
+          // For theorems, sort entries `available > disabled > locked`
           // otherwise alphabetically
-          (x, y) => +(docType === "Lemma") * (+x.locked - +y.locked || +x.disabled - +y.disabled) || x.displayName.localeCompare(y.displayName)
+          (x, y) => +(docType === InventoryTab.theorem) * (+x.locked - +y.locked || +x.disabled - +y.disabled) || x.displayName.localeCompare(y.displayName)
         ).map((tile, i) => {
             return <InventoryItem key={`${tile.category}-${tile.name}`}
               tile={tile}
               recent={recentItems.map(it => it.name).includes(tile.name)}
-              isTheorem={docType === "Lemma"}
+              isTheorem={docType === InventoryTab.theorem}
               enableAll={enableAll} />
         })
       }

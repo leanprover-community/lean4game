@@ -91,7 +91,7 @@ export const apiSlice = createApi({
       query: ({game}) => `${game}/inventory.json`,
     }),
     loadDoc: builder.query<Doc, {game: string, name: string, type: InventoryTab}>({
-      query: ({game, type, name}) => `${game}/doc__${type.toUpperCase()}__${name}.json`,
+      query: ({game, type, name}) => `${game}/doc__${capitalizeFirstLetter(type)}__${name}.json`,
     }),
   }),
 })
@@ -99,3 +99,7 @@ export const apiSlice = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const { useGetGameInfoQuery, useLoadLevelQuery, useLoadDocQuery, useLoadInventoryOverviewQuery } = apiSlice
+
+function capitalizeFirstLetter(val) {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
