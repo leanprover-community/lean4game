@@ -12,12 +12,14 @@ jobs:
       - uses: leanprover/lean-action@v1
         with:
           build: true
-          test: false # buggy?
+          test: false # buggy
           lint: false
           use-github-cache: false
           use-mathlib-cache: false
           check-reservoir-eligibility: false
           lake-package-directory: "server"
+
+      - run: elan default stable
 
       - run: lake test
 
