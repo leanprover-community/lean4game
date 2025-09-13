@@ -12,7 +12,7 @@ jobs:
       - uses: leanprover/lean-action@v1
         with:
           build: true
-          test: false # buggy
+          test: true
           lint: false
           use-github-cache: false
           use-mathlib-cache: false
@@ -20,11 +20,6 @@ jobs:
           lake-package-directory: "server"
 
       - run: elan default stable
-
-      - name: Run server tests
-        run: |
-          cd server
-          lake test
 
       - name: Build the project
         run: |
