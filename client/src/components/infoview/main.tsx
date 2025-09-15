@@ -40,8 +40,6 @@ import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
 import { useGameTranslation } from '../../utils/translation';
-import { useSelector } from 'react-redux';
-
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -88,7 +86,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
         newTiles.push(level?.statementName)
       }
 
-      let inv: string[] = useSelector(selectInventory(gameId))
+      let inv: string[] = selectInventory(gameId)(store.getState())
 
       // add new items and remove duplicates
       let newInv = [...inv, ...newTiles].filter((item, i, array) => array.indexOf(item) == i)
