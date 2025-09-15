@@ -41,7 +41,6 @@ import { useTranslation } from 'react-i18next';
 import path from 'path';
 import { useGameTranslation } from '../../utils/translation';
 
-
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
  */
@@ -138,14 +137,18 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
  */
 function ExerciseStatement({ data, showLeanStatement = false }) {
   const { t : gT } = useGameTranslation()
+  const { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
 
   if (!(data?.descrText || data?.descrFormat)) { return <></> }
   return <>
     <div className="exercise-statement">
-      {data?.descrText &&
+      {data?.descrText ?
         <Markdown>
-          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + gT(data?.descrText)}
+          {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + t(data?.descrText, {ns: gameId})}
+        </Markdown> : data?.displayName &&
+        <Markdown>
+          {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + gT(data?.descrText)}
         </Markdown>
       }
       {data?.descrFormat && showLeanStatement &&

@@ -95,6 +95,12 @@ structure InventoryTile where
   displayName : String
   /-- Category to group inventory items by (currently only used for lemmas). -/
   category : String
+  /-- The world which introduced this item. -/
+  world : Option Name := none
+  /-- The level which introduced this item. -/
+  level : Option Nat := none
+  /-- Set to `true` if there exists an exercise in the game proving this statement. -/
+  proven := false
   /-- If `true` then the item only gets unlocked in a later level. -/
   locked := true
   /-- If `true` then the item is blocked for this level. -/
