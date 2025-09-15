@@ -160,7 +160,7 @@ describe('Basic Lean4Game Features', () => {
       cy.focused().type('rw [x]{enter}')
 
       // Wait for the error message to appear
-      cy.contains("tactic 'rewrite' failed")
+      cy.contains("Invalid rewrite argument")
     })
   })
 
