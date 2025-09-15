@@ -16,6 +16,7 @@ import { downloadProgress } from './popup/erase'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { popupAtom, PopupType } from '../store/popup-atoms'
+import { useGameTranslation } from '../utils/translation'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -223,6 +224,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
   gameInfo: GameInfo,
 }) {
   const { t } = useTranslation()
+  const { t: gT } = useGameTranslation()
   const gameId = React.useContext(GameIdContext)
   const gameProgress = useAppSelector(selectProgress(gameId))
   const {mobile} = React.useContext(PreferencesContext)
@@ -234,7 +236,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
       <span className="app-bar-title"></span>
     </div>
     <div>
-      {!mobile && <span className="app-bar-title">{t(gameInfo?.title, {ns: gameId})}</span>}
+      {!mobile && <span className="app-bar-title">{gT(gameInfo?.title)}</span>}
     </div>
     <div className="nav-btns">
       {mobile && <MobileNavButtons pageNumber={pageNumber} setPageNumber={setPageNumber} />}
@@ -242,11 +244,11 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
     </div>
     <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
       <GameInfoButton setNavOpen={setNavOpen} />
-      <EraseButton setNavOpen={setNavOpen} />
       <DownloadButton setNavOpen={setNavOpen} gameId={gameId} gameProgress={gameProgress}/>
       <UploadButton setNavOpen={setNavOpen} />
       <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
       <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
+      <EraseButton setNavOpen={setNavOpen} />
       <PreferencesButton setNavOpen={setNavOpen} />
     </div>
   </div>
@@ -260,6 +262,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
   setPageNumber?: any,
 }) {
   const { t } = useTranslation()
+  const { t: gT } = useGameTranslation()
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
@@ -289,6 +292,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
           <GameInfoButton setNavOpen={setNavOpen} />
           <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
           <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
+          <EraseButton setNavOpen={setNavOpen} />
           <PreferencesButton setNavOpen={setNavOpen} />
         </div>
       </> :
@@ -296,7 +300,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
         {/* DESKTOP VERSION */}
         <div className='app-bar-left'>
           <HomeButton isDropdown={false} />
-          <span className="app-bar-title">{worldTitle && `${t("World")}: ${t(worldTitle, {ns: gameId})}`}</span>
+          <span className="app-bar-title">{worldTitle && `${t("World")}: ${gT(worldTitle)}`}</span>
         </div>
         <div>
           <span className="app-bar-title">{levelTitle}</span>
@@ -311,6 +315,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
           <GameInfoButton setNavOpen={setNavOpen} />
           <ImpressumButton setNavOpen={setNavOpen} isDropdown={true} />
           <PrivacyButton setNavOpen={setNavOpen} isDropdown={true} />
+          <EraseButton setNavOpen={setNavOpen} />
           <PreferencesButton setNavOpen={setNavOpen} />
         </div>
       </>

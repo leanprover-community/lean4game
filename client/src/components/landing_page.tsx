@@ -22,9 +22,11 @@ import i18next from 'i18next';
 import { popupAtom, PopupType } from '../store/popup-atoms';
 import { useAtom } from 'jotai';
 import { GithubIcon } from './navigation/github_icon';
+import { useGameTranslation } from '../utils/translation';
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
   let { t } = useTranslation()
+  const { t : gT } = useGameTranslation()
   let navigate = useNavigate();
   const routeChange = () =>{
     navigate(gameId);
@@ -36,17 +38,17 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
 
   return <div className="game" onClick={routeChange}>
     <div className="wrapper">
-      <div className="title">{t(data.title, { ns: gameId })}</div>
-      <div className="short-description">{t(data.short, { ns: gameId })}
+      <div className="title">{gT(data.title)}</div>
+      <div className="short-description">{gT(data.short)}
       </div>
       { data.image ? <img className="image" src={path.join("data", gameId, data.image)} alt="" /> : <div className="image"/> }
-      <div className="long description"><Markdown>{t(data.long, { ns: gameId })}</Markdown></div>
+      <div className="long description"><Markdown>{gT(data.long)}</Markdown></div>
     </div>
     <table className="info">
       <tbody>
       <tr>
         <td title="consider playing these games first.">{t("Prerequisites")}</td>
-        <td><Markdown>{t(data.prerequisites.join(', '), { ns: gameId })}</Markdown></td>
+        <td><Markdown>{gT(data.prerequisites.join(', '))}</Markdown></td>
       </tr>
       <tr>
         <td>{t("Worlds")}</td>

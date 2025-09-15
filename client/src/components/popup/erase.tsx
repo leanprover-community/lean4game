@@ -5,7 +5,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { GameIdContext } from '../../app'
 import { useAppDispatch } from '../../hooks'
-import { deleteLevelProgress, deleteProgress, selectProgress } from '../../state/progress'
+import { deleteLevelProgress, deleteProgress, deleteWorldProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
 import { Button } from '../button'
 import { Trans, useTranslation } from 'react-i18next'
@@ -87,7 +87,7 @@ export function ErasePopup () {
   }
 
   function eraseWorld (ev) {
-    dispatch(deleteProgress({game: gameId, world: worldId}))
+    dispatch(deleteWorldProgress({game: gameId, world: worldId}))
     setPopup(null)
     ev.preventDefault()
   }

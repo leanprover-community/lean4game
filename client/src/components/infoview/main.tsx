@@ -34,11 +34,12 @@ import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { store } from '../../state/store';
-import { Hints, MoreHelpButton, filterHints } from '../hints';
+import { Hint, Hints, MoreHelpButton, filterHints } from '../hints';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
+import { useGameTranslation } from '../../utils/translation';
 
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
@@ -136,7 +137,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
  * If `showLeanStatement` is true, it will additionally display the lean code.
  */
 function ExerciseStatement({ data, showLeanStatement = false }) {
-  let { t } = useTranslation()
+  const { t : gT } = useGameTranslation()
   const gameId = React.useContext(GameIdContext)
 
   if (!(data?.descrText || data?.descrFormat)) { return <></> }
@@ -144,7 +145,7 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
     <div className="exercise-statement">
       {data?.descrText &&
         <Markdown>
-          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + t(data?.descrText, {ns: gameId})}
+          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + gT(data?.descrText)}
         </Markdown>
       }
       {data?.descrFormat && showLeanStatement &&
@@ -507,6 +508,8 @@ export function TypewriterInterface({props}) {
     }
   })
 
+  let introText: Array<string> = t(props?.data?.introduction, {ns: gameId}).split(/\n(\s*\n)+/)
+
   return <div className="typewriter-interface">
     <RpcContext.Provider value={rpcSess}>
     <div className="content">
@@ -560,9 +563,11 @@ export function TypewriterInterface({props}) {
                   <Command proof={proof} i={i} deleteProof={deleteProof(i)} />
                   <Errors errors={step.diags} typewriterMode={true} />
                   {mobile && i == 0 && props.data?.introduction &&
-                    <div className={`message information step-0${selectedStep === 0 ? ' selected' : ''}`} onClick={toggleSelectStep(0)}>
-                      <Markdown>{props.data?.introduction}</Markdown>
-                    </div>
+                    introText?.filter(it => it.trim()).map(((it, i) =>
+                      // Show the level's intro text as hints, too
+                      <Hint key={`intro-p-${i}`}
+                        hint={{text: it, hidden: false, rawText: it, varNames: []}} step={0} selected={selectedStep} toggleSelection={toggleSelectStep(0)} />
+                    ))
                   }
                   {mobile &&
                     <Hints key={`hints-${i}`}

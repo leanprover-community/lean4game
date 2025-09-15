@@ -96,6 +96,8 @@ async function doImport (owner, repo, id) {
     artifactId = artifact.id
     const url = artifact.archive_download_url
     const unpackingScript = path.join(__dirname, "..", "..", "scripts", "unpack.sh")
+    const toolchainScript = path.join(__dirname, "..", "..", "scripts", "install_toolchain.sh")
+
     const gamesPath = path.join(__dirname, "..", "..", "..", "games");
     const gamesTmpPath = path.join(__dirname, "..", "..", "..", "games", "tmp");
 
@@ -110,8 +112,11 @@ async function doImport (owner, repo, id) {
     await download(id, url, path.join(__dirname, "..", "..", "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
     progress[id].output += `Download finished.\n`
 
-
+    // Unpack downloaded game
     await runProcess(id, "/bin/bash", [unpackingScript, gamesPath, artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
+    // Install necessary toolchain
+    await runProcess(id, "/bin/bash", [toolchainScript, gamesPath, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
+
 
     // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
     // manifest = JSON.parse(manifest);
@@ -122,6 +127,8 @@ async function doImport (owner, repo, id) {
     // fs.writeFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`, JSON.stringify(manifest));
     // await runProcess(id, "tar", ["-cvf", `../archive_${artifactId}.tar`, "."], `tmp/artifact_${artifactId}_inner/`)
     // // await runProcess(id, "docker", ["load", "-i", `tmp/archive_${artifactId}.tar`])
+
+
 
     progress[id].done = true
     progress[id].output += `Done!\n`

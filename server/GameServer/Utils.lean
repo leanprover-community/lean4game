@@ -54,3 +54,40 @@ instance : Coe String Name where
 --       msg ++ (f!"{name}" ++ .line )
 
 --   logInfo msg
+
+/--
+Removes whitespace sequences starting with `\n` which do not contain any
+more `\n`. Whitespace sequences which contain multiple `\n` are not modified.
+-/
+def _root_.String.dropSingleNewlines (s : String) : String := Id.run do
+  let mut pos : String.Pos := 0
+  let mut out : String := ""
+  while !s.atEnd pos do
+    let c := s.get pos
+    -- let posₙ := s.next pos
+    if c == '\n' then
+      let (wsSeq, posₙ) := getWhitespaceSeq s pos
+      out := out.append wsSeq
+      pos := posₙ
+    else
+      out := out.push c
+      pos := s.next pos
+  return ⟨out.toList⟩
+where
+  getWhitespaceSeq (s : String) (pos : String.Pos) : String × String.Pos := Id.run do
+    let mut newLineCount := 0
+    let mut pos := pos
+    let mut wsSeq := ""
+    while !s.atEnd pos && (s.get pos).isWhitespace do
+      let c := (s.get pos)
+      if c == '\n' then
+        newLineCount := newLineCount + 1
+      wsSeq := wsSeq.push c
+      pos := s.next pos
+    match newLineCount, s.atEnd pos with
+    | 0, _ => unreachable!
+    -- if there is only one `\n` we drop it and return a single space
+    | 1, true => return ("", pos)
+    | 1, false => return (" ", pos)
+    -- multiple consequtive `\n` remain unmodified
+    | _, _ => return (wsSeq, pos)

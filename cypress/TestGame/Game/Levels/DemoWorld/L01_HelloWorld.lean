@@ -5,12 +5,13 @@ Level 1
 
 Title "Test Level"
 
-Introduction "This is a test level."
+Introduction "This is a test level. There can be $\\textbf{LaTeX}$"
 
 variable (x y : Nat)
 
 Statement (h : x = 2) (g: y = 4) : x + x = y := by
-  Hint "You can either start using `{h}` or `{g}`."
+  Hint "You can either start using `{h}` or `{g}`.
+  Single newlines are stripped."
   Branch
     rw [g]
     Hint "You should use `{h}` now."

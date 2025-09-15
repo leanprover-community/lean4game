@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useGetGameInfoQuery } from '../../state/api'
 import { GameIdContext } from '../../app'
 import { Markdown } from '../markdown'
+import { useGameTranslation } from '../../utils/translation'
 
 /** Pop-up that is displaying the Game Info.
  *
@@ -11,13 +12,13 @@ import { Markdown } from '../markdown'
  * controlled by the containing element.
  */
 export function InfoPopup () {
-  let { t } = useTranslation()
+  const { t : gT } = useGameTranslation()
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
   return <>
     <Typography variant="body1" component="div" className="welcome-text">
-      <Markdown>{t(gameInfo.data?.info, {ns: gameId})}</Markdown>
+      <Markdown>{gT(gameInfo.data?.info)}</Markdown>
       <hr />
       <Trans>
         <h2>Progress saving</h2>

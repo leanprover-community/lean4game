@@ -1,0 +1,30 @@
+msgid ""
+msgstr "Project-Id-Version: Game v4.22.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-13\n"
+"Last-Translator: \n"
+"Language-Team: none\n"
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit"
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "Test Level"
+msgstr "Testlevel auf Deutsch"
+
+#. §0: $\\textbf{LaTeX}$
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "This is a test level. There can be §0"
+msgstr "Ein Testlevel. Der Text kann §0 beinhalten"
+
+#. §0: `«{h}»`
+#. §1: `«{g}»`
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "You can either start using §0 or §1. Single newlines are stripped."
+msgstr "Du kannst mit §0 oder §1 starten. Einzelne Zeilenumbrüche werden rausgefiltert."
+
+# Fallback for backwards compatibility
+#: Game.Levels.DemoWorld.L01_HelloWorld
+#: Game.Levels.DemoWorld.L02_HypothesisNames
+msgid "You should use `«{g}»` now."
+msgstr "Jetzt `«{g}»` verwenden."
