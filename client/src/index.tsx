@@ -19,7 +19,7 @@ let single_game = (import.meta.env.VITE_LEAN4GAME_SINGLE === "true")
 let single_game_name = (import.meta.env.VITE_LEAN4GAME_SINGLE_NAME === undefined) ? "game" : import.meta.env.VITE_LEAN4GAME_SINGLE_NAME
 let root_object: RouteObject = single_game ? {
   path: "/",
-  loader: () => redirect("/g/local/${ single_game_name }")
+  loader: () => redirect(`/g/local/${single_game_name}`)
 } : {
   path: "/",
   element: <App />,
