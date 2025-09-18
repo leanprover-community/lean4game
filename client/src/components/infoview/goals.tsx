@@ -9,7 +9,7 @@ import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infov
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
 import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
-import { useAppendTypewriterInput } from './context';
+import { PreferencesContext, useAppendTypewriterInput } from './context';
 import { InteractiveGoal, InteractiveGoals, InteractiveGoalsWithHints, InteractiveHypothesisBundle, ProofState } from './rpc_api';
 import { RpcSessionAtPos } from '@leanprover/infoview/*';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
@@ -144,6 +144,7 @@ interface GoalProps {
  * Displays the hypotheses, target type and optional case label of a goal according to the
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
+    const {mobile} = React.useContext(PreferencesContext)
     const { goal, filter, showHints, typewriter } = props
     let { t } = useTranslation()
 
@@ -159,7 +160,7 @@ export const Goal = React.memo((props: GoalProps) => {
             undefined,
         [locs, goal.mvarId])
     const goalLi = <div key={'goal'} className="goal">
-        {/* <div className="goal-title">{t("Goal")}:</div> */}
+        {mobile && <div className="goal-title">{t("Goal")}:</div> }
         <LocationsContext.Provider value={goalLocs}>
             <InteractiveCode fmt={goal.type} />
         </LocationsContext.Provider>
@@ -185,12 +186,14 @@ export const Goal = React.memo((props: GoalProps) => {
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         </div>
         {!filter.reverse && <>
-            <div className='goal-sign'>
-                <svg width="100%" height="100%">
-                    <line x1="0%" y1="0%" x2="0%" y2="100%" />
-                    <line x1="0%" y1="50%" x2="100%" y2="50%" />
-                </svg>
-            </div>
+            { !mobile &&
+                <div className='goal-sign'>
+                    <svg width="100%" height="100%">
+                        <line x1="0%" y1="0%" x2="0%" y2="100%" />
+                        <line x1="0%" y1="50%" x2="100%" y2="50%" />
+                    </svg>
+                </div>
+            }
             {goalLi}
         </>}
         {/* {showHints && hints} */}

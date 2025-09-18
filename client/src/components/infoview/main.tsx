@@ -346,6 +346,7 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
 /** The tabs of goals that lean ahs after the command of this step has been processed */
 function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: InteractiveGoalsWithHints, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
   let { t } = useTranslation()
+  const {mobile} = React.useContext(PreferencesContext)
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
   if (proofStep.goals.length == 0) {
@@ -361,7 +362,7 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
         </div>
       ))}
     </div>
-    <div className="goal-tab vscode-light">
+    <div className="goal-tab vscode-light" style={{flexDirection: mobile ? "column" : "row"}}>
       <Goal typewriter={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]?.goal} />
     </div>
   </div>

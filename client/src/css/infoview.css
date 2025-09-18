@@ -235,7 +235,6 @@
 .goal-tab {
   /* border: 2px dotted darkgreen; */
   display: flex;
-  flex-direction: row;
 }
 
 .goal-tab .goal, .goal-tab .hypotheses {
