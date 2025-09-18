@@ -30,7 +30,7 @@ describe('Basic Lean4Game Features', () => {
   const navigateToLevel = () => {
     navigateToIntroduction()
     cy.contains('Start').click()
-    cy.contains('Goal:', { timeout: 60000 })
+    cy.contains('Assumptions:', { timeout: 60000 })
   }
 
   describe('Navigation and UI Structure', () => {
@@ -227,7 +227,7 @@ describe('Basic Lean4Game Features', () => {
   describe('Hypothesis Names', () => {
     it('Should use player\'s hypothesis names in hints', () => {
       cy.visit('/#/g/test/TestGame/world/TestWorld/level/2')
-      cy.contains('Goal:', { timeout: 60000 })
+      cy.contains('Assumptions:', { timeout: 60000 })
 
       cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
       cy.focused().type('have myname : x + z = y + z := by rw [h]{enter}')
@@ -240,8 +240,7 @@ describe('Basic Lean4Game Features', () => {
   describe('Non-Prop Level', () => {
     it('Non-prop statements should be allowed', () => {
       cy.visit('/#/g/test/TestGame/world/TestWorld/level/3')
-      cy.contains('Goal:', { timeout: 60000 })
-      cy.contains('intro first!')
+      cy.contains('intro first!', { timeout: 60000 })
       cy.focused().type('intro x{enter}')
       cy.contains('now apply!', { timeout: 10000 })
       cy.focused().type('apply x{enter}')
