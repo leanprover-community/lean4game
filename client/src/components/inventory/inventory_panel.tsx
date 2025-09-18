@@ -18,6 +18,9 @@ export function InventoryPanel({levelInfo, visible = true} : {
   levelInfo : LevelInfo | InventoryOverview | undefined,
   visible?: boolean
 }) {
+  const gameId = React.useContext(GameIdContext)
+  const inventory: string[] = useSelector(selectInventory(gameId))
+
   const [tab] = useAtom(inventoryTabAtom)
   const [, setSubtab] = useAtom(theoremSubtabAtom)
   const [doc] = useAtom(selectedDocTileAtom)
@@ -25,8 +28,8 @@ export function InventoryPanel({levelInfo, visible = true} : {
   const [, setTheoremInventory] = useAtom(inventoryTilesAtoms[InventoryTab.theorem])
   const [, setTacticInventory] = useAtom(inventoryTilesAtoms[InventoryTab.tactic])
   const [, setDefinitionInventory] = useAtom(inventoryTilesAtoms[InventoryTab.definition])
+  const [, setUserInventory] = useAtom(userInventoryAtom)
 
-  const gameId = React.useContext(GameIdContext)
   const difficulty = useSelector(selectDifficulty(gameId))
 
   // TODO: this is some glue since not everything is in jotai yet
@@ -36,13 +39,10 @@ export function InventoryPanel({levelInfo, visible = true} : {
     setDefinitionInventory(levelInfo?.definitions ?? [])
   }, [levelInfo])
 
-  // // Some glue as the user inventory isn't fully in jotai yet
-  const [, setUserInventory] = useAtom(userInventoryAtom)
-  const inventory: string[] = useSelector(selectInventory(gameId))
-  // TODO!
-  // useEffect(() => {
-  //   setUserInventory(inventory)
-  // }, [inventory])
+  // Some glue as the user inventory isn't fully in jotai yet
+  useEffect(() => {
+    setUserInventory(inventory)
+  }, [inventory])
 
   // Some glue as the game/world/level-ID is not in jotai yet
   const { worldId, levelId } = useContext(WorldLevelIdContext)
