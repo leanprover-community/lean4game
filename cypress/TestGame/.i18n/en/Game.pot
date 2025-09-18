@@ -1,7 +1,7 @@
 msgid ""
-msgstr "Project-Id-Version: Game v4.22.0\n"
+msgstr "Project-Id-Version: Game v4.23.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-13\n"
+"POT-Creation-Date: 2025-09-18\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
@@ -20,6 +20,11 @@ msgstr ""
 msgid "Test Level"
 msgstr ""
 
+#. §0: `ℕ`
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "Commutativity on §0"
+msgstr ""
+
 #: GameServer.RpcHandlers
 msgid "level completed! 🎉"
 msgstr ""
@@ -27,6 +32,10 @@ msgstr ""
 #. §0: $\\textbf{LaTeX}$
 #: Game.Levels.DemoWorld.L01_HelloWorld
 msgid "This is a test level. There can be §0"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "The way to proof reflexivity."
 msgstr ""
 
 #. §0: `«{g}»`
@@ -39,15 +48,15 @@ msgstr ""
 msgid "intermediate goal solved! 🎉"
 msgstr ""
 
+#: Game.Levels.DemoWorld.L02_HypothesisNames
+#: Game.Levels.DemoWorld.L03_NonProp
+msgid "Done!"
+msgstr ""
+
 #. §0: `«{h}»`
 #. §1: `«{g}»`
 #: Game.Levels.DemoWorld.L01_HelloWorld
 msgid "You can either start using §0 or §1. Single newlines are stripped."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L02_HypothesisNames
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "Done!"
 msgstr ""
 
 #: Game.Levels.DemoWorld.L03_NonProp

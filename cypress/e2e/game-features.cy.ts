@@ -127,17 +127,37 @@ describe('Basic Lean4Game Features', () => {
       })
     })
 
-    it('should show rfl documentation when clicked', () => {
+    it('should show tactic documentation when clicked', () => {
       navigateToLevel()
-
-      // Click on rfl button in tactics panel
       cy.get('.inventory').within(() => {
         cy.contains('rfl').click()
       })
+      cy.get('.documentation').within(() => {
+        cy.contains('The way to proof reflexivity').should('be.visible')
+      })
+    })
 
-      // Check for the rfl docstring (We don't check for the exact text, because it can change)
-      cy.contains('reflexivity').should('be.visible')
-      cy.contains('(lean docstring)').should('be.visible')
+    it('should show theorem documentation when clicked', () => {
+      navigateToLevel()
+      cy.get('.inventory').within(() => {
+        cy.contains('Theorems').click()
+        cy.contains('add_comm').click()
+      })
+      cy.get('.documentation').within(() => {
+        cy.contains('Commutativity').should('be.visible')
+      })
+    })
+
+    it('should show definition documentation when clicked', () => {
+      navigateToLevel()
+      cy.get('.inventory').within(() => {
+        cy.contains('Definitions').click()
+        cy.contains('==').click()
+        cy.contains('equality').click()
+      })
+      cy.get('.documentation').within(() => {
+        cy.contains('An equality').should('be.visible')
+      })
     })
   })
 

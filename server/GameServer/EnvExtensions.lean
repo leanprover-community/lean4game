@@ -48,13 +48,13 @@ mathlib or from parsing the lemma in question.
 -/
 
 /-- The game knows three different inventory types that contain slightly different information -/
-inductive InventoryType where | Tactic | Lemma | Definition
+inductive InventoryType where | Tactic | Theorem | Definition
 deriving ToJson, FromJson, Repr, BEq, Hashable, Inhabited
 
 -- TODO: golf this?
 instance : ToString InventoryType := ⟨fun t => match t with
 | .Tactic => "Tactic"
-| .Lemma => "Lemma"
+| .Theorem => "Theorem"
 | .Definition => "Definition"⟩
 
 /-- The keys/templates of the inventory items, stored in `InventoryTemplateExt`. -/
@@ -330,7 +330,7 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
     displayName := match lvl.statementName with
       | .anonymous => none
       | name => match (inventoryExt.getState env).find?
-          (fun x => x.name == name && x.type == .Lemma) with
+          (fun x => x.name == name && x.type == .Theorem) with
         | some n => n.displayName
         | none => name.toString
         -- Note: we could call `.find!` because we check in `Statement` that the
