@@ -2,6 +2,7 @@ import React from "react"
 import { useTranslation } from "react-i18next"
 import { inventoryCurrentTabNewTilesAtom, inventoryCurrentTabRecentTilesAtom, inventorySubtabAtom, inventorySubtabOptionsAtom, InventoryTab, inventoryTabAtom, inventoryTabNewTilesAtom, inventoryTabRecentTilesAtom } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
+import "../../css/tab_bar.css"
 
 function TabTitle(type: InventoryTab): string {
   switch(type) {

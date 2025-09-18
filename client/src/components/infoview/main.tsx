@@ -7,6 +7,7 @@ import 'tachyons/css/tachyons.css';
 import '@vscode/codicons/dist/codicon.css';
 import '../../../../node_modules/lean4-infoview/src/infoview/index.css';
 import '../../css/infoview.css'
+import "../../css/tab_bar.css"
 
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
 import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';

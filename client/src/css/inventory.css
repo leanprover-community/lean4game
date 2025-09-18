@@ -81,65 +81,6 @@
   cursor: pointer;
 }
 
-.inventory .tab-bar {
-  border-bottom: 0.1em solid var(--clr-dark-gray);
-  margin-bottom: 1em;
-}
-
-.inventory .tab {
-  color: var(--clr-darker-gray);
-  line-height: inherit;
-  text-decoration: none;
-  padding: 0.2rem 1rem;
-  font-size: 1rem;
-  margin: 0 .1rem;
-  border: 0;
-  cursor: pointer;
-  display: inline-block;
-}
-
-.inventory .tab-bar.major {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  padding-top: .5em;
-  font-weight: bold;
-}
-
-.inventory .tab-bar.major .tab {
-  flex: 1;
-  text-align: center;
-  font-size: 1.2em;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.inventory .tab-bar.current .tab.active {
-  color: black;
-  border-bottom: 0.3em solid var(--clr-primary);
-}
-
-.inventory .tab.recent {
-  background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(242, 190, 255));
-}
-
-.inventory .tab.recent:not(.active) {
-  border-bottom: 0.3em solid rgb(242, 190, 255);
-}
-
-.inventory .tab.new {
-  background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(255, 242, 190));
-}
-
-.inventory .tab.new:not(.active) {
-  border-bottom: 0.3em solid rgb(255, 242, 190);
-}
-
-.inventory .tab.active {
-  color: black;
-  border-bottom: 0.3em solid #999;
-}
-
 .inventory .item .copy-button {
 	min-width: 3px;
 	min-height: 3px;

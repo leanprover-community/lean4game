@@ -15,6 +15,9 @@ import { RpcSessionAtPos } from '@leanprover/infoview/*';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageserver-protocol';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { selectTypewriterMode } from '../../state/progress';
+import { GameIdContext } from '../../app';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -144,7 +147,9 @@ interface GoalProps {
  * Displays the hypotheses, target type and optional case label of a goal according to the
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
+    const gameId = React.useContext(GameIdContext)
     const {mobile} = React.useContext(PreferencesContext)
+    const typewriterMode = useSelector(selectTypewriterMode(gameId))
     const { goal, filter, showHints, typewriter } = props
     let { t } = useTranslation()
 
@@ -160,7 +165,7 @@ export const Goal = React.memo((props: GoalProps) => {
             undefined,
         [locs, goal.mvarId])
     const goalLi = <div key={'goal'} className="goal">
-        {mobile && <div className="goal-title">{t("Goal")}:</div> }
+        {(mobile || !typewriterMode) && <div className="goal-title">{t("Goal")}:</div> }
         <LocationsContext.Provider value={goalLocs}>
             <InteractiveCode fmt={goal.type} />
         </LocationsContext.Provider>
@@ -186,7 +191,7 @@ export const Goal = React.memo((props: GoalProps) => {
             {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         </div>
         {!filter.reverse && <>
-            { !mobile &&
+            { (!mobile && typewriterMode) &&
                 <div className='goal-sign'>
                     <svg width="100%" height="100%">
                         <line x1="0%" y1="0%" x2="0%" y2="100%" />
