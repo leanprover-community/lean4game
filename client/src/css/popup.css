@@ -1,3 +1,88 @@
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0;
+  z-index: 1000;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 2;
+}
+
+.modal h2 {
+  text-align: center;
+}
+
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: max(50%, 300px);
+  max-width: 60ch;
+  max-height: 80%;
+  overflow: scroll;
+  background: #fff;
+  z-index: 3;
+  padding: 2em;
+  border-radius: 1em;
+  text-align: left;
+  color: var(--vscode-breadcrumb-foreground);
+}
+
+.modal input[type="text"] {
+  width: 100%;
+}
+
+.modal .form-error {
+  color: #a00;
+  font-weight: bold;
+}
+
+.modal input[type="submit"] {
+  border: none;
+  color: var(--vscode-button-foreground);
+  background: var(--vscode-button-background);
+  cursor: pointer;
+  padding: .5em 1em;
+  border-radius: .2em;
+  display: block;
+  margin: 1em auto;
+}
+
+.modal-close {
+  float: right;
+  scale: 2;
+  color: var(--vscode-breadcrumb-foreground);
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  float: right;
+  scale: 2;
+  color: var(--vscode-breadcrumb-focusForeground);
+}
+
+.modal table {
+  width: 100%;
+}
+
+.modal a.download-link {
+  cursor: pointer;
+  font-style: italic;
+  text-decoration: underline dotted;
+
+}
+
 /* For the "Rules" popup. */
 .slider-wrapper {
   padding-left: 2rem;
