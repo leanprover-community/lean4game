@@ -39,7 +39,7 @@ elab "Level" level:num : command => do
 
 /-- Define the title of the current game/world/level. -/
 elab "Title" t:str : command => do
-  let title ← t.getString.dropSingleNewlines.translate
+  let title ← t.getString.translate
   match ← getCurLayer with
   | .Level => modifyCurLevel fun level => pure {level with title := title}
   | .World => modifyCurWorld  fun world => pure {world with title := title}
@@ -49,7 +49,7 @@ elab "Title" t:str : command => do
 
 /-- Define the introduction of the current game/world/level. -/
 elab "Introduction" t:str : command => do
-  let intro ← t.getString.dropSingleNewlines.translate
+  let intro ← t.getString.translate
   match ← getCurLayer with
   | .Level => modifyCurLevel fun level => pure {level with introduction := intro}
   | .World => modifyCurWorld  fun world => pure {world with introduction := intro}
@@ -57,7 +57,7 @@ elab "Introduction" t:str : command => do
 
 /-- Define the info of the current game. Used for e.g. credits -/
 elab "Info" t:str : command => do
-  let info ← t.getString.dropSingleNewlines.translate
+  let info ← t.getString.translate
   match ← getCurLayer with
   | .Level =>
     logError "Can't use `Info` in a level!"
@@ -89,7 +89,7 @@ elab "Image" t:str : command => do
 /-- Define the conclusion of the current game or current level if some
 building a level. -/
 elab "Conclusion" t:str : command => do
-  let conclusion ← t.getString.dropSingleNewlines.translate
+  let conclusion ← t.getString.translate
   match ← getCurLayer with
   | .Level => modifyCurLevel fun level => pure {level with conclusion := conclusion}
   | .World => modifyCurWorld  fun world => pure {world with conclusion := conclusion}
@@ -102,13 +102,13 @@ elab "Prerequisites" t:str* : command => do
 
 /-- Short caption for the game (1 sentence) -/
 elab "CaptionShort" t:str : command => do
-  let caption ← t.getString.dropSingleNewlines.translate
+  let caption ← t.getString.translate
   modifyCurGame fun game => pure {game with
     tile := {game.tile with short := caption}}
 
 /-- More detailed description what the game is about (2-4 sentences). -/
 elab "CaptionLong" t:str : command => do
-  let caption ← t.getString.dropSingleNewlines.translate
+  let caption ← t.getString.translate
   modifyCurGame fun game => pure {game with
     tile := {game.tile with long := caption}}
 
@@ -154,7 +154,7 @@ TacticDoc rw in "Equalities"
  -/
 elab doc:docComment ? "TacticDoc" name:ident inArg?:((" in " str)?) content:str ? : command => do
   let doc ← parseDocCommentLegacy doc content
-  let doc ← doc.dropSingleNewlines.translate
+  let doc ← doc.translate
   let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else "📖︎"
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Tactic
@@ -185,7 +185,7 @@ The theorem/definition to have the same fully qualified name as in mathlib.
 elab doc:docComment ? "TheoremDoc" name:ident "as" displayName:str inArg?:((" in " str)?) content:str ? :
     command => do
   let doc ← parseDocCommentLegacy doc content
-  let doc ← doc.dropSingleNewlines.translate
+  let doc ← doc.translate
   let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else "📖︎"
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Theorem
@@ -220,7 +220,7 @@ The theorem/definition to have the same fully qualified name as in mathlib.
  -/
 elab doc:docComment ? "DefinitionDoc" name:ident "as" displayName:str inArg?:((" in " str)?) template:str ? : command => do
   let doc ← parseDocCommentLegacy doc template
-  let doc ← doc.dropSingleNewlines.translate
+  let doc ← doc.translate
   let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else "📖︎"
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Definition
@@ -399,7 +399,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   let docContent ← parseDocComment doc
   let docContent ← match docContent with
   | none => pure none
-  | some d => d.dropSingleNewlines.translate
+  | some d => d.translate
 
   -- The default name of the statement is `[Game].[World].level[no.]`, e.g. `NNG.Addition.level1`
   -- However, this should not be used when designing the game.
