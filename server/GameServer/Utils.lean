@@ -55,6 +55,7 @@ instance : Coe String Name where
 
 --   logInfo msg
 
+-- unused
 /--
 Removes whitespace sequences starting with `\n` which do not contain any
 more `\n`. Whitespace sequences which contain multiple `\n` are not modified.
