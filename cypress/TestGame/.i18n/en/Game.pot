@@ -1,7 +1,7 @@
 msgid ""
 msgstr "Project-Id-Version: Game v4.23.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18\n"
+"POT-Creation-Date: 2025-09-20\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
@@ -53,12 +53,6 @@ msgstr ""
 msgid "Done!"
 msgstr ""
 
-#. §0: `«{h}»`
-#. §1: `«{g}»`
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "You can either start using §0 or §1. Single newlines are stripped."
-msgstr ""
-
 #: Game.Levels.DemoWorld.L03_NonProp
 msgid "Non-Prop-Valued"
 msgstr ""
@@ -107,6 +101,12 @@ msgstr ""
 
 #: Game.Levels.DemoWorld
 msgid "This is the introduction of Test World."
+msgstr ""
+
+#. §0: `«{h}»`
+#. §1: `«{g}»`
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "You can either start using §0 or §1."
 msgstr ""
 
 #: Game.Levels.DemoWorld.L03_NonProp
