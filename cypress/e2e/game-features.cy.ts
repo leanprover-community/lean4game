@@ -76,8 +76,7 @@ describe('Basic Lean4Game Features', () => {
       navigateToLevel()
 
       // Enter first tactic
-      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
-      cy.focused().type('rw [g]{enter}')
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('rw [g]{enter}')
 
       // Wait for the goal state to update after first tactic
       cy.contains('x + x = 4', { timeout: 10000 }).should('be.visible')
@@ -96,7 +95,7 @@ describe('Basic Lean4Game Features', () => {
       cy.get('.infoview').contains('x + x = y')
       cy.get('.infoview').contains('You can either start using h or g.')
 
-      cy.focused().type('rw [h]{enter}')
+      cy.get('.codeview').type('rw [h]{enter}')
 
       cy.contains('2 + 2 = y')
       cy.get('.infoview').contains('2 + 2 = y')
@@ -166,8 +165,7 @@ describe('Basic Lean4Game Features', () => {
       navigateToLevel()
 
       // Use typewriter interface (blue box at bottom)
-      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
-      cy.focused().type('rw [h]{enter}')
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('rw [h]{enter}')
 
       // Wait for Lean to process the tactic
       // Should show updated goal state (proving the tactic was processed)
@@ -178,8 +176,7 @@ describe('Basic Lean4Game Features', () => {
       navigateToLevel()
 
       // Use typewriter interface to enter an invalid tactic
-      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
-      cy.focused().type('rw [x]{enter}')
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('rw [x]{enter}')
 
       // Wait for the error message to appear
       cy.contains("Invalid rewrite argument")
@@ -191,15 +188,13 @@ describe('Basic Lean4Game Features', () => {
       navigateToLevel()
 
       // Solve the level step by step (based on the Lean file)
-      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
-      cy.focused().type('rw [h]{enter}')
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('rw [h]{enter}')
 
       // Wait for the goal state to update after first tactic
       cy.contains('2 + 2 = y', { timeout: 10000 }).should('be.visible')
 
       // Enter second tactic
-      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
-      cy.focused().type('rw [g]{enter}')
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('rw [g]{enter}')
 
       // Look for the completion message from the Lean file
       cy.contains('This last message appears if the level is solved.', { timeout: 60000 })
@@ -212,8 +207,7 @@ describe('Basic Lean4Game Features', () => {
       navigateToLevel()
 
       // Solve the level step by step (based on the Lean file)
-      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
-      cy.focused().type('rw [h]{enter}')
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('rw [h]{enter}')
 
       // Wait for the goal state to update after first tactic
       cy.contains('2 + 2 = y', { timeout: 10000 }).should('be.visible')
@@ -229,8 +223,7 @@ describe('Basic Lean4Game Features', () => {
       cy.visit('/#/g/test/TestGame/world/TestWorld/level/2')
       cy.contains('Assumptions:', { timeout: 60000 })
 
-      cy.get('.typewriter-input .monaco-editor .view-lines').click({ force: true })
-      cy.focused().type('have myname : x + z = y + z := by rw [h]{enter}')
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('have myname : x + z = y + z := by rw [h]{enter}')
 
       // Check that the hint uses the player's hypothesis name `myname`
       cy.contains('You should use myname now')
@@ -240,10 +233,12 @@ describe('Basic Lean4Game Features', () => {
   describe('Non-Prop Level', () => {
     it('Non-prop statements should be allowed', () => {
       cy.visit('/#/g/test/TestGame/world/TestWorld/level/3')
-      cy.contains('intro first!', { timeout: 60000 })
-      cy.focused().type('intro x{enter}')
+      cy.get('.goal-sign').should('be.visible')
+      //cy.contains('Goal:', { timeout: 60000 })
+      cy.contains('intro first!')
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('intro x{enter}')
       cy.contains('now apply!', { timeout: 10000 })
-      cy.focused().type('apply x{enter}')
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('apply x{enter}')
       cy.contains('Done!', { timeout: 10000 })
     })
   })
@@ -261,6 +256,46 @@ describe('Basic Lean4Game Features', () => {
 
       // Close popup
       cy.get('body').click(0, 0)
+    })
+
+    it('should change language of hints to selected language if translation is available', () => {
+      navigateToLevel()
+      // Click menu button to open dropdown
+      cy.get('#menu-btn').click()
+
+      // Click preferences
+      cy.contains('Preferences').click()
+
+      // Select german language
+      cy.get('.MuiSelect-select').click()
+      cy.get('.MuiPaper-root').click()
+      cy.get('li[data-value="de"]').click()
+
+      // Close preferences
+      cy.get('.codicon').click()
+
+      // Check that displayed language is german
+      cy.contains('Du kannst mit h oder g starten.').should('be.visible')
+    })
+
+    it('should not change language of hints to selected language if translation is not available', () => {
+      navigateToLevel()
+      // Click menu button to open dropdown
+      cy.get('#menu-btn').click()
+
+      // Click preferences
+      cy.contains('Preferences').click()
+
+      // Select mandarin language
+      cy.get('.MuiSelect-select').click()
+      cy.get('.MuiPaper-root').click()
+      cy.get('li[data-value="zh"]').click()
+
+      // Close preferences
+      cy.get('.codicon').click()
+
+      // Check that displayed language is english
+      cy.contains('You can either start using h or g.').should('be.visible')
     })
   })
 })
