@@ -266,7 +266,7 @@ export class GameManager {
       const gamesPath = path.join(this.dir, '..', '..', '..', 'games');
       if (!fs.existsSync(gamesPath)) {
         console.error(`[${new Date()}] Did not find the following folder: ${gamesPath}`);
-        console.error('[${new Date()}] Did you already import any games?');
+        console.error(`[${new Date()}] Did you already import any games?`);
         return "";
       }
       game_dir = path.join(gamesPath, `${owner}`, `${repo.toLowerCase()}`);
