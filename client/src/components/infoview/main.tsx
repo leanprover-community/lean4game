@@ -7,6 +7,7 @@ import 'tachyons/css/tachyons.css';
 import '@vscode/codicons/dist/codicon.css';
 import '../../../../node_modules/lean4-infoview/src/infoview/index.css';
 import '../../css/infoview.css'
+import "../../css/tab_bar.css"
 
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
 import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
@@ -40,7 +41,6 @@ import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
 import { useGameTranslation } from '../../utils/translation';
-
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -138,14 +138,18 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
  */
 function ExerciseStatement({ data, showLeanStatement = false }) {
   const { t : gT } = useGameTranslation()
+  const { t } = useTranslation()
   const gameId = React.useContext(GameIdContext)
 
   if (!(data?.descrText || data?.descrFormat)) { return <></> }
   return <>
     <div className="exercise-statement">
-      {data?.descrText &&
+      {data?.descrText ?
         <Markdown>
-          {(data?.displayName ? `**Theorem** \`${data?.displayName}\`: ` : '') + gT(data?.descrText)}
+          {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + t(data?.descrText, {ns: gameId})}
+        </Markdown> : data?.displayName &&
+        <Markdown>
+          {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + gT(data?.descrText)}
         </Markdown>
       }
       {data?.descrFormat && showLeanStatement &&
@@ -343,6 +347,7 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
 /** The tabs of goals that lean ahs after the command of this step has been processed */
 function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: InteractiveGoalsWithHints, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
   let { t } = useTranslation()
+  const {mobile} = React.useContext(PreferencesContext)
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
   if (proofStep.goals.length == 0) {
@@ -358,7 +363,7 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
         </div>
       ))}
     </div>
-    <div className="goal-tab vscode-light">
+    <div className="goal-tab vscode-light" style={{flexDirection: mobile ? "column" : "row"}}>
       <Goal typewriter={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]?.goal} />
     </div>
   </div>
@@ -607,7 +612,7 @@ export function TypewriterInterface({props}) {
               <div className="button-row mobile">
                 {props.level >= props.worldSize ?
                   <Button to={`/${gameId}`}>
-                    <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
+                    <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
                   </Button>
                 :
                   <Button to={`/${gameId}/world/${props.world}/level/${props.level + 1}`}>

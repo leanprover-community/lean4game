@@ -30,7 +30,7 @@ describe('Basic Lean4Game Features', () => {
   const navigateToLevel = () => {
     navigateToIntroduction()
     cy.contains('Start').click()
-    cy.contains('Goal:', { timeout: 60000 })
+    cy.contains('Assumptions:', { timeout: 60000 })
   }
 
   describe('Navigation and UI Structure', () => {
@@ -114,8 +114,10 @@ describe('Basic Lean4Game Features', () => {
     it('should display tactics panel with rfl and rw buttons', () => {
       navigateToLevel()
 
-      // Check that tactics section exists
-      cy.contains('Tactics').should('be.visible')
+      // Check that tactics section exists, open it
+      cy.get('.inventory').within(() => {
+        cy.contains('Tactics').should('be.visible').click()
+      })
 
       // Check for the specific tactics buttons
       cy.get('.inventory').within(() => {
@@ -124,17 +126,37 @@ describe('Basic Lean4Game Features', () => {
       })
     })
 
-    it('should show rfl documentation when clicked', () => {
+    it('should show tactic documentation when clicked', () => {
       navigateToLevel()
-
-      // Click on rfl button in tactics panel
       cy.get('.inventory').within(() => {
         cy.contains('rfl').click()
       })
+      cy.get('.documentation').within(() => {
+        cy.contains('The way to proof reflexivity').should('be.visible')
+      })
+    })
 
-      // Check for the rfl docstring (We don't check for the exact text, because it can change)
-      cy.contains('reflexivity').should('be.visible')
-      cy.contains('(lean docstring)').should('be.visible')
+    it('should show theorem documentation when clicked', () => {
+      navigateToLevel()
+      cy.get('.inventory').within(() => {
+        cy.contains('Theorems').click()
+        cy.contains('add_comm').click()
+      })
+      cy.get('.documentation').within(() => {
+        cy.contains('Commutativity').should('be.visible')
+      })
+    })
+
+    it('should show definition documentation when clicked', () => {
+      navigateToLevel()
+      cy.get('.inventory').within(() => {
+        cy.contains('Definitions').click()
+        cy.contains('==').click()
+        cy.contains('equality').click()
+      })
+      cy.get('.documentation').within(() => {
+        cy.contains('An equality').should('be.visible')
+      })
     })
   })
 
@@ -157,7 +179,7 @@ describe('Basic Lean4Game Features', () => {
       cy.get('.typewriter-input .monaco-editor .view-lines').type('rw [x]{enter}')
 
       // Wait for the error message to appear
-      cy.contains("tactic 'rewrite' failed")
+      cy.contains("Invalid rewrite argument")
     })
   })
 
@@ -199,7 +221,7 @@ describe('Basic Lean4Game Features', () => {
   describe('Hypothesis Names', () => {
     it('Should use player\'s hypothesis names in hints', () => {
       cy.visit('/#/g/test/TestGame/world/TestWorld/level/2')
-      cy.contains('Goal:', { timeout: 60000 })
+      cy.contains('Assumptions:', { timeout: 60000 })
 
       cy.get('.typewriter-input .monaco-editor .view-lines').type('have myname : x + z = y + z := by rw [h]{enter}')
 

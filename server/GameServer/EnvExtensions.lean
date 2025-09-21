@@ -48,13 +48,13 @@ mathlib or from parsing the lemma in question.
 -/
 
 /-- The game knows three different inventory types that contain slightly different information -/
-inductive InventoryType where | Tactic | Lemma | Definition
+inductive InventoryType where | Tactic | Theorem | Definition
 deriving ToJson, FromJson, Repr, BEq, Hashable, Inhabited
 
 -- TODO: golf this?
 instance : ToString InventoryType := ⟨fun t => match t with
 | .Tactic => "Tactic"
-| .Lemma => "Lemma"
+| .Theorem => "Theorem"
 | .Definition => "Definition"⟩
 
 /-- The keys/templates of the inventory items, stored in `InventoryTemplateExt`. -/
@@ -95,6 +95,12 @@ structure InventoryTile where
   displayName : String
   /-- Category to group inventory items by (currently only used for lemmas). -/
   category : String
+  /-- The world which introduced this item. -/
+  world : Option Name := none
+  /-- The level which introduced this item. -/
+  level : Option Nat := none
+  /-- Set to `true` if there exists an exercise in the game proving this statement. -/
+  proven := false
   /-- If `true` then the item only gets unlocked in a later level. -/
   locked := true
   /-- If `true` then the item is blocked for this level. -/
@@ -324,7 +330,7 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
     displayName := match lvl.statementName with
       | .anonymous => none
       | name => match (inventoryExt.getState env).find?
-          (fun x => x.name == name && x.type == .Lemma) with
+          (fun x => x.name == name && x.type == .Theorem) with
         | some n => n.displayName
         | none => name.toString
         -- Note: we could call `.find!` because we check in `Statement` that the

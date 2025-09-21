@@ -1,18 +1,46 @@
-.inventory, .documentation {
+.inventory-panel {
+  position: relative;
+}
+
+.inventory-panel .documentation {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: white;
+}
+
+.documentation .nav-button {
+  float: right;
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  width: 1rem;
+  min-width: unset;
+}
+
+.documentation .nav-button.lock {
+  float: left;
+  font-size: .7rem;
+}
+
+.inventory, .inventory-panel .documentation {
   padding: 0 1em 1em 1em;
 }
 
-.inventory h2, .documentation h2, .documentation h1 {
+.inventory h2, .inventory-panel .documentation h2, .inventory-panel .documentation h1 {
   font-size: 1.5em;
   margin-top: 1em;
   margin-bottom: .2em;
 }
 
-.documentation h1 {
+.inventory-panel .documentation h1 {
   font-weight: 900;
 }
 
-.documentation.hidden {
+.inventory-panel .documentation.hidden {
   display: none;
   transition: display 2s;
 }
@@ -33,7 +61,7 @@
   position: relative;
 }
 
-.inventory .item.locked {
+.inventory .item.locked:not(.enabled) {
   border: solid 1px #ccc;
   color: #ccc;
 }
@@ -46,45 +74,12 @@
   background-color: rgb(255, 242, 190);
 }
 
-.inventory .item:not(.locked), .inventory .item.enabled {
+.inventory .item.recent {
+  background-color: rgb(242, 190, 255);
+}
+.inventory .item, .inventory .item.enabled {
   cursor: pointer;
 }
-
-.tab-bar {
-  border-bottom: 0.1em solid var(--clr-dark-gray);
-  margin-bottom: 0.5em;
-}
-
-.tab {
-  color: var(--clr-darker-gray);
-  line-height: inherit;
-  text-decoration: none;
-  padding: 0.2rem .6em;
-  font-size: 1rem;
-  margin: 0 .1em;
-  border: 0;
-  cursor: pointer;
-  display: inline-block;
-}
-
-.tab-bar.current .tab.active {
-  color: black;
-  border-bottom: 0.3em solid var(--clr-primary);
-}
-
-.inventory .tab.new {
-  background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(255, 242, 190));
-}
-
-.inventory .tab.new:not(.active) {
-  border-bottom: 0.3em solid rgb(255, 242, 190);
-}
-
-.tab.active {
-  color: black;
-  border-bottom: 0.3em solid #999;
-}
-
 
 .inventory .item .copy-button {
 	min-width: 3px;

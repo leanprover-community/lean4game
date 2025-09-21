@@ -53,7 +53,7 @@ def saveGameData (allItemsByType : HashMap InventoryType (HashSet Name))
 
   IO.FS.writeFile (path / gameFileName) (toString (getGameJson game))
 
-  for inventoryType in [InventoryType.Lemma, .Tactic, .Definition] do
+  for inventoryType in [InventoryType.Theorem, .Tactic, .Definition] do
     for name in allItemsByType.getD inventoryType {} do
       let some item ← getInventoryItem? name inventoryType
         | throwError "Expected item to exist: {name}"

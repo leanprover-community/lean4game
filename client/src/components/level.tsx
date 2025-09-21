@@ -26,7 +26,6 @@ import { changedSelection, codeEdited, selectCode, selectSelections, selectCompl
 import { store } from '../state/store'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import {InventoryPanel} from './inventory'
 import { hasInteractiveErrors } from './infoview/typewriter'
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
   ProofContext, SelectionContext, WorldLevelIdContext } from './infoview/context'
@@ -54,6 +53,7 @@ import { PreferencesPopup } from './popup/preferences'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
 import { useGameTranslation } from '../utils/translation'
+import { InventoryPanel } from './inventory/inventory_panel'
 
 
 monacoSetup()
@@ -176,7 +176,7 @@ function ChatPanel({lastLevel, visible = true}) {
     <div className="button-row">
       {proof?.completed && (lastLevel ?
         <Button ref={focusRef} to={`/${gameId}`}>
-          <FontAwesomeIcon icon={faHome} />&nbsp;{t("Leave World")}
+          <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
         </Button> :
         <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
           {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />

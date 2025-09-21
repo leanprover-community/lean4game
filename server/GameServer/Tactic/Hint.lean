@@ -68,7 +68,7 @@ elab (name := Hint) "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => d
     -- Evaluate the text in the `Hint`'s context to get the old variable names.
     let rawText := (← GameServer.evalHintMessage text) hintFVarsNames
     let ctx₂ := {env := ← getEnv, mctx := ← getMCtx, lctx := ← getLCtx, opts := {}}
-    let rawText : String := (← (MessageData.withContext ctx₂ rawText).toString).dropSingleNewlines
+    let rawText : String := (← (MessageData.withContext ctx₂ rawText).toString)
 
     -- i18n
     rawText.markForTranslation

@@ -11,10 +11,6 @@ import { changedReadIntro, selectReadIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { PreferencesContext } from './infoview/context'
-import { InventoryPanel } from './inventory'
-import { ErasePopup } from './popup/erase'
-import { RulesHelpPopup } from './popup/rules_help'
-import { PreferencesPopup} from "./popup/preferences"
 import { WorldTreePanel } from './world_tree'
 
 import '../css/welcome.css'
@@ -23,6 +19,7 @@ import { Hint } from './hints'
 import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useGameTranslation } from '../utils/translation'
+import { InventoryPanel } from './inventory/inventory_panel'
 
 
 /** the panel showing the game's introduction text */
