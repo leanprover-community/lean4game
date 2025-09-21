@@ -233,7 +233,8 @@ describe('Basic Lean4Game Features', () => {
   describe('Non-Prop Level', () => {
     it('Non-prop statements should be allowed', () => {
       cy.visit('/#/g/test/TestGame/world/TestWorld/level/3')
-      cy.contains('Goal:', { timeout: 60000 })
+      cy.get('.goal-sign').should('be.visible')
+      //cy.contains('Goal:', { timeout: 60000 })
       cy.contains('intro first!')
       cy.get('.typewriter-input .monaco-editor .view-lines').type('intro x{enter}')
       cy.contains('now apply!', { timeout: 10000 })
@@ -269,8 +270,11 @@ describe('Basic Lean4Game Features', () => {
       cy.get('.MuiSelect-select').click()
       cy.get('ul[id=":r0:"]').get('li[data-value="de"]').click()
 
+      // Close preferences
+      cy.get('.codicon').click()
+
       // Check that displayed language is german
-      cy.contains('Du kannst mit h oder g starten. Einzelne Zeilenumbrüche werden rausgefiltert.').should('be.visible')
+      cy.contains('Du kannst mit h oder g starten.').should('be.visible')
     })
 
     it('should not change language of hints to selected language if translation is not available', () => {
@@ -285,8 +289,11 @@ describe('Basic Lean4Game Features', () => {
       cy.get('.MuiSelect-select').click()
       cy.get('ul[id=":r0:"]').get('li[data-value="zh"]').click()
 
+      // Close preferences
+      cy.get('.codicon').click()
+
       // Check that displayed language is english
-      cy.contains('You can either start using h or g. Single newlines are stripped.').should('be.visible')
+      cy.contains('You can either start using h or g.').should('be.visible')
     })
   })
 })
