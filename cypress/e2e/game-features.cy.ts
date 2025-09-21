@@ -241,5 +241,37 @@ describe('Basic Lean4Game Features', () => {
       // Close popup
       cy.get('body').click(0, 0)
     })
+
+    it('should change language of hints to selected language if translation is available', () => {
+      navigateToLevel()
+      // Click menu button to open dropdown
+      cy.get('#menu-btn').click()
+
+      // Click preferences
+      cy.contains('Preferences').click()
+
+      // Select german language
+      cy.get('.MuiSelect-select').click()
+      cy.get('ul[id=":r0:"]').get('li[data-value="de"]').click()
+
+      // Check that displayed language is german
+      cy.contains('Du kannst mit h oder g starten. Einzelne Zeilenumbrüche werden rausgefiltert.').should('be.visible')
+    })
+
+    it('should not change language of hints to selected language if translation is not available', () => {
+      navigateToLevel()
+      // Click menu button to open dropdown
+      cy.get('#menu-btn').click()
+
+      // Click preferences
+      cy.contains('Preferences').click()
+
+      // Select mandarin as language
+      cy.get('.MuiSelect-select').click()
+      cy.get('ul[id=":r0:"]').get('li[data-value="zh"]').click()
+
+      // Check that displayed language is english
+      cy.contains('You can either start using h or g. Single newlines are stripped.').should('be.visible')
+    })
   })
 })
