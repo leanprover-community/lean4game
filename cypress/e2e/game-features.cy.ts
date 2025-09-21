@@ -268,7 +268,8 @@ describe('Basic Lean4Game Features', () => {
 
       // Select german language
       cy.get('.MuiSelect-select').click()
-      cy.get('ul[id=":r0:"]').get('li[data-value="de"]').click()
+      cy.get('.MuiPaper-root').click()
+      cy.get('li[data-value="de"]').click()
 
       // Close preferences
       cy.get('.codicon').click()
@@ -287,7 +288,8 @@ describe('Basic Lean4Game Features', () => {
 
       // Select mandarin language
       cy.get('.MuiSelect-select').click()
-      cy.get('ul[id=":r0:"]').get('li[data-value="zh"]').click()
+      cy.get('.MuiPaper-root').click()
+      cy.get('li[data-value="zh"]').click()
 
       // Close preferences
       cy.get('.codicon').click()
