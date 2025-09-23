@@ -131,8 +131,8 @@ elab "CoverImage" t:str : command => do
   modifyCurGame fun game => pure {game with
     tile := {game.tile with image := file}}
 
-
-syntax settingsArg := atomic(" (" (&"unbundleHyps" <|> &"unbundleHyps") " := " withoutPosition(term) ")")
+-- Note: the syntax to add multiple is `(&"anotherOption" <|> &"unbundleHyps")`
+syntax settingsArg := atomic(" (" (&"unbundleHyps") " := " withoutPosition(term) ")")
 
 /--
 Settings to customise the game appearance. Usage `Settings (setting1 := val1) (setting2 := val2)`.
@@ -148,17 +148,6 @@ elab "Settings " args:settingsArg* : command => do
     | `(settingsArg| (unbundleHyps := false)) => settings := { unbundleHyps := false }
     | _ => throwUnsupportedSyntax
   modifyCurGame (pure { · with settings := settings })
-
--- open Lean Elab Term Command in
--- unsafe elab "Settings" s:term : command => do
---   let stx ← liftTermElabM <| elabTerm s (mkConst ``Game.Settings)
---   logInfo s!"{stx}"
---   let sVal ← liftTermElabM <| evalExpr Game.Settings (mkConst ``Game.Settings) stx DefinitionSafety.unsafe
---   -- logInfo s!"{sVal.unbundleHyps}"
---   -- modifyCurGame fun game => pure {game with settings := sVal }
---   pure ()
-
--- Settings { unbundleHyps := false }
 
 /-! # Inventory
 
