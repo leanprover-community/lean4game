@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { selectTypewriterMode } from '../../state/progress';
 import { GameIdContext } from '../../app';
+import { useGetGameInfoQuery } from '../../state/api';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -141,7 +142,6 @@ interface GoalProps {
     filter: GoalFilterState
     showHints?: boolean
     typewriter: boolean
-    unbundle?: boolean /** unbundle `x y : Nat` into `x : Nat` and `y : Nat` */
 }
 
 /**
@@ -149,9 +149,10 @@ interface GoalProps {
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
     const gameId = React.useContext(GameIdContext)
+    const game = useGetGameInfoQuery({game: gameId})
     const {mobile} = React.useContext(PreferencesContext)
     const typewriterMode = useSelector(selectTypewriterMode(gameId))
-    const { goal, filter, showHints, typewriter, unbundle } = props
+    const { goal, filter, showHints, typewriter } = props
     let { t } = useTranslation()
 
     // TODO: Apparently `goal` can be `undefined`
@@ -177,8 +178,9 @@ export const Goal = React.memo((props: GoalProps) => {
     // if (props.goal.isRemoved) cn += 'b--removed '
 
     function unbundleHyps (hyps: InteractiveHypothesisBundle[]) : InteractiveHypothesisBundle[] {
+        console.debug("game", game)
         return hyps.flatMap(hyp => (
-            unbundle ? hyp.names.map(name => {return {...hyp, names: [name]}}) : [hyp]
+            game.data?.settings?.unbundleHyps ? hyp.names.map(name => {return {...hyp, names: [name]}}) : [hyp]
         ))
     }
 

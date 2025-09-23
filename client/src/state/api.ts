@@ -26,6 +26,9 @@ export interface GameInfo {
   conclusion: null|string,
   tile: null|GameTile,
   image: null|string
+  settings: {
+    unbundleHyps: boolean,
+  } | undefined
 }
 
 export interface InventoryTile {

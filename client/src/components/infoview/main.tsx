@@ -364,7 +364,7 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
       ))}
     </div>
     <div className="goal-tab vscode-light" style={{flexDirection: mobile ? "column" : "row"}}>
-      <Goal typewriter={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]?.goal} unbundle={false} />
+      <Goal typewriter={false} filter={goalFilter} goal={proofStep.goals[selectedGoal]?.goal} />
     </div>
   </div>
 }
