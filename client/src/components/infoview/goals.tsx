@@ -178,7 +178,6 @@ export const Goal = React.memo((props: GoalProps) => {
     // if (props.goal.isRemoved) cn += 'b--removed '
 
     function unbundleHyps (hyps: InteractiveHypothesisBundle[]) : InteractiveHypothesisBundle[] {
-        console.debug("game", game)
         return hyps.flatMap(hyp => (
             game.data?.settings?.unbundleHyps ? hyp.names.map(name => {return {...hyp, names: [name]}}) : [hyp]
         ))
