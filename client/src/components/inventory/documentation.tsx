@@ -1,7 +1,7 @@
 import React, { useContext } from "react"
 import { useTranslation } from "react-i18next"
 import { GameIdContext } from "../../app"
-import { useLoadDocQuery } from "../../state/api"
+import { useLoadDocQuery, useLoadDocLegacyQuery } from "../../state/api"
 import { Markdown } from "../markdown"
 import { useAppDispatch } from "../../hooks"
 import { useSelector } from "react-redux"
@@ -28,6 +28,7 @@ export function Documentation({ type } : {type : InventoryTab}) {
   // let { docTile, setDocTile } = useContext(InventoryContext)
 
   const docEntry = useLoadDocQuery({game: gameId, name: docTile.name, type: type })
+  const legacyDocEntry = useLoadDocLegacyQuery({game: gameId, name: docTile.name, type: type == InventoryTab.theorem ? "lemma" : type})
   let inv: string[] = useSelector(selectInventory(gameId))
 
   // Set `inventoryDoc` to `null` to close the doc
@@ -51,8 +52,8 @@ export function Documentation({ type } : {type : InventoryTab}) {
         inverted={true} />
     }
     <h1 className="doc">{docTile.displayName}</h1>
-    <p><code>{docEntry.data?.statement}</code></p>
-    <Markdown>{gT(docEntry.data?.content)}</Markdown>
+    <p><code>{docEntry.data?.statement ?? legacyDocEntry.data?.statement}</code></p>
+    <Markdown>{gT(docEntry.data?.content ?? legacyDocEntry.data?.content)}</Markdown>
     {/* TODO: The condition below should be updated so that the section
     is displayed whenever it's non-empty. */}
     {docTile.proven && <>
