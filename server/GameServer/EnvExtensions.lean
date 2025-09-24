@@ -393,6 +393,18 @@ structure GameTile where
   image: String := default
 deriving Inhabited, ToJson, FromJson
 
+/-- Settings which modify the game's frontend display. -/
+structure Game.Settings where
+  /--
+  If `true`, display two hypotheses `A : Prop` and `B : Prop`
+  instead of a joint `A B : Prop`.
+  -/
+  unbundleHyps : Bool := false
+deriving Repr, ToJson, FromJson
+
+instance : Inhabited Game.Settings where
+  default := {}
+
 structure Game where
   /-- Internal name of the game. -/
   name : Name
@@ -411,6 +423,8 @@ structure Game where
   tile : GameTile := default
   /-- The path to the background image of the world. -/
   image : String := default
+  /-- Settings to individualise the game's UI. -/
+  settings : Game.Settings := default
 deriving Inhabited, ToJson, FromJson
 
 def getGameJson (game : «Game») : Json := Id.run do

@@ -131,6 +131,24 @@ elab "CoverImage" t:str : command => do
   modifyCurGame fun game => pure {game with
     tile := {game.tile with image := file}}
 
+-- Note: the syntax to add multiple is `(&"anotherOption" <|> &"unbundleHyps")`
+syntax settingsArg := atomic(" (" (&"unbundleHyps") " := " withoutPosition(term) ")")
+
+/--
+Settings to customise the game appearance. Usage `Settings (setting1 := val1) (setting2 := val2)`.
+Valid settings are:
+
+* (unbundleHyps := false)
+ -/
+elab "Settings " args:settingsArg* : command => do
+  let mut settings: Game.Settings := default
+  for arg in args do
+    match arg with
+    | `(settingsArg| (unbundleHyps := true)) => settings := { settings with unbundleHyps := true }
+    | `(settingsArg| (unbundleHyps := false)) => settings := { unbundleHyps := false }
+    | _ => throwUnsupportedSyntax
+  modifyCurGame (pure { · with settings := settings })
+
 /-! # Inventory
 
 The inventory contains docs for tactics, theorems, and definitions. These are all locked

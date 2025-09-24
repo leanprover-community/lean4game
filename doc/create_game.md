@@ -329,6 +329,22 @@ CoverImage "images/cover.png"
 
 ## 11. Advanced Topics
 
+### Customising Game UI
+
+There are some options to customise how the game content is displayed. These
+can be configured using the following command inside `Game.lean`
+
+```
+Settings
+  (unbundleHyps := true)
+  (anotherOption := false)
+```
+
+Currently existing options are:
+
+* `unbundleHyps` (default: `false`): if enabled, display two lines `A : Prop` and `B : Prop` instead
+  of a single `A B : Prop`.
+
 ### Markdown
 
 Texts should generally support markdown. For some tips on how to use markdown, see
