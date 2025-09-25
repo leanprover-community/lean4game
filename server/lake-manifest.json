@@ -15,7 +15,7 @@
    "type": "git",
    "subDir": null,
    "scope": "hhu-adam",
-   "rev": "c293094f25d8548435dcfa6bc58cc8ed52f15341",
+   "rev": "c07e62c1431859fd6ead265774a6393cae4744cf",
    "name": "i18n",
    "manifestFile": "lake-manifest.json",
    "inputRev": "v4.23.0",
