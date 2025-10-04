@@ -4,12 +4,12 @@ This is the source code for a Lean game platform hosted at [adam.math.hhu.de](ht
 
 ## Creating a Game
 
-Please follow the tutorial [Creating a Game](docs/en/getting-started/create_game.md). In particular, the following steps might be of interest:
+Please follow the tutorial [Creating a Game](getting-started/create_game.md). In particular, the following steps might be of interest:
 
-* Step 6: [How to Run Games Locally](docs/en/getting-started/running_locally.md)
-* Step 8: [How to Update an existing Game](docs/en/server-deployment/update_game.md)
-* Step 10: [How to Publish a Game](docs/en/server-deployment/publish_game.md)
-* [Troubleshooting](docs/en/getting-started/troubleshoot.md)
+* Step 6: [How to Run Games Locally](getting-started/running_locally.md)
+* Step 8: [How to Update an existing Game](server-deployment/update_game.md)
+* Step 10: [How to Publish a Game](server-deployment/publish_game.md)
+* [Troubleshooting](getting-started/troubleshoot.md)
 
 ## Documentation
 
@@ -18,20 +18,20 @@ should be up-to-date:
 
 ### Game creation API
 
-- [Creating a Game](docs/en/game-development/create_game.md): **the main document to consult**.
-- [More about Hints](docs/en/game-development/hints.md): describes the `Hint` and `Branch` tactic.
+- [Creating a Game](getting-started/create_game.md): **the main document to consult**.
+- [More about Hints](game-development/hints.md): describes the `Hint` and `Branch` tactic.
 
 ### Frontend API
 
-* [How to Run Games Locally](docs/en/getting-started/running_locally.md): play a game on your computer
-* [How to Update an existing Game](docs/en/server-deployment/update_game.md): update to a new lean version
-* [How to Publish a Game](docs/en/server-deployment/publish_game.md): load your game to adam.math.hhu.de for others to play
+* [How to Run Games Locally](getting-started/running_locally.md): play a game on your computer
+* [How to Update an existing Game](server-deployment/update_game.md): update to a new lean version
+* [How to Publish a Game](server-deployment/publish_game.md): load your game to adam.math.hhu.de for others to play
 
 ### Backend
 
 not fully written yet.
 
-* [Server](docs/en/server-deployment/DOCUMENTATION.md): describes the server part (i.e. the content of `server/` und `relay/`).
+* [Server](server-deployment/DOCUMENTATION.md): describes the server part (i.e. the content of `server/` und `relay/`).
 
 ## Contributing
 
@@ -46,7 +46,7 @@ The interface can be translated to various languages. For adding a translation, 
 3. Add all translations.
 4. Commit the changes you made to `config.json` together with the new `translation.json`.
 
-For translating games, see [Translating a game](docs/en/game-development/translate.md).
+For translating games, see [Translating a game](game-development/translate.md).
 
 ## Security
 

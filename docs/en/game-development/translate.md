@@ -7,7 +7,7 @@ The intended workflow currently is the following:
 1. When you call `lake build` in your game, it should automatically create a template file `.i18n/en/Game.pot`. Alternatively you can call `lake exe i18n --template` to recreate it.
 2. Open the file `Game.pot` (the "t" stands for "template") with [Poedit](https://poedit.net/) (or a similar software) and translate all strings. Save your work as `.i18n/{language}/Game.po`.
 4. Call `lake exe i18n --export-json` to create all Json files `.i18n/{language}/Game.json` which the server needs.
-5. Add your translations (i.e. `.po` and `.json`, but not the `.mo` files) and push your results, and [publish the game](publish_game.md).
+5. Add your translations (i.e. `.po` and `.json`, but not the `.mo` files) and push your results, and [publish the game](../server-deployment/publish_game.md).
 
 If you choose the correct language in the "Preferences" of the game, you should see your translations.
 

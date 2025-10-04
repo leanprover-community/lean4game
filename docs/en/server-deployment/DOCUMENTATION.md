@@ -34,8 +34,7 @@ Currently, this happens through a lake-post-update-hook when calling `lake updat
 
 ### Starting the server
 
-When using the [manual installation](running_locally.md#manual-installation) you can run the server
-using
+When using [manual installation](../getting-started/running_locally.md#manual-installation), you can run the server with
 
 ```
 npm start
