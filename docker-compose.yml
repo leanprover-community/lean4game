@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  lean4game:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lean4game-app
+    ports:
+      - "${HOST_PORT:-8080}:${PORT:-8080}"
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT:-8080}
+      - CLIENT_PORT=${CLIENT_PORT:-3000}
+      - VITE_CLIENT_DEFAULT_LANGUAGE=${VITE_CLIENT_DEFAULT_LANGUAGE:-en}
+    env_file:
+      - .env
+    volumes:
+      # Optional: Mount games directory for development
+      - ./games:/app/games:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8080}/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - lean4game-network
+
+networks:
+  lean4game-network:
+    driver: bridge
+
+volumes:
+  lean4game-data:
+    driver: local

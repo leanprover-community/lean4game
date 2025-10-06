@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # Prepare NNG4 project
+  nng4-setup:
+    image: node:22-alpine
+    container_name: nng4-setup
+    working_dir: /workspace
+    volumes:
+      - nng4-data:/workspace/NNG4
+      - ./:/workspace/lean4game
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    command: >
+      sh -c "
+        apk add --no-cache git curl bash &&
+        if [ ! -d '/workspace/NNG4/.git' ]; then
+          echo 'Cloning NNG4 repository...' &&
+          git clone https://github.com/leanprover-community/NNG4 /workspace/NNG4
+        else
+          echo 'NNG4 already exists, pulling latest changes...' &&
+          cd /workspace/NNG4 &&
+          git pull origin main
+        fi &&
+        cd /workspace/NNG4 &&
+        echo 'Installing elan...' &&
+        curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y &&
+        export PATH=\"/root/.elan/bin:\$PATH\" &&
+        echo 'Running lake update...' &&
+        lake update -R &&
+        echo 'Building NNG4...' &&
+        lake build &&
+        echo 'NNG4 setup completed successfully!'
+      "
+    networks:
+      - lean4game-network
+
+  # Step 2: Build and run Lean4Game
+  lean4game:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lean4game-nng4-app
+    ports:
+      - "${HOST_PORT:-8080}:${PORT:-8080}"
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT:-8080}
+      - CLIENT_PORT=${CLIENT_PORT:-3000}
+      - VITE_CLIENT_DEFAULT_LANGUAGE=${VITE_CLIENT_DEFAULT_LANGUAGE:-en}
+    env_file:
+      - .env
+    volumes:
+      # Mount NNG4 project to the application
+      - nng4-data:/app/NNG4:ro
+      # Optional: Mount games directory for development
+      - lean4game-data:/app/games:ro
+    depends_on:
+      nng4-setup:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8080}/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # 增加启动时间，因为需要等待 NNG4 构建完成
+    networks:
+      - lean4game-network
+
+networks:
+  lean4game-network:
+    driver: bridge
+
+volumes:
+  nng4-data:
+    driver: local
+  lean4game-data:
+    driver: local
