@@ -5,17 +5,17 @@
 ## 1. 将游戏上传到 github
 
 首先，您需要将游戏放在公共 Github 仓库中，并确保 github action 已运行。
-您可以通过在首页看到绿色勾号，或查看"Actions"标签来检查这一点。
+可以通过在首页看到绿色勾号，或查看"Actions"标签来检查这一点。
 
 ## 2. 导入游戏
 
-您调用最新 action 运行中"What's Next?"下列出的 URL。明确地说，您调用形式为
+查看最新 action 日志，其中 "What's Next?" 标签列出的 URL。具体地说，调用形式为
 
 > adam.math.hhu.de/import/trigger/{USER}/{REPOSITORY}
 
-的 URL，其中 `{USER}` 和 `{REPOSITORY}` 替换为 github 用户和仓库名称。
+其中 `{USER}` 和 `{REPOSITORY}` 替换为 github 用户和仓库名称。
 
-您应该看到一个白色屏幕，显示导入更新并最终报告"Done."
+打开网页应该会看到一个白色屏幕，显示导入更新并最终报告"Done."
 
 ## 3. 玩游戏
 
@@ -27,6 +27,6 @@
 
 ## 5. 主页
 
-将游戏添加到主页由服务器维护者手动完成。如果您希望我们为您的游戏添加磁贴，请告诉我们！
+将游戏添加到主页由服务器维护者手动完成。如果您希望将游戏添加到主页中，请告诉我们！
 
 例如，您可以[在 Zulip 上联系 Jon](https://leanprover.zulipchat.com/#narrow/dm/385895-Jon-Eugster)。

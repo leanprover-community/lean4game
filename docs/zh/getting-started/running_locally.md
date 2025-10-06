@@ -8,12 +8,12 @@
 
 1. VSCode 开发容器：需要在您的机器上安装 `docker`
 2. Codespaces：需要活跃的互联网连接，计算时间有限
-3. Gitpod：目前还不能工作（这是真的吗？）
+3. Gitpod：目前还不能正常运行（尚未确认？）
 4. 手动安装：需要在您的系统上安装 `npm`
 
-推荐的选项是"VSCode 开发容器"，但您可以根据您的设置选择上述任何选项。
+推荐的选项是"VSCode 开发容器"，但您可以根据个人喜好选择上述任何选项。
 
-模板游戏 [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) 包含所有相关文件，使您的本地设置（开发容器 / gitpod / codespaces）能够正常工作。如果您需要在现有游戏中使用开发设置的任何新改进，您可能需要从那里复制这些文件来手动更新它们。
+模板游戏 [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) 包含所有相关文件，可以让您的本地设置（开发容器 / gitpod / codespaces）正常工作。如果您需要在已有游戏中开发新改进，您可以从这个仓库复制文件来手动更新。
 
 ## VSCode 开发容器
 
@@ -23,13 +23,12 @@
     * 如果您还没有安装 docker 引擎：[安装说明](https://docs.docker.com/engine/install/)。
       我在 linux 上遵循了"服务器"说明。
     * 注意在 Linux 上您需要将您的用户添加到 `docker` 组
-      ([参见说明](https://docs.docker.com/engine/install/linux-postinstall/)) 并可能需要重启。
+      ([参见说明](https://docs.docker.com/engine/install/linux-postinstall/)) 并可能需要重启 shell。
     * 在 VSCode 中打开游戏文件夹：`cd NNG4 && code .` 或在 VSCode 中"打开文件夹"
     * 会出现一条消息提示您安装"Dev Containers"扩展（由 Microsoft 提供）。（或者从 VSCode 扩展中安装它）。
 
 2.  **在开发容器中打开项目** *(每次)*：<br/>
-    一旦您安装了开发容器扩展，在 VSCode 中（重新）打开您的游戏项目文件夹。
-    会出现一条消息询问您是否"在容器中重新打开"。
+    一旦您安装了开发容器扩展，在 VSCode 中（重新）打开您的游戏项目文件夹。会出现一条消息询问您是否"在容器中重新打开"。
 
     * 第一次启动会花费一些时间，大约 2-15 分钟。第一次启动后，这应该会很快。
     * 构建完成后，您可以在浏览器中打开 http://localhost:3000，这应该会加载游戏。
@@ -39,11 +38,11 @@
 
 ## Codespaces
 
-您可以使用 Github codespaces 来处理您的游戏（点击"Code"，然后"Codespaces"，然后"在 main 上创建 codespace"）。它应该在后台本地运行游戏。您可以在"Ports"下打开它，然后点击"在浏览器中打开"。
+您可以使用 Github codespaces 来处理您的游戏（点击仓库绿色按钮"Code"，然后"Codespaces"，然后"在 main 上创建 codespace"）。它应该在后台本地运行游戏。您可以在"Ports"下打开它，然后点击"在浏览器中打开"。
 
 注意：您必须等到 npm 正确启动，这可能需要很长时间。
 
-与开发容器一样，您需要在更改任何 lean 文件后运行 `lake build`，然后重新加载浏览器。
+与开发容器一样，在更改任何 lean 文件后，您需要在运行 `lake build`，然后重新加载浏览器。
 
 ## Gitpod
 
@@ -53,7 +52,7 @@ TODO：不确定这是否还能工作！
 
 ## 手动安装
 
-这会在您的计算机上手动安装 `lean4game`。（这与设置适当的在线服务器的安装相同，只是运行命令（即 `npm start`）不同。）
+这会在您的计算机上手动安装 `lean4game`。（这与设置在线服务器的安装方式相同，只是运行命令（即 `npm start`）不同。）
 
 安装 `nvm`：
 ```bash
@@ -79,7 +78,7 @@ lake update -R
 lake build
 ```
 
-将服务器仓库克隆到游戏旁边的目录中：
+将服务器仓库克隆到游戏同级的目录中：
 ```bash
 cd ..
 git clone https://github.com/leanprover-community/lean4game.git
@@ -132,4 +131,4 @@ cd NNG4
 lake update -R -Klean4game.local
 lake build
 ```
-这会导致 lake 在本地搜索 `GameServer` lake 包，而不是使用 github 上的版本。因此，您可以编辑 `../lean4game` 中的本地 `GameServer` 副本，然后 `lake build` 将直接使用这个修改后的副本来构建您的游戏。
+这可以让 lake 在本地搜索 `GameServer` 包，而不是使用 github 上的版本。因此，您可以编辑 `../lean4game` 中的本地 `GameServer` 副本，然后 `lake build` 将直接使用这个修改后的副本来构建您的游戏。

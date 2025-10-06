@@ -29,4 +29,4 @@
 # 发布
 关于上传到服务器的错误。
 
-* 您的游戏概览加载了，但服务器在加载关卡时崩溃：检查您游戏的 github action 是否与 [GameSkeleton 的](https://github.com/hhu-adam/GameSkeleton/blob/main/.github/workflows/build.yml) 相同，特别是确保有一个关于构建 "`gameserver`-executable" 的步骤。
+* 您的游戏概览加载了，但服务器在加载关卡时崩溃：请检查您游戏的 github action 是否和 [GameSkeleton 的](https://github.com/hhu-adam/GameSkeleton/blob/main/.github/workflows/build.yml) 雷同，特别是确保有一个关于构建 "`gameserver`-executable" 的步骤。

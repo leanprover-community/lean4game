@@ -23,17 +23,15 @@
     npm install
     ```
     其中 `{VERSION_TAG}` 是上面形式为 `v4.X.0` 的标签
-* **Gitpod/Codespaces**：创建一个新的
+* **Gitpod/Codespaces**：创建一个新的空间
 
-这将把您的游戏（以及您可能使用的 mathlib 版本）更新到新的 lean 版本。
+这些操作可以把您的游戏（以及您可能使用的 mathlib 版本）更新到新的 lean 版本。
 
-## 最新的开发设置
+## 新的开发设置
 
-您的游戏仓库中有一些文件用于开发设置
-（dev container/codespaces/gitpod）。如果您需要更新开发设置，例如因为它不再工作，
-您需要将相关文件从 [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) 模板复制到您的游戏仓库中。
+您的游戏仓库中有一些用于开发设置的文件（dev container/codespaces/gitpod）。如果您需要更新这些设置，比如它不能正常运行，您需要将相关文件从 [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) 模板复制到您的游戏仓库中。
 
-相关文件是：
+相关文件包括：
 
 ```
 .devcontainer/
