@@ -171,7 +171,7 @@ at the end.
 
 Now it's time to test the game locally and play it.
 
-There are multiple ways how you can start the game locally to test-play it described at [How to Run the Game Locally](running_locally.md). If you have problems getting one of the setups to work, please get in contact!
+There are multiple ways how you can start the game locally to test-play it described at [How to Run the Game Locally](../getting-started/running_locally.md). If you have problems getting one of the setups to work, please get in contact!
 
 
 ## 7. Dive into Level creation
@@ -254,7 +254,7 @@ You can but a `Statement` inside namespaces like you would with `theorem`.
 
 #### Doc String / Exercise statement
 
-Add a docstring that contains the exercise statement in natural language. If you do this, it will appear at the top of the exercise. See [LaTeX in Games](latex.md) for more details on formatting.
+Add a docstring that contains the exercise statement in natural language. If you do this, it will appear at the top of the exercise. See [LaTeX in Games](../game-development/latex.md) for more details on formatting.
 
 ```lean
 /-- The exercise statement in natural language using latex: $\iff$. -/
@@ -262,7 +262,7 @@ Statement ...
   sorry
 ```
 
-For more details and features, read [Writing Exercises](writing_exercises.md)
+For more details and features, read [Writing Exercises](../game-development/writing_exercises.md)
 
 ### 7. c) Proof
 
@@ -288,7 +288,7 @@ Most important for game development are probably the `Hints`.
 The hints will be displayed whenever the player's current goal matches the goal the hint is
 placed at inside the sample proof. You can use `Branch` to place hints in dead ends or alternative proof strands.
 
-Read [More about Hints](hints.md) for how they work and what the options are.
+Read [More about Hints](../game-development/hints.md) for how they work and what the options are.
 
 ### 7. e) Extra: Images
 You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
@@ -298,19 +298,19 @@ in one of the files you created in 2), 3), or 4) (i.e. game/world/level).
 
 NOTE: At present, only the images for a world are displayed. They appear in the introduction of the world.
 
-You can also embed images in the text as descriped in [Markdown](markdown.md).
+You can also embed images in the text as descriped in [Markdown](../game-development/markdown.md).
 
 ## 8. Update your game
 
-In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](update_game.md).
+In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](../getting-started/update_game.md).
 
 ## 9. Add translation
 
-See [Translating a game](translate.md).
+See [Translating a game](../game-development/translate.md).
 
 ## 10. Publish your game
 
-To publish your game on the official server, see [Publishing a game](publish_game.md)
+To publish your game on the official server, see [Publishing a game](../getting-started/publish_game.md)
 
 There are a few more options you can add in `Game.lean` before the `MakeGame` command, which describe the tile that is visible on the server's landing page:
 
@@ -348,7 +348,7 @@ Currently existing options are:
 ### Markdown
 
 Texts should generally support markdown. For some tips on how to use markdown, see
-[Markdown styling](markdown.md).
+[Markdown styling](../game-development/markdown.md).
 
 In particular, you can embed images in texts, see the specific instructions in that file.
 
@@ -357,7 +357,7 @@ In particular, you can embed images in texts, see the specific instructions in t
 ### Markdown
 
 Texts should generally support markdown. For some tips on how to use markdown, see
-[Markdown styling](markdown.md).
+[Markdown styling](../game-development/markdown.md).
 
 In particular, you can embed images in texts, see the specific instructions in that file.
 
@@ -372,7 +372,7 @@ Inside strings, you need to escape backslashes, but not inside doc-strings, ther
 ### LaTeX support
 
 LaTeX is rendered using the [KaTeX library](https://katex.org/),
-see [Using LaTeX in the Game](latex.md) for details.
+see [Using LaTeX in the Game](../game-development/latex.md) for details.
 
 ### Number Of Levels Limit
 

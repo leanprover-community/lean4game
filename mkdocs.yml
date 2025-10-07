@@ -1,0 +1,134 @@
+site_name: Lean4Game Documentation
+site_description: Interactive Lean 4 Game Platform - Create and Play Mathematical Proof Games
+site_author: Lean Community
+site_url: https://leanprover-community.github.io/lean4game/
+
+repo_name: leanprover-community/lean4game
+repo_url: https://github.com/leanprover-community/lean4game
+edit_uri: edit/main/docs/
+
+docs_dir: docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo # 换个主题
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.prune
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+    - content.action.view
+  language: en
+
+plugins:
+  - search
+  - i18n:
+      docs_structure: folder
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+          site_name: "Lean4Game Documentation"
+        - locale: zh
+          name: 中文
+          build: true
+          site_name: "Lean4Game 文档"
+          nav_translations:
+            Home: 首页
+            Getting Started: 快速开始
+            Game Development: 游戏开发
+            Server & Deployment: 服务器与部署
+            Reference: 参考文档
+            Running Locally: 本地运行
+            Creating a Game: 游戏创建
+            Troubleshooting: 故障排除
+            Writing Exercises: 编写练习
+            Hints System: 提示系统
+            Environment Setup: 环境设置
+            LaTeX Support: LaTeX 支持
+            Markdown Features: Markdown 功能
+            Translation: 翻译
+            Server Architecture: 服务器架构
+            Server Configuration: 服务器配置
+            Client Features: 客户端功能
+            Publishing Games: 发布游戏
+            Updating Games: 更新游戏
+            NPM Scripts: NPM 脚本
+            Changelog: 变更日志
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra:
+  alternate:
+    - name: English
+      link: /lean4game/
+      lang: en
+    - name: 中文
+      link: /lean4game/zh/
+      lang: zh
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/leanprover-community/lean4game
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Running Locally: getting-started/running_locally.md
+    - Updating Games: getting-started/update_game.md
+    - Publishing Games: getting-started/publish_game.md
+    - Troubleshooting: getting-started/troubleshoot.md
+    - Changelog: changelog.md
+  - Game Development:
+    - Creating a Game: game-development/create_game.md
+    - Writing Exercises: game-development/writing_exercises.md
+    - Hints System: game-development/hints.md
+    - Environment Setup: game-development/environment.md
+    - LaTeX Support: game-development/latex.md
+    - Markdown Features: game-development/markdown.md
+    - Translation: game-development/translate.md
+  - Server & Deployment:
+    - Server Architecture: server-deployment/DOCUMENTATION.md
+    - Server Configuration: server-deployment/server.md
+    - Client Features: server-deployment/client.md
+    - NPM Scripts: server-deployment/npm_scripts.md
