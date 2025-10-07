@@ -7,7 +7,7 @@
 1. 当您在游戏中调用 `lake build` 时，它应该自动创建模板文件 `.i18n/en/Game.pot`。或者您可以调用 `lake exe i18n --template` 来重新创建它。
 2. 使用 [Poedit](https://poedit.net/)（或类似软件）打开文件 `Game.pot`（"t" 代表 "template"）并翻译所有字符串。将您的工作保存为 `.i18n/{language}/Game.po`。
 4. 调用 `lake exe i18n --export-json` 创建服务器需要的所有 Json 文件 `.i18n/{language}/Game.json`。
-5. 添加您的翻译（即 `.po` 和 `.json`，但不包括 `.mo` 文件）并推送您的结果，然后[发布游戏](../server-deployment/publish_game.md)。
+5. 添加您的翻译（即 `.po` 和 `.json`，但不包括 `.mo` 文件）并推送您的结果，然后[发布游戏](../getting-started/publish_game.md)。
 
 如果您在游戏的"首选项"中选择正确的语言，您应该能看到您的翻译。
 

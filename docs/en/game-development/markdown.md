@@ -20,4 +20,4 @@ For external images, you can add them using a full URL:
 ```
 
 Note: the `images/` folder is the same folder used for introduction images for worlds.
-See [Creating a Game > 6e](../getting-started/create_game.md#6-e-extra-images)
+See [Creating a Game > 6e](../game-development/create_game.md#6-e-extra-images)

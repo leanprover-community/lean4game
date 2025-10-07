@@ -115,9 +115,12 @@ nav:
   - Home: index.md
   - Getting Started:
     - Running Locally: getting-started/running_locally.md
-    - Creating a Game: getting-started/create_game.md
+    - Updating Games: getting-started/update_game.md
+    - Publishing Games: getting-started/publish_game.md
     - Troubleshooting: getting-started/troubleshoot.md
+    - Changelog: changelog.md
   - Game Development:
+    - Creating a Game: game-development/create_game.md
     - Writing Exercises: game-development/writing_exercises.md
     - Hints System: game-development/hints.md
     - Environment Setup: game-development/environment.md
@@ -128,8 +131,4 @@ nav:
     - Server Architecture: server-deployment/DOCUMENTATION.md
     - Server Configuration: server-deployment/server.md
     - Client Features: server-deployment/client.md
-    - Publishing Games: server-deployment/publish_game.md
-    - Updating Games: server-deployment/update_game.md
     - NPM Scripts: server-deployment/npm_scripts.md
-  - Reference:
-    - Changelog: reference/changelog.md

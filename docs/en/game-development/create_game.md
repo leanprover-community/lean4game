@@ -171,7 +171,7 @@ at the end.
 
 Now it's time to test the game locally and play it.
 
-There are multiple ways how you can start the game locally to test-play it described at [How to Run the Game Locally](running_locally.md). If you have problems getting one of the setups to work, please get in contact!
+There are multiple ways how you can start the game locally to test-play it described at [How to Run the Game Locally](../getting-started/running_locally.md). If you have problems getting one of the setups to work, please get in contact!
 
 
 ## 7. Dive into Level creation
@@ -302,7 +302,7 @@ You can also embed images in the text as descriped in [Markdown](../game-develop
 
 ## 8. Update your game
 
-In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](../server-deployment/update_game.md).
+In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](../getting-started/update_game.md).
 
 ## 9. Add translation
 
@@ -310,7 +310,7 @@ See [Translating a game](../game-development/translate.md).
 
 ## 10. Publish your game
 
-To publish your game on the official server, see [Publishing a game](../server-deployment/publish_game.md)
+To publish your game on the official server, see [Publishing a game](../getting-started/publish_game.md)
 
 There are a few more options you can add in `Game.lean` before the `MakeGame` command, which describe the tile that is visible on the server's landing page:
 

@@ -19,4 +19,4 @@
 ```
 
 注意：`images/` 文件夹与用于世界介绍图像的文件夹相同。
-参见[创建游戏 > 6e](../getting-started/create_game.md#6-e-额外图像)
+参见[创建游戏 > 6e](../game-development/create_game.md#6-e-额外图像)

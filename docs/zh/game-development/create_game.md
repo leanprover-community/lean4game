@@ -156,7 +156,7 @@ No world introducing sorry, but required by MyWorld
 
 现在是时候本地测试游戏并玩它了。
 
-有多种方法可以在本地启动游戏进行测试，详见[如何本地运行游戏](running_locally.md)。如果您在设置任何一种方法时遇到问题，请联系我们！
+有多种方法可以在本地启动游戏进行测试，详见[如何本地运行游戏](../getting-started/running_locally.md)。如果您在设置任何一种方法时遇到问题，请联系我们！
 
 ## 7. 深入关卡创建
 
@@ -276,7 +276,7 @@ Statement ...
 
 ## 8. 更新您的游戏
 
-原则上，更新您的游戏到新的 Lean 版本就像修改 `lean-toolchain` 一样简单。但是，您应该阅读[更新现有游戏](../server-deployment/update_game.md)中的详细信息。
+原则上，更新您的游戏到新的 Lean 版本就像修改 `lean-toolchain` 一样简单。但是，您应该阅读[更新现有游戏](../getting-started/update_game.md)中的详细信息。
 
 ## 9. 添加翻译
 
@@ -284,7 +284,7 @@ Statement ...
 
 ## 10. 发布您的游戏
 
-要在官方服务器上发布您的游戏，请参见[发布游戏](../server-deployment/publish_game.md)
+要在官方服务器上发布您的游戏，请参见[发布游戏](../getting-started/publish_game.md)
 
 在 `MakeGame` 命令之前，您可以在 `Game.lean` 中添加一些更多选项，这些选项描述在服务器登录页面上可见的磁贴：
 

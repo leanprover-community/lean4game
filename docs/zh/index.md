@@ -4,11 +4,11 @@
 
 ## 创建游戏
 
-请按照教程 [创建游戏](getting-started/create_game.md) 进行操作。特别是，这几个步骤您可能会感兴趣：
+请按照教程 [创建游戏](game-development/create_game.md) 进行操作。特别是，这几个步骤您可能会感兴趣：
 
 * 步骤 6：[如何在本地运行游戏](getting-started/running_locally.md)
-* 步骤 8：[如何更新现有游戏](server-deployment/update_game.md)
-* 步骤 10：[如何发布游戏](server-deployment/publish_game.md)
+* 步骤 8：[如何更新现有游戏](getting-started/update_game.md)
+* 步骤 10：[如何发布游戏](getting-started/publish_game.md)
 * [故障排除](getting-started/troubleshoot.md)
 
 ## 文档
@@ -17,14 +17,14 @@
 
 ### 游戏创建 API
 
-- [创建游戏](getting-started/create_game.md)：**主要参考文档**。
+- [创建游戏](game-development/create_game.md)：**主要参考文档**。
 - [更多关于提示的信息](game-development/hints.md)：描述 `Hint` 和 `Branch` 策略。
 
 ### 前端 API
 
 * [如何在本地运行游戏](getting-started/running_locally.md)：在您的计算机上玩游戏
-* [如何更新现有游戏](server-deployment/update_game.md)：更新到新的 lean 版本
-* [如何发布游戏](server-deployment/publish_game.md)：将您的游戏加载到 adam.math.hhu.de 供其他人玩
+* [如何更新现有游戏](getting-started/update_game.md)：更新到新的 lean 版本
+* [如何发布游戏](getting-started/publish_game.md)：将您的游戏加载到 adam.math.hhu.de 供其他人玩
 
 ### 后端
 

@@ -4,11 +4,11 @@ This is the source code for a Lean game platform hosted at [adam.math.hhu.de](ht
 
 ## Creating a Game
 
-Please follow the tutorial [Creating a Game](getting-started/create_game.md). In particular, the following steps might be of interest:
+Please follow the tutorial [Creating a Game](game-development/create_game.md). In particular, the following steps might be of interest:
 
 * Step 6: [How to Run Games Locally](getting-started/running_locally.md)
-* Step 8: [How to Update an existing Game](server-deployment/update_game.md)
-* Step 10: [How to Publish a Game](server-deployment/publish_game.md)
+* Step 8: [How to Update an existing Game](getting-started/update_game.md)
+* Step 10: [How to Publish a Game](getting-started/publish_game.md)
 * [Troubleshooting](getting-started/troubleshoot.md)
 
 ## Documentation
@@ -18,14 +18,14 @@ should be up-to-date:
 
 ### Game creation API
 
-- [Creating a Game](getting-started/create_game.md): **the main document to consult**.
+- [Creating a Game](game-development/create_game.md): **the main document to consult**.
 - [More about Hints](game-development/hints.md): describes the `Hint` and `Branch` tactic.
 
 ### Frontend API
 
 * [How to Run Games Locally](getting-started/running_locally.md): play a game on your computer
-* [How to Update an existing Game](server-deployment/update_game.md): update to a new lean version
-* [How to Publish a Game](server-deployment/publish_game.md): load your game to adam.math.hhu.de for others to play
+* [How to Update an existing Game](getting-started/update_game.md): update to a new lean version
+* [How to Publish a Game](getting-started/publish_game.md): load your game to adam.math.hhu.de for others to play
 
 ### Backend
 

@@ -1,12 +1,10 @@
 ## NPM 脚本
 
-* `npm start`：以开发模式启动项目。当客户端文件发生更改时，浏览器将自动重新加载。当 lean 文件发生更改时，Lean 服务器将被重新编译和重启。Lean 服务器将在没有容器的情况下启动。客户端和服务器可以使用脚本 `npm run start:client` 和 `npm run start:server` 分别启动。项目可以通过 `http://localhost:3000` 访问。
-在内部，到 `ws://localhost:3000/websockets` 的 websocket 请求将被转发到运行在端口 `8080` 上的 Lean 服务器。
+* `npm start`：以开发模式启动项目。当客户端文件发生更改时，浏览器将自动重新加载。当 lean 文件发生更改时，Lean 服务器将被重新编译和重启。此时 Lean 服务器的启动将不依赖容器。客户端和服务器分别使用脚本 `npm run start:client` 和 `npm run start:server` 启动，并通过 `http://localhost:3000` 访问项目。在内部，到 `ws://localhost:3000/websockets` 的 websocket 请求将被转发到运行在端口 `8080` 上的 Lean 服务器。
 
-* `npm run build`：以生产模式构建项目。客户端的所有资产将被编译到 `client/dist` 中。
-在服务器端，该命令将设置一个包含 Lean 服务器的 docker 镜像。这两个部分可以使用 `npm run build:client` 和 `npm run build:server` 分别构建。
+* `npm run build`：以生产模式构建项目。对于客户端，所有文件将被编译到 `client/dist` 中。对于服务器端，该命令将设置一个包含 Lean 服务器的 docker 镜像。这两个部分可以使用 `npm run build:client` 和 `npm run build:server` 分别构建。
 
-* `npm run production`：以生产模式启动项目。这需要已经运行构建脚本。它将在 `PORT` 环境变量指定的端口上启动服务器，或默认在 `8080` 上启动。您可以通过运行 `PORT=80 npm run production` 在特定端口上运行。服务器将通过 http 提供 `client/dist` 中的文件，并通过 web socket 协议提供对 bubblewrapped Lean 服务器的访问。
+* `npm run production`：以生产模式启动项目。这需要先运行构建脚本。它将在 `PORT` 环境变量指定的端口上启动服务器，或默认在 `8080` 上启动。您可以通过运行 `PORT=80 npm run production` 在特定端口上运行。服务器将通过 http 提供 `client/dist` 中的文件，并通过 web socket 协议提供对 bubblewrapped Lean 服务器的访问。
 
 ### 环境变量
 
