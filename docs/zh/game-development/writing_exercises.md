@@ -55,8 +55,7 @@ Statement my_simp_theorem ...
 
 ## 格式化
 
-您可以在引号内使用 markdown 进行格式化，如 `Hint ""`。
-也支持 Latex，请参见 latex.md。
+您可以在引号内使用 markdown 进行格式化，如 `Hint ""`。也支持 Latex，请参见 latex.md。
 
 ## 将命名语句添加为定理
 可以这样做：

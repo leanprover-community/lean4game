@@ -1,10 +1,10 @@
 # Lean 4 Game
 
-这是托管在 [adam.math.hhu.de](https://adam.math.hhu.de) 的 Lean 游戏平台的源码。
+这是托管在 [adam.math.hhu.de](https://adam.math.hhu.de) 的 Lean 游戏平台的源代码。
 
 ## 创建游戏
 
-请按照教程 [创建游戏](game-development/create_game.md) 进行操作。特别是，这几个步骤您可能会感兴趣：
+请按照教程 [创建游戏](game-development/create_game.md) 进行操作。特别地，这几个步骤您可能会感兴趣：
 
 * 步骤 6：[如何在本地运行游戏](getting-started/running_locally.md)
 * 步骤 8：[如何更新现有游戏](getting-started/update_game.md)
