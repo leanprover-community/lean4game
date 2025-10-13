@@ -179,6 +179,8 @@ export class GameManager {
     let worldId: string
     let levelId: string
 
+    let semanticTokenRequestIds = new Set<number>()
+
     const PROOF_START_LINE = 2
 
     const gameDataPath = path.join(gameDir, '.lake', 'gamedata', `game.json`)
@@ -198,6 +200,10 @@ export class GameManager {
         inventory = message.params.initializationOptions.inventory
         // We abuse the rootUri field to pass the game name to the server
         message.params.rootUri = gameData.name
+      }
+
+      if (message.method === "textDocument/semanticTokens/full") {
+        semanticTokenRequestIds.add(message.id)
       }
 
       if (message.method === "textDocument/didOpen") {
@@ -251,7 +257,7 @@ export class GameManager {
       }
 
       // Shift semantic tokens (https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_semanticTokens)
-      if ((message as any)?.result?.data) {
+      if (semanticTokenRequestIds.delete((message as any)?.id)) {
         const data : number[] = (message as any).result.data
         let i = 0
         let newData = []
