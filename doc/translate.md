@@ -11,14 +11,13 @@ The intended workflow currently is the following:
 
 If you choose the correct language in the "Preferences" of the game, you should see your translations.
 
-## Details (TO BE MERGED)
+## Details
 
 For the translations, codeblocks (starting with one or many backticks (\`)) and
 latex blocks (starting with one or two `$`) are replaced by placeholders `§n`,
-you see the content of these in the comments.
-Moreover, single newlines (`\n`) will be stripped from the translated string.
-
-These pre-processing steps aim to improve interaction with automated translation tooling.
+you see the content of these in the comments.  The aim of this pre-processing step is 
+to (a) aviod typos created by manually copying over codeblocks or latex blocks, and 
+(b) to improve interaction with automated translation tooling.
 
 ## Alternative: avoiding .po
 
