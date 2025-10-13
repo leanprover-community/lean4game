@@ -245,6 +245,32 @@ export class GameManager {
       shiftLines(message, -PROOF_START_LINE);
       replaceUri(message, `file:///${worldId}/${levelId}`) // as defined in `level.tsx`
 
+      // Disable range semantic tokens because they are difficult to shift
+      if ((message as any)?.result?.capabilities?.semanticTokensProvider?.range) {
+        (message as any).result.capabilities.semanticTokensProvider.range = false
+      }
+
+      // Shift semantic tokens (https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_semanticTokens)
+      if ((message as any)?.result?.data) {
+        const data : number[] = (message as any).result.data
+        let i = 0
+        let newData = []
+        let line = 0
+        // Search for semantic tokens at or after PROOF_START_LINE
+        while (i < data.length) {
+          line += data[i] // line info is a delta
+          if (line >= PROOF_START_LINE) {
+            // Relevant tokens start here. Copy them.
+            newData = data.slice(i);
+            // Adjust the first line number to be relative to the proof
+            newData[0] = line - PROOF_START_LINE;
+            break;
+          }
+          i += 5 // Line info is on every fifth entry
+        }
+        (message as any).result.data = newData
+      }
+
       return message
     });
   }
