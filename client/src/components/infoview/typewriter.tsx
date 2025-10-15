@@ -91,7 +91,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   const {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
 
-  const inputRef = useRef()
+  const inputRef = useRef<HTMLDivElement>()
 
   // The context storing all information about the current proof
   const {proof, setProof, interimDiags, setInterimDiags, setCrashed} = React.useContext(ProofContext)
@@ -206,6 +206,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       },
       lineNumbers: 'off',
       tabSize: 2,
+      wordWrap: 'on',
       glyphMargin: false,
       folding: false,
       lineDecorationsWidth: 0,
@@ -214,12 +215,19 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       overviewRulerLanes: 0,
       hideCursorInOverviewRuler: true,
       scrollbar: {
-        vertical: 'hidden',
-        horizontalScrollbarSize: 3
+        verticalScrollbarSize: 3
       },
+      scrollBeyondLastLine: false,
       overviewRulerBorder: false,
       theme: 'vs-code-theme-converted',
       contextmenu: false
+    })
+
+    myEditor.onDidContentSizeChange(() => {
+      myEditor.layout({
+        width: inputRef.current.clientWidth,
+        height: Math.min(myEditor.getContentHeight(), window.innerHeight / 3)
+      })
     })
 
     setOneLineEditor(myEditor)
