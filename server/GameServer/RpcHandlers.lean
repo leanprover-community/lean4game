@@ -211,6 +211,11 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
       let mut steps : Array <| InteractiveGoalsWithHints := #[]
       let mut diag : Array InteractiveDiagnostic ← doc.diagnosticsRef.get
 
+      -- Increase the severity of `uses 'sorry'` warnings
+      diag := diag.map (fun d => if d.toDiagnostic.message == "declaration uses 'sorry'"
+        then { d with severity? := some Lsp.DiagnosticSeverity.error }
+        else d)
+
       -- Level is completed if there are no errors or warnings
       let completedWithWarnings : Bool := ¬ diag.any (·.severity? == some .error)
       let completed : Bool := completedWithWarnings ∧ ¬ diag.any (·.severity? == some .warning)
