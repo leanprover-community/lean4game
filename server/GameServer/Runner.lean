@@ -109,7 +109,10 @@ elab "Runner" gameId:str worldId:str levelId:num
     | logError m!"Level not found: {levelId}"
 
   -- use open namespaces and options as in the level file
-  let scope := level.scope
+  let scope := { level.scope with
+    varDecls := level.scope.varDecls.map (⟨·.raw.rewriteBottomUp fun stx => stx.setInfo .none⟩)
+    attrs :=  level.scope.attrs.map (⟨·.raw.rewriteBottomUp fun stx => stx.setInfo .none⟩)
+  }
   Elab.Command.withScope (fun _ => scope) do
     for od in scope.openDecls do
       let .simple ns _ := od
@@ -145,12 +148,15 @@ elab "Runner" gameId:str worldId:str levelId:num
 
     let tacticStx := ← `(Lean.Parser.Tactic.tacticSeq| $[$(tacticStx)]*)
 
+    let goal := ⟨level.goal.raw.rewriteBottomUp fun stx => stx.setInfo .none⟩
+
     let isProp := level.isProp
-    let optDeclSig := declSig.toOptDeclSig level.goal
+    let optDeclSig := declSig.toOptDeclSig goal
+
 
     -- Run the proof
     let thmStatement ← match isProp with
-    | true => `(command| theorem the_theorem $(level.goal) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩)} )
+    | true => `(command| theorem the_theorem $(goal) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩)} )
     | false => `(command| def the_theorem $(optDeclSig) := by {let_intros; $(⟨level.preamble⟩); $(⟨tacticStx⟩)} )
 
     elabCommand thmStatement
