@@ -196,7 +196,9 @@ export const Goal = React.memo((props: GoalProps) => {
             {objectHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
         {!typewriter && assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">{t("Assumptions")}:</div>
-            {assumptionHyps.map((h, i) => <Hyp hyp={h} mvarId={goal.mvarId} key={i} />)}</div> }
+            {assumptionHyps.map((h, i) => {
+                h = {...h, val: null} // JE: never show value of assumptions (proof irrelevance)
+                return <Hyp hyp={h} mvarId={goal.mvarId} key={i} />})}</div> }
         </div>
         {!filter.reverse && <>
             { (!mobile && typewriterMode) &&
