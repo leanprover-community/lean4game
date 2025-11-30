@@ -217,7 +217,7 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
 
       let mut intermediateGoalCount := 0
 
-      let positionsWithSource : Array (String.Pos × String) := Id.run do
+      let positionsWithSource : Array (String.Pos.Raw × String) := Id.run do
         let mut res := #[]
         for i in [0:text.positions.size] do
           --TODO(ALEX): Generalize for other start positions

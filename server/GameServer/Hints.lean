@@ -40,10 +40,10 @@ def evalHintMessage : Expr → MetaM (Array Expr → MessageData) := fun _ => pu
 
 /-- Remove any spaces at the beginning of a new line -/
 partial def removeIndentation (s : String) : String :=
-  let rec loop (i : String.Pos) (acc : String) (removeSpaces := false) : String :=
-    let c := s.get i
-    let i := s.next i
-    if s.atEnd i then
+  let rec loop (i : String.Pos.Raw) (acc : String) (removeSpaces := false) : String :=
+    let c := i.get s
+    let i := i.next s
+    if i.atEnd s then
       acc.push c
     else if removeSpaces && c == ' ' then
       loop i acc (removeSpaces := true)
