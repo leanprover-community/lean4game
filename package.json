@@ -37,7 +37,7 @@
     "i18next-scanner-typescript": "^1.2.0",
     "ip-anonymize": "^0.1.0",
     "jotai": "^2.13.1",
-    "lean4-infoview": "https://gitpkg.now.sh/leanprover/vscode-lean4/lean4-infoview?de0062c",
+    "lean4-infoview": "https://gitpkg2.vercel.app/leanprover/vscode-lean4/lean4-infoview?de0062c",
     "lean4monaco": "^1.0.46",
     "lean4web": "github:hhu-adam/lean4web#414d9e62638a392fca278761b4c61a1d2e138bc7",
     "marked": "^4.3.0",
@@ -75,7 +75,7 @@
     "ws": "^8.18.1"
   },
   "devDependencies": {
-    "@codingame/esbuild-import-meta-url-plugin": "https://gitpkg.vercel.app/hhu-adam/lean4monaco/esbuild-import-meta-url-plugin?main",
+    "@codingame/esbuild-import-meta-url-plugin": "https://gitpkg2.vercel.app/hhu-adam/lean4monaco/esbuild-import-meta-url-plugin?795c5647a62038f3b2eb9837fd28705cb43318bf",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@redux-devtools/core": "^3.13.1",
     "@testing-library/react": "^13.4.0",
