@@ -6,11 +6,11 @@ import type { Location, Diagnostic } from 'vscode-languageserver-protocol'
 import { getInteractiveTermGoal, InteractiveDiagnostic, UserWidgetInstance, Widget_getWidgets, RpcSessionAtPos, isRpcError,
   RpcErrorCode, getInteractiveDiagnostics } from '@leanprover/infoview-api'
 import { basename, DocumentPosition, RangeHelpers, useEvent, usePausableState, discardMethodNotFound,
-  mapRpcError, useAsyncWithTrigger, PausableProps } from '../../../../node_modules/lean4-infoview/src/infoview/util'
-import { ConfigContext, EditorContext, LspDiagnosticsContext, ProgressContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts'
-import { PanelWidgetDisplay } from '../../../../node_modules/lean4-infoview/src/infoview/userWidget'
-import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions'
-import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation'
+  mapRpcError, useAsyncWithTrigger, PausableProps } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util'
+import { ConfigContext, EditorContext, LspDiagnosticsContext, ProgressContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts'
+import { PanelWidgetDisplay } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/userWidget'
+import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions'
+import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/goalLocation'
 
 import { AllMessages, lspDiagToInteractive } from './messages'
 import { goalsToString, Goal, MainAssumptions, OtherGoals } from './goals'

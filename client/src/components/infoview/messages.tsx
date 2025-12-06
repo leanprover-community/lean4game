@@ -4,11 +4,11 @@ import { Location, DocumentUri, Diagnostic, DiagnosticSeverity, PublishDiagnosti
 
 import { LeanDiagnostic, RpcErrorCode, getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api'
 
-import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util'
-import { ConfigContext, EditorContext, LspDiagnosticsContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts'
-import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/collapsing'
-import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer'
-import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions'
+import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState, useEventResult } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util'
+import { ConfigContext, EditorContext, LspDiagnosticsContext, VersionContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts'
+import { Details } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/collapsing'
+import { InteractiveMessage } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/traceExplorer'
+import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions'
 
 import { InputModeContext } from './context'
 import { useTranslation } from 'react-i18next'

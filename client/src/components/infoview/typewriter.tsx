@@ -6,7 +6,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { Registry } from 'monaco-textmate' // peer dependency
 import { wireTmGrammars } from 'monaco-editor-textmate'
 import { DiagnosticSeverity, PublishDiagnosticsParams, DocumentUri } from 'vscode-languageserver-protocol';
-import { useServerNotificationEffect } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { useServerNotificationEffect } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
 import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
 import * as leanSyntax from 'lean4web/client/src/syntaxes/lean.json'
@@ -15,8 +15,8 @@ import * as codeblockSyntax from 'lean4web/client/src/syntaxes/codeblock.json'
 import languageConfig from 'lean4/language-configuration.json';
 import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types';
-import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
+import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
+import { RpcContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
 import { DeletedChatContext, InputModeContext, MonacoEditorContext, PreferencesContext, ProofContext, WorldLevelIdContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'

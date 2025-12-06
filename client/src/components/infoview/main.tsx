@@ -5,15 +5,15 @@ import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location,
 
 import 'tachyons/css/tachyons.css';
 import '@vscode/codicons/dist/codicon.css';
-import '../../../../node_modules/lean4-infoview/src/infoview/index.css';
+import '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/index.css';
 import '../../css/infoview.css'
 import "../../css/tab_bar.css"
 
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
-import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { RpcContext, WithRpcSessions, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infoview/serverVersion';
+import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
+import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts';
+import { RpcContext, WithRpcSessions, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
+import { ServerVersion } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/serverVersion';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDeleteLeft, faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
@@ -36,7 +36,7 @@ import { CircularProgress } from '@mui/material';
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { store } from '../../state/store';
 import { Hint, Hints, MoreHelpButton, filterHints } from '../hints';
-import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
