@@ -2,6 +2,7 @@
   "allGames": [
     "leanprover-community/nng4",
     "hhu-adam/robo",
+    "alexkontorovich/realanalysisgame",
     "djvelleman/stg4",
     "trequetrum/lean4game-logic",
     "jadabouhawili/knightsandknaves-lean4game",
