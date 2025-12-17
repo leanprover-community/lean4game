@@ -11,7 +11,8 @@ i18n
       // > see https://github.com/i18next/i18next-http-backend
       loadPath: function(lngs, namespaces: Array<string>) {
         if (namespaces[0].startsWith("g/")) {
-          return '/i18n/{{ns}}/{{lng}}/Game.json';
+          // return '/i18n/{{ns}}/{{lng}}/Game.json';
+          return '/i18n/{{ns}}/{{lng}}/Game.po';
         } else {
           return '/locales/{{lng}}/{{ns}}.json';
         }
