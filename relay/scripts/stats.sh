@@ -6,7 +6,7 @@ python=/usr/bin/python3
 cpu_usage=$CPU_SCRIPT
 # Execute python script
 cpu=$($python $cpu_usage)
-# Calculate memory usage by computing 1 - %free_memory
-mem=$(free | sed '2q;d' | awk '{print 1 - ($4/$2)}')
+# Calculate memory usage by computing 1 - (free + cache)/total
+mem=$(free | sed '2q;d' | awk '{print 1 - ($4+$6)/$2}')
 
 printf "CPU, MEM\n%f, %f\n" $cpu $mem
