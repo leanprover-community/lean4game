@@ -381,6 +381,7 @@ structure GameTile where
   TODO: Must be a list with a single language currently
    -/
   languages: List String := default
+  standardLang: String := default
   /-- A list of games which this one builds upon -/
   prerequisites: List String := default
   /-- Number of worlds in the game -/

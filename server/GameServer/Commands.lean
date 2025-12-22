@@ -120,6 +120,14 @@ elab "Languages" t:str* : command => do
   modifyCurGame fun game => pure {game with
     tile := {game.tile with languages := t.map (·.getString) |>.toList}}
 
+/-- A list of Languages the game is translated to by default. For example `Languages "de" "en"`.
+
+The keys are ISO language codes.
+ -/
+elab "StandardLanguage" t:str : command => do
+  modifyCurGame fun game => pure {game with
+    tile := {game.tile with standardLang := t.getString}}
+
 /-- The Image of the game (optional). TODO: Not implemented -/
 elab "CoverImage" t:str : command => do
   let file := t.getString
