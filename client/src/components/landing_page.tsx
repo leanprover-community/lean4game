@@ -24,8 +24,20 @@ import { GithubIcon } from './navigation/github_icon';
 import { useGameTranslation } from '../utils/translation';
 import { navOpenAtom } from '../store/navigation-atoms';
 
+function useFixedTranslation(language: string, gameId: string) {
+    let { t } = useTranslation()
+    return (key: string) => t(key, {ns: gameId, lng:language })
+}
+
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
-  let { t } = useTranslation()
+  let t
+
+  if (data.standardLanguage) {
+    t  = useFixedTranslation(data.standardLanguage, gameId)
+  }else {
+    t = useTranslation()
+  }
+
   let navigate = useNavigate();
   const routeChange = () =>{
     navigate(gameId);

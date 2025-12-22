@@ -10,6 +10,7 @@ export interface GameTile {
   short: string
   long: string
   languages: Array<string>
+  standardLanguage: string
   prerequisites: Array<string>
   worlds: number
   levels: number
