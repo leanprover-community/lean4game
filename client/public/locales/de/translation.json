@@ -1,6 +1,8 @@
 {
   "Tactics": "Taktiken",
-  "Lean Game Server": "Lean-Lern-Spiel-Server",
+  "Caption": {
+    "translation": "Lean-Lern-Spiel-Server"
+  },
   "<p>Game rules determine if it is allowed to skip levels and if the games runs checks to only allow unlocked tactics and theorems in proofs.</p><1>Note: \"Unlocked\" tactics (or theorems) are determined by two things: The set of minimal tactics needed to solve a level, plus any tactics you unlocked in another level. That means if you unlock <1>simp</1> in a level, you can use it henceforth in any level.</1><p>The options are:</p>": "<p>Die Spielregeln bestimmen ob es erlaubt ist, Levels zu überspringen und ob das Spiel überprüft welche Taktiken und Theoreme freigeschaltet sind und nur diese im Beweis akzeptiert.</p><1>Bemerkung: \"Freigeschaltete\" Taktiken (und Theoreme) werden durch zwei Faktoren bestimmt: The Menge der Taktiken die minimal notwending sind um den Level zu lösen und dazu die Menge aller Taktiken, die in einem anderen Level freigeschaltet wurden. Das bedeutet wenn <1>simp</1> in einem Level freigeschaltet wird, kann diese Taktik danach in jeglichen Levels verwendet werden.",
   "Game Rules": "Spielregeln",
   "levels": "Level",
@@ -50,15 +52,28 @@
   "Theorems": "Theoreme",
   "Not unlocked yet": "Noch nicht verfügbar",
   "Not available in this level": "In diesem Level nicht verfügbar",
-  "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "Eine Sammlung von Lernspielen für den Beweisassistenten <1>Lean</1> <i>(Lean 4)</i> und dessen mathematische Bibliothek <5>mathlib</5>",
-  "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder.": "Kein Spiel geladen.  Öffne <1>http://localhost:3000/#/g/local/FOLDER</1> um ein Spiel direkt aus einem lokalen Ordner zu laden.",
+  "Subcaption": {
+    "description": "Eine Sammlung von Lernspielen für den Beweisassistenten <1>Lean</1> <i>(Lean 4)</i> und dessen mathematische Bibliothek <2>mathlib</2>"
+  },
+  "No Games": {
+    "description": "Kein Spiel geladen.  Öffne <1>http://localhost:3000/#/g/local/FOLDER</1> um ein Spiel direkt aus einem lokalen Ordner zu laden."
+  },
   "Prerequisites": "Voraussetzungen",
   "Worlds": "Welten",
   "Levels": "Level",
   "Language": "Sprache",
-  "Development notes": "Entwicklungsstand",
-  "Adding new games": "Neue Spiele hinzufügen",
-  "Funding": "Finanzierung",
+  "Development notes": {
+    "translation": "Entwicklungsstand",
+    "description": "Der Spieleserver und die alle Spiele befinden sich in fortlaufender Entwicklung.  Wir bitten darum, Fehler und Ungereimtheiten als <1>GitHub Issue</1> zu melden."
+  },
+  "Adding new games": {
+    "translation": "Neue Spiele hinzufügen",
+    "description": "Für alle, die selbst Spiel entwickeln möchten, gibt es ein <1>GameSkeleton Github Repo</1> als Vorlage und die Anleitung <2>How to Create a Game</2>.<p>Die <3>Anleitung</3> erklärt auch, wie ein solches Spiel mittels einer passenden URL auf den Sever geladen und gespiel werden kann. Fragen dazu beantworten wir gern.</p><p>Als Kacheln sichtbar ist auf dieser Seite nur eine kuratierte Auswahl an existierenden Spielen. Wir erweitern diese Auswahl auf Anfrage sehr gerne.</p>"
+  },
+  "Funding": {
+    "translation": "Finanzierung",
+    "description": "Dieser Spiele-Server wird bereitgestellt vom Zentrum für Informations- und Medientechnologie der Heinrich-Heine-Universität Düsseldorf. Die lean4game-Software wurde im Rahmen des Projekts <1>ADAM: Anticipating the Digital Age of Mathematics</1> entwickelt, finanziert durch das Programm <i>Freiraum 2022</i> der <i>Stiftung Innovation in der Hochschullehre</i>. Der laufende Betrieb des Servers und die Weiterentwicklung der Software werden durch Mittel des <i>AI for Math Fund</i> der Stiftung <i>Renaissance Philanthropy</i> ermöglicht."
+  },
   "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>Soll der Spielstand unwiderruflich gelöscht werden?</p><p>(Dies löscht sämtliche Beweise und das gesammelte Inventar. Spielstände anderer Spiele werden nicht gelöscht.)</p>",
   "Delete Progress?": "Spielstand löschen?",
   "Delete": "Löschen",
@@ -79,10 +94,11 @@
   "Retry proof from here": "Ab hier neu ansetzen",
   "Retry": "Noch einmal",
   "Failed command": "Gescheiterter Befehl",
-  "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>": "Diese Server läuft auf universitäter Infrastruktur mit begrenzten Kapazitäten.  Wir schätzen, dass die Belastungsgrenze bei rund 70 gleichzeitig laufenden Spielen besteht.",
   "<0>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</0>": "Der Spieleserver und die alle Spiele befinden sich in fortlaufender Entwicklung.  Wir bitten darum, Fehler und Ungereimtheiten als <1>GitHub Issue</1> zu melden.",
-  "This server has been developed as part of the project <1>ADAM: Anticipating the Digital Age of Mathematics</1> at Heinrich Heine University Düsseldorf.": "Die Lean-Spiele-Software und dieser Spiele-Server werden als Teils der Projekts <1>ADAM: Anticipating the Digital Age of Mathematics</1> an der Heinrich-Heine-Universität Düsseldorf entwickelt.",
-  "Server capacity": "Server-Auslastung",
+  "Server capacity": {
+    "translation": "Server-Auslastung",
+    "description": "Diese Server läuft auf universitäter Infrastruktur mit begrenzten Kapazitäten.  Wir schätzen, dass die Belastungsgrenze bei rund 70 gleichzeitig laufenden Spielen besteht."
+  },
   "RAM": "RAM",
   " used": "",
   "CPU": "CPU",
