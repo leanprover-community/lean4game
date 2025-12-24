@@ -7,7 +7,7 @@
   },
   "Development notes": {
     "translation": "Notes de développement",
-    "description": "<0>La plupart des aspects des jeux et de l'infrastructure sont encore en développement. N'hésitez pas à créer un <1>GitHub Issue</1> pour tout problème que vous rencontrez !</0>"
+    "description": "<p>La plupart des aspects des jeux et de l'infrastructure sont encore en développement. N'hésitez pas à créer un <1>GitHub Issue</1> pour tout problème que vous rencontrez !</p>"
   },
   "Adding new games": {
     "translation": "Ajouter de nouveaux jeux",

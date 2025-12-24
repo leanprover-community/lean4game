@@ -1,6 +1,24 @@
 {
+  "Caption": {
+    "translation": "LEAN 游戏服务器"
+  },
+  "Subcaption": {
+    "description": "这是一个为证明助手 <1>Lean</1> <i>(Lean 4)</i> 及其数学库 <5>mathlib</5> 设计的学习游戏库"
+  },
+  "Development notes": {
+    "translation": "开发笔记"
+  },
+  "Adding new games": {
+    "translation": "添加新游戏",
+    "description": "如果你打算编写自己的游戏，可以使用 <1>GameSkeleton Github Repo</1> 作为模板，并参阅 <2>如何创建游戏</2>。<p>你可以直接将游戏上传至服务器，并通过正确的 URL 进行游戏。上面的 <3>说明</3> 已详细介绍了如何将游戏加载到服务器的步骤。如果你有任何疑问，请随时联系我们。</p><p>本页上的精选游戏都是手动添加的。如果你想添加你的游戏，请与我们联系，我们非常欢迎。</p>"
+  },
+  "Funding": {
+    "translation": "资助"
+  },
+  "No Games":{
+    "description": "未加载游戏。访问 <1>http://localhost:3000/#/g/local/FOLDER</1> 从本地文件夹打开游戏。"
+  },
   "Tactics": "策略",
-  "Lean Game Server": "LEAN 游戏服务器",
   "<p>Game rules determine if it is allowed to skip levels and if the games runs checks to only allow unlocked tactics and theorems in proofs.</p><1>Note: \"Unlocked\" tactics (or theorems) are determined by two things: The set of minimal tactics needed to solve a level, plus any tactics you unlocked in another level. That means if you unlock <1>simp</1> in a level, you can use it henceforth in any level.</1><p>The options are:</p>": "<p>游戏规则决定是否允许跳过关卡，以及游戏是否只允许在证明中使用已解锁的策略和定理。</p><1>注意：“解锁”的策略（或定理）由两个因素决定：解决关卡所需的最小策略集合，加上你在其他关卡中解锁的任何策略。这意味着，如果你在某个关卡中解锁了<1>simp</1>，你可以在任何关卡中使用它。</1><p>选项有：</p>",
   "Game Rules": "游戏规则",
   "levels": "关卡",
@@ -57,16 +75,10 @@
   "Theorems": "定理",
   "Not unlocked yet": "尚未解锁",
   "Not available in this level": "本关卡不提供",
-  "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "这是一个为证明助手 <1>Lean</1> <i>(Lean 4)</i> 及其数学库 <5>mathlib</5> 设计的学习游戏库",
-  "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder.": "未加载游戏。访问 <1>http://localhost:3000/#/g/local/FOLDER</1> 从本地文件夹打开游戏。",
-  "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>如果你打算编写自己的游戏，可以使用 <1>GameSkeleton Github Repo</1> 作为模板，并参阅 <3>如何创建游戏</3>。</0><1>你可以直接将游戏上传至服务器，并通过正确的 URL 进行游戏。上面的 <1>说明</1> 已详细介绍了如何将游戏加载到服务器的步骤。如果你有任何疑问，请随时联系我们。</1><p>本页上的精选游戏都是手动添加的。如果你想添加你的游戏，请与我们联系，我们非常欢迎。</p>",
   "Prerequisites": "前置条件",
   "Worlds": "世界",
   "Levels": "关卡",
   "Language": "语言",
-  "Development notes": "开发笔记",
-  "Adding new games": "添加新游戏",
-  "Funding": "资助",
   "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>您确定要永久删除您的游戏进度吗？</p><p>（此操作将删除您的所有证明和收集的定理与策略，但不会影响其他游戏的保存数据。）</p>",
   "Delete Progress?": "删除进度？",
   "Delete": "删除",

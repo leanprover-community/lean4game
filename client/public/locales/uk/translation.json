@@ -1,6 +1,28 @@
 {
+  "Caption": {
+    "translation": "Ігровий сервер Lean"
+  },
+  "Subcaption": {
+    "description": "Репозиторій навчальних ігор для помічника з доказів <1>Lean</1> <i>(Lean 4)</i> і його математичної бібліотеки <2>mathlib</2>"
+  },
+  "Development notes": {
+    "translation": "Нотатки щодо розробки",
+    "description": "</p>Більшість аспектів ігор та інфраструктури все ще знаходяться в розробці. Не соромтеся надсилати <1>GitHub issue</1> про будь-які проблеми, які виникають!</p>"
+  },
+  "Adding new games": {
+    "translation": "Додавання нових ігор",
+    "description": "Якщо ви плануєте написати власну гру, вам слід використовувати <1>GameSkeleton Github репу</1> як шаблон і прочитати <2>Як створити гру</2>.<p>Ви можете безпосередньо завантажити свої ігри на сервер і грати в них за допомогою правильної URL-адреси. У <3>наведених вище інструкціях</3> також пояснюється, як завантажити гру на сервер. Ми хотіли б заохотити вас зв’язатися з нами, якщо у вас виникнуть запитання.</p><p>Рекомендовані ігри на цій сторінці додаються вручну. Зв’яжіться з нами, і ми з радістю додамо ваші.</p>"
+  },
+  "Funding": {
+    "translation": "Фінансування"
+  },
+  "Server Capacity": {
+    "description": "<p>Оскільки цей запуски серверу покладаються на наші університетські машини, віни мають обмежену потужність. Наша поточна оцінка становить приблизно 70 одночасних ігор. Ми сподіваємося, що в майбутньому ми зможемо розглянути та краще перевірити це обмеження."
+  },
+  "No Games": {
+    "description": "Немає завантажених ігор. Використовуйте <1>http://localhost:3000/#/g/local/FOLDER</1>, щоб відкрити гру безпосередньо з локальної папки."
+  },
   "Tactics": "Тактики",
-  "Lean Game Server": "Ігровий сервер Lean",
   "<p>Game rules determine if it is allowed to skip levels and if the games runs checks to only allow unlocked tactics and theorems in proofs.</p><1>Note: \"Unlocked\" tactics (or theorems) are determined by two things: The set of minimal tactics needed to solve a level, plus any tactics you unlocked in another level. That means if you unlock <1>simp</1> in a level, you can use it henceforth in any level.</1><p>The options are:</p>": "<p>Правила гри визначають, чи можна пропускати рівні та чи перевіряються ігри, щоб дозволити лише розблоковані тактики та теореми в доказах.</p><1>Примітка. \"Розблоковані\" тактики (або теореми) визначаються двома речами: набором мінімальних тактик, необхідних для вирішення рівня, плюс будь-які тактики, які ви розблокували на іншому рівні. Це означає, що якщо ви розблокуєте <1>simp</1> на рівні, ви зможете використовувати його на будь-якому рівні.</1><p>Варіанти:</p>",
   "Game Rules": "Правила гри",
   "levels": "рівні",
@@ -56,17 +78,11 @@
   "Theorems": "Теореми",
   "Not unlocked yet": "Ще не розблоковано",
   "Not available in this level": "Недоступно на цьому рівні",
-  "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "Репозиторій навчальних ігор для помічника з доказів <1>Lean</1> <i>(Lean 4)</i> і його математичної бібліотеки <5>mathlib</5>",
-  "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder.": "Немає завантажених ігор. Використовуйте <1>http://localhost:3000/#/g/local/FOLDER</1>, щоб відкрити гру безпосередньо з локальної папки.",
-  "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games. We hope to address and test this limitation better in the future.</p><1>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</1>": "<p>Оскільки цей запуски серверу покладаються на наші університетські машини, віни мають обмежену потужність. Наша поточна оцінка становить приблизно 70 одночасних ігор. Ми сподіваємося, що в майбутньому ми зможемо розглянути та краще перевірити це обмеження.</p><1>Більшість аспектів ігор та інфраструктури все ще знаходяться в розробці. Не соромтеся надсилати <1>GitHub issue</1> про будь-які проблеми, які виникають!</1>",
   "This server has been developed as part of the project <1>ADAM : Anticipating the Digital Age of Mathematics</1> at Heinrich-Heine-Universität in Düsseldorf.": "Цей сервер був розроблений в рамках проекту <1>ADAM : Anticipating the Digital Age of Mathematics</1> в університеті Генріха Гейне в Дюссельдорфі.",
   "Prerequisites": "Передумови",
   "Worlds": "Світи",
   "Levels": "Рівні",
   "Language": "Мови",
-  "Development notes": "Нотатки щодо розробки",
-  "Adding new games": "Додавання нових ігор",
-  "Funding": "Фінансування",
   "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>Ви хочете безповоротно видалити збережений прогрес?</p><p>(Це видаляє ваші докази та зібраний інвентар. Збереження з інших ігор не видаляються.)</p>",
   "Delete Progress?": "Видалити прогрес?",
   "Delete": "Видалити",
@@ -81,7 +97,6 @@
   "Mobile": "Мобільний",
   "Auto": "Автоматично",
   "Desktop": "Десктоп",
-  "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>Якщо ви плануєте написати власну гру, вам слід використовувати <1>GameSkeleton Github репу</1> як шаблон і прочитати <3>Як створити гру</3>.</0><1>Ви можете безпосередньо завантажити свої ігри на сервер і грати в них за допомогою правильної URL-адреси. У <1>наведених вище інструкціях</1> також пояснюється, як завантажити гру на сервер. Ми хотіли б заохотити вас зв’язатися з нами, якщо у вас виникнуть запитання.</1><p>Рекомендовані ігри на цій сторінці додаються вручну. Зв’яжіться з нами, і ми з радістю додамо ваші.</p>",
   "Level": "Рівень",
   "Introduction": "Вступ",
   "Retry proof from here": "Повторіть доказ звідси",

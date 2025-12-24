@@ -1,6 +1,6 @@
 {
   "Caption": {
-      "translation": "Lean Game Server"
+    "translation": "Lean Game Server"
   },
   "Subcaption": {
     "description": "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <2>mathlib</2>"
