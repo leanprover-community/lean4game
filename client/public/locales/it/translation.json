@@ -1,4 +1,28 @@
 {
+  "Caption": {
+    "translation": "Lean Game Server"
+  },
+  "Subcaption": {
+    "description": "Un repository di giochi didattici per il proof assistant <1>Lean</1> <i>(Lean 4)</i> e la sua libreria matematica <5>mathlib</5>"
+  },
+  "Development notes": {
+    "translation": "Note di sviluppo",
+    "description":  "<p>Molti aspetti dei giochi e dell'infrastruttura sono ancora in fase di sviluppo. Segnalaci qualsiasi problema con una <1>Issue su GitHub</1>.</p>"
+  },
+  "Adding new games": {
+    "translation": "Aggiungere nuovi giochi",
+    "description": "Se stai pensando di creare un nuovo gioco, ti consigliamo di usare il <1>GameSkeleton disponibile su Github</1> come punto di partenza e di leggere la guida <2>How to Create a Game</2>.<p>Puoi caricare direttamente i tuoi giochi nella tua copia del server e testarli allo URL corretto. Le <3>istruzioni su GitHub</3> spiegano in dettaglio come caricare il tuo gioco sul server. Per qualsiasi altra domanda, ti invitiamo a contattarci. </p><p>I giochi in evidenza in questa pagina sono curati a mano da noi. Se vuoi vedere il tuo gioco, scrivici e lo aggiungeremo volentieri.</p>"
+  },
+  "Funding": {
+    "translation": "Fondi"
+  },
+  "Server capacity": {
+    "translation": "Capacità del Server",
+    "description": "<p>Il server che esegue il codice Lean gira sulle macchine della nostra università, perciò ha una capacità limitata. La nostra stima attuale è di circa 70 giochi simultanei.</p>"
+  },
+  "No Games": {
+    "description": "Nessun gioco rilevato. Visita <1>http://localhost:3000/#/g/local/FOLDER</1> per aprire un gioco da una cartella locale."
+  },
   "Intro": "Introduzione",
   "Game Introduction": "Introduzione al gioco",
   "Start": "Via",
@@ -50,24 +74,14 @@
   "Theorems": "Teoremi",
   "Not unlocked yet": "Non ancora sbloccato",
   "Not available in this level": "Non disponibile in questo livello",
-  "A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <5>mathlib</5>": "Un repository di giochi didattici per il proof assistant <1>Lean</1> <i>(Lean 4)</i> e la sua libreria matematica <5>mathlib</5>",
-  "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder.": "Nessun gioco rilevato. Visita <1>http://localhost:3000/#/g/local/FOLDER</1> per aprire un gioco da una cartella locale.",
-  "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>": "<p>Il server che esegue il codice Lean gira sulle macchine della nostra università, perciò ha una capacità limitata. La nostra stima attuale è di circa 70 giochi simultanei.</p>",
-  "<0>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</0>": "<0>Molti aspetti dei giochi e dell'infrastruttura sono ancora in fase di sviluppo. Segnalaci qualsiasi problema con una <1>Issue su GitHub</1>.</0>",
-  "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>Se stai pensando di creare un nuovo gioco, ti consigliamo di usare il <1>GameSkeleton disponibile su Github</1> come punto di partenza e di leggere la guida <3>How to Create a Game</3>.</0><1>Puoi caricare direttamente i tuoi giochi nella tua copia del server e testarli allo URL corretto. Le <1>istruzioni su GitHub</1> spiegano in dettaglio come caricare il tuo gioco sul server. Per qualsiasi altra domanda, ti invitiamo a contattarci. </1><p>I giochi in evidenza in questa pagina sono curati a mano da noi. Se vuoi vedere il tuo gioco, scrivici e lo aggiungeremo volentieri.</p>",
   "This server has been developed as part of the project <1>ADAM: Anticipating the Digital Age of Mathematics</1> at Heinrich Heine University Düsseldorf.": "Questo server è stato sviluppato nell'ambito del progetto <1>ADAM: Anticipating the Digital Age of Mathematics</1> alla Heinrich Heine University Düsseldorf.",
   "Prerequisites": "Prerequisiti",
   "Worlds": "Mondi",
   "Levels": "Livelli",
   "Language": "Lingua",
-  "Lean Game Server": "Lean Game Server",
-  "Server capacity": "Capacità del Server",
   "RAM": "RAM",
   " used": " in uso",
   "CPU": "CPU",
-  "Development notes": "Note di sviluppo",
-  "Adding new games": "Aggiungere nuovi giochi",
-  "Funding": "Fondi",
   "Level": "Livello",
   "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>Vuoi eliminare irreversibilmente il tuo progresso?</p><p>(Questa operazione eliminerà il codice delle tue dimostrazioni e il tuo inventario. I dati di salvataggio appartenenti ad altri giochi non verranno eliminati.)</p>",
   "Delete Progress?": "Reset del gioco",

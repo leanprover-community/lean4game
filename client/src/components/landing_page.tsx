@@ -127,23 +127,27 @@ function LandingPage() {
         </div>
       </nav>
       <div id="main-title">
-        <h1>{t("Lean Game Server")}</h1>
+        <h1>{t("Caption.translation", { defaultValue: "Lean Game Server"})}</h1>
         <p>
-          <Trans>
-            A repository of learning games for the
-            proof assistant <a target="_blank" href="https://leanprover-community.github.io/">Lean</a> <i>(Lean 4)</i> and
-            its mathematical library <a target="_blank" href="https://github.com/leanprover-community/mathlib4">mathlib</a>
-          </Trans>
+          <Trans
+            i18nKey="Subcaption.description"
+            defaults="A repository of learning games for the proof assistant <1>Lean</1> <i>(Lean 4)</i> and its mathematical library <2>mathlib</2>"
+            components={
+              {1: <a target="_blank" href="https://leanprover-community.github.io/"/>,
+               2: <a target="_blank" href="https://github.com/leanprover-community/mathlib4"/>
+            }}
+          />
         </p>
       </div>
     </header>
     <div className="game-list">
       {allTiles.filter(x => x != null).length == 0 ?
         <p>
-          <Trans>
-            No Games loaded. Use <a>http://localhost:3000/#/g/local/FOLDER</a> to open a
-            game directly from a local folder.
-          </Trans>
+          <Trans
+            i18nKey="No Games.description"
+            default="No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder."
+            components={{1: <a />}}
+          />
         </p>
         : lean4gameConfig.allGames.map((id, i) => (
           <Tile
@@ -158,13 +162,11 @@ function LandingPage() {
       (usageMem >= 0 || usageCPU >= 0 ) &&
       <section>
         <div className="wrapper">
-          <h2>{t("Server capacity")}</h2>
-          <Trans>
-            <p>
-              As this server runs lean on our university machines, it has a limited capacity.
-              Our current estimate is about 70 simultaneous games.
-            </p>
-          </Trans>
+          <h2>{t("Server capacity.translation", { defaultValue: "Server capacity" })}</h2>
+          <Trans
+            i18nKey="Server capacity.description"
+            defaults="<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>"
+          />
           <p>
             { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem.toFixed(2)} %</strong>{t(" used")}.<br/></> }
             { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU.toFixed(2)} %</strong>{t(" used")}. </> }
@@ -174,48 +176,40 @@ function LandingPage() {
     }
     <section>
       <div className="wrapper">
-        <h2>{t("Development notes")}</h2>
-        <Trans>
-          <p>
-            Most aspects of the games and the infrastructure are still in development. Feel free to
-            file a <a target="_blank" href="https://github.com/leanprover-community/lean4game/issues">GitHub Issue</a> about
-            any problems you experience!
-          </p>
-        </Trans>
+        <h2>{t("Development notes.translation", { defaultValue: "Development notes" })}</h2>
+        <Trans
+          i18nKey="Development notes.description"
+          defaults="<p>Most aspects of the games and the infrastructure are still in development. Feel free to file a <1>GitHub Issue</1> about any problems you experience!</p>"
+          components={{1: <a target="_blank" href="https://github.com/leanprover-community/lean4game/issues"/>}}
+        />
       </div>
     </section>
     <section>
       <div className="wrapper">
-        <h2>{t("Adding new games")}</h2>
-        <Trans>
-          <p>
-            If you are considering writing your own game, you should use
-            the <a target="_blank" href="https://github.com/hhu-adam/GameSkeleton">GameSkeleton Github Repo</a> as
-            a template and read <a target="_blank" href="https://github.com/leanprover-community/lean4game/">How to Create a Game</a>.
-          </p>
-          <p>
-            You can directly load your games into the server and play it using
-            the correct URL. The <a target="_blank" href="https://github.com/leanprover-community/lean4game/">instructions above</a> also
-            explain the details for how to load your game to the server.
-
-            We'd like to encourage you to contact us if you have any questions.
-          </p>
-          <p>
-            Featured games on this page are added manually.
-            Please get in contact and we'll happily add yours.
-          </p>
-        </Trans>
+        <h2>{t("Adding new games.translation", { defaultValue: "Adding new games" })}</h2>
+        <Trans
+          i18nKey="Adding new games.description"
+          defaults="If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <2>How to Create a Game</2>.<p>You can directly load your games into the server and play it using the correct URL. The <3>instructions above</3> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</p><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>"
+          components={
+            {
+             1: <a target="_blank" href="https://github.com/hhu-adam/GameSkeleton"/>,
+             2: <a target="_blank" href="https://github.com/leanprover-community/lean4game/"/>,
+             3: <a target="_blank" href="https://github.com/leanprover-community/lean4game/"/>,
+            }
+          }
+        />
       </div>
     </section>
     <section>
       <div className="wrapper">
-        <h2>{t("Funding")}</h2>
+        {/* "Funding.translation" is a key corresponding to a .json entry in a translation.json file. */}
+        <h2>{t("Funding.translation", { defaultValue: "Funding" })}</h2>
         <p>
-          <Trans>
-            This server has been developed as part of the
-            project <a target="_blank" href="https://hhu-adam.github.io">ADAM: Anticipating the Digital Age of Mathematics</a> at
-            Heinrich Heine University Düsseldorf.
-          </Trans>
+          <Trans
+            i18nKey="Funding.description"
+            defaults="This server is hosted at Heinrich Heine University Düsseldorf. The lean4game software was developed as part of the project <1>ADAM: Anticipating the Digital Age of Mathematics</1>, funded by the programme <i>Freiraum 2022</i> of the <i>Stiftung Innovation in der Hochschullehre</i>. Ongoing maintenance and development are generously supported by <i>Renaissance Philanthropy</i> through the <i>AI for Math Fund</i>."
+            components={{1: <a target="_blank" href="https://hhu-adam.github.io"/>}}
+          />
         </p>
       </div>
     </section>
