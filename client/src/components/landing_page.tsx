@@ -27,17 +27,6 @@ import { GithubIcon } from './navigation/github_icon';
 import { useGameTranslation } from '../utils/translation';
 import { navOpenAtom } from '../store/navigation-atoms';
 
-function ScopedI18n({ lng, children }: { lng: string, children: React.ReactNode}) {
-  const scopedI18n = i18n.createInstance()
-
-  scopedI18n.init({
-    lng,
-    fallbackLng: 'en',
-    resources: { en: {}, de: {} },
-  });
-
-  return <I18nextProvider i18n={scopedI18n}>{children}</I18nextProvider>;
-}
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
   let { t, i18n } = useTranslation()
