@@ -26,7 +26,7 @@ import { navOpenAtom } from '../store/navigation-atoms';
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
   let { t, i18n } = useTranslation()
-
+  console.log(`GameID called: ${gameId}`)
   if (gameId == "g/hhu-adam/Robo") {
     i18n.changeLanguage("de")
   }
