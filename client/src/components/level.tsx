@@ -13,9 +13,9 @@ import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/re
 import { InfoProvider } from 'lean4web/client/src/editor/infoview'
 import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter'
 import { InfoviewApi } from '@leanprover/infoview'
-import { EditorContext } from '../../../node_modules/lean4-infoview/src/infoview/contexts'
-import { EditorConnection, EditorEvents } from '../../../node_modules/lean4-infoview/src/infoview/editorConnection'
-import { EventEmitter } from '../../../node_modules/lean4-infoview/src/infoview/event'
+import { EditorContext } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts'
+import { EditorConnection, EditorEvents } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/editorConnection'
+import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/event'
 import { Diagnostic } from 'vscode-languageserver-types'
 
 import { GameIdContext } from '../app'
