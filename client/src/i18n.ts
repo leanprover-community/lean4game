@@ -13,6 +13,7 @@ i18n
         const lng = namespaces[0] === "g/hhu-adam/robo" ? "de" : lngs[0];
 
         if (namespaces[0].startsWith("g/")) {
+          console.log(`Find translation in: /i18n/${namespaces[0]}/${lng}/Game.json`)
           return `/i18n/${namespaces[0]}/${lng}/Game.json`;
         } else {
           return `/locales/${lng}/${namespaces[0]}.json`;
