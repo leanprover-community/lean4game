@@ -53,7 +53,6 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
   }
 
   return <div className="game" onClick={routeChange}>
-    <ScopedI18n lng={gameId === "g/hhu-adam/robo" ? "de" : "en"}>
       <div className="wrapper">
         <div className="title">{t(data.title, {ns: gameId})}</div>
         <div className="short-description">{t(data.short, { ns: gameId })}
@@ -91,9 +90,7 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
         </tr>
         </tbody>
       </table>
-    </ScopedI18n>
   </div>
-
 }
 
 

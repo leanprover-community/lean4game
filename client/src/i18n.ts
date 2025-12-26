@@ -10,10 +10,12 @@ i18n
     backend: {
       // > see https://github.com/i18next/i18next-http-backend
       loadPath: function(lngs, namespaces: Array<string>) {
+        const lng = namespaces[0] === "g/hhu-adam/robo" ? "de" : lngs[0];
+
         if (namespaces[0].startsWith("g/")) {
-          return '/i18n/{{ns}}/{{lng}}/Game.json';
+          return `/i18n/${namespaces[0]}/${lng}/Game.json`;
         } else {
-          return '/locales/{{lng}}/{{ns}}.json';
+          return `/locales/${lng}/${namespaces[0]}.json`;
         }
       }
     },
