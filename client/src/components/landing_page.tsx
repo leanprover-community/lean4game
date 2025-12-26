@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useEffect } from 'react';
+
 import { useNavigate } from "react-router-dom";
 import { Trans, useTranslation } from 'react-i18next';
 
@@ -26,12 +28,15 @@ import { navOpenAtom } from '../store/navigation-atoms';
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
   let { t, i18n } = useTranslation()
-  console.log(`GameID called: ${gameId}`)
-  if (gameId == "g/hhu-adam/robo") {
-    i18n.changeLanguage("de")
-  }
+
+  useEffect(() => {
+    if (gameId === "g/hhu-adam/robo" && i18n.language !== "de") {
+      i18n.changeLanguage("de")
+    }
+  }, [gameId, i18n])
 
   let navigate = useNavigate();
+
   const routeChange = () =>{
     navigate(gameId);
   }
