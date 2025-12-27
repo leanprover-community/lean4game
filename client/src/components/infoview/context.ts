@@ -7,6 +7,7 @@ import { InteractiveDiagnostic } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types'
 import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { PreferencesState } from '../../state/preferences';
+import { NO_HISTORY_INDEX } from './typewriter';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)
@@ -126,6 +127,14 @@ export const DeletedChatContext = React.createContext<{
   setShowHelp: () => {}
 })
 
+export const HistoryContext = React.createContext<{
+  history: string[],
+  setHistory: React.Dispatch<React.SetStateAction<string[]>>,
+}>({
+  history: [],
+  setHistory: () => {},
+});
+
 export const InputModeContext = React.createContext<{
   typewriterMode: boolean,
   setTypewriterMode: React.Dispatch<React.SetStateAction<boolean>>,
@@ -133,6 +142,10 @@ export const InputModeContext = React.createContext<{
   setTypewriterInput: React.Dispatch<React.SetStateAction<string>>,
   lockEditorMode: boolean,
   setLockEditorMode: React.Dispatch<React.SetStateAction<boolean>>,
+  historyIndex: number,
+  setHistoryIndex: React.Dispatch<React.SetStateAction<number>>,
+  tempInput: string,
+  setTempInput: React.Dispatch<React.SetStateAction<string>>,
 }>({
   typewriterMode: true,
   setTypewriterMode: () => {},
@@ -140,6 +153,10 @@ export const InputModeContext = React.createContext<{
   setTypewriterInput: () => {},
   lockEditorMode: false,
   setLockEditorMode: () => {},
+  historyIndex: NO_HISTORY_INDEX,
+  setHistoryIndex: () => {},
+  tempInput: "",
+  setTempInput: () => {},
 });
 
 

@@ -17,10 +17,13 @@ import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } fro
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { DeletedChatContext, InputModeContext, MonacoEditorContext, PreferencesContext, ProofContext, WorldLevelIdContext } from './context'
+import { DeletedChatContext, HistoryContext, InputModeContext, MonacoEditorContext, PreferencesContext, ProofContext, WorldLevelIdContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
+
+/* Constant for historyIndex, indicating navigation is not active */
+export const NO_HISTORY_INDEX = -1;
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;
@@ -89,7 +92,9 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
-  const {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
+  // Typewriter state from consolidated context
+  const {history, setHistory} = React.useContext(HistoryContext);
+  const {typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode, historyIndex, setHistoryIndex, tempInput, setTempInput} = React.useContext(InputModeContext)
 
   const inputRef = useRef<HTMLDivElement>()
 
@@ -110,6 +115,15 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
     const pos = editor.getPosition()
     if (typewriterInput) {
+      // Add to history if not empty and not duplicate of last entry
+      const trimmed = typewriterInput.trim();
+      if (trimmed) {
+        setHistory(prev => {
+          const filtered = prev.filter(item => item !== trimmed)
+          return [...filtered, trimmed].slice(-100) // Keep last 100 commands
+        })
+      }
+
       setProcessing(true)
       editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
@@ -120,6 +134,8 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
         forceMoveMarkers: false
       }])
       setTypewriterInput('')
+      setHistoryIndex(NO_HISTORY_INDEX)
+      setTempInput('')
       // Load proof after executing edits
       loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
     }
@@ -253,14 +269,41 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   useEffect(() => {
     if (!oneLineEditor) return
-    // Run command when pressing enter
+    // Run command when pressing enter and handle history navigation
     const l = oneLineEditor.onKeyUp((ev) => {
       if (ev.code === "Enter" || ev.code === "NumpadEnter") {
         runCommand()
+      } else if (ev.code === "ArrowUp") {
+        // Navigate up in history
+        if (history.length > 0) {
+          if (historyIndex === NO_HISTORY_INDEX) {
+            // Save current input and go to last history item
+            setTempInput(typewriterInput)
+            setHistoryIndex(history.length - 1)
+            setTypewriterInput(history[history.length - 1])
+          } else if (historyIndex > 0) {
+            // Go to previous history item
+            setHistoryIndex(historyIndex - 1)
+            setTypewriterInput(history[historyIndex - 1])
+          }
+        }
+      } else if (ev.code === "ArrowDown") {
+        // Navigate down in history
+        if (historyIndex !== NO_HISTORY_INDEX) {
+          if (historyIndex < history.length - 1) {
+            // Go to next history item
+            setHistoryIndex(historyIndex + 1)
+            setTypewriterInput(history[historyIndex + 1])
+          } else {
+            // Return to current input
+            setHistoryIndex(NO_HISTORY_INDEX)
+            setTypewriterInput(tempInput)
+          }
+        }
       }
     })
     return () => { l.dispose() }
-  }, [oneLineEditor, runCommand])
+  }, [oneLineEditor, runCommand, history, historyIndex, typewriterInput, tempInput])
 
   // BUG: Causes `file closed` error
   //TODO: Intention is to run once when loading, does that work?

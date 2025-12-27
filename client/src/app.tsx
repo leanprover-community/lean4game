@@ -8,7 +8,8 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
-import { PreferencesContext, WorldLevelIdContext} from './components/infoview/context';
+import { HistoryContext, PreferencesContext, WorldLevelIdContext} from './components/infoview/context';
+import { NO_HISTORY_INDEX } from './components/infoview/typewriter';
 import UsePreferences from "./state/hooks/use_preferences"
 import i18n from './i18n';
 import { Popup } from './components/popup/popup';
@@ -24,6 +25,9 @@ function App() {
 
   const {mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = UsePreferences()
 
+  // Typewriter history state (persists across game levels)
+  const [history, setHistory] = React.useState<string[]>([])
+
   React.useEffect(() => {
     i18n.changeLanguage(language)
   }, [language])
@@ -33,10 +37,12 @@ function App() {
       <GameIdContext.Provider value={gameId}>
           <WorldLevelIdContext.Provider value={{worldId, levelId}}>
           <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}}>
-            <React.Suspense>
-              <Outlet />
-            </React.Suspense>
-            <Popup />
+            <HistoryContext.Provider value={{history, setHistory}}>
+              <React.Suspense>
+                <Outlet />
+              </React.Suspense>
+              <Popup />
+            </HistoryContext.Provider>
           </PreferencesContext.Provider>
           </WorldLevelIdContext.Provider>
       </GameIdContext.Provider>

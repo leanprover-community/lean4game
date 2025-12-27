@@ -26,7 +26,7 @@ import { changedSelection, codeEdited, selectCode, selectSelections, selectCompl
 import { store } from '../state/store'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import { hasInteractiveErrors } from './infoview/typewriter'
+import { NO_HISTORY_INDEX, hasInteractiveErrors } from './infoview/typewriter'
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
   ProofContext, SelectionContext, WorldLevelIdContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
@@ -233,9 +233,10 @@ function PlayableLevel() {
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
 
-  // set to true to prevent switching between typewriter and editor
   const [lockEditorMode, setLockEditorMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
+  const [tempInput, setTempInput] = useState("")
+  const [historyIndex, setHistoryIndex] = useState(NO_HISTORY_INDEX)
   const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
@@ -396,7 +397,7 @@ function PlayableLevel() {
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
-        <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode}}>
+        <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode, historyIndex, setHistoryIndex, tempInput, setTempInput}}>
           <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={editor}>
