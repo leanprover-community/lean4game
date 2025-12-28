@@ -24,6 +24,18 @@
   "No Games": {
     "description": "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder."
   },
+  "Progress saving": {
+    "translation": "Progress saving",
+    "description": "The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br/>Warning: In most browsers, deleting cookies will also clear the local storage (or \"local site data\"). Make sure to download your game progress first!"
+  },
+  "Development": {
+    "translation": "Development",
+    "description": "The game engine has been created by <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>. On a prototype by <strong>Patrick Massot</strong>. The source code of this Lean game engine is <1>available on Github</1>. If you experience any problems, please file an <2>Issue on Github</2> or get directly in contact."
+  },
+  "Accessibility": {
+    "translation": "Accessibility",
+    "description": "If you experience any accessibilty barriers, please get in contact with us! We are dedicated to address such barriers to the best of our abilities."
+  },
   "Tactics": "Tactics",
   "<p>Game rules determine if it is allowed to skip levels and if the games runs checks to only allow unlocked tactics and theorems in proofs.</p><1>Note: \"Unlocked\" tactics (or theorems) are determined by two things: The set of minimal tactics needed to solve a level, plus any tactics you unlocked in another level. That means if you unlock <1>simp</1> in a level, you can use it henceforth in any level.</1><p>The options are:</p>": "<p>Game rules determine if it is allowed to skip levels and if the games runs checks to only allow unlocked tactics and theorems in proofs.</p><1>Note: \"Unlocked\" tactics (or theorems) are determined by two things: The set of minimal tactics needed to solve a level, plus any tactics you unlocked in another level. That means if you unlock <1>simp</1> in a level, you can use it henceforth in any level.</1><p>The options are:</p>",
   "Game Rules": "Game Rules",
