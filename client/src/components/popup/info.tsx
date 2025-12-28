@@ -21,28 +21,44 @@ export function InfoPopup () {
       <Markdown>{gT(gameInfo.data?.info)}</Markdown>
       <hr />
       <Trans>
-        <h2>Progress saving</h2>
+        <h2>{gT("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>
         <p>
-          The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br />
-          Warning: In most browsers, deleting cookies will also clear the local storage (or "local site data").
-          Make sure to download your game progress first!
+          <Trans
+            i18nKey="Progress saving.description"
+            defaults="The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br/>Warning: In most browsers, deleting cookies will also clear the local storage (or 'local site data'). Make sure to download your game progress first!"
+          />
         </p>
-        <h2>Accessibility</h2>
+        <h2>{gT("Accessibility.translation", { defaultValue: "Accessibility" })}</h2>
         <p>
-          If you experience any accessibilty barriers, please get in contact with us!
-          We are dedicated to address such barriers to the best of our abilities.
+          <Trans
+            i18nKey="Accessibility.description"
+            defaults="If you experience any accessibilty barriers, please get in contact with us! We are dedicated to address such barriers to the best of our abilities."
+          />
         </p>
-        <h2>Development</h2>
-        <p>The game engine has been created by <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>.
-          On a prototype by <strong>Patrick Massot</strong>.
-        </p>
+        <h2>{gT("Development.translation", { defaultValue: "Development" })}</h2>
         <p>
+          <Trans
+          i18nKey="Development.description"
+          defaults="The game engine has been created by <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>. On a prototype by <strong>Patrick Massot</strong>. The source code of this Lean game engine is <1>available on Github</1>. If you experience any problems, please file an <2>Issue on Github</2> or get directly in contact."
+          components={{
+            1: <a target="_blank" href="https://github.com/leanprover-community/lean4game"/>,
+            2: <a target="_blank" href="https://github.com/leanprover-community/lean4game/issues"/>
+          }}
+          />
+        </p>
+        {/*
+          <p>The game engine has been created by <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>.
+            On a prototype by <strong>Patrick Massot</strong>.
+          </p>
+          <p>
           The source code of this Lean game engine
           is <a href="https://github.com/leanprover-community/lean4game" target="_blank">available on Github</a>.
           If you experience any problems, please
           file an <a href="https://github.com/leanprover-community/lean4game/issues" target="_blank">Issue on Github</a> or
           get directly in contact.
-        </p>
+
+          </p>
+        */}
         <h2>{gT("Funding.translation", { defaultValue: "Funding" })}</h2>
         <p>
           <Trans
