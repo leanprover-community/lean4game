@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useEffect, useState, useRef, useContext } from 'react'
-import { useSelector, useStore } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Split from 'react-split'
 import { useParams } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -8,10 +8,7 @@ import { faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgress } from '@mui/material'
 import type { Location } from 'vscode-languageserver-protocol'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider'
-import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter'
-import { InfoProvider } from 'lean4web/client/src/editor/infoview'
-import { LeanTaskGutter } from 'lean4web/client/src/editor/taskgutter'
+import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions } from 'lean4monaco'
 import { InfoviewApi } from '@leanprover/infoview'
 import { EditorContext } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts'
 import { EditorConnection, EditorEvents } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/editorConnection'
@@ -26,11 +23,10 @@ import { changedSelection, codeEdited, selectCode, selectSelections, selectCompl
 import { store } from '../state/store'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import { hasInteractiveErrors } from './infoview/typewriter'
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
   ProofContext, SelectionContext, WorldLevelIdContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
-import { GameHint, InteractiveGoalsWithHints, ProofState } from './infoview/rpc_api'
+import { GameHint, ProofState } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
 import path from 'path';
 
@@ -38,25 +34,15 @@ import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
-import 'lean4web/client/src/editor/infoview.css'
-import 'lean4web/client/src/editor/vscode.css'
 import '../css/level.css'
 import { LevelAppBar } from './app_bar'
-import { LeanClient } from 'lean4web/client/src/editor/leanclient'
-import { DisposingWebSocketMessageReader } from 'lean4web/client/src/reader'
 import { WebSocketMessageWriter, toSocket } from 'vscode-ws-jsonrpc'
-import { IConnectionProvider } from 'monaco-languageclient'
-import { monacoSetup } from 'lean4web/client/src/monacoSetup'
-import { onigasmH } from 'onigasm/lib/onigasmH'
 import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
-import { PreferencesPopup } from './popup/preferences'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 
-
-monacoSetup()
 
 function Level() {
   const params = useParams()
@@ -176,10 +162,10 @@ function ChatPanel({lastLevel, visible = true}) {
     <div className="button-row">
       {proof?.completed && (lastLevel ?
         <Button ref={focusRef} to={`/${gameId}`}>
-          <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
+          TODO{/* //TODO <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")} */}
         </Button> :
         <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-          {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+          TODO{/* {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} /> */}
         </Button>)
         }
       <MoreHelpButton />
@@ -204,6 +190,7 @@ function PlayableLevel() {
   let { t } = useTranslation()
   const { t : gT } = useGameTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
+  const infoviewRef = useRef<HTMLDivElement>(null)
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
@@ -244,7 +231,21 @@ function PlayableLevel() {
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
   function closeInventoryDoc () {setInventoryDoc(null)}
 
+  const [leanMonacoEditor, setLeanMonacoEditor] = useState<LeanMonacoEditor|null>(null)
+  const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
 
+  const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + gameId
+
+  const [options, setOptions] = useState<LeanMonacoOptions>({
+    // TODO: copy old settings
+    websocket: {
+      url: socketUrl
+    },
+    htmlElement: undefined, // The wrapper div for monaco
+    vscode: {
+      "editor.wordWrap": true,
+    }
+  })
 
   const onDidChangeContent = (code) => {
     dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code}))
@@ -258,14 +259,36 @@ function PlayableLevel() {
   }
 
 
-  const {editor, infoProvider, editorConnection} =
-    useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection)
+  // Start infoview and editor(s)
+  useEffect(() => {
+    // You must create a single `LeanMonaco` instance (infoview), but you can create multiple
+    // `LeanMonacoEditor` instances (editor)
+    // You must await `leanMonaco.start` or use `await leanMonaco.whenReady` before
+    // starting the editors!
+    const leanMonaco = new LeanMonaco()
+    const leanMonacoEditor = new LeanMonacoEditor()
+    const uriStr = `file:///${worldId}/${levelId}.lean`
+    setLeanMonacoEditor(leanMonacoEditor)
+
+    leanMonaco.setInfoviewElement(infoviewRef.current!)
+
+    ;(async () => {
+      await leanMonaco.start(options)
+      await leanMonacoEditor.start(codeviewRef.current!, uriStr, initialCode ?? '')
+      // setEditorConnection(leanMonacoEditor.editor.)
+    })()
+
+    return () => {
+      leanMonaco.dispose()
+      leanMonacoEditor.dispose()
+    }
+  }, [options, infoviewRef, codeviewRef])
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `TypewriterInterface`.
    */
   const handleUndo = () => {
-    const endPos = editor.getModel().getFullModelRange().getEndPosition()
+    const endPos = leanMonacoEditor?.editor.getModel().getFullModelRange().getEndPosition()
     let range
     console.log(endPos.column)
     if (endPos.column === 1) {
@@ -279,7 +302,7 @@ function PlayableLevel() {
         endPos
       )
     }
-    editor.executeEdits("undo-button", [{
+    leanMonacoEditor?.editor.executeEdits("undo-button", [{
       range,
       text: "",
       forceMoveMarkers: false
@@ -297,8 +320,8 @@ function PlayableLevel() {
     if (level?.data?.template) {
       setLockEditorMode(true)
 
-      if (editor) {
-        let code = editor.getModel().getLinesContent()
+      if (leanMonacoEditor?.editor) {
+        let code = leanMonacoEditor?.editor.getModel().getLinesContent()
 
         // console.log(`insert. code: ${code}`)
         // console.log(`insert. join: ${code.join('')}`)
@@ -313,8 +336,8 @@ function PlayableLevel() {
           console.debug(`inserting template:\n${level.data.template}`)
           // TODO: This does not work! HERE
           // Probably overwritten by a query to the server
-          editor.executeEdits("template-writer", [{
-            range: editor.getModel().getFullModelRange(),
+          leanMonacoEditor?.editor.executeEdits("template-writer", [{
+            range: leanMonacoEditor?.editor.getModel().getFullModelRange(),
             text: level.data.template + `\n`,
             forceMoveMarkers: true
           }])
@@ -325,7 +348,7 @@ function PlayableLevel() {
     } else {
       setLockEditorMode(false)
     }
-  }, [level, levelId, worldId, gameId, editor])
+  }, [level, levelId, worldId, gameId, leanMonacoEditor?.editor])
 
 
   useEffect(() => {
@@ -338,14 +361,14 @@ function PlayableLevel() {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    if (!(typewriterMode && !lockEditorMode) && editor) {
+    if (!(typewriterMode && !lockEditorMode) && leanMonacoEditor?.editor) {
       // Delete last input attempt from command line
-      editor.executeEdits("typewriter", [{
-        range: editor.getSelection(),
+      leanMonacoEditor?.editor.executeEdits("typewriter", [{
+        range: leanMonacoEditor?.editor.getSelection(),
         text: "",
         forceMoveMarkers: false
       }]);
-      editor.focus()
+      leanMonacoEditor?.editor.focus()
     }
   }, [typewriterMode, lockEditorMode])
 
@@ -367,10 +390,10 @@ function PlayableLevel() {
 
   // Effect when command line mode gets enabled
   useEffect(() => {
-    if (onigasmH && editor && (typewriterMode && !lockEditorMode)) {
-      let code = editor.getModel().getLinesContent().filter(line => line.trim())
-      editor.executeEdits("typewriter", [{
-        range: editor.getModel().getFullModelRange(),
+    if (leanMonacoEditor?.editor && (typewriterMode && !lockEditorMode)) {
+      let code = leanMonacoEditor?.editor.getModel().getLinesContent().filter(line => line.trim())
+      leanMonacoEditor?.editor.executeEdits("typewriter", [{
+        range: leanMonacoEditor?.editor.getModel().getFullModelRange(),
         text: code.length ? code.join('\n') + '\n' : '',
         forceMoveMarkers: true
       }]);
@@ -390,7 +413,7 @@ function PlayableLevel() {
       //   editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
       // }
     }
-  }, [editor, typewriterMode, lockEditorMode, onigasmH == null])
+  }, [leanMonacoEditor, leanMonacoEditor?.editor, typewriterMode, lockEditorMode])
 
   return <>
     <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
@@ -399,7 +422,7 @@ function PlayableLevel() {
         <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode}}>
           <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
             <EditorContext.Provider value={editorConnection}>
-              <MonacoEditorContext.Provider value={editor}>
+              <MonacoEditorContext.Provider value={leanMonacoEditor?.editor}>
                 <LevelAppBar
                   pageNumber={pageNumber} setPageNumber={setPageNumber}
                   isLoading={level.isLoading}
@@ -456,9 +479,11 @@ function IntroductionPanel({gameInfo}) {
     </div>
     <div className={`button-row${mobile ? ' mobile' : ''}`}>
       {gameInfo.data?.worldSize[worldId] == 0 ?
-        <Button to={`/${gameId}`}><FontAwesomeIcon icon={faHome} /></Button> :
+        <Button to={`/${gameId}`}>
+          TODO{/* <FontAwesomeIcon icon={faHome} /> */}
+          </Button> :
         <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/1`}>
-          {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
+          TODO{/* {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} /> */}
         </Button>
       }
     </div>
@@ -523,167 +548,167 @@ function Introduction() {
 //   </Split>
 // }
 
-function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
+// function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
 
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = useContext(WorldLevelIdContext)
+//   const gameId = React.useContext(GameIdContext)
+//   const {worldId, levelId} = useContext(WorldLevelIdContext)
 
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
-  const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
-  const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
+//   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
+//   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
+//   const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
 
-  const uriStr = `file:///${worldId}/${levelId}`
-  const uri = monaco.Uri.parse(uriStr)
+//   const uriStr = `file:///${worldId}/${levelId}`
+//   const uri = monaco.Uri.parse(uriStr)
 
-  const inventory: Array<String> = useSelector(selectInventory(gameId))
-  const difficulty: number = useSelector(selectDifficulty(gameId))
+//   const inventory: Array<String> = useSelector(selectInventory(gameId))
+//   const difficulty: number = useSelector(selectDifficulty(gameId))
 
-  useEffect(() => {
-    const model = monaco.editor.createModel(initialCode ?? '', 'lean4', uri)
-    if (onDidChangeContent) {
-      model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
-    }
+//   useEffect(() => {
+//     const model = monaco.editor.createModel(initialCode ?? '', 'lean4', uri)
+//     if (onDidChangeContent) {
+//       model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
+//     }
 
-    const editor = monaco.editor.create(codeviewRef.current!, {
-      model,
-      glyphMargin: true,
-      quickSuggestions: false,
-      lineDecorationsWidth: 5,
-      folding: false,
-      lineNumbers: 'on',
-      lightbulb: {
-        enabled: true
-      },
-      unicodeHighlight: {
-          ambiguousCharacters: false,
-      },
-      automaticLayout: true,
-      minimap: {
-        enabled: false
-      },
-      lineNumbersMinChars: 3,
-      tabSize: 2,
-      'semanticHighlighting.enabled': true,
-      theme: 'vs-code-theme-converted'
-    })
-    if (onDidChangeSelection) {
-      editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
-    }
-    if (initialSelections) {
-      console.debug("Initial Selection: ", initialSelections)
-      // BUG: Somehow I get an `invalid arguments` bug here
-      // editor.setSelections(initialSelections)
-    }
-    setEditor(editor)
-    const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
+//     const editor = monaco.editor.create(codeviewRef.current!, {
+//       model,
+//       glyphMargin: true,
+//       quickSuggestions: false,
+//       lineDecorationsWidth: 5,
+//       folding: false,
+//       lineNumbers: 'on',
+//       lightbulb: {
+//         enabled: true
+//       },
+//       unicodeHighlight: {
+//           ambiguousCharacters: false,
+//       },
+//       automaticLayout: true,
+//       minimap: {
+//         enabled: false
+//       },
+//       lineNumbersMinChars: 3,
+//       tabSize: 2,
+//       'semanticHighlighting.enabled': true,
+//       theme: 'vs-code-theme-converted'
+//     })
+//     if (onDidChangeSelection) {
+//       editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
+//     }
+//     if (initialSelections) {
+//       console.debug("Initial Selection: ", initialSelections)
+//       // BUG: Somehow I get an `invalid arguments` bug here
+//       // editor.setSelections(initialSelections)
+//     }
+//     setEditor(editor)
+//     const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
 
-    const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + gameId
+//     const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + gameId
 
-    const connectionProvider : IConnectionProvider = {
-      get: async () => {
-        return await new Promise((resolve, reject) => {
-          console.log(`connecting ${socketUrl}`)
-          const websocket = new WebSocket(socketUrl)
-          websocket.addEventListener('error', (ev) => {
-            reject(ev)
-          })
-          websocket.addEventListener('message', (msg) => {
-            // console.log(msg.data)
-          })
-          websocket.addEventListener('open', () => {
-            const socket = toSocket(websocket)
-            const reader = new DisposingWebSocketMessageReader(socket)
-            const writer = new WebSocketMessageWriter(socket)
-            resolve({
-              reader,
-              writer
-            })
-          })
-        })
-      }
-    }
+//     const connectionProvider : IConnectionProvider = {
+//       get: async () => {
+//         return await new Promise((resolve, reject) => {
+//           console.log(`connecting ${socketUrl}`)
+//           const websocket = new WebSocket(socketUrl)
+//           websocket.addEventListener('error', (ev) => {
+//             reject(ev)
+//           })
+//           websocket.addEventListener('message', (msg) => {
+//             // console.log(msg.data)
+//           })
+//           websocket.addEventListener('open', () => {
+//             const socket = toSocket(websocket)
+//             const reader = new DisposingWebSocketMessageReader(socket)
+//             const writer = new WebSocketMessageWriter(socket)
+//             resolve({
+//               reader,
+//               writer
+//             })
+//           })
+//         })
+//       }
+//     }
 
-    // Following `vscode-lean4/webview/index.ts`
-    const client = new LeanClient(connectionProvider, showRestartMessage, {inventory, difficulty})
-    const infoProvider = new InfoProvider(client)
-    // const div: HTMLElement = infoviewRef.current!
-    const imports = {
-      '@leanprover/infoview': `${window.location.origin}/index.production.min.js`,
-      'react': `${window.location.origin}/react.production.min.js`,
-      'react/jsx-runtime': `${window.location.origin}/react-jsx-runtime.production.min.js`,
-      'react-dom': `${window.location.origin}/react-dom.production.min.js`,
-      'react-popper': `${window.location.origin}/react-popper.production.min.js`
-    }
-    // loadRenderInfoview(imports, [infoProvider.getApi(), div], setInfoviewApi)
-    setInfoProvider(infoProvider)
+//     // Following `vscode-lean4/webview/index.ts`
+//     const client = new LeanClient(connectionProvider, showRestartMessage, {inventory, difficulty})
+//     const infoProvider = new InfoProvider(client)
+//     // const div: HTMLElement = infoviewRef.current!
+//     const imports = {
+//       '@leanprover/infoview': `${window.location.origin}/index.production.min.js`,
+//       'react': `${window.location.origin}/react.production.min.js`,
+//       'react/jsx-runtime': `${window.location.origin}/react-jsx-runtime.production.min.js`,
+//       'react-dom': `${window.location.origin}/react-dom.production.min.js`,
+//       'react-popper': `${window.location.origin}/react-popper.production.min.js`
+//     }
+//     // loadRenderInfoview(imports, [infoProvider.getApi(), div], setInfoviewApi)
+//     setInfoProvider(infoProvider)
 
-    // TODO: it looks like we get errors "File Changed" here.
-    client.restart("Lean4Game")
+//     // TODO: it looks like we get errors "File Changed" here.
+//     client.restart("Lean4Game")
 
-    const editorApi = infoProvider.getApi()
+//     const editorApi = infoProvider.getApi()
 
-    const editorEvents: EditorEvents = {
-        initialize: new EventEmitter(),
-        gotServerNotification: new EventEmitter(),
-        sentClientNotification: new EventEmitter(),
-        serverRestarted: new EventEmitter(),
-        serverStopped: new EventEmitter(),
-        changedCursorLocation: new EventEmitter(),
-        changedInfoviewConfig: new EventEmitter(),
-        runTestScript: new EventEmitter(),
-        requestedAction: new EventEmitter(),
-    };
+//     const editorEvents: EditorEvents = {
+//         initialize: new EventEmitter(),
+//         gotServerNotification: new EventEmitter(),
+//         sentClientNotification: new EventEmitter(),
+//         serverRestarted: new EventEmitter(),
+//         serverStopped: new EventEmitter(),
+//         changedCursorLocation: new EventEmitter(),
+//         changedInfoviewConfig: new EventEmitter(),
+//         runTestScript: new EventEmitter(),
+//         requestedAction: new EventEmitter(),
+//     };
 
-    // Challenge: write a type-correct fn from `Eventify<T>` to `T` without using `any`
-    const infoviewApi: InfoviewApi = {
-        initialize: async l => editorEvents.initialize.fire(l),
-        gotServerNotification: async (method, params) => {
-            editorEvents.gotServerNotification.fire([method, params]);
-        },
-        sentClientNotification: async (method, params) => {
-            editorEvents.sentClientNotification.fire([method, params]);
-        },
-        serverRestarted: async r => editorEvents.serverRestarted.fire(r),
-        serverStopped: async serverStoppedReason => {
-            editorEvents.serverStopped.fire(serverStoppedReason)
-        },
-        changedCursorLocation: async loc => editorEvents.changedCursorLocation.fire(loc),
-        changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
-        requestedAction: async action => editorEvents.requestedAction.fire(action),
-        // See https://rollupjs.org/guide/en/#avoiding-eval
-        // eslint-disable-next-line @typescript-eslint/no-implied-eval
-        runTestScript: async script => new Function(script)(),
-        getInfoviewHtml: async () => document.body.innerHTML,
-    };
+//     // Challenge: write a type-correct fn from `Eventify<T>` to `T` without using `any`
+//     const infoviewApi: InfoviewApi = {
+//         initialize: async l => editorEvents.initialize.fire(l),
+//         gotServerNotification: async (method, params) => {
+//             editorEvents.gotServerNotification.fire([method, params]);
+//         },
+//         sentClientNotification: async (method, params) => {
+//             editorEvents.sentClientNotification.fire([method, params]);
+//         },
+//         serverRestarted: async r => editorEvents.serverRestarted.fire(r),
+//         serverStopped: async serverStoppedReason => {
+//             editorEvents.serverStopped.fire(serverStoppedReason)
+//         },
+//         changedCursorLocation: async loc => editorEvents.changedCursorLocation.fire(loc),
+//         changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
+//         requestedAction: async action => editorEvents.requestedAction.fire(action),
+//         // See https://rollupjs.org/guide/en/#avoiding-eval
+//         // eslint-disable-next-line @typescript-eslint/no-implied-eval
+//         runTestScript: async script => new Function(script)(),
+//         getInfoviewHtml: async () => document.body.innerHTML,
+//     };
 
-    const ec = new EditorConnection(editorApi, editorEvents);
-    setEditorConnection(ec)
+//     const ec = new EditorConnection(editorApi, editorEvents);
+//     setEditorConnection(ec)
 
-    editorEvents.initialize.on((loc: Location) => ec.events.changedCursorLocation.fire(loc))
+//     editorEvents.initialize.on((loc: Location) => ec.events.changedCursorLocation.fire(loc))
 
-    setEditor(editor)
-    setInfoProvider(infoProvider)
+//     setEditor(editor)
+//     setInfoProvider(infoProvider)
 
-    infoProvider.openPreview(editor, infoviewApi)
-    const taskgutter = new LeanTaskGutter(infoProvider.client, editor)
+//     infoProvider.openPreview(editor, infoviewApi)
+//     const taskgutter = new LeanTaskGutter(infoProvider.client, editor)
 
-    // TODO:
-    // setRestart(() => restart)
+//     // TODO:
+//     // setRestart(() => restart)
 
-    return () => {
-      editor.dispose();
-      model.dispose();
-      abbrevRewriter.dispose();
-      taskgutter.dispose();
-      infoProvider.dispose();
-      client.dispose();
-    }
-  }, [gameId, worldId, levelId])
+//     return () => {
+//       editor.dispose();
+//       model.dispose();
+//       abbrevRewriter.dispose();
+//       taskgutter.dispose();
+//       infoProvider.dispose();
+//       client.dispose();
+//     }
+//   }, [gameId, worldId, levelId])
 
-  const showRestartMessage = () => {
-    // setRestartMessage(true)
-    console.log("TODO: SHOW RESTART MESSAGE")
-  }
+//   const showRestartMessage = () => {
+//     // setRestartMessage(true)
+//     console.log("TODO: SHOW RESTART MESSAGE")
+//   }
 
-  return {editor, infoProvider, editorConnection}
-}
+//   return {editor, infoProvider, editorConnection}
+// }

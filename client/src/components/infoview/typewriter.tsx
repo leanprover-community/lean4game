@@ -3,16 +3,8 @@ import { useRef, useState, useEffect, useContext } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { Registry } from 'monaco-textmate' // peer dependency
-import { wireTmGrammars } from 'monaco-editor-textmate'
 import { DiagnosticSeverity, PublishDiagnosticsParams, DocumentUri } from 'vscode-languageserver-protocol';
 import { useServerNotificationEffect } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
-import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
-import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
-import * as leanSyntax from 'lean4web/client/src/syntaxes/lean.json'
-import * as leanMarkdownSyntax from 'lean4web/client/src/syntaxes/lean-markdown.json'
-import * as codeblockSyntax from 'lean4web/client/src/syntaxes/codeblock.json'
-import languageConfig from 'lean4/language-configuration.json';
 import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
@@ -26,54 +18,6 @@ export interface GameDiagnosticsParams {
   uri: DocumentUri;
   diagnostics: Diagnostic[];
 }
-
-/* We register a new language `leancmd` that looks like lean4, but does not use the lsp server. */
-
-// register Monaco languages
-monaco.languages.register({
-  id: 'lean4cmd',
-  extensions: ['.leancmd']
-})
-
-// register Monaco languages // TODO: JE. I dont understand why I suddenly had to add this when it worked without before.
-monaco.languages.register({
-  id: 'lean4',
-  extensions: ['.lean']
-})
-
-// map of monaco "language id's" to TextMate scopeNames
-const grammars = new Map()
-grammars.set('lean4', 'source.lean')
-grammars.set('lean4cmd', 'source.lean')
-
-const registry = new Registry({
-  getGrammarDefinition: async (scopeName) => {
-    if (scopeName === 'source.lean') {
-      return {
-          format: 'json',
-          content: JSON.stringify(leanSyntax)
-      }
-    } else if (scopeName === 'source.lean.markdown') {
-      return {
-          format: 'json',
-          content: JSON.stringify(leanMarkdownSyntax)
-      }
-    } else {
-      return {
-          format: 'json',
-          content: JSON.stringify(codeblockSyntax)
-      }
-    }
-  }
-});
-
-wireTmGrammars(monaco, registry, grammars)
-
-let config: any = { ...languageConfig }
-config.autoClosingPairs = config.autoClosingPairs.map(
-  pair => { return {'open': pair[0], 'close': pair[1]} }
-)
-monaco.languages.setLanguageConfiguration('lean4cmd', config);
 
 /** The input field */
 export function Typewriter({disabled}: {disabled?: boolean}) {
@@ -194,9 +138,9 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       value: typewriterInput,
       language: "lean4cmd",
       quickSuggestions: false,
-      lightbulb: {
-        enabled: true
-      },
+      // lightbulb: {
+      //   enabled: true
+      // },
       unicodeHighlight: {
           ambiguousCharacters: false,
       },
@@ -232,9 +176,9 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
     setOneLineEditor(myEditor)
 
-    const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), myEditor.getModel(), myEditor)
+    // const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), myEditor.getModel(), myEditor)
 
-    return () => {abbrevRewriter.dispose(); myEditor.dispose()}
+    // return () => {abbrevRewriter.dispose(); myEditor.dispose()}
   }, [])
 
   useEffect(() => {
@@ -284,7 +228,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
           <div ref={inputRef} className="typewriter-input" />
         </div>
         <button type="submit" disabled={processing} className="btn btn-inverted">
-          <FontAwesomeIcon icon={faWandMagicSparkles} />&nbsp;{t("Execute")}
+          TODO{/* <TODO></TODO><FontAwesomeIcon icon={faWandMagicSparkles} />&nbsp;{t("Execute")} */}
         </button>
       </form>
     </div>

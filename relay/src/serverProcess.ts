@@ -219,6 +219,12 @@ export class GameManager {
         const levelDataPath = path.join(gameDir, '.lake', 'gamedata', `level__${worldId}__${levelId}.json`)
         const levelData = JSON.parse(fs.readFileSync(levelDataPath, 'utf8'))
 
+        if (difficulty === undefined || inventory === undefined) {
+          console.error("Did not receive difficulty/inventory from client!")
+          difficulty = 1
+          inventory = []
+        }
+
         let content = message.params.textDocument.text;
         message.params.textDocument.text =
           `import ${levelData.module} import GameServer.Runner \nRunner ` +
@@ -249,7 +255,7 @@ export class GameManager {
       if (usesCustomLeanServer) return message
 
       shiftLines(message, -PROOF_START_LINE);
-      replaceUri(message, `file:///${worldId}/${levelId}`) // as defined in `level.tsx`
+      replaceUri(message, `file:///${worldId}/${levelId}.lean`) // as defined in `level.tsx`
 
       // Disable range semantic tokens because they are difficult to shift
       if ((message as any)?.result?.capabilities?.semanticTokensProvider?.range) {
