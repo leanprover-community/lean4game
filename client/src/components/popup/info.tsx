@@ -12,6 +12,7 @@ import { useGameTranslation } from '../../utils/translation'
  * controlled by the containing element.
  */
 export function InfoPopup () {
+  const { t } = useTranslation()
   const { t : gT } = useGameTranslation()
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
@@ -21,21 +22,21 @@ export function InfoPopup () {
       <Markdown>{gT(gameInfo.data?.info)}</Markdown>
       <hr />
       <Trans>
-        <h2>{gT("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>
+        <h2>{t("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>
         <p>
           <Trans
             i18nKey="Progress saving.description"
             defaults="The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br/>Warning: In most browsers, deleting cookies will also clear the local storage (or 'local site data'). Make sure to download your game progress first!"
           />
         </p>
-        <h2>{gT("Accessibility.translation", { defaultValue: "Accessibility" })}</h2>
+        <h2>{t("Accessibility.translation", { defaultValue: "Accessibility" })}</h2>
         <p>
           <Trans
             i18nKey="Accessibility.description"
             defaults="If you experience any accessibilty barriers, please get in contact with us! We are dedicated to address such barriers to the best of our abilities."
           />
         </p>
-        <h2>{gT("Development.translation", { defaultValue: "Development" })}</h2>
+        <h2>{t("Development.translation", { defaultValue: "Development" })}</h2>
         <p>
           <Trans
           i18nKey="Development.description"
@@ -59,7 +60,7 @@ export function InfoPopup () {
 
           </p>
         */}
-        <h2>{gT("Funding.translation", { defaultValue: "Funding" })}</h2>
+        <h2>{t("Funding.translation", { defaultValue: "Funding" })}</h2>
         <p>
           <Trans
             i18nKey="Funding.description"

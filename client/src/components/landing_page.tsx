@@ -90,7 +90,7 @@ function LandingPage() {
   const [usageCPU, setUsageCPU] = React.useState<number>()
   const [usageMem, setUsageMem] = React.useState<number>()
 
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   // Load the namespaces of all games
   // TODO: should `allGames` contain game-ids starting with `g/`?
