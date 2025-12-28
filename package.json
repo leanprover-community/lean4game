@@ -39,7 +39,7 @@
     "jotai": "^2.13.1",
     "lean4-infoview": "https://gitpkg2.vercel.app/leanprover/vscode-lean4/lean4-infoview?de0062c",
     "lean4monaco": "^1.0.46",
-    "lean4web": "github:hhu-adam/lean4web#414d9e62638a392fca278761b4c61a1d2e138bc7",
+    "lean4web": "github:hhu-adam/lean4web#lean4game-legacy",
     "marked": "^4.3.0",
     "memfs": "^4.11.1",
     "node-schedule": "^2.1.1",
