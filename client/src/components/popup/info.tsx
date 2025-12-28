@@ -43,7 +43,7 @@ export function InfoPopup () {
           file an <a href="https://github.com/leanprover-community/lean4game/issues" target="_blank">Issue on Github</a> or
           get directly in contact.
         </p>
-        <h2>Funding</h2>
+        <h2>{gT("Funding.translation", { defaultValue: "Funding" })}</h2>
         <p>
           <Trans
             i18nKey="Funding.description"
