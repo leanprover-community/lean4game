@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { DidChangeTextDocumentParams, DidCloseTextDocumentParams, TextDocumentContentChangeEvent } from 'vscode-languageserver-protocol';
 
-import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { DocumentPosition, Keyed, PositionHelpers, useClientNotificationEffect, useClientNotificationState, useEvent, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { EditorContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts';
+import { DocumentPosition, Keyed, PositionHelpers, useClientNotificationEffect, useClientNotificationState, useEvent, useEventResult } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { Info, InfoProps } from './info';
 import { useTranslation } from 'react-i18next';
 
