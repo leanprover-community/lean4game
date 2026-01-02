@@ -18,10 +18,6 @@ export function InfoPopup () {
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
   // DEBUG
-  console.log(gameInfo.data?.info)
-  console.log('-----------------')
-  console.log(t(gameInfo.data?.info, {ns: gameId}))
-  console.log('-----------------')
   console.log(gT(gameInfo.data?.info))
 
   return <>
