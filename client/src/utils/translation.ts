@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { useTranslation, UseTranslationResponse } from 'react-i18next'
 import { GameIdContext } from '../app'
+import i18next from 'i18next';
 
 /**
  * This file provides the tools to process translations created by the Lean package `lean-i18n`.
@@ -52,6 +53,8 @@ export function useGameTranslation(): UseTranslationResponse<'translation', unde
   const modifiedT = ((key: string | undefined) => {
     if (!key) return ""
     console.log(`Key: ${key}`)
+    const keyExists =  i18next.exists(key, { ns: gameId });
+    console.log('Does "info" exist in the "game" namespace?', keyExists)
     const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
     console.log(`Code blocks: ${codeBlocks}`)
     console.log(`Key without blocks: ${keyWithoutBlocks}`)
