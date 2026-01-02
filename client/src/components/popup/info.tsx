@@ -13,7 +13,7 @@ import { useGameTranslation } from '../../utils/translation'
  */
 export function InfoPopup () {
   const { t } = useTranslation()
-  // const { t : gT } = useGameTranslation()
+  const { t : gT } = useGameTranslation()
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
@@ -21,6 +21,8 @@ export function InfoPopup () {
   console.log(gameInfo.data?.info)
   console.log('-----------------')
   console.log(t(gameInfo.data?.info, {ns: gameId}))
+  console.log('-----------------')
+  console.log(gT(gameInfo.data?.info))
 
   return <>
     <Typography variant="body1" component="div" className="welcome-text">
