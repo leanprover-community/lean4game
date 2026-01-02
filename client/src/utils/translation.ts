@@ -54,7 +54,7 @@ export function useGameTranslation(): UseTranslationResponse<'translation', unde
     if (!key) return ""
     console.log(`Key: ${key}`)
     const keyExists =  i18next.exists(key, { ns: gameId });
-    console.log('Does "info" exist in the "game" namespace?', keyExists)
+    console.log(`Does ${key} exist in the "game" namespace?`, keyExists)
     const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
     console.log(`Code blocks: ${codeBlocks}`)
     console.log(`Key without blocks: ${keyWithoutBlocks}`)
