@@ -46,10 +46,12 @@ function extractCodeBlocks(input: string): {
  */
 export function useGameTranslation(): UseTranslationResponse<'translation', undefined> {
   const gameId = useContext(GameIdContext)
+  console.log(`GameId: ${gameId}`)
   const { t, ...rest } = useTranslation()
   const pattern = /(?<!\\)§(\d+)/g;
   const modifiedT = ((key: string | undefined) => {
     if (!key) return ""
+    console.log(`Key: ${key}`)
     const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
     // look-up the unmodified `key` in case of failure for backwards compatibility.
     let translatedKey = t([keyWithoutBlocks, key], {ns: gameId})
