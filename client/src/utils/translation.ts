@@ -53,6 +53,8 @@ export function useGameTranslation(): UseTranslationResponse<'translation', unde
     if (!key) return ""
     console.log(`Key: ${key}`)
     const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
+    console.log(`Code blocks: ${codeBlocks}`)
+    console.log(`Key without blocks: ${keyWithoutBlocks}`)
     // look-up the unmodified `key` in case of failure for backwards compatibility.
     let translatedKey = t([keyWithoutBlocks, key], {ns: gameId})
     return translatedKey.replace(pattern, (_, num: string) => codeBlocks[Number(num)] ?? num);
