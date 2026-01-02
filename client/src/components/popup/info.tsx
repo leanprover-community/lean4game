@@ -17,6 +17,11 @@ export function InfoPopup () {
   const gameId = React.useContext(GameIdContext)
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
+  // DEBUG
+  console.log(gameInfo.data?.info)
+  console.log('-----------------')
+  console.log(t(gameInfo.data?.info, {ns: gameId}))
+
   return <>
     <Typography variant="body1" component="div" className="welcome-text">
       <Markdown>{t(gameInfo.data?.info, {ns: gameId})}</Markdown>
