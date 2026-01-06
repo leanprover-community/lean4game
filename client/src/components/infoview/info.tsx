@@ -13,6 +13,8 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/goalLocation'
 
 import { AllMessages, lspDiagToInteractive } from './messages'
+import { InputModeContext } from './context'
+import { goalsToString } from './goals'
 import { goalsToString, Goal, MainAssumptions, OtherGoals } from './goals'
 import { InteractiveTermGoal, InteractiveGoalsWithHints, InteractiveGoals, ProofState } from './rpc_api'
 import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext, WorldLevelIdContext } from './context'
@@ -91,6 +93,7 @@ interface InfoDisplayContentProps extends PausableProps {
 const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
     let { t } = useTranslation()
     const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused, proofString} = props
+    const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
 
     const hasWidget = userWidgets.length > 0
     const hasError = !!error
@@ -138,6 +141,12 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
             )}
           </div>
         </LocationsContext.Provider>
+        {goals && goals.goals.length > 0 && !(typewriterMode && !lockEditorMode) && (
+          <div className="message error">
+            <div>unsolved goals</div>
+            <pre className="font-code pre-wrap">{goalsToString(goals)}</pre>
+          </div>
+        )}
         {userWidgets.map(widget =>
           <details key={`widget::${widget.id}::${widget.range?.toString()}`} open>
             <summary className='mv2 pointer'>{widget.name}</summary>
@@ -244,7 +253,12 @@ function InfoAtCursor(props: InfoProps) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const [curLoc, setCurLoc] = React.useState<Location>(ec.events.changedCursorLocation.current!)
     useEvent(ec.events.changedCursorLocation, loc => loc && setCurLoc(loc), [])
-    const pos = { uri: curLoc.uri, ...curLoc.range.start }
+    const start = curLoc.range.start ?? { line: 0, character: 0 }
+    const pos = {
+      uri: curLoc.uri,
+      line: start.line ?? 0,
+      character: start.character ?? 0,
+    }
     return <InfoAux {...props} pos={pos} />
 }
 

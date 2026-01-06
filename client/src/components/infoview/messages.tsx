@@ -206,13 +206,14 @@ function AllMessagesBody({uri, curPos, messages}: {uri: DocumentUri, curPos: Doc
     let { t } = useTranslation()
     const [msgs, setMsgs] = React.useState<InteractiveDiagnostic[] | undefined>(undefined)
     React.useEffect(() => { void messages().then(
-        msgs => setMsgs(msgs.filter(
-            (d)=>{
-                //console.log(`message start: ${d.range.start.line}. CurPos: ${curPos.line}`)
-
-                // Only show the messages from the line where the cursor is.
-                return d.range.start.line == curPos.line
-            }))
+        msgs => setMsgs(msgs.filter((d) => {
+            const text = TaggedText_stripTags(d.message)
+            if (text.includes('unsolved goals')) {
+                return true
+            }
+            // Only show the messages from the line where the cursor is.
+            return d.range.start.line == curPos.line
+        }))
     ) }, [messages, curPos])
     if (msgs === undefined) return <div>{t("Loading messages…")}</div>
     else return <MessagesList uri={uri} messages={msgs}/>

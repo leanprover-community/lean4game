@@ -9,7 +9,7 @@ import { CircularProgress } from '@mui/material'
 import type { Location } from 'vscode-languageserver-protocol'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions } from 'lean4monaco'
-import { InfoviewApi } from '@leanprover/infoview'
+import type { EditorApi, InfoviewApi } from '@leanprover/infoview-api'
 import { EditorContext } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts'
 import { EditorConnection, EditorEvents } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/editorConnection'
 import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/event'
@@ -162,10 +162,10 @@ function ChatPanel({lastLevel, visible = true}) {
     <div className="button-row">
       {proof?.completed && (lastLevel ?
         <Button ref={focusRef} to={`/${gameId}`}>
-          TODO{/* //TODO <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")} */}
+          <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
         </Button> :
         <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
-          TODO{/* {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} /> */}
+          {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>)
         }
       <MoreHelpButton />
@@ -174,12 +174,13 @@ function ChatPanel({lastLevel, visible = true}) {
 }
 
 
-function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
+function ExercisePanel({codeviewRef, infoviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, infoviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
   const gameInfo = useGetGameInfoQuery({game: gameId})
   return <div className={`exercise-panel ${visible ? '' : 'hidden'}`}>
+    <div ref={infoviewRef} className="infoview" style={{display: 'none'}}></div>
     <div className="exercise">
       <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} worldSize={gameInfo.data?.worldSize[worldId]}/>
     </div>
@@ -272,17 +273,124 @@ function PlayableLevel() {
 
     leanMonaco.setInfoviewElement(infoviewRef.current!)
 
+    let disposed = false
     ;(async () => {
       await leanMonaco.start(options)
+      if (disposed) {
+        return
+      }
       await leanMonacoEditor.start(codeviewRef.current!, uriStr, initialCode ?? '')
-      // setEditorConnection(leanMonacoEditor.editor.)
+      if (disposed) {
+        return
+      }
+
+      const infoProvider = leanMonaco.infoProvider as {
+        editorApi: EditorApi
+        webviewPanel?: { api: InfoviewApi, visible: boolean }
+        sendConfig?: () => Promise<void>
+        sendPosition?: () => Promise<void>
+      } | undefined
+
+      if (!infoProvider?.editorApi) {
+        console.warn('Lean infoview is not ready yet.')
+        return
+      }
+
+      const editorEvents: EditorEvents = {
+        initialize: new EventEmitter(),
+        gotServerNotification: new EventEmitter(),
+        sentClientNotification: new EventEmitter(),
+        serverRestarted: new EventEmitter(),
+        serverStopped: new EventEmitter(),
+        changedCursorLocation: new EventEmitter(),
+        changedInfoviewConfig: new EventEmitter(),
+        runTestScript: new EventEmitter(),
+        requestedAction: new EventEmitter(),
+      }
+
+      const infoviewApi: InfoviewApi = {
+        initialize: async l => editorEvents.initialize.fire(l),
+        gotServerNotification: async (method, params) => {
+          editorEvents.gotServerNotification.fire([method, params])
+        },
+        sentClientNotification: async (method, params) => {
+          editorEvents.sentClientNotification.fire([method, params])
+        },
+        serverRestarted: async r => editorEvents.serverRestarted.fire(r),
+        serverStopped: async serverStoppedReason => {
+          editorEvents.serverStopped.fire(serverStoppedReason)
+        },
+        changedCursorLocation: async loc => editorEvents.changedCursorLocation.fire(loc),
+        changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
+        requestedAction: async action => editorEvents.requestedAction.fire(action),
+        runTestScript: async script => new Function(script)(),
+        getInfoviewHtml: async () => document.body.innerHTML,
+      }
+
+      infoProvider.webviewPanel = {
+        api: infoviewApi,
+        visible: true,
+      }
+
+      const editorConnection = new EditorConnection(infoProvider.editorApi, editorEvents)
+      setEditorConnection(editorConnection)
+
+      const model = leanMonacoEditor.editor.getModel()
+      const fireCursorLocation = () => {
+        const selection = leanMonacoEditor.editor.getSelection()
+        const position = leanMonacoEditor.editor.getPosition()
+        if (!selection || !model) {
+          if (!position || !model) {
+            return
+          }
+          const loc: Location = {
+            uri: model.uri.toString(),
+            range: {
+              start: {
+                line: position.lineNumber - 1,
+                character: position.column - 1,
+              },
+              end: {
+                line: position.lineNumber - 1,
+                character: position.column - 1,
+              },
+            },
+          }
+          editorEvents.changedCursorLocation.fire(loc)
+          return
+        }
+        const loc: Location = {
+          uri: model.uri.toString(),
+          range: {
+            start: {
+              line: selection.startLineNumber - 1,
+              character: selection.startColumn - 1,
+            },
+            end: {
+              line: selection.endLineNumber - 1,
+              character: selection.endColumn - 1,
+            },
+          },
+        }
+        editorEvents.changedCursorLocation.fire(loc)
+      }
+
+      fireCursorLocation()
+      leanMonacoEditor.editor.onDidChangeCursorSelection(() => {
+        fireCursorLocation()
+      })
+
+      await infoProvider.sendConfig?.()
+      await infoProvider.sendPosition?.()
     })()
 
     return () => {
-      leanMonaco.dispose()
+      disposed = true
+      // Avoid calling LeanMonaco.dispose() until upstream disposal is fixed;
+      // it can throw from InfoProvider.dispose in the bundled build.
       leanMonacoEditor.dispose()
     }
-  }, [options, infoviewRef, codeviewRef])
+  }, [options, infoviewRef, codeviewRef, initialCode, worldId, levelId])
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `TypewriterInterface`.
@@ -435,6 +543,7 @@ function PlayableLevel() {
                     <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
                       <ExercisePanel
                         codeviewRef={codeviewRef}
+                        infoviewRef={infoviewRef}
                         visible={pageNumber == 0} />
                       <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
                     </div>
@@ -443,7 +552,8 @@ function PlayableLevel() {
                   <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
                     <ChatPanel lastLevel={lastLevel}/>
                     <ExercisePanel
-                      codeviewRef={codeviewRef} />
+                      codeviewRef={codeviewRef}
+                      infoviewRef={infoviewRef} />
                     <InventoryPanel levelInfo={level?.data} />
                   </Split>
                 }
@@ -480,10 +590,10 @@ function IntroductionPanel({gameInfo}) {
     <div className={`button-row${mobile ? ' mobile' : ''}`}>
       {gameInfo.data?.worldSize[worldId] == 0 ?
         <Button to={`/${gameId}`}>
-          TODO{/* <FontAwesomeIcon icon={faHome} /> */}
+          <FontAwesomeIcon icon={faHome} />
           </Button> :
         <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/1`}>
-          TODO{/* {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} /> */}
+          {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>
       }
     </div>

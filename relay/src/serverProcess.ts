@@ -296,7 +296,8 @@ export class GameManager {
 
     let game_dir: string
     if(owner == 'local') {
-      game_dir = path.join(this.dir, '..', '..', '..', '..', repo)
+      const workspaceRoot = this.findWorkspaceRoot()
+      game_dir = workspaceRoot ? path.join(workspaceRoot, repo) : ""
     } else if (owner == 'test') {
       game_dir = path.join(this.dir, '..', '..', '..', 'cypress', repo)
       console.debug(game_dir)
@@ -323,6 +324,21 @@ export class GameManager {
     }
 
     return game_dir;
+  }
+
+  private findWorkspaceRoot(): string | null {
+    // Find an ancestor that contains the lean4game directory.
+    let current = this.dir
+    for (let i = 0; i < 10; i++) {
+      if (fs.existsSync(path.join(current, 'lean4game'))) {
+        return current
+      }
+      const parent = path.dirname(current)
+      if (parent === current) break
+      current = parent
+    }
+    console.error(`[${new Date()}] Could not locate workspace root (containing lean4game).`);
+    return null
   }
 
   getTagString(tag: Tag) {

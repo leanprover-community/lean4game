@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { DiagnosticSeverity, PublishDiagnosticsParams, DocumentUri } from 'vscode-languageserver-protocol';
-import { useServerNotificationEffect } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
+import { useServerNotificationEffect } from './notification_util';
 import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
@@ -31,6 +31,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const {worldId, levelId} = useContext(WorldLevelIdContext)
 
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
+  const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
   const {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
@@ -134,6 +135,9 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
 
   useEffect(() => {
+    if (oneLineEditorRef.current) {
+      return
+    }
     const myEditor = monaco.editor.create(inputRef.current!, {
       value: typewriterInput,
       language: "lean4cmd",
@@ -158,6 +162,10 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       'semanticHighlighting.enabled': true,
       overviewRulerLanes: 0,
       hideCursorInOverviewRuler: true,
+      padding: {
+        top: 0,
+        bottom: 0,
+      },
       scrollbar: {
         verticalScrollbarSize: 3
       },
@@ -167,18 +175,29 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       contextmenu: false
     })
 
-    myEditor.onDidContentSizeChange(() => {
+    const layoutInput = () => {
+      const lineHeight = myEditor.getOption(monaco.editor.EditorOption.lineHeight)
+      const height = Math.min(myEditor.getContentHeight(), lineHeight + 2, window.innerHeight / 3)
+      inputRef.current.style.height = `${height}px`
       myEditor.layout({
         width: inputRef.current.clientWidth,
-        height: Math.min(myEditor.getContentHeight(), window.innerHeight / 3)
+        height
       })
-    })
+    }
+    myEditor.onDidContentSizeChange(layoutInput)
+    layoutInput()
 
+    oneLineEditorRef.current = myEditor
     setOneLineEditor(myEditor)
 
     // const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), myEditor.getModel(), myEditor)
 
-    // return () => {abbrevRewriter.dispose(); myEditor.dispose()}
+    return () => {
+      // abbrevRewriter.dispose()
+      myEditor.dispose()
+      oneLineEditorRef.current = null
+      setOneLineEditor(null)
+    }
   }, [])
 
   useEffect(() => {
@@ -192,18 +211,31 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
         oneLineEditor.setValue(newValue)
       }
     })
-    return () => { l.dispose() }
+    return () => {
+      if (typeof (l as any)?.dispose === 'function') {
+        l.dispose()
+      } else if (typeof l === 'function') {
+        l()
+      }
+    }
   }, [oneLineEditor, setTypewriterInput])
 
   useEffect(() => {
     if (!oneLineEditor) return
-    // Run command when pressing enter
-    const l = oneLineEditor.onKeyUp((ev) => {
+    // Run command when pressing enter (and block newline insertion)
+    const l = oneLineEditor.onKeyDown((ev) => {
       if (ev.code === "Enter" || ev.code === "NumpadEnter") {
+        ev.preventDefault()
         runCommand()
       }
     })
-    return () => { l.dispose() }
+    return () => {
+      if (typeof (l as any)?.dispose === 'function') {
+        l.dispose()
+      } else if (typeof l === 'function') {
+        l()
+      }
+    }
   }, [oneLineEditor, runCommand])
 
   // BUG: Causes `file closed` error
@@ -228,7 +260,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
           <div ref={inputRef} className="typewriter-input" />
         </div>
         <button type="submit" disabled={processing} className="btn btn-inverted">
-          TODO{/* <TODO></TODO><FontAwesomeIcon icon={faWandMagicSparkles} />&nbsp;{t("Execute")} */}
+          <FontAwesomeIcon icon={faWandMagicSparkles} />&nbsp;{t("Execute")}
         </button>
       </form>
     </div>
