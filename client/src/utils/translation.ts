@@ -63,15 +63,9 @@ export function useGameTranslation(): UseTranslationResponse<'translation', unde
   const pattern = /(?<!\\)§(\d+)/g;
   const modifiedT = ((key: string | undefined) => {
     if (!key) return ""
-    key = normalizeKeyString(key)
-    console.log(`Key: ${key}`)
-    const keyExists =  i18next.exists(key, { ns: gameId });
-    console.log(`Does ${key} exist in the "game" namespace?`, keyExists)
     const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
-    console.log(`Code blocks: ${codeBlocks}`)
-    console.log(`Key without blocks: ${keyWithoutBlocks}`)
     // look-up the unmodified `key` in case of failure for backwards compatibility.
-    let translatedKey = t([keyWithoutBlocks, key], {ns: gameId})
+    let translatedKey = t([keyWithoutBlocks, normalizeKeyString(key)], {ns: gameId})
     return translatedKey.replace(pattern, (_, num: string) => codeBlocks[Number(num)] ?? num);
   }) as typeof t
   return { t: modifiedT, ...rest }
