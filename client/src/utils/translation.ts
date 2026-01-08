@@ -1,7 +1,6 @@
 import { useContext } from 'react'
 import { useTranslation, UseTranslationResponse } from 'react-i18next'
 import { GameIdContext } from '../app'
-import i18next from 'i18next';
 
 /**
  * This file provides the tools to process translations created by the Lean package `lean-i18n`.
@@ -58,7 +57,6 @@ function normalizeKeyString(key: string): string{
  */
 export function useGameTranslation(): UseTranslationResponse<'translation', undefined> {
   const gameId = useContext(GameIdContext)
-  console.log(`GameId: ${gameId}`)
   const { t, ...rest } = useTranslation()
   const pattern = /(?<!\\)§(\d+)/g;
   const modifiedT = ((key: string | undefined) => {

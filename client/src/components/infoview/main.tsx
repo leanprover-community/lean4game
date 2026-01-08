@@ -5,15 +5,15 @@ import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location,
 
 import 'tachyons/css/tachyons.css';
 import '@vscode/codicons/dist/codicon.css';
-import '../../../../node_modules/lean4-infoview/src/infoview/index.css';
+import '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/index.css';
 import '../../css/infoview.css'
 import "../../css/tab_bar.css"
 
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
-import { useClientNotificationEffect, useServerNotificationEffect, useEventResult, useServerNotificationState } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { RpcContext, WithRpcSessions, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
-import { ServerVersion } from '../../../../node_modules/lean4-infoview/src/infoview/serverVersion';
+import { useClientNotificationEffect, useEventResult, useServerNotificationEffect, useServerNotificationState } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
+import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts';
+import { RpcContext, WithRpcSessions, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
+import { ServerVersion } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/serverVersion';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDeleteLeft, faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
@@ -36,7 +36,7 @@ import { CircularProgress } from '@mui/material';
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { store } from '../../state/store';
 import { Hint, Hints, MoreHelpButton, filterHints } from '../hints';
-import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
@@ -48,8 +48,9 @@ import { useGameTranslation } from '../../utils/translation';
 export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) {
   const ec = React.useContext(EditorContext)
   const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+  const showTypewriter = Boolean(ec) && typewriterMode && !lockEditorMode
   return <>
-    <div className={(typewriterMode && !lockEditorMode) ? 'hidden' : ''}>
+    <div className={showTypewriter ? 'hidden' : ''}>
       <ExerciseStatement data={level} showLeanStatement={true} />
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
@@ -163,13 +164,26 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
 // while `TypewriterInterface` has this copy-pasted in.
 export function Main(props: { world: string, level: number, data: LevelInfo}) {
   let { t } = useTranslation()
+  const { t: gT } = useGameTranslation()
+  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
   const ec = React.useContext(EditorContext);
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
 
-  const { proof, setProof } = React.useContext(ProofContext)
+  const { proof, setProof, setCrashed } = React.useContext(ProofContext)
   const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
+  const editor = React.useContext(MonacoEditorContext)
+  const model = editor?.getModel()
+  const uri = model?.uri.toString()
+  const rpcSess = useRpcSessionAtPos({ uri: uri ?? '', line: 0, character: 0 })
+
+  React.useEffect(() => {
+    if (!uri) {
+      return
+    }
+    loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
+  }, [rpcSess, uri, worldId, levelId, setProof, setCrashed])
 
 
   function toggleSelection(line: number) {
@@ -182,7 +196,7 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
       }
     }
   }
-  console.debug(`template: ${props.data?.template}`)
+  //console.debug(`template: ${props.data?.template}`)
 
   // React.useEffect (() => {
   //   if (props.data.template) {
@@ -211,14 +225,76 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
   const curPos: DocumentPosition | undefined =
     useEventResult(ec.events.changedCursorLocation, loc => loc ? { uri: loc.uri, ...loc.range.start } : undefined)
 
+  React.useEffect(() => {
+    if (typewriterMode && !lockEditorMode) {
+      return
+    }
+    if (!uri) {
+      return
+    }
+    loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
+  }, [typewriterMode, lockEditorMode, uri, worldId, levelId, rpcSess, setProof, setCrashed])
+
+  useServerNotificationEffect('textDocument/publishDiagnostics', (params: any) => {
+    if (typewriterMode && !lockEditorMode) {
+      return
+    }
+    if (!uri || params?.uri !== uri) {
+      return
+    }
+    loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
+  }, [typewriterMode, lockEditorMode, uri, worldId, levelId, rpcSess, setProof, setCrashed])
+
+  const hintLine = (() => {
+    const isEditorMode = !(typewriterMode && !lockEditorMode)
+    const curLine = Number.isFinite(curPos?.line)
+      ? curPos.line
+      : (Number.isFinite((curPos as any)?._line) ? (curPos as any)._line : undefined)
+    const curChar = Number.isFinite(curPos?.character)
+      ? curPos.character
+      : (Number.isFinite((curPos as any)?._character) ? (curPos as any)._character : undefined)
+    if (isEditorMode && Number.isFinite(curLine)) {
+      const baseLine = curLine
+      return (curChar === 0 && baseLine > 0) ? baseLine - 1 : baseLine
+    }
+    if (Number.isFinite(selectedStep)) {
+      return selectedStep
+    }
+    if (!proof?.steps?.length) {
+      return 0
+    }
+    const lastIndex = proof.steps.length - 1
+    return lastStepHasErrors(proof) ? Math.max(0, lastIndex - 1) : lastIndex
+  })()
+
+  const clampedHintLine = Math.max(0, Math.min(Number.isFinite(hintLine) ? hintLine : 0, (proof?.steps?.length ?? 1) - 1))
+  const hintStepIndex = (() => {
+    if (Number.isFinite(selectedStep)) {
+      return selectedStep
+    }
+    if (!proof?.steps?.length) {
+      return 0
+    }
+    const maxIndex = proof.steps.length - 1
+    return Math.min(clampedHintLine + 1, maxIndex)
+  })()
+  const hintsToShow = (() => {
+    if (!proof?.steps?.length) {
+      return undefined
+    }
+    return proof.steps[hintStepIndex]?.goals?.[0]?.hints
+  })()
+
   // Effect when the cursor changes in the editor
   React.useEffect(() => {
     // TODO: this is a bit of a hack and will yield unexpected behaviour if lines
     // are indented.
-    let newPos = curPos?.line + (curPos?.character == 0 ? 0 : 1)
+    const newPos = curPos?.line + (curPos?.character == 0 ? 0 : 1)
 
-    // scroll the chat along
-    setSelectedStep(newPos)
+    if (Number.isFinite(newPos)) {
+      // scroll the chat along
+      setSelectedStep(newPos)
+    }
   }, [curPos])
 
   useClientNotificationEffect(
@@ -239,9 +315,7 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
   // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
   // that we want to persist.
   let ret
-  if (!serverVersion) {
-    ret = <p>{t("Waiting for Lean server to start…")}</p>
-  } else if (serverStoppedResult) {
+  if (serverStoppedResult) {
     ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
   } else {
     ret = <div className="infoview vscode-light">
@@ -251,10 +325,12 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
         </div>
       }
       <Infos />
-      <Hints hints={proof?.steps[curPos?.line]?.goals[0]?.hints}
-        showHidden={showHelp.has(curPos?.line)} step={curPos?.line}
-        selected={selectedStep} toggleSelection={toggleSelection(curPos?.line)}
-        lastLevel={curPos?.line == proof?.steps.length - 1}/>
+      {hintsToShow && (
+        <Hints hints={hintsToShow}
+          showHidden={showHelp.has(hintStepIndex)} step={hintStepIndex}
+          selected={selectedStep} toggleSelection={toggleSelection(hintStepIndex)}
+          lastLevel={hintStepIndex == proof?.steps.length - 1}/>
+      )}
       <MoreHelpButton selected={curPos?.line}/>
     </div>
   }
@@ -391,7 +467,6 @@ export function TypewriterInterfaceWrapper(props: { world: string, level: number
   // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
   // that we want to persist.
 
-  if (!serverVersion) { return <></> }
   if (serverStoppedResult) {
     return <div>
       <p>{serverStoppedResult.message}</p>
@@ -408,11 +483,13 @@ export function TypewriterInterface({props}) {
   const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
   const editor = React.useContext(MonacoEditorContext)
-  const model = editor.getModel()
-  const uri = model.uri.toString()
+  const model = editor?.getModel()
+  const uri = model?.uri.toString() ?? ''
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  const fallbackUri = `file:///${worldId}/${levelId}.lean`
+  const effectiveUri = uri || fallbackUri
   let image: string = gameInfo.data?.worlds.nodes[worldId].image
 
 
@@ -428,7 +505,15 @@ export function TypewriterInterface({props}) {
   // const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
   // const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
 
-  const rpcSess = useRpcSessionAtPos({uri: uri, line: 0, character: 0})
+  const rpcSess = useRpcSessionAtPos({uri: effectiveUri, line: 0, character: 0})
+
+  React.useEffect(() => {
+    if (!effectiveUri) {
+      return
+    }
+    setCrashed(false)
+    loadGoals(rpcSess, effectiveUri, worldId, levelId, setProof, setCrashed)
+  }, [rpcSess, effectiveUri, worldId, levelId, setProof, setCrashed])
 
   /** Delete all proof lines starting from a given line.
   * Note that the first line (i.e. deleting everything) is `1`!
@@ -530,10 +615,10 @@ export function TypewriterInterface({props}) {
         </div> */}
       </div>
       <div className='proof' ref={proofPanelRef}>
-        <ExerciseStatement data={props.data} />
-        {crashed ? <div>
+        <ExerciseStatement data={props.data} showLeanStatement={true} />
+        {((crashed && (interimDiags.length > 0 || proof?.steps.length > 0))) ? <div>
           <p className="crashed_message">{t("Crashed! Go to editor mode and fix your proof! Last server response:")}</p>
-          {interimDiags.map(diag => {
+          {interimDiags.map((diag, index) => {
             const severityClass = diag.severity ? {
               [DiagnosticSeverity.Error]: 'error',
               [DiagnosticSeverity.Warning]: 'warning',
@@ -541,7 +626,7 @@ export function TypewriterInterface({props}) {
               [DiagnosticSeverity.Hint]: 'hint',
             }[diag.severity] : '';
 
-            return <div>
+            return <div key={`interim-diag-${index}`}>
               <div className={`${severityClass} ml1 message`}>
                 <p className="mv2">{t("Line")}&nbsp;{diag.range.start.line}, {t("Character")}&nbsp;{diag.range.start.character}</p>
                 <pre className="font-code pre-wrap">
@@ -628,7 +713,7 @@ export function TypewriterInterface({props}) {
         }
       </div>
     </div>
-    <Typewriter disabled={disableInput || !proof?.steps.length}/>
+    <Typewriter disabled={disableInput || crashed}/>
     </RpcContext.Provider>
   </div>
 }
