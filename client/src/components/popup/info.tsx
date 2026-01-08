@@ -23,7 +23,6 @@ export function InfoPopup () {
       <hr />
       <Trans>
         <h2>{t("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>
-        <h2>{t("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>
         <p>
           <Trans
             i18nKey="Progress saving.description"
@@ -35,12 +34,7 @@ export function InfoPopup () {
           />
         </p>
         <h2>{t("Accessibility.translation", { defaultValue: "Accessibility" })}</h2>
-        <h2>{t("Accessibility.translation", { defaultValue: "Accessibility" })}</h2>
         <p>
-          <Trans
-            i18nKey="Accessibility.description"
-            defaults="If you experience any accessibilty barriers, please get in contact with us! We are dedicated to address such barriers to the best of our abilities."
-          />
           <Trans
             i18nKey="Accessibility.description"
             defaults="If you experience any accessibilty barriers, please get in contact with us! We are dedicated to address such barriers to the best of our abilities."
