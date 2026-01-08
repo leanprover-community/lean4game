@@ -69,8 +69,8 @@ def InitializeParams.toLeanInternal (p : InitializeParams) : Lean.Lsp.Initialize
   clientInfo? := p.clientInfo?
   rootUri? := p.rootUri?
   initializationOptions? := p.initializationOptions?.map fun o => {
-    editDelay? := o.editDelay?
     hasWidgets? := o.hasWidgets?
+    logCfg? := o.logCfg?
   }
   capabilities := p.capabilities
   trace := p.trace

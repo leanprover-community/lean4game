@@ -1,7 +1,12 @@
-#/bin/bash
+#!/bin/bash
 
-# Note: This fails if there is no default toolchain installed
-ELAN_HOME=$(lake env printenv ELAN_HOME)
+# Limit CPU time per process to 1h
+ulimit -t 3600
+# NB: The RSS limit (ulimit -m) is not supported by modern linux!
+
+PROJECT_NAME="$(realpath $1)"
+LEAN_ROOT="$(cd $1 && lean --print-prefix)"
+LEAN_SRC_PATH=$(cd $1 && lake env printenv LEAN_SRC_PATH)
 
 # $1 : the game directory
 # $2 : does the game use a custom Lean server?
@@ -15,19 +20,21 @@ else
   GAMESERVER_CMD="lake serve --"
 fi
 
-(exec bwrap\
-  --bind $1 /game \
-  --bind $ELAN_HOME /elan \
-  --bind /usr /usr \
+exec bwrap\
+  --ro-bind "$1" /game \
+  --ro-bind "$LEAN_ROOT" /lean \
+  --ro-bind /usr /usr \
+  --ro-bind /etc/localtime /etc/localtime \
   --dev /dev \
+  --tmpfs /tmp \
   --proc /proc \
   --symlink usr/lib /lib\
   --symlink usr/lib64 /lib64\
   --symlink usr/bin /bin\
   --symlink usr/sbin /sbin\
   --clearenv \
-  --setenv PATH "/elan/bin:/bin" \
-  --setenv ELAN_HOME "/elan" \
+  --setenv PATH "/bin:/usr/bin:/lean/bin" \
+  --setenv LEAN_SRC_PATH "$LEAN_SRC_PATH" \
   --unshare-user \
   --unshare-pid  \
   --unshare-net  \
@@ -37,4 +44,3 @@ fi
   --chdir "$GAMESERVER_PATH" \
   $3 \
   $GAMESERVER_CMD
-)

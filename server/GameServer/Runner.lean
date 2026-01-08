@@ -30,7 +30,7 @@ partial def findForbiddenTactics
     -- distinguish keywords from tactic names.
     let allowed := GameServer.ALLOWED_KEYWORDS
     -- Ignore syntax elements that do not start with a letter or are listed above.
-    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
+    if 0 < val.length ∧ val.toList[0]!.isAlpha ∧ not (allowed.contains val) then
       match levelInfo.tactics.find? (·.name.toString == val) with
       | none =>
         -- Tactic will never be introduced in the game.
@@ -121,11 +121,11 @@ elab "Runner" gameId:str worldId:str levelId:num
     activateScoped scope.currNamespace
 
     -- Position before first tactic and any prepended whitespace
-    let startPos := byStx.getTailInfo.getRange?.getD (String.Range.mk 0 0) |>.stop
+    let startPos := byStx.getTailInfo.getRange?.getD (Lean.Syntax.Range.mk 0 0) |>.stop
 
     -- Position behind the last tactic
     let endPos := (tacticStx.map TSyntax.raw).getD byStx
-      |>.getTailInfo |>.getRangeWithTrailing? |>.getD (String.Range.mk 0 0) |>.stop
+      |>.getTailInfo |>.getRangeWithTrailing? |>.getD (Lean.Syntax.Range.mk 0 0) |>.stop
     -- Adjust endPos to be one character earlier (probably the end of file character?)
     let endPos := ⟨endPos.byteIdx-1⟩
 

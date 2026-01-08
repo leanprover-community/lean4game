@@ -125,7 +125,7 @@ partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : Co
     -- ignore syntax elements that do not start with a letter
     -- and ignore some standard keywords
     let allowed := GameServer.ALLOWED_KEYWORDS
-    if 0 < val.length ∧ val.data[0]!.isAlpha ∧ not (allowed.contains val) then
+    if 0 < val.length ∧ val.toList[0]!.isAlpha ∧ not (allowed.contains val) then
       return {acc with tactics := acc.tactics.insert val}
     else
       return acc
