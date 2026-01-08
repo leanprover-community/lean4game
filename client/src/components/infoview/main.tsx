@@ -10,8 +10,7 @@ import '../../css/infoview.css'
 import "../../css/tab_bar.css"
 
 import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
-import { useEventResult } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
-import { useClientNotificationEffect, useServerNotificationEffect, useServerNotificationState } from './notification_util';
+import { useClientNotificationEffect, useEventResult, useServerNotificationEffect, useServerNotificationState } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts';
 import { RpcContext, WithRpcSessions, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
 import { ServerVersion } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/serverVersion';
