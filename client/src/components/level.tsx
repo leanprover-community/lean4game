@@ -233,6 +233,8 @@ function PlayableLevel() {
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
+  const inventory: Array<String> = useSelector(selectInventory(gameId))
+  const difficulty: number = useSelector(selectDifficulty(gameId))
 
   const dispatch = useAppDispatch()
 
@@ -283,6 +285,12 @@ function PlayableLevel() {
     htmlElement: undefined, // The wrapper div for monaco
     vscode: {
       "editor.wordWrap": true,
+    },
+    clientOptions: {
+      initializationOptions: {
+        difficulty: difficulty,
+        inventory: inventory,
+      }
     }
   })
 
@@ -433,7 +441,7 @@ function PlayableLevel() {
       disposed = true
       leanMonacoEditor.dispose()
     }
-  }, [options, infoviewRef, codeviewRef, initialCode, worldId, levelId])
+  }, [options, infoviewRef, codeviewRef, initialCode, worldId, levelId, difficulty, inventory])
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `TypewriterInterface`.
