@@ -3,20 +3,12 @@ import { useRef, useState, useEffect, useContext } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { Registry } from 'monaco-textmate' // peer dependency
-import { wireTmGrammars } from 'monaco-editor-textmate'
 import { DiagnosticSeverity, PublishDiagnosticsParams, DocumentUri } from 'vscode-languageserver-protocol';
-import { useServerNotificationEffect } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { AbbreviationRewriter } from 'lean4web/client/src/editor/abbreviation/rewriter/AbbreviationRewriter';
-import { AbbreviationProvider } from 'lean4web/client/src/editor/abbreviation/AbbreviationProvider';
-import * as leanSyntax from 'lean4web/client/src/syntaxes/lean.json'
-import * as leanMarkdownSyntax from 'lean4web/client/src/syntaxes/lean-markdown.json'
-import * as codeblockSyntax from 'lean4web/client/src/syntaxes/codeblock.json'
-import languageConfig from 'lean4/language-configuration.json';
+import { useServerNotificationEffect } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types';
-import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
-import { RpcContext } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions';
+import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
+import { RpcContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
 import { DeletedChatContext, InputModeContext, MonacoEditorContext, PreferencesContext, ProofContext, WorldLevelIdContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
@@ -27,66 +19,20 @@ export interface GameDiagnosticsParams {
   diagnostics: Diagnostic[];
 }
 
-/* We register a new language `leancmd` that looks like lean4, but does not use the lsp server. */
-
-// register Monaco languages
-monaco.languages.register({
-  id: 'lean4cmd',
-  extensions: ['.leancmd']
-})
-
-// register Monaco languages // TODO: JE. I dont understand why I suddenly had to add this when it worked without before.
-monaco.languages.register({
-  id: 'lean4',
-  extensions: ['.lean']
-})
-
-// map of monaco "language id's" to TextMate scopeNames
-const grammars = new Map()
-grammars.set('lean4', 'source.lean')
-grammars.set('lean4cmd', 'source.lean')
-
-const registry = new Registry({
-  getGrammarDefinition: async (scopeName) => {
-    if (scopeName === 'source.lean') {
-      return {
-          format: 'json',
-          content: JSON.stringify(leanSyntax)
-      }
-    } else if (scopeName === 'source.lean.markdown') {
-      return {
-          format: 'json',
-          content: JSON.stringify(leanMarkdownSyntax)
-      }
-    } else {
-      return {
-          format: 'json',
-          content: JSON.stringify(codeblockSyntax)
-      }
-    }
-  }
-});
-
-wireTmGrammars(monaco, registry, grammars)
-
-let config: any = { ...languageConfig }
-config.autoClosingPairs = config.autoClosingPairs.map(
-  pair => { return {'open': pair[0], 'close': pair[1]} }
-)
-monaco.languages.setLanguageConfiguration('lean4cmd', config);
-
 /** The input field */
 export function Typewriter({disabled}: {disabled?: boolean}) {
   let { t } = useTranslation()
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
-  const model = editor.getModel()
-  const uri = model.uri.toString()
+  const model = editor?.getModel()
+  const uri = model?.uri.toString() ?? ''
+  const hasEditor = Boolean(editor && model)
 
   const {worldId, levelId} = useContext(WorldLevelIdContext)
 
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
+  const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
   const {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
@@ -103,7 +49,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   // Run the command
   const runCommand = React.useCallback(() => {
-    if (processing) {return}
+    if (processing || !hasEditor) {return}
 
     // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
     setDeletedChat([])
@@ -138,16 +84,11 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   }, [typewriterInput])
 
   useEffect(() => {
-    if (oneLineEditor) {
+    if (oneLineEditor && hasEditor) {
       oneLineEditor.setPosition({ column: editor.getValue().length + 1, lineNumber: 1 })
       isSuggestionsMobileMode || oneLineEditor.focus()
     }
-  }, [oneLineEditor])
-
-  /* Load proof on start/switching to typewriter */
-  useEffect(() => {
-    loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
-  }, [])
+  }, [oneLineEditor, hasEditor, isSuggestionsMobileMode, editor])
 
   /** If the last step has an error, add the command to the typewriter. */
   useEffect(() => {
@@ -158,12 +99,16 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   // React when answer from the server comes back
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
+    if (!hasEditor) {
+      return
+    }
     if (params.uri == uri) {
       setProcessing(false)
 
-      console.log('Received lean diagnostics')
-      console.log(params.diagnostics)
-      setInterimDiags(params.diagnostics)
+      const seriousDiags = params.diagnostics.filter(diag =>
+        diag.severity === DiagnosticSeverity.Error || diag.severity === DiagnosticSeverity.Warning
+      )
+      setInterimDiags(seriousDiags)
       // loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
 
       // TODO: loadAllGoals()
@@ -178,7 +123,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     // TODO: This is the wrong place apparently. Where do wee need to load them?
     // TODO: instead of loading all goals every time, we could only load the last one
     // loadAllGoals()
-  }, [uri]);
+  }, [uri, hasEditor, editor]);
 
   // // React when answer from the server comes back
   // useServerNotificationEffect('$/game/publishDiagnostics', (params: GameDiagnosticsParams) => {
@@ -190,13 +135,16 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
 
   useEffect(() => {
+    if (oneLineEditorRef.current) {
+      return
+    }
     const myEditor = monaco.editor.create(inputRef.current!, {
       value: typewriterInput,
-      language: "lean4cmd",
+      language: "lean4",
       quickSuggestions: false,
-      lightbulb: {
-        enabled: true
-      },
+      // lightbulb: {
+      //   enabled: true
+      // },
       unicodeHighlight: {
           ambiguousCharacters: false,
       },
@@ -214,6 +162,10 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       'semanticHighlighting.enabled': true,
       overviewRulerLanes: 0,
       hideCursorInOverviewRuler: true,
+      padding: {
+        top: 0,
+        bottom: 0,
+      },
       scrollbar: {
         verticalScrollbarSize: 3
       },
@@ -223,18 +175,29 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       contextmenu: false
     })
 
-    myEditor.onDidContentSizeChange(() => {
+    const layoutInput = () => {
+      const lineHeight = myEditor.getOption(monaco.editor.EditorOption.lineHeight)
+      const height = Math.min(myEditor.getContentHeight(), lineHeight + 2, window.innerHeight / 3)
+      inputRef.current.style.height = `${height}px`
       myEditor.layout({
         width: inputRef.current.clientWidth,
-        height: Math.min(myEditor.getContentHeight(), window.innerHeight / 3)
+        height
       })
-    })
+    }
+    myEditor.onDidContentSizeChange(layoutInput)
+    layoutInput()
 
+    oneLineEditorRef.current = myEditor
     setOneLineEditor(myEditor)
 
-    const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), myEditor.getModel(), myEditor)
+    // const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), myEditor.getModel(), myEditor)
 
-    return () => {abbrevRewriter.dispose(); myEditor.dispose()}
+    return () => {
+      // abbrevRewriter.dispose()
+      myEditor.dispose()
+      oneLineEditorRef.current = null
+      setOneLineEditor(null)
+    }
   }, [])
 
   useEffect(() => {
@@ -248,18 +211,31 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
         oneLineEditor.setValue(newValue)
       }
     })
-    return () => { l.dispose() }
+    return () => {
+      if (typeof (l as any)?.dispose === 'function') {
+        l.dispose()
+      } else if (typeof l === 'function') {
+        l()
+      }
+    }
   }, [oneLineEditor, setTypewriterInput])
 
   useEffect(() => {
     if (!oneLineEditor) return
-    // Run command when pressing enter
-    const l = oneLineEditor.onKeyUp((ev) => {
+    // Run command when pressing enter (and block newline insertion)
+    const l = oneLineEditor.onKeyDown((ev) => {
       if (ev.code === "Enter" || ev.code === "NumpadEnter") {
+        ev.preventDefault()
         runCommand()
       }
     })
-    return () => { l.dispose() }
+    return () => {
+      if (typeof (l as any)?.dispose === 'function') {
+        l.dispose()
+      } else if (typeof l === 'function') {
+        l()
+      }
+    }
   }, [oneLineEditor, runCommand])
 
   // BUG: Causes `file closed` error

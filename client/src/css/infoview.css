@@ -76,22 +76,31 @@
 
 .typewriter form {
   display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+  width: 100%;
+  --typewriter-control-height: 30.4px;
 }
 
 .typewriter button, .undo-button {
   display: block;
   white-space: nowrap;
   flex: 0;
+  min-width: 6rem;
+  height: var(--typewriter-control-height);
 }
 
 .typewriter .typewriter-input-wrapper{
   min-width: 0;
   flex: 1;
-  padding: 0.4em .6em 0;
+  padding: 0.2em .6em;
   font-size: 1rem;
   background: white;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  min-height: var(--typewriter-control-height);
 }
 
 .typewriter-interface .proof .MuiCircularProgress-root {
@@ -102,7 +111,16 @@
 }
 
 .typewriter .typewriter-input {
-  flex: 1;
+  flex: 0 0 auto;
+  width: 100%;
+  align-self: flex-start;
+  margin-top: 0;
+}
+
+.typewriter-input .monaco-editor,
+.typewriter-input .monaco-editor-background {
+  height: 100%;
+  margin-top: 0;
 }
 
 /* Turn off some monaco decorations: */

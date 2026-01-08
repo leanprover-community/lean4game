@@ -5,14 +5,14 @@
  */
 import * as React from 'react'
 import { InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_stripTags } from '@leanprover/infoview-api'
-import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/lean4-infoview/src/infoview/goalLocation';
-import { InteractiveCode } from '../../../../node_modules/lean4-infoview/src/infoview/interactiveCode'
-import { WithTooltipOnHover } from '../../../../node_modules/lean4-infoview/src/infoview/tooltips';
+import { EditorContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts';
+import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/goalLocation';
+import { InteractiveCode } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/interactiveCode'
+import { WithTooltipOnHover } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/tooltips';
 import { PreferencesContext, useAppendTypewriterInput } from './context';
 import { InteractiveGoal, InteractiveGoals, InteractiveGoalsWithHints, InteractiveHypothesisBundle, ProofState } from './rpc_api';
 import { RpcSessionAtPos } from '@leanprover/infoview/*';
-import { DocumentPosition } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageserver-protocol';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -378,11 +378,14 @@ rpcSess.call('Game.getProofState',
       setCrashed(false)
     } else {
       console.warn('received undefined proof state!')
-      setCrashed(true)
-      // setProof(undefined)
+      // Avoid transient crash state while the server warms up.
     }
   }
 ).catch((error) => {
+  if (error === 'No connection to Lean') {
+    console.warn(error)
+    return
+  }
   setCrashed(true)
   console.warn(error)
 })

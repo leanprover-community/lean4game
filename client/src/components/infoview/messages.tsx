@@ -4,11 +4,11 @@ import { Location, DocumentUri, Diagnostic, DiagnosticSeverity, PublishDiagnosti
 
 import { LeanDiagnostic, RpcErrorCode, getInteractiveDiagnostics, InteractiveDiagnostic, TaggedText_stripTags } from '@leanprover/infoview-api'
 
-import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util'
-import { ConfigContext, EditorContext, LspDiagnosticsContext, VersionContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts'
-import { Details } from '../../../../node_modules/lean4-infoview/src/infoview/collapsing'
-import { InteractiveMessage } from '../../../../node_modules/lean4-infoview/src/infoview/traceExplorer'
-import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/lean4-infoview/src/infoview/rpcSessions'
+import { basename, escapeHtml, usePausableState, useEvent, addUniqueKeys, DocumentPosition, useServerNotificationState, useEventResult } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util'
+import { ConfigContext, EditorContext, LspDiagnosticsContext, VersionContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts'
+import { Details } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/collapsing'
+import { InteractiveMessage } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/traceExplorer'
+import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions'
 
 import { InputModeContext } from './context'
 import { useTranslation } from 'react-i18next'
@@ -206,13 +206,14 @@ function AllMessagesBody({uri, curPos, messages}: {uri: DocumentUri, curPos: Doc
     let { t } = useTranslation()
     const [msgs, setMsgs] = React.useState<InteractiveDiagnostic[] | undefined>(undefined)
     React.useEffect(() => { void messages().then(
-        msgs => setMsgs(msgs.filter(
-            (d)=>{
-                //console.log(`message start: ${d.range.start.line}. CurPos: ${curPos.line}`)
-
-                // Only show the messages from the line where the cursor is.
-                return d.range.start.line == curPos.line
-            }))
+        msgs => setMsgs(msgs.filter((d) => {
+            const text = TaggedText_stripTags(d.message)
+            if (text.includes('unsolved goals')) {
+                return true
+            }
+            // Only show the messages from the line where the cursor is.
+            return d.range.start.line == curPos.line
+        }))
     ) }, [messages, curPos])
     if (msgs === undefined) return <div>{t("Loading messages…")}</div>
     else return <MessagesList uri={uri} messages={msgs}/>

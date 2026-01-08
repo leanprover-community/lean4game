@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { DidChangeTextDocumentParams, DidCloseTextDocumentParams, TextDocumentContentChangeEvent } from 'vscode-languageserver-protocol';
 
-import { EditorContext } from '../../../../node_modules/lean4-infoview/src/infoview/contexts';
-import { DocumentPosition, Keyed, PositionHelpers, useClientNotificationEffect, useClientNotificationState, useEvent, useEventResult } from '../../../../node_modules/lean4-infoview/src/infoview/util';
+import { EditorContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts';
+import { DocumentPosition, Keyed, PositionHelpers, useClientNotificationEffect, useEvent, useEventResult } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { Info, InfoProps } from './info';
 import { useTranslation } from 'react-i18next';
 
@@ -15,65 +15,67 @@ export function Infos() {
 
     // Update pins when the document changes. In particular, when edits are made
     // earlier in the text such that a pin has to move up or down.
-    const [pinnedPositions, setPinnedPositions] = useClientNotificationState(
+    const [pinnedPositions, setPinnedPositions] = React.useState<Array<Keyed<DocumentPosition>>>([])
+    useClientNotificationEffect(
         'textDocument/didChange',
-        new Array<Keyed<DocumentPosition>>(),
-        (pinnedPositions, params: DidChangeTextDocumentParams) => {
-            if (pinnedPositions.length === 0) return pinnedPositions;
+        (params: DidChangeTextDocumentParams) => {
+            setPinnedPositions((prevPins) => {
+                if (prevPins.length === 0) return prevPins;
 
-            let changed: boolean = false;
-            const newPins = pinnedPositions.map(pin => {
-                if (pin.uri !== params.textDocument.uri) return pin;
-                // NOTE(WN): It's important to make a clone here, otherwise this
-                // actually mutates the pin. React state updates must be pure.
-                // See https://github.com/facebook/react/issues/12856
-                const newPin: Keyed<DocumentPosition> = { ...pin };
-                for (const chg of params.contentChanges) {
-                    if (!TextDocumentContentChangeEvent.isIncremental(chg)) {
-                        changed = true;
-                        return null;
+                let changed: boolean = false;
+                const newPins = prevPins.map(pin => {
+                    if (pin.uri !== params.textDocument.uri) return pin;
+                    // NOTE(WN): It's important to make a clone here, otherwise this
+                    // actually mutates the pin. React state updates must be pure.
+                    // See https://github.com/facebook/react/issues/12856
+                    const newPin: Keyed<DocumentPosition> = { ...pin };
+                    for (const chg of params.contentChanges) {
+                        if (!TextDocumentContentChangeEvent.isIncremental(chg)) {
+                            changed = true;
+                            return null;
+                        }
+                        if (PositionHelpers.isLessThanOrEqual(newPin, chg.range.start)) continue;
+                        // We can assume chg.range.start < pin
+
+                        // If the pinned position is replaced with new text, just delete the pin.
+                        if (PositionHelpers.isLessThanOrEqual(newPin, chg.range.end)) {
+                            changed = true;
+                            return null;
+                        }
+
+                        const oldPin = { ...newPin };
+
+                        // How many lines before the pin position were added by the change.
+                        // Can be negative when more lines are removed than added.
+                        let additionalLines = 0;
+                        let lastLineLen = chg.range.start.character;
+                        for (const c of chg.text)
+                            if (c === '\n') {
+                                additionalLines++;
+                                lastLineLen = 0;
+                            } else lastLineLen++;
+
+                        // Subtract lines that were already present
+                        additionalLines -= (chg.range.end.line - chg.range.start.line)
+                        newPin.line += additionalLines;
+
+                        if (oldPin.line < chg.range.end.line) {
+                            // Should never execute by the <= check above.
+                            throw new Error('unreachable code reached')
+                        } else if (oldPin.line === chg.range.end.line) {
+                            newPin.character = lastLineLen + (oldPin.character - chg.range.end.character);
+                        }
                     }
-                    if (PositionHelpers.isLessThanOrEqual(newPin, chg.range.start)) continue;
-                    // We can assume chg.range.start < pin
+                    if (!DocumentPosition.isEqual(newPin, pin)) changed = true;
 
-                    // If the pinned position is replaced with new text, just delete the pin.
-                    if (PositionHelpers.isLessThanOrEqual(newPin, chg.range.end)) {
-                        changed = true;
-                        return null;
-                    }
+                    // NOTE(WN): We maintain the `key` when a pin is moved around to maintain
+                    // its component identity and minimise flickering.
+                    return newPin;
+                });
 
-                    const oldPin = { ...newPin };
-
-                    // How many lines before the pin position were added by the change.
-                    // Can be negative when more lines are removed than added.
-                    let additionalLines = 0;
-                    let lastLineLen = chg.range.start.character;
-                    for (const c of chg.text)
-                        if (c === '\n') {
-                            additionalLines++;
-                            lastLineLen = 0;
-                        } else lastLineLen++;
-
-                    // Subtract lines that were already present
-                    additionalLines -= (chg.range.end.line - chg.range.start.line)
-                    newPin.line += additionalLines;
-
-                    if (oldPin.line < chg.range.end.line) {
-                        // Should never execute by the <= check above.
-                        throw new Error('unreachable code reached')
-                    } else if (oldPin.line === chg.range.end.line) {
-                        newPin.character = lastLineLen + (oldPin.character - chg.range.end.character);
-                    }
-                }
-                if (!DocumentPosition.isEqual(newPin, pin)) changed = true;
-
-                // NOTE(WN): We maintain the `key` when a pin is moved around to maintain
-                // its component identity and minimise flickering.
-                return newPin;
+                if (changed) return newPins.filter(p => p !== null) as Keyed<DocumentPosition>[];
+                return prevPins;
             });
-
-            if (changed) return newPins.filter(p => p !== null) as Keyed<DocumentPosition>[];
-            return pinnedPositions;
         },
         []
     );

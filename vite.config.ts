@@ -1,7 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
+import { normalizePath } from 'vite'
+import path from 'node:path'
 import svgr from "vite-plugin-svgr"
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import importMetaUrlPlugin from '@codingame/esbuild-import-meta-url-plugin'
+
 
 const backendPort = process.env.PORT || 8080;
 const clientPort = process.env.CLIENT_PORT || 3000;
@@ -24,16 +29,33 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: 'node_modules/@leanprover/infoview/dist/*.production.min.js',
-          dest: '.'
+          src: [
+            normalizePath(path.resolve(__dirname, './node_modules/lean4monaco/node_modules/@leanprover/infoview/dist/*')),
+            normalizePath(path.resolve(__dirname, './node_modules/lean4monaco/dist/webview/webview.js')),
+          ],
+          dest: 'infoview'
+        },
+        {
+          src: [
+            normalizePath(path.resolve(__dirname, './node_modules/lean4monaco/node_modules/@leanprover/infoview/dist/codicon.ttf'))
+          ],
+          dest: 'assets'
         }
       ]
-    })
+    }),
+    nodePolyfills({
+      overrides: {
+        fs: 'memfs',
+      },
+    }),
   ],
   publicDir: "client/public",
   base: "/", // setting this to `/leangame/` means the server is now accessible at `localhost:3000/leangame`
   optimizeDeps: {
-    exclude: ['games']
+    exclude: ['games'],
+    esbuildOptions: {
+      plugins: [importMetaUrlPlugin]
+    }
   },
   server: {
     port: Number(clientPort),
