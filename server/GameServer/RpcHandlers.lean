@@ -217,7 +217,7 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
 
       let mut intermediateGoalCount := 0
 
-      let positionsWithSource : Array (String.Pos × String) := Id.run do
+      let positionsWithSource : Array (String.Pos.Raw × String) := Id.run do
         let mut res := #[]
         for i in [0:text.positions.size] do
           --TODO(ALEX): Generalize for other start positions
@@ -228,7 +228,7 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
             res := res.push (text.positions[i]!, "")
           if i >= text.positions.size - 2 then continue -- skip final linebreak
           let source : String :=
-            Substring.toString ⟨text.source, text.positions[i]!, text.positions[i + 1]!⟩
+            Substring.Raw.toString ⟨text.source, text.positions[i]!, text.positions[i + 1]!⟩
           if source.trim.length == 0 then continue -- skip empty lines
           res := res.push (text.positions[i + 1]!, source)
         return res
