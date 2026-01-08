@@ -441,7 +441,7 @@ function PlayableLevel() {
       disposed = true
       leanMonacoEditor.dispose()
     }
-  }, [options, infoviewRef, codeviewRef, initialCode, worldId, levelId, difficulty, inventory])
+  }, [options, infoviewRef, codeviewRef, initialCode, worldId, levelId])
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `TypewriterInterface`.
