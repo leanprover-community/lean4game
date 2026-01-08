@@ -25,8 +25,9 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   /** Reference to the hidden multi-line editor */
   const editor = React.useContext(MonacoEditorContext)
-  const model = editor.getModel()
-  const uri = model.uri.toString()
+  const model = editor?.getModel()
+  const uri = model?.uri.toString() ?? ''
+  const hasEditor = Boolean(editor && model)
 
   const {worldId, levelId} = useContext(WorldLevelIdContext)
 
@@ -48,7 +49,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   // Run the command
   const runCommand = React.useCallback(() => {
-    if (processing) {return}
+    if (processing || !hasEditor) {return}
 
     // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
     setDeletedChat([])
@@ -83,16 +84,11 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   }, [typewriterInput])
 
   useEffect(() => {
-    if (oneLineEditor) {
+    if (oneLineEditor && hasEditor) {
       oneLineEditor.setPosition({ column: editor.getValue().length + 1, lineNumber: 1 })
       isSuggestionsMobileMode || oneLineEditor.focus()
     }
-  }, [oneLineEditor])
-
-  /* Load proof on start/switching to typewriter */
-  useEffect(() => {
-    loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
-  }, [])
+  }, [oneLineEditor, hasEditor, isSuggestionsMobileMode, editor])
 
   /** If the last step has an error, add the command to the typewriter. */
   useEffect(() => {
@@ -103,12 +99,16 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   // React when answer from the server comes back
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
+    if (!hasEditor) {
+      return
+    }
     if (params.uri == uri) {
       setProcessing(false)
 
-      console.log('Received lean diagnostics')
-      console.log(params.diagnostics)
-      setInterimDiags(params.diagnostics)
+      const seriousDiags = params.diagnostics.filter(diag =>
+        diag.severity === DiagnosticSeverity.Error || diag.severity === DiagnosticSeverity.Warning
+      )
+      setInterimDiags(seriousDiags)
       // loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
 
       // TODO: loadAllGoals()
@@ -123,7 +123,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     // TODO: This is the wrong place apparently. Where do wee need to load them?
     // TODO: instead of loading all goals every time, we could only load the last one
     // loadAllGoals()
-  }, [uri]);
+  }, [uri, hasEditor, editor]);
 
   // // React when answer from the server comes back
   // useServerNotificationEffect('$/game/publishDiagnostics', (params: GameDiagnosticsParams) => {
@@ -140,7 +140,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     }
     const myEditor = monaco.editor.create(inputRef.current!, {
       value: typewriterInput,
-      language: "lean4cmd",
+      language: "lean4",
       quickSuggestions: false,
       // lightbulb: {
       //   enabled: true

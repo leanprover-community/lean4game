@@ -188,6 +188,9 @@ export class GameManager {
 
     /** Sending messages from the client to the server */
     socketConnection.forward(serverConnection, (message: any) => {
+      if (message?.error) {
+        console.error(`[${new Date()}] CLIENT->SERVER error payload: ${JSON.stringify(message.error)}`)
+      }
 
       // backwards compatibility for versions ≤ v4.7.0
       if (usesCustomLeanServer) {
@@ -207,6 +210,7 @@ export class GameManager {
       }
 
       if (message.method === "textDocument/didOpen") {
+        console.info(`[${new Date()}] didOpen: ${message.params?.textDocument?.uri}`)
         // Parse the URI to get world and level
         const uri = new URL(message.params.textDocument.uri)
         const pathParts = path.parse(uri.pathname)
@@ -217,6 +221,9 @@ export class GameManager {
 
         // Read level data from JSON file
         const levelDataPath = path.join(gameDir, '.lake', 'gamedata', `level__${worldId}__${levelId}.json`)
+        if (!fs.existsSync(levelDataPath)) {
+          console.error(`[${new Date()}] Missing level data: ${levelDataPath}`)
+        }
         const levelData = JSON.parse(fs.readFileSync(levelDataPath, 'utf8'))
 
         if (difficulty === undefined || inventory === undefined) {
@@ -247,6 +254,9 @@ export class GameManager {
 
     /** Sending messages from the server to the client */
     serverConnection.forward(socketConnection, message => {
+      if ((message as any)?.error) {
+        console.error(`[${new Date()}] SERVER->CLIENT error payload: ${JSON.stringify((message as any).error)}`)
+      }
 
       // Print the message as the server sends it
       if (isDevelopment) { console.log(`SERVER: ${JSON.stringify(message)}`); }

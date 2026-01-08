@@ -378,11 +378,14 @@ rpcSess.call('Game.getProofState',
       setCrashed(false)
     } else {
       console.warn('received undefined proof state!')
-      setCrashed(true)
-      // setProof(undefined)
+      // Avoid transient crash state while the server warms up.
     }
   }
 ).catch((error) => {
+  if (error === 'No connection to Lean') {
+    console.warn(error)
+    return
+  }
   setCrashed(true)
   console.warn(error)
 })

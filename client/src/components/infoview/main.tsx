@@ -178,6 +178,13 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
   const uri = model?.uri.toString()
   const rpcSess = useRpcSessionAtPos({ uri: uri ?? '', line: 0, character: 0 })
 
+  React.useEffect(() => {
+    if (!uri) {
+      return
+    }
+    loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
+  }, [rpcSess, uri, worldId, levelId, setProof, setCrashed])
+
 
   function toggleSelection(line: number) {
     return (ev) => {
@@ -308,9 +315,7 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
   // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
   // that we want to persist.
   let ret
-  if (!serverVersion) {
-    ret = <p>{t("Waiting for Lean server to start…")}</p>
-  } else if (serverStoppedResult) {
+  if (serverStoppedResult) {
     ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
   } else {
     ret = <div className="infoview vscode-light">
@@ -462,7 +467,6 @@ export function TypewriterInterfaceWrapper(props: { world: string, level: number
   // it's important not to reconstruct the `WithBlah` wrappers below since they contain state
   // that we want to persist.
 
-  if (!serverVersion) { return <></> }
   if (serverStoppedResult) {
     return <div>
       <p>{serverStoppedResult.message}</p>
@@ -479,11 +483,13 @@ export function TypewriterInterface({props}) {
   const ec = React.useContext(EditorContext)
   const gameId = React.useContext(GameIdContext)
   const editor = React.useContext(MonacoEditorContext)
-  const model = editor.getModel()
-  const uri = model.uri.toString()
+  const model = editor?.getModel()
+  const uri = model?.uri.toString() ?? ''
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  const fallbackUri = `file:///${worldId}/${levelId}.lean`
+  const effectiveUri = uri || fallbackUri
   let image: string = gameInfo.data?.worlds.nodes[worldId].image
 
 
@@ -499,7 +505,15 @@ export function TypewriterInterface({props}) {
   // const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
   // const curUri = useEventResult(ec.events.changedCursorLocation, loc => loc?.uri);
 
-  const rpcSess = useRpcSessionAtPos({uri: uri, line: 0, character: 0})
+  const rpcSess = useRpcSessionAtPos({uri: effectiveUri, line: 0, character: 0})
+
+  React.useEffect(() => {
+    if (!effectiveUri) {
+      return
+    }
+    setCrashed(false)
+    loadGoals(rpcSess, effectiveUri, worldId, levelId, setProof, setCrashed)
+  }, [rpcSess, effectiveUri, worldId, levelId, setProof, setCrashed])
 
   /** Delete all proof lines starting from a given line.
   * Note that the first line (i.e. deleting everything) is `1`!
@@ -602,9 +616,9 @@ export function TypewriterInterface({props}) {
       </div>
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement data={props.data} showLeanStatement={true} />
-        {crashed ? <div>
+        {((crashed && (interimDiags.length > 0 || proof?.steps.length > 0))) ? <div>
           <p className="crashed_message">{t("Crashed! Go to editor mode and fix your proof! Last server response:")}</p>
-          {interimDiags.map(diag => {
+          {interimDiags.map((diag, index) => {
             const severityClass = diag.severity ? {
               [DiagnosticSeverity.Error]: 'error',
               [DiagnosticSeverity.Warning]: 'warning',
@@ -612,7 +626,7 @@ export function TypewriterInterface({props}) {
               [DiagnosticSeverity.Hint]: 'hint',
             }[diag.severity] : '';
 
-            return <div>
+            return <div key={`interim-diag-${index}`}>
               <div className={`${severityClass} ml1 message`}>
                 <p className="mv2">{t("Line")}&nbsp;{diag.range.start.line}, {t("Character")}&nbsp;{diag.range.start.character}</p>
                 <pre className="font-code pre-wrap">
@@ -699,7 +713,7 @@ export function TypewriterInterface({props}) {
         }
       </div>
     </div>
-    <Typewriter disabled={disableInput || !proof?.steps.length}/>
+    <Typewriter disabled={disableInput || crashed}/>
     </RpcContext.Provider>
   </div>
 }

@@ -9,6 +9,7 @@ import { CircularProgress } from '@mui/material'
 import type { Location } from 'vscode-languageserver-protocol'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions } from 'lean4monaco'
+import { setupMonacoClient } from 'lean4monaco/dist/monacoleanclient'
 import type { EditorApi, InfoviewApi } from '@leanprover/infoview-api'
 import { EditorContext } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts'
 import { EditorConnection, EditorEvents } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/editorConnection'
@@ -43,6 +44,43 @@ import i18next from 'i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 
+
+let sharedLeanMonaco: LeanMonaco | null = null
+let sharedLeanMonacoStart: Promise<void> | null = null
+let sharedLeanMonacoGameId: string | null = null
+
+const getSharedLeanMonaco = () => {
+  if (!sharedLeanMonaco) {
+    sharedLeanMonaco = new LeanMonaco()
+  }
+  return sharedLeanMonaco
+}
+
+const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
+  const maybeLeanMonaco = leanMonaco as unknown as {
+    clientProvider?: {
+      getClients?: () => Array<{ getClientFolder?: () => unknown; stop?: () => Promise<void> }>
+      stopClient?: (folder: unknown) => Promise<void>
+      setupClient?: unknown
+    }
+    getWebSocketOptions?: (options: LeanMonacoOptions) => unknown
+  }
+  if (!maybeLeanMonaco.clientProvider || !maybeLeanMonaco.getWebSocketOptions) {
+    return
+  }
+  maybeLeanMonaco.clientProvider.setupClient = setupMonacoClient(
+    maybeLeanMonaco.getWebSocketOptions(options) as any
+  )
+  const clients = maybeLeanMonaco.clientProvider.getClients?.() ?? []
+  for (const client of clients) {
+    const folder = client?.getClientFolder?.()
+    if (folder && maybeLeanMonaco.clientProvider.stopClient) {
+      await maybeLeanMonaco.clientProvider.stopClient(folder)
+    } else {
+      await client?.stop?.()
+    }
+  }
+}
 
 function Level() {
   const params = useParams()
@@ -266,7 +304,7 @@ function PlayableLevel() {
     // `LeanMonacoEditor` instances (editor)
     // You must await `leanMonaco.start` or use `await leanMonaco.whenReady` before
     // starting the editors!
-    const leanMonaco = new LeanMonaco()
+    const leanMonaco = getSharedLeanMonaco()
     const leanMonacoEditor = new LeanMonacoEditor()
     const uriStr = `file:///${worldId}/${levelId}.lean`
     setLeanMonacoEditor(leanMonacoEditor)
@@ -275,7 +313,14 @@ function PlayableLevel() {
 
     let disposed = false
     ;(async () => {
-      await leanMonaco.start(options)
+      if (!sharedLeanMonacoStart) {
+        sharedLeanMonacoStart = leanMonaco.start(options)
+      } else if (sharedLeanMonacoGameId && sharedLeanMonacoGameId !== gameId) {
+        await sharedLeanMonacoStart
+        await reconfigureLeanMonacoClient(leanMonaco, options)
+      }
+      sharedLeanMonacoGameId = gameId
+      await sharedLeanMonacoStart
       if (disposed) {
         return
       }
@@ -386,8 +431,6 @@ function PlayableLevel() {
 
     return () => {
       disposed = true
-      // Avoid calling LeanMonaco.dispose() until upstream disposal is fixed;
-      // it can throw from InfoProvider.dispose in the bundled build.
       leanMonacoEditor.dispose()
     }
   }, [options, infoviewRef, codeviewRef, initialCode, worldId, levelId])

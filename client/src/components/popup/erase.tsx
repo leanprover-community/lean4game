@@ -103,8 +103,8 @@ export function ErasePopup () {
       <p>Do you want to delete your saved progress irreversibly?</p>
     </Trans>
     <div className='settings-buttons'>
-      <Button onClick={levelId && eraseLevel} to="" disabled={!levelId} >{t("Delete this Level")}</Button>
-      <Button onClick={worldId && eraseWorld} to="" disabled={!worldId} >{t("Delete this World")}</Button>
+      <Button onClick={levelId ? eraseLevel : undefined} to="" disabled={!levelId} >{t("Delete this Level")}</Button>
+      <Button onClick={worldId ? eraseWorld : undefined} to="" disabled={!worldId} >{t("Delete this World")}</Button>
       <Button onClick={eraseProgress} to={`/${gameId}/`}>{t("Delete Everything")}</Button>
     </div>
     <Trans>
