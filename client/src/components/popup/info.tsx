@@ -23,14 +23,24 @@ export function InfoPopup () {
       <hr />
       <Trans>
         <h2>{t("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>
+        <h2>{t("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>
         <p>
+          <Trans
+            i18nKey="Progress saving.description"
+            defaults="The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br/>Warning: In most browsers, deleting cookies will also clear the local storage (or 'local site data'). Make sure to download your game progress first!"
+          />
           <Trans
             i18nKey="Progress saving.description"
             defaults="The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br/>Warning: In most browsers, deleting cookies will also clear the local storage (or 'local site data'). Make sure to download your game progress first!"
           />
         </p>
         <h2>{t("Accessibility.translation", { defaultValue: "Accessibility" })}</h2>
+        <h2>{t("Accessibility.translation", { defaultValue: "Accessibility" })}</h2>
         <p>
+          <Trans
+            i18nKey="Accessibility.description"
+            defaults="If you experience any accessibilty barriers, please get in contact with us! We are dedicated to address such barriers to the best of our abilities."
+          />
           <Trans
             i18nKey="Accessibility.description"
             defaults="If you experience any accessibilty barriers, please get in contact with us! We are dedicated to address such barriers to the best of our abilities."
