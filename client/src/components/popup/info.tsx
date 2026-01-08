@@ -22,7 +22,7 @@ export function InfoPopup () {
 
   return <>
     <Typography variant="body1" component="div" className="welcome-text">
-      <Markdown>{t(gameInfo.data?.info, {ns: gameId})}</Markdown>
+      <Markdown>{gT(gameInfo.data?.info)}</Markdown>
       <hr />
       <Trans>
         <h2>{t("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>
