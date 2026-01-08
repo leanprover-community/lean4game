@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { useTranslation, UseTranslationResponse } from 'react-i18next'
 import { GameIdContext } from '../app'
+import i18next from 'i18next';
 
 /**
  * This file provides the tools to process translations created by the Lean package `lean-i18n`.
@@ -40,12 +41,24 @@ function extractCodeBlocks(input: string): {
 }
 
 /**
+ * This function exchanges implicit line breaks in a translation keys
+ * to explicit ones. This is necessary as the translation keys generated
+ * by lean-i18n do contain explit line breaks, i.e. `\n`. The keys that are originally
+ * sources from the games .lean files do not contain explicit line breaks which leads to
+ * key-errors, when trying to load translations.
+ */
+function normalizeKeyString(key: string): string{
+  return key.replace(/\n/g, '\\n')
+}
+
+/**
  * Wrapper around the hook obtained from `useTranslation`.
  * Add the game-ID namespace and replace code blocks according to
  * the translation keys received from `lean-i18n`.
  */
 export function useGameTranslation(): UseTranslationResponse<'translation', undefined> {
   const gameId = useContext(GameIdContext)
+  console.log(`GameId: ${gameId}`)
   const { t, ...rest } = useTranslation()
   const pattern = /(?<!\\)§(\d+)/g;
   const modifiedT = ((key: string | undefined) => {
