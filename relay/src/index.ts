@@ -25,7 +25,7 @@ router.get('/import/trigger/:owner/:repo', importTrigger)
 
 const server = app
   .use(express.static(clientDistPath)) // TODO: add a dist folder from inside the game
-  .use('/i18n/g/:owner/:repo/:lang/*', (req, res, next) => {
+  .use('/i18n/g/:owner/:repo/:lang/*path', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
     const lang = req.params.lang
@@ -51,14 +51,14 @@ const server = app
 
     console.log(`[${new Date()}] ${anon_ip} requested translation for ${owner}/${repo} in ${lang}`)
 
-    const filename = req.params[0];
+    const filename = (req.params as any).path.join('/');
     req.url = filename;
     express.static(path.join(gameManager.getGameDir(owner,repo),".i18n",lang))(req, res, next);
   })
-  .use('/data/g/:owner/:repo/*', (req, res, next) => {
+  .use('/data/g/:owner/:repo/*path', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
-    const filename = req.params[0];
+    const filename = (req.params as any).path.join('/');
     req.url = filename;
     console.debug(gameManager.getGameDir(owner,repo))
     express.static(path.join(gameManager.getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
