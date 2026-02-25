@@ -1,15 +1,15 @@
 # Example for hosting Lean4Game yourself
 
 These instructions aim to give you an exemplary manual on how to host your
-Theseelean4game instance, such that, others can access it via the internet.
+lean4game instance such that others can access it via the internet.
 This manual will assume that you already have a running Linux server that
 uses the `apt` package manager.
-(the steps are analogous for other Linux distributions and their package managers).
+(The steps are analogous for other Linux distributions and their package managers.)
 
 ## Download Dependencies
 
-In this section we will use nginx for our server, but any other web server might be applied here.
-Analogously, the same logic applies to pm2 as our choice for process management tool.
+We will use nginx for our server, but any other web server might be applied here.
+The same logic applies to pm2 as our choice for process management tool.
 
 1. Install a ```nginx``` web server as reverse proxy
 
@@ -59,16 +59,16 @@ Analogously, the same logic applies to pm2 as our choice for process management 
  ```
 ## Setup Reverse Proxy
 
-The next step would include setting up a reverse proxy with nginx and adding
+The next step is to set up a reverse proxy with nginx and to add
 information concerning domain and SSL certification. As those considerations are
-quite individual, technical and safety critical, we will refer here to a general instruction on how
+quite individual, technical and safety critical, we refer to general instructions on how
 to set up a reverse [proxy using nginx on Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-as-a-reverse-proxy-on-ubuntu-22-04).
 
 ## Setting up Lean4Game
 
 This section will be somewhat similar to what is written in the section about
 [running Lean4Game locally](running_locally.md).
-We diverge here in the sense, that we are only describing the installation of Lean4Game itself.
+We diverge here in that we only describe the installation of Lean4Game itself.
 Before starting, you will need to generate a [GitHub access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
 1. Clone hosted projects via ```git``` onto server. **Important:** Please use the HTTPS URL from GitHub, not the SSH URL, to clone the project repositories.
@@ -119,4 +119,4 @@ module.exports = {
    pm2 start ecosystem.config.cjs
 ```
 
-Having done that you should be able to now access your hosted Lean4Game instance via the domain that has been specified during the setup of the nginx server. For more information on how to maintain your established server please refer to the [server maintenance documentation](server.md)
+Having done that you should now be able to access your hosted Lean4Game instance via the domain that has been specified during the setup of the nginx server. For more information on how to maintain your established server, please refer to the [server maintenance documentation](server.md).
