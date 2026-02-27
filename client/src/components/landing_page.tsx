@@ -170,7 +170,7 @@ function LandingPage() {
           <h2>{t("Server capacity.translation", { defaultValue: "Server capacity" })}</h2>
           <Trans
             i18nKey="Server capacity.description"
-            defaults="<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>"
+            defaults="<p>As this server runs lean on our university machines, it has a limited capacity. We estimate that our setup will support around 50 simultaneous games at high performance, and up to 180 simultaneous games at a slower pace.</p>"
           />
           <p>
             { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem.toFixed(2)} %</strong>{t(" used")}.<br/></> }
