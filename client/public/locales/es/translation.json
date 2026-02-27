@@ -18,7 +18,7 @@
   },
   "Server capacity": {
     "translation": "Capacidad del servidor",
-    "description": "<p>Como este servidor corre en máquinas de nuestra universidad, tiene una capacidad limitada. Nuestra estimación actual es de unos 70 juegos simultáneos.</p>."
+    "description": "<p>Como este servidor corre en máquinas de nuestra universidad, tiene una capacidad limitada. Estimamos que nuestra configuración admitirá alrededor de 50 partidas simultáneas con un alto rendimiento y hasta 180 partidas simultáneas a un ritmo más lento.</p>."
   },
   "No Games": {
     "description": "No se ha cargado ningún juego. Usa <1>http://localhost:3000/#/g/local/FOLDER</1> para abrir un juego directamente desde una carpeta local"
