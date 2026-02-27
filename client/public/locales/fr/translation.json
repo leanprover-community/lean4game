@@ -18,7 +18,7 @@
   },
   "Server capacity": {
     "translation": "Capacité du serveur",
-    "description": "<p>Comme ce serveur exécute Lean sur nos machines universitaires, il a une capacité limitée. Notre estimation actuelle est d'environ 70 jeux simultanés.</p>"
+    "description": "<p>Comme ce serveur exécute Lean sur nos machines universitaires, il a une capacité limitée. Nous estimons que notre configuration permettra de prendre en charge environ 50 parties simultanées à haute performance et jusqu'à 180 parties simultanées à un rythme plus lent.</p>"
   },
   "No Games": {
     "description": "Aucun jeu chargé. Utilisez <1>http://localhost:3000/#/g/local/FOLDER</1> pour ouvrir un jeu directement depuis un dossier local."
