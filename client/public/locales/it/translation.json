@@ -18,7 +18,7 @@
   },
   "Server capacity": {
     "translation": "Capacità del Server",
-    "description": "<p>Il server che esegue il codice Lean gira sulle macchine della nostra università, perciò ha una capacità limitata. La nostra stima attuale è di circa 70 giochi simultanei.</p>"
+    "description": "<p>Il server che esegue il codice Lean gira sulle macchine della nostra università, perciò ha una capacità limitata. Prevediamo che la nostra configurazione supporterà circa 50 partite simultanee ad alte prestazioni e fino a 180 partite simultanee a un ritmo più lento.</p>"
   },
   "No Games": {
     "description": "Nessun gioco rilevato. Visita <1>http://localhost:3000/#/g/local/FOLDER</1> per aprire un gioco da una cartella locale."
