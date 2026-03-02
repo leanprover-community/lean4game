@@ -2,7 +2,7 @@
  * @fileOverview configure the store and save the state periodically to the browser storage
 */
 import { configureStore } from '@reduxjs/toolkit';
-import { debounce } from "debounce";
+import debounce from "debounce";
 
 import { connection } from '../connection'
 import { apiSlice } from './api'
