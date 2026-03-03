@@ -64,6 +64,7 @@ const server = app
     express.static(path.join(gameManager.getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
   .use('/data/stats', (req, res, next) => {
+    // TODO: this throws on Windows
     const statsScriptPath = path.join(__dirname, "..", "..", "scripts", "stats.sh");
     const statsProcess = spawn('/bin/bash', [statsScriptPath, process.pid.toString()])
     let outputData = ''
