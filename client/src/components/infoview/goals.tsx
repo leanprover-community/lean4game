@@ -355,6 +355,27 @@ export const FilteredGoals = React.memo(({ headerChildren, goals }: FilteredGoal
     </div>
 })
 
+/**
+ * Check whether the proof goals actually demonstrate completion.
+ *
+ * The server sets `column` to a number when it found and processed tactic info
+ * at a position (`goalsAt?` returned results), and to null when it didn't
+ * (e.g. the tactic hasn't been elaborated yet during transient editing states).
+ * Zero goals with `column == null` means "no data" not "all goals solved".
+ */
+function isProofGoalsComplete(proof: ProofState): boolean {
+  if (proof.steps.length < 2) return false
+  if (proof.steps[0].goals.length === 0) return false
+  const lastIdx = lastStepHasErrors(proof)
+    ? proof.steps.length - 2
+    : proof.steps.length - 1
+  if (lastIdx < 1) return false
+  const lastStep = proof.steps[lastIdx]
+  // Zero goals AND column is set → tactic was processed and produced no goals (genuine completion)
+  // Zero goals AND column is null → no tactic info found (transient state, not completion)
+  return lastStep.goals.length === 0 && lastStep.column != null
+}
+
 export function loadGoals(
   rpcSess: RpcSessionAtPos,
   uri: string,
@@ -372,8 +393,13 @@ rpcSess.call('Game.getProofState',
 ).then(
   (proof : ProofState) => {
     if (typeof proof !== 'undefined') {
-      console.info(`received a proof state!`)
-      console.log(proof)
+      // The server determines `completed` from absence of diagnostics, but during
+      // fast editing diagnostics can be transiently empty (server still processing)
+      // or RPC responses can arrive out of order. Cross-validate against the actual
+      // goal state: a proof is only complete if the goals show it.
+      if ((proof.completed || proof.completedWithWarnings) && !isProofGoalsComplete(proof)) {
+        proof = { ...proof, completed: false, completedWithWarnings: false }
+      }
       setProof(proof)
       setCrashed(false)
     } else {
