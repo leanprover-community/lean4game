@@ -18,7 +18,7 @@ def parseDocComment! (doc: Option (TSyntax `Lean.Parser.Command.docComment)) :
     logWarning "Add a text to this command with `/-- yada yada -/ MyCommand`!"
     pure ""
   | some s => match s.raw[1] with
-    | .atom _ val => pure <| val.dropRight 2 |>.trim -- some (val.extract 0 (val.endPos - ⟨2⟩))
+    | .atom _ val => pure <| val.dropEnd 2 |>.trimAscii.copy -- some (val.extract 0 (val.endPos - ⟨2⟩))
     | _           => pure "" --panic "not implemented error message" --throwErrorAt s "unexpected doc string{indentD s.raw[1]}"
 
 /-- Read a doc comment and get its content. Return `none` if no doc comment available. -/
