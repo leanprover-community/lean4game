@@ -100,3 +100,15 @@ jobs:
       - name: Run Cypress tests (Production mode)
         if: matrix.os == 'ubuntu-latest'
         run: npm run test:prod
+
+  all:
+    name: all
+    needs: test
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - run: |
+          if [[ "${{ needs.test.result }}" != "success" ]]; then
+            echo "Matrix failed"
+            exit 1
+          fi
