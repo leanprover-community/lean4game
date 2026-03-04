@@ -185,7 +185,6 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
     loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
   }, [rpcSess, uri, worldId, levelId, setProof, setCrashed])
 
-
   function toggleSelection(line: number) {
     return (ev) => {
       console.debug('toggled selection')

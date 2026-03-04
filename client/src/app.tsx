@@ -1,5 +1,7 @@
 import * as React from 'react';
+import { useEffect, useRef } from 'react';
 import { Outlet, useParams } from "react-router-dom";
+import { useAtom } from 'jotai';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -12,6 +14,8 @@ import { PreferencesContext, WorldLevelIdContext} from './components/infoview/co
 import UsePreferences from "./state/hooks/use_preferences"
 import i18n from './i18n';
 import { Popup } from './components/popup/popup';
+import { leanMonacoAtom, leanMonacoOptionsAtom } from './store/editor-atoms';
+import { LeanMonaco } from 'lean4monaco';
 
 export const GameIdContext = React.createContext<string>(undefined);
 
@@ -24,9 +28,29 @@ function App() {
 
   const {mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = UsePreferences()
 
-  React.useEffect(() => {
+  const infoviewRef = useRef<HTMLDivElement>(null)
+  const [leanMonaco, setLeanMonaco] = useAtom(leanMonacoAtom)
+  const [leanMonacoOptions] = useAtom(leanMonacoOptionsAtom)
+
+  useEffect(() => {
     i18n.changeLanguage(language)
   }, [language])
+
+  // You need to start one `LeanMonaco` instance once in your application using a `useEffect`
+  useEffect(() => {
+    const _leanMonaco = new LeanMonaco()
+    setLeanMonaco(_leanMonaco)
+    _leanMonaco.setInfoviewElement(infoviewRef.current!)
+
+    ;(async () => {
+      await _leanMonaco.start(leanMonacoOptions)
+      console.debug('[lean4game]: leanMonaco started')
+    })()
+
+    return () => {
+      leanMonaco?.dispose?.()
+    }
+  }, [leanMonacoOptions, setLeanMonaco])
 
   return (
     <div className="app">

@@ -43,18 +43,8 @@ import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
-
-
-let sharedLeanMonaco: LeanMonaco | null = null
-let sharedLeanMonacoStart: Promise<void> | null = null
-let sharedLeanMonacoGameId: string | null = null
-
-const getSharedLeanMonaco = () => {
-  if (!sharedLeanMonaco) {
-    sharedLeanMonaco = new LeanMonaco()
-  }
-  return sharedLeanMonaco
-}
+import { useAtom } from 'jotai'
+import { leanMonacoAtom } from '../store/editor-atoms'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
   const maybeLeanMonaco = leanMonaco as unknown as {
@@ -230,6 +220,9 @@ function PlayableLevel() {
   const { t : gT } = useGameTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
+  const [leanMonaco] = useAtom(leanMonacoAtom)
+
+
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
@@ -273,18 +266,6 @@ function PlayableLevel() {
   const [leanMonacoEditor, setLeanMonacoEditor] = useState<LeanMonacoEditor|null>(null)
   const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
 
-  const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + gameId
-
-  const [options, setOptions] = useState<LeanMonacoOptions>({
-    // TODO: copy old settings
-    websocket: {
-      url: socketUrl
-    },
-    htmlElement: undefined, // The wrapper div for monaco
-    vscode: {
-      "editor.wordWrap": true,
-    }
-  })
 
   const onDidChangeContent = (code) => {
     dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code}))
@@ -297,39 +278,22 @@ function PlayableLevel() {
     dispatch(changedSelection({game: gameId, world: worldId, level: levelId, selections}))
   }
 
-
-  // Start infoview and editor(s)
+  // Start the editor
   useEffect(() => {
-    // You must create a single `LeanMonaco` instance (infoview), but you can create multiple
-    // `LeanMonacoEditor` instances (editor)
-    // You must await `leanMonaco.start` or use `await leanMonaco.whenReady` before
-    // starting the editors!
-    const leanMonaco = getSharedLeanMonaco()
-    const leanMonacoEditor = new LeanMonacoEditor()
-    const uriStr = `file:///${worldId}/${levelId}.lean`
-    setLeanMonacoEditor(leanMonacoEditor)
+    if (leanMonaco) {
+      const leanMonacoEditor = new LeanMonacoEditor()
+      const uriStr = `file:///${worldId}/${levelId}.lean`
 
-    leanMonaco.setInfoviewElement(infoviewRef.current!)
+      ;(async () => {
+        await leanMonaco!.whenReady
+        console.debug('[demo]: starting editor')
+        await leanMonacoEditor.start(codeviewRef.current!, uriStr, initialCode ?? '')
+        console.debug('[demo]: editor started')
+        setLeanMonacoEditor(leanMonacoEditor)
 
-    let disposed = false
-    ;(async () => {
-      if (!sharedLeanMonacoStart) {
-        sharedLeanMonacoStart = leanMonaco.start(options)
-      } else if (sharedLeanMonacoGameId && sharedLeanMonacoGameId !== gameId) {
-        await sharedLeanMonacoStart
-        await reconfigureLeanMonacoClient(leanMonaco, options)
-      }
-      sharedLeanMonacoGameId = gameId
-      await sharedLeanMonacoStart
-      if (disposed) {
-        return
-      }
-      await leanMonacoEditor.start(codeviewRef.current!, uriStr, initialCode ?? '')
-      if (disposed) {
-        return
-      }
+        // TODO: old stuff from here on
 
-      const infoProvider = leanMonaco.infoProvider as {
+        const infoProvider = leanMonaco.infoProvider as {
         editorApi: EditorApi
         webviewPanel?: { api: InfoviewApi, visible: boolean }
         sendConfig?: () => Promise<void>
@@ -427,13 +391,14 @@ function PlayableLevel() {
 
       await infoProvider.sendConfig?.()
       await infoProvider.sendPosition?.()
-    })()
 
-    return () => {
-      disposed = true
-      leanMonacoEditor.dispose()
+      })()
+
+      return () => {
+        leanMonacoEditor.dispose()
+      }
     }
-  }, [options, infoviewRef, codeviewRef, initialCode, worldId, levelId])
+  }, [leanMonaco, worldId, levelId])
 
   /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
    * `TypewriterInterface`.

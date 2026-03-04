@@ -39,10 +39,12 @@ export function InventoryPanel({levelInfo, visible = true} : {
     setDefinitionInventory(levelInfo?.definitions ?? [])
   }, [levelInfo])
 
-  // Some glue as the user inventory isn't fully in jotai yet
-  useEffect(() => {
-    setUserInventory(inventory)
-  }, [inventory])
+  // // FIXME: this is triggered in each render
+  // // Some glue as the user inventory isn't fully in jotai yet
+  // useEffect(() => {
+  //   setUserInventory(inventory)
+  //   console.debug("B")
+  // }, [inventory])
 
   // Some glue as the game/world/level-ID is not in jotai yet
   const { worldId, levelId } = useContext(WorldLevelIdContext)
