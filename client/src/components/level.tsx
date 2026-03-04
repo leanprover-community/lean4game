@@ -222,7 +222,6 @@ function PlayableLevel() {
   const infoviewRef = useRef<HTMLDivElement>(null)
   const [leanMonaco] = useAtom(leanMonacoAtom)
 
-
   const gameId = React.useContext(GameIdContext)
   const {worldId, levelId} = useContext(WorldLevelIdContext)
   const {mobile} = React.useContext(PreferencesContext)
