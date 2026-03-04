@@ -37,7 +37,7 @@
     "i18next-scanner-typescript": "^1.2.0",
     "ip-anonymize": "^0.1.0",
     "jotai": "^2.13.1",
-    "lean4monaco": "^1.1.5",
+    "lean4monaco": "^1.1.6",
     "marked": "^4.3.0",
     "memfs": "^4.51.1",
     "monaco-editor-wrapper": "^5.3.1",
