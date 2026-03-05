@@ -1,6 +1,5 @@
 import React, { useContext } from "react"
 import { useTranslation } from "react-i18next"
-import { GameIdContext } from "../../app"
 import { useLoadDocQuery, useLoadDocLegacyQuery } from "../../state/api"
 import { Markdown } from "../markdown"
 import { useAppDispatch } from "../../hooks"
@@ -12,13 +11,15 @@ import { faLock, faXmark } from "@fortawesome/free-solid-svg-icons"
 import { NavButton } from "../navigation/nav_button"
 import { store } from "../../state/store"
 import { useGameTranslation } from "../../utils/translation"
+import { gameIdAtom, navigateAcrossWorldsAtom } from "../../store/location-atoms"
 
 /** The `documentation` */
 export function Documentation({ type } : {type : InventoryTab}) {
   const { t } = useTranslation()
   const { t: gT } = useGameTranslation()
   const dispatch = useAppDispatch()
-  const gameId = useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
   const difficulty = useSelector(selectDifficulty(gameId))
 
   const [docTile] = useAtom(selectedDocTileAtom)
@@ -59,7 +60,7 @@ export function Documentation({ type } : {type : InventoryTab}) {
     {docTile.proven && <>
         <h2>Further details</h2>
         <ul>
-          {docTile.proven && <li>Proven in: <a href={`#/${gameId}/world/${docTile.world}/level/${docTile.level}`}>{docTile.world} level {docTile.level}</a></li>}
+          {docTile.proven && <li>Proven in: <a onClick={() => navigateAcrossWorlds(docTile.world, docTile.level)}>{docTile.world} level {docTile.level}</a></li>}
         </ul>
       </>
     }

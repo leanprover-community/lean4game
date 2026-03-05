@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
-import { useNavigate } from "react-router-dom";
 import { I18nextProvider, Trans, useTranslation } from 'react-i18next';
 
 import '@fontsource/roboto/300.css';
@@ -26,22 +25,18 @@ import { useAtom } from 'jotai';
 import { GithubIcon } from './navigation/github_icon';
 import { useGameTranslation } from '../utils/translation';
 import { navOpenAtom } from '../store/navigation-atoms';
+import { gameIdAtom } from '../store/location-atoms';
 
 
 function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
   let { t, i18n } = useTranslation()
-
-  let navigate = useNavigate();
-
-  const routeChange = () =>{
-    navigate(gameId);
-  }
+  const [, navigateToGame] = useAtom(gameIdAtom)
 
   if (typeof data === 'undefined') {
     return <></>
   }
 
-  return <div className="game" onClick={routeChange}>
+  return <div className="game" onClick={() => navigateToGame(gameId)}>
       <div className="wrapper">
         <div className="title">{t(data.title, {ns: gameId})}</div>
         <div className="short-description">{t(data.short, { ns: gameId })}

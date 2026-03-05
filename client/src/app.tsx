@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useAtom } from 'jotai';
 
 import '@fontsource/roboto/300.css';
@@ -10,21 +10,15 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
-import { PreferencesContext, WorldLevelIdContext} from './components/infoview/context';
+import { PreferencesContext } from './components/infoview/context';
 import UsePreferences from "./state/hooks/use_preferences"
 import i18n from './i18n';
 import { Popup } from './components/popup/popup';
 import { leanMonacoAtom, leanMonacoOptionsAtom } from './store/editor-atoms';
 import { LeanMonaco } from 'lean4monaco';
+import { gameIdAtom } from './store/location-atoms';
 
-export const GameIdContext = React.createContext<string>(undefined);
-
-function App() {
-
-  const params = useParams()
-  const gameId = "g/" + params.owner + "/" + params.repo
-  const levelId = parseInt(params.levelId)
-  const worldId = params.worldId
+function App({ children }: { children?: React.ReactNode }) {
 
   const {mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = UsePreferences()
 
@@ -54,16 +48,12 @@ function App() {
 
   return (
     <div className="app">
-      <GameIdContext.Provider value={gameId}>
-          <WorldLevelIdContext.Provider value={{worldId, levelId}}>
-          <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}}>
-            <React.Suspense>
-              <Outlet />
-            </React.Suspense>
-            <Popup />
-          </PreferencesContext.Provider>
-          </WorldLevelIdContext.Provider>
-      </GameIdContext.Provider>
+      <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}}>
+        <React.Suspense>
+          {children}
+        </React.Suspense>
+        <Popup />
+      </PreferencesContext.Provider>
     </div>
   )
 }

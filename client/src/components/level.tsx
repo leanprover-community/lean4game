@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useEffect, useState, useRef, useContext } from 'react'
 import { useSelector } from 'react-redux'
 import Split from 'react-split'
-import { useParams } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgress } from '@mui/material'
@@ -16,7 +15,6 @@ import { EditorConnection, EditorEvents } from '../../../node_modules/vscode-lea
 import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/event'
 import { Diagnostic } from 'vscode-languageserver-types'
 
-import { GameIdContext } from '../app'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
 import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited,
@@ -25,7 +23,7 @@ import { store } from '../state/store'
 import { Button } from './button'
 import { Markdown } from './markdown'
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
-  ProofContext, SelectionContext, WorldLevelIdContext } from './infoview/context'
+  ProofContext, SelectionContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint, ProofState } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
@@ -45,6 +43,7 @@ import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { useAtom } from 'jotai'
 import { leanMonacoAtom } from '../store/editor-atoms'
+import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
   const maybeLeanMonaco = leanMonaco as unknown as {
@@ -73,10 +72,9 @@ const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: Lean
 }
 
 function Level() {
-  const params = useParams()
-  const { levelId, worldId } = useContext(WorldLevelIdContext)
-
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
 
   // Load the namespace of the game
   i18next.loadNamespaces(gameId).catch(err => {
@@ -94,8 +92,9 @@ function ChatPanel({lastLevel, visible = true}) {
   const { t : gT } = useGameTranslation()
   const chatRef = useRef<HTMLDivElement>(null)
   const {mobile} = useContext(PreferencesContext)
-  const gameId = useContext(GameIdContext)
-  const {worldId, levelId} = useContext(WorldLevelIdContext)
+  const [gameId, navigateToGame] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId, navigateToLevel] = useAtom(levelIdAtom)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
   const {proof, setProof} = useContext(ProofContext)
   const {deletedChat, setDeletedChat, showHelp, setShowHelp} = useContext(DeletedChatContext)
@@ -140,7 +139,7 @@ function ChatPanel({lastLevel, visible = true}) {
 
   let introText: Array<string> = gT(level?.data?.introduction ?? "").split(/\n(\s*\n)+/)
 
-  const focusRef = useRef<HTMLAnchorElement>()
+  const focusRef = useRef<HTMLButtonElement>()
   useEffect(() => {
    if (proof?.completed) {
      focusRef.current.focus()
@@ -189,10 +188,10 @@ function ChatPanel({lastLevel, visible = true}) {
     </div>
     <div className="button-row">
       {proof?.completed && (lastLevel ?
-        <Button ref={focusRef} to={`/${gameId}`}>
+        <Button ref={focusRef} onClick={() => navigateToGame(gameId)} >
           <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
         </Button> :
-        <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+        <Button ref={focusRef} onClick={() => navigateToLevel(levelId + 1)}  >
           {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>)
         }
@@ -203,8 +202,9 @@ function ChatPanel({lastLevel, visible = true}) {
 
 
 function ExercisePanel({codeviewRef, infoviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, infoviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = useContext(WorldLevelIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
   const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
   const gameInfo = useGetGameInfoQuery({game: gameId})
   return <div className={`exercise-panel ${visible ? '' : 'hidden'}`}>
@@ -222,8 +222,10 @@ function PlayableLevel() {
   const infoviewRef = useRef<HTMLDivElement>(null)
   const [leanMonaco] = useAtom(leanMonacoAtom)
 
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = useContext(WorldLevelIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
+
   const {mobile} = React.useContext(PreferencesContext)
 
   const dispatch = useAppDispatch()
@@ -240,7 +242,7 @@ function PlayableLevel() {
   // The state variables for the `ProofContext`
   const [proof, setProof] = useState<ProofState>({steps: [], diagnostics: [], completed: false, completedWithWarnings: false})
   const [interimDiags, setInterimDiags] = useState<Array<Diagnostic>>([])
-  const [isCrashed, setIsCrashed] = useState<Boolean>(false)
+  const [isCrashed, setIsCrashed] = useState<boolean>(false)
 
 
   // When deleting the proof, we want to keep to old messages around until
@@ -576,13 +578,15 @@ function PlayableLevel() {
 function IntroductionPanel({gameInfo}) {
   let { t } = useTranslation()
   const { t : gT } = useGameTranslation()
-  const gameId = React.useContext(GameIdContext)
-  const {worldId} = useContext(WorldLevelIdContext)
+  const [gameId, navigateToGame] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [, navigateToLevel] = useAtom(levelIdAtom)
+
   const {mobile} = React.useContext(PreferencesContext)
 
   let text: Array<string> = gT(gameInfo.data?.worlds.nodes[worldId].introduction).split(/\n(\s*\n)+/)
 
-  const focusRef = useRef<HTMLAnchorElement>()
+  const focusRef = useRef<HTMLButtonElement>()
   useEffect(() => {
    focusRef.current?.focus()
   }, [])
@@ -596,10 +600,10 @@ function IntroductionPanel({gameInfo}) {
     </div>
     <div className={`button-row${mobile ? ' mobile' : ''}`}>
       {gameInfo.data?.worldSize[worldId] == 0 ?
-        <Button to={`/${gameId}`}>
+        <Button onClick={() => navigateToGame(gameId)}>
           <FontAwesomeIcon icon={faHome} />
           </Button> :
-        <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/1`}>
+        <Button ref={focusRef} onClick={() => navigateToLevel(1)}>
           {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>
       }
@@ -613,14 +617,15 @@ export default Level
 function Introduction() {
   let { t } = useTranslation()
 
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+
   const {mobile} = useContext(PreferencesContext)
 
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
-  const {worldId} = useContext(WorldLevelIdContext)
 
   let image: string = gameInfo.data?.worlds.nodes[worldId].image
 

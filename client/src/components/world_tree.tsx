@@ -2,7 +2,6 @@
  * @fileOverview Define the menu displayed with the tree of worlds on the welcome page
 */
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import { useStore, useSelector } from 'react-redux'
 import { Slider } from '@mui/material'
 import cytoscape, { LayoutOptions } from 'cytoscape'
@@ -10,7 +9,6 @@ import klay from 'cytoscape-klay'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
-import { GameIdContext } from '../app'
 import { useAppDispatch } from '../hooks'
 import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
 import { store } from '../state/store'
@@ -21,6 +19,8 @@ import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { popupAtom, PopupType } from '../store/popup-atoms'
 import { useGameTranslation } from '../utils/translation'
+import { gameIdAtom, levelIdAtom, navigateAcrossWorldsAtom, worldIdAtom } from '../store/location-atoms'
+import { Button } from './button'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -57,6 +57,7 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
     unlocked: boolean,
     worldSize: number
   }) {
+  const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
 
   const N = Math.max(worldSize, NMIN)
 
@@ -68,7 +69,7 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
   // Sinus-Satz: (1.1*r) / sin(β/2) = R / sin(π/2)
   let R = 1.1 * r / Math.sin(beta/2)
 
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
   const difficulty = useSelector(selectDifficulty(gameId))
   const levelDisabled = (difficulty >= 2 && !(unlocked || completed))
 
@@ -92,7 +93,7 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
     s * position.y - Math.cos(level * betaSpiral(level)) * (R + 2*r*(level-1)/(NSPIRAL+1))
 
   return (
-    <Link to={levelDisabled ? '' : `/${gameId}/world/${world}/level/${level == 1 ? 0 : level}`}
+    <a onClick={() => {if (!levelDisabled) navigateAcrossWorlds(world, level == 1 ? 0 : level)}}
         className={`level${levelDisabled ? ' disabled' : ''}`}>
       <circle fill={completed ? lightgreen : unlocked? blue : lightgrey} cx={x} cy={y} r={r} />
       <foreignObject className="level-title-wrapper" x={x} y={y}
@@ -103,7 +104,7 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
           </p>
         </div>
       </foreignObject>
-    </Link>
+    </a>
   )
 }
 
@@ -140,11 +141,11 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
     nextLevel = 0
   }
   let playable = difficulty <= 1 || completed || unlocked
-  const gameId = React.useContext(GameIdContext)
+  const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
 
-  return <Link
-      to={playable ? `/${gameId}/world/${world}/level/${nextLevel}` : ''}
-      className={playable ? '' : 'disabled'}>
+  return <a
+      onClick={() => {if (playable) navigateAcrossWorlds(world, nextLevel)}}
+      className={`world${playable ? '' : ' disabled'}`}>
     <circle className="world-circle" cx={s*position.x} cy={s*position.y} r={R}
         fill={completed ? green : unlocked ? blue : grey}/>
     { false ? // fontSize >= MINFONT ?
@@ -170,7 +171,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
           </p>
         </div>
       </foreignObject>}
-  </Link>
+  </a>
 }
 
 /** svg object for a connection path between worlds in the game tree */
@@ -201,7 +202,7 @@ export const downloadFile = ({ data, fileName, fileType } :
 /** The menu that is shown next to the world selection graph */
 export function WorldSelectionMenu() {
   const { t, i18n } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
   const difficulty = useSelector(selectDifficulty(gameId))
   const dispatch = useAppDispatch()
   const { mobile } = React.useContext(PreferencesContext)
@@ -283,7 +284,7 @@ export function WorldTreePanel({worlds, worldSize}:
   { worlds: any,
     worldSize: any,
   }) {
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
   const difficulty = useSelector(selectDifficulty(gameId))
   const {nodes, bounds}: any = worlds ? computeWorldLayout(worlds) : {nodes: []}
 

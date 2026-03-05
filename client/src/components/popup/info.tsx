@@ -2,9 +2,10 @@ import * as React from 'react'
 import { Typography } from '@mui/material'
 import { Trans, useTranslation } from 'react-i18next'
 import { useGetGameInfoQuery } from '../../state/api'
-import { GameIdContext } from '../../app'
 import { Markdown } from '../markdown'
 import { useGameTranslation } from '../../utils/translation'
+import { useAtom } from 'jotai'
+import { gameIdAtom } from '../../store/location-atoms'
 
 /** Pop-up that is displaying the Game Info.
  *
@@ -13,7 +14,8 @@ import { useGameTranslation } from '../../utils/translation'
  */
 export function InfoPopup () {
   const { t } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+
   const gameInfo = useGetGameInfoQuery({game: gameId})
 
 

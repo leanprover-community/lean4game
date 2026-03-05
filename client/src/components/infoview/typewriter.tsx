@@ -13,6 +13,8 @@ import { DeletedChatContext, InputModeContext, MonacoEditorContext, PreferencesC
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
+import { useAtom } from 'jotai'
+import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;
@@ -29,7 +31,8 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const uri = model?.uri.toString() ?? ''
   const hasEditor = Boolean(editor && model)
 
-  const {worldId, levelId} = useContext(WorldLevelIdContext)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
 
   const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
   const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)

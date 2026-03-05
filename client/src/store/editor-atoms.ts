@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { LeanMonaco, LeanMonacoOptions } from 'lean4monaco'
-import { gameIdAtom } from "./game-atoms";
+import { gameIdAtom } from "./location-atoms";
 
 /** Options for the LeanMonaco instance */
 export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {

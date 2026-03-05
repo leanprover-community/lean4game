@@ -5,10 +5,12 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for you
 import gfm from "remark-gfm";
-import { GameIdContext } from '../app';
+import { useAtom } from 'jotai';
+import { gameIdAtom } from '../store/location-atoms';
 
 export function Markdown(props: any) {
-  const gameId = useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+
   // Prefix image URLs of the form  `![...](images/...)` with the game ID
   let children = props?.children
 

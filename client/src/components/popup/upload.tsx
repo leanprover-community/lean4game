@@ -6,11 +6,10 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../hooks'
 import { GameProgressState, loadProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
-import { Button } from '../utils'
 import { Trans, useTranslation } from 'react-i18next'
-import { GameIdContext } from '../../app'
 import { popupAtom } from '../../store/popup-atoms'
 import { useAtom } from 'jotai'
+import { gameIdAtom } from '../../store/location-atoms'
 
 /** Pop-up that is displaying the Game Info.
  *
@@ -21,7 +20,7 @@ export function UploadPopup () {
   let { t } = useTranslation()
 
   const [file, setFile] = React.useState<File>();
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
   const gameProgress = useSelector(selectProgress(gameId))
   const dispatch = useAppDispatch()
 
@@ -71,6 +70,6 @@ export function UploadPopup () {
     </p>
 
     {/* TODO: apperently clicking this redirects the user back to the landing page... */}
-    <Button to="" onClick={uploadProgress} disabled={!file}>{t("Load selected file")}</Button>
+    <Button  onClick={uploadProgress} disabled={!file}>{t("Load selected file")}</Button>
   </>
 }
