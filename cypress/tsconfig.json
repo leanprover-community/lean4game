@@ -17,6 +17,6 @@
     "target": "ES2022",
     "types": ["cypress", "node"]
   },
-  "include": ["**/*.ts", "**/*.tsx", "../cypress.config.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "../cypress.config.cjs"],
   "exclude": ["dist"]
 }
