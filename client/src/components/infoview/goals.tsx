@@ -17,8 +17,9 @@ import { DiagnosticSeverity } from 'vscode-languageserver-protocol';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { selectTypewriterMode } from '../../state/progress';
-import { GameIdContext } from '../../app';
 import { useGetGameInfoQuery } from '../../state/api';
+import { useAtom } from 'jotai';
+import { gameIdAtom } from '../../store/location-atoms';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -148,7 +149,7 @@ interface GoalProps {
  * Displays the hypotheses, target type and optional case label of a goal according to the
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
-    const gameId = React.useContext(GameIdContext)
+    const [gameId] = useAtom(gameIdAtom)
     const game = useGetGameInfoQuery({game: gameId})
     const {mobile} = React.useContext(PreferencesContext)
     const typewriterMode = useSelector(selectTypewriterMode(gameId))

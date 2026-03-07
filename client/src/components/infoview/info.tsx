@@ -14,12 +14,13 @@ import { GoalsLocation, Locations, LocationsContext } from '../../../../node_mod
 
 import { AllMessages, lspDiagToInteractive } from './messages'
 import { InputModeContext } from './context'
-import { goalsToString } from './goals'
 import { goalsToString, Goal, MainAssumptions, OtherGoals } from './goals'
 import { InteractiveTermGoal, InteractiveGoalsWithHints, InteractiveGoals, ProofState } from './rpc_api'
-import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext, WorldLevelIdContext } from './context'
+import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext } from './context'
 import { useTranslation } from 'react-i18next'
 import { useContext } from 'react'
+import { useAtom } from 'jotai'
+import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
 
 // TODO: All about pinning could probably be removed
 type InfoKind = 'cursor' | 'pin'
@@ -275,7 +276,9 @@ function InfoAux(props: InfoProps) {
 
     const config = React.useContext(ConfigContext)
 
-    const {worldId, levelId} = useContext(WorldLevelIdContext)
+    const [worldId] = useAtom(worldIdAtom)
+    const [levelId] = useAtom(levelIdAtom)
+
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const pos = props.pos!

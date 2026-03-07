@@ -1,13 +1,12 @@
 import React from "react"
 import { selectInventory } from "../../state/progress"
 import { InventoryTile } from "../../state/api"
-import { GameIdContext } from "../../app"
-import { WorldLevelIdContext } from "../infoview/context"
 import { store } from "../../state/store"
 import { InventoryItem } from "./inventory_item"
 import { currentInventoryTilesAtom, InventoryTab, inventoryTabAtom } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
 import { useSelector } from "react-redux"
+import { gameIdAtom, levelIdAtom, worldIdAtom } from "../../store/location-atoms"
 
 export function InventoryList({tiles, docType, enableAll=false} : {
   tiles: InventoryTile[],
@@ -15,8 +14,9 @@ export function InventoryList({tiles, docType, enableAll=false} : {
   enableAll?: boolean,
 }) {
   const [currentTiles] = useAtom(currentInventoryTilesAtom)
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
 
   // Add inventory items from local store as unlocked.
   // Items are unlocked if they are in the local store, or if the server says they should be

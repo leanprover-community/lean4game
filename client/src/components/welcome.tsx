@@ -5,7 +5,6 @@ import { Box, CircularProgress } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
-import { GameIdContext } from '../app'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { changedReadIntro, selectReadIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
@@ -20,12 +19,15 @@ import i18next from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
+import { gameIdAtom } from '../store/location-atoms'
+import { useAtom } from 'jotai'
 
 
 /** the panel showing the game's introduction text */
 function IntroductionPanel({introduction, setPageNumber}: {introduction: string, setPageNumber}) {
   const {mobile} = React.useContext(PreferencesContext)
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+
 
   const { t : gT } = useGameTranslation()
 
@@ -49,7 +51,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
     </div>
     {mobile &&
       <div className="button-row">
-        <Button className="btn" to=""
+        <Button className="btn"
           title="" onClick={() => {
             setPageNumber(1);
             dispatch(changedReadIntro({game: gameId, world: null, readIntro: true}))
@@ -63,7 +65,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
 
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
 
   // Load the namespace of the game
   i18next.loadNamespaces(gameId)

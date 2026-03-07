@@ -1,19 +1,20 @@
 import * as React from 'react';
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { Markdown } from '../markdown';
 import { GameTile } from '../../state/api'
 import { Flag } from '../flag';
 import path from 'path';
+import { useAtom } from 'jotai';
+import { gameIdAtom } from '../../store/location-atoms';
 
 /** One tile for a game visible on the front page */
 export function Tile({gameId, data}: {gameId: string, data: GameTile | undefined}) {
   let { t } = useTranslation()
-  let navigate = useNavigate()
+  const [, navigateToGame] = useAtom(gameIdAtom)
 
   if (!data) return null
 
-  return <div className="game" onClick={() => navigate(gameId)}>
+  return <div className="game" onClick={() => navigateToGame(gameId)}>
     <div className="wrapper">
       <div className="title">{t(data.title, { ns: gameId })}</div>
       <div className="short-description">{t(data.short, { ns: gameId })}

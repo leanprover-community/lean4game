@@ -19,7 +19,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDeleteLeft, faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
-import { GameIdContext } from '../../app';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { LevelInfo, useGetGameInfoQuery } from '../../state/api';
 import { changedInventory, levelCompleted, selectCode, selectCompleted, selectInventory } from '../../state/progress';
@@ -28,7 +27,7 @@ import { Markdown } from '../markdown';
 import { Infos } from './infos';
 import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
-import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext, ProofContext, SelectionContext, WorldLevelIdContext } from './context';
+import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext, ProofContext, SelectionContext } from './context';
 import { Typewriter, getInteractiveDiagsAt, hasErrors, hasInteractiveErrors } from './typewriter';
 import { InteractiveDiagnostic } from '@leanprover/infoview/*';
 import { Button } from '../button';
@@ -41,6 +40,8 @@ import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
 import { useGameTranslation } from '../../utils/translation';
+import { useAtom } from 'jotai';
+import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -55,7 +56,7 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
     {ec ?
-      <DualEditorMain worldId={worldId} levelId={levelId} level={level} worldSize={worldSize} /> :
+      <DualEditorMain level={level} worldSize={worldSize} /> :
       // TODO: Style this if relevant.
       <></>
     }
@@ -63,9 +64,11 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
 }
 
 /** The part of the two editors that needs the editor connection first */
-function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: string, levelId: number, level: LevelInfo, worldSize: number }) {
+function DualEditorMain({ level, worldSize }: { level: LevelInfo, worldSize: number }) {
   const ec = React.useContext(EditorContext)
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
   const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
 
   const {proof, setProof} = React.useContext(ProofContext)
@@ -117,9 +120,9 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
           <WithLspDiagnosticsContext>
             <ProgressContext.Provider value={allProgress}>
               {(typewriterMode && !lockEditorMode) ?
-                <TypewriterInterfaceWrapper world={worldId} level={levelId} data={level} worldSize={worldSize}/>
+                <TypewriterInterfaceWrapper data={level} worldSize={worldSize}/>
                 :
-                <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} data={level} />
+                <Main key={`${worldId}/${levelId}`} data={level} />
               }
             </ProgressContext.Provider>
           </WithLspDiagnosticsContext>
@@ -140,7 +143,7 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
 function ExerciseStatement({ data, showLeanStatement = false }) {
   const { t : gT } = useGameTranslation()
   const { t } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
 
   if (!(data?.descrText || data?.descrFormat)) { return <></> }
   return <>
@@ -162,13 +165,14 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
 
 // TODO: This is only used in `EditorInterface`
 // while `TypewriterInterface` has this copy-pasted in.
-export function Main(props: { world: string, level: number, data: LevelInfo}) {
+export function Main(props: { data: LevelInfo}) {
   let { t } = useTranslation()
   const { t: gT } = useGameTranslation()
   const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
   const ec = React.useContext(EditorContext);
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
 
   const { proof, setProof, setCrashed } = React.useContext(ProofContext)
   const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
@@ -184,7 +188,6 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
     }
     loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
   }, [rpcSess, uri, worldId, levelId, setProof, setCrashed])
-
 
   function toggleSelection(line: number) {
     return (ev) => {
@@ -362,7 +365,7 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
   } else {
     return <div className="command">
       <div className="command-text">{proof?.steps[i].command}</div>
-      <Button to="" className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={deleteProof}>
+      <Button  className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={deleteProof}>
         <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;{t("Retry")}
       </Button>
     </div>
@@ -446,9 +449,8 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
 }
 
 // Splitting up Typewriter into two parts is a HACK
-export function TypewriterInterfaceWrapper(props: { world: string, level: number, data: LevelInfo, worldSize: number }) {
+export function TypewriterInterfaceWrapper(props: { data: LevelInfo, worldSize: number }) {
   const ec = React.useContext(EditorContext)
-  const gameId = React.useContext(GameIdContext)
 
   useClientNotificationEffect(
     'textDocument/didClose',
@@ -481,13 +483,14 @@ export function TypewriterInterfaceWrapper(props: { world: string, level: number
 export function TypewriterInterface({props}) {
   let { t } = useTranslation()
   const ec = React.useContext(EditorContext)
-  const gameId = React.useContext(GameIdContext)
+  const [gameId, navigateToGame] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId, navigateToLevel] = useAtom(levelIdAtom)
   const editor = React.useContext(MonacoEditorContext)
   const model = editor?.getModel()
   const uri = model?.uri.toString() ?? ''
 
   const gameInfo = useGetGameInfoQuery({game: gameId})
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
   const fallbackUri = `file:///${worldId}/${levelId}.lean`
   const effectiveUri = uri || fallbackUri
   let image: string = gameInfo.data?.worlds.nodes[worldId].image
@@ -695,12 +698,12 @@ export function TypewriterInterface({props}) {
             }
             {mobile && proof?.completed &&
               <div className="button-row mobile">
-                {props.level >= props.worldSize ?
-                  <Button to={`/${gameId}`}>
+                {levelId >= props.worldSize ?
+                  <Button onClick={() => navigateToGame(gameId)} >
                     <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
                   </Button>
                 :
-                  <Button to={`/${gameId}/world/${props.world}/level/${props.level + 1}`}>
+                  <Button onClick={() => navigateToLevel(levelId + 1)} >
                     Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
                   </Button>
                 }

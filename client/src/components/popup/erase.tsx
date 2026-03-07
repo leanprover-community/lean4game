@@ -3,7 +3,6 @@
 */
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { GameIdContext } from '../../app'
 import { useAppDispatch } from '../../hooks'
 import { deleteLevelProgress, deleteProgress, deleteWorldProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
@@ -12,7 +11,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useContext } from 'react'
 import { useAtom } from 'jotai'
 import { popupAtom } from '../../store/popup-atoms'
-import { WorldLevelIdContext } from '../infoview/context'
+import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms'
 
 /** download the current progress (i.e. what's saved in the browser store) */
 export function downloadProgress(gameId: string, gameProgress: any, ev: React.MouseEvent) {
@@ -57,17 +56,19 @@ export function downloadProgress(gameId: string, gameProgress: any, ev: React.Mo
 //         Saves from other games are not deleted.)
 //       </p>
 //     </Trans>
-//     <Button onClick={eraseProgress} to="">{t("Delete")}</Button>
-//     <Button onClick={downloadAndErase} to="">{t("Download & Delete")}</Button>
-//     <Button onClick={handleClose} to="">{t("Cancel")}</Button>
+//     <Button onClick={eraseProgress} >{t("Delete")}</Button>
+//     <Button onClick={downloadAndErase} >{t("Download & Delete")}</Button>
+//     <Button onClick={handleClose} >{t("Cancel")}</Button>
 //   </div>
 // </div>
 // }
 
 export function ErasePopup () {
   let { t } = useTranslation()
-  const gameId = useContext(GameIdContext)
-   const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  const [gameId, navigateToGame] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
+
   // const { setPage } = useContext(PageContext)
   const gameProgress = useSelector(selectProgress(gameId))
   const dispatch = useAppDispatch()
@@ -103,9 +104,9 @@ export function ErasePopup () {
       <p>Do you want to delete your saved progress irreversibly?</p>
     </Trans>
     <div className='settings-buttons'>
-      <Button onClick={levelId && eraseLevel} to="" disabled={!levelId} >{t("Delete this Level")}</Button>
-      <Button onClick={worldId && eraseWorld} to="" disabled={!worldId} >{t("Delete this World")}</Button>
-      <Button onClick={eraseProgress} to={`/${gameId}/`}>{t("Delete Everything")}</Button>
+      <Button onClick={levelId && eraseLevel}  disabled={!levelId} >{t("Delete this Level")}</Button>
+      <Button onClick={worldId && eraseWorld}  disabled={!worldId} >{t("Delete this World")}</Button>
+      <Button onClick={(ev) => {eraseProgress(ev); navigateToGame(gameId)}} >{t("Delete Everything")}</Button>
     </div>
     <Trans>
       <p>
@@ -117,8 +118,8 @@ export function ErasePopup () {
       </p>
     </Trans>
     <div className='settings-buttons'>
-      <Button onClick={downloadAndErase} to={`/${gameId}/`}>{t("Download & Delete everything")}</Button>
-      <Button onClick={(ev) => {setPopup(null); ev.preventDefault()}} to="">{t("Cancel")}</Button>
+      <Button onClick={(ev) => {downloadAndErase(ev); navigateToGame(gameId)}} >{t("Download & Delete everything")}</Button>
+      <Button onClick={(ev) => {setPopup(null); ev.preventDefault()}} >{t("Cancel")}</Button>
     </div>
   </>
 }

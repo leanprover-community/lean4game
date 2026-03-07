@@ -1,6 +1,7 @@
+import { useAtom } from 'jotai';
 import { useContext } from 'react'
 import { useTranslation, UseTranslationResponse } from 'react-i18next'
-import { GameIdContext } from '../app'
+import { gameIdAtom } from '../store/location-atoms';
 
 /**
  * This file provides the tools to process translations created by the Lean package `lean-i18n`.
@@ -56,7 +57,8 @@ function normalizeKeyString(key: string): string{
  * the translation keys received from `lean-i18n`.
  */
 export function useGameTranslation(): UseTranslationResponse<'translation', undefined> {
-  const gameId = useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+
   const { t, ...rest } = useTranslation()
   const pattern = /(?<!\\)§(\d+)/g;
   const modifiedT = ((key: string | undefined) => {

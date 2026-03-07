@@ -38,7 +38,7 @@ export const ProofContext = React.createContext<{
   interimDiags: Diagnostic[],
   setInterimDiags: React.Dispatch<React.SetStateAction<Array<Diagnostic>>>
   /** TODO: Workaround to capture a crash of the gameserver. */
-  crashed: Boolean,
+  crashed: boolean,
   setCrashed: React.Dispatch<React.SetStateAction<Boolean>>
 }>({
   proof: {steps: [], diagnostics: [], completed: false, completedWithWarnings: false},
@@ -94,14 +94,6 @@ export const PreferencesContext = React.createContext<IPreferencesContext>({
   setIsSavePreferences: () => {},
   setLanguage: () => {},
   setIsSuggestionsMobileMode: () => {},
-})
-
-export const WorldLevelIdContext = React.createContext<{
-  worldId : string,
-  levelId: number
-}>({
-  worldId : null,
-  levelId: 0,
 })
 
 /** Context to keep highlight selected proof step and corresponding chat messages. */

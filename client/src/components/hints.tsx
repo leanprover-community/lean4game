@@ -5,15 +5,16 @@ import { DeletedChatContext, ProofContext } from "./infoview/context";
 import { lastStepHasErrors } from "./infoview/goals";
 import { Button } from "./button";
 import { useGameTranslation } from "../utils/translation";
-import { GameIdContext } from "../app";
 import { useTranslation } from "react-i18next";
+import { useAtom } from "jotai";
+import { gameIdAtom } from "../store/location-atoms";
 
 /** Plug-in the variable names in a hint. We do this client-side to prepare
  * for i18n in the future. i.e. one should be able translate the `rawText`
  * and have the variables substituted just before displaying.
  */
 function getHintText(hint: GameHint): string {
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
   let { t: gT } = useGameTranslation()
   if (hint.rawText) {
     // Replace the variable names used in the hint with the ones used by the player
@@ -119,7 +120,7 @@ export function MoreHelpButton({selected=null} : {selected?: number}) {
   }
 
   if (hasHiddenHints(proof?.steps[k]) && !showHelp.has(k)) {
-    return <Button to="" onClick={activateHiddenHints}>
+    return <Button  onClick={activateHiddenHints}>
       {t("Show more help!")}
     </Button>
   }

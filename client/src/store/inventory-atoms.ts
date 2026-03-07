@@ -1,6 +1,6 @@
 import { Atom, atom } from "jotai";
 import { InventoryTile } from "../state/api";
-import { levelIdAtom, worldIdAtom } from "./game-atoms";
+import { levelIdAtom, worldIdAtom } from "./location-atoms";
 
 /** Valid inventory tabs */
 export enum InventoryTab {
