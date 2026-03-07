@@ -40,7 +40,7 @@ export const gameIdAtom = atom((get) => {
   }
 }, (get, set, gameId: string) => {
   const location = get(locationAtom)
-  set(locationAtom, { ...location, hash: `#/${gameId}` }, { replace: true })
+  set(locationAtom, { ...location, hash: `#/${gameId}`, pathname: "" }, { replace: true })
 })
 
 export const worldIdAtom = atom((get) => {
@@ -56,7 +56,7 @@ export const worldIdAtom = atom((get) => {
 }, (get, set, worldId: string) => {
   const gameId = get(gameIdAtom)
   const location = get(locationAtom)
-  set(locationAtom, { ...location, hash: `#/${gameId}/world/${worldId}` }, { replace: true })
+  set(locationAtom, { ...location, hash: `#/${gameId}/world/${worldId}`, pathname: "" }, { replace: true })
 })
 
 export const levelIdAtom = atom((get) => {
@@ -75,11 +75,16 @@ export const levelIdAtom = atom((get) => {
   const gameId = get(gameIdAtom)
   const worldId = get(worldIdAtom)
   const location = get(locationAtom)
-  set(locationAtom, { ...location, hash: `#/${gameId}/world/${worldId}/level/${Math.max(levelId, 0)}` }, { replace: true })}
+  set(locationAtom, { ...location, hash: `#/${gameId}/world/${worldId}/level/${Math.max(levelId, 0)}`, pathname: "" }, { replace: true })}
 )
 
 export const navigateAcrossWorldsAtom = atom(null, (get, set, worldId: string, levelId: number) => {
   const gameId = get(gameIdAtom)
   const location = get(locationAtom)
-  set(locationAtom, { ...location, hash: `#/${gameId}/world/${worldId}/level/${Math.max(levelId, 0)}` }, { replace: true })
+  set(locationAtom, { ...location, hash: `#/${gameId}/world/${worldId}/level/${Math.max(levelId, 0)}`, pathname: "" }, { replace: true })
+})
+
+export const redirectAtom = atom(null, (get, set, hash: string) => {
+  const location = get(locationAtom)
+  set(locationAtom, { ...location, hash: hash, pathname: "" }, { replace: true })
 })
