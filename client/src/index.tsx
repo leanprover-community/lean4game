@@ -3,19 +3,21 @@ import { createRoot } from 'react-dom/client'
 import App from './app'
 import { store } from './state/store'
 import { Provider } from 'react-redux'
-import ErrorPage from './components/error_page'
 import Welcome from './components/welcome'
 import LandingPage from './components/landing_page'
 import Level from './components/level'
 import './i18n';
 import { useAtom } from 'jotai'
 import { gameIdAtom, hashSegmentsAtom, levelIdAtom, worldIdAtom } from './store/location-atoms'
+import { ErrorBoundary } from './error/ErrorBoundary'
+import { NotFound } from './error/NotFound'
 
 
 function Router() {
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
+  const [hashSegments] = useAtom(hashSegmentsAtom)
 
   let child: React.ReactNode
 
@@ -23,11 +25,18 @@ function Router() {
     child = <Level />
   } else if (gameId) {
     child = <Welcome />
-  } else {
+  } else if (hashSegments.length == 0) {
     child = <LandingPage />
   }
+  else {
+    child = <NotFound />
+  }
 
-  return <App>{child}</App>
+  return (
+    <ErrorBoundary>
+      <App>{child}</App>
+    </ErrorBoundary>
+  )
 }
 
 

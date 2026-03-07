@@ -4,12 +4,14 @@ import { atomWithLocation } from 'jotai-location'
 const locationAtom = atomWithLocation()
 
 export const navigateToLandingPageAtom = atom(null, (get, set) => {
-  set(locationAtom, { hash: "" }, { replace: true })
+  set(locationAtom, { hash: "", pathname: "" }, { replace: true })
 })
 
 /**
  * Splitting `#/g/test/TestGame/world/TestWorld/level/1` into
  * ["g", "test", "TestGame", "world", "TestWorld", "level", "1"]
+ *
+ * Deprecated: the urls of the form `/#/g/...` will be deprecated soon in favour normal Urls `/...`
  */
 export const hashSegmentsAtom = atom((get) => {
   const { hash } = get(locationAtom)
@@ -17,35 +19,67 @@ export const hashSegmentsAtom = atom((get) => {
   return clean.split("/").filter(Boolean)
 })
 
+/**
+ * Splitting `/test/TestGame/TestWorld/1` into
+ * ["test", "TestGame", "TestWorld", "1"]
+ */
+export const pathSegmentsAtom = atom((get) => {
+  const { pathname } = get(locationAtom)
+  return pathname?.split("/").filter(Boolean)
+})
+
 export const gameIdAtom = atom((get) => {
-  const segments = get(hashSegmentsAtom)
-  if (segments.length < 3 || segments[0] !== "g") return null
-  return segments.slice(0, 3).join("/")
-}, (_get, set, gameId: string) => {
-  set(locationAtom, { hash: `#/${gameId}` }, { replace: true })
+  const segments = get(pathSegmentsAtom)
+  if (segments.length >= 2) {
+    return `g/${segments[0]}/${segments[1]}`
+  }
+  // for backwards compatibility:
+  const hashSegments = get(hashSegmentsAtom)
+  if (hashSegments.length >= 3 && hashSegments[0] === "g") {
+    return hashSegments.slice(0, 3).join("/")
+  }
+}, (get, set, gameId: string) => {
+  const location = get(locationAtom)
+  set(locationAtom, { ...location, hash: `#/${gameId}` }, { replace: true })
 })
 
 export const worldIdAtom = atom((get) => {
-  const segments = get(hashSegmentsAtom)
-  if (segments.length < 5 || segments[3] !== "world") return null
-  return segments[4]
+  const segments = get(pathSegmentsAtom)
+  if (segments.length >= 3) {
+    return segments[2]
+  }
+  // for backwards compatibility:
+  const hashSegments = get(hashSegmentsAtom)
+  if (hashSegments.length >= 4 && hashSegments[3] === "world") {
+    return hashSegments[4]
+  }
 }, (get, set, worldId: string) => {
   const gameId = get(gameIdAtom)
-  set(locationAtom, { hash: `#/${gameId}/world/${worldId}` }, { replace: true })
+  const location = get(locationAtom)
+  set(locationAtom, { ...location, hash: `#/${gameId}/world/${worldId}` }, { replace: true })
 })
 
 export const levelIdAtom = atom((get) => {
-  const segments = get(hashSegmentsAtom)
-  if (segments.length < 7 || segments[5] !== "level") return null
-  const value = Number(segments[6])
-  return Number.isFinite(value) ? value : null
+  const segments = get(pathSegmentsAtom)
+  if (segments.length >= 4) {
+    const value = Number(segments[3])
+    return Number.isFinite(value) ? value : null
+  }
+  // for backwards compatibility:
+  const hashSegments = get(hashSegmentsAtom)
+  if (hashSegments.length >= 6 && hashSegments[5] === "level") {
+    const value = Number(hashSegments[6])
+    return Number.isFinite(value) ? value : null
+  }
 }, (get, set, levelId: number) => {
   const gameId = get(gameIdAtom)
   const worldId = get(worldIdAtom)
-  set(locationAtom, { hash: `#/${gameId}/world/${worldId}/level/${Math.max(levelId, 0)}` }, { replace: true })}
+  const location = get(locationAtom)
+  set(locationAtom, { ...location, hash: `#/${gameId}/world/${worldId}/level/${Math.max(levelId, 0)}` }, { replace: true })}
 )
 
 export const navigateAcrossWorldsAtom = atom(null, (get, set, worldId: string, levelId: number) => {
   const gameId = get(gameIdAtom)
-  set(locationAtom, { hash: `#/${gameId}/world/${worldId}/level/${Math.max(levelId, 0)}` }, { replace: true })
+  const location = get(locationAtom)
+  set(locationAtom, { ...location, hash: `#/${gameId}/world/${worldId}/level/${Math.max(levelId, 0)}` }, { replace: true })
 })
