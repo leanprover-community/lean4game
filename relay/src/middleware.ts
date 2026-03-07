@@ -1,4 +1,4 @@
-import { exec } from 'child_process'
+import { exec, ExecOptions } from 'child_process'
 import fs from 'fs'
 import anonymize from 'ip-anonymize'
 import { Octokit } from 'octokit'
@@ -7,16 +7,17 @@ import { resolve } from 'path'
 import process from 'process'
 import { AccessLogger, Connection } from './services/AccessLogger.js'
 import { Request, Response } from 'express'
+import type { Params } from './param-types.js'
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
-const RESERVED_DISK_SPACE_MB: number = parseInt(process.env.RESERVED_DISC_SPACE_MB)
+const RESERVED_DISK_SPACE_MB: number = parseInt(process.env.RESERVED_DISC_SPACE_MB ?? "0")
 const DISK_INFO_CMD_MB = 'df -BM'
 const octokit = new Octokit({auth: TOKEN})
 const accessLogger = new AccessLogger()
 
-function checkDiskSpace(path) {
+function checkDiskSpace(path: string) {
   return new Promise<number>((resolve, reject) => {
-    exec(DISK_INFO_CMD_MB, path, (error, stdout, stderr) => {
+    exec(DISK_INFO_CMD_MB, { cwd: path }, (error, stdout, stderr) => {
       if (error) {
         return reject(new Error(`Error checking disk space: ${error.message}`))
       }
@@ -34,7 +35,7 @@ function checkDiskSpace(path) {
   })
 }
 
-function getGitHubArtifactInformation(owner, repo){
+function getGitHubArtifactInformation(owner: string, repo: string){
   return new Promise<number>(async (resolve, reject) =>{
     const artifacts =  octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
       owner,
@@ -45,14 +46,14 @@ function getGitHubArtifactInformation(owner, repo){
     })
 
     const artifact = (await artifacts).data.artifacts.reduce(
-      (acc, cur) => acc.created_at < cur.created_at ? cur : acc)
+      (acc, cur) => acc.created_at! < cur.created_at! ? cur : acc)
 
     resolve(artifact.size_in_bytes)
   })
 }
 
 // TODO: Game directory has to be set correctly. Currently games are sourced from dist/games which is not correct
-export function safeImport(owner, repo, id, importFunc) {
+export function safeImport(owner: string, repo: string, id: string, importFunc: (owner: string, repo: string, id: string) => void) {
   return new Promise<void>((resolve, reject) => {
     const rootPath = '/'
     checkDiskSpace(rootPath).then(async usedDiskSpace => {
@@ -78,12 +79,13 @@ export function getActiveConnections(): Connection[] {
   return accessLogger.getActiveConnections()
 }
 
-export function logGameAccess(req) {
+export function logGameAccess(req: Request<Params>) {
   const owner = req.params.owner;
   const repo = req.params.repo;
   const lang = req.params.lang;
 
-  const anon_ip = anonymize(req.headers['x-forwarded-for'] || req.socket.remoteAddress);
+  const headers = req.headers['x-forwarded-for']
+  const anon_ip = anonymize((Array.isArray(headers) ? headers[0] : headers) ?? req.socket.remoteAddress ?? "")
   const log = path.join(process.cwd(), 'logs', 'game-access.log');
   const header = "date;anon-ip;game;lang\n";
   const data = `${new Date()};${anon_ip};${owner}/${repo};${lang}\n`;

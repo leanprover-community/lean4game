@@ -17,8 +17,8 @@ const isDevelopment = environment === 'development';
 const noBwrap = process.env.NO_BWRAP == "true"
 
 export class GameManager {
-  queueLength: {}
-  queue: {}
+  queueLength: Record<string, number>
+  queue: Record<string, ChildProcess[]>
   urlRegEx: RegExp
   dir: string
 
@@ -40,9 +40,9 @@ export class GameManager {
     this.dir = directory
   }
 
-  startGame(req: IncomingMessage, ip: string): GameSession{
-    let ps: ChildProcess
-    const reRes = this.urlRegEx.exec(req.url);
+  startGame(req: IncomingMessage, ip: string): GameSession | undefined {
+    let ps: ChildProcess | undefined
+    const reRes = this.urlRegEx.exec(req.url!);
 
     if (!reRes) { console.error(`Connection refused because of invalid URL: ${req.url}`); return; }
     const reResTag: Tag = { owner: reRes[1], repo: reRes[2] };
@@ -60,17 +60,17 @@ export class GameManager {
       this.fillQueue(reResTag);
     }
 
-    if (ps == null) {
+    if (ps == undefined) {
       console.error(`[${new Date()}]server process is undefined/null`);
       return;
     }
 
     const gameDir = this.getGameDir(reResTag.owner, reResTag.repo)
 
-    return {process: ps, game: game, gameDir: gameDir, usesCustomLeanServer: customLeanServer !== null }
+    return {process: ps, game: game, gameDir: gameDir, usesCustomLeanServer: customLeanServer != null }
   }
 
-  getCustomLeanServer(owner, repo) : string | null {
+  getCustomLeanServer(owner: string, repo: string) : string | null {
     let gameDir = this.getGameDir(owner, repo);
     let binary = path.join(gameDir, ".lake", "packages", "GameServer", "server", ".lake", "build", "bin", "gameserver");
     if (fs.existsSync(binary)) {
@@ -124,13 +124,13 @@ export class GameManager {
   fillQueue(tag: { owner: string; repo: string; }) {
     const tagString = this.getTagString(tag);
     while (this.queue[tagString].length < this.queueLength[tagString]) {
-      let serverProcess: cp.ChildProcessWithoutNullStreams;
+      let serverProcess: ChildProcess | undefined;
       serverProcess = this.createGameProcess(
         tag.owner, tag.repo,
         this.getCustomLeanServer(tag.owner, tag.repo)
       );
-      if (serverProcess == null) {
-        console.error(`[${new Date()}] serverProcess was undefined/null`);
+      if (!serverProcess) {
+        console.error(`[${new Date()}] serverProcess was undefined`);
         return;
       }
       this.queue[tagString].push(serverProcess);
@@ -156,25 +156,24 @@ export class GameManager {
       }
       for (let key in p) {
         if (typeof p[key] === 'object' && p[key] !== null) {
-          p[key] = shiftLines(p[key], offset);
+          p[key] = shiftLines(p[key], offset)
         }
       }
       return p;
     }
 
-    function replaceUri(obj: object, val: string) {
+    function replaceUri(obj: Record<string, any>, val: string): Record<string, any> {
       for (const key in obj) {
-        if (key === 'uri') {
+        if (key === "uri") {
           obj[key] = val;
-        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-          replaceUri(obj[key], val);
+        } else if (typeof obj[key] === "object" && obj[key] !== null) {
+          replaceUri(obj[key], val)
         }
       }
       return obj
     }
 
-
-    // These values will be set by the initialize message
+    // These values will be set by the initialise message
     let difficulty: number
     let inventory: string[]
     let worldId: string
@@ -277,7 +276,7 @@ export class GameManager {
       if (semanticTokenRequestIds.delete((message as any)?.id)) {
         const data : number[] = (message as any).result.data
         let i = 0
-        let newData = []
+        let newData: number[] = []
         let line = 0
         // Search for semantic tokens at or after PROOF_START_LINE
         while (i < data.length) {

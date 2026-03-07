@@ -1,23 +1,22 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "nodenext",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "composite": true,
-    "outDir": "./dist/",
-    "module": "NodeNext",
-    "target": "es5",
-    "allowJs": true,
-    "resolveJsonModule": true,
+    "incremental": true,
+    "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "nodenext",
-    "jsx": "react",
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [
-      "ES2021.String",
-      "DOM"
-    ],
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
     "skipLibCheck": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "lib": ["ES2022"],
+    "allowJs": true
   },
-  "include": ["./src/"]
+  "include": ["src/**/*"],
+  "exclude": ["dist"]
 }
