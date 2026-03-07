@@ -37,13 +37,10 @@ export function InventoryPanel({levelInfo, visible = true} : {
     setDefinitionInventory(levelInfo?.definitions ?? [])
   }, [levelInfo])
 
-  // // FIXME: this is triggered in each render
-  // // Some glue as the user inventory isn't fully in jotai yet
-  // useEffect(() => {
-  //   setUserInventory(inventory)
-  //   console.debug("B")
-  // }, [inventory])
-
+  // Some glue as the user inventory isn't fully in jotai yet
+  useEffect(() => {
+    setUserInventory(inventory)
+  }, [inventory])
 
   // If the level specifies `TheoremTab "Nat"`, we switch to this tab on loading.
   // `defaultTab` is `null` or `undefined` otherwise, in which case we don't want to switch.
