@@ -10,10 +10,25 @@ On the server side, the command will set up a docker image containing the Lean s
 
 ### Environment Variables
 
-The client and server ports, as well as the default language, can be configured using environment variables:
+Some parts of the project can be configured using environment variables.
 
-* `PORT`: Sets the port for the backend server (default: `8080`).
-* `CLIENT_PORT`: Sets the port for the client server (default: `3000`).
-* `VITE_CLIENT_DEFAULT_LANGUAGE`: Sets the default language for the application (default: `en`).
+### Client
 
-Ensure these environment variables are set appropriately in your environment to configure the project as needed.
+For example for `npm start`, `npm start:client`.
+
+| name | values | default | description |
+| ---- | ------ | ------- | ----------- |
+| `CLIENT_PORT` | a number | `3000`  | sets the port for the client server |
+| `VITE_CLIENT_DEFAULT_LANGUAGE` | ISO language key | `en` | sets the default language for the application |
+| ... |  |  | TODO |
+
+### Server
+
+For example for `npm start`, `npm run production`, `npm run start:relay`.
+
+| name | values | default | description |
+| ---- | ------ | ------- | ----------- |
+| `PORT` | a number | `8080` | sets the port for the backend server |
+| `API_PORT` | a number | `undefined` | TODO: describe |
+| `NO_BWRAP` | `true`, `false` | `false` | to disable to use of `bubblewrap` in production mode. This means `Lean` runs without any container on your system, which imposes a security risk! |
+| ... |  |  | TODO |
