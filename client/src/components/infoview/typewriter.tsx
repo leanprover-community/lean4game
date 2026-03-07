@@ -241,14 +241,14 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     }
   }, [oneLineEditor, runCommand])
 
-  // BUG: Causes `file closed` error
-  //TODO: Intention is to run once when loading, does that work?
-  useEffect(() => {
-    console.debug(`time to update: ${uri} \n ${rpcSess}`)
-    console.debug(rpcSess)
-    // console.debug('LOAD ALL GOALS')
-    // TODO: loadAllGoals()
-  }, [rpcSess])
+  // // BUG: Causes `file closed` error
+  // //TODO: Intention is to run once when loading, does that work?
+  // useEffect(() => {
+  //   console.debug(`time to update: ${uri} \n ${rpcSess}`)
+  //   console.debug(rpcSess)
+  //   // console.debug('LOAD ALL GOALS')
+  //   // TODO: loadAllGoals()
+  // }, [rpcSess])
 
   /** Process the entered command */
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {
