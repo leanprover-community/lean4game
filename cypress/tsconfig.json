@@ -6,16 +6,14 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
+    "jsx": "react-jsx",
     "lib": ["ES2022", "DOM"],
     "module": "nodenext",
     "outDir": "./dist",
     "resolveJsonModule": true,
     "rootDir": "./",
-    "skipLibCheck": true,
-    "sourceMap": true,
     "strict": true,
     "target": "ES2022",
-    "types": ["cypress", "node"]
   },
   "include": ["**/*.ts", "**/*.tsx", "../cypress.config.cjs"],
   "exclude": ["dist"]
