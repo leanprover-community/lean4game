@@ -81,7 +81,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-screenshots
+          name: "cypress-screenshots-${{ matrix.name }}-${{ matrix.browser }}"
           path: cypress/screenshots
           if-no-files-found: ignore
 
