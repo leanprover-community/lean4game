@@ -1,16 +1,16 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "jsx": "react-jsx",
-    "composite": true,
-    "incremental": true,
-    "strict": true,
-    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "composite": true,
+    "esModuleInterop": true,
+    "incremental": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM"],
+    "outDir": "./dist",
     "resolveJsonModule": true,
-    "lib": ["ES2022", "DOM"]
+    "rootDir": "./src",
+    "strict": true
   },
   "include": ["src/**/*"],
   "exclude": ["dist"]

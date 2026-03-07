@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "./client" },
-    { "path": "./relay" }
+    { "path": "./relay" },
+    { "path": "./cypress" }
   ]
 }
