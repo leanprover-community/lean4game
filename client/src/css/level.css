@@ -320,6 +320,11 @@ td code  {
   box-shadow: -.1rem .3rem .3rem 0 rgba(0, 0, 0, 0.1);
 }
 
+.menu.dropdown .btn {
+  text-align: left;
+  margin: 0;
+}
+
 .menu.dropdown.hidden {
   display: none;
 }

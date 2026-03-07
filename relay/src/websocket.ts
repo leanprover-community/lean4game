@@ -32,7 +32,8 @@ export class GameSessionsObserver {
     this.gameManager = gameManager
     this.wss = wss
     this.players = new Map<WebSocket, Player>()
-  };
+    this.socketCounter = 0
+  }
 
   /**
    * Return information about all current open game sessions on the server.
@@ -56,11 +57,12 @@ export class GameSessionsObserver {
      * player's information to the PlayerMeasuremnt intance.
      */
     webSockets.forEach( (ws) => {
-      if(this.players.get(ws) !== undefined){
+      const player = this.players.get(ws)
+      if (player != undefined) {
         measurement.date.push(timestamp)
-        measurement.anon_Ip.push(this.players.get(ws).anonIP)
-        measurement.game.push(this.players.get(ws).currentGame)
-        measurement.lang.push( this.players.get(ws).lang)
+        measurement.anon_Ip.push(player.anonIP)
+        measurement.game.push(player.currentGame)
+        measurement.lang.push(player.lang)
       }
     })
 
@@ -75,8 +77,12 @@ export class GameSessionsObserver {
    * @param wss
    */
   startObservedGame(ws: WebSocket, req: IncomingMessage) {
-    const ip = anonymize(req.headers['x-forwarded-for'] as string || req.socket.remoteAddress);
-    let gameSession: GameSession = this.gameManager.startGame(req, ip)
+    const headers = req.headers['x-forwarded-for']
+    const ip = anonymize(((Array.isArray(headers) ? headers[0] : headers) ?? req.socket.remoteAddress) ?? "") ?? ""
+    let gameSession: GameSession | undefined = this.gameManager.startGame(req, ip)
+
+    if (!gameSession) return // TODO: can this happen? do we need to do anytthing here?
+
     let ps = gameSession.process
     let game = gameSession.game
     let gameDir = gameSession.gameDir
@@ -84,8 +90,12 @@ export class GameSessionsObserver {
     const langRegex: RegExp = /^[a-zA-Z-]+(?=,)/
     let lang = "en-US"
 
-    if(langRegex.exec(req.headers['accept-language']) !== null) {
-      lang = langRegex.exec(req.headers['accept-language'])[0]
+    const accept_lang = req.headers['accept-language']
+    if(accept_lang && langRegex.exec(accept_lang) !== null) {
+      const newLang = langRegex.exec(accept_lang)
+      if (newLang) {
+        lang = newLang[0]
+      }
     }
 
     this.addPlayerConnection(ws, game, ip, ps, lang);
@@ -105,8 +115,10 @@ export class GameSessionsObserver {
     const socketConnection = jsonrpcserver.createConnection(reader, writer, () => {
       ws.close()
     });
-    const serverConnection = jsonrpcserver.createProcessStreamConnection(this.players.get(ws).process);
-
+    const player = this.players.get(ws)
+    if (!player) return
+    const serverConnection = jsonrpcserver.createProcessStreamConnection(player.process);
+    if (!serverConnection) return
     this.gameManager.messageTranslation(
       socketConnection, serverConnection, gameDir, gameSession.usesCustomLeanServer
     )
@@ -124,8 +136,12 @@ export class GameSessionsObserver {
     ws.on('close', () => {
       const player = this.players.get(ws)
       this.players.delete(ws)
-      //this.socketCounter--
-      console.log(`[${new Date()}] Socket closed by ${ip} on ${player.currentGame}`)
+      //this.socketCounter-- // TODO?: why is this commented out?
+      if (player) {
+        console.log(`[${new Date()}] Socket closed by ${ip} on ${player.currentGame}`)
+      } else {
+        console.log(`[${new Date()}] Tried to close non-existing socket by ${ip}`)
+      }
     })
   }
 

@@ -1,22 +1,20 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "composite": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
     "incremental": true,
-    "lib": ["ES2022"],
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM"],
     "module": "nodenext",
     "outDir": "./dist",
     "resolveJsonModule": true,
-    "rootDir": "./src",
-    "skipLibCheck": true,
-    "sourceMap": true,
+    "rootDir": "./",
     "strict": true,
-    "target": "ES2022"
+    "target": "ES2022",
   },
-  "include": ["src/**/*"],
+  "include": ["**/*.ts", "**/*.tsx", "../cypress.config.cjs"],
   "exclude": ["dist"]
 }

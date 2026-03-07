@@ -5,6 +5,13 @@ import { safeImport } from './middleware.js'
 import { Octokit } from 'octokit';
 import { spawn } from 'child_process'
 import { fileURLToPath } from 'url';
+import type { Request, Response } from "express";
+import { Params } from './param-types.js';
+
+interface Progress {
+  done: boolean,
+  output: string,
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,9 +24,9 @@ const octokit = new Octokit({
   auth: TOKEN
 })
 
-const progress = {}
+const progress: Record<string, Progress> = {}
 
-async function runProcess(id, cmd, args, cwd) {
+async function runProcess(id: string, cmd: string, args: string[], cwd: string) {
   return new Promise<void>((resolve, reject) => {
     const ls = spawn(cmd, args, {cwd});
 
@@ -35,9 +42,12 @@ async function runProcess(id, cmd, args, cwd) {
           progress[id].output += data.toString()
         }
       } catch(e){
-        progress[id].output += `Error: ${e.toString()}\n${e.stack}`
+        if (e instanceof Error) {
+          progress[id].output += `Error: ${e.toString()}\n${e.stack}`
+        } else {
+          progress[id].output += `Error: ${e}`
+        }
       }
-
     });
 
     ls.on('close', (code) => {
@@ -46,7 +56,7 @@ async function runProcess(id, cmd, args, cwd) {
   })
 }
 
-async function download(id, url, dest) {
+async function download(id: string, url: string, dest: string) {
   let numProgressChars = 0
   return new Promise<void>((resolve, reject) => {
     // The options argument is optional so you can omit it
@@ -78,7 +88,7 @@ async function download(id, url, dest) {
   })
 }
 
-async function doImport (owner, repo, id) {
+async function doImport (owner: string, repo: string, id: string) {
   progress[id].output += `Import starting in a few seconds...\n`
   await new Promise(resolve => setTimeout(resolve, 3000))
   let artifactId = null
@@ -91,7 +101,7 @@ async function doImport (owner, repo, id) {
       }
     })
     const artifact = artifacts.data.artifacts
-      .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
+      .reduce((acc, cur) => acc.created_at! < cur.created_at! ? cur : acc)
 
     artifactId = artifact.id
     const url = artifact.archive_download_url
@@ -113,7 +123,7 @@ async function doImport (owner, repo, id) {
     progress[id].output += `Download finished.\n`
 
     // Unpack downloaded game
-    await runProcess(id, "/bin/bash", [unpackingScript, gamesPath, artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
+    await runProcess(id, "/bin/bash", [unpackingScript, gamesPath, `${artifactId}`, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
     // Install necessary toolchain
     await runProcess(id, "/bin/bash", [toolchainScript, gamesPath, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
 
@@ -134,7 +144,12 @@ async function doImport (owner, repo, id) {
     progress[id].output += `Done!\n`
     progress[id].output += `Play the game at: {your website}/#/g/${owner}/${repo}\n`
   } catch (e) {
-    progress[id].output += `Error: ${e.toString()}\n${e.stack}`
+    if (e instanceof Error) {
+      progress[id].output += `Error: ${e.toString()}\n${e.stack}`
+    } else {
+      progress[id].output += `Error: ${e}`
+    }
+
   } finally {
     // clean-up temp. files
     if (artifactId) {
@@ -146,7 +161,7 @@ async function doImport (owner, repo, id) {
   await new Promise(resolve => setTimeout(resolve, 10000))
 }
 
-export const importTrigger = (req, res) => {
+export const importTrigger = (req: Request<Params>, res: Response) => {
   const owner = req.params.owner
   const repo = req.params.repo
   const id = req.params.owner + '/' + req.params.repo
@@ -166,7 +181,7 @@ export const importTrigger = (req, res) => {
   res.redirect(`/import/status/${owner}/${repo}`)
 }
 
-export const importStatus = (req, res) => {
+export const importStatus = (req: Request<Params>, res: Response) => {
   const owner = req.params.owner
   const repo = req.params.repo
   const id = req.params.owner + '/' + req.params.repo
