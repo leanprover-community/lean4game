@@ -83,6 +83,7 @@ jobs:
         with:
           name: "cypress-screenshots-${{ matrix.name }}-${{ matrix.browser }}"
           path: cypress/screenshots
+          retention-days: 2
           if-no-files-found: ignore
 
       - name: Install Bubblewrap
