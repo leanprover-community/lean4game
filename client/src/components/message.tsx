@@ -7,7 +7,7 @@ import '@fontsource/roboto/700.css';
 import { Button, Dialog, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { Markdown } from './markdown';
 
-function Message({ isOpen, content, close }) {
+function Message({ isOpen, content, close }: { isOpen: boolean, content: string, close: () => void }) {
 
   return (
     <Dialog open={isOpen} onClose={close}>

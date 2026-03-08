@@ -64,8 +64,8 @@ function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
           <td>
             {data.languages.map((lang) => {
               let langOpt = lean4gameConfig.languages.find((e) => e.iso == lang)
-              if (lean4gameConfig.useFlags) {
-                return <ReactCountryFlag key={`flag-${lang}`} title={langOpt?.name} countryCode={langOpt?.flag} className="emojiFlag"/>
+              if (lean4gameConfig.useFlags && langOpt?.flag) {
+                return <ReactCountryFlag key={`flag-${lang}`} title={langOpt.name} countryCode={langOpt.flag} className="emojiFlag"/>
               } else {
                 return <span title={langOpt?.name}>{lang}</span>
               }

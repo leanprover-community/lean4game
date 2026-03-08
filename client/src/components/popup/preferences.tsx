@@ -83,7 +83,7 @@ export function PreferencesPopup() {
                 <Box sx={{ width: 300 }}>
                   <Slider
                     aria-label={t("Always visible")}
-                    value={marks.find(item => item.key === layout).value}
+                    value={marks.find(item => item.key === layout)?.value}
                     step={1}
                     marks={marks}
                     max={2}

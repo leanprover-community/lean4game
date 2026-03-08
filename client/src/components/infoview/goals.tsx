@@ -16,10 +16,10 @@ import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-in
 import { DiagnosticSeverity } from 'vscode-languageserver-protocol';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { selectTypewriterMode } from '../../state/progress';
 import { useGetGameInfoQuery } from '../../state/api';
 import { useAtom } from 'jotai';
 import { gameIdAtom } from '../../store/location-atoms';
+import { typewriterModeAtom } from '../../store/progress-atoms';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -150,9 +150,9 @@ interface GoalProps {
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
     const [gameId] = useAtom(gameIdAtom)
+    const [typewriterMode] = useAtom(typewriterModeAtom)
     const game = useGetGameInfoQuery({game: gameId})
     const {mobile} = React.useContext(PreferencesContext)
-    const typewriterMode = useSelector(selectTypewriterMode(gameId))
     const { goal, filter, showHints, typewriter } = props
     let { t } = useTranslation()
 

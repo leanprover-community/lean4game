@@ -8,7 +8,6 @@ import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faCircleInfo, faTerminal, faGear } from '@fortawesome/free-solid-svg-icons'
 import { InputModeContext, PreferencesContext } from "./infoview/context"
 import { GameInfo, useGetGameInfoQuery } from '../state/api'
-import { changedReadIntro, selectCompleted, selectDifficulty, selectProgress } from '../state/progress'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
@@ -18,6 +17,7 @@ import { popupAtom, PopupType } from '../store/popup-atoms'
 import { closeNavAtom, navOpenAtom } from '../store/navigation-atoms'
 import { useGameTranslation } from '../utils/translation'
 import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
+import { completedAtom, difficultyAtom, progressAtom, readGameIntroAtom, typewriterModeAtom } from '../store/progress-atoms'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -25,17 +25,16 @@ function MobileNavButtons({pageNumber, setPageNumber}:
     setPageNumber: any}) {
   const { t } = useTranslation()
   const [, navigateToLandingPage] = useAtom(navigateToLandingPageAtom)
-  const dispatch = useAppDispatch()
-  const [gameId] = useAtom(gameIdAtom)
+  const [, setReadGameIntro] = useAtom(readGameIntroAtom)
 
   // if `prevText` or `prevIcon` is set, show a button to go back
   let prevText  = {0: null, 1: t("Intro"), 2: null}[pageNumber]
   let prevIcon  = {0: null, 1: null, 2: faBookOpen}[pageNumber]
-  let prevTitle = {0: null, 1: t("Game Introduction"), 2: t("close inventory")}[pageNumber]
+  let prevTitle = {0: null, 1: t("Game Introduction"), 2: t("close inventory")}[pageNumber] ?? undefined
   // if `nextText` or `nextIcon` is set, show a button to go forward
   let nextText  = {0: t("Start"), 1: null, 2: null}[pageNumber]
   let nextIcon  = {0: null, 1: faBook, 2: null}[pageNumber]
-  let nextTitle = {0: t("Start"), 1: t("Inventory"), 2: null}[pageNumber]
+  let nextTitle = {0: t("Start"), 1: t("Inventory"), 2: null}[pageNumber] ?? undefined
 
   return <>
     {(prevText || prevIcon) &&
@@ -49,10 +48,13 @@ function MobileNavButtons({pageNumber, setPageNumber}:
     }
     {(nextText || nextIcon) &&
       <Button className="btn btn-inverted toggle-width"  inverted={true}
-          title={nextTitle} onClick={() => {
+          title={nextTitle}
+          onClick={() => {
             console.log(`page number: ${pageNumber}`)
             setPageNumber(pageNumber+1);
-            dispatch(changedReadIntro({game: gameId, world: null, readIntro: true}))}}>
+            setReadGameIntro(true)
+          }}
+      >
         {nextText && `${nextText}`}
         {nextIcon && <FontAwesomeIcon icon={nextIcon} />}
       </Button>
@@ -71,22 +73,23 @@ export function MenuButton() {
 /** button to go one level futher.
  * for the last level, this button turns into a button going back to the welcome page.
  */
-function NextButton({worldSize, difficulty, completed}) {
+function NextButton({worldSize} : {worldSize: number }) {
   const [, closeNav] = useAtom(closeNavAtom)
   const { t } = useTranslation()
   const [gameId, navigateToGame] = useAtom(gameIdAtom)
-  const [worldId] = useAtom(worldIdAtom)
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
-  return (levelId < worldSize ?
+  const [difficulty] = useAtom(difficultyAtom)
+  const [completed] = useAtom(completedAtom)
+  return (levelId && levelId < worldSize ?
     <Button inverted={true}
         onClick={() => {navigateToLevel(levelId + 1); closeNav()}}
          title={t("next level")}
-        disabled={difficulty >= 2 && !(completed || levelId == 0)}
+        disabled={difficulty >= 2 && !(completed || levelId === 0)}
       >
-      <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId ? t("Next") : t("Start")}
+      <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId !== 0 ? t("Next") : t("Start")}
     </Button>
     :
-    <Button onClick={() => navigateToGame(gameId)}  inverted={true} title={t("Home")} id="home-btn">
+    <Button onClick={() => {if (gameId) navigateToGame(gameId)}}  inverted={true} title={t("Home")} id="home-btn">
       <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
     </Button>
   )
@@ -101,7 +104,7 @@ function PreviousButton() {
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
-  return (levelId > 0 && <>
+  return (levelId && levelId > 0 && <>
     <Button disabled={levelId <= 0} inverted={true}
         onClick={() => {navigateToLevel(levelId - 1); closeNav()}}
         title={t("previous level")}
@@ -112,11 +115,12 @@ function PreviousButton() {
 }
 
 /** button to toggle between editor and typewriter */
-function InputModeButton({isDropdown}) {
+function InputModeButton({ isDropdown } : {isDropdown: boolean}) {
   const [, closeNav] = useAtom(closeNavAtom)
   const { t } = useTranslation()
   const [levelId] = useAtom(levelIdAtom)
-  const {typewriterMode, setTypewriterMode, lockEditorMode} = React.useContext(InputModeContext)
+  const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
+  const {lockEditorMode} = React.useContext(InputModeContext)
 
   /** toggle input mode if allowed */
   function toggleInputMode(ev: React.MouseEvent) {
@@ -127,7 +131,7 @@ function InputModeButton({isDropdown}) {
   }
 
   return <Button
-      className={`btn btn-inverted ${isDropdown? '' : 'toggle-width'}`} disabled={levelId <= 0 || lockEditorMode}
+      className={`btn btn-inverted ${isDropdown? '' : 'toggle-width'}`} disabled={!levelId || levelId <= 0 || lockEditorMode}
       inverted={true}
       onClick={(ev) => toggleInputMode(ev)}
       title={lockEditorMode ? t("Editor mode is enforced!") : typewriterMode ? t("Editor mode") : t("Typewriter mode")}>
@@ -136,7 +140,7 @@ function InputModeButton({isDropdown}) {
   </Button>
 }
 
-export function ImpressumButton({isDropdown}) {
+export function ImpressumButton({ isDropdown } : {isDropdown: boolean}) {
   const [, closeNav] = useAtom(closeNavAtom)
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
@@ -147,7 +151,7 @@ export function ImpressumButton({isDropdown}) {
   </Button>
 }
 
-export function PrivacyButton({isDropdown}) {
+export function PrivacyButton({ isDropdown } : {isDropdown: boolean}) {
   const [, closeNav] = useAtom(closeNavAtom)
   const [, setPopup] = useAtom(popupAtom)
   const { t } = useTranslation()
@@ -186,10 +190,23 @@ function EraseButton () {
   </Button>
 }
 
-function DownloadButton ({gameId, gameProgress}) {
+function DownloadButton () {
   const [, closeNav] = useAtom(closeNavAtom)
+  const [gameId] = useAtom(gameIdAtom)
+  const [gameProgress] = useAtom(progressAtom)
   const { t } = useTranslation()
-  return <Button title={t("Download Progress")} inverted={true}  onClick={(ev) => {downloadProgress(gameId, gameProgress, ev); closeNav()}}>
+  return <Button
+    title={t("Download Progress")}
+    inverted={true}
+    disabled={!gameId}
+    onClick={(ev) => {
+      ev.preventDefault()
+      if (gameId && gameProgress) {
+        downloadProgress(gameId, gameProgress)
+      }
+      closeNav()
+    }}
+  >
     <FontAwesomeIcon icon={faDownload} />&nbsp;{t("Download")}
   </Button>
 }
@@ -204,11 +221,11 @@ function UploadButton () {
 }
 
 /**  button to go back to welcome page */
-function HomeButton({isDropdown}) {
+function HomeButton({ isDropdown } : {isDropdown: boolean}) {
   const { t } = useTranslation()
   const [gameId, navigateToGame] = useAtom(gameIdAtom)
   return <Button
-    onClick={() => navigateToGame(gameId)}
+    onClick={() => {if (gameId) navigateToGame(gameId)}}
     inverted={true} title={t("Home")} id="home-btn">
     <FontAwesomeIcon icon={faHome} />
     {isDropdown && <>&nbsp;{t("Home")}</>}
@@ -226,7 +243,7 @@ function LandingPageButton() {
 /** button in mobile level to toggle inventory.
  * only displays a button if `setPageNumber` is set.
  */
-function InventoryButton({pageNumber, setPageNumber}) {
+function InventoryButton({pageNumber, setPageNumber} : {pageNumber: number, setPageNumber: (val: number) => void}) {
   const { t } = useTranslation()
   return (setPageNumber &&
     <Button  className="btn btn-inverted toggle-width"
@@ -245,8 +262,6 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
 }) {
   const { t } = useTranslation()
   const { t: gT } = useGameTranslation()
-  const [gameId] = useAtom(gameIdAtom)
-  const gameProgress = useAppSelector(selectProgress(gameId))
   const {mobile} = React.useContext(PreferencesContext)
   const [navOpen, setNavOpen] = useAtom(navOpenAtom)
 
@@ -265,7 +280,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
     <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
       <GameInfoButton />
       <EraseButton />
-      <DownloadButton gameId={gameId} gameProgress={gameProgress}/>
+      <DownloadButton />
       <UploadButton />
       <ImpressumButton isDropdown={true} />
       <PrivacyButton isDropdown={true} />
@@ -286,12 +301,9 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
   const { t: gT } = useGameTranslation()
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
-  const [levelId] = useAtom(levelIdAtom)
   const {mobile} = React.useContext(PreferencesContext)
   const [navOpen, setNavOpen] = useAtom(navOpenAtom)
   const gameInfo = useGetGameInfoQuery({game: gameId})
-  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
-  const difficulty = useAppSelector(selectDifficulty(gameId))
 
   let worldTitle = gameInfo.data?.worlds.nodes[worldId]?.title
 
@@ -307,7 +319,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
           <MenuButton />
         </div>
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
-          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} />
+          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} />
           <PreviousButton />
           <HomeButton isDropdown={true} />
           <InputModeButton isDropdown={true}/>
@@ -329,7 +341,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
         </div>
         <div className="nav-btns">
           <PreviousButton  />
-          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} difficulty={difficulty} completed={completed} />
+          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} />
           <InputModeButton isDropdown={false}/>
           <MenuButton  />
         </div>

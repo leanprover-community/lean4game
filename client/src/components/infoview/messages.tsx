@@ -12,6 +12,8 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-
 
 import { InputModeContext } from './context'
 import { useTranslation } from 'react-i18next'
+import { useAtom } from 'jotai'
+import { typewriterModeAtom } from '../../store/progress-atoms'
 
 interface MessageViewProps {
     uri: DocumentUri;
@@ -58,6 +60,7 @@ export function Errors ({errors, typewriterMode} : {errors : InteractiveDiagnost
 }
 
 const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
+    const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
     const ec = React.useContext(EditorContext);
     const fname = escapeHtml(basename(uri));
     const {line, character} = diag.range.start;
@@ -80,7 +83,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         message = diag.message
     }
 
-    const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+    const { lockEditorMode } = React.useContext(InputModeContext)
 
     return (
     // <details open>

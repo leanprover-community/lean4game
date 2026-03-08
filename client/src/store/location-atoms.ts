@@ -15,8 +15,8 @@ export const navigateToLandingPageAtom = atom(null, (get, set) => {
  */
 export const hashSegmentsAtom = atom((get) => {
   const { hash } = get(locationAtom)
-  const clean = hash.replace(/^#\/*/, "")
-  return clean.split("/").filter(Boolean)
+  const clean = hash?.replace(/^#\/*/, "")
+  return clean?.split("/").filter(Boolean).map(it => it.toLowerCase()) ?? []
 })
 
 /**
@@ -25,7 +25,7 @@ export const hashSegmentsAtom = atom((get) => {
  */
 export const pathSegmentsAtom = atom((get) => {
   const { pathname } = get(locationAtom)
-  return pathname?.split("/").filter(Boolean)
+  return pathname?.split("/").filter(Boolean).map(it => it.toLowerCase()) ?? []
 })
 
 export const gameIdAtom = atom((get) => {
@@ -63,13 +63,13 @@ export const levelIdAtom = atom((get) => {
   const segments = get(pathSegmentsAtom)
   if (segments.length >= 4) {
     const value = Number(segments[3])
-    return Number.isFinite(value) ? value : null
+    return Number.isFinite(value) ? value : undefined
   }
   // for backwards compatibility:
   const hashSegments = get(hashSegmentsAtom)
   if (hashSegments.length >= 6 && hashSegments[5] === "level") {
     const value = Number(hashSegments[6])
-    return Number.isFinite(value) ? value : null
+    return Number.isFinite(value) ? value : undefined
   }
 }, (get, set, levelId: number) => {
   const gameId = get(gameIdAtom)

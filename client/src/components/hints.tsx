@@ -8,6 +8,7 @@ import { useGameTranslation } from "../utils/translation";
 import { useTranslation } from "react-i18next";
 import { useAtom } from "jotai";
 import { gameIdAtom } from "../store/location-atoms";
+import { MouseEventHandler } from "react";
 
 /** Plug-in the variable names in a hint. We do this client-side to prepare
  * for i18n in the future. i.e. one should be able translate the `rawText`
@@ -103,7 +104,7 @@ export function MoreHelpButton({selected=null} : {selected?: number}) {
     ((selected === null) ? (proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)) : selected)
     : 0
 
-  const activateHiddenHints = (ev) => {
+  const activateHiddenHints = (ev: any) => {
     // If the last step (`k`) has errors, we want the hidden hints from the
     // second-to-last step to be affected
     if (!(proof?.steps.length)) {return}

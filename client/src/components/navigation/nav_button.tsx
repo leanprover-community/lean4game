@@ -13,8 +13,11 @@ export const NavButton: React.FC<{
   inverted?: boolean
   disabled?: boolean
   className?: string
-}> = ({icon, iconElement, text, onClick=()=>{}, title, href=null, inverted=false, disabled=false, className=''}) => {
-  return <a className={`${className} nav-button btn${inverted?' btn-inverted':''}${disabled?' btn-disabled':''}`} onClick={disabled?null:onClick} href={disabled?null:href} title={title}>
+}> = ({icon, iconElement, text, onClick=()=>{}, title, href=undefined, inverted=false, disabled=false, className=''}) => {
+  return <a
+    className={`${className} nav-button btn${inverted?' btn-inverted':''}${disabled?' btn-disabled':''}`}
+    onClick={ (ev) => {if(!disabled) onClick(ev) }}
+    href={(!disabled) ? href : undefined} title={title}>
     {iconElement ?? (icon && <FontAwesomeIcon icon={icon} />)}{text && <>&nbsp;{text}</>}
   </a>
 }

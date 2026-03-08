@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
 import { useAppDispatch } from '../hooks'
-import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
+import { selectCompleted } from '../state/progress'
 import { store } from '../state/store'
 
 import '../css/world_tree.css'
@@ -21,6 +21,7 @@ import { popupAtom, PopupType } from '../store/popup-atoms'
 import { useGameTranslation } from '../utils/translation'
 import { gameIdAtom, levelIdAtom, navigateAcrossWorldsAtom, worldIdAtom } from '../store/location-atoms'
 import { Button } from './button'
+import { difficultyAtom } from '../store/progress-atoms'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -70,7 +71,7 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
   let R = 1.1 * r / Math.sin(beta/2)
 
   const [gameId] = useAtom(gameIdAtom)
-  const difficulty = useSelector(selectDifficulty(gameId))
+  const [difficulty] = useAtom(difficultyAtom)
   const levelDisabled = (difficulty >= 2 && !(unlocked || completed))
 
   /** In the spiral, the angle `β` should decrease to avoid big gaps between levels.
@@ -203,11 +204,10 @@ export const downloadFile = ({ data, fileName, fileType } :
 export function WorldSelectionMenu() {
   const { t, i18n } = useTranslation()
   const [gameId] = useAtom(gameIdAtom)
-  const difficulty = useSelector(selectDifficulty(gameId))
+  const [difficulty, setDifficulty] = useAtom(difficultyAtom)
   const dispatch = useAppDispatch()
   const { mobile } = React.useContext(PreferencesContext)
   const [popup, setPopup] = useAtom(popupAtom)
-
 
   function label(x : number) {
     return x == 0 ? t("none") : x == 1 ? t("relaxed") : t("regular")
@@ -238,7 +238,7 @@ export function WorldSelectionMenu() {
         getAriaValueText={label}
         valueLabelDisplay="off"
         onChange={(ev, val: number) => {
-          dispatch(changedDifficulty({game: gameId, difficulty: val}))
+          setDifficulty(val)
         }}
         ></Slider>
     </div>
@@ -285,7 +285,7 @@ export function WorldTreePanel({worlds, worldSize}:
     worldSize: any,
   }) {
   const [gameId] = useAtom(gameIdAtom)
-  const difficulty = useSelector(selectDifficulty(gameId))
+  const [difficulty] = useAtom(difficultyAtom)
   const {nodes, bounds}: any = worlds ? computeWorldLayout(worlds) : {nodes: []}
 
   // scroll to playable world

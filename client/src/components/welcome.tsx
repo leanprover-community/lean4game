@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { changedReadIntro, selectReadIntro } from '../state/progress'
 import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
 import { PreferencesContext } from './infoview/context'
@@ -21,12 +20,14 @@ import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { gameIdAtom } from '../store/location-atoms'
 import { useAtom } from 'jotai'
+import { readGameIntroAtom } from '../store/progress-atoms'
 
 
 /** the panel showing the game's introduction text */
-function IntroductionPanel({introduction, setPageNumber}: {introduction: string, setPageNumber}) {
+function IntroductionPanel({introduction, setPageNumber}: {introduction: string, setPageNumber: (val: number) => void}) {
   const {mobile} = React.useContext(PreferencesContext)
   const [gameId] = useAtom(gameIdAtom)
+  const [, setReadGameIntro] = useAtom(readGameIntroAtom)
 
 
   const { t : gT } = useGameTranslation()
@@ -54,7 +55,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
         <Button className="btn"
           title="" onClick={() => {
             setPageNumber(1);
-            dispatch(changedReadIntro({game: gameId, world: null, readIntro: true}))
+            setReadGameIntro(true)
           }}>
           Start&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
         </Button>
@@ -66,6 +67,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
   const [gameId] = useAtom(gameIdAtom)
+  const [readGameIntro] = useAtom(readGameIntroAtom)
 
   // Load the namespace of the game
   i18next.loadNamespaces(gameId)
@@ -77,8 +79,7 @@ function Welcome() {
   const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   // For mobile only
-  const readIntro = useAppSelector(selectReadIntro(gameId, null))
-  const [pageNumber, setPageNumber] = React.useState(readIntro ? 1 : 0)
+  const [pageNumber, setPageNumber] = React.useState(readGameIntro ? 1 : 0)
 
   // set the window title
   useEffect(() => {

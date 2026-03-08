@@ -11,6 +11,7 @@ function TabTitle(type: InventoryTab): string {
     case InventoryTab.definition: return "Definitions"
     default:
       const _exhaustive: never = type
+      return ""
   }
 }
 

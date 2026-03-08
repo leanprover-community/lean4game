@@ -9,31 +9,29 @@ import '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/index.
 import '../../css/infoview.css'
 import "../../css/tab_bar.css"
 
-import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
+import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig } from '@leanprover/infoview-api';
 import { useClientNotificationEffect, useEventResult, useServerNotificationEffect, useServerNotificationState } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts';
 import { RpcContext, WithRpcSessions, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
 import { ServerVersion } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/serverVersion';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDeleteLeft, faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import { faDeleteLeft, faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import { useAppDispatch } from '../../hooks';
 import { LevelInfo, useGetGameInfoQuery } from '../../state/api';
-import { changedInventory, levelCompleted, selectCode, selectCompleted, selectInventory } from '../../state/progress';
+import { levelCompleted } from '../../state/progress';
 import { Markdown } from '../markdown';
 
 import { Infos } from './infos';
-import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
+import { Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext, ProofContext, SelectionContext } from './context';
-import { Typewriter, getInteractiveDiagsAt, hasErrors, hasInteractiveErrors } from './typewriter';
-import { InteractiveDiagnostic } from '@leanprover/infoview/*';
+import { Typewriter, getInteractiveDiagsAt, hasInteractiveErrors } from './typewriter';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
-import { store } from '../../state/store';
 import { Hint, Hints, MoreHelpButton, filterHints } from '../hints';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
@@ -42,13 +40,14 @@ import path from 'path';
 import { useGameTranslation } from '../../utils/translation';
 import { useAtom } from 'jotai';
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms';
+import { inventoryAtom, typewriterModeAtom } from '../../store/progress-atoms';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
  */
 export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) {
   const ec = React.useContext(EditorContext)
-  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+  const { lockEditorMode } = React.useContext(InputModeContext)
   const showTypewriter = Boolean(ec) && typewriterMode && !lockEditorMode
   return <>
     <div className={showTypewriter ? 'hidden' : ''}>
@@ -69,7 +68,9 @@ function DualEditorMain({ level, worldSize }: { level: LevelInfo, worldSize: num
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
-  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+  const [, addToInventory] = useAtom(inventoryAtom)
+  const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
+  const { lockEditorMode } = React.useContext(InputModeContext)
 
   const {proof, setProof} = React.useContext(ProofContext)
 
@@ -90,14 +91,7 @@ function DualEditorMain({ level, worldSize }: { level: LevelInfo, worldSize: num
       if (level?.statementName != null) {
         newTiles.push(level?.statementName)
       }
-
-      let inv: string[] = selectInventory(gameId)(store.getState())
-
-      // add new items and remove duplicates
-      let newInv = [...inv, ...newTiles].filter((item, i, array) => array.indexOf(item) == i)
-
-      dispatch(changedInventory({ game: gameId, inventory: newInv }))
-
+      addToInventory(newTiles)
     }
   }, [proof, level])
 
@@ -168,11 +162,12 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
 export function Main(props: { data: LevelInfo}) {
   let { t } = useTranslation()
   const { t: gT } = useGameTranslation()
-  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+  const { lockEditorMode } = React.useContext(InputModeContext)
   const ec = React.useContext(EditorContext);
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
+  const [typewriterMode] = useAtom(typewriterModeAtom)
 
   const { proof, setProof, setCrashed } = React.useContext(ProofContext)
   const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)

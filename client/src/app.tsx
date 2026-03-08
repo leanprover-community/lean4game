@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
-import { Outlet } from "react-router-dom";
 import { useAtom } from 'jotai';
 
 import '@fontsource/roboto/300.css';
@@ -16,7 +15,6 @@ import i18n from './i18n';
 import { Popup } from './components/popup/popup';
 import { leanMonacoAtom, leanMonacoOptionsAtom } from './store/editor-atoms';
 import { LeanMonaco } from 'lean4monaco';
-import { gameIdAtom } from './store/location-atoms';
 
 function App({ children }: { children?: React.ReactNode }) {
 

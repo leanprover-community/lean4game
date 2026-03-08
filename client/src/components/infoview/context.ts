@@ -119,15 +119,11 @@ export const DeletedChatContext = React.createContext<{
 })
 
 export const InputModeContext = React.createContext<{
-  typewriterMode: boolean,
-  setTypewriterMode: React.Dispatch<React.SetStateAction<boolean>>,
   typewriterInput: string,
   setTypewriterInput: React.Dispatch<React.SetStateAction<string>>,
   lockEditorMode: boolean,
   setLockEditorMode: React.Dispatch<React.SetStateAction<boolean>>,
 }>({
-  typewriterMode: true,
-  setTypewriterMode: () => {},
   typewriterInput: "",
   setTypewriterInput: () => {},
   lockEditorMode: false,

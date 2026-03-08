@@ -2,20 +2,18 @@
  * @fileOverview
 */
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../hooks'
-import { deleteLevelProgress, deleteProgress, deleteWorldProgress, selectProgress } from '../../state/progress'
 import { downloadFile } from '../world_tree'
 import { Button } from '../button'
 import { Trans, useTranslation } from 'react-i18next'
-import { useContext } from 'react'
 import { useAtom } from 'jotai'
 import { popupAtom } from '../../store/popup-atoms'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms'
+import { levelProgressAtom, progressAtom, worldProgressAtom } from '../../store/progress-atoms'
+import { GameProgress } from '../../store/progress-types'
 
 /** download the current progress (i.e. what's saved in the browser store) */
-export function downloadProgress(gameId: string, gameProgress: any, ev: React.MouseEvent) {
-  ev.preventDefault()
+export function downloadProgress(gameId: string, gameProgress: GameProgress) {
   downloadFile({
     data: JSON.stringify(gameProgress, null, 2),
     fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
@@ -68,34 +66,37 @@ export function ErasePopup () {
   const [gameId, navigateToGame] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
+  const [gameProgress, setGameProgress] = useAtom(progressAtom)
+  const [worldProgress, setWorldProgress] = useAtom(worldProgressAtom)
+  const [levelProgress, setLevelProgress] = useAtom(levelProgressAtom)
 
   // const { setPage } = useContext(PageContext)
-  const gameProgress = useSelector(selectProgress(gameId))
   const dispatch = useAppDispatch()
   const [, setPopup] = useAtom(popupAtom)
 
-  const eraseProgress = (ev) => {
-    dispatch(deleteProgress({game: gameId}))
+  const eraseProgress = () => {
+    setGameProgress(null)
     setPopup(null)
     // setPage(0) // TODO: fix me
     // ev.preventDefault() // TODO: this is a hack to prevent the buttons below from opening a link
   }
 
-  function eraseLevel (ev) {
-    dispatch(deleteLevelProgress({game: gameId, world: worldId, level: levelId}))
+  function eraseLevel () {
+    setLevelProgress(null)
     setPopup(null)
-    ev.preventDefault()
   }
 
-  function eraseWorld (ev) {
-    dispatch(deleteWorldProgress({game: gameId, world: worldId}))
+  function eraseWorld () {
+    setWorldProgress(null)
     setPopup(null)
-    ev.preventDefault()
   }
 
-  const downloadAndErase = (ev) => {
-    downloadProgress(gameId, gameProgress, ev)
-    eraseProgress(ev)
+  const downloadAndErase = () => {
+    if (!gameId) return
+    if (gameProgress) {
+      downloadProgress(gameId, gameProgress)
+    }
+    eraseProgress()
   }
 
   return <>
@@ -104,9 +105,9 @@ export function ErasePopup () {
       <p>Do you want to delete your saved progress irreversibly?</p>
     </Trans>
     <div className='settings-buttons'>
-      <Button onClick={levelId && eraseLevel}  disabled={!levelId} >{t("Delete this Level")}</Button>
-      <Button onClick={worldId && eraseWorld}  disabled={!worldId} >{t("Delete this World")}</Button>
-      <Button onClick={(ev) => {eraseProgress(ev); navigateToGame(gameId)}} >{t("Delete Everything")}</Button>
+      <Button onClick={(ev) => {ev.preventDefault(); eraseLevel()}}  disabled={!levelId} >{t("Delete this Level")}</Button>
+      <Button onClick={(ev) => {ev.preventDefault(); eraseWorld()}}  disabled={!worldId} >{t("Delete this World")}</Button>
+      <Button onClick={(ev) => {ev.preventDefault(); eraseProgress(); if(gameId) {navigateToGame(gameId)}}} >{t("Delete Everything")}</Button>
     </div>
     <Trans>
       <p>
@@ -118,7 +119,7 @@ export function ErasePopup () {
       </p>
     </Trans>
     <div className='settings-buttons'>
-      <Button onClick={(ev) => {downloadAndErase(ev); navigateToGame(gameId)}} >{t("Download & Delete everything")}</Button>
+      <Button onClick={(ev) => {ev.preventDefault(); downloadAndErase(); if(gameId) {navigateToGame(gameId)}}} >{t("Download & Delete everything")}</Button>
       <Button onClick={(ev) => {setPopup(null); ev.preventDefault()}} >{t("Cancel")}</Button>
     </div>
   </>
