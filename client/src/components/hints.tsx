@@ -8,7 +8,6 @@ import { useGameTranslation } from "../utils/translation";
 import { useTranslation } from "react-i18next";
 import { useAtom } from "jotai";
 import { gameIdAtom } from "../store/location-atoms";
-import { MouseEventHandler } from "react";
 
 /** Plug-in the variable names in a hint. We do this client-side to prepare
  * for i18n in the future. i.e. one should be able translate the `rawText`
@@ -22,7 +21,7 @@ function getHintText(hint: GameHint): string {
     // variable names are marked like `«{g}»` inside the text.
     return gT(hint.rawText).replaceAll(/«\{(.*?)\}»/g, ((_, v) =>
       // `hint.varNames` contains tuples `[oldName, newName]`
-      (hint.varNames.find(x => x[0] == v))[1]))
+      (hint.varNames.find(x => x[0] == v))?.[1] ?? ""))
   } else {
     // hints created in the frontend do not have a `rawText`
     // TODO: `hint.text` could be removed in theory.
@@ -30,7 +29,7 @@ function getHintText(hint: GameHint): string {
   }
 }
 
-export function Hint({hint, step, selected, toggleSelection, lastLevel} : {hint: GameHint, step: number, selected: number, toggleSelection: any, lastLevel?: boolean}) {
+export function Hint({hint, step, selected, toggleSelection, lastLevel} : {hint: GameHint, step: number, selected: number | null, toggleSelection: any, lastLevel?: boolean}) {
   return <div className={`message information step-${step}` + (step == selected ? ' selected' : '') + (lastLevel ? ' recent' : '')} onClick={toggleSelection}>
     <Markdown>{getHintText(hint)}</Markdown>
   </div>
@@ -93,7 +92,7 @@ function hasHiddenHints(step: InteractiveGoalsWithHints): boolean {
 }
 
 
-export function MoreHelpButton({selected=null} : {selected?: number}) {
+export function MoreHelpButton({selected=null} : {selected: number | null}) {
 
   const { t } = useTranslation()
 

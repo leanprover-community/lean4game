@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next'
 import { useContext } from 'react'
 import { useAtom } from 'jotai'
 import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
-import { typewriterModeAtom } from '../../store/progress-atoms'
+import { typewriterModeAtom } from '../../store/editor-atoms'
 
 // TODO: All about pinning could probably be removed
 type InfoKind = 'cursor' | 'pin'

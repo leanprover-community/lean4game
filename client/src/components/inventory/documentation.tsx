@@ -1,6 +1,5 @@
 import React, { useContext } from "react"
 import { useTranslation } from "react-i18next"
-import { useLoadDocQuery, useLoadDocLegacyQuery } from "../../state/api"
 import { Markdown } from "../markdown"
 import { useAppDispatch } from "../../hooks"
 import { useSelector } from "react-redux"
@@ -11,6 +10,7 @@ import { NavButton } from "../navigation/nav_button"
 import { useGameTranslation } from "../../utils/translation"
 import { gameIdAtom, navigateAcrossWorldsAtom } from "../../store/location-atoms"
 import { difficultyAtom, inventoryAtom } from "../../store/progress-atoms"
+import { docAtomFamily, docAtomLegacyFamily } from "../../store/query-atoms"
 
 /** The `documentation` */
 export function Documentation({ type } : {type : InventoryTab}) {
@@ -25,11 +25,8 @@ export function Documentation({ type } : {type : InventoryTab}) {
   const [docTile] = useAtom(selectedDocTileAtom)
   const [, closeDoc] = useAtom(closeDocAtom)
 
-  // // const docEntry = useLoadDocQuery({game: gameId, type: type, name: name})
-  // let { docTile, setDocTile } = useContext(InventoryContext)
-
-  const docEntry = useLoadDocQuery({game: gameId, name: docTile.name, type: type })
-  const legacyDocEntry = useLoadDocLegacyQuery({game: gameId, name: docTile.name, type: type == InventoryTab.theorem ? "lemma" : type})
+  const [{ data: docEntry }] = useAtom(docAtomFamily([type, docTile?.name ?? ""]))
+  const [{ data: legacyDocEntry }] = useAtom(docAtomLegacyFamily([type, docTile?.name ?? ""]))
 
   if (!docTile) return null
 
@@ -54,8 +51,8 @@ export function Documentation({ type } : {type : InventoryTab}) {
         inverted={true} />
     }
     <h1 className="doc">{docTile.displayName}</h1>
-    <p><code>{docEntry.data?.statement ?? legacyDocEntry.data?.statement}</code></p>
-    <Markdown>{gT(docEntry.data?.content ?? legacyDocEntry.data?.content)}</Markdown>
+    <p><code>{docEntry?.statement ?? legacyDocEntry?.statement}</code></p>
+    <Markdown>{gT(docEntry?.content ?? legacyDocEntry?.content ?? "")}</Markdown>
     {/* TODO: The condition below should be updated so that the section
     is displayed whenever it's non-empty. */}
     {docTile.proven && <>

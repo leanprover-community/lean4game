@@ -7,7 +7,6 @@ import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
   faCircleInfo, faTerminal, faGear } from '@fortawesome/free-solid-svg-icons'
 import { InputModeContext, PreferencesContext } from "./infoview/context"
-import { GameInfo, useGetGameInfoQuery } from '../state/api'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
@@ -17,7 +16,10 @@ import { popupAtom, PopupType } from '../store/popup-atoms'
 import { closeNavAtom, navOpenAtom } from '../store/navigation-atoms'
 import { useGameTranslation } from '../utils/translation'
 import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
-import { completedAtom, difficultyAtom, progressAtom, readGameIntroAtom, typewriterModeAtom } from '../store/progress-atoms'
+import { completedAtom, difficultyAtom, progressAtom } from '../store/progress-atoms'
+import { gameInfoAtom } from '../store/query-atoms'
+import { readGameIntroAtom } from '../store/chat-atoms'
+import { typewriterModeAtom } from '../store/editor-atoms'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -255,13 +257,13 @@ function InventoryButton({pageNumber, setPageNumber} : {pageNumber: number, setP
 }
 
 /** the navigation bar on the welcome page */
-export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
+export function WelcomeAppBar({pageNumber, setPageNumber} : {
   pageNumber: number,
   setPageNumber: any,
-  gameInfo: GameInfo,
 }) {
   const { t } = useTranslation()
   const { t: gT } = useGameTranslation()
+  const [{data: gameInfo}] = useAtom(gameInfoAtom)
   const {mobile} = React.useContext(PreferencesContext)
   const [navOpen, setNavOpen] = useAtom(navOpenAtom)
 
@@ -271,7 +273,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
       <span className="app-bar-title"></span>
     </div>
     <div>
-      {!mobile && <span className="app-bar-title">{gT(gameInfo?.title)}</span>}
+      {!mobile && <span className="app-bar-title">{gT(gameInfo?.title ?? "")}</span>}
     </div>
     <div className="nav-btns">
       {mobile && <MobileNavButtons pageNumber={pageNumber} setPageNumber={setPageNumber} />}
@@ -291,7 +293,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber, gameInfo} : {
 }
 
 /** the navigation bar in a level */
-export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPageNumber=undefined} : {
+export function LevelAppBar({isLoading, levelTitle, pageNumber=1, setPageNumber=undefined} : {
   isLoading: boolean,
   levelTitle: string,
   pageNumber?: number,
@@ -303,11 +305,12 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
   const [worldId] = useAtom(worldIdAtom)
   const {mobile} = React.useContext(PreferencesContext)
   const [navOpen, setNavOpen] = useAtom(navOpenAtom)
-  const gameInfo = useGetGameInfoQuery({game: gameId})
+  const [{data: gameInfo}] = useAtom(gameInfoAtom)
 
-  let worldTitle = gameInfo.data?.worlds.nodes[worldId]?.title
 
-  return <div className="app-bar" style={isLoading ? {display: "none"} : null} >
+  let worldTitle = worldId ? gameInfo?.worlds?.nodes[worldId]?.title : ""
+
+  return <div className="app-bar" style={isLoading ? {display: "none"} : undefined} >
     {mobile ?
       <>
         {/* MOBILE VERSION */}
@@ -319,7 +322,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
           <MenuButton />
         </div>
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
-          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} />
+          <NextButton worldSize={gameInfo?.worldSize?.[worldId]} />
           <PreviousButton />
           <HomeButton isDropdown={true} />
           <InputModeButton isDropdown={true}/>
@@ -341,7 +344,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=undefined, setPag
         </div>
         <div className="nav-btns">
           <PreviousButton  />
-          <NextButton worldSize={gameInfo.data?.worldSize[worldId]} />
+          <NextButton worldSize={gameInfo?.worldSize[worldId]} />
           <InputModeButton isDropdown={false}/>
           <MenuButton  />
         </div>

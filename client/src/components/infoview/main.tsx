@@ -19,9 +19,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDeleteLeft, faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
-import { useAppDispatch } from '../../hooks';
-import { LevelInfo, useGetGameInfoQuery } from '../../state/api';
-import { levelCompleted } from '../../state/progress';
+import { LevelInfo } from '../../state/api';
 import { Markdown } from '../markdown';
 
 import { Infos } from './infos';
@@ -40,22 +38,26 @@ import path from 'path';
 import { useGameTranslation } from '../../utils/translation';
 import { useAtom } from 'jotai';
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms';
-import { inventoryAtom, typewriterModeAtom } from '../../store/progress-atoms';
+import { completedAtom } from '../../store/progress-atoms';
+import { gameInfoAtom, levelInfoAtom } from '../../store/query-atoms';
+import { typewriterModeAtom } from '../../store/editor-atoms';
+import { inventoryAtom } from '../../store/inventory-atoms';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
  */
-export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) {
+export function DualEditor({ codeviewRef } : { codeviewRef: any }) {
+  const [typewriterMode] = useAtom(typewriterModeAtom)
   const ec = React.useContext(EditorContext)
   const { lockEditorMode } = React.useContext(InputModeContext)
   const showTypewriter = Boolean(ec) && typewriterMode && !lockEditorMode
   return <>
     <div className={showTypewriter ? 'hidden' : ''}>
-      <ExerciseStatement data={level} showLeanStatement={true} />
+      <ExerciseStatement showLeanStatement={true} />
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
     {ec ?
-      <DualEditorMain level={level} worldSize={worldSize} /> :
+      <DualEditorMain /> :
       // TODO: Style this if relevant.
       <></>
     }
@@ -63,37 +65,40 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
 }
 
 /** The part of the two editors that needs the editor connection first */
-function DualEditorMain({ level, worldSize }: { level: LevelInfo, worldSize: number }) {
+function DualEditorMain() {
   const ec = React.useContext(EditorContext)
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [{ data: levelInfo }] = useAtom(levelInfoAtom)
+
+  const [, setCompleted] = useAtom(completedAtom)
+
   const [, addToInventory] = useAtom(inventoryAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
   const { lockEditorMode } = React.useContext(InputModeContext)
 
   const {proof, setProof} = React.useContext(ProofContext)
 
-  const dispatch = useAppDispatch()
-
   React.useEffect(() => {
     if (proof?.completed) {
-      dispatch(levelCompleted({ game: gameId, world: worldId, level: levelId }))
+      setCompleted(true)
 
       // On completion, add the names of all new items to the local storage
       let newTiles = [
-        ...level?.tactics,
-        ...level?.lemmas,
-        ...level?.definitions
+        ...levelInfo?.tactics ?? [],
+        ...levelInfo?.lemmas ?? [],
+        ...levelInfo?.definitions ?? []
       ].filter((tile) => tile.new).map((tile) => tile.name)
 
       // Add the proven statement to the local storage as well.
-      if (level?.statementName != null) {
-        newTiles.push(level?.statementName)
+      if (levelInfo?.statementName != null) {
+        newTiles.push(levelInfo?.statementName)
       }
       addToInventory(newTiles)
     }
-  }, [proof, level])
+  }, [proof, levelInfo])
 
   /* Set up updates to the global infoview state on editor events. */
   const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
@@ -114,9 +119,9 @@ function DualEditorMain({ level, worldSize }: { level: LevelInfo, worldSize: num
           <WithLspDiagnosticsContext>
             <ProgressContext.Provider value={allProgress}>
               {(typewriterMode && !lockEditorMode) ?
-                <TypewriterInterfaceWrapper data={level} worldSize={worldSize}/>
+                <TypewriterInterfaceWrapper/>
                 :
-                <Main key={`${worldId}/${levelId}`} data={level} />
+                <Main key={`${worldId}/${levelId}`} />
               }
             </ProgressContext.Provider>
           </WithLspDiagnosticsContext>
@@ -134,24 +139,25 @@ function DualEditorMain({ level, worldSize }: { level: LevelInfo, worldSize: num
  *
  * If `showLeanStatement` is true, it will additionally display the lean code.
  */
-function ExerciseStatement({ data, showLeanStatement = false }) {
+function ExerciseStatement({ showLeanStatement = false }) {
   const { t : gT } = useGameTranslation()
   const { t } = useTranslation()
   const [gameId] = useAtom(gameIdAtom)
+  const [{ data: levelInfo }] = useAtom(levelInfoAtom)
 
-  if (!(data?.descrText || data?.descrFormat)) { return <></> }
+  if (!(levelInfo?.descrText || levelInfo?.descrFormat)) { return <></> }
   return <>
     <div className="exercise-statement">
-      {data?.descrText ?
+      {levelInfo?.descrText ?
         <Markdown>
-          {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + t(data?.descrText, {ns: gameId})}
-        </Markdown> : data?.displayName &&
+          {(levelInfo?.displayName ? `**${t("Theorem")}** \`${levelInfo?.displayName}\`: ` : '') + t(levelInfo?.descrText, {ns: gameId})}
+        </Markdown> : levelInfo?.displayName &&
         <Markdown>
-          {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + gT(data?.descrText)}
+          {(levelInfo?.displayName ? `**${t("Theorem")}** \`${levelInfo?.displayName}\`: ` : '') + gT(levelInfo?.descrText ?? "")}
         </Markdown>
       }
-      {data?.descrFormat && showLeanStatement &&
-        <p><code className="lean-code">{data?.descrFormat}</code></p>
+      {levelInfo?.descrFormat && showLeanStatement &&
+        <p><code className="lean-code">{levelInfo?.descrFormat}</code></p>
       }
     </div>
   </>
@@ -159,7 +165,7 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
 
 // TODO: This is only used in `EditorInterface`
 // while `TypewriterInterface` has this copy-pasted in.
-export function Main(props: { data: LevelInfo}) {
+export function Main() {
   let { t } = useTranslation()
   const { t: gT } = useGameTranslation()
   const { lockEditorMode } = React.useContext(InputModeContext)
@@ -167,6 +173,9 @@ export function Main(props: { data: LevelInfo}) {
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [{ data: levelInfo }] = useAtom(levelInfoAtom)
+
   const [typewriterMode] = useAtom(typewriterModeAtom)
 
   const { proof, setProof, setCrashed } = React.useContext(ProofContext)
@@ -178,17 +187,17 @@ export function Main(props: { data: LevelInfo}) {
   const rpcSess = useRpcSessionAtPos({ uri: uri ?? '', line: 0, character: 0 })
 
   React.useEffect(() => {
-    if (!uri) {
+    if (!uri || !worldId || !levelId) {
       return
     }
     loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
   }, [rpcSess, uri, worldId, levelId, setProof, setCrashed])
 
   function toggleSelection(line: number) {
-    return (ev) => {
+    return (ev: any) => {
       console.debug('toggled selection')
       if (selectedStep == line) {
-        setSelectedStep(undefined)
+        setSelectedStep(null)
       } else {
         setSelectedStep(line)
       }
@@ -444,7 +453,7 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
 }
 
 // Splitting up Typewriter into two parts is a HACK
-export function TypewriterInterfaceWrapper(props: { data: LevelInfo, worldSize: number }) {
+export function TypewriterInterfaceWrapper() {
   const ec = React.useContext(EditorContext)
 
   useClientNotificationEffect(
@@ -471,24 +480,25 @@ export function TypewriterInterfaceWrapper(props: { data: LevelInfo, worldSize: 
     </div>
   }
 
-  return <TypewriterInterface props={props} />
+  return <TypewriterInterface />
 }
 
 /** The interface in command line mode */
-export function TypewriterInterface({props}) {
+export function TypewriterInterface() {
   let { t } = useTranslation()
   const ec = React.useContext(EditorContext)
   const [gameId, navigateToGame] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+
   const editor = React.useContext(MonacoEditorContext)
   const model = editor?.getModel()
   const uri = model?.uri.toString() ?? ''
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
   const fallbackUri = `file:///${worldId}/${levelId}.lean`
   const effectiveUri = uri || fallbackUri
-  let image: string = gameInfo.data?.worlds.nodes[worldId].image
+  let image: string = gameInfo?.worlds?.nodes[worldId].image
 
 
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
@@ -533,7 +543,7 @@ export function TypewriterInterface({props}) {
       editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           { lineNumber: line, column: 1 },
-          editor.getModel().getFullModelRange().getEndPosition()
+          editor.getModel()?.getFullModelRange().getEndPosition()
         ),
         text: '',
         forceMoveMarkers: false

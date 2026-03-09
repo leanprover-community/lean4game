@@ -26,14 +26,14 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
   const [copied, setCopied] = useState(false)
 
   const appendTypewriterInput = useAppendTypewriterInput()
-  const handleClick = (ev) => {
+  const handleClick = (ev: any) => {
     if (appendTypewriterInput(ev.shiftKey, tile.displayName, isTheorem, false)) {
       return
     }
     setDoc(tile)
   }
 
-  const copyItemName = (ev) => {
+  const copyItemName = (ev: any) => {
     navigator.clipboard.writeText(tile.displayName)
     setCopied(true)
     setInterval(() => {

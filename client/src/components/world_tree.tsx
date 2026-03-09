@@ -9,9 +9,6 @@ import klay from 'cytoscape-klay'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
-import { useAppDispatch } from '../hooks'
-import { selectCompleted } from '../state/progress'
-import { store } from '../state/store'
 
 import '../css/world_tree.css'
 import { PreferencesContext } from './infoview/context'
@@ -22,6 +19,7 @@ import { useGameTranslation } from '../utils/translation'
 import { gameIdAtom, levelIdAtom, navigateAcrossWorldsAtom, worldIdAtom } from '../store/location-atoms'
 import { Button } from './button'
 import { difficultyAtom } from '../store/progress-atoms'
+import { completedAtomFamily } from '../store/world-tree-atoms'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -50,15 +48,15 @@ const darkblue = '#1667b8'
 
 
 /** svg object for a level in the game tree */
-export function LevelIcon({ world, level, position, completed, unlocked, worldSize }:
+export function LevelIcon({ world, level, position, unlocked, worldSize }:
   { world: string,
     level: number,
     position: cytoscape.Position,
-    completed: boolean,
     unlocked: boolean,
     worldSize: number
   }) {
   const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
+  const [completed] = useAtom(completedAtomFamily([world, level]))
 
   const N = Math.max(worldSize, NMIN)
 
@@ -78,7 +76,7 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
    * This is a simplified function, which has little mathematical foundation, but
    * works fine in tests up to `N=30`.
    */
-  function betaSpiral(level) {
+  function betaSpiral(level: number) {
     return 2 * Math.PI / ((NSPIRAL+1) + 2 * Math.max(0, (level-2)) / (NSPIRAL+1))
   }
 
@@ -118,6 +116,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
     difficulty: number,
     worldSize: number
   }) {
+  const [completed] = useAtom(completedAtomFamily([world, null]))
   const { t : gT } = useGameTranslation()
 
   // See level icons. Match radius computed there minus `1.2*r`
@@ -132,8 +131,8 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
 
   // index `0` indicates that all prerequisites are completed
   let unlocked = completedLevels[0]
-  // indices `1`-`n` indicate that the corresponding level is completed
-  let completed = completedLevels.slice(1).every(Boolean)
+  // // indices `1`-`n` indicate that the corresponding level is completed
+  // let completed = completedLevels.slice(1).every(Boolean)
   // select the first non-completed level
   let nextLevel: number = completedLevels.findIndex(c => !c)
   if (nextLevel <= 1) {
@@ -349,7 +348,6 @@ export function WorldTreePanel({worlds, worldSize}:
             world={worldId}
             level={i}
             position={position}
-            completed={completed[worldId][i]}
             unlocked={completed[worldId][i-1]}
             key={`${gameId}-${worldId}-${i}`}
             worldSize={worldSize[worldId]}

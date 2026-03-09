@@ -12,7 +12,6 @@ export function InventoryList({tiles, docType, enableAll=false} : {
   enableAll?: boolean,
 }) {
   const [currentTiles] = useAtom(currentInventoryTilesAtom)
-  const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
   const [inventory] = useAtom(inventoryAtom)

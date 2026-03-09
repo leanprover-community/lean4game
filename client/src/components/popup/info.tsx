@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { Typography } from '@mui/material'
 import { Trans, useTranslation } from 'react-i18next'
-import { useGetGameInfoQuery } from '../../state/api'
 import { Markdown } from '../markdown'
 import { useGameTranslation } from '../../utils/translation'
 import { useAtom } from 'jotai'
 import { gameIdAtom } from '../../store/location-atoms'
+import { gameInfoAtom } from '../../store/query-atoms'
 
 /** Pop-up that is displaying the Game Info.
  *
@@ -14,14 +14,15 @@ import { gameIdAtom } from '../../store/location-atoms'
  */
 export function InfoPopup () {
   const { t } = useTranslation()
+  const { t: gT } = useGameTranslation()
   const [gameId] = useAtom(gameIdAtom)
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
 
 
   return <>
     <Typography variant="body1" component="div" className="welcome-text">
-      <Markdown>{t(gameInfo.data?.info, { ns:gameId })}</Markdown>
+      <Markdown>{gT(gameInfo?.info ?? "")}</Markdown>
       <hr />
       <Trans>
         <h2>{t("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>

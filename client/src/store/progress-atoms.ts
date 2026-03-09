@@ -1,18 +1,13 @@
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
-import { GameProgress, LevelProgress, Progress, WorldProgress, Selection } from "./progress-types";
+import { GameProgress, LevelProgress, Progress, WorldProgress, Selection, DEFAULT_DIFFICULTY } from "./progress-types";
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { atom } from "jotai";
 
 /**
- * Currently we have three difficulties:
+ * The player's progress is stored in local storage under `game_progress`.
  *
- *   | lock tactics | lock levels |
- * --|--------------|-------------|
- * 0 |      no      |      no     |
- * 1 |     yes      |      no     |
- * 2 |     yes      |     yes     |
+ * The atoms here deal with reading from and reading to local storage.
  */
-const DEFAULT_DIFFICULTY = 2
 
 const defaultProgress: Progress = {
   games: {}
@@ -118,54 +113,6 @@ export const difficultyAtom = atom(
   }
 )
 
-/**
- * The user's unlocked inventory.
- * The setter adds the new constants to the existing inventory
- * ignoring duplicates.
- *  */
-export const inventoryAtom = atom(
-  get => {
-    const progress = get(progressAtom)
-    if (!progress) return null
-    return progress.inventory
-  },
-  (get, set, val: string[]) => {
-    const progress = get(progressAtom)
-    if (!progress) return
-    const newInventory = [...new Set([...progress.inventory, ...val])]
-    set(progressAtom, { ...progress, inventory: newInventory })
-  }
-)
-
-/** User read the game introduction. Only relevant on mobile */
-export const readGameIntroAtom = atom(
-  get => {
-    const progress = get(progressAtom)
-    if (!progress) return false
-    return progress.readIntro
-  },
-  (get, set, val: boolean) => {
-    const progress = get(progressAtom)
-    if (!progress) return
-    set(progressAtom, { ...progress, readIntro: val })
-  }
-)
-
-/** Whether the current game is in typewriter mode */
-export const typewriterModeAtom = atom(
-  get => {
-    const progress = get(progressAtom)
-    if (!progress) return false
-    return progress.typewriterMode
-  },
-  (get, set, val: boolean | null) => {
-    const progress = get(progressAtom)
-    if (!progress) return
-    const valMod = (val === null) ? undefined : val
-    set(progressAtom, { ...progress, typewriterMode: valMod })
-  }
-)
-
 export const completedAtom = atom(
   get => {
     const levelProgress = get(levelProgressAtom)
@@ -175,41 +122,5 @@ export const completedAtom = atom(
     const levelProgress = get(levelProgressAtom)
     if (!levelProgress) return
     set(levelProgressAtom, { ...levelProgress, completed: val })
-  }
-)
-
-export const codeAtom = atom(
-  get => {
-    const levelProgress = get(levelProgressAtom)
-    return levelProgress?.code
-  },
-  (get, set, val: string) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
-    set(levelProgressAtom, { ...levelProgress, code: val })
-  }
-)
-
-export const helpAtom = atom(
-  get => {
-    const levelProgress = get(levelProgressAtom)
-    return levelProgress?.help ?? []
-  },
-  (get, set, val: number[]) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
-    set(levelProgressAtom, { ...levelProgress, help: val })
-  }
-)
-
-export const selectionsAtom = atom(
-  get => {
-    const levelProgress = get(levelProgressAtom)
-    return levelProgress?.selections ?? []
-  },
-  (get, set, val: Selection[]) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
-    set(levelProgressAtom, { ...levelProgress, selections: val })
   }
 )

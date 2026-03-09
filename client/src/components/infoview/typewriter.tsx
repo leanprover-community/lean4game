@@ -34,7 +34,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
 
-  const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
+  const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>()
   const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
@@ -63,7 +63,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           pos,
-          editor.getModel().getFullModelRange().getEndPosition()
+          editor.getModel()?.getFullModelRange().getEndPosition()
         ),
         text: typewriterInput.trim() + "\n",
         forceMoveMarkers: false

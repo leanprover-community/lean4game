@@ -48,7 +48,7 @@ function App({ children }: { children?: React.ReactNode }) {
 
   return (
     <div className="app">
-      <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}}>
+      <PreferencesContext.Provider value={{mobile: mobile ?? false, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}}>
         <React.Suspense>
           {children}
         </React.Suspense>

@@ -13,10 +13,6 @@ import { EditorContext } from '../../../node_modules/vscode-lean4/lean4-infoview
 import { EditorConnection, EditorEvents } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/editorConnection'
 import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/event'
 import { Diagnostic } from 'vscode-languageserver-types'
-
-import { useAppDispatch, useAppSelector } from '../hooks'
-import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
-import { store } from '../state/store'
 import { Button } from './button'
 import { Markdown } from './markdown'
 import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
@@ -38,9 +34,11 @@ import i18next from 'i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { useAtom } from 'jotai'
-import { leanMonacoAtom } from '../store/editor-atoms'
+import { codeAtom, leanMonacoAtom, selectionsAtom, typewriterModeAtom } from '../store/editor-atoms'
 import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
-import { codeAtom, completedAtom, helpAtom, selectionsAtom, typewriterModeAtom } from '../store/progress-atoms'
+import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
+import { helpAtom } from '../store/chat-atoms'
+import { inventoryOverviewAtom } from '../store/inventory-atoms'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
   const maybeLeanMonaco = leanMonaco as unknown as {
@@ -74,17 +72,15 @@ function Level() {
   const [levelId] = useAtom(levelIdAtom)
 
   // Load the namespace of the game
-  i18next.loadNamespaces(gameId).catch(err => {
+  i18next.loadNamespaces(gameId ?? "").catch(err => {
     console.warn(`translations for ${gameId} do not exist.`)
   })
-
-  const gameInfo = useGetGameInfoQuery({game: gameId})
 
   if (levelId == 0) return <Introduction />
   return <PlayableLevel key={`${worldId}/${levelId}`} />
 }
 
-function ChatPanel({lastLevel, visible = true}) {
+function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: boolean}) {
   let { t } = useTranslation()
   const { t : gT } = useGameTranslation()
   const chatRef = useRef<HTMLDivElement>(null)
@@ -92,7 +88,7 @@ function ChatPanel({lastLevel, visible = true}) {
   const [gameId, navigateToGame] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
-  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  const [{ data: levelInfo }] = useAtom(levelInfoAtom)
   const {proof, setProof} = useContext(ProofContext)
   const {deletedChat, setDeletedChat, showHelp, setShowHelp} = useContext(DeletedChatContext)
   const {selectedStep, setSelectedStep} = useContext(SelectionContext)
@@ -100,10 +96,10 @@ function ChatPanel({lastLevel, visible = true}) {
   let k = proof?.steps.length ? proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) : 0
 
   function toggleSelection(line: number) {
-    return (ev) => {
+    return (ev: any) => {
       console.debug('toggled selection')
       if (selectedStep == line) {
-        setSelectedStep(undefined)
+        setSelectedStep(null)
       } else {
         setSelectedStep(line)
       }
@@ -121,7 +117,7 @@ function ChatPanel({lastLevel, visible = true}) {
   // Scroll to element if selection changes
   useEffect(() => {
     if (typeof selectedStep !== 'undefined') {
-      Array.from(chatRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
+      Array.from(chatRef.current!.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
         elem.scrollIntoView({block: "center"})
       })
     }
@@ -133,7 +129,7 @@ function ChatPanel({lastLevel, visible = true}) {
   //   // chatRef.current!.scrollTo(0,0)
   // }, [gameId, worldId, levelId])
 
-  let introText: Array<string> = gT(level?.data?.introduction ?? "").split(/\n(\s*\n)+/)
+  let introText: Array<string> = gT(levelInfo?.introduction ?? "").split(/\n(\s*\n)+/)
 
   const focusRef = useRef<HTMLButtonElement>()
   useEffect(() => {
@@ -174,9 +170,9 @@ function ChatPanel({lastLevel, visible = true}) {
           <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
             {t("Level completed! 🎉")}
           </div>
-          {level?.data?.conclusion?.trim() &&
+          {levelInfo?.conclusion?.trim() &&
             <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
-              <Markdown>{gT(level?.data?.conclusion ?? "")}</Markdown>
+              <Markdown>{gT(levelInfo?.conclusion ?? "")}</Markdown>
             </div>
           }
         </>
@@ -198,15 +194,10 @@ function ChatPanel({lastLevel, visible = true}) {
 
 
 function ExercisePanel({codeviewRef, infoviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, infoviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
-  const [gameId] = useAtom(gameIdAtom)
-  const [worldId] = useAtom(worldIdAtom)
-  const [levelId] = useAtom(levelIdAtom)
-  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
-  const gameInfo = useGetGameInfoQuery({game: gameId})
   return <div className={`exercise-panel ${visible ? '' : 'hidden'}`}>
     <div ref={infoviewRef} className="infoview" style={{display: 'none'}}></div>
     <div className="exercise">
-      <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} worldSize={gameInfo.data?.worldSize[worldId]}/>
+      <DualEditor codeviewRef={codeviewRef} />
     </div>
   </div>
 }
@@ -225,13 +216,12 @@ function PlayableLevel() {
 
   const {mobile} = React.useContext(PreferencesContext)
 
-  const dispatch = useAppDispatch()
-
   const [code] = useAtom(codeAtom)
   const [initialSelections] = useAtom(selectionsAtom)
+  const [help, setHelp] = useAtom(helpAtom)
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
-  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [{ data: levelInfo, isLoading: levelInfoIsLoading }] = useAtom(levelInfoAtom)
 
   // The state variables for the `ProofContext`
   const [proof, setProof] = useState<ProofState>({steps: [], diagnostics: [], completed: false, completedWithWarnings: false})
@@ -250,7 +240,7 @@ function PlayableLevel() {
   // set to true to prevent switching between typewriter and editor
   const [lockEditorMode, setLockEditorMode] = useState(false)
   const [typewriterInput, setTypewriterInput] = useState("")
-  const lastLevel = (levelId !== undefined) && levelId >= gameInfo.data?.worldSize[worldId]
+  const lastLevel = worldId && (levelId !== undefined) && levelId >= (gameInfo?.worldSize?.[worldId] ?? 0)
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
   // If this state is set to a pair `(name, type)` then the according doc will be open.
@@ -416,11 +406,12 @@ function PlayableLevel() {
 
   useEffect (() => {
     // Lock editor mode
-    if (level?.data?.template) {
+    if (levelInfo?.template) {
       setLockEditorMode(true)
+      const model = leanMonacoEditor?.editor.getModel()
 
-      if (leanMonacoEditor?.editor) {
-        let code = leanMonacoEditor?.editor.getModel().getLinesContent()
+      if (model) {
+        let code = model.getLinesContent()
 
         // console.log(`insert. code: ${code}`)
         // console.log(`insert. join: ${code.join('')}`)
@@ -431,13 +422,13 @@ function PlayableLevel() {
 
         // TODO: It does seem that the template is always indented by spaces.
         // This is a hack, assuming there are exactly two.
-        if (!code.join('').trim().length) {
-          console.debug(`inserting template:\n${level.data.template}`)
+        if (!code.join("").trim().length) {
+          console.debug(`inserting template:\n${levelInfo?.template}`)
           // TODO: This does not work! HERE
           // Probably overwritten by a query to the server
           leanMonacoEditor?.editor.executeEdits("template-writer", [{
-            range: leanMonacoEditor?.editor.getModel().getFullModelRange(),
-            text: level.data.template + `\n`,
+            range: model.getFullModelRange(),
+            text: levelInfo?.template + `\n`,
             forceMoveMarkers: true
           }])
         } else {
@@ -447,7 +438,7 @@ function PlayableLevel() {
     } else {
       setLockEditorMode(false)
     }
-  }, [level, levelId, worldId, gameId, leanMonacoEditor?.editor])
+  }, [levelInfo, levelId, worldId, gameId, leanMonacoEditor?.editor])
 
 
   useEffect(() => {
@@ -458,10 +449,11 @@ function PlayableLevel() {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    if (!(typewriterMode && !lockEditorMode) && leanMonacoEditor?.editor) {
+    const model = leanMonacoEditor?.editor.getModel()
+    if (!(typewriterMode && !lockEditorMode) && model) {
       // Delete last input attempt from command line
       leanMonacoEditor?.editor.executeEdits("typewriter", [{
-        range: leanMonacoEditor?.editor.getSelection(),
+        range: model.getFullModelRange(),
         text: "",
         forceMoveMarkers: false
       }]);
@@ -473,7 +465,7 @@ function PlayableLevel() {
     // Forget whether hidden hints are displayed for steps that don't exist yet
     if (proof?.steps.length) {
       console.debug(Array.from(showHelp))
-      setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof?.steps.length))))
+      setShowHelp([...new Set(Array.from(showHelp).filter(i => (i < proof?.steps.length)))])
     }
   }, [proof])
 
@@ -481,16 +473,17 @@ function PlayableLevel() {
   useEffect(() => {
     if (proof?.steps.length) {
       console.debug(`showHelp:\n ${showHelp}`)
-      dispatch(helpEdited({game: gameId, world: worldId, level: levelId, help: Array.from(showHelp)}))
+      setHelp(Array.from(showHelp))
     }
   }, [showHelp])
 
   // Effect when command line mode gets enabled
   useEffect(() => {
-    if (leanMonacoEditor?.editor && (typewriterMode && !lockEditorMode)) {
-      let code = leanMonacoEditor?.editor.getModel().getLinesContent().filter(line => line.trim())
+    const model = leanMonacoEditor?.editor.getModel()
+    if (model&& (typewriterMode && !lockEditorMode)) {
+      let code = model.getLinesContent().filter(line => line.trim())
       leanMonacoEditor?.editor.executeEdits("typewriter", [{
-        range: leanMonacoEditor?.editor.getModel().getFullModelRange(),
+        range: model.getFullModelRange(),
         text: code.length ? code.join('\n') + '\n' : '',
         forceMoveMarkers: true
       }]);
@@ -513,7 +506,7 @@ function PlayableLevel() {
   }, [leanMonacoEditor, leanMonacoEditor?.editor, typewriterMode, lockEditorMode])
 
   return <>
-    <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
+    <div style={levelInfoIsLoading? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
         <InputModeContext.Provider value={{typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode}}>
@@ -522,28 +515,28 @@ function PlayableLevel() {
               <MonacoEditorContext.Provider value={leanMonacoEditor?.editor}>
                 <LevelAppBar
                   pageNumber={pageNumber} setPageNumber={setPageNumber}
-                  isLoading={level.isLoading}
+                  isLoading={levelInfoIsLoading}
                   levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
                     (level?.data?.title && ` : ${gT(level?.data?.title ?? "")}`)}
                   />
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
                   <>
-                    <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
+                    <div className={`app-content level-mobile ${levelInfoIsLoading ? 'hidden' : ''}`}>
                       <ExercisePanel
                         codeviewRef={codeviewRef}
                         infoviewRef={infoviewRef}
                         visible={pageNumber == 0} />
-                      <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
+                      <InventoryPanel levelInfo={levelInfo} visible={pageNumber == 1} />
                     </div>
                   </>
                 :
-                  <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+                  <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${levelInfoIsLoading ? 'hidden' : ''}`}>
                     <ChatPanel lastLevel={lastLevel}/>
                     <ExercisePanel
                       codeviewRef={codeviewRef}
                       infoviewRef={infoviewRef} />
-                    <InventoryPanel levelInfo={level?.data} />
+                    <InventoryPanel levelInfo={levelInfo} />
                   </Split>
                 }
               </MonacoEditorContext.Provider>
@@ -555,16 +548,17 @@ function PlayableLevel() {
   </>
 }
 
-function IntroductionPanel({gameInfo}) {
+function IntroductionPanel() {
   let { t } = useTranslation()
   const { t : gT } = useGameTranslation()
   const [gameId, navigateToGame] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [, navigateToLevel] = useAtom(levelIdAtom)
 
   const {mobile} = React.useContext(PreferencesContext)
 
-  let text: Array<string> = gT(gameInfo.data?.worlds.nodes[worldId].introduction).split(/\n(\s*\n)+/)
+  let text: Array<string> = gT(gameInfo?.worlds?.nodes[worldId ?? ""].introduction ?? "").split(/\n(\s*\n)+/)
 
   const focusRef = useRef<HTMLButtonElement>()
   useEffect(() => {
@@ -579,8 +573,8 @@ function IntroductionPanel({gameInfo}) {
       ))}
     </div>
     <div className={`button-row${mobile ? ' mobile' : ''}`}>
-      {gameInfo.data?.worldSize[worldId] == 0 ?
-        <Button onClick={() => navigateToGame(gameId)}>
+      {gameInfo?.worldSize?.[worldId ?? ""] == 0 ?
+        <Button onClick={() => {if (gameId) navigateToGame(gameId)}}>
           <FontAwesomeIcon icon={faHome} />
           </Button> :
         <Button ref={focusRef} onClick={() => navigateToLevel(1)}>
@@ -602,31 +596,34 @@ function Introduction() {
 
   const {mobile} = useContext(PreferencesContext)
 
-  const inventory = useLoadInventoryOverviewQuery({game: gameId})
+  const [{ data: inventory }] = useAtom(inventoryOverviewAtom)
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
+  const [{ data: gameInfo, isLoading: isLoadingGameInfo }] = useAtom(gameInfoAtom)
 
 
-  let image: string = gameInfo.data?.worlds.nodes[worldId].image
+  let image: string = worldId ? gameInfo?.worlds?.nodes[worldId].image ?? "" : ""
 
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} />
-    {gameInfo.isLoading ?
+    <LevelAppBar isLoading={isLoadingGameInfo} levelTitle={t("Introduction")} />
+    {isLoadingGameInfo ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?
-        <IntroductionPanel gameInfo={gameInfo} />
+        <IntroductionPanel />
       :
         <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
-          <IntroductionPanel gameInfo={gameInfo} />
+          <IntroductionPanel />
           <div className="world-image-container empty center">
-            {image &&
+            {image && gameId &&
               <img className="contain" src={path.join("data", gameId, image)} alt="" />
             }
 
           </div>
-          <InventoryPanel levelInfo={inventory?.data} />
+          <InventoryPanel levelInfo={inventory} />
         </Split>
       }
 
   </>
+}
+function useGetGameInfoQuery(arg0: { game: string | undefined }) {
+  throw new Error('Function not implemented.')
 }

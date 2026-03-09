@@ -90,7 +90,7 @@ export function PreferencesPopup() {
                     sx={{
                       '& .MuiSlider-track': { display: 'none', },
                     }}
-                    onChange={handlerChangeLayout}
+                    onChange={(ev, val) => handlerChangeLayout(ev, val)}
                   />
                 </Box>
               }

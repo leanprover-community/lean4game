@@ -98,10 +98,10 @@ export const PreferencesContext = React.createContext<IPreferencesContext>({
 
 /** Context to keep highlight selected proof step and corresponding chat messages. */
 export const SelectionContext = React.createContext<{
-  selectedStep : number,
-  setSelectedStep: React.Dispatch<React.SetStateAction<number>>
+  selectedStep : number | null,
+  setSelectedStep: React.Dispatch<React.SetStateAction<number | null>>
 }>({
-  selectedStep : undefined,
+  selectedStep : null,
   setSelectedStep: () => {}
 })
 
@@ -112,9 +112,9 @@ export const DeletedChatContext = React.createContext<{
   showHelp : Set<number>,
   setShowHelp: React.Dispatch<React.SetStateAction<Set<number>>>
 }>({
-  deletedChat: undefined,
+  deletedChat: [],
   setDeletedChat: () => {},
-  showHelp: undefined,
+  showHelp: new Set(),
   setShowHelp: () => {}
 })
 
