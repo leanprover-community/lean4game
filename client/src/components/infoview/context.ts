@@ -27,30 +27,6 @@ export type InfoStatus = 'updating' | 'error' | 'ready';
 //   errors: InteractiveDiagnostic[]       // TODO: Add correct type
 // }
 
-/** The context storing the proof step-by-step for the command line mode */
-export const ProofContext = React.createContext<{
-  /** The proof consists of multiple steps that are processed one after the other.
-   * In particular multi-line terms like `match`-statements will not be supported.
-   *
-   * Note that the first step will always have "" as command
-   */
-  proof: ProofState,
-  setProof: React.Dispatch<React.SetStateAction<ProofState>>
-  /** TODO: Workaround to capture a crash of the gameserver. */
-  interimDiags: Diagnostic[],
-  setInterimDiags: React.Dispatch<React.SetStateAction<Array<Diagnostic>>>
-  /** TODO: Workaround to capture a crash of the gameserver. */
-  crashed: boolean,
-  setCrashed: React.Dispatch<React.SetStateAction<Boolean>>
-}>({
-  proof: {steps: [], diagnostics: [], completed: false, completedWithWarnings: false},
-  setProof: () => {},
-  interimDiags: [],
-  setInterimDiags: () => {},
-  crashed: false,
-  setCrashed: () => {}
-})
-
 
 // TODO: Do we still need that?
 export interface ProofStateProps {
@@ -94,16 +70,6 @@ export const SelectionContext = React.createContext<{
   selectedStep : null,
   setSelectedStep: () => {}
 })
-
-/** Context for deleted Hints that are visible just a bit after they've been deleted */
-export const DeletedChatContext = React.createContext<{
-  deletedChat : GameHint[],
-  setDeletedChat: React.Dispatch<React.SetStateAction<Array<GameHint>>>
-}>({
-  deletedChat: [],
-  setDeletedChat: () => {},
-})
-
 
 const SUFFIX_OVERRIDES: Record<string, string> = {
   "induction": "generalizing",

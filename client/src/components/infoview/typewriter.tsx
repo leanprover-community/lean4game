@@ -9,14 +9,15 @@ import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } fro
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
-import { DeletedChatContext, MonacoEditorContext, ProofContext } from './context'
+import { MonacoEditorContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
 import { preferencesAtom } from '../../store/preferences-atoms'
-import { typewriterContentAtom } from '../../store/editor-atoms'
+import { crashedAtom, interimDiagsAtom, proofAtom, typewriterContentAtom } from '../../store/editor-atoms'
+import { deletedChatAtom } from '../../store/chat-atoms'
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;
@@ -44,11 +45,12 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
 
   const inputRef = useRef<HTMLDivElement>()
 
-  // The context storing all information about the current proof
-  const {proof, setProof, interimDiags, setInterimDiags, setCrashed} = React.useContext(ProofContext)
+  const [proof, setProof] = useAtom(proofAtom)
+  const [interimDiags, setInterimDiags] = useAtom(interimDiagsAtom)
+  const [, setCrashed] = useAtom(crashedAtom)
 
   // state to store the last batch of deleted messages
-  const {setDeletedChat} = React.useContext(DeletedChatContext)
+  const [, setDeletedChat] = useAtom(deletedChatAtom)
 
   const rpcSess = React.useContext(RpcContext)
 

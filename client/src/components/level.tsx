@@ -15,8 +15,7 @@ import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/
 import { Diagnostic } from 'vscode-languageserver-types'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import { DeletedChatContext, MonacoEditorContext,
-  ProofContext, SelectionContext } from './infoview/context'
+import { MonacoEditorContext, SelectionContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint, ProofState } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
@@ -34,10 +33,10 @@ import i18next from 'i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { useAtom } from 'jotai'
-import { codeAtom, leanMonacoAtom, lockEditorModeAtom, selectionsAtom, typewriterModeAtom } from '../store/editor-atoms'
+import { codeAtom, leanMonacoAtom, lockEditorModeAtom, proofAtom, selectionsAtom, typewriterModeAtom } from '../store/editor-atoms'
 import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
-import { helpAtom } from '../store/chat-atoms'
+import { deletedChatAtom, helpAtom } from '../store/chat-atoms'
 import { inventoryOverviewAtom } from '../store/inventory-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
 
@@ -91,8 +90,8 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
   const [{ data: levelInfo }] = useAtom(levelInfoAtom)
   const [help, setHelp] = useAtom(helpAtom)
-  const {proof, setProof} = useContext(ProofContext)
-  const {deletedChat, setDeletedChat} = useContext(DeletedChatContext)
+  const [proof, setProof] = useAtom(proofAtom)
+  const [deletedChat, setDeletedChat] = useAtom(deletedChatAtom)
   const {selectedStep, setSelectedStep} = useContext(SelectionContext)
 
   let k = proof?.steps.length ? proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) : 0
@@ -227,15 +226,6 @@ function PlayableLevel() {
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [{ data: levelInfo, isLoading: levelInfoIsLoading }] = useAtom(levelInfoAtom)
 
-  // The state variables for the `ProofContext`
-  const [proof, setProof] = useState<ProofState>({steps: [], diagnostics: [], completed: false, completedWithWarnings: false})
-  const [interimDiags, setInterimDiags] = useState<Array<Diagnostic>>([])
-  const [isCrashed, setIsCrashed] = useState<boolean>(false)
-
-
-  // When deleting the proof, we want to keep to old messages around until
-  // a new proof has been entered. e.g. to consult messages coming from dead ends
-  const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
 
@@ -507,9 +497,7 @@ function PlayableLevel() {
 
   return <>
     <div style={levelInfoIsLoading? undefined : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <DeletedChatContext.Provider value={{deletedChat, setDeletedChat}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
-          <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={leanMonacoEditor?.editor}>
                 <LevelAppBar
@@ -540,9 +528,7 @@ function PlayableLevel() {
                 }
               </MonacoEditorContext.Provider>
             </EditorContext.Provider>
-          </ProofContext.Provider>
       </SelectionContext.Provider>
-    </DeletedChatContext.Provider>
   </>
 }
 

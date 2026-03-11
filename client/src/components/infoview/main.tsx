@@ -24,7 +24,7 @@ import { Markdown } from '../markdown';
 import { Infos } from './infos';
 import { Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
-import { DeletedChatContext, MonacoEditorContext, ProofContext, SelectionContext } from './context';
+import { MonacoEditorContext, SelectionContext } from './context';
 import { Typewriter, getInteractiveDiagsAt, hasInteractiveErrors } from './typewriter';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
@@ -39,10 +39,10 @@ import { useAtom } from 'jotai';
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms';
 import { completedAtom } from '../../store/progress-atoms';
 import { gameInfoAtom, levelInfoAtom } from '../../store/query-atoms';
-import { lockEditorModeAtom, typewriterContentAtom, typewriterModeAtom } from '../../store/editor-atoms';
+import { crashedAtom, interimDiags, interimDiagsAtom, lockEditorModeAtom, proofAtom, typewriterContentAtom, typewriterModeAtom } from '../../store/editor-atoms';
 import { inventoryAtom } from '../../store/inventory-atoms';
 import { mobileAtom } from '../../store/preferences-atoms';
-import { helpAtom } from '../../store/chat-atoms';
+import { deletedChatAtom, helpAtom } from '../../store/chat-atoms';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -78,7 +78,7 @@ function DualEditorMain() {
   const [, addToInventory] = useAtom(inventoryAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
 
-  const {proof, setProof} = React.useContext(ProofContext)
+  const [proof] = useAtom(proofAtom)
 
   React.useEffect(() => {
     if (proof?.completed) {
@@ -178,9 +178,9 @@ export function Main() {
 
   const [typewriterMode] = useAtom(typewriterModeAtom)
 
-  const { proof, setProof, setCrashed } = React.useContext(ProofContext)
+  const [proof, setProof] = useAtom(proofAtom)
+  const [, setCrashed] = useAtom(crashedAtom)
   const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
-  const { setDeletedChat } = React.useContext(DeletedChatContext)
   const editor = React.useContext(MonacoEditorContext)
   const model = editor?.getModel()
   const uri = model?.uri.toString()
@@ -455,9 +455,12 @@ export function TypewriterInterface() {
 
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
-  const { setDeletedChat } = React.useContext(DeletedChatContext)
+  const [, setDeletedChat] = useAtom(deletedChatAtom)
   const [mobile] = useAtom(mobileAtom)
-  const { proof, setProof, crashed, setCrashed, interimDiags } = React.useContext(ProofContext)
+  const [proof, setProof ] = useAtom(proofAtom)
+  const [crashed, setCrashed ] = useAtom(crashedAtom)
+  const [interimDiags ] = useAtom(interimDiagsAtom)
+
   const [, setTypewriter] = useAtom(typewriterContentAtom)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
 

@@ -1,14 +1,14 @@
 import { GameHint, InteractiveGoalsWithHints, ProofState } from "./infoview/rpc_api";
 import * as React from 'react';
 import { Markdown } from './markdown';
-import { DeletedChatContext, ProofContext } from "./infoview/context";
 import { lastStepHasErrors } from "./infoview/goals";
 import { Button } from "./button";
 import { useGameTranslation } from "../utils/translation";
 import { useTranslation } from "react-i18next";
 import { useAtom } from "jotai";
 import { gameIdAtom } from "../store/location-atoms";
-import { helpAtom } from "../store/chat-atoms";
+import { deletedChatAtom, helpAtom } from "../store/chat-atoms";
+import { proofAtom } from "../store/editor-atoms";
 
 /** Plug-in the variable names in a hint. We do this client-side to prepare
  * for i18n in the future. i.e. one should be able translate the `rawText`
@@ -98,8 +98,8 @@ export function MoreHelpButton({selected=null} : {selected: number | null}) {
   const { t } = useTranslation()
   const [help, setHelp] = useAtom(helpAtom)
 
-  const {proof, setProof} = React.useContext(ProofContext)
-  const {deletedChat, setDeletedChat} = React.useContext(DeletedChatContext)
+  const [proof, setProof] = useAtom(proofAtom)
+  const [deletedChat, setDeletedChat] = useAtom(deletedChatAtom)
 
   let k = proof?.steps.length ?
     ((selected === null) ? (proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)) : selected)
