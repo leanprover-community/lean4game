@@ -450,7 +450,7 @@ function PlayableLevel() {
 
   useEffect(() => {
     const model = leanMonacoEditor?.editor?.getModel()
-    if (!(typewriterMode && !lockEditorMode) && model) {
+    if (!(typewriterMode) && model) {
       // Delete last input attempt from command line
       leanMonacoEditor?.editor.executeEdits("typewriter", [{
         range: model.getFullModelRange(),
@@ -459,7 +459,7 @@ function PlayableLevel() {
       }]);
       leanMonacoEditor?.editor.focus()
     }
-  }, [typewriterMode, lockEditorMode])
+  }, [typewriterMode])
 
   // useEffect(() => {
   //   // Forget whether hidden hints are displayed for steps that don't exist yet
@@ -480,7 +480,7 @@ function PlayableLevel() {
   // Effect when command line mode gets enabled
   useEffect(() => {
     const model = leanMonacoEditor?.editor?.getModel()
-    if (model&& (typewriterMode && !lockEditorMode)) {
+    if (model&& (typewriterMode)) {
       let code = model.getLinesContent().filter(line => line.trim())
       leanMonacoEditor?.editor.executeEdits("typewriter", [{
         range: model.getFullModelRange(),

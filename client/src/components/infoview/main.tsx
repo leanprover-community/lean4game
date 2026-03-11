@@ -50,7 +50,6 @@ import { helpAtom } from '../../store/chat-atoms';
 export function DualEditor({ codeviewRef } : { codeviewRef: any }) {
   const [typewriterMode] = useAtom(typewriterModeAtom)
   const ec = React.useContext(EditorContext)
-  const [lockEditorMode] = useAtom(lockEditorModeAtom)
   const showTypewriter = Boolean(ec) && typewriterMode
   return <>
     <div className={showTypewriter ? 'hidden' : ''}>
@@ -78,7 +77,6 @@ function DualEditorMain() {
 
   const [, addToInventory] = useAtom(inventoryAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
-  const [lockEditorMode] = useAtom(lockEditorModeAtom)
 
   const {proof, setProof} = React.useContext(ProofContext)
 
