@@ -26,9 +26,9 @@ jobs:
           - macos-latest
           - windows-latest
         browser:
-          # - electron
+          - electron
           # - chrome
-          - firefox
+          # - firefox
           # - webkit
           # - chromium
         # exclude:
