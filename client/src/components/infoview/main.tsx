@@ -717,7 +717,9 @@ export function TypewriterInterface() {
                 }
               </div>
             }
-          </> : <CircularProgress variant="determinate" value={100*(1 - 1.024 ** (- loadingProgress))} />
+          </> :
+          <CircularProgress />
+          // <CircularProgress variant="determinate" value={100*(1 - 1.024 ** (- Math.max(loadingProgress, 1)))} />
         // note: since we don't know the total number of files,
         // we use a function which strictly monotonely increases towards `100` as `x → ∞`
         // The base is chosen at random s.t. we get roughly 91% for `x = 100`.
