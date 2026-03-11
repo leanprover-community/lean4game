@@ -15,7 +15,7 @@ import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/
 import { Diagnostic } from 'vscode-languageserver-types'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import { DeletedChatContext, InputModeContext, MonacoEditorContext,
+import { DeletedChatContext, MonacoEditorContext,
   ProofContext, SelectionContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint, ProofState } from './infoview/rpc_api'
@@ -509,7 +509,6 @@ function PlayableLevel() {
     <div style={levelInfoIsLoading? undefined : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <DeletedChatContext.Provider value={{deletedChat, setDeletedChat}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
-        <InputModeContext.Provider value={{typewriterInput, setTypewriterInput}}>
           <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={leanMonacoEditor?.editor}>
@@ -542,7 +541,6 @@ function PlayableLevel() {
               </MonacoEditorContext.Provider>
             </EditorContext.Provider>
           </ProofContext.Provider>
-        </InputModeContext.Provider>
       </SelectionContext.Provider>
     </DeletedChatContext.Provider>
   </>

@@ -36,6 +36,8 @@ export const codeAtom = atom(
   }
 )
 
+export const typewriterContentAtom = atom<string>("")
+
 export const selectionsAtom = atom(
   get => {
     const levelProgress = get(levelProgressAtom)

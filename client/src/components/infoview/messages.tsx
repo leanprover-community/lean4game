@@ -10,7 +10,6 @@ import { Details } from '../../../../node_modules/vscode-lean4/lean4-infoview/sr
 import { InteractiveMessage } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/traceExplorer'
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions'
 
-import { InputModeContext } from './context'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { typewriterModeAtom } from '../../store/editor-atoms'

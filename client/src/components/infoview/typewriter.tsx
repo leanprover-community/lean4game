@@ -9,13 +9,14 @@ import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } fro
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
-import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext } from './context'
+import { DeletedChatContext, MonacoEditorContext, ProofContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
 import { preferencesAtom } from '../../store/preferences-atoms'
+import { typewriterContentAtom } from '../../store/editor-atoms'
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;
@@ -39,7 +40,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
-  const {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
+  const [typewriter, setTypewriter] = useAtom(typewriterContentAtom)
 
   const inputRef = useRef<HTMLDivElement>()
 
@@ -59,33 +60,33 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     setDeletedChat([])
 
     const pos = editor.getPosition()
-    if (typewriterInput) {
+    if (typewriter) {
       setProcessing(true)
       editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           pos,
           editor.getModel()?.getFullModelRange().getEndPosition()
         ),
-        text: typewriterInput.trim() + "\n",
+        text: typewriter.trim() + "\n",
         forceMoveMarkers: false
       }])
-      setTypewriterInput('')
+      setTypewriter('')
       // Load proof after executing edits
-      loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
+      loadGoals(rpcSess, uri, worldId!, levelId!, setProof, setCrashed)
     }
 
     editor.setPosition(pos)
-  }, [typewriterInput, editor])
+  }, [typewriter, editor])
 
   const [{ isSuggestionsMobileMode }] = useAtom(preferencesAtom)
 
   useEffect(() => {
-    if (oneLineEditor && oneLineEditor.getValue() !== typewriterInput) {
-      oneLineEditor.setValue(typewriterInput)
-      oneLineEditor.setPosition({ column: typewriterInput.length + 1, lineNumber: 1 })
+    if (oneLineEditor && oneLineEditor.getValue() !== typewriter) {
+      oneLineEditor.setValue(typewriter)
+      oneLineEditor.setPosition({ column: typewriter.length + 1, lineNumber: 1 })
       isSuggestionsMobileMode || oneLineEditor.focus()
     }
-  }, [typewriterInput])
+  }, [typewriter])
 
   useEffect(() => {
     if (oneLineEditor && hasEditor) {
@@ -97,7 +98,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   /** If the last step has an error, add the command to the typewriter. */
   useEffect(() => {
     if (lastStepHasErrors(proof)) {
-      setTypewriterInput(proof?.steps[proof?.steps.length - 1].command)
+      setTypewriter(proof?.steps[proof?.steps.length - 1].command)
     }
   }, [proof])
 
@@ -143,7 +144,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       return
     }
     const myEditor = monaco.editor.create(inputRef.current!, {
-      value: typewriterInput,
+      value: typewriter,
       language: "lean4",
       quickSuggestions: false,
       // lightbulb: {
@@ -200,7 +201,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       // abbrevRewriter.dispose()
       myEditor.dispose()
       oneLineEditorRef.current = null
-      setOneLineEditor(null)
+      setOneLineEditor(undefined)
     }
   }, [])
 
@@ -209,7 +210,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     // Ensure that our one-line editor can only have a single line
     const l = oneLineEditor.getModel()?.onDidChangeContent((e) => {
       const value = oneLineEditor.getValue()
-      setTypewriterInput(value)
+      setTypewriter(value)
       const newValue = value.replace(/[\n\r]/g, '')
       if (value != newValue) {
         oneLineEditor.setValue(newValue)
@@ -222,7 +223,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
         l()
       }
     }
-  }, [oneLineEditor, setTypewriterInput])
+  }, [oneLineEditor, setTypewriter])
 
   useEffect(() => {
     if (!oneLineEditor) return

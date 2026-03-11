@@ -8,6 +8,7 @@ import { Diagnostic } from 'vscode-languageserver-types'
 import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from './rpc_api';
 import { Preferences, preferencesAtom } from '../../store/preferences-atoms';
 import { useAtom } from 'jotai';
+import { typewriterContentAtom } from '../../store/editor-atoms';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)
@@ -103,14 +104,6 @@ export const DeletedChatContext = React.createContext<{
   setDeletedChat: () => {},
 })
 
-export const InputModeContext = React.createContext<{
-  typewriterInput: string,
-  setTypewriterInput: React.Dispatch<React.SetStateAction<string>>,
-}>({
-  typewriterInput: "",
-  setTypewriterInput: () => {},
-});
-
 
 const SUFFIX_OVERRIDES: Record<string, string> = {
   "induction": "generalizing",
@@ -129,46 +122,46 @@ const PREFIX_OVERRIDES: Record<string, string> = {
   "simp": "simp only []",
 }
 export function useAppendTypewriterInput() {
-  let {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
+  const [typewriter, setTypewriter] = useAtom(typewriterContentAtom)
   const [{ isSuggestionsMobileMode }] = useAtom(preferencesAtom)
   return (shiftKey: boolean, suffix: string, isTheorem: boolean, isAssumption: boolean) => {
     if (!isSuggestionsMobileMode && !shiftKey) {
       return false
     }
     // Automagically detect and adjust punctuation for mobile keyboardless usage
-    typewriterInput = typewriterInput.trim()
-    if (!typewriterInput.length) {
-      typewriterInput = Object.hasOwn(PREFIX_OVERRIDES, suffix) ? PREFIX_OVERRIDES[suffix] : isTheorem ? `rw [${suffix}]` : suffix
-      setTypewriterInput(typewriterInput + " ")
+    let _typewriter = typewriter.trim()
+    if (!typewriter.length) {
+      _typewriter = Object.hasOwn(PREFIX_OVERRIDES, suffix) ? PREFIX_OVERRIDES[suffix] : isTheorem ? `rw [${suffix}]` : suffix
+      setTypewriter(_typewriter + " ")
       return true
     }
     suffix = !isAssumption && Object.hasOwn(SUFFIX_OVERRIDES, suffix) ? SUFFIX_OVERRIDES[suffix] : suffix
     if (suffix === "ℕ") {
-      if (/ \d$/.test(typewriterInput)) {
-        suffix = ((+typewriterInput.slice(-2) + 1) % 10).toString()
-        typewriterInput = typewriterInput.slice(0, -2)
+      if (/ \d$/.test(_typewriter)) {
+        suffix = ((+_typewriter.slice(-2) + 1) % 10).toString()
+        _typewriter = _typewriter.slice(0, -2)
       } else {
         suffix = "0"
       }
       suffix = " " + suffix
-    } else if (suffix === "∈" && typewriterInput.endsWith("∈")) {
+    } else if (suffix === "∈" && _typewriter.endsWith("∈")) {
       suffix = " {} "
-    } else if (isAssumption && /^apply |^symm|^push_neg/.test(typewriterInput)) {
+    } else if (isAssumption && /^apply |^symm|^push_neg/.test(_typewriter)) {
       suffix = " at " + suffix
     } else if (suffix === "have") {
-      suffix = typewriterInput === "have :" ? "=" : " :="
-    } else if (/[\]}]$/.test(typewriterInput)) {
+      suffix = _typewriter === "have :" ? "=" : " :="
+    } else if (/[\]}]$/.test(_typewriter)) {
       if (isAssumption) {
         suffix = " at " + suffix
       } else {
-        const closing = typewriterInput.slice(-1)
-        typewriterInput = typewriterInput.slice(0, -1)
+        const closing = _typewriter.slice(-1)
+        _typewriter = _typewriter.slice(0, -1)
         if (suffix === "←") {
-          const imbalance = (typewriterInput.match(/\(/)?.length ?? 0) - (typewriterInput.match(/\)/)?.length ?? 0)
-          suffix = /[[,({]$/.test(typewriterInput) ? "←" : /\([^)]*$/.test(typewriterInput) ? ")" : " ("
+          const imbalance = (_typewriter.match(/\(/)?.length ?? 0) - (_typewriter.match(/\)/)?.length ?? 0)
+          suffix = /[[,({]$/.test(_typewriter) ? "←" : /\([^)]*$/.test(_typewriter) ? ")" : " ("
         } else {
-          if (!/[[,({]$/.test(typewriterInput)) {
-            suffix = (isTheorem && !typewriterInput.endsWith("←") && closing === "]" ? ", " : /^[ᶜ.]/.test(suffix) ? "" : " ") + suffix
+          if (!/[[,({]$/.test(_typewriter)) {
+            suffix = (isTheorem && !_typewriter.endsWith("←") && closing === "]" ? ", " : /^[ᶜ.]/.test(suffix) ? "" : " ") + suffix
           }
         }
         suffix = suffix + closing
@@ -176,7 +169,7 @@ export function useAppendTypewriterInput() {
     } else if (!/^[ᶜ.]/.test(suffix)) {
       suffix = " " + suffix
     }
-    setTypewriterInput(`${typewriterInput}${suffix} `.trimLeft())
+    setTypewriter(`${_typewriter}${suffix} `.trimStart())
     return true
   }
 }
