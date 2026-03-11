@@ -71,7 +71,8 @@ export function MenuButton() {
   </Button>
 }
 
-/** button to go one level futher.
+/**
+ * button to go one level futher.
  * for the last level, this button turns into a button going back to the welcome page.
  */
 function NextButton({worldSize} : {worldSize: number }) {
@@ -81,15 +82,25 @@ function NextButton({worldSize} : {worldSize: number }) {
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
   const [difficulty] = useAtom(difficultyAtom)
   const [completed] = useAtom(completedAtom)
-  return (levelId && levelId < worldSize ?
+  if (levelId === undefined) return null
+  if (levelId == 0) return (
     <Button inverted={true}
         onClick={() => {navigateToLevel(levelId + 1); closeNav()}}
          title={t("next level")}
+      >
+      <FontAwesomeIcon icon={faArrowRight} />&nbsp;{t("Start")}
+    </Button>
+  )
+  if (levelId < worldSize) return (
+    <Button inverted={true}
+        onClick={() => {navigateToLevel(levelId + 1); closeNav()}}
+        title={t("next level")}
         disabled={difficulty >= 2 && !(completed || levelId === 0)}
       >
-      <FontAwesomeIcon icon={faArrowRight} />&nbsp;{levelId !== 0 ? t("Next") : t("Start")}
+      <FontAwesomeIcon icon={faArrowRight} />&nbsp;{t("Next")}
     </Button>
-    :
+  )
+  return (
     <Button onClick={() => {if (gameId) navigateToGame(gameId)}}  inverted={true} title={t("Home")} id="home-btn">
       <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
     </Button>
@@ -105,14 +116,15 @@ function PreviousButton() {
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
-  return (levelId && levelId > 0 && <>
+  if (!levelId) return null
+  return (
     <Button disabled={levelId <= 0} inverted={true}
         onClick={() => {navigateToLevel(levelId - 1); closeNav()}}
         title={t("previous level")}
       >
       <FontAwesomeIcon icon={faArrowLeft} />&nbsp;{t("Previous")}
     </Button>
-  </>)
+  )
 }
 
 /** button to toggle between editor and typewriter */

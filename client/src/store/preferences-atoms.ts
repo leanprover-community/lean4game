@@ -24,7 +24,16 @@ const defaultPreferences: Preferences = {
 
 const storage = createJSONStorage<Preferences>(() => localStorage)
 
-// TODO: only store preferences if box is checked!
+const conditionalStorage = {
+  ...storage,
+  setItem: (key: string, value: Preferences) => {
+    if (value.isSavePreferences) {
+      storage.setItem(key, value)
+    } else {
+      storage.removeItem(key)
+    }
+  },
+}
 
 /**
  * User preferences synchronised with local storage
@@ -32,7 +41,7 @@ const storage = createJSONStorage<Preferences>(() => localStorage)
 export const preferencesAtom = atomWithStorage<Preferences>(
   'preferences',
   defaultPreferences,
-  storage,
+  conditionalStorage,
   { getOnInit: true }
 )
 
