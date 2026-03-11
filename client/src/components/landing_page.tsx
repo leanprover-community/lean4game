@@ -1,33 +1,23 @@
 import * as React from 'react';
-import { useEffect } from 'react';
-
-import { I18nextProvider, Trans, useTranslation } from 'react-i18next';
-
+import { Trans, useTranslation } from 'react-i18next';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-
 import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
-
 import { Markdown } from './markdown';
 import path from 'path';
-
 import { ImpressumButton, MenuButton, PreferencesButton, PrivacyButton } from './app_bar';
 import ReactCountryFlag from 'react-country-flag';
 import lean4gameConfig from '../config.json'
 import i18next from 'i18next';
-import i18n from 'i18next';
 import { popupAtom, PopupType } from '../store/popup-atoms';
 import { useAtom } from 'jotai';
 import { GithubIcon } from './navigation/github_icon';
-import { useGameTranslation } from '../utils/translation';
 import { navOpenAtom } from '../store/navigation-atoms';
 import { gameIdAtom } from '../store/location-atoms';
-import { GameTile } from '../store/api';
 import { gameInfoAtomFamily } from '../store/query-atoms';
-
 
 function Tile({gameId}: {gameId: string}) {
   const { t, i18n } = useTranslation()
@@ -39,7 +29,6 @@ function Tile({gameId}: {gameId: string}) {
   if (!gameTile) {
     return <></>
   }
-
 
   return <div className="game" onClick={() => navigateToGame(gameId)}>
       <div className="wrapper">
@@ -85,7 +74,7 @@ function Tile({gameId}: {gameId: string}) {
 
 function LandingPage() {
   const [, setPopup] = useAtom(popupAtom)
-  const [navOpen, setNavOpen] = useAtom(navOpenAtom)
+  const [navOpen] = useAtom(navOpenAtom)
 
   const [usageCPU, setUsageCPU] = React.useState<number>()
   const [usageMem, setUsageMem] = React.useState<number>()

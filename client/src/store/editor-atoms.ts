@@ -4,6 +4,8 @@ import { gameIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
+import { ProofState } from "../components/infoview/rpc_api";
+import { Diagnostic } from 'vscode-languageserver-types'
 
 /** Options for the LeanMonaco instance */
 export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
@@ -35,6 +37,8 @@ export const codeAtom = atom(
     set(levelProgressAtom, { ...levelProgress, code: val })
   }
 )
+
+export const typewriterContentAtom = atom<string>("")
 
 export const selectionsAtom = atom(
   get => {
@@ -72,3 +76,16 @@ export const typewriterModeAtom = atom(
     set(progressAtom, { ...progress, typewriterMode: valMod })
   }
 )
+
+/** The proof consists of multiple steps that are processed one after the other.
+ * In particular multi-line terms like `match`-statements will not be supported.
+ *
+ * Note that the first step will always have "" as command
+ */
+export const proofAtom = atom<ProofState>()
+
+/** TODO: Workaround to capture a crash of the gameserver. */
+export const interimDiagsAtom = atom<Array<Diagnostic>>()
+
+/** TODO: Workaround to capture a crash of the gameserver. */
+export const crashedAtom = atom<boolean>()

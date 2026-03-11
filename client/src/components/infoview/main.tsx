@@ -1,7 +1,7 @@
 /* Partly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/main.tsx */
 
 import * as React from 'react';
-import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location, DocumentUri } from 'vscode-languageserver-protocol';
+import type { DidCloseTextDocumentParams, DocumentUri } from 'vscode-languageserver-protocol';
 
 import 'tachyons/css/tachyons.css';
 import '@vscode/codicons/dist/codicon.css';
@@ -24,7 +24,7 @@ import { Markdown } from '../markdown';
 import { Infos } from './infos';
 import { Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
-import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, SelectionContext } from './context';
+import { MonacoEditorContext } from './context';
 import { Typewriter, getInteractiveDiagsAt, hasInteractiveErrors } from './typewriter';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
@@ -39,10 +39,10 @@ import { useAtom } from 'jotai';
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms';
 import { completedAtom } from '../../store/progress-atoms';
 import { gameInfoAtom, levelInfoAtom } from '../../store/query-atoms';
-import { lockEditorModeAtom, typewriterModeAtom } from '../../store/editor-atoms';
+import { crashedAtom, interimDiagsAtom, lockEditorModeAtom, proofAtom, typewriterContentAtom, typewriterModeAtom } from '../../store/editor-atoms';
 import { inventoryAtom } from '../../store/inventory-atoms';
 import { mobileAtom } from '../../store/preferences-atoms';
-import { helpAtom } from '../../store/chat-atoms';
+import { deletedChatAtom, helpAtom, selectedStepAtom } from '../../store/chat-atoms';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -78,7 +78,7 @@ function DualEditorMain() {
   const [, addToInventory] = useAtom(inventoryAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
 
-  const {proof, setProof} = React.useContext(ProofContext)
+  const [proof] = useAtom(proofAtom)
 
   React.useEffect(() => {
     if (proof?.completed) {
@@ -178,9 +178,9 @@ export function Main() {
 
   const [typewriterMode] = useAtom(typewriterModeAtom)
 
-  const { proof, setProof, setCrashed } = React.useContext(ProofContext)
-  const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
-  const { setDeletedChat } = React.useContext(DeletedChatContext)
+  const [proof, setProof] = useAtom(proofAtom)
+  const [, setCrashed] = useAtom(crashedAtom)
+  const [selectedStep, setSelectedStep] = useAtom(selectedStepAtom)
   const editor = React.useContext(MonacoEditorContext)
   const model = editor?.getModel()
   const uri = model?.uri.toString()
@@ -376,57 +376,6 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
   }
 }
 
-// const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
-//   const ec = React.useContext(EditorContext);
-//   const fname = escapeHtml(basename(uri));
-//   const {line, character} = diag.range.start;
-//   const loc: Location = { uri, range: diag.range };
-//   const text = TaggedText_stripTags(diag.message);
-//   const severityClass = diag.severity ? {
-//       [DiagnosticSeverity.Error]: 'error',
-//       [DiagnosticSeverity.Warning]: 'warning',
-//       [DiagnosticSeverity.Information]: 'information',
-//       [DiagnosticSeverity.Hint]: 'hint',
-//   }[diag.severity] : '';
-//   const title = `Line ${line+1}, Character ${character}`;
-
-//   // Hide "unsolved goals" messages
-//   let message;
-//   if ("append" in diag.message && "text" in diag.message.append[0] &&
-//     diag.message?.append[0].text === "unsolved goals") {
-//       message = diag.message.append[0]
-//   } else {
-//       message = diag.message
-//   }
-
-//   const { typewriterMode } = React.useContext(InputModeContext)
-
-//   return (
-//   // <details open>
-//       // <summary className={severityClass + ' mv2 pointer'}>{title}
-//       //     <span className="fr">
-//       //         <a className="link pointer mh2 dim codicon codicon-go-to-file"
-//       //            onClick={e => { e.preventDefault(); void ec.revealLocation(loc); }}
-//       //            title="reveal file location"></a>
-//       //         <a className="link pointer mh2 dim codicon codicon-quote"
-//       //            data-id="copy-to-comment"
-//       //            onClick={e => {e.preventDefault(); void ec.copyToComment(text)}}
-//       //            title="copy message to comment"></a>
-//       //         <a className="link pointer mh2 dim codicon codicon-clippy"
-//       //            onClick={e => {e.preventDefault(); void ec.api.copyToClipboard(text)}}
-//       //            title="copy message to clipboard"></a>
-//       //     </span>
-//       // </summary>
-//       <div className={severityClass + ' ml1 message'}>
-//           {!typewriterMode && <p className="mv2">{title}</p>}
-//           <pre className="font-code pre-wrap">
-//               <InteractiveMessage fmt={message} />
-//           </pre>
-//       </div>
-//   // </details>
-//   )
-// }, fastIsEqual)
-
 /** The tabs of goals that lean ahs after the command of this step has been processed */
 function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: InteractiveGoalsWithHints, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
   let { t } = useTranslation()
@@ -506,11 +455,14 @@ export function TypewriterInterface() {
 
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
-  const { setDeletedChat } = React.useContext(DeletedChatContext)
+  const [, setDeletedChat] = useAtom(deletedChatAtom)
   const [mobile] = useAtom(mobileAtom)
-  const { proof, setProof, crashed, setCrashed, interimDiags } = React.useContext(ProofContext)
-  const { setTypewriterInput } = React.useContext(InputModeContext)
-  const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
+  const [proof, setProof ] = useAtom(proofAtom)
+  const [crashed, setCrashed ] = useAtom(crashedAtom)
+  const [interimDiags ] = useAtom(interimDiagsAtom)
+
+  const [, setTypewriter] = useAtom(typewriterContentAtom)
+  const [selectedStep, setSelectedStep] = useAtom(selectedStepAtom)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
   // const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
@@ -552,7 +504,7 @@ export function TypewriterInterface() {
         forceMoveMarkers: false
       }])
       setSelectedStep(null)
-      setTypewriterInput(proof?.steps[line].command)
+      setTypewriter(proof?.steps[line].command)
       // Reload proof on deleting
       loadGoals(rpcSess, uri, worldId!, levelId!, setProof, setCrashed)
       ev.stopPropagation()
