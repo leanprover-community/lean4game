@@ -2,7 +2,6 @@
  * @fileOverview
 */
 import * as React from 'react'
-import { useAppDispatch } from '../../hooks'
 import { downloadFile } from '../world_tree'
 import { Trans, useTranslation } from 'react-i18next'
 import { popupAtom } from '../../store/popup-atoms'

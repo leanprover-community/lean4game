@@ -1,4 +1,4 @@
-import { GameHint, InteractiveGoalsWithHints, ProofState } from "./infoview/rpc_api";
+import { GameHint, InteractiveGoalsWithHints } from "./infoview/rpc_api";
 import * as React from 'react';
 import { Markdown } from './markdown';
 import { lastStepHasErrors } from "./infoview/goals";

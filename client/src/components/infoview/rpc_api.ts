@@ -6,7 +6,6 @@
 import type { Range } from 'vscode-languageserver-protocol';
 import type { ContextInfo, FVarId, CodeWithInfos, MVarId } from '@leanprover/infoview-api';
 import { InteractiveDiagnostic, TermInfo } from '@leanprover/infoview/*';
-import type { Diagnostic } from 'vscode-languageserver-protocol';
 
 export interface InteractiveHypothesisBundle {
   /** The pretty names of the variables in the bundle. Anonymous names are rendered

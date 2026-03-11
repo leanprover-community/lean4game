@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { RefObject } from 'react';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {

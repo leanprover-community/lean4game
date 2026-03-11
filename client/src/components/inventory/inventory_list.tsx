@@ -3,7 +3,7 @@ import { InventoryTile } from "../../store/api"
 import { InventoryItem } from "./inventory_item"
 import { currentInventoryTilesAtom, inventoryAtom, InventoryTab } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
-import { gameIdAtom, levelIdAtom, worldIdAtom } from "../../store/location-atoms"
+import { levelIdAtom, worldIdAtom } from "../../store/location-atoms"
 
 export function InventoryList({tiles, docType, enableAll=false} : {
   tiles: InventoryTile[],

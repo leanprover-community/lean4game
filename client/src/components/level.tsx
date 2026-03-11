@@ -83,12 +83,11 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
   const chatRef = useRef<HTMLDivElement>(null)
   const [mobile] = useAtom(mobileAtom)
   const [gameId, navigateToGame] = useAtom(gameIdAtom)
-  const [worldId] = useAtom(worldIdAtom)
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
   const [{ data: levelInfo }] = useAtom(levelInfoAtom)
-  const [help, setHelp] = useAtom(helpAtom)
-  const [proof, setProof] = useAtom(proofAtom)
-  const [deletedChat, setDeletedChat] = useAtom(deletedChatAtom)
+  const [help] = useAtom(helpAtom)
+  const [proof] = useAtom(proofAtom)
+  const [deletedChat] = useAtom(deletedChatAtom)
   const [selectedStep, setSelectedStep] = useAtom(selectedStepAtom)
 
   let k = proof?.steps.length ? proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) : 0
@@ -206,29 +205,19 @@ function PlayableLevel() {
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
   const [leanMonaco] = useAtom(leanMonacoAtom)
-
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
-
   const [mobile] = useAtom(mobileAtom)
-
   const [code] = useAtom(codeAtom)
-  const [initialSelections] = useAtom(selectionsAtom)
-
-  // A set of row numbers where help is displayed
-  const [help, setHelp] = useAtom(helpAtom)
-
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [{ data: levelInfo, isLoading: levelInfoIsLoading }] = useAtom(levelInfoAtom)
-
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
-
   // set to true to prevent switching between typewriter and editor
   const [lockEditorMode] = useAtom(lockEditorModeAtom)
-  const [typewriterInput, setTypewriterInput] = useState("")
+  const [, setTypewriterInput] = useState("")
   const lastLevel = worldId && (levelId !== undefined) && levelId >= (gameInfo?.worldSize?.[worldId] ?? 0)
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
