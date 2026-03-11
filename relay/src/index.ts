@@ -9,6 +9,8 @@ import { spawn } from 'child_process'
 import { GameManager } from './serverProcess.js';
 import { GameSessionsObserver } from './websocket.js';
 import { WebSocketServer } from 'ws';
+import type { Request, Response } from "express";
+import type { Params } from './param-types.js';
 // import fs from 'fs'
 // const __filename = url.fileURLToPath(import.meta.url);
 
@@ -25,12 +27,14 @@ router.get('/import/trigger/:owner/:repo', importTrigger)
 
 const server = app
   .use(express.static(clientDistPath)) // TODO: add a dist folder from inside the game
-  .use('/i18n/g/:owner/:repo/:lang/*', (req, res, next) => {
+  .use('/i18n/g/:owner/:repo/:lang/*', (req: Request<Params>, res: Response, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
     const lang = req.params.lang
 
-    const anon_ip = anonymize(req.headers['x-forwarded-for'] as string || req.socket.remoteAddress)
+
+    const headers = req.headers['x-forwarded-for']
+    const anon_ip = anonymize((Array.isArray(headers) ? headers[0] : headers) ?? req.socket.remoteAddress ?? "")
     const log = path.join(process.cwd(), 'logs', 'game-access.log')
     const header = "date;anon-ip;game;lang\n"
     const data = `${new Date()};${anon_ip};${owner}/${repo};${lang}\n`
@@ -55,7 +59,7 @@ const server = app
     req.url = filename;
     express.static(path.join(gameManager.getGameDir(owner,repo),".i18n",lang))(req, res, next);
   })
-  .use('/data/g/:owner/:repo/*', (req, res, next) => {
+  .use('/data/g/:owner/:repo/*', (req: Request<Params>, res: Response, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
     const filename = req.params[0];
@@ -63,7 +67,7 @@ const server = app
     console.debug(gameManager.getGameDir(owner,repo))
     express.static(path.join(gameManager.getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
   })
-  .use('/data/stats', (req, res, next) => {
+  .use('/data/stats', (req: Request<Params>, res: Response, next) => {
     // TODO: this throws on Windows
     const statsScriptPath = path.join(__dirname, "..", "..", "scripts", "stats.sh");
     const statsProcess = spawn('/bin/bash', [statsScriptPath, process.pid.toString()])

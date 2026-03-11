@@ -1,24 +1,17 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "outDir": "./dist/",
-    "module": "esnext",
-    "target": "es5",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "jsx": "react",
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [
-      "ES2021.String",
-      "DOM"
-    ]
+    "composite": true,
+    "esModuleInterop": true,
+    "incremental": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM"],
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "strict": true
   },
-  "include": [
-    "./src/",
-    "./src/config.json",
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["dist"]
 }

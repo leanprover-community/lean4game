@@ -1,21 +1,7 @@
 {
-  "compilerOptions": {
-    "composite": true,
-    "module": "esnext",
-    "target": "es5",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "jsx": "react",
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "lib": [
-      "ES2021.String",
-      "DOM"
-    ]
-  },
-  "references": [{"path": "./relay"}, {"path": "./client"}],
-  "exclude": ["./server/"]
+  "references": [
+    { "path": "./client" },
+    { "path": "./relay" },
+    { "path": "./cypress" }
+  ]
 }
