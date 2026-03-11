@@ -148,8 +148,8 @@ function InputModeButton({ isDropdown } : {isDropdown: boolean}) {
       inverted={true}
       onClick={(ev) => toggleInputMode(ev)}
       title={lockEditorMode ? t("Editor mode is enforced!") : typewriterMode ? t("Editor mode") : t("Typewriter mode")}>
-    <FontAwesomeIcon icon={(typewriterMode && !lockEditorMode) ? faCode : faTerminal} />
-    {isDropdown && ((typewriterMode && !lockEditorMode) ? <>&nbsp;{t("Editor mode")}</> : <>&nbsp;{t("Typewriter mode")}</>)}
+    <FontAwesomeIcon icon={(typewriterMode) ? faCode : faTerminal} />
+    {isDropdown && ((typewriterMode) ? <>&nbsp;{t("Editor mode")}</> : <>&nbsp;{t("Typewriter mode")}</>)}
   </Button>
 }
 

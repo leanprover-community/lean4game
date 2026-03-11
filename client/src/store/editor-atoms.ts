@@ -24,21 +24,6 @@ export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
 /** The unique leanMonaco instance for the entire application */
 export const leanMonacoAtom = atom<LeanMonaco | null>(null)
 
-/** Whether the current game is in typewriter mode */
-export const typewriterModeAtom = atom(
-  get => {
-    const progress = get(progressAtom)
-    if (!progress) return false
-    return progress.typewriterMode
-  },
-  (get, set, val: boolean | null) => {
-    const progress = get(progressAtom)
-    if (!progress) return
-    const valMod = (val === null) ? undefined : val
-    set(progressAtom, { ...progress, typewriterMode: valMod })
-  }
-)
-
 export const codeAtom = atom(
   get => {
     const levelProgress = get(levelProgressAtom)
@@ -68,3 +53,22 @@ export const lockEditorModeAtom = atom(get => {
   const { data: levelInfo } = get(levelInfoAtom)
   return levelInfo?.template != null
 })
+
+/** Whether the current game is in typewriter mode */
+export const typewriterModeAtom = atom(
+  get => {
+    // force editor mode
+    const lockEditorMode = get(lockEditorModeAtom)
+    if (lockEditorMode) return false
+
+    // read setting from local storage
+    const progress = get(progressAtom)
+    return progress?.typewriterMode ?? true
+  },
+  (get, set, val: boolean | null) => {
+    const progress = get(progressAtom)
+    if (!progress) return
+    const valMod = (val === null) ? undefined : val
+    set(progressAtom, { ...progress, typewriterMode: valMod })
+  }
+)

@@ -51,7 +51,7 @@ export function DualEditor({ codeviewRef } : { codeviewRef: any }) {
   const [typewriterMode] = useAtom(typewriterModeAtom)
   const ec = React.useContext(EditorContext)
   const [lockEditorMode] = useAtom(lockEditorModeAtom)
-  const showTypewriter = Boolean(ec) && typewriterMode && !lockEditorMode
+  const showTypewriter = Boolean(ec) && typewriterMode
   return <>
     <div className={showTypewriter ? 'hidden' : ''}>
       <ExerciseStatement showLeanStatement={true} />
@@ -119,7 +119,7 @@ function DualEditorMain() {
         <WithRpcSessions>
           <WithLspDiagnosticsContext>
             <ProgressContext.Provider value={allProgress}>
-              {(typewriterMode && !lockEditorMode) ?
+              {(typewriterMode) ?
                 <TypewriterInterfaceWrapper/>
                 :
                 <Main key={`${worldId}/${levelId}`} />
@@ -235,7 +235,7 @@ export function Main() {
     useEventResult(ec.events.changedCursorLocation, loc => loc ? { uri: loc.uri, ...loc.range.start } : undefined)
 
   React.useEffect(() => {
-    if (typewriterMode && !lockEditorMode) {
+    if (typewriterMode) {
       return
     }
     if (!uri) {
@@ -245,7 +245,7 @@ export function Main() {
   }, [typewriterMode, lockEditorMode, uri, worldId, levelId, rpcSess, setProof, setCrashed])
 
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: any) => {
-    if (typewriterMode && !lockEditorMode) {
+    if (typewriterMode) {
       return
     }
     if (!uri || params?.uri !== uri) {
@@ -255,7 +255,7 @@ export function Main() {
   }, [typewriterMode, lockEditorMode, uri, worldId, levelId, rpcSess, setProof, setCrashed])
 
   const hintLine = (() => {
-    const isEditorMode = !(typewriterMode && !lockEditorMode)
+    const isEditorMode = !(typewriterMode)
     const curLine = Number.isFinite(curPos?.line)
       ? curPos.line
       : (Number.isFinite((curPos as any)?._line) ? (curPos as any)._line : undefined)
