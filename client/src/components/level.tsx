@@ -38,9 +38,7 @@ import { codeAtom, leanMonacoAtom, lockEditorModeAtom, selectionsAtom, typewrite
 import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
 import { helpAtom } from '../store/chat-atoms'
-import { inventoryAtom, inventoryOverviewAtom } from '../store/inventory-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
-import { difficultyAtom } from '../store/progress-atoms'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
   const maybeLeanMonaco = leanMonaco as unknown as {
@@ -216,9 +214,6 @@ function PlayableLevel() {
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
-  const inventory = useAtom(inventoryAtom)
-  const [difficulty] = useAtom(difficultyAtom)
-
 
   const [mobile] = useAtom(mobileAtom)
 
