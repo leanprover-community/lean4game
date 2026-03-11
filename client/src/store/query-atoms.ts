@@ -6,20 +6,21 @@ import { atom } from 'jotai'
 import { InventoryTab } from './inventory-atoms'
 
 /** The info about all games */
-export const gameInfoAtomFamily = atomFamily((gameId) => atomWithQuery<GameInfo>((get) => {
+export const gameInfoAtomFamily = atomFamily((gameId: string) => atomWithQuery<GameInfo>(() => {
   return {
     queryKey: ['gameInfo', gameId],
     queryFn: async () => {
       const res = await fetch(`${window.location.origin}/data/${gameId}/game.json`)
       return res.json()
     },
+    enabled: gameId.length > 0,
   }
 }))
 
 /** The info about the current game */
 export const gameInfoAtom = atom((get) => {
   const gameId = get(gameIdAtom)
-  return get(gameInfoAtomFamily(gameId))
+  return get(gameInfoAtomFamily(gameId ?? ""))
 })
 
 /** Info about the current level */

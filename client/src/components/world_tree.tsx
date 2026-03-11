@@ -19,7 +19,7 @@ import { useGameTranslation } from '../utils/translation'
 import { gameIdAtom, levelIdAtom, navigateAcrossWorldsAtom, worldIdAtom } from '../store/location-atoms'
 import { Button } from './button'
 import { difficultyAtom } from '../store/progress-atoms'
-import { completedAtomFamily } from '../store/world-tree-atoms'
+import { completedAtomFamily, worldDependenciesCompletedAtomFamily } from '../store/world-tree-atoms'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -108,15 +108,15 @@ export function LevelIcon({ world, level, position, unlocked, worldSize }:
 }
 
 /** svg object of one world in the game tree */
-export function WorldIcon({world, title, position, completedLevels, difficulty, worldSize}:
+export function WorldIcon({world, title, position, difficulty, worldSize}:
   { world: string,
     title: string,
     position: cytoscape.Position,
-    completedLevels: any,
     difficulty: number,
     worldSize: number
   }) {
   const [completed] = useAtom(completedAtomFamily([world, null]))
+  const [unlocked] = useAtom(worldDependenciesCompletedAtomFamily(world))
   const { t : gT } = useGameTranslation()
 
   // See level icons. Match radius computed there minus `1.2*r`
@@ -130,7 +130,7 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
   let labelOffset = R + 2.5 * r
 
   // index `0` indicates that all prerequisites are completed
-  let unlocked = completedLevels[0]
+  // let unlocked = completedLevels[0]
   // // indices `1`-`n` indicate that the corresponding level is completed
   // let completed = completedLevels.slice(1).every(Boolean)
   // select the first non-completed level
@@ -204,7 +204,6 @@ export function WorldSelectionMenu() {
   const { t, i18n } = useTranslation()
   const [gameId] = useAtom(gameIdAtom)
   const [difficulty, setDifficulty] = useAtom(difficultyAtom)
-  const dispatch = useAppDispatch()
   const { mobile } = React.useContext(PreferencesContext)
   const [popup, setPopup] = useAtom(popupAtom)
 
@@ -302,19 +301,19 @@ export function WorldTreePanel({worlds, worldSize}:
 
   let svgElements = []
 
-  // for each `worldId` as index, this contains a list of booleans with indices
-  // 0, 1, …, n. Index `0` will be set to `false` if any dependency is not completely solved.
-  // Indices `1, …, n` indicate if the corresponding level is completed
-  var completed = {}
+  // // for each `worldId` as index, this contains a list of booleans with indices
+  // // 0, 1, …, n. Index `0` will be set to `false` if any dependency is not completely solved.
+  // // Indices `1, …, n` indicate if the corresponding level is completed
+  // var completed = {}
 
   if (worlds && worldSize) {
-    // Fill `completed` with the level data.
-    for (let worldId in nodes) {
-      completed[worldId] = Array.from({ length: worldSize[worldId] + 1 }, (_, i) => {
-        // index `0` starts off as `true` but can be set to `false` by any edge with non-completed source
-        return i == 0 || selectCompleted(gameId, worldId, i)(store.getState())
-      })
-    }
+    // // Fill `completed` with the level data.
+    // for (let worldId in nodes) {
+    //   completed[worldId] = Array.from({ length: worldSize[worldId] + 1 }, (_, i) => {
+    //     // index `0` starts off as `true` but can be set to `false` by any edge with non-completed source
+    //     return i == 0 || selectCompleted(gameId, worldId, i)(store.getState())
+    //   })
+    // }
 
     // draw all connecting paths
     for (let i in worlds.edges) {
@@ -335,7 +334,7 @@ export function WorldTreePanel({worlds, worldSize}:
         <WorldIcon world={worldId}
           title={nodes[worldId].data.title || worldId}
           position={position}
-          completedLevels={completed[worldId]}
+          // completedLevels={completed[worldId]}
           difficulty={difficulty}
           key={`${gameId}-${worldId}`}
           worldSize={worldSize[worldId]}
