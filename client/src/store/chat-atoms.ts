@@ -33,3 +33,6 @@ export const helpAtom = atom(
  * a new proof has been entered. e.g. to consult messages coming from dead ends
  */
 export const deletedChatAtom = atom<GameHint[]>([])
+
+/** Context to keep highlight selected proof step and corresponding chat messages. */
+export const selectedStepAtom = atom<number>()

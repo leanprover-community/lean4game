@@ -1,9 +1,8 @@
 import React, { useEffect } from "react"
 import "../../css/inventory.css"
-import { inventoryAtom, InventoryTab, inventoryTabAtom, inventoryTilesAtoms, selectedDocTileAtom, theoremSubtabAtom, userInventoryAtom } from "../../store/inventory-atoms"
+import { InventoryTab, inventoryTabAtom, inventoryTilesAtoms, selectedDocTileAtom, theoremSubtabAtom } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
 import { InventoryOverview, InventoryTile, LevelInfo } from "../../store/api"
-import { gameIdAtom } from "../../store/location-atoms"
 import { InventorySubTabBar, InventoryTabBar } from "./tab_bars"
 import { InventoryList } from "./inventory_list"
 import { Documentation } from "./documentation"
@@ -14,18 +13,12 @@ export function InventoryPanel({levelInfo, visible = true} : {
   levelInfo : LevelInfo | InventoryOverview | undefined,
   visible?: boolean
 }) {
-  const [gameId] = useAtom(gameIdAtom)
-  const [inventory] = useAtom(inventoryAtom)
-
   const [tab] = useAtom(inventoryTabAtom)
   const [, setSubtab] = useAtom(theoremSubtabAtom)
   const [doc] = useAtom(selectedDocTileAtom)
-
   const [, setTheoremInventory] = useAtom(inventoryTilesAtoms[InventoryTab.theorem])
   const [, setTacticInventory] = useAtom(inventoryTilesAtoms[InventoryTab.tactic])
   const [, setDefinitionInventory] = useAtom(inventoryTilesAtoms[InventoryTab.definition])
-  const [, setUserInventory] = useAtom(userInventoryAtom)
-
   const [difficulty] = useAtom(difficultyAtom)
 
   // TODO: this is some glue since not everything is in jotai yet

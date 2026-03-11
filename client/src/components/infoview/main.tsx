@@ -1,7 +1,7 @@
 /* Partly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/main.tsx */
 
 import * as React from 'react';
-import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location, DocumentUri } from 'vscode-languageserver-protocol';
+import type { DidCloseTextDocumentParams, DocumentUri } from 'vscode-languageserver-protocol';
 
 import 'tachyons/css/tachyons.css';
 import '@vscode/codicons/dist/codicon.css';
@@ -24,7 +24,7 @@ import { Markdown } from '../markdown';
 import { Infos } from './infos';
 import { Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
-import { MonacoEditorContext, SelectionContext } from './context';
+import { MonacoEditorContext } from './context';
 import { Typewriter, getInteractiveDiagsAt, hasInteractiveErrors } from './typewriter';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
@@ -39,10 +39,10 @@ import { useAtom } from 'jotai';
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms';
 import { completedAtom } from '../../store/progress-atoms';
 import { gameInfoAtom, levelInfoAtom } from '../../store/query-atoms';
-import { crashedAtom, interimDiags, interimDiagsAtom, lockEditorModeAtom, proofAtom, typewriterContentAtom, typewriterModeAtom } from '../../store/editor-atoms';
+import { crashedAtom, interimDiagsAtom, lockEditorModeAtom, proofAtom, typewriterContentAtom, typewriterModeAtom } from '../../store/editor-atoms';
 import { inventoryAtom } from '../../store/inventory-atoms';
 import { mobileAtom } from '../../store/preferences-atoms';
-import { deletedChatAtom, helpAtom } from '../../store/chat-atoms';
+import { deletedChatAtom, helpAtom, selectedStepAtom } from '../../store/chat-atoms';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -180,7 +180,7 @@ export function Main() {
 
   const [proof, setProof] = useAtom(proofAtom)
   const [, setCrashed] = useAtom(crashedAtom)
-  const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
+  const [selectedStep, setSelectedStep] = useAtom(selectedStepAtom)
   const editor = React.useContext(MonacoEditorContext)
   const model = editor?.getModel()
   const uri = model?.uri.toString()
@@ -462,7 +462,7 @@ export function TypewriterInterface() {
   const [interimDiags ] = useAtom(interimDiagsAtom)
 
   const [, setTypewriter] = useAtom(typewriterContentAtom)
-  const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
+  const [selectedStep, setSelectedStep] = useAtom(selectedStepAtom)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
   // const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;

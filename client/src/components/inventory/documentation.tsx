@@ -6,14 +6,13 @@ import { useAtom } from "jotai"
 import { faLock, faXmark } from "@fortawesome/free-solid-svg-icons"
 import { NavButton } from "../navigation/nav_button"
 import { useGameTranslation } from "../../utils/translation"
-import { gameIdAtom, navigateAcrossWorldsAtom } from "../../store/location-atoms"
+import { navigateAcrossWorldsAtom } from "../../store/location-atoms"
 import { difficultyAtom } from "../../store/progress-atoms"
 
 /** The `documentation` */
 export function Documentation({ type } : {type : InventoryTab}) {
   const { t } = useTranslation()
   const { t: gT } = useGameTranslation()
-  const [gameId] = useAtom(gameIdAtom)
   const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
   const [difficulty] = useAtom(difficultyAtom)
   const [, addToInventory] = useAtom(inventoryAtom)

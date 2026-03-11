@@ -1,23 +1,20 @@
 import * as React from 'react'
-import { useEffect, useState, useRef, useContext } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Split from 'react-split'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgress } from '@mui/material'
 import type { Location } from 'vscode-languageserver-protocol'
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions } from 'lean4monaco'
 import { setupMonacoClient } from 'lean4monaco/dist/monacoleanclient'
 import type { EditorApi, InfoviewApi } from '@leanprover/infoview-api'
 import { EditorContext } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts'
 import { EditorConnection, EditorEvents } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/editorConnection'
 import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/event'
-import { Diagnostic } from 'vscode-languageserver-types'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import { MonacoEditorContext, SelectionContext } from './infoview/context'
+import { MonacoEditorContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
-import { GameHint, ProofState } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
 import path from 'path';
 
@@ -34,9 +31,9 @@ import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { useAtom } from 'jotai'
 import { codeAtom, leanMonacoAtom, lockEditorModeAtom, proofAtom, selectionsAtom, typewriterModeAtom } from '../store/editor-atoms'
-import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
+import { gameIdAtom, levelIdAtom, worldIdAtom } from '../store/location-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
-import { deletedChatAtom, helpAtom } from '../store/chat-atoms'
+import { deletedChatAtom, helpAtom, selectedStepAtom } from '../store/chat-atoms'
 import { inventoryOverviewAtom } from '../store/inventory-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
 
@@ -92,7 +89,7 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
   const [help, setHelp] = useAtom(helpAtom)
   const [proof, setProof] = useAtom(proofAtom)
   const [deletedChat, setDeletedChat] = useAtom(deletedChatAtom)
-  const {selectedStep, setSelectedStep} = useContext(SelectionContext)
+  const [selectedStep, setSelectedStep] = useAtom(selectedStepAtom)
 
   let k = proof?.steps.length ? proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) : 0
 
@@ -100,7 +97,7 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
     return (ev: any) => {
       console.debug('toggled selection')
       if (selectedStep == line) {
-        setSelectedStep(null)
+        setSelectedStep(undefined)
       } else {
         setSelectedStep(line)
       }
@@ -497,7 +494,6 @@ function PlayableLevel() {
 
   return <>
     <div style={levelInfoIsLoading? undefined : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-      <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={leanMonacoEditor?.editor}>
                 <LevelAppBar
@@ -528,7 +524,6 @@ function PlayableLevel() {
                 }
               </MonacoEditorContext.Provider>
             </EditorContext.Provider>
-      </SelectionContext.Provider>
   </>
 }
 

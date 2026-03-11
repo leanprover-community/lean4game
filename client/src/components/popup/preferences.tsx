@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { Input, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
-import { Markdown } from '../markdown'
-import { Switch, Button, ButtonGroup } from '@mui/material';
+import { MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
+import { Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import lean4gameConfig from '../../config.json'

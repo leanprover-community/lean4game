@@ -4,8 +4,7 @@
 import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic } from '@leanprover/infoview-api';
-import { Diagnostic } from 'vscode-languageserver-types'
-import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from './rpc_api';
+import { InteractiveTermGoal,InteractiveGoalsWithHints } from './rpc_api';
 import { Preferences, preferencesAtom } from '../../store/preferences-atoms';
 import { useAtom } from 'jotai';
 import { typewriterContentAtom } from '../../store/editor-atoms';
@@ -62,14 +61,6 @@ export interface IPreferencesContext extends Preferences{
   setIsSuggestionsMobileMode: any;
 }
 
-/** Context to keep highlight selected proof step and corresponding chat messages. */
-export const SelectionContext = React.createContext<{
-  selectedStep : number | null,
-  setSelectedStep: React.Dispatch<React.SetStateAction<number | null>>
-}>({
-  selectedStep : null,
-  setSelectedStep: () => {}
-})
 
 const SUFFIX_OVERRIDES: Record<string, string> = {
   "induction": "generalizing",

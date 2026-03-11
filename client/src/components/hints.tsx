@@ -30,19 +30,19 @@ function getHintText(hint: GameHint): string {
   }
 }
 
-export function Hint({hint, step, selected, toggleSelection, lastLevel} : {hint: GameHint, step: number, selected: number | null, toggleSelection: any, lastLevel?: boolean}) {
+export function Hint({hint, step, selected, toggleSelection, lastLevel} : {hint: GameHint, step: number, selected?: number, toggleSelection: any, lastLevel?: boolean}) {
   return <div className={`message information step-${step}` + (step == selected ? ' selected' : '') + (lastLevel ? ' recent' : '')} onClick={toggleSelection}>
     <Markdown>{getHintText(hint)}</Markdown>
   </div>
 }
 
-export function HiddenHint({hint, step, selected, toggleSelection, lastLevel} : {hint: GameHint, step: number, selected: number, toggleSelection: any, lastLevel?: boolean}) {
+export function HiddenHint({hint, step, selected, toggleSelection, lastLevel} : {hint: GameHint, step: number, selected?: number, toggleSelection: any, lastLevel?: boolean}) {
   return <div className={`message warning step-${step}` + (step == selected ? ' selected' : '') + (lastLevel ? ' recent' : '')} onClick={toggleSelection}>
     <Markdown>{getHintText(hint)}</Markdown>
   </div>
 }
 
-export function Hints({hints, showHidden, step, selected, toggleSelection, lastLevel} : {hints: GameHint[], showHidden: boolean, step: number, selected: number, toggleSelection: any, lastLevel?: boolean}) {
+export function Hints({hints, showHidden, step, selected, toggleSelection, lastLevel} : {hints: GameHint[], showHidden: boolean, step: number, selected?: number, toggleSelection: any, lastLevel?: boolean}) {
   if (!hints) {return <></>}
   const openHints = hints.filter(hint => !hint.hidden)
   const hiddenHints = hints.filter(hint => hint.hidden)
@@ -88,8 +88,8 @@ export function filterHints(hints: GameHint[], prevHints: GameHint[]): GameHint[
 }
 
 
-function hasHiddenHints(step: InteractiveGoalsWithHints): boolean {
-  return step?.goals[0]?.hints.some((hint) => hint.hidden)
+function hasHiddenHints(step?: InteractiveGoalsWithHints): boolean {
+  return step !== undefined && step.goals[0]?.hints.some((hint) => hint.hidden)
 }
 
 

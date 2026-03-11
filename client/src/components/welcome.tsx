@@ -12,7 +12,6 @@ import '../css/welcome.css'
 import { WelcomeAppBar } from './app_bar'
 import { Hint } from './hints'
 import i18next from 'i18next'
-import { useTranslation } from 'react-i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { gameIdAtom } from '../store/location-atoms'
@@ -45,7 +44,7 @@ function IntroductionPanel({setPageNumber}: {setPageNumber: (val: number) => voi
         t.trim() ?
           <Hint key={`intro-p-${i}`}
             hint={{text: t, hidden: false, rawText: t, varNames: []}}
-            step={0} selected={null} toggleSelection={undefined} />
+            step={0} selected={undefined} toggleSelection={undefined} />
         : <></>
       ))}
     </div>
