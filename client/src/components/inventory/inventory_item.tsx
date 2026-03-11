@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAppendTypewriterInput } from "../infoview/context"
-import { InventoryTile } from "../../state/api"
+import { InventoryTile } from "../../store/api"
 import { useAtom } from "jotai"
 import { selectedDocTileAtom } from "../../store/inventory-atoms"
 
@@ -26,14 +26,14 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
   const [copied, setCopied] = useState(false)
 
   const appendTypewriterInput = useAppendTypewriterInput()
-  const handleClick = (ev) => {
+  const handleClick = (ev: any) => {
     if (appendTypewriterInput(ev.shiftKey, tile.displayName, isTheorem, false)) {
       return
     }
     setDoc(tile)
   }
 
-  const copyItemName = (ev) => {
+  const copyItemName = (ev: any) => {
     navigator.clipboard.writeText(tile.displayName)
     setCopied(true)
     setInterval(() => {

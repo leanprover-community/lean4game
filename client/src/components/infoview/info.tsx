@@ -13,13 +13,13 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-
 import { GoalsLocation, Locations, LocationsContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/goalLocation'
 
 import { AllMessages, lspDiagToInteractive } from './messages'
-import { InputModeContext } from './context'
-import { goalsToString } from './goals'
 import { goalsToString, Goal, MainAssumptions, OtherGoals } from './goals'
-import { InteractiveTermGoal, InteractiveGoalsWithHints, InteractiveGoals, ProofState } from './rpc_api'
-import { MonacoEditorContext, ProofStateProps, InfoStatus, ProofContext, WorldLevelIdContext } from './context'
+import { InteractiveTermGoal, InteractiveGoals, ProofState } from './rpc_api'
+import { MonacoEditorContext, InfoStatus, ProofContext } from './context'
 import { useTranslation } from 'react-i18next'
-import { useContext } from 'react'
+import { useAtom } from 'jotai'
+import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
+import { typewriterModeAtom } from '../../store/editor-atoms'
 
 // TODO: All about pinning could probably be removed
 type InfoKind = 'cursor' | 'pin'
@@ -92,8 +92,8 @@ interface InfoDisplayContentProps extends PausableProps {
 
 const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
     let { t } = useTranslation()
+    const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
     const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused, proofString} = props
-    const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
 
     const hasWidget = userWidgets.length > 0
     const hasError = !!error
@@ -141,7 +141,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
             )}
           </div>
         </LocationsContext.Provider>
-        {goals && goals.goals.length > 0 && !(typewriterMode && !lockEditorMode) && (
+        {goals && goals.goals.length > 0 && !(typewriterMode) && (
           <div className="message error">
             <div>unsolved goals</div>
             <pre className="font-code pre-wrap">{goalsToString(goals)}</pre>
@@ -275,7 +275,9 @@ function InfoAux(props: InfoProps) {
 
     const config = React.useContext(ConfigContext)
 
-    const {worldId, levelId} = useContext(WorldLevelIdContext)
+    const [worldId] = useAtom(worldIdAtom)
+    const [levelId] = useAtom(levelIdAtom)
+
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const pos = props.pos!

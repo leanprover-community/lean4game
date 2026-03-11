@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { useEffect, useState, useRef, useContext } from 'react'
-import { useSelector } from 'react-redux'
 import Split from 'react-split'
-import { useParams } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgress } from '@mui/material'
@@ -15,17 +13,10 @@ import { EditorContext } from '../../../node_modules/vscode-lean4/lean4-infoview
 import { EditorConnection, EditorEvents } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/editorConnection'
 import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/event'
 import { Diagnostic } from 'vscode-languageserver-types'
-
-import { GameIdContext } from '../app'
-import { useAppDispatch, useAppSelector } from '../hooks'
-import { useGetGameInfoQuery, useLoadInventoryOverviewQuery, useLoadLevelQuery } from '../state/api'
-import { changedSelection, codeEdited, selectCode, selectSelections, selectCompleted, helpEdited,
-  selectHelp, selectDifficulty, selectInventory, selectTypewriterMode, changeTypewriterMode } from '../state/progress'
-import { store } from '../state/store'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
-  ProofContext, SelectionContext, WorldLevelIdContext } from './infoview/context'
+import { DeletedChatContext, InputModeContext, MonacoEditorContext,
+  ProofContext, SelectionContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint, ProofState } from './infoview/rpc_api'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
@@ -37,24 +28,19 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import '../css/level.css'
 import { LevelAppBar } from './app_bar'
-import { WebSocketMessageWriter, toSocket } from 'vscode-ws-jsonrpc'
 import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
-
-
-let sharedLeanMonaco: LeanMonaco | null = null
-let sharedLeanMonacoStart: Promise<void> | null = null
-let sharedLeanMonacoGameId: string | null = null
-
-const getSharedLeanMonaco = () => {
-  if (!sharedLeanMonaco) {
-    sharedLeanMonaco = new LeanMonaco()
-  }
-  return sharedLeanMonaco
-}
+import { useAtom } from 'jotai'
+import { codeAtom, leanMonacoAtom, lockEditorModeAtom, selectionsAtom, typewriterModeAtom } from '../store/editor-atoms'
+import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
+import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
+import { helpAtom } from '../store/chat-atoms'
+import { inventoryAtom, inventoryOverviewAtom } from '../store/inventory-atoms'
+import { mobileAtom } from '../store/preferences-atoms'
+import { difficultyAtom } from '../store/progress-atoms'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
   const maybeLeanMonaco = leanMonaco as unknown as {
@@ -83,42 +69,40 @@ const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: Lean
 }
 
 function Level() {
-  const params = useParams()
-  const { levelId, worldId } = useContext(WorldLevelIdContext)
-
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
 
   // Load the namespace of the game
-  i18next.loadNamespaces(gameId).catch(err => {
+  i18next.loadNamespaces(gameId ?? "").catch(err => {
     console.warn(`translations for ${gameId} do not exist.`)
   })
-
-  const gameInfo = useGetGameInfoQuery({game: gameId})
 
   if (levelId == 0) return <Introduction />
   return <PlayableLevel key={`${worldId}/${levelId}`} />
 }
 
-function ChatPanel({lastLevel, visible = true}) {
+function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: boolean}) {
   let { t } = useTranslation()
   const { t : gT } = useGameTranslation()
   const chatRef = useRef<HTMLDivElement>(null)
-  const {mobile} = useContext(PreferencesContext)
-  const gameId = useContext(GameIdContext)
-  const {worldId, levelId} = useContext(WorldLevelIdContext)
-  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  const [mobile] = useAtom(mobileAtom)
+  const [gameId, navigateToGame] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId, navigateToLevel] = useAtom(levelIdAtom)
+  const [{ data: levelInfo }] = useAtom(levelInfoAtom)
+  const [help, setHelp] = useAtom(helpAtom)
   const {proof, setProof} = useContext(ProofContext)
-  const {deletedChat, setDeletedChat, showHelp, setShowHelp} = useContext(DeletedChatContext)
+  const {deletedChat, setDeletedChat} = useContext(DeletedChatContext)
   const {selectedStep, setSelectedStep} = useContext(SelectionContext)
-  const completed = useAppSelector(selectCompleted(gameId, worldId, levelId))
 
   let k = proof?.steps.length ? proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) : 0
 
   function toggleSelection(line: number) {
-    return (ev) => {
+    return (ev: any) => {
       console.debug('toggled selection')
       if (selectedStep == line) {
-        setSelectedStep(undefined)
+        setSelectedStep(null)
       } else {
         setSelectedStep(line)
       }
@@ -131,12 +115,12 @@ function ChatPanel({lastLevel, visible = true}) {
     if (!mobile) {
       chatRef.current!.lastElementChild?.scrollIntoView() //scrollTo(0,0)
     }
-  }, [proof, showHelp])
+  }, [proof, help])
 
   // Scroll to element if selection changes
   useEffect(() => {
     if (typeof selectedStep !== 'undefined') {
-      Array.from(chatRef.current?.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
+      Array.from(chatRef.current!.getElementsByClassName(`step-${selectedStep}`)).map((elem) => {
         elem.scrollIntoView({block: "center"})
       })
     }
@@ -148,12 +132,12 @@ function ChatPanel({lastLevel, visible = true}) {
   //   // chatRef.current!.scrollTo(0,0)
   // }, [gameId, worldId, levelId])
 
-  let introText: Array<string> = gT(level?.data?.introduction ?? "").split(/\n(\s*\n)+/)
+  let introText: Array<string> = gT(levelInfo?.introduction ?? "").split(/\n(\s*\n)+/)
 
-  const focusRef = useRef<HTMLAnchorElement>()
+  const focusRef = useRef<HTMLButtonElement>()
   useEffect(() => {
    if (proof?.completed) {
-     focusRef.current.focus()
+     focusRef.current?.focus()
    }
   }, [!!proof?.completed])
 
@@ -168,7 +152,7 @@ function ChatPanel({lastLevel, visible = true}) {
         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
         if (step.goals.length > 0 && !isLastStepWithErrors(proof, i)) {
           return <Hints key={`hints-${i}`}
-          hints={filteredHints} showHidden={showHelp.has(i)} step={i}
+          hints={filteredHints} showHidden={help.has(i)} step={i}
           selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof?.steps.length - 1}/>
         }
       })}
@@ -179,7 +163,7 @@ function ChatPanel({lastLevel, visible = true}) {
         if (!(i == proof?.steps.length - 1 && withErr)) {
           // TODO: Should not use index as key.
           return <Hints key={`hints-${i}`}
-            hints={step} showHidden={showHelp.has(i)} step={i}
+            hints={step} showHidden={showHelp?.has(i)} step={i}
             selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof?.steps.length - 1}/>
         }
       })} */}
@@ -189,9 +173,9 @@ function ChatPanel({lastLevel, visible = true}) {
           <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
             {t("Level completed! 🎉")}
           </div>
-          {level?.data?.conclusion?.trim() &&
+          {levelInfo?.conclusion?.trim() &&
             <div className={`message information recent step-${k}${selectedStep == k ? ' selected' : ''}`} onClick={toggleSelection(k)}>
-              <Markdown>{gT(level?.data?.conclusion ?? "")}</Markdown>
+              <Markdown>{gT(levelInfo?.conclusion ?? "")}</Markdown>
             </div>
           }
         </>
@@ -199,28 +183,24 @@ function ChatPanel({lastLevel, visible = true}) {
     </div>
     <div className="button-row">
       {proof?.completed && (lastLevel ?
-        <Button ref={focusRef} to={`/${gameId}`}>
+        <Button ref={focusRef} onClick={() => {if (gameId) navigateToGame(gameId)}} >
           <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
         </Button> :
-        <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/${levelId + 1}`}>
+        <Button ref={focusRef} onClick={() => {if(levelId !== undefined) navigateToLevel(levelId + 1)}}  >
           {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>)
         }
-      <MoreHelpButton />
+      <MoreHelpButton selected={null} />
     </div>
   </div>
 }
 
 
 function ExercisePanel({codeviewRef, infoviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, infoviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = useContext(WorldLevelIdContext)
-  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
-  const gameInfo = useGetGameInfoQuery({game: gameId})
   return <div className={`exercise-panel ${visible ? '' : 'hidden'}`}>
     <div ref={infoviewRef} className="infoview" style={{display: 'none'}}></div>
     <div className="exercise">
-      <DualEditor level={level?.data} codeviewRef={codeviewRef} levelId={levelId} worldId={worldId} worldSize={gameInfo.data?.worldSize[worldId]}/>
+      <DualEditor codeviewRef={codeviewRef} />
     </div>
   </div>
 }
@@ -230,114 +210,69 @@ function PlayableLevel() {
   const { t : gT } = useGameTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
   const infoviewRef = useRef<HTMLDivElement>(null)
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = useContext(WorldLevelIdContext)
-  const {mobile} = React.useContext(PreferencesContext)
-  const inventory: Array<String> = useSelector(selectInventory(gameId))
-  const difficulty: number = useSelector(selectDifficulty(gameId))
+  const [leanMonaco] = useAtom(leanMonacoAtom)
 
-  const dispatch = useAppDispatch()
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
+  const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
+  const inventory = useAtom(inventoryAtom)
+  const [difficulty] = useAtom(difficultyAtom)
 
-  const initialCode = useAppSelector(selectCode(gameId, worldId, levelId))
-  const initialSelections = useAppSelector(selectSelections(gameId, worldId, levelId))
 
-  const typewriterMode = useSelector(selectTypewriterMode(gameId))
-  const setTypewriterMode = (newTypewriterMode: boolean) => dispatch(changeTypewriterMode({game: gameId, typewriterMode: newTypewriterMode}))
+  const [mobile] = useAtom(mobileAtom)
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
-  const level = useLoadLevelQuery({game: gameId, world: worldId, level: levelId})
+  const [code] = useAtom(codeAtom)
+  const [initialSelections] = useAtom(selectionsAtom)
+
+  // A set of row numbers where help is displayed
+  const [help, setHelp] = useAtom(helpAtom)
+
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [{ data: levelInfo, isLoading: levelInfoIsLoading }] = useAtom(levelInfoAtom)
 
   // The state variables for the `ProofContext`
   const [proof, setProof] = useState<ProofState>({steps: [], diagnostics: [], completed: false, completedWithWarnings: false})
   const [interimDiags, setInterimDiags] = useState<Array<Diagnostic>>([])
-  const [isCrashed, setIsCrashed] = useState<Boolean>(false)
+  const [isCrashed, setIsCrashed] = useState<boolean>(false)
 
 
   // When deleting the proof, we want to keep to old messages around until
   // a new proof has been entered. e.g. to consult messages coming from dead ends
   const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
-  // A set of row numbers where help is displayed
-  const [showHelp, setShowHelp] = useState<Set<number>>(new Set())
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
 
   // set to true to prevent switching between typewriter and editor
-  const [lockEditorMode, setLockEditorMode] = useState(false)
+  const [lockEditorMode] = useAtom(lockEditorModeAtom)
   const [typewriterInput, setTypewriterInput] = useState("")
-  const lastLevel = levelId >= gameInfo.data?.worldSize[worldId]
+  const lastLevel = worldId && (levelId !== undefined) && levelId >= (gameInfo?.worldSize?.[worldId] ?? 0)
 
   // When clicking on an inventory item, the inventory is overlayed by the item's doc.
   // If this state is set to a pair `(name, type)` then the according doc will be open.
   // Set `inventoryDoc` to `null` to close the doc
-  const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string}>(null)
+  const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string} | null>(null)
   function closeInventoryDoc () {setInventoryDoc(null)}
 
   const [leanMonacoEditor, setLeanMonacoEditor] = useState<LeanMonacoEditor|null>(null)
   const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
 
-  const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + gameId
-
-  const [options, setOptions] = useState<LeanMonacoOptions>({
-    // TODO: copy old settings
-    websocket: {
-      url: socketUrl
-    },
-    htmlElement: undefined, // The wrapper div for monaco
-    vscode: {
-      "editor.wordWrap": true,
-    },
-    clientOptions: {
-      initializationOptions: {
-        difficulty: difficulty,
-        inventory: inventory,
-      }
-    }
-  })
-
-  const onDidChangeContent = (code) => {
-    dispatch(codeEdited({game: gameId, world: worldId, level: levelId, code}))
-  }
-
-  const onDidChangeSelection = (monacoSelections) => {
-    const selections = monacoSelections.map(
-      ({selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}) =>
-      {return {selectionStartLineNumber, selectionStartColumn, positionLineNumber, positionColumn}})
-    dispatch(changedSelection({game: gameId, world: worldId, level: levelId, selections}))
-  }
-
-
-  // Start infoview and editor(s)
+  // Start the editor
   useEffect(() => {
-    // You must create a single `LeanMonaco` instance (infoview), but you can create multiple
-    // `LeanMonacoEditor` instances (editor)
-    // You must await `leanMonaco.start` or use `await leanMonaco.whenReady` before
-    // starting the editors!
-    const leanMonaco = getSharedLeanMonaco()
-    const leanMonacoEditor = new LeanMonacoEditor()
-    const uriStr = `file:///${worldId}/${levelId}.lean`
-    setLeanMonacoEditor(leanMonacoEditor)
+    if (leanMonaco) {
+      const leanMonacoEditor = new LeanMonacoEditor()
+      const uriStr = `file:///${worldId}/${levelId}.lean`
 
-    leanMonaco.setInfoviewElement(infoviewRef.current!)
+      ;(async () => {
+        await leanMonaco!.whenReady
+        console.debug('[demo]: starting editor')
+        await leanMonacoEditor.start(codeviewRef.current!, uriStr, code ?? "")
+        console.debug('[demo]: editor started')
+        setLeanMonacoEditor(leanMonacoEditor)
 
-    let disposed = false
-    ;(async () => {
-      if (!sharedLeanMonacoStart) {
-        sharedLeanMonacoStart = leanMonaco.start(options)
-      } else if (sharedLeanMonacoGameId && sharedLeanMonacoGameId !== gameId) {
-        await sharedLeanMonacoStart
-        await reconfigureLeanMonacoClient(leanMonaco, options)
-      }
-      sharedLeanMonacoGameId = gameId
-      await sharedLeanMonacoStart
-      if (disposed) {
-        return
-      }
-      await leanMonacoEditor.start(codeviewRef.current!, uriStr, initialCode ?? '')
-      if (disposed) {
-        return
-      }
+        // TODO: old stuff from here on
 
-      const infoProvider = leanMonaco.infoProvider as {
+        const infoProvider = leanMonaco.infoProvider as {
         editorApi: EditorApi
         webviewPanel?: { api: InfoviewApi, visible: boolean }
         sendConfig?: () => Promise<void>
@@ -388,7 +323,7 @@ function PlayableLevel() {
       const editorConnection = new EditorConnection(infoProvider.editorApi, editorEvents)
       setEditorConnection(editorConnection)
 
-      const model = leanMonacoEditor.editor.getModel()
+      const model = leanMonacoEditor.editor?.getModel()
       const fireCursorLocation = () => {
         const selection = leanMonacoEditor.editor.getSelection()
         const position = leanMonacoEditor.editor.getPosition()
@@ -435,38 +370,39 @@ function PlayableLevel() {
 
       await infoProvider.sendConfig?.()
       await infoProvider.sendPosition?.()
-    })()
 
-    return () => {
-      disposed = true
-      leanMonacoEditor.dispose()
-    }
-  }, [options, infoviewRef, codeviewRef, initialCode, worldId, levelId])
+      })()
 
-  /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
-   * `TypewriterInterface`.
-   */
-  const handleUndo = () => {
-    const endPos = leanMonacoEditor?.editor.getModel().getFullModelRange().getEndPosition()
-    let range
-    console.log(endPos.column)
-    if (endPos.column === 1) {
-      range = monaco.Selection.fromPositions(
-        new monaco.Position(endPos.lineNumber - 1, 1),
-        endPos
-      )
-    } else {
-      range = monaco.Selection.fromPositions(
-        new monaco.Position(endPos.lineNumber, 1),
-        endPos
-      )
+      return () => {
+        leanMonacoEditor.dispose()
+      }
     }
-    leanMonacoEditor?.editor.executeEdits("undo-button", [{
-      range,
-      text: "",
-      forceMoveMarkers: false
-    }]);
-  }
+  }, [leanMonaco, worldId, levelId])
+
+  // /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
+  //  * `TypewriterInterface`.
+  //  */
+  // const handleUndo = () => {
+  //   const endPos = leanMonacoEditor?.editor.getModel().getFullModelRange().getEndPosition()
+  //   let range
+  //   console.log(endPos?.column)
+  //   if (endPos?.column === 1) {
+  //     range = monaco.Selection.fromPositions(
+  //       new monaco.Position(endPos.lineNumber - 1, 1),
+  //       endPos
+  //     )
+  //   } else {
+  //     range = monaco.Selection.fromPositions(
+  //       new monaco.Position(endPos.lineNumber, 1),
+  //       endPos
+  //     )
+  //   }
+  //   leanMonacoEditor?.editor.executeEdits("undo-button", [{
+  //     range,
+  //     text: "",
+  //     forceMoveMarkers: false
+  //   }]);
+  // }
 
   // Select and highlight proof steps and corresponding hints
   // TODO: with the new design, there is no difference between the introduction and
@@ -476,11 +412,11 @@ function PlayableLevel() {
 
   useEffect (() => {
     // Lock editor mode
-    if (level?.data?.template) {
-      setLockEditorMode(true)
+    if (levelInfo?.template) {
+      const model = leanMonacoEditor?.editor?.getModel()
 
-      if (leanMonacoEditor?.editor) {
-        let code = leanMonacoEditor?.editor.getModel().getLinesContent()
+      if (model) {
+        let code = model.getLinesContent()
 
         // console.log(`insert. code: ${code}`)
         // console.log(`insert. join: ${code.join('')}`)
@@ -491,13 +427,13 @@ function PlayableLevel() {
 
         // TODO: It does seem that the template is always indented by spaces.
         // This is a hack, assuming there are exactly two.
-        if (!code.join('').trim().length) {
-          console.debug(`inserting template:\n${level.data.template}`)
+        if (!code.join("").trim().length) {
+          console.debug(`inserting template:\n${levelInfo?.template}`)
           // TODO: This does not work! HERE
           // Probably overwritten by a query to the server
           leanMonacoEditor?.editor.executeEdits("template-writer", [{
-            range: leanMonacoEditor?.editor.getModel().getFullModelRange(),
-            text: level.data.template + `\n`,
+            range: model.getFullModelRange(),
+            text: levelInfo?.template + `\n`,
             forceMoveMarkers: true
           }])
         } else {
@@ -505,9 +441,8 @@ function PlayableLevel() {
         }
       }
     } else {
-      setLockEditorMode(false)
     }
-  }, [level, levelId, worldId, gameId, leanMonacoEditor?.editor])
+  }, [levelInfo, levelId, worldId, gameId, leanMonacoEditor?.editor])
 
 
   useEffect(() => {
@@ -515,44 +450,44 @@ function PlayableLevel() {
     // Reset command line input when loading a new level
     setTypewriterInput("")
 
-    // Load the selected help steps from the store
-    setShowHelp(new Set(selectHelp(gameId, worldId, levelId)(store.getState())))
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    if (!(typewriterMode && !lockEditorMode) && leanMonacoEditor?.editor) {
+    const model = leanMonacoEditor?.editor?.getModel()
+    if (!(typewriterMode) && model) {
       // Delete last input attempt from command line
       leanMonacoEditor?.editor.executeEdits("typewriter", [{
-        range: leanMonacoEditor?.editor.getSelection(),
+        range: model.getFullModelRange(),
         text: "",
         forceMoveMarkers: false
       }]);
       leanMonacoEditor?.editor.focus()
     }
-  }, [typewriterMode, lockEditorMode])
+  }, [typewriterMode])
 
-  useEffect(() => {
-    // Forget whether hidden hints are displayed for steps that don't exist yet
-    if (proof?.steps.length) {
-      console.debug(Array.from(showHelp))
-      setShowHelp(new Set(Array.from(showHelp).filter(i => (i < proof?.steps.length))))
-    }
-  }, [proof])
+  // useEffect(() => {
+  //   // Forget whether hidden hints are displayed for steps that don't exist yet
+  //   if (proof?.steps.length) {
+  //     console.debug(Array.from(help))
+  //     setHelp([...new Set(Array.from(help).filter(i => (i < proof?.steps.length)))])
+  //   }
+  // }, [proof])
 
-  // save showed help in store
-  useEffect(() => {
-    if (proof?.steps.length) {
-      console.debug(`showHelp:\n ${showHelp}`)
-      dispatch(helpEdited({game: gameId, world: worldId, level: levelId, help: Array.from(showHelp)}))
-    }
-  }, [showHelp])
+  // // save showed help in store
+  // useEffect(() => {
+  //   if (proof?.steps.length) {
+  //     console.debug(`showHelp:\n ${showHelp}`)
+  //     setHelp(Array.from(showHelp))
+  //   }
+  // }, [showHelp])
 
   // Effect when command line mode gets enabled
   useEffect(() => {
-    if (leanMonacoEditor?.editor && (typewriterMode && !lockEditorMode)) {
-      let code = leanMonacoEditor?.editor.getModel().getLinesContent().filter(line => line.trim())
+    const model = leanMonacoEditor?.editor?.getModel()
+    if (model&& (typewriterMode)) {
+      let code = model.getLinesContent().filter(line => line.trim())
       leanMonacoEditor?.editor.executeEdits("typewriter", [{
-        range: leanMonacoEditor?.editor.getModel().getFullModelRange(),
+        range: model.getFullModelRange(),
         text: code.length ? code.join('\n') + '\n' : '',
         forceMoveMarkers: true
       }]);
@@ -575,37 +510,37 @@ function PlayableLevel() {
   }, [leanMonacoEditor, leanMonacoEditor?.editor, typewriterMode, lockEditorMode])
 
   return <>
-    <div style={level.isLoading ? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
+    <div style={levelInfoIsLoading? undefined : {display: "none"}} className="app-content loading"><CircularProgress /></div>
+    <DeletedChatContext.Provider value={{deletedChat, setDeletedChat}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
-        <InputModeContext.Provider value={{typewriterMode, setTypewriterMode, typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode}}>
+        <InputModeContext.Provider value={{typewriterInput, setTypewriterInput}}>
           <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={leanMonacoEditor?.editor}>
                 <LevelAppBar
                   pageNumber={pageNumber} setPageNumber={setPageNumber}
-                  isLoading={level.isLoading}
-                  levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
-                    (level?.data?.title && ` : ${gT(level?.data?.title ?? "")}`)}
+                  isLoading={levelInfoIsLoading}
+                  levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${worldId ? gameInfo?.worldSize?.[worldId] ?? "" : ""}` +
+                    (levelInfo?.title && ` : ${gT(levelInfo?.title ?? "")}`)}
                   />
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
                   <>
-                    <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
+                    <div className={`app-content level-mobile ${levelInfoIsLoading ? 'hidden' : ''}`}>
                       <ExercisePanel
                         codeviewRef={codeviewRef}
                         infoviewRef={infoviewRef}
                         visible={pageNumber == 0} />
-                      <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
+                      <InventoryPanel levelInfo={levelInfo} visible={pageNumber == 1} />
                     </div>
                   </>
                 :
-                  <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
+                  <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${levelInfoIsLoading ? 'hidden' : ''}`}>
                     <ChatPanel lastLevel={lastLevel}/>
                     <ExercisePanel
                       codeviewRef={codeviewRef}
                       infoviewRef={infoviewRef} />
-                    <InventoryPanel levelInfo={level?.data} />
+                    <InventoryPanel levelInfo={levelInfo} />
                   </Split>
                 }
               </MonacoEditorContext.Provider>
@@ -617,16 +552,19 @@ function PlayableLevel() {
   </>
 }
 
-function IntroductionPanel({gameInfo}) {
+function IntroductionPanel() {
   let { t } = useTranslation()
   const { t : gT } = useGameTranslation()
-  const gameId = React.useContext(GameIdContext)
-  const {worldId} = useContext(WorldLevelIdContext)
-  const {mobile} = React.useContext(PreferencesContext)
+  const [gameId, navigateToGame] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [, navigateToLevel] = useAtom(levelIdAtom)
 
-  let text: Array<string> = gT(gameInfo.data?.worlds.nodes[worldId].introduction).split(/\n(\s*\n)+/)
+  const [mobile] = useAtom(mobileAtom)
 
-  const focusRef = useRef<HTMLAnchorElement>()
+  let text: Array<string> = gT(gameInfo?.worlds?.nodes[worldId ?? ""]?.introduction ?? "").split(/\n(\s*\n)+/)
+
+  const focusRef = useRef<HTMLButtonElement>()
   useEffect(() => {
    focusRef.current?.focus()
   }, [])
@@ -639,11 +577,11 @@ function IntroductionPanel({gameInfo}) {
       ))}
     </div>
     <div className={`button-row${mobile ? ' mobile' : ''}`}>
-      {gameInfo.data?.worldSize[worldId] == 0 ?
-        <Button to={`/${gameId}`}>
+      {gameInfo?.worldSize?.[worldId ?? ""] == 0 ?
+        <Button onClick={() => {if (gameId) navigateToGame(gameId)}}>
           <FontAwesomeIcon icon={faHome} />
           </Button> :
-        <Button ref={focusRef} to={`/${gameId}/world/${worldId}/level/1`}>
+        <Button ref={focusRef} onClick={() => navigateToLevel(1)}>
           {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>
       }
@@ -657,219 +595,39 @@ export default Level
 function Introduction() {
   let { t } = useTranslation()
 
-  const gameId = React.useContext(GameIdContext)
-  const {mobile} = useContext(PreferencesContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
 
-  const inventory = useLoadInventoryOverviewQuery({game: gameId})
+  const [mobile] = useAtom(mobileAtom)
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
+  const [{ data: inventory }] = useAtom(inventoryOverviewAtom)
 
-  const {worldId} = useContext(WorldLevelIdContext)
+  const [{ data: gameInfo, isLoading: isLoadingGameInfo }] = useAtom(gameInfoAtom)
 
-  let image: string = gameInfo.data?.worlds.nodes[worldId].image
+
+  let image: string = worldId ? gameInfo?.worlds?.nodes[worldId]?.image ?? "" : ""
 
   return <>
-    <LevelAppBar isLoading={gameInfo.isLoading} levelTitle={t("Introduction")} />
-    {gameInfo.isLoading ?
+    <LevelAppBar isLoading={isLoadingGameInfo} levelTitle={t("Introduction")} />
+    {isLoadingGameInfo ?
       <div className="app-content loading"><CircularProgress /></div>
     : mobile ?
-        <IntroductionPanel gameInfo={gameInfo} />
+        <IntroductionPanel />
       :
         <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level`}>
-          <IntroductionPanel gameInfo={gameInfo} />
+          <IntroductionPanel />
           <div className="world-image-container empty center">
-            {image &&
+            {image && gameId &&
               <img className="contain" src={path.join("data", gameId, image)} alt="" />
             }
 
           </div>
-          <InventoryPanel levelInfo={inventory?.data} />
+          <InventoryPanel levelInfo={inventory} />
         </Split>
       }
 
   </>
 }
-
-// {mobile?
-//   // TODO: This is copied from the `Split` component below...
-//   <>
-//     <div className={`app-content level-mobile ${level.isLoading ? 'hidden' : ''}`}>
-//       <ExercisePanel
-//         codeviewRef={codeviewRef}
-//         visible={pageNumber == 0} />
-//       <InventoryPanel levelInfo={level?.data} visible={pageNumber == 1} />
-//     </div>
-//   </>
-// :
-//   <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${level.isLoading ? 'hidden' : ''}`}>
-//     <ChatPanel lastLevel={lastLevel}/>
-//     <ExercisePanel
-//       codeviewRef={codeviewRef} />
-//     <InventoryPanel levelInfo={level?.data} />
-//   </Split>
-// }
-
-// function useLevelEditor(codeviewRef, initialCode, initialSelections, onDidChangeContent, onDidChangeSelection) {
-
-//   const gameId = React.useContext(GameIdContext)
-//   const {worldId, levelId} = useContext(WorldLevelIdContext)
-
-//   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor|null>(null)
-//   const [infoProvider, setInfoProvider] = useState<null|InfoProvider>(null)
-//   const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
-
-//   const uriStr = `file:///${worldId}/${levelId}`
-//   const uri = monaco.Uri.parse(uriStr)
-
-//   const inventory: Array<String> = useSelector(selectInventory(gameId))
-//   const difficulty: number = useSelector(selectDifficulty(gameId))
-
-//   useEffect(() => {
-//     const model = monaco.editor.createModel(initialCode ?? '', 'lean4', uri)
-//     if (onDidChangeContent) {
-//       model.onDidChangeContent(() => onDidChangeContent(model.getValue()))
-//     }
-
-//     const editor = monaco.editor.create(codeviewRef.current!, {
-//       model,
-//       glyphMargin: true,
-//       quickSuggestions: false,
-//       lineDecorationsWidth: 5,
-//       folding: false,
-//       lineNumbers: 'on',
-//       lightbulb: {
-//         enabled: true
-//       },
-//       unicodeHighlight: {
-//           ambiguousCharacters: false,
-//       },
-//       automaticLayout: true,
-//       minimap: {
-//         enabled: false
-//       },
-//       lineNumbersMinChars: 3,
-//       tabSize: 2,
-//       'semanticHighlighting.enabled': true,
-//       theme: 'vs-code-theme-converted'
-//     })
-//     if (onDidChangeSelection) {
-//       editor.onDidChangeCursorSelection(() => onDidChangeSelection(editor.getSelections()))
-//     }
-//     if (initialSelections) {
-//       console.debug("Initial Selection: ", initialSelections)
-//       // BUG: Somehow I get an `invalid arguments` bug here
-//       // editor.setSelections(initialSelections)
-//     }
-//     setEditor(editor)
-//     const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), model, editor)
-
-//     const socketUrl = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + '/websocket/' + gameId
-
-//     const connectionProvider : IConnectionProvider = {
-//       get: async () => {
-//         return await new Promise((resolve, reject) => {
-//           console.log(`connecting ${socketUrl}`)
-//           const websocket = new WebSocket(socketUrl)
-//           websocket.addEventListener('error', (ev) => {
-//             reject(ev)
-//           })
-//           websocket.addEventListener('message', (msg) => {
-//             // console.log(msg.data)
-//           })
-//           websocket.addEventListener('open', () => {
-//             const socket = toSocket(websocket)
-//             const reader = new DisposingWebSocketMessageReader(socket)
-//             const writer = new WebSocketMessageWriter(socket)
-//             resolve({
-//               reader,
-//               writer
-//             })
-//           })
-//         })
-//       }
-//     }
-
-//     // Following `vscode-lean4/webview/index.ts`
-//     const client = new LeanClient(connectionProvider, showRestartMessage, {inventory, difficulty})
-//     const infoProvider = new InfoProvider(client)
-//     // const div: HTMLElement = infoviewRef.current!
-//     const imports = {
-//       '@leanprover/infoview': `${window.location.origin}/index.production.min.js`,
-//       'react': `${window.location.origin}/react.production.min.js`,
-//       'react/jsx-runtime': `${window.location.origin}/react-jsx-runtime.production.min.js`,
-//       'react-dom': `${window.location.origin}/react-dom.production.min.js`,
-//       'react-popper': `${window.location.origin}/react-popper.production.min.js`
-//     }
-//     // loadRenderInfoview(imports, [infoProvider.getApi(), div], setInfoviewApi)
-//     setInfoProvider(infoProvider)
-
-//     // TODO: it looks like we get errors "File Changed" here.
-//     client.restart("Lean4Game")
-
-//     const editorApi = infoProvider.getApi()
-
-//     const editorEvents: EditorEvents = {
-//         initialize: new EventEmitter(),
-//         gotServerNotification: new EventEmitter(),
-//         sentClientNotification: new EventEmitter(),
-//         serverRestarted: new EventEmitter(),
-//         serverStopped: new EventEmitter(),
-//         changedCursorLocation: new EventEmitter(),
-//         changedInfoviewConfig: new EventEmitter(),
-//         runTestScript: new EventEmitter(),
-//         requestedAction: new EventEmitter(),
-//     };
-
-//     // Challenge: write a type-correct fn from `Eventify<T>` to `T` without using `any`
-//     const infoviewApi: InfoviewApi = {
-//         initialize: async l => editorEvents.initialize.fire(l),
-//         gotServerNotification: async (method, params) => {
-//             editorEvents.gotServerNotification.fire([method, params]);
-//         },
-//         sentClientNotification: async (method, params) => {
-//             editorEvents.sentClientNotification.fire([method, params]);
-//         },
-//         serverRestarted: async r => editorEvents.serverRestarted.fire(r),
-//         serverStopped: async serverStoppedReason => {
-//             editorEvents.serverStopped.fire(serverStoppedReason)
-//         },
-//         changedCursorLocation: async loc => editorEvents.changedCursorLocation.fire(loc),
-//         changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
-//         requestedAction: async action => editorEvents.requestedAction.fire(action),
-//         // See https://rollupjs.org/guide/en/#avoiding-eval
-//         // eslint-disable-next-line @typescript-eslint/no-implied-eval
-//         runTestScript: async script => new Function(script)(),
-//         getInfoviewHtml: async () => document.body.innerHTML,
-//     };
-
-//     const ec = new EditorConnection(editorApi, editorEvents);
-//     setEditorConnection(ec)
-
-//     editorEvents.initialize.on((loc: Location) => ec.events.changedCursorLocation.fire(loc))
-
-//     setEditor(editor)
-//     setInfoProvider(infoProvider)
-
-//     infoProvider.openPreview(editor, infoviewApi)
-//     const taskgutter = new LeanTaskGutter(infoProvider.client, editor)
-
-//     // TODO:
-//     // setRestart(() => restart)
-
-//     return () => {
-//       editor.dispose();
-//       model.dispose();
-//       abbrevRewriter.dispose();
-//       taskgutter.dispose();
-//       infoProvider.dispose();
-//       client.dispose();
-//     }
-//   }, [gameId, worldId, levelId])
-
-//   const showRestartMessage = () => {
-//     // setRestartMessage(true)
-//     console.log("TODO: SHOW RESTART MESSAGE")
-//   }
-
-//   return {editor, infoProvider, editorConnection}
-// }
+function useGetGameInfoQuery(arg0: { game: string | undefined }) {
+  throw new Error('Function not implemented.')
+}

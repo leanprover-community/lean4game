@@ -1,35 +1,30 @@
-import React, { useContext } from "react"
+import React from "react"
 import { useTranslation } from "react-i18next"
-import { GameIdContext } from "../../app"
-import { useLoadDocQuery, useLoadDocLegacyQuery } from "../../state/api"
 import { Markdown } from "../markdown"
-import { useAppDispatch } from "../../hooks"
-import { useSelector } from "react-redux"
-import { changedInventory, selectDifficulty, selectInventory } from "../../state/progress"
-import { closeDocAtom, InventoryTab, selectedDocTileAtom } from "../../store/inventory-atoms"
+import { closeDocAtom, docAtomFamily, docAtomLegacyFamily, inventoryAtom, InventoryTab, selectedDocTileAtom } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
 import { faLock, faXmark } from "@fortawesome/free-solid-svg-icons"
 import { NavButton } from "../navigation/nav_button"
-import { store } from "../../state/store"
 import { useGameTranslation } from "../../utils/translation"
+import { gameIdAtom, navigateAcrossWorldsAtom } from "../../store/location-atoms"
+import { difficultyAtom } from "../../store/progress-atoms"
 
 /** The `documentation` */
 export function Documentation({ type } : {type : InventoryTab}) {
   const { t } = useTranslation()
   const { t: gT } = useGameTranslation()
-  const dispatch = useAppDispatch()
-  const gameId = useContext(GameIdContext)
-  const difficulty = useSelector(selectDifficulty(gameId))
+  const [gameId] = useAtom(gameIdAtom)
+  const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
+  const [difficulty] = useAtom(difficultyAtom)
+  const [, addToInventory] = useAtom(inventoryAtom)
 
   const [docTile] = useAtom(selectedDocTileAtom)
   const [, closeDoc] = useAtom(closeDocAtom)
 
-  // // const docEntry = useLoadDocQuery({game: gameId, type: type, name: name})
-  // let { docTile, setDocTile } = useContext(InventoryContext)
+  const [{ data: docEntry }] = useAtom(docAtomFamily([type, docTile?.name ?? ""]))
+  const [{ data: legacyDocEntry }] = useAtom(docAtomLegacyFamily([type, docTile?.name ?? ""]))
 
-  const docEntry = useLoadDocQuery({game: gameId, name: docTile.name, type: type })
-  const legacyDocEntry = useLoadDocLegacyQuery({game: gameId, name: docTile.name, type: type == InventoryTab.theorem ? "lemma" : type})
-  let inv: string[] = useSelector(selectInventory(gameId))
+  if (!docTile) return null
 
   // Set `inventoryDoc` to `null` to close the doc
 
@@ -45,21 +40,24 @@ export function Documentation({ type } : {type : InventoryTab}) {
         title={t("Unlock this item!")}
         onClick={() => {
           console.log(`Adding '${docTile.name}' to the inventory.`)
-          dispatch(changedInventory({ game: gameId, inventory: [...inv, docTile.name] }))
+          addToInventory([docTile.name])
           closeDoc() // note: closing seems better than keeping it open without the lock disappearing
         }}
         className="lock"
         inverted={true} />
     }
     <h1 className="doc">{docTile.displayName}</h1>
-    <p><code>{docEntry.data?.statement ?? legacyDocEntry.data?.statement}</code></p>
-    <Markdown>{gT(docEntry.data?.content ?? legacyDocEntry.data?.content)}</Markdown>
+    <p><code>{docEntry?.statement ?? legacyDocEntry?.statement}</code></p>
+    <Markdown>{gT(docEntry?.content ?? legacyDocEntry?.content ?? "")}</Markdown>
     {/* TODO: The condition below should be updated so that the section
     is displayed whenever it's non-empty. */}
     {docTile.proven && <>
         <h2>Further details</h2>
         <ul>
-          {docTile.proven && <li>Proven in: <a href={`#/${gameId}/world/${docTile.world}/level/${docTile.level}`}>{docTile.world} level {docTile.level}</a></li>}
+          {docTile.proven && <li>Proven in: <a onClick={() => {
+            if (!docTile.world || !docTile.level) return
+            navigateAcrossWorlds(docTile.world, docTile.level)
+          }}>{docTile.world} level {docTile.level}</a></li>}
         </ul>
       </>
     }

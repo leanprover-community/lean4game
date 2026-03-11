@@ -6,7 +6,8 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic } from '@leanprover/infoview-api';
 import { Diagnostic } from 'vscode-languageserver-types'
 import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from './rpc_api';
-import { PreferencesState } from '../../state/preferences';
+import { Preferences, preferencesAtom } from '../../store/preferences-atoms';
+import { useAtom } from 'jotai';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)
@@ -38,7 +39,7 @@ export const ProofContext = React.createContext<{
   interimDiags: Diagnostic[],
   setInterimDiags: React.Dispatch<React.SetStateAction<Array<Diagnostic>>>
   /** TODO: Workaround to capture a crash of the gameserver. */
-  crashed: Boolean,
+  crashed: boolean,
   setCrashed: React.Dispatch<React.SetStateAction<Boolean>>
 }>({
   proof: {steps: [], diagnostics: [], completed: false, completedWithWarnings: false},
@@ -76,40 +77,20 @@ export interface ProofStateProps {
 //   setProofState: () => {},
 // })
 
-export interface IPreferencesContext extends PreferencesState{
+export interface IPreferencesContext extends Preferences{
   mobile: boolean, // The variables that actually control the page 'layout' can only be changed through layout.
-  setLayout: React.Dispatch<React.SetStateAction<PreferencesState["layout"]>>;
-  setIsSavePreferences: React.Dispatch<React.SetStateAction<PreferencesState["isSavePreferences"]>>;
-  setLanguage: React.Dispatch<React.SetStateAction<PreferencesState["language"]>>;
+  setLayout: React.Dispatch<React.SetStateAction<Preferences["layout"]>>;
+  setIsSavePreferences: React.Dispatch<React.SetStateAction<Preferences["isSavePreferences"]>>;
+  setLanguage: React.Dispatch<React.SetStateAction<Preferences["language"]>>;
   setIsSuggestionsMobileMode: any;
 }
 
-export const PreferencesContext = React.createContext<IPreferencesContext>({
-  mobile: false,
-  layout: "auto",
-  isSavePreferences: false,
-  language: "en",
-  isSuggestionsMobileMode: false,
-  setLayout: () => {},
-  setIsSavePreferences: () => {},
-  setLanguage: () => {},
-  setIsSuggestionsMobileMode: () => {},
-})
-
-export const WorldLevelIdContext = React.createContext<{
-  worldId : string,
-  levelId: number
-}>({
-  worldId : null,
-  levelId: 0,
-})
-
 /** Context to keep highlight selected proof step and corresponding chat messages. */
 export const SelectionContext = React.createContext<{
-  selectedStep : number,
-  setSelectedStep: React.Dispatch<React.SetStateAction<number>>
+  selectedStep : number | null,
+  setSelectedStep: React.Dispatch<React.SetStateAction<number | null>>
 }>({
-  selectedStep : undefined,
+  selectedStep : null,
   setSelectedStep: () => {}
 })
 
@@ -117,29 +98,17 @@ export const SelectionContext = React.createContext<{
 export const DeletedChatContext = React.createContext<{
   deletedChat : GameHint[],
   setDeletedChat: React.Dispatch<React.SetStateAction<Array<GameHint>>>
-  showHelp : Set<number>,
-  setShowHelp: React.Dispatch<React.SetStateAction<Set<number>>>
 }>({
-  deletedChat: undefined,
+  deletedChat: [],
   setDeletedChat: () => {},
-  showHelp: undefined,
-  setShowHelp: () => {}
 })
 
 export const InputModeContext = React.createContext<{
-  typewriterMode: boolean,
-  setTypewriterMode: React.Dispatch<React.SetStateAction<boolean>>,
   typewriterInput: string,
   setTypewriterInput: React.Dispatch<React.SetStateAction<string>>,
-  lockEditorMode: boolean,
-  setLockEditorMode: React.Dispatch<React.SetStateAction<boolean>>,
 }>({
-  typewriterMode: true,
-  setTypewriterMode: () => {},
   typewriterInput: "",
   setTypewriterInput: () => {},
-  lockEditorMode: false,
-  setLockEditorMode: () => {},
 });
 
 
@@ -161,7 +130,7 @@ const PREFIX_OVERRIDES: Record<string, string> = {
 }
 export function useAppendTypewriterInput() {
   let {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
-  const {isSuggestionsMobileMode} = React.useContext(PreferencesContext)
+  const [{ isSuggestionsMobileMode }] = useAtom(preferencesAtom)
   return (shiftKey: boolean, suffix: string, isTheorem: boolean, isAssumption: boolean) => {
     if (!isSuggestionsMobileMode && !shiftKey) {
       return false

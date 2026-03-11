@@ -229,7 +229,7 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
           if i >= text.positions.size - 2 then continue -- skip final linebreak
           let source : String :=
             Substring.Raw.toString ⟨text.source, text.positions[i]!, text.positions[i + 1]!⟩
-          if source.trim.length == 0 then continue -- skip empty lines
+          if source.trimAscii.isEmpty then continue -- skip empty lines
           res := res.push (text.positions[i + 1]!, source)
         return res
 

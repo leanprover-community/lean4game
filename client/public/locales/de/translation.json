@@ -19,7 +19,7 @@
   },
   "Server capacity": {
     "translation": "Server-Auslastung",
-    "description": "Diese Server läuft auf universitäter Infrastruktur mit begrenzten Kapazitäten.  Wir schätzen, dass die Belastungsgrenze bei rund 70 gleichzeitig laufenden Spielen besteht."
+    "description": "Diese Server läuft auf universitäter Infrastruktur mit begrenzten Kapazitäten. Wir schätzen, dass unsere Konfiguration etwa 50 gleichzeitige Spiele mit hoher Leistung und bis zu 180 gleichzeitige Spiele mit geringerer Leistung unterstützen wird."
   },
   "No Games": {
     "description": "Kein Spiel geladen.  Öffne <1>http://localhost:3000/#/g/local/FOLDER</1> um ein Spiel direkt aus einem lokalen Ordner zu laden."

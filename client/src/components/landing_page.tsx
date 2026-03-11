@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
-import { useNavigate } from "react-router-dom";
 import { I18nextProvider, Trans, useTranslation } from 'react-i18next';
 
 import '@fontsource/roboto/300.css';
@@ -13,7 +12,6 @@ import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 
 import { Markdown } from './markdown';
-import { GameTile, useGetGameInfoQuery } from '../state/api'
 import path from 'path';
 
 import { ImpressumButton, MenuButton, PreferencesButton, PrivacyButton } from './app_bar';
@@ -26,51 +24,53 @@ import { useAtom } from 'jotai';
 import { GithubIcon } from './navigation/github_icon';
 import { useGameTranslation } from '../utils/translation';
 import { navOpenAtom } from '../store/navigation-atoms';
+import { gameIdAtom } from '../store/location-atoms';
+import { GameTile } from '../store/api';
+import { gameInfoAtomFamily } from '../store/query-atoms';
 
 
-function Tile({gameId, data}: {gameId: string, data: GameTile|undefined}) {
-  let { t, i18n } = useTranslation()
+function Tile({gameId}: {gameId: string}) {
+  const { t, i18n } = useTranslation()
+  const [{ data: gameInfo }] = useAtom(gameInfoAtomFamily(gameId))
+  const [, navigateToGame] = useAtom(gameIdAtom)
 
-  let navigate = useNavigate();
+  const gameTile = gameInfo?.tile
 
-  const routeChange = () =>{
-    navigate(gameId);
-  }
-
-  if (typeof data === 'undefined') {
+  if (!gameTile) {
     return <></>
   }
 
-  return <div className="game" onClick={routeChange}>
+
+  return <div className="game" onClick={() => navigateToGame(gameId)}>
       <div className="wrapper">
-        <div className="title">{t(data.title, {ns: gameId})}</div>
-        <div className="short-description">{t(data.short, { ns: gameId })}
+        <div className="title">{t(gameTile.title, {ns: gameId})}</div>
+        <div className="short-description">{t(gameTile.short, { ns: gameId })}
         </div>
-        { data.image ? <img className="image" src={path.join("data", gameId, data.image)} alt="" /> : <div className="image"/> }
-        <div className="long description"><Markdown>{t(data.long, { ns: gameId })}</Markdown></div>
+        { gameTile.image ? <img className="image" src={path.join("data", gameId, gameTile.image)} alt="" /> : <div className="image"/> }
+        <div className="long description"><Markdown>{t(gameTile.long, { ns: gameId })}</Markdown></div>
       </div>
       <table className="info">
         <tbody>
         <tr>
           <td title="consider playing these games first.">{t("Prerequisites")}</td>
-          <td><Markdown>{t(data.prerequisites.join(', '), { ns: gameId })}</Markdown></td>
+          <td><Markdown>{t(gameTile.prerequisites.join(', '), { ns: gameId })}</Markdown></td>
         </tr>
         <tr>
           <td>{t("Worlds")}</td>
-          <td>{data.worlds}</td>
+          <td>{gameTile.worlds}</td>
         </tr>
         <tr>
           <td>{t("Levels")}</td>
-          <td>{data.levels}</td>
+          <td>{gameTile.levels}</td>
         </tr>
         <tr className="languages">
           <td>{t("Language")}</td>
 
           <td>
-            {data.languages.map((lang) => {
+            {gameTile.languages.map((lang) => {
               let langOpt = lean4gameConfig.languages.find((e) => e.iso == lang)
-              if (lean4gameConfig.useFlags) {
-                return <ReactCountryFlag key={`flag-${lang}`} title={langOpt?.name} countryCode={langOpt?.flag} className="emojiFlag"/>
+              if (lean4gameConfig.useFlags && langOpt?.flag) {
+                return <ReactCountryFlag key={`flag-${lang}`} title={langOpt.name} countryCode={langOpt.flag} className="emojiFlag"/>
               } else {
                 return <span title={langOpt?.name}>{lang}</span>
               }
@@ -89,28 +89,14 @@ function LandingPage() {
 
   const [usageCPU, setUsageCPU] = React.useState<number>()
   const [usageMem, setUsageMem] = React.useState<number>()
+  const showUsageMem = usageMem !== undefined && usageMem >= 0
+  const showUsageCPU = usageCPU !== undefined && usageCPU >= 0
 
   const { t } = useTranslation()
 
   // Load the namespaces of all games
   // TODO: should `allGames` contain game-ids starting with `g/`?
   i18next.loadNamespaces(lean4gameConfig.allGames.map(id => `g/${id}`))
-
-  let allTiles = lean4gameConfig.allGames.map((gameId) => {
-    let q =  useGetGameInfoQuery({game: `g/${gameId}`})
-
-    // if (q.isError) {
-    //   if (q.error?.originalStatus === 404) {
-    //     // Handle 404 error
-    //     console.log('File not found');
-    //   } else {
-    //     // Suppress additional console.error messages
-    //     console.error(q.error);
-    //   }
-    // }
-
-    return q.data?.tile
-  })
 
   /** Parse `games/stats.csv` if present and display server capacity. */
   React.useEffect(() => {
@@ -146,7 +132,15 @@ function LandingPage() {
       </div>
     </header>
     <div className="game-list">
-      {allTiles.filter(x => x != null).length == 0 ?
+      {
+      lean4gameConfig.allGames.map((id, i) => (
+          <Tile
+            key={id}
+            gameId={`g/${id}`}
+          />
+        ))
+      }
+      {/* {allTiles.filter(x => x != null).length == 0 ?
         <p>
           <Trans
             i18nKey="No Games.description"
@@ -158,23 +152,22 @@ function LandingPage() {
           <Tile
             key={id}
             gameId={`g/${id}`}
-            data={allTiles[i]}
           />
         ))
-      }
+      } */}
     </div>
     { // show server capacity from `games/stats.csv` if present
-      (usageMem >= 0 || usageCPU >= 0 ) &&
+      (showUsageMem || showUsageCPU) &&
       <section>
         <div className="wrapper">
           <h2>{t("Server capacity.translation", { defaultValue: "Server capacity" })}</h2>
           <Trans
             i18nKey="Server capacity.description"
-            defaults="<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>"
+            defaults="<p>As this server runs lean on our university machines, it has a limited capacity. We estimate that our setup will support around 50 simultaneous games at high performance, and up to 180 simultaneous games at a slower pace.</p>"
           />
           <p>
-            { usageMem >= 0 && <> {t("RAM")}: <strong>{usageMem.toFixed(2)} %</strong>{t(" used")}.<br/></> }
-            { usageCPU >= 0 && <> {t("CPU")}: <strong>{usageCPU.toFixed(2)} %</strong>{t(" used")}. </> }
+            { showUsageMem && <> {t("RAM")}: <strong>{usageMem.toFixed(2)} %</strong>{t(" used")}.<br/></> }
+            { showUsageCPU && <> {t("CPU")}: <strong>{usageCPU.toFixed(2)} %</strong>{t(" used")}. </> }
           </p>
         </div>
       </section>
