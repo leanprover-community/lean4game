@@ -5,11 +5,7 @@ import { Box, CircularProgress } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
-import { useAppDispatch, useAppSelector } from '../hooks'
-import { changedReadIntro, selectReadIntro } from '../state/progress'
-import { useGetGameInfoQuery, useLoadInventoryOverviewQuery } from '../state/api'
 import { Button } from './button'
-import { PreferencesContext } from './infoview/context'
 import { WorldTreePanel } from './world_tree'
 
 import '../css/welcome.css'
@@ -21,23 +17,27 @@ import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { gameIdAtom } from '../store/location-atoms'
 import { useAtom } from 'jotai'
+import { readGameIntroAtom } from '../store/chat-atoms'
+import { gameInfoAtom } from '../store/query-atoms'
+import { inventoryOverviewAtom } from '../store/inventory-atoms'
+import { mobileAtom } from '../store/preferences-atoms'
 
 
 /** the panel showing the game's introduction text */
-function IntroductionPanel({introduction, setPageNumber}: {introduction: string, setPageNumber}) {
-  const {mobile} = React.useContext(PreferencesContext)
-  const [gameId] = useAtom(gameIdAtom)
+function IntroductionPanel({setPageNumber}: {setPageNumber: (val: number) => void}) {
+  const [mobile] = useAtom(mobileAtom)
+  const [{ data: gameInfo, isLoading: gameInfoIsLoading }] = useAtom(gameInfoAtom)
+  const [, setReadGameIntro] = useAtom(readGameIntroAtom)
 
 
   const { t : gT } = useGameTranslation()
 
-  const dispatch = useAppDispatch()
 
   // TODO: I left the setup for splitting up the introduction in place, but if it's not needed
   // then this can be simplified.
 
   // let text: Array<string> = introduction.split(/\n(\s*\n)+/)
-  let text: Array<string> = introduction ? [gT(introduction)] : []
+  let text: Array<string> = gameInfo?.introduction ? [gT(gameInfo.introduction)] : []
 
   return <div className="column chat-panel">
     <div className="chat">
@@ -54,7 +54,7 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
         <Button className="btn"
           title="" onClick={() => {
             setPageNumber(1);
-            dispatch(changedReadIntro({game: gameId, world: null, readIntro: true}))
+            setReadGameIntro(true)
           }}>
           Start&nbsp;<FontAwesomeIcon icon={faArrowRight}/>
         </Button>
@@ -66,49 +66,48 @@ function IntroductionPanel({introduction, setPageNumber}: {introduction: string,
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
   const [gameId] = useAtom(gameIdAtom)
+  const [readGameIntro] = useAtom(readGameIntroAtom)
+  const [{ data: gameInfo, isLoading: gameInfoIsLoading }] = useAtom(gameInfoAtom)
+  const [{ data: inventory }] = useAtom(inventoryOverviewAtom)
 
   // Load the namespace of the game
-  i18next.loadNamespaces(gameId)
+  i18next.loadNamespaces(gameId ?? "")
 
-  const {mobile} = React.useContext(PreferencesContext)
-  const {layout, isSavePreferences, language, setLayout, setIsSavePreferences, setLanguage} = React.useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
-  const inventory = useLoadInventoryOverviewQuery({game: gameId})
 
   // For mobile only
-  const readIntro = useAppSelector(selectReadIntro(gameId, null))
-  const [pageNumber, setPageNumber] = React.useState(readIntro ? 1 : 0)
+  const [pageNumber, setPageNumber] = React.useState(readGameIntro ? 1 : 0)
 
   // set the window title
   useEffect(() => {
-    if (gameInfo.data?.title) {
-      window.document.title = gameInfo.data.title
+    if (gameInfo?.title) {
+      window.document.title = gameInfo.title
     }
-  }, [gameInfo.data?.title])
+  }, [gameInfo?.title])
 
-  return gameInfo.isLoading ?
+  return gameInfoIsLoading ?
     <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}>
       <CircularProgress />
     </Box>
   : <>
-    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} gameInfo={gameInfo.data} />
+    <WelcomeAppBar pageNumber={pageNumber} setPageNumber={setPageNumber} />
     <div className="app-content">
       { mobile ?
           <div className="welcome mobile">
             {(pageNumber == 0 ?
-              <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
+              <IntroductionPanel setPageNumber={setPageNumber} />
             : pageNumber == 1 ?
-              <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
+              <WorldTreePanel />
             :
-              <InventoryPanel levelInfo={inventory?.data} />
+              <InventoryPanel levelInfo={inventory} />
             )}
           </div>
         :
           <Split className="welcome" minSize={0} snapOffset={200}  sizes={[25, 50, 25]}>
-            <IntroductionPanel introduction={gameInfo.data?.introduction} setPageNumber={setPageNumber} />
-            <WorldTreePanel worlds={gameInfo.data?.worlds} worldSize={gameInfo.data?.worldSize} />
-            <InventoryPanel levelInfo={inventory?.data} />
+            <IntroductionPanel setPageNumber={setPageNumber} />
+            <WorldTreePanel />
+            <InventoryPanel levelInfo={inventory} />
           </Split>
       }
     </div>

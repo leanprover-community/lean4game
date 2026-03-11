@@ -9,17 +9,17 @@ import { EditorContext } from '../../../../node_modules/vscode-lean4/lean4-infov
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/interactiveCode'
 import { WithTooltipOnHover } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/tooltips';
-import { PreferencesContext, useAppendTypewriterInput } from './context';
+import { useAppendTypewriterInput } from './context';
 import { InteractiveGoal, InteractiveGoals, InteractiveGoalsWithHints, InteractiveHypothesisBundle, ProofState } from './rpc_api';
 import { RpcSessionAtPos } from '@leanprover/infoview/*';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageserver-protocol';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { selectTypewriterMode } from '../../state/progress';
-import { useGetGameInfoQuery } from '../../state/api';
 import { useAtom } from 'jotai';
 import { gameIdAtom } from '../../store/location-atoms';
+import { typewriterModeAtom } from '../../store/editor-atoms';
+import { gameInfoAtom } from '../../store/query-atoms';
+import { mobileAtom } from '../../store/preferences-atoms';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -96,7 +96,8 @@ function Hyp({ hyp: h, mvarId }: HypProps) {
         <span
             className={namecls + (isInaccessibleName(n) ? 'goal-inaccessible ' : '')}
             key={i}
-            onClick={ev => void appendTypewriterInput(ev.shiftKey, n, h.isAssumption, h.isAssumption) }
+            // FIXME: 3rd argument looks wrong
+            onClick={ev => void appendTypewriterInput(ev.shiftKey, n, h.isAssumption ?? false, h.isAssumption ?? false) }
         >
             <SelectableLocation
                 locs={locs}
@@ -150,9 +151,9 @@ interface GoalProps {
  * provided `filter`. */
 export const Goal = React.memo((props: GoalProps) => {
     const [gameId] = useAtom(gameIdAtom)
-    const game = useGetGameInfoQuery({game: gameId})
-    const {mobile} = React.useContext(PreferencesContext)
-    const typewriterMode = useSelector(selectTypewriterMode(gameId))
+    const [typewriterMode] = useAtom(typewriterModeAtom)
+    const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+    const [mobile] = useAtom(mobileAtom)
     const { goal, filter, showHints, typewriter } = props
     let { t } = useTranslation()
 
@@ -180,7 +181,7 @@ export const Goal = React.memo((props: GoalProps) => {
 
     function unbundleHyps (hyps: InteractiveHypothesisBundle[]) : InteractiveHypothesisBundle[] {
         return hyps.flatMap(hyp => (
-            game.data?.settings?.unbundleHyps ? hyp.names.map(name => {return {...hyp, names: [name]}}) : [hyp]
+            gameInfo?.settings?.unbundleHyps ? hyp.names.map(name => {return {...hyp, names: [name]}}) : [hyp]
         ))
     }
 
@@ -198,7 +199,7 @@ export const Goal = React.memo((props: GoalProps) => {
         {!typewriter && assumptionHyps.length > 0 &&
             <div className="hyp-group"><div className="hyp-group-title">{t("Assumptions")}:</div>
             {assumptionHyps.map((h, i) => {
-                h = {...h, val: null} // JE: never show value of assumptions (proof irrelevance)
+                h = {...h, val: undefined} // JE: never show value of assumptions (proof irrelevance)
                 return <Hyp hyp={h} mvarId={goal.mvarId} key={i} />})}</div> }
         </div>
         {!filter.reverse && <>

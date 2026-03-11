@@ -9,12 +9,13 @@ import { InteractiveDiagnostic, RpcSessionAtPos, getInteractiveDiagnostics } fro
 import { Diagnostic } from 'vscode-languageserver-types';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { RpcContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
-import { DeletedChatContext, InputModeContext, MonacoEditorContext, PreferencesContext, ProofContext, WorldLevelIdContext } from './context'
+import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext } from './context'
 import { goalsToString, lastStepHasErrors, loadGoals } from './goals'
 import { GameHint, ProofState } from './rpc_api'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
+import { preferencesAtom } from '../../store/preferences-atoms'
 
 export interface GameDiagnosticsParams {
   uri: DocumentUri;
@@ -34,7 +35,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
 
-  const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>(null)
+  const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>()
   const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const [processing, setProcessing] = useState(false)
 
@@ -63,7 +64,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           pos,
-          editor.getModel().getFullModelRange().getEndPosition()
+          editor.getModel()?.getFullModelRange().getEndPosition()
         ),
         text: typewriterInput.trim() + "\n",
         forceMoveMarkers: false
@@ -76,7 +77,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     editor.setPosition(pos)
   }, [typewriterInput, editor])
 
-  const {isSuggestionsMobileMode} = React.useContext(PreferencesContext)
+  const [{ isSuggestionsMobileMode }] = useAtom(preferencesAtom)
 
   useEffect(() => {
     if (oneLineEditor && oneLineEditor.getValue() !== typewriterInput) {
@@ -206,7 +207,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   useEffect(() => {
     if (!oneLineEditor) return
     // Ensure that our one-line editor can only have a single line
-    const l = oneLineEditor.getModel().onDidChangeContent((e) => {
+    const l = oneLineEditor.getModel()?.onDidChangeContent((e) => {
       const value = oneLineEditor.getValue()
       setTypewriterInput(value)
       const newValue = value.replace(/[\n\r]/g, '')

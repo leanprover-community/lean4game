@@ -2,25 +2,21 @@
  * @fileOverview Define the menu displayed with the tree of worlds on the welcome page
 */
 import * as React from 'react'
-import { useStore, useSelector } from 'react-redux'
 import { Slider } from '@mui/material'
 import cytoscape, { LayoutOptions } from 'cytoscape'
 import klay from 'cytoscape-klay'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
-
-import { useAppDispatch } from '../hooks'
-import { selectDifficulty, changedDifficulty, selectCompleted } from '../state/progress'
-import { store } from '../state/store'
-
 import '../css/world_tree.css'
-import { PreferencesContext } from './infoview/context'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { popupAtom, PopupType } from '../store/popup-atoms'
 import { useGameTranslation } from '../utils/translation'
-import { gameIdAtom, levelIdAtom, navigateAcrossWorldsAtom, worldIdAtom } from '../store/location-atoms'
-import { Button } from './button'
+import { gameIdAtom, navigateAcrossWorldsAtom } from '../store/location-atoms'
+import { difficultyAtom } from '../store/progress-atoms'
+import { gameInfoAtom } from '../store/query-atoms'
+import { mobileAtom } from '../store/preferences-atoms'
+import { levelCompletedAtomFamily, worldCompletedAtom, worldDependenciesCompletedAtomFamily } from '../store/world-tree-atoms'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -49,17 +45,22 @@ const darkblue = '#1667b8'
 
 
 /** svg object for a level in the game tree */
-export function LevelIcon({ world, level, position, completed, unlocked, worldSize }:
+export function LevelIcon({ world, level, position }:
   { world: string,
     level: number,
     position: cytoscape.Position,
-    completed: boolean,
-    unlocked: boolean,
-    worldSize: number
   }) {
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [difficulty] = useAtom(difficultyAtom)
+  const [levelUnlocked] = useAtom(levelCompletedAtomFamily(`${world}:${level-1}`))
+  const [worldUnlocked] = useAtom(worldDependenciesCompletedAtomFamily(world))
+  const [completed] = useAtom(levelCompletedAtomFamily(`${world}:${level}`))
+
+  const unlocked = level <= 1 ? worldUnlocked && levelUnlocked : levelUnlocked
+  const levelDisabled = (difficulty >= 2 && !(unlocked || completed))
   const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
 
-  const N = Math.max(worldSize, NMIN)
+  const N = Math.max(gameInfo?.worldSize?.[world] ?? NMIN, NMIN)
 
   // divide circle into `N+2` equal pieces.
   // only for non-spiraling case
@@ -69,15 +70,11 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
   // Sinus-Satz: (1.1*r) / sin(β/2) = R / sin(π/2)
   let R = 1.1 * r / Math.sin(beta/2)
 
-  const [gameId] = useAtom(gameIdAtom)
-  const difficulty = useSelector(selectDifficulty(gameId))
-  const levelDisabled = (difficulty >= 2 && !(unlocked || completed))
-
   /** In the spiral, the angle `β` should decrease to avoid big gaps between levels.
    * This is a simplified function, which has little mathematical foundation, but
    * works fine in tests up to `N=30`.
    */
-  function betaSpiral(level) {
+  function betaSpiral(level: number) {
     return 2 * Math.PI / ((NSPIRAL+1) + 2 * Math.max(0, (level-2)) / (NSPIRAL+1))
   }
 
@@ -106,21 +103,25 @@ export function LevelIcon({ world, level, position, completed, unlocked, worldSi
       </foreignObject>
     </a>
   )
+
 }
 
 /** svg object of one world in the game tree */
-export function WorldIcon({world, title, position, completedLevels, difficulty, worldSize}:
+export function WorldIcon({world, title, position}:
   { world: string,
     title: string,
     position: cytoscape.Position,
-    completedLevels: any,
-    difficulty: number,
-    worldSize: number
   }) {
   const { t : gT } = useGameTranslation()
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [difficulty] = useAtom(difficultyAtom)
+  const [unlocked] = useAtom(worldDependenciesCompletedAtomFamily(world))
+  const [completed] = useAtom(worldCompletedAtom(world))
+  const worldDisabled = (difficulty >= 2 && !(unlocked || completed))
+  const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
 
   // See level icons. Match radius computed there minus `1.2*r`
-  const N = Math.max(worldSize, NMIN)
+  const N = Math.max(gameInfo?.worldSize?.[world] ?? NMIN, NMIN)
   const betaHalf = Math.PI / Math.min(N+2, ((N < (NMAX+1) ? NMAX : NSPIRAL) + 1))
   let R = 1.1 * r / Math.sin(betaHalf) - 1.2 * r
 
@@ -129,23 +130,9 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
   // Offset for the labels for small worlds
   let labelOffset = R + 2.5 * r
 
-  // index `0` indicates that all prerequisites are completed
-  let unlocked = completedLevels[0]
-  // indices `1`-`n` indicate that the corresponding level is completed
-  let completed = completedLevels.slice(1).every(Boolean)
-  // select the first non-completed level
-  let nextLevel: number = completedLevels.findIndex(c => !c)
-  if (nextLevel <= 1) {
-    // note: `findIndex` returns `-1` on failure, therefore the indices
-    // `-1, 0, 1` indicate all that the introduction should be shown
-    nextLevel = 0
-  }
-  let playable = difficulty <= 1 || completed || unlocked
-  const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
-
   return <a
-      onClick={() => {if (playable) navigateAcrossWorlds(world, nextLevel)}}
-      className={`world${playable ? '' : ' disabled'}`}>
+      onClick={() => {if (!worldDisabled) navigateAcrossWorlds(world, 0)}}
+      className={`world${worldDisabled ? ' disabled' : ''}`}>
     <circle className="world-circle" cx={s*position.x} cy={s*position.y} r={R}
         fill={completed ? green : unlocked ? blue : grey}/>
     { false ? // fontSize >= MINFONT ?
@@ -175,10 +162,11 @@ export function WorldIcon({world, title, position, completedLevels, difficulty, 
 }
 
 /** svg object for a connection path between worlds in the game tree */
-export function WorldPath({source, target, unlocked} : {source: any, target: any, unlocked: boolean}) {
+export function WorldPath({source, target, sourceWorld} : {source: any, target: any, sourceWorld: string}) {
+  const [ sourceCompleted ] = useAtom(worldCompletedAtom(sourceWorld))
   return <line x1={s*source.position.x} y1={s*source.position.y}
           x2={s*target.position.x} y2={s*target.position.y}
-          stroke={unlocked ? green : grey} strokeWidth={lineWidth} />
+          stroke={sourceCompleted ? green : grey} strokeWidth={lineWidth} />
 }
 
 /** Download a file containing `data` */
@@ -203,11 +191,9 @@ export const downloadFile = ({ data, fileName, fileType } :
 export function WorldSelectionMenu() {
   const { t, i18n } = useTranslation()
   const [gameId] = useAtom(gameIdAtom)
-  const difficulty = useSelector(selectDifficulty(gameId))
-  const dispatch = useAppDispatch()
-  const { mobile } = React.useContext(PreferencesContext)
+  const [difficulty, setDifficulty] = useAtom(difficultyAtom)
+  const [mobile] = useAtom(mobileAtom)
   const [popup, setPopup] = useAtom(popupAtom)
-
 
   function label(x : number) {
     return x == 0 ? t("none") : x == 1 ? t("relaxed") : t("regular")
@@ -237,15 +223,15 @@ export function WorldSelectionMenu() {
         valueLabelFormat={label}
         getAriaValueText={label}
         valueLabelDisplay="off"
-        onChange={(ev, val: number) => {
-          dispatch(changedDifficulty({game: gameId, difficulty: val}))
+        onChange={(ev, val) => {
+          setDifficulty(Array.isArray(val) ? val[0]: val)
         }}
         ></Slider>
     </div>
   </nav>
 }
 
-export function computeWorldLayout(worlds) {
+export function computeWorldLayout(worlds: {nodes: {[id:string]: {id: string, title: string, introduction: string, image: string}}, edges: string[][]}) {
   let elements = []
   for (let id in worlds.nodes) {
     elements.push({ data: { id: id, title: worlds.nodes[id].title } })
@@ -280,12 +266,13 @@ export function computeWorldLayout(worlds) {
 }
 
 
-export function WorldTreePanel({worlds, worldSize}:
-  { worlds: any,
-    worldSize: any,
-  }) {
+export function WorldTreePanel() {
   const [gameId] = useAtom(gameIdAtom)
-  const difficulty = useSelector(selectDifficulty(gameId))
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+
+  const worlds = gameInfo?.worlds
+  const worldSize = gameInfo?.worldSize
+
   const {nodes, bounds}: any = worlds ? computeWorldLayout(worlds) : {nodes: []}
 
   // scroll to playable world
@@ -302,30 +289,15 @@ export function WorldTreePanel({worlds, worldSize}:
   }, [worlds, worldSize])
 
   let svgElements = []
-
-  // for each `worldId` as index, this contains a list of booleans with indices
-  // 0, 1, …, n. Index `0` will be set to `false` if any dependency is not completely solved.
-  // Indices `1, …, n` indicate if the corresponding level is completed
-  var completed = {}
-
   if (worlds && worldSize) {
-    // Fill `completed` with the level data.
-    for (let worldId in nodes) {
-      completed[worldId] = Array.from({ length: worldSize[worldId] + 1 }, (_, i) => {
-        // index `0` starts off as `true` but can be set to `false` by any edge with non-completed source
-        return i == 0 || selectCompleted(gameId, worldId, i)(store.getState())
-      })
-    }
 
     // draw all connecting paths
     for (let i in worlds.edges) {
       const edge = worlds.edges[i]
-      let sourceCompleted = completed[edge[0]].slice(1).every(Boolean)
-      // if the origin world is not completed, mark the target world as non-playable
-      if (!sourceCompleted) {completed[edge[1]][0] = false}
       svgElements.push(
         <WorldPath key={`path_${edge[0]}-->${edge[1]}`}
-          source={nodes[edge[0]]} target={nodes[edge[1]]} unlocked={sourceCompleted}/>
+          sourceWorld={edge[0]}
+          source={nodes[edge[0]]} target={nodes[edge[1]]}/>
       )
     }
 
@@ -336,10 +308,7 @@ export function WorldTreePanel({worlds, worldSize}:
         <WorldIcon world={worldId}
           title={nodes[worldId].data.title || worldId}
           position={position}
-          completedLevels={completed[worldId]}
-          difficulty={difficulty}
           key={`${gameId}-${worldId}`}
-          worldSize={worldSize[worldId]}
         />
       )
 
@@ -349,10 +318,7 @@ export function WorldTreePanel({worlds, worldSize}:
             world={worldId}
             level={i}
             position={position}
-            completed={completed[worldId][i]}
-            unlocked={completed[worldId][i-1]}
             key={`${gameId}-${worldId}-${i}`}
-            worldSize={worldSize[worldId]}
           />
         )
       }
@@ -364,7 +330,7 @@ export function WorldTreePanel({worlds, worldSize}:
   let R = 1.1 * r / Math.sin(Math.PI / (NMAX+1))
   const padding = R + 2.1*r
 
-  let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : null
+  let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : 100
 
   return <div className="column">
       <WorldSelectionMenu />

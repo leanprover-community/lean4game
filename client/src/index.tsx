@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './app'
-import { store } from './state/store'
 import { Provider } from 'react-redux'
 import Welcome from './components/welcome'
 import LandingPage from './components/landing_page'
@@ -55,8 +54,6 @@ const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <Router />
-    </Provider>
+    <Router />
   </React.StrictMode>
 );

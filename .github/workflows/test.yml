@@ -77,6 +77,15 @@ jobs:
       - name: Run Cypress tests (Development mode)
         run: npm run test
 
+      - name: Upload Cypress screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "cypress-screenshots-${{ matrix.name }}-${{ matrix.browser }}"
+          path: cypress/screenshots
+          retention-days: 2
+          if-no-files-found: ignore
+
       - name: Install Bubblewrap
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install bubblewrap
