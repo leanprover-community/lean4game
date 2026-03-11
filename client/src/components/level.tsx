@@ -38,7 +38,6 @@ import { codeAtom, leanMonacoAtom, lockEditorModeAtom, selectionsAtom, typewrite
 import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
 import { helpAtom } from '../store/chat-atoms'
-import { inventoryOverviewAtom } from '../store/inventory-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {

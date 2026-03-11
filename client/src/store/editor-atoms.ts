@@ -1,9 +1,10 @@
 import { atom } from "jotai";
 import { LeanMonaco, LeanMonacoOptions } from 'lean4monaco'
 import { gameIdAtom } from "./location-atoms";
-import { levelProgressAtom, progressAtom } from "./progress-atoms";
+import { difficultyAtom, levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
+import { inventoryAtom } from "./inventory-atoms";
 
 /** Options for the LeanMonaco instance */
 export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
@@ -18,6 +19,12 @@ export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
     // See docstring of `LeanMonacoOptions`!
     // For example:
     "editor.wordWrap": true,
+  },
+  clientOptions: {
+    initializationOptions: {
+      difficulty: get(difficultyAtom),
+      inventory: get(inventoryAtom),
+    }
   }
 }})
 
