@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAppendTypewriterInput } from "../infoview/context"
-import { InventoryTile } from "../../state/api"
+import { InventoryTile } from "../../store/api"
 import { useAtom } from "jotai"
 import { selectedDocTileAtom } from "../../store/inventory-atoms"
 

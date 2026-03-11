@@ -9,7 +9,7 @@ import { EditorContext } from '../../../../node_modules/vscode-lean4/lean4-infov
 import { Locations, LocationsContext, SelectableLocation } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/goalLocation';
 import { InteractiveCode } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/interactiveCode'
 import { WithTooltipOnHover } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/tooltips';
-import { PreferencesContext, useAppendTypewriterInput } from './context';
+import { useAppendTypewriterInput } from './context';
 import { InteractiveGoal, InteractiveGoals, InteractiveGoalsWithHints, InteractiveHypothesisBundle, ProofState } from './rpc_api';
 import { RpcSessionAtPos } from '@leanprover/infoview/*';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
@@ -19,6 +19,7 @@ import { useAtom } from 'jotai';
 import { gameIdAtom } from '../../store/location-atoms';
 import { typewriterModeAtom } from '../../store/editor-atoms';
 import { gameInfoAtom } from '../../store/query-atoms';
+import { mobileAtom } from '../../store/preferences-atoms';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
@@ -152,7 +153,7 @@ export const Goal = React.memo((props: GoalProps) => {
     const [gameId] = useAtom(gameIdAtom)
     const [typewriterMode] = useAtom(typewriterModeAtom)
     const [{ data: gameInfo }] = useAtom(gameInfoAtom)
-    const {mobile} = React.useContext(PreferencesContext)
+    const [mobile] = useAtom(mobileAtom)
     const { goal, filter, showHints, typewriter } = props
     let { t } = useTranslation()
 

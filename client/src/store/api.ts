@@ -2,7 +2,7 @@
  * @fileOverview Define API of the server-client communication
 */
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { InventoryTab } from '../store/inventory-atoms'
+import { InventoryTab } from './inventory-atoms'
 
 
 export interface GameTile {

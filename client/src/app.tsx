@@ -9,24 +9,22 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
-import { PreferencesContext } from './components/infoview/context';
-import UsePreferences from "./state/hooks/use_preferences"
 import i18n from './i18n';
 import { Popup } from './components/popup/popup';
 import { leanMonacoAtom, leanMonacoOptionsAtom } from './store/editor-atoms';
 import { LeanMonaco } from 'lean4monaco';
+import { preferencesAtom } from './store/preferences-atoms';
 
 function App({ children }: { children?: React.ReactNode }) {
-
-  const {mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = UsePreferences()
 
   const infoviewRef = useRef<HTMLDivElement>(null)
   const [leanMonaco, setLeanMonaco] = useAtom(leanMonacoAtom)
   const [leanMonacoOptions] = useAtom(leanMonacoOptionsAtom)
+  const [preferences] = useAtom(preferencesAtom)
 
   useEffect(() => {
-    i18n.changeLanguage(language)
-  }, [language])
+    i18n.changeLanguage(preferences.language)
+  }, [preferences.language])
 
   // You need to start one `LeanMonaco` instance once in your application using a `useEffect`
   useEffect(() => {
@@ -48,12 +46,10 @@ function App({ children }: { children?: React.ReactNode }) {
 
   return (
     <div className="app">
-      <PreferencesContext.Provider value={{mobile: mobile ?? false, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}}>
-        <React.Suspense>
-          {children}
-        </React.Suspense>
-        <Popup />
-      </PreferencesContext.Provider>
+      <React.Suspense>
+        {children}
+      </React.Suspense>
+      <Popup />
     </div>
   )
 }

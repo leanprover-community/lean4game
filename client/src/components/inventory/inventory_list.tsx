@@ -1,10 +1,9 @@
 import React from "react"
-import { InventoryTile } from "../../state/api"
+import { InventoryTile } from "../../store/api"
 import { InventoryItem } from "./inventory_item"
-import { currentInventoryTilesAtom, InventoryTab } from "../../store/inventory-atoms"
+import { currentInventoryTilesAtom, inventoryAtom, InventoryTab } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "../../store/location-atoms"
-import { inventoryAtom } from "../../store/progress-atoms"
 
 export function InventoryList({tiles, docType, enableAll=false} : {
   tiles: InventoryTile[],

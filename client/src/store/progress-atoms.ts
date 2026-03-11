@@ -35,7 +35,7 @@ export const progressAtom = atom(
     console.debug(`progress for ${gameId}`)
     if (!gameId) return null
     const allProgress = get(allProgressAtom)
-    return allProgress.games[gameId] ?? null
+    return allProgress.games[gameId] ?? defaultGameProgress
   },
   (get, set, val: GameProgress | null) => {
     const gameId = get(gameIdAtom)
@@ -104,6 +104,7 @@ export const difficultyAtom = atom(
   },
   (get, set, val: number) => {
     const progress = get(progressAtom)
+    console.debug(progress)
     if (!progress) return
     if (val < 0 || val > 2) {
       console.error("Cannot set difficulty outside of 0, 1, 2!")

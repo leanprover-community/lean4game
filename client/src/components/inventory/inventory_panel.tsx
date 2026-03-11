@@ -1,13 +1,13 @@
-import React, { useContext, useEffect } from "react"
+import React, { useEffect } from "react"
 import "../../css/inventory.css"
-import { InventoryTab, inventoryTabAtom, inventoryTilesAtoms, selectedDocTileAtom, theoremSubtabAtom, userInventoryAtom } from "../../store/inventory-atoms"
+import { inventoryAtom, InventoryTab, inventoryTabAtom, inventoryTilesAtoms, selectedDocTileAtom, theoremSubtabAtom, userInventoryAtom } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
-import { InventoryOverview, InventoryTile, LevelInfo } from "../../state/api"
+import { InventoryOverview, InventoryTile, LevelInfo } from "../../store/api"
 import { gameIdAtom } from "../../store/location-atoms"
 import { InventorySubTabBar, InventoryTabBar } from "./tab_bars"
 import { InventoryList } from "./inventory_list"
 import { Documentation } from "./documentation"
-import { difficultyAtom, inventoryAtom } from "../../store/progress-atoms"
+import { difficultyAtom } from "../../store/progress-atoms"
 
 /** The panel showing the user's inventory with tactics, definitions, and lemmas */
 export function InventoryPanel({levelInfo, visible = true} : {

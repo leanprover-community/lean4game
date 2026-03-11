@@ -6,8 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
   faCircleInfo, faTerminal, faGear } from '@fortawesome/free-solid-svg-icons'
-import { InputModeContext, PreferencesContext } from "./infoview/context"
-import { useAppDispatch, useAppSelector } from '../hooks'
+import { InputModeContext } from "./infoview/context"
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
 import { useTranslation } from 'react-i18next'
@@ -20,6 +19,7 @@ import { completedAtom, difficultyAtom, progressAtom } from '../store/progress-a
 import { gameInfoAtom } from '../store/query-atoms'
 import { readGameIntroAtom } from '../store/chat-atoms'
 import { typewriterModeAtom } from '../store/editor-atoms'
+import { mobileAtom } from '../store/preferences-atoms'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -264,7 +264,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber} : {
   const { t } = useTranslation()
   const { t: gT } = useGameTranslation()
   const [{data: gameInfo}] = useAtom(gameInfoAtom)
-  const {mobile} = React.useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
   const [navOpen, setNavOpen] = useAtom(navOpenAtom)
 
   return <div className="app-bar">
@@ -303,7 +303,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=1, setPageNumber=
   const { t: gT } = useGameTranslation()
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
-  const {mobile} = React.useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
   const [navOpen, setNavOpen] = useAtom(navOpenAtom)
   const [{data: gameInfo}] = useAtom(gameInfoAtom)
 

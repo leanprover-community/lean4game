@@ -15,7 +15,7 @@ import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/
 import { Diagnostic } from 'vscode-languageserver-types'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext,
+import { DeletedChatContext, InputModeContext, MonacoEditorContext,
   ProofContext, SelectionContext } from './infoview/context'
 import { DualEditor } from './infoview/main'
 import { GameHint, ProofState } from './infoview/rpc_api'
@@ -39,6 +39,7 @@ import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from 
 import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
 import { helpAtom } from '../store/chat-atoms'
 import { inventoryOverviewAtom } from '../store/inventory-atoms'
+import { mobileAtom } from '../store/preferences-atoms'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
   const maybeLeanMonaco = leanMonaco as unknown as {
@@ -84,7 +85,7 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
   let { t } = useTranslation()
   const { t : gT } = useGameTranslation()
   const chatRef = useRef<HTMLDivElement>(null)
-  const {mobile} = useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
   const [gameId, navigateToGame] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
@@ -187,7 +188,7 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
           {t("Next")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>)
         }
-      <MoreHelpButton />
+      <MoreHelpButton selected={null} />
     </div>
   </div>
 }
@@ -214,7 +215,7 @@ function PlayableLevel() {
   const [levelId] = useAtom(levelIdAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
 
-  const {mobile} = React.useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
 
   const [code] = useAtom(codeAtom)
   const [initialSelections] = useAtom(selectionsAtom)
@@ -506,7 +507,7 @@ function PlayableLevel() {
   }, [leanMonacoEditor, leanMonacoEditor?.editor, typewriterMode, lockEditorMode])
 
   return <>
-    <div style={levelInfoIsLoading? null : {display: "none"}} className="app-content loading"><CircularProgress /></div>
+    <div style={levelInfoIsLoading? undefined : {display: "none"}} className="app-content loading"><CircularProgress /></div>
     <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
         <InputModeContext.Provider value={{typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode}}>
@@ -556,7 +557,7 @@ function IntroductionPanel() {
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [, navigateToLevel] = useAtom(levelIdAtom)
 
-  const {mobile} = React.useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
 
   let text: Array<string> = gT(gameInfo?.worlds?.nodes[worldId ?? ""].introduction ?? "").split(/\n(\s*\n)+/)
 
@@ -594,7 +595,7 @@ function Introduction() {
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
 
-  const {mobile} = useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
 
   const [{ data: inventory }] = useAtom(inventoryOverviewAtom)
 

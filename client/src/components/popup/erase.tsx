@@ -2,7 +2,6 @@
  * @fileOverview
 */
 import * as React from 'react'
-import { useAppDispatch } from '../../hooks'
 import { downloadFile } from '../world_tree'
 import { Button } from '../button'
 import { Trans, useTranslation } from 'react-i18next'
@@ -71,7 +70,6 @@ export function ErasePopup () {
   const [levelProgress, setLevelProgress] = useAtom(levelProgressAtom)
 
   // const { setPage } = useContext(PageContext)
-  const dispatch = useAppDispatch()
   const [, setPopup] = useAtom(popupAtom)
 
   const eraseProgress = () => {

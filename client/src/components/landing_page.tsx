@@ -25,7 +25,7 @@ import { GithubIcon } from './navigation/github_icon';
 import { useGameTranslation } from '../utils/translation';
 import { navOpenAtom } from '../store/navigation-atoms';
 import { gameIdAtom } from '../store/location-atoms';
-import { GameTile } from '../state/api';
+import { GameTile } from '../store/api';
 import { gameInfoAtomFamily } from '../store/query-atoms';
 
 

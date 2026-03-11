@@ -11,38 +11,49 @@ export const worldProgressAtomFamily = atomFamily((worldId: string) => atom(get 
 }))
 
 /** The current level progress */
-export const levelProgressAtomFamily = atomFamily((key: [string, number]) => atom(get => {
-  const worldId = key[0]
-  const levelId = key[1]
-  const worldProgress = get(worldProgressAtomFamily(worldId))
-  if (!levelId || !worldProgress) return null
-  return worldProgress[levelId]
+export const levelProgressAtomFamily = atomFamily((key: string) =>
+  atom(get => {
+    const [worldId, levelStr] = key.split(":")
+    const levelId = Number(levelStr)
+    const worldProgress = get(worldProgressAtomFamily(worldId))
+    return worldProgress?.[levelId] ?? null
+  })
+)
+
+/** Completion of a specific level */
+export const levelCompletedAtomFamily = atomFamily((key: string) => atom<boolean>(get => {
+  const [worldId, levelStr] = key.split(":")
+  const levelId = Number(levelStr)
+  if (levelId == 0) return true
+  const levelProgress = get(levelProgressAtomFamily(key))
+  return levelProgress?.completed ?? false
 }))
 
-/** Whether the last level of each dependency has been completed */
+/** The completion state of all levels */
+export const levelsCompletedAtomFamily = atomFamily((worldId: string) => atom<boolean[]>(get => {
+  const { data: gameInfo } = get(gameInfoAtom)
+  const worldSize = gameInfo?.worldSize?.[worldId]
+  return Array.from(Array(worldSize).keys()).map(i => (get(levelCompletedAtomFamily(`${worldId}: ${i}`))))
+}))
+
+/** A world is completed if all its levels are */
+export const worldCompletedAtom = atomFamily((worldId: string) => atom<boolean>(get => {
+  return (get(levelsCompletedAtomFamily(worldId)).every(it => it))
+}))
+
+/** The first uncompleted level or `0` */
+export const firstIncompleteLevel = atomFamily((worldId: string) => atom<number>(get => {
+  const firstIncompleteLevel = get(levelsCompletedAtomFamily(worldId)).findIndex(it => !it)
+  // note: `findIndex` returns `-1` on failure, therefore the indices
+  // `-1, 0, 1` indicate all that the introduction should be shown
+  return firstIncompleteLevel >= 1 ? firstIncompleteLevel : 0
+}))
+
+/** A world is unlocked if all dependency worlds have been completed */
 export const worldDependenciesCompletedAtomFamily = atomFamily((worldId: string) => atom<boolean>(get => {
   const { data: gameInfo } = get(gameInfoAtom)
   const prerequisitesCompleted: boolean[] = gameInfo?.worlds?.edges.filter(it => it[1] == worldId)?.map(it => {
-    const worldSizeDep = gameInfo?.worldSize?.[it[1]]
-    return (worldSizeDep ? get(completedAtomFamily([worldId, worldSizeDep - 1])) : false) ?? false
+    return get(worldCompletedAtom(worldId)) ?? false
   }) ?? []
   return prerequisitesCompleted.every(it => it)
-}))
-
-/**  */
-export const completedAtomFamily = atomFamily((key: [string, number | null]) => atom<boolean>(get => {
-  const worldId = key[0]
-  const levelId = key[1]
-  const { data: gameInfo } = get(gameInfoAtom)
-  if (levelId !== null) {
-    const levelProgress = get(levelProgressAtomFamily([worldId, levelId]))
-    return levelProgress?.completed ?? false
-  } else {
-    // Check: all levels in the world are completed
-    // and the last level of each prerequisite world
-    const worldSize = gameInfo?.worldSize?.[worldId]
-    const completedLevels: boolean[] = Array.from(Array(worldSize).keys()).map(i => (get(completedAtomFamily([worldId,i]))))
-    const worldDependenciesCompleted: boolean = get(worldDependenciesCompletedAtomFamily(worldId))
-    return completedLevels.every(it => it) && worldDependenciesCompleted
-  }
 }))

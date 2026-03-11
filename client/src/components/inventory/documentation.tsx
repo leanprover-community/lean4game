@@ -1,22 +1,18 @@
-import React, { useContext } from "react"
+import React from "react"
 import { useTranslation } from "react-i18next"
 import { Markdown } from "../markdown"
-import { useAppDispatch } from "../../hooks"
-import { useSelector } from "react-redux"
-import { closeDocAtom, InventoryTab, selectedDocTileAtom } from "../../store/inventory-atoms"
+import { closeDocAtom, docAtomFamily, docAtomLegacyFamily, inventoryAtom, InventoryTab, selectedDocTileAtom } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
 import { faLock, faXmark } from "@fortawesome/free-solid-svg-icons"
 import { NavButton } from "../navigation/nav_button"
 import { useGameTranslation } from "../../utils/translation"
 import { gameIdAtom, navigateAcrossWorldsAtom } from "../../store/location-atoms"
-import { difficultyAtom, inventoryAtom } from "../../store/progress-atoms"
-import { docAtomFamily, docAtomLegacyFamily } from "../../store/query-atoms"
+import { difficultyAtom } from "../../store/progress-atoms"
 
 /** The `documentation` */
 export function Documentation({ type } : {type : InventoryTab}) {
   const { t } = useTranslation()
   const { t: gT } = useGameTranslation()
-  const dispatch = useAppDispatch()
   const [gameId] = useAtom(gameIdAtom)
   const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
   const [difficulty] = useAtom(difficultyAtom)

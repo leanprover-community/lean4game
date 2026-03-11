@@ -19,13 +19,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDeleteLeft, faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
-import { LevelInfo } from '../../state/api';
 import { Markdown } from '../markdown';
 
 import { Infos } from './infos';
 import { Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
-import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext, ProofContext, SelectionContext } from './context';
+import { DeletedChatContext, InputModeContext, MonacoEditorContext, ProofContext, SelectionContext } from './context';
 import { Typewriter, getInteractiveDiagsAt, hasInteractiveErrors } from './typewriter';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
@@ -42,6 +41,7 @@ import { completedAtom } from '../../store/progress-atoms';
 import { gameInfoAtom, levelInfoAtom } from '../../store/query-atoms';
 import { typewriterModeAtom } from '../../store/editor-atoms';
 import { inventoryAtom } from '../../store/inventory-atoms';
+import { mobileAtom } from '../../store/preferences-atoms';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -430,7 +430,7 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
 /** The tabs of goals that lean ahs after the command of this step has been processed */
 function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: InteractiveGoalsWithHints, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
   let { t } = useTranslation()
-  const {mobile} = React.useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
   if (proofStep.goals.length == 0) {
@@ -504,7 +504,7 @@ export function TypewriterInterface() {
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
   const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
-  const {mobile} = React.useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
   const { proof, setProof, crashed, setCrashed, interimDiags } = React.useContext(ProofContext)
   const { setTypewriterInput } = React.useContext(InputModeContext)
   const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
@@ -677,7 +677,7 @@ export function TypewriterInterface() {
                     <GoalsTabs proofStep={step} last={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) ? (n) => setDisableInput(n > 0) : (n) => {}}/>
                   }
                   {mobile && i == proof?.steps.length - 1 &&
-                    <MoreHelpButton />
+                    <MoreHelpButton selected={null} />
                   }
 
                   {/* Show a message that there are no goals left */}
