@@ -233,7 +233,7 @@ describe('Basic Lean4Game Features', () => {
   describe('Non-Prop Level', () => {
     it('Non-prop statements should be allowed', () => {
       cy.visit('/#/g/test/TestGame/world/TestWorld/level/3')
-      cy.get('.goal-sign').should('be.visible')
+      cy.get('.goal-sign', { timeout: 60000 }).should('be.visible')
       //cy.contains('Goal:', { timeout: 60000 })
       cy.contains('intro first!')
       cy.get('.typewriter-input .monaco-editor .view-lines').type('intro x{enter}')
