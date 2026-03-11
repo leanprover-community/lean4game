@@ -15,7 +15,7 @@ defaults:
   run:
     shell: bash
 env:
-  NODE_VERSION: 25
+  NODE_VERSION: 24
 jobs:
   test:
     strategy:
@@ -49,10 +49,10 @@ jobs:
         if: matrix.os == 'macos-latest' && matrix.browser == 'firefox'
         uses: browser-actions/setup-firefox@v1
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -79,7 +79,7 @@ jobs:
 
       - name: Upload Cypress screenshots
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: "cypress-screenshots-${{ matrix.name }}-${{ matrix.browser }}"
           path: cypress/screenshots
