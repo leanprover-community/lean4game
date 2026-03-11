@@ -78,35 +78,3 @@ export interface Doc {
   type: string, // TODO: can I remove these?
   category: string,
 }
-
-// // Define a service using a base URL and expected endpoints
-// export const apiSlice = createApi({
-//   reducerPath: 'gameApi',
-//   baseQuery: fetchBaseQuery({ baseUrl: window.location.origin + "/data" }),
-//   endpoints: (builder) => ({
-//     getGameInfo: builder.query<GameInfo, {game: string}>({
-//       query: ({game}) => `${game}/game.json`,
-//     }),
-//     loadLevel: builder.query<LevelInfo, {game: string, world: string, level: number}>({
-//       query: ({game, world, level}) => `${game}/level__${world}__${level}.json`,
-//     }),
-//     loadInventoryOverview: builder.query<InventoryOverview, {game: string}>({
-//       query: ({game}) => `${game}/inventory.json`,
-//     }),
-//     loadDoc: builder.query<Doc, {game: string, name: string, type: InventoryTab}>({
-//       query: ({game, type, name}) => `${game}/doc__${capitalizeFirstLetter(type)}__${name}.json`,
-//     }),
-//     // backwards compatibility
-//     loadDocLegacy: builder.query<Doc, {game: string, name: string, type: "lemma" | "tactic" | "definition" }>({
-//       query: ({game, type, name}) => `${game}/doc__${capitalizeFirstLetter(type)}__${name}.json`,
-//     }),
-//   }),
-// })
-
-// // Export hooks for usage in functional components, which are
-// // auto-generated based on the defined endpoints
-// export const { useGetGameInfoQuery, useLoadLevelQuery, useLoadDocQuery, useLoadDocLegacyQuery, useLoadInventoryOverviewQuery } = apiSlice
-
-// function capitalizeFirstLetter(val) {
-//   return String(val).charAt(0).toUpperCase() + String(val).slice(1);
-// }
