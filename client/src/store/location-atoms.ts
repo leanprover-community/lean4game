@@ -29,12 +29,12 @@ export const pathSegmentsAtom = atom((get) => {
 })
 
 export const gameIdAtom = atom((get) => {
-  const segments = get(pathSegmentsAtom).map(it => it.toLowerCase())
+  const segments = get(pathSegmentsAtom)
   if (segments.length >= 2) {
     return `g/${segments[0]}/${segments[1]}`
   }
   // for backwards compatibility:
-  const hashSegments = get(hashSegmentsAtom).map(it => it.toLowerCase())
+  const hashSegments = get(hashSegmentsAtom)
   if (hashSegments.length >= 3 && hashSegments[0] === "g") {
     return hashSegments.slice(0, 3).join("/")
   }
