@@ -62,6 +62,10 @@ export interface InteractiveGoalsWithHints {
   goals: InteractiveGoalWithHints[];
   command: string;
   diags: InteractiveDiagnostic[];
+  line?: number;
+  /** Set to a number when the server found tactic info at this position.
+   *  null/undefined when no tactic info exists (e.g. during transient processing). */
+  column?: number;
 }
 
 /**
