@@ -16,7 +16,7 @@ export const navigateToLandingPageAtom = atom(null, (get, set) => {
 export const hashSegmentsAtom = atom((get) => {
   const { hash } = get(locationAtom)
   const clean = hash?.replace(/^#\/*/, "")
-  return clean?.split("/").filter(Boolean).map(it => it.toLowerCase()) ?? []
+  return clean?.split("/").filter(Boolean) ?? []
 })
 
 /**
@@ -25,16 +25,16 @@ export const hashSegmentsAtom = atom((get) => {
  */
 export const pathSegmentsAtom = atom((get) => {
   const { pathname } = get(locationAtom)
-  return pathname?.split("/").filter(Boolean).map(it => it.toLowerCase()) ?? []
+  return pathname?.split("/").filter(Boolean) ?? []
 })
 
 export const gameIdAtom = atom((get) => {
-  const segments = get(pathSegmentsAtom)
+  const segments = get(pathSegmentsAtom).map(it => it.toLowerCase())
   if (segments.length >= 2) {
     return `g/${segments[0]}/${segments[1]}`
   }
   // for backwards compatibility:
-  const hashSegments = get(hashSegmentsAtom)
+  const hashSegments = get(hashSegmentsAtom).map(it => it.toLowerCase())
   if (hashSegments.length >= 3 && hashSegments[0] === "g") {
     return hashSegments.slice(0, 3).join("/")
   }

@@ -8,6 +8,7 @@ import { useGameTranslation } from "../utils/translation";
 import { useTranslation } from "react-i18next";
 import { useAtom } from "jotai";
 import { gameIdAtom } from "../store/location-atoms";
+import { helpAtom } from "../store/chat-atoms";
 
 /** Plug-in the variable names in a hint. We do this client-side to prepare
  * for i18n in the future. i.e. one should be able translate the `rawText`
@@ -95,9 +96,10 @@ function hasHiddenHints(step: InteractiveGoalsWithHints): boolean {
 export function MoreHelpButton({selected=null} : {selected: number | null}) {
 
   const { t } = useTranslation()
+  const [help, setHelp] = useAtom(helpAtom)
 
   const {proof, setProof} = React.useContext(ProofContext)
-  const {deletedChat, setDeletedChat, showHelp, setShowHelp} = React.useContext(DeletedChatContext)
+  const {deletedChat, setDeletedChat} = React.useContext(DeletedChatContext)
 
   let k = proof?.steps.length ?
     ((selected === null) ? (proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)) : selected)
@@ -109,17 +111,17 @@ export function MoreHelpButton({selected=null} : {selected: number | null}) {
     if (!(proof?.steps.length)) {return}
 
     // state must not be mutated, therefore we need to clone the set
-    let tmp = new Set(showHelp)
+    let tmp = new Set(help)
     if (tmp.has(k)) {
       tmp.delete(k)
     } else {
       tmp.add(k)
     }
-    setShowHelp(tmp)
+    setHelp(tmp)
     console.debug(`help: ${Array.from(tmp.values())}`)
   }
 
-  if (hasHiddenHints(proof?.steps[k]) && !showHelp.has(k)) {
+  if (hasHiddenHints(proof?.steps[k]) && !help?.has(k)) {
     return <Button  onClick={activateHiddenHints}>
       {t("Show more help!")}
     </Button>

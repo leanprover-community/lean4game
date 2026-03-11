@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next'
 import { useContext } from 'react'
 import { useAtom } from 'jotai'
 import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
-import { typewriterModeAtom } from '../../store/editor-atoms'
+import { lockEditorModeAtom, typewriterModeAtom } from '../../store/editor-atoms'
 
 // TODO: All about pinning could probably be removed
 type InfoKind = 'cursor' | 'pin'
@@ -96,7 +96,7 @@ const InfoDisplayContent = React.memo((props: InfoDisplayContentProps) => {
     let { t } = useTranslation()
     const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
     const {pos, messages, goals, termGoal, error, userWidgets, triggerUpdate, isPaused, setPaused, proofString} = props
-    const { lockEditorMode } = React.useContext(InputModeContext)
+    const [lockEditorMode] = useAtom(lockEditorModeAtom)
 
     const hasWidget = userWidgets.length > 0
     const hasError = !!error

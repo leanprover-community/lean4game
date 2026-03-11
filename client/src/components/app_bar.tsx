@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload, faUpload, faEraser, faBook, faBookOpen, faGlobe, faHome,
   faArrowRight, faArrowLeft, faXmark, faBars, faCode,
   faCircleInfo, faTerminal, faGear } from '@fortawesome/free-solid-svg-icons'
-import { InputModeContext } from "./infoview/context"
 import { Button } from './button'
 import { downloadProgress } from './popup/erase'
 import { useTranslation } from 'react-i18next'
@@ -18,7 +17,7 @@ import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from 
 import { completedAtom, difficultyAtom, progressAtom } from '../store/progress-atoms'
 import { gameInfoAtom } from '../store/query-atoms'
 import { readGameIntroAtom } from '../store/chat-atoms'
-import { typewriterModeAtom } from '../store/editor-atoms'
+import { lockEditorModeAtom, typewriterModeAtom } from '../store/editor-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
@@ -122,7 +121,7 @@ function InputModeButton({ isDropdown } : {isDropdown: boolean}) {
   const { t } = useTranslation()
   const [levelId] = useAtom(levelIdAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
-  const {lockEditorMode} = React.useContext(InputModeContext)
+  const [lockEditorMode] = useAtom(lockEditorModeAtom)
 
   /** toggle input mode if allowed */
   function toggleInputMode(ev: React.MouseEvent) {
@@ -344,7 +343,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=1, setPageNumber=
         </div>
         <div className="nav-btns">
           <PreviousButton  />
-          <NextButton worldSize={gameInfo?.worldSize[worldId]} />
+          <NextButton worldSize={gameInfo?.worldSize?.[worldId]} />
           <InputModeButton isDropdown={false}/>
           <MenuButton  />
         </div>

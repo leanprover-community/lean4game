@@ -3,6 +3,7 @@ import { LeanMonaco, LeanMonacoOptions } from 'lean4monaco'
 import { gameIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
+import { levelInfoAtom } from "./query-atoms";
 
 /** Options for the LeanMonaco instance */
 export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
@@ -61,3 +62,9 @@ export const selectionsAtom = atom(
     set(levelProgressAtom, { ...levelProgress, selections: val })
   }
 )
+
+/** If a level has a template, the user is forced to use editor mode */
+export const lockEditorModeAtom = atom(get => {
+  const { data: levelInfo } = get(levelInfoAtom)
+  return levelInfo?.template != null
+})

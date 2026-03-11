@@ -98,25 +98,17 @@ export const SelectionContext = React.createContext<{
 export const DeletedChatContext = React.createContext<{
   deletedChat : GameHint[],
   setDeletedChat: React.Dispatch<React.SetStateAction<Array<GameHint>>>
-  showHelp : Set<number>,
-  setShowHelp: React.Dispatch<React.SetStateAction<Set<number>>>
 }>({
   deletedChat: [],
   setDeletedChat: () => {},
-  showHelp: new Set(),
-  setShowHelp: () => {}
 })
 
 export const InputModeContext = React.createContext<{
   typewriterInput: string,
   setTypewriterInput: React.Dispatch<React.SetStateAction<string>>,
-  lockEditorMode: boolean,
-  setLockEditorMode: React.Dispatch<React.SetStateAction<boolean>>,
 }>({
   typewriterInput: "",
   setTypewriterInput: () => {},
-  lockEditorMode: false,
-  setLockEditorMode: () => {},
 });
 
 

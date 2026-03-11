@@ -18,11 +18,11 @@ export const readGameIntroAtom = atom(
 export const helpAtom = atom(
   get => {
     const levelProgress = get(levelProgressAtom)
-    return levelProgress?.help ?? []
+    return new Set(levelProgress?.help ?? [])
   },
-  (get, set, val: number[]) => {
+  (get, set, val: Set<number>) => {
     const levelProgress = get(levelProgressAtom)
     if (!levelProgress) return
-    set(levelProgressAtom, { ...levelProgress, help: val })
+    set(levelProgressAtom, { ...levelProgress, help: [ ...val ] })
   }
 )

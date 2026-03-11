@@ -34,7 +34,7 @@ import i18next from 'i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { useAtom } from 'jotai'
-import { codeAtom, leanMonacoAtom, selectionsAtom, typewriterModeAtom } from '../store/editor-atoms'
+import { codeAtom, leanMonacoAtom, lockEditorModeAtom, selectionsAtom, typewriterModeAtom } from '../store/editor-atoms'
 import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
 import { helpAtom } from '../store/chat-atoms'
@@ -90,8 +90,9 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
   const [worldId] = useAtom(worldIdAtom)
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
   const [{ data: levelInfo }] = useAtom(levelInfoAtom)
+  const [help, setHelp] = useAtom(helpAtom)
   const {proof, setProof} = useContext(ProofContext)
-  const {deletedChat, setDeletedChat, showHelp, setShowHelp} = useContext(DeletedChatContext)
+  const {deletedChat, setDeletedChat} = useContext(DeletedChatContext)
   const {selectedStep, setSelectedStep} = useContext(SelectionContext)
 
   let k = proof?.steps.length ? proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) : 0
@@ -113,7 +114,7 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
     if (!mobile) {
       chatRef.current!.lastElementChild?.scrollIntoView() //scrollTo(0,0)
     }
-  }, [proof, showHelp])
+  }, [proof, help])
 
   // Scroll to element if selection changes
   useEffect(() => {
@@ -150,7 +151,7 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
         if (step.goals.length > 0 && !isLastStepWithErrors(proof, i)) {
           return <Hints key={`hints-${i}`}
-          hints={filteredHints} showHidden={showHelp.has(i)} step={i}
+          hints={filteredHints} showHidden={help.has(i)} step={i}
           selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof?.steps.length - 1}/>
         }
       })}
@@ -161,7 +162,7 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
         if (!(i == proof?.steps.length - 1 && withErr)) {
           // TODO: Should not use index as key.
           return <Hints key={`hints-${i}`}
-            hints={step} showHidden={showHelp.has(i)} step={i}
+            hints={step} showHidden={showHelp?.has(i)} step={i}
             selected={selectedStep} toggleSelection={toggleSelection(i)} lastLevel={i == proof?.steps.length - 1}/>
         }
       })} */}
@@ -219,6 +220,8 @@ function PlayableLevel() {
 
   const [code] = useAtom(codeAtom)
   const [initialSelections] = useAtom(selectionsAtom)
+
+  // A set of row numbers where help is displayed
   const [help, setHelp] = useAtom(helpAtom)
 
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
@@ -233,13 +236,11 @@ function PlayableLevel() {
   // When deleting the proof, we want to keep to old messages around until
   // a new proof has been entered. e.g. to consult messages coming from dead ends
   const [deletedChat, setDeletedChat] = useState<Array<GameHint>>([])
-  // A set of row numbers where help is displayed
-  const [showHelp, setShowHelp] = useAtom(helpAtom)
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
 
   // set to true to prevent switching between typewriter and editor
-  const [lockEditorMode, setLockEditorMode] = useState(false)
+  const [lockEditorMode] = useAtom(lockEditorModeAtom)
   const [typewriterInput, setTypewriterInput] = useState("")
   const lastLevel = worldId && (levelId !== undefined) && levelId >= (gameInfo?.worldSize?.[worldId] ?? 0)
 
@@ -318,7 +319,7 @@ function PlayableLevel() {
       const editorConnection = new EditorConnection(infoProvider.editorApi, editorEvents)
       setEditorConnection(editorConnection)
 
-      const model = leanMonacoEditor.editor.getModel()
+      const model = leanMonacoEditor.editor?.getModel()
       const fireCursorLocation = () => {
         const selection = leanMonacoEditor.editor.getSelection()
         const position = leanMonacoEditor.editor.getPosition()
@@ -408,8 +409,7 @@ function PlayableLevel() {
   useEffect (() => {
     // Lock editor mode
     if (levelInfo?.template) {
-      setLockEditorMode(true)
-      const model = leanMonacoEditor?.editor.getModel()
+      const model = leanMonacoEditor?.editor?.getModel()
 
       if (model) {
         let code = model.getLinesContent()
@@ -437,7 +437,6 @@ function PlayableLevel() {
         }
       }
     } else {
-      setLockEditorMode(false)
     }
   }, [levelInfo, levelId, worldId, gameId, leanMonacoEditor?.editor])
 
@@ -450,7 +449,7 @@ function PlayableLevel() {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    const model = leanMonacoEditor?.editor.getModel()
+    const model = leanMonacoEditor?.editor?.getModel()
     if (!(typewriterMode && !lockEditorMode) && model) {
       // Delete last input attempt from command line
       leanMonacoEditor?.editor.executeEdits("typewriter", [{
@@ -462,25 +461,25 @@ function PlayableLevel() {
     }
   }, [typewriterMode, lockEditorMode])
 
-  useEffect(() => {
-    // Forget whether hidden hints are displayed for steps that don't exist yet
-    if (proof?.steps.length) {
-      console.debug(Array.from(showHelp))
-      setShowHelp([...new Set(Array.from(showHelp).filter(i => (i < proof?.steps.length)))])
-    }
-  }, [proof])
+  // useEffect(() => {
+  //   // Forget whether hidden hints are displayed for steps that don't exist yet
+  //   if (proof?.steps.length) {
+  //     console.debug(Array.from(help))
+  //     setHelp([...new Set(Array.from(help).filter(i => (i < proof?.steps.length)))])
+  //   }
+  // }, [proof])
 
-  // save showed help in store
-  useEffect(() => {
-    if (proof?.steps.length) {
-      console.debug(`showHelp:\n ${showHelp}`)
-      setHelp(Array.from(showHelp))
-    }
-  }, [showHelp])
+  // // save showed help in store
+  // useEffect(() => {
+  //   if (proof?.steps.length) {
+  //     console.debug(`showHelp:\n ${showHelp}`)
+  //     setHelp(Array.from(showHelp))
+  //   }
+  // }, [showHelp])
 
   // Effect when command line mode gets enabled
   useEffect(() => {
-    const model = leanMonacoEditor?.editor.getModel()
+    const model = leanMonacoEditor?.editor?.getModel()
     if (model&& (typewriterMode && !lockEditorMode)) {
       let code = model.getLinesContent().filter(line => line.trim())
       leanMonacoEditor?.editor.executeEdits("typewriter", [{
@@ -508,17 +507,17 @@ function PlayableLevel() {
 
   return <>
     <div style={levelInfoIsLoading? undefined : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-    <DeletedChatContext.Provider value={{deletedChat, setDeletedChat, showHelp, setShowHelp}}>
+    <DeletedChatContext.Provider value={{deletedChat, setDeletedChat}}>
       <SelectionContext.Provider value={{selectedStep, setSelectedStep}}>
-        <InputModeContext.Provider value={{typewriterInput, setTypewriterInput, lockEditorMode, setLockEditorMode}}>
+        <InputModeContext.Provider value={{typewriterInput, setTypewriterInput}}>
           <ProofContext.Provider value={{proof, setProof, interimDiags, setInterimDiags, crashed: isCrashed, setCrashed: setIsCrashed}}>
             <EditorContext.Provider value={editorConnection}>
               <MonacoEditorContext.Provider value={leanMonacoEditor?.editor}>
                 <LevelAppBar
                   pageNumber={pageNumber} setPageNumber={setPageNumber}
                   isLoading={levelInfoIsLoading}
-                  levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${gameInfo.data?.worldSize[worldId]}` +
-                    (level?.data?.title && ` : ${gT(level?.data?.title ?? "")}`)}
+                  levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${worldId ? gameInfo?.worldSize?.[worldId] ?? "" : ""}` +
+                    (levelInfo?.title && ` : ${gT(levelInfo?.title ?? "")}`)}
                   />
                 {mobile?
                   // TODO: This is copied from the `Split` component below...
@@ -559,7 +558,7 @@ function IntroductionPanel() {
 
   const [mobile] = useAtom(mobileAtom)
 
-  let text: Array<string> = gT(gameInfo?.worlds?.nodes[worldId ?? ""].introduction ?? "").split(/\n(\s*\n)+/)
+  let text: Array<string> = gT(gameInfo?.worlds?.nodes[worldId ?? ""]?.introduction ?? "").split(/\n(\s*\n)+/)
 
   const focusRef = useRef<HTMLButtonElement>()
   useEffect(() => {
@@ -602,7 +601,7 @@ function Introduction() {
   const [{ data: gameInfo, isLoading: isLoadingGameInfo }] = useAtom(gameInfoAtom)
 
 
-  let image: string = worldId ? gameInfo?.worlds?.nodes[worldId].image ?? "" : ""
+  let image: string = worldId ? gameInfo?.worlds?.nodes[worldId]?.image ?? "" : ""
 
   return <>
     <LevelAppBar isLoading={isLoadingGameInfo} levelTitle={t("Introduction")} />

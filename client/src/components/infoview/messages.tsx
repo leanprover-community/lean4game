@@ -13,7 +13,7 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-
 import { InputModeContext } from './context'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
-import { typewriterModeAtom } from '../../store/editor-atoms'
+import { lockEditorModeAtom, typewriterModeAtom } from '../../store/editor-atoms'
 
 interface MessageViewProps {
     uri: DocumentUri;
@@ -83,7 +83,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         message = diag.message
     }
 
-    const { lockEditorMode } = React.useContext(InputModeContext)
+    const [lockEditorMode] = useAtom(lockEditorModeAtom)
 
     return (
     // <details open>

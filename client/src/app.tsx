@@ -38,8 +38,8 @@ function App({ children }: { children?: React.ReactNode }) {
     })()
 
     return () => {
-      if (leanMonaco && typeof leanMonaco.dispose === "function") {
-        leanMonaco.dispose()
+      if (leanMonaco && typeof leanMonaco?.dispose === "function") {
+        leanMonaco?.dispose?.()
       }
     }
   }, [leanMonacoOptions, setLeanMonaco])
