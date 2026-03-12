@@ -85,7 +85,7 @@ export const typewriterModeAtom = atom(
 export const proofAtom = atom<ProofState>()
 
 /** TODO: Workaround to capture a crash of the gameserver. */
-export const interimDiagsAtom = atom<Array<Diagnostic>>()
+export const interimDiagsAtom = atom<Array<Diagnostic>>([])
 
 /** TODO: Workaround to capture a crash of the gameserver. */
-export const crashedAtom = atom<boolean>()
+export const crashedAtom = atom<boolean>(false)
