@@ -362,8 +362,8 @@ export function loadGoals(
   uri: string,
   worldId: string,
   levelId: number,
-  setProof: React.Dispatch<React.SetStateAction<ProofState>>,
-  setCrashed: React.Dispatch<React.SetStateAction<Boolean>>) {
+  setProof: React.Dispatch<React.SetStateAction<ProofState | undefined>>,
+  setCrashed: React.Dispatch<React.SetStateAction<boolean>>) {
 console.info('sending rpc request to load the proof state')
 
 rpcSess.call('Game.getProofState',
@@ -372,11 +372,11 @@ rpcSess.call('Game.getProofState',
         worldId, levelId
     }
 ).then(
-  (proof : ProofState) => {
+  (proof) => {
     if (typeof proof !== 'undefined') {
       console.info(`received a proof state!`)
       console.log(proof)
-      setProof(proof)
+      setProof(proof as ProofState)
       setCrashed(false)
     } else {
       console.warn('received undefined proof state!')

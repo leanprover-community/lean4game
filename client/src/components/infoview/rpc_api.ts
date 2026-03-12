@@ -78,6 +78,6 @@ export interface ProofState {
    * be the "unsolved goals" message, I believe.
    */
   diagnostics : InteractiveDiagnostic[];
-  completed : Boolean;
-  completedWithWarnings : Boolean;
+  completed : boolean;
+  completedWithWarnings : boolean;
 }

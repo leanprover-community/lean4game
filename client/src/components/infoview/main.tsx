@@ -197,7 +197,7 @@ export function Main() {
     return (ev: any) => {
       console.debug('toggled selection')
       if (selectedStep == line) {
-        setSelectedStep(null)
+        setSelectedStep(undefined)
       } else {
         setSelectedStep(line)
       }
@@ -255,7 +255,7 @@ export function Main() {
   const hintLine = (() => {
     const isEditorMode = !(typewriterMode)
     const curLine = Number.isFinite(curPos?.line)
-      ? curPos.line
+      ? curPos?.line
       : (Number.isFinite((curPos as any)?._line) ? (curPos as any)._line : undefined)
     const curChar = Number.isFinite(curPos?.character)
       ? curPos.character
@@ -482,7 +482,7 @@ export function TypewriterInterface() {
   * Note that the first line (i.e. deleting everything) is `1`!
   */
   function deleteProof(line: number) {
-    return (ev) => {
+    return (ev: any) => {
       let deletedChat: Array<GameHint> = []
       proof?.steps.slice(line).map((step, i) => {
         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
@@ -503,8 +503,8 @@ export function TypewriterInterface() {
         text: '',
         forceMoveMarkers: false
       }])
-      setSelectedStep(null)
-      setTypewriter(proof?.steps[line].command)
+      setSelectedStep(undefined)
+      setTypewriter(proof?.steps[line].command ?? "")
       // Reload proof on deleting
       loadGoals(rpcSess, uri, worldId!, levelId!, setProof, setCrashed)
       ev.stopPropagation()
@@ -512,10 +512,10 @@ export function TypewriterInterface() {
   }
 
   function toggleSelectStep(line: number) {
-    return (ev) => {
+    return (ev: any) => {
       if (mobile) {return}
       if (selectedStep == line) {
-        setSelectedStep(null)
+        setSelectedStep(undefined)
         console.debug(`unselected step`)
       } else {
         setSelectedStep(line)
@@ -526,7 +526,7 @@ export function TypewriterInterface() {
 
    // Scroll to the end of the proof if it is updated.
    React.useEffect(() => {
-    if (proof?.steps.length > 1) {
+    if (proof?.steps?.length && proof?.steps?.length > 1) {
       proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
     } else {
       proofPanelRef.current?.scrollTo(0,0)
