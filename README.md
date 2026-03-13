@@ -33,6 +33,9 @@ not fully written yet.
 
 * [Server](doc/DOCUMENTATION.md): describes the server part (i.e. the content of `server/` und `relay/`).
 
+### Hosting
+[How to host a lean4game instance yoursely](doc/hosting.md): example of how to setup your own lean4game server 
+
 ## Contributing
 
 Contributions to `lean4game` are always welcome!
