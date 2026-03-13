@@ -71,7 +71,7 @@ This section will be somewhat similar to what is written in the section about
 We diverge here in that we only describe the installation of Lean4Game itself.
 Before starting, you will need to generate a [fine-grained GitHub access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with the following properties:
 
-- Expiration: choose "Custom" and select a day up to 365 days from today.
+- Expiration: choose "Custom" and select a day up to 365 days from today. (Note that you will need to update the token after a year)
 - Repository access: Public repositories (read-only)
 - No further permissions. It should say "0 permissions for none of your repositories" and "0 account permissions"
 
@@ -90,9 +90,7 @@ save the access token after its generation as you can only see it once and it is
     npm install
  ```
 
-3. Set lean4game environment variables in ```ecosystem.config.cjs``` file
-
-To get the GitHub Access Token required for fields ```LEAN4GAME_GITHUB_USER``` and ```LEAN4GAME_GITHUB_TOKEN``` please refer to the dedicated [instructions](./Updating/updating_github_access_token.md).
+3. Set lean4game environment variables in ```ecosystem.config.cjs``` file. The github access token should have been generated and saved as described in the beginning of this section.
 
 ```vim
 // This is a configuration file for pm2, a production process manager for nodejs
