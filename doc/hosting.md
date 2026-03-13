@@ -69,7 +69,13 @@ to set up a reverse [proxy using nginx on Ubuntu](https://www.digitalocean.com/c
 This section will be somewhat similar to what is written in the section about
 [running Lean4Game locally](running_locally.md).
 We diverge here in that we only describe the installation of Lean4Game itself.
-Before starting, you will need to generate a [GitHub access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
+Before starting, you will need to generate a [fine-grained GitHub access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with the following properties:
+
+- Expiration: choose "Custom" and select a day up to 365 days from today.
+- Repository access: Public repositories (read-only)
+- No further permissions. It should say "0 permissions for none of your repositories" and "0 account permissions"
+
+save the access token after its generation as you can only see it once and it is needed for step 3.
 
 1. Clone hosted projects via ```git``` onto server. **Important:** Please use the HTTPS URL from GitHub, not the SSH URL, to clone the project repositories.
 
