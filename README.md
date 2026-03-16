@@ -1,10 +1,10 @@
 # Lean 4 Game
 
-This is the source code for a Lean game platform hosted at [adam.math.hhu.de](https://adam.math.hhu.de).
+This is the source code for the Lean Game Server hosted at [adam.math.hhu.de](https://adam.math.hhu.de).
 
 ## Creating a Game
 
-Please follow the tutorial [Creating a Game](doc/create_game.md). In particular, the following steps might be of interest:
+Please follow the tutorial [Creating a Game](doc/create_game.md). In particular, the following steps may be of interest:
 
 * Step 6: [How to Run Games Locally](doc/running_locally.md)
 * Step 8: [How to Update an existing Game](doc/update_game.md)
@@ -13,13 +13,12 @@ Please follow the tutorial [Creating a Game](doc/create_game.md). In particular,
 
 ## Documentation
 
-The documentation is very much work in progress but the linked documentation here
-should be up-to-date:
+The documentation is very much work in progress but the links below should be up-to-date:
 
 ### Game creation API
 
 - [Creating a Game](doc/create_game.md): **the main document to consult**.
-- [More about Hints](doc/hints.md): describes the `Hint` and `Branch` tactic.
+- [More about Hints](doc/hints.md): describes the `Hint` and `Branch` tactics.
 
 ### Frontend API
 
@@ -29,12 +28,10 @@ should be up-to-date:
 
 ### Backend
 
-not fully written yet.
-
-* [Server](doc/DOCUMENTATION.md): describes the server part (i.e. the content of `server/` und `relay/`).
+* [Server](doc/DOCUMENTATION.md): describes the server part (i.e. the content of `server/` and `relay/`).
 
 ### Hosting
-* [How to host a lean4game instance yoursely](doc/hosting.md): example of how to setup your own lean4game server 
+* [How to host a lean4game instance yourself](doc/hosting.md): how to set up your own Lean Game Server
 
 ## Contributing
 
@@ -45,7 +42,7 @@ Contributions to `lean4game` are always welcome!
 The interface can be translated to various languages. For adding a translation, one needs to do the following:
 
 1. In `client/src/config.json`, add your new language. The "iso" key is the ISO language code, i.e. it should be accepted by "i18next" and "GNU gettext"; the "flag" key is once accepted by [react-country-flag](https://www.npmjs.com/package/react-country-flag).
-2. Run `npm run translate`. This should create a new file `client/public/locales/{language}/translation.json`. (alternatively you can copy-paste `client/public/locales/en/translation.json`)
+2. Run `npm run translate`. This should create a new file `client/public/locales/{language}/translation.json`. (Alternatively, you can copy-paste `client/public/locales/en/translation.json`.)
 3. Add all translations.
 4. Commit the changes you made to `config.json` together with the new `translation.json`.
 
@@ -57,7 +54,7 @@ Providing the use access to a Lean instance running on the server is a severe se
 
 ## Contact
 
-In case of technical problems with ```adam.math.hhu.de``` please contact us via <a href="mailto:matvey.lorkish@hhu.de?subject=Lean4Game: <Your%20Question>">e-mail</a>.
+In case of technical problems with `adam.math.hhu.de` please contact us via <a href="mailto:matvey.lorkish@hhu.de?subject=Lean4Game: <Your%20Question>">e-mail</a>.
 
 ## Credits
 
