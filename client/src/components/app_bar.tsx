@@ -11,14 +11,19 @@ import { downloadProgress } from './popup/erase'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
 import { popupAtom, PopupType } from '../store/popup-atoms'
-import { closeNavAtom, navOpenAtom } from '../store/navigation-atoms'
+import { closeNavAtom, langNavOpenAtom, navOpenAtom } from '../store/navigation-atoms'
 import { useGameTranslation } from '../utils/translation'
 import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from '../store/location-atoms'
 import { completedAtom, difficultyAtom, progressAtom } from '../store/progress-atoms'
 import { gameInfoAtom } from '../store/query-atoms'
 import { readGameIntroAtom } from '../store/chat-atoms'
 import { lockEditorModeAtom, typewriterModeAtom } from '../store/editor-atoms'
-import { mobileAtom } from '../store/preferences-atoms'
+import { mobileAtom, preferencesAtom } from '../store/preferences-atoms'
+import { NavButton } from './navigation/nav_button'
+import { Flag } from './flag'
+import i18n from '../i18n'
+import { useState } from 'react'
+import lean4gameConfig from '../config.json'
 
 /** navigation buttons for mobile welcome page to switch between intro/tree/inventory. */
 function MobileNavButtons({pageNumber, setPageNumber}:
@@ -126,6 +131,43 @@ function PreviousButton() {
     </Button>
   )
 }
+
+export function LanguageButton() {
+  const { t } = useTranslation()
+  const [langNavOpen, setLangNavOpen] = useAtom(langNavOpenAtom)
+
+  return (
+    <NavButton
+      iconElement={langNavOpen ? undefined : <Flag iso={i18n.language} />}
+      icon={langNavOpen ? faXmark : undefined}
+      title={langNavOpen ? t('close language menu') : t('open language menu')}
+      onClick={() => {setLangNavOpen(!langNavOpen)}}
+    />
+  )
+}
+
+export function LanguageDropdown() {
+  const [gameId] = useAtom(gameIdAtom)
+  const [, setPreferences] = useAtom(preferencesAtom)
+  const [{data: gameInfo}] = useAtom(gameInfoAtom)
+  const [langNavOpen, setLangNavOpen] = useAtom(langNavOpenAtom)
+
+  const available = gameId && gameInfo?.tile?.languages ? gameInfo?.tile?.languages : Object.entries(lean4gameConfig.languages).map(it => it[1].iso)
+
+  return (
+    <div className={'menu dropdown' + (langNavOpen ? '' : ' hidden')} onClick={() => {setLangNavOpen(!langNavOpen)}} >
+      {available.map(iso =>
+          <NavButton
+            key={`lang-selection-${iso}`}
+            iconElement={<Flag iso={iso} />}
+            text={lean4gameConfig.languages.find(it => it.iso == iso)?.name}
+            onClick={() => {setPreferences(prev => ({ ...prev, language: iso }))}}
+            inverted={true} />)
+      }
+    </div>
+  )
+}
+
 
 /** button to toggle between editor and typewriter */
 function InputModeButton({ isDropdown } : {isDropdown: boolean}) {
@@ -288,8 +330,10 @@ export function WelcomeAppBar({pageNumber, setPageNumber} : {
     </div>
     <div className="nav-btns">
       {mobile && <MobileNavButtons pageNumber={pageNumber} setPageNumber={setPageNumber} />}
+      {(gameInfo?.tile?.languages.length ?? 1 > 1) && <LanguageButton />}
       <MenuButton />
     </div>
+    <LanguageDropdown />
     <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
       <GameInfoButton />
       <DownloadButton />
@@ -311,12 +355,11 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=1, setPageNumber=
 }) {
   const { t } = useTranslation()
   const { t: gT } = useGameTranslation()
-  const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [mobile] = useAtom(mobileAtom)
   const [navOpen, setNavOpen] = useAtom(navOpenAtom)
   const [{data: gameInfo}] = useAtom(gameInfoAtom)
-
+  const [langNavOpen, setLangNavOpen] = useState(false)
 
   let worldTitle = worldId ? gameInfo?.worlds?.nodes[worldId]?.title : ""
 
@@ -356,8 +399,10 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=1, setPageNumber=
           <PreviousButton  />
           <NextButton worldSize={gameInfo?.worldSize?.[worldId]} />
           <InputModeButton isDropdown={false}/>
+          {(gameInfo?.tile?.languages.length ?? 1 > 1) && <LanguageButton />}
           <MenuButton  />
         </div>
+        <LanguageDropdown />
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
           <GameInfoButton />
           <ImpressumButton isDropdown={true} />

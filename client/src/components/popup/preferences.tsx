@@ -58,7 +58,7 @@ export function PreferencesPopup() {
                     onChange={handlerChangeLanguage}>
                       {lean4gameConfig.languages.map(lang => {
                         return <MenuItem key={`menu-item-lang-${lang.iso}`} value={lang.iso}>
-                          {lean4gameConfig.useFlags && <ReactCountryFlag countryCode={lang.flag}/>}
+                          {preferences.useFlags && <ReactCountryFlag countryCode={lang.flag}/>}
                           &nbsp;
                           {lang.name}
                         </MenuItem>
@@ -72,6 +72,20 @@ export function PreferencesPopup() {
               If a game does not exist in the language selected, this setting has no effect
               and the game's default language is used.
             </p>
+          </div>
+          <div className='preferences-item'>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={preferences.useFlags}
+                  onChange={() => setPreferences(prev => ({ ...prev, useFlags: !preferences.useFlags }))}
+                  name="checked"
+                  color="primary"
+                />
+              }
+              label={t("Use country flags to represent languages")}
+              labelPlacement="end"
+            />
           </div>
         </div>
         <div className='preferences-category'>
@@ -119,6 +133,9 @@ export function PreferencesPopup() {
           </div>
         </div>
         <div className='preferences-category tail-category'>
+          <div className='category-title'>
+            <h3>{t("Browser Storage")}</h3>
+          </div>
           <div className='preferences-item'>
             <FormControlLabel
               control={

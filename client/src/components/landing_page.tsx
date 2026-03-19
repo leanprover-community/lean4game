@@ -8,7 +8,7 @@ import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 import { Markdown } from './markdown';
 import path from 'path';
-import { ImpressumButton, MenuButton, PreferencesButton, PrivacyButton } from './app_bar';
+import { ImpressumButton, LanguageButton, LanguageDropdown, MenuButton, PreferencesButton, PrivacyButton } from './app_bar';
 import ReactCountryFlag from 'react-country-flag';
 import lean4gameConfig from '../config.json'
 import i18next from 'i18next';
@@ -18,11 +18,13 @@ import { GithubIcon } from './navigation/github_icon';
 import { navOpenAtom } from '../store/navigation-atoms';
 import { gameIdAtom } from '../store/location-atoms';
 import { gameInfoAtomFamily } from '../store/query-atoms';
+import { preferencesAtom } from '../store/preferences-atoms';
 
 function Tile({gameId}: {gameId: string}) {
   const { t, i18n } = useTranslation()
   const [{ data: gameInfo }] = useAtom(gameInfoAtomFamily(gameId))
   const [, navigateToGame] = useAtom(gameIdAtom)
+  const [preferences] = useAtom(preferencesAtom)
 
   const gameTile = gameInfo?.tile
 
@@ -58,7 +60,7 @@ function Tile({gameId}: {gameId: string}) {
           <td>
             {gameTile.languages.map((lang) => {
               let langOpt = lean4gameConfig.languages.find((e) => e.iso == lang)
-              if (lean4gameConfig.useFlags && langOpt?.flag) {
+              if (preferences.useFlags && langOpt?.flag) {
                 return <ReactCountryFlag key={`flag-${lang}`} title={langOpt.name} countryCode={langOpt.flag} className="emojiFlag"/>
               } else {
                 return <span title={langOpt?.name}>{lang}</span>
@@ -81,11 +83,11 @@ function LandingPage() {
   const showUsageMem = usageMem !== undefined && usageMem >= 0
   const showUsageCPU = usageCPU !== undefined && usageCPU >= 0
 
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   // Load the namespaces of all games
   // TODO: should `allGames` contain game-ids starting with `g/`?
-  i18next.loadNamespaces(lean4gameConfig.allGames.map(id => `g/${id}`))
+  i18n.loadNamespaces(lean4gameConfig.allGames.map(id => `g/${id}`))
 
   /** Parse `games/stats.csv` if present and display server capacity. */
   React.useEffect(() => {
@@ -98,8 +100,10 @@ function LandingPage() {
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
       <nav className="landing-page-nav">
+        <LanguageButton />
         <GithubIcon url="https://github.com/leanprover-community/lean4game"/>
         <MenuButton />
+        <LanguageDropdown />
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
             <ImpressumButton isDropdown={true} />
             <PrivacyButton isDropdown={true} />

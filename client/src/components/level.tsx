@@ -64,14 +64,24 @@ const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: Lean
 }
 
 function Level() {
+  const { t: gT, i18n } = useGameTranslation()
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
   const [levelId] = useAtom(levelIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
 
   // Load the namespace of the game
-  i18next.loadNamespaces(gameId ?? "").catch(err => {
+  i18n.loadNamespaces(gameId ?? "").catch(err => {
     console.warn(`translations for ${gameId} do not exist.`)
   })
+
+  // set the window title
+  useEffect(() => {
+    if (gameInfo?.title) {
+      window.document.title = gT(gameInfo.title)
+    }
+  }, [gameInfo?.title, i18n.language])
+
 
   if (levelId == 0) return <Introduction />
   return <PlayableLevel key={`${worldId}/${levelId}`} />

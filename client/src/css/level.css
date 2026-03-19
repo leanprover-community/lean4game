@@ -324,6 +324,11 @@ td code  {
   display: none;
 }
 
+.menu.dropdown .btn {
+  text-align: left;
+  margin: 0;
+}
+
 #menu-btn {
   padding: 0;
   font-size: 1.3rem;

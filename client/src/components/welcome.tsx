@@ -64,14 +64,14 @@ function IntroductionPanel({setPageNumber}: {setPageNumber: (val: number) => voi
 
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
-  const { t: gT } = useGameTranslation()
+  const { t: gT, i18n } = useGameTranslation()
   const [gameId] = useAtom(gameIdAtom)
   const [readGameIntro] = useAtom(readGameIntroAtom)
   const [{ data: gameInfo, isLoading: gameInfoIsLoading }] = useAtom(gameInfoAtom)
   const [{ data: inventory }] = useAtom(inventoryOverviewAtom)
 
   // Load the namespace of the game
-  i18next.loadNamespaces(gameId ?? "")
+  i18n.loadNamespaces(gameId ?? "")
 
   const [mobile] = useAtom(mobileAtom)
 
@@ -84,7 +84,7 @@ function Welcome() {
     if (gameInfo?.title) {
       window.document.title = gT(gameInfo.title)
     }
-  }, [gameInfo?.title, i18next.language])
+  }, [gameInfo?.title, i18n.language])
 
   return gameInfoIsLoading ?
     <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}>
