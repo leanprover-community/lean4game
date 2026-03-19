@@ -84,7 +84,7 @@ function Welcome() {
     if (gameInfo?.title) {
       window.document.title = gT(gameInfo.title)
     }
-  }, [gameInfo?.title])
+  }, [gameInfo?.title, i18next.language])
 
   return gameInfoIsLoading ?
     <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}>
