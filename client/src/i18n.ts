@@ -23,8 +23,8 @@ i18n
     // > language to use, more information here:
     // > https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
     lng: "en",
-    // we use natural language keys, so we don't need a fallback language.
-    fallbackLng: false,
+    // Fallback to English if other translations are missing
+    fallbackLng: "en",
     // > you can use the i18n.changeLanguage function to change the language manually:
     // > https://www.i18next.com/overview/api#changelanguage
     // > if you're using a language detector, do not define the lng option

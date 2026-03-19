@@ -64,6 +64,7 @@ function IntroductionPanel({setPageNumber}: {setPageNumber: (val: number) => voi
 
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
+  const { t: gT } = useGameTranslation()
   const [gameId] = useAtom(gameIdAtom)
   const [readGameIntro] = useAtom(readGameIntroAtom)
   const [{ data: gameInfo, isLoading: gameInfoIsLoading }] = useAtom(gameInfoAtom)
@@ -81,9 +82,9 @@ function Welcome() {
   // set the window title
   useEffect(() => {
     if (gameInfo?.title) {
-      window.document.title = gameInfo.title
+      window.document.title = gT(gameInfo.title)
     }
-  }, [gameInfo?.title])
+  }, [gameInfo?.title, i18next.language])
 
   return gameInfoIsLoading ?
     <Box display="flex" alignItems="center" justifyContent="center" sx={{ height: "calc(100vh - 64px)" }}>
