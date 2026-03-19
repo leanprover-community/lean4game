@@ -8,7 +8,7 @@ import '../css/landing_page.css'
 import bgImage from '../assets/bg.jpg'
 import { Markdown } from './markdown';
 import path from 'path';
-import { ImpressumButton, MenuButton, PreferencesButton, PrivacyButton } from './app_bar';
+import { ImpressumButton, LanguageButton, LanguageDropdown, MenuButton, PreferencesButton, PrivacyButton } from './app_bar';
 import ReactCountryFlag from 'react-country-flag';
 import lean4gameConfig from '../config.json'
 import i18next from 'i18next';
@@ -98,8 +98,10 @@ function LandingPage() {
   return <div className="landing-page">
     <header style={{backgroundImage: `url(${bgImage})`}}>
       <nav className="landing-page-nav">
+        <LanguageButton />
         <GithubIcon url="https://github.com/leanprover-community/lean4game"/>
         <MenuButton />
+        <LanguageDropdown />
         <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
             <ImpressumButton isDropdown={true} />
             <PrivacyButton isDropdown={true} />
