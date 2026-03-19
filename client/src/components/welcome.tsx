@@ -64,7 +64,7 @@ function IntroductionPanel({setPageNumber}: {setPageNumber: (val: number) => voi
 
 /** main page of the game showing among others the tree of worlds/levels */
 function Welcome() {
-  const { gT } = useGameTranslation()
+  const { t: gT } = useGameTranslation()
   const [gameId] = useAtom(gameIdAtom)
   const [readGameIntro] = useAtom(readGameIntroAtom)
   const [{ data: gameInfo, isLoading: gameInfoIsLoading }] = useAtom(gameInfoAtom)
