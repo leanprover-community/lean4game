@@ -6,6 +6,7 @@ export interface Preferences {
   isSavePreferences: boolean
   language: string
   isSuggestionsMobileMode: boolean
+  useFlags: boolean
 }
 
 export function getWindowDimensions() {
@@ -20,6 +21,7 @@ const defaultPreferences: Preferences = {
   isSavePreferences: false,
   language: import.meta.env.VITE_CLIENT_DEFAULT_LANGUAGE || "en",
   isSuggestionsMobileMode: 'ontouchstart' in document.documentElement,
+  useFlags: false,
 };
 
 const storage = createJSONStorage<Preferences>(() => localStorage)
