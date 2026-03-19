@@ -292,12 +292,11 @@ export function WelcomeAppBar({pageNumber, setPageNumber} : {
     </div>
     <div className={'menu dropdown' + (navOpen ? '' : ' hidden')}>
       <GameInfoButton />
-      <EraseButton />
       <DownloadButton />
       <UploadButton />
+      <EraseButton />
       <ImpressumButton isDropdown={true} />
       <PrivacyButton isDropdown={true} />
-      <EraseButton />
       <PreferencesButton />
     </div>
   </div>
