@@ -31,7 +31,7 @@ should be up-to-date:
 
 not fully written yet.
 
-* [Server](doc/DOCUMENTATION.md): describes the server part (i.e. the content of `server/` und `relay/`).
+* [Server](doc/DOCUMENTATION.md): describes the server part (i.e. the content of `server/` and `relay/`).
 
 ## Contributing
 
