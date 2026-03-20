@@ -1,12 +1,9 @@
 {
-  "name": "lean4game",
+  "name": "lean4game-client",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "homepage": ".",
-  "workspaces": [
-    "client",
-    "relay"
-  ],
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -97,36 +94,7 @@
     "warning": "^4.0.3"
   },
   "scripts": {
-    "start": "concurrently -n server,relay,client -c blue,yellow,green \"npm run build:server\" \"npm run start:relay\" \"npm run start:client\"",
-    "start:relay": "npm --workspace relay run dev",
-    "start:client": "npm --workspace client run dev",
-    "build": "npm run build:server && npm run build:relay && npm run build:client && npm run build:test",
-    "build:server": "cd server && lake build",
-    "build:client": "npm --workspace client run build",
-    "build:relay": "npm --workspace relay run build",
-    "build:test": "cd cypress/TestGame && lake build",
-    "production": "npm run prod",
-    "prod": "npm --workspace relay run prod",
-    "translate": "npx i18next-scanner --config client/i18next-scanner.config.cjs",
-    "test": "npm run build:test && concurrently -n server,cypress -c blue,green \"npm start\" \"cypress run\" -k -s first --hide server",
-    "test:prod": "npm run build && concurrently -n server,cypress -c blue,green \"PORT=3000 npm run production\" \"cypress run\" -k -s first"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "dev": "cross-env NODE_ENV=development vite --host",
+    "build": "cross-env NODE_ENV=production vite build"
   }
 }
