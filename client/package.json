@@ -6,8 +6,6 @@
   "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
-    "@floating-ui/react": "^0.27.4",
     "@fontsource/roboto-mono": "^4.5.8",
     "@fontsource/roboto": "^4.5.8",
     "@fortawesome/fontawesome-svg-core": "6.5.1",
