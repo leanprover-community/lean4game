@@ -1,9 +1,7 @@
 {
   "name": "lean4game-client",
-  "version": "0.1.0",
   "type": "module",
   "private": true,
-  "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@fontsource/roboto-mono": "^4.5.8",

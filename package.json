@@ -2,7 +2,6 @@
   "name": "lean4game",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
   "workspaces": [
     "client",
     "relay"
