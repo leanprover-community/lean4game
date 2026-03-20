@@ -62,7 +62,7 @@ The same logic applies to pm2 as our choice for process management tool.
 The next step is to set up a reverse proxy with nginx and to add
 information concerning domain and SSL certification. As those considerations are
 quite individual, technical and safety critical, we refer to general instructions on how
-to set up a reverse [proxy using nginx on Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-as-a-reverse-proxy-on-ubuntu-22-04).
+to set up a [reverse proxy using nginx on Ubuntu](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-as-a-reverse-proxy-on-ubuntu-22-04).
 
 ## Setting up Lean4Game
 
@@ -75,7 +75,7 @@ Before starting, you will need to generate a [fine-grained GitHub access token](
 - Repository access: Public repositories (read-only)
 - No further permissions. It should say "0 permissions for none of your repositories" and "0 account permissions"
 
-save the access token after its generation as you can only see it once and it is needed for step 3.
+Save the access token after its generation as you can only see it once, and it is needed for step 3.
 
 1. Clone hosted projects via ```git``` onto server. **Important:** Please use the HTTPS URL from GitHub, not the SSH URL, to clone the project repositories.
 
