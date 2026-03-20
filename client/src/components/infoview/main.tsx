@@ -325,8 +325,8 @@ export function Main() {
   if (serverStoppedResult) {
     ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
   } else {
-    ret = <>
-      <div className="infoview vscode-light lean4game-infoview">
+    ret = <div className="infoview vscode-light">
+      <div className="lean4game-infoview">
         {proof?.completedWithWarnings &&
           <div className="level-completed">
             {proof?.completed ? t("Level completed! 🎉") : t("Level completed with warnings 🎭")}
@@ -341,7 +341,7 @@ export function Main() {
           lastLevel={hintStepIndex == proof?.steps.length - 1}/>
       )}
       <MoreHelpButton selected={curPos?.line}/>
-    </>
+    </div>
   }
 
   return ret
