@@ -32,6 +32,10 @@ svg .level-title {
   transition: opacity .3s;
 }
 
+svg .level, svg .world {
+  cursor: pointer;
+}
+
 svg .level:hover .level-title {
   opacity: 1;
 }

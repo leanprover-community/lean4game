@@ -10,8 +10,9 @@ import { Details } from '../../../../node_modules/vscode-lean4/lean4-infoview/sr
 import { InteractiveMessage } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/traceExplorer'
 import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions'
 
-import { InputModeContext } from './context'
 import { useTranslation } from 'react-i18next'
+import { useAtom } from 'jotai'
+import { typewriterModeAtom } from '../../store/editor-atoms'
 
 interface MessageViewProps {
     uri: DocumentUri;
@@ -58,6 +59,7 @@ export function Errors ({errors, typewriterMode} : {errors : InteractiveDiagnost
 }
 
 const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
+    const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
     const ec = React.useContext(EditorContext);
     const fname = escapeHtml(basename(uri));
     const {line, character} = diag.range.start;
@@ -80,8 +82,6 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         message = diag.message
     }
 
-    const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
-
     return (
     // <details open>
         // <summary className={severityClass + ' mv2 pointer'}>{title}
@@ -99,7 +99,7 @@ const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
         //     </span>
         // </summary>
         <div className={severityClass + ' ml1 message'}>
-            {!(typewriterMode && !lockEditorMode) && <p className="mv2">{title}</p>}
+            {!(typewriterMode) && <p className="mv2">{title}</p>}
             <pre className="font-code pre-wrap">
                 <InteractiveMessage fmt={message} />
             </pre>

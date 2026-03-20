@@ -1,6 +1,9 @@
 import { Atom, atom } from "jotai";
-import { InventoryTile } from "../state/api";
-import { levelIdAtom, worldIdAtom } from "./game-atoms";
+import { Doc, InventoryOverview, InventoryTile } from "./api";
+import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
+import { atomWithQuery } from "jotai-tanstack-query";
+import { atomFamily } from "jotai/utils";
+import { progressAtom } from "./progress-atoms";
 
 /** Valid inventory tabs */
 export enum InventoryTab {
@@ -8,6 +11,68 @@ export enum InventoryTab {
   tactic = "tactic",
   definition = "definition",
 }
+
+export const inventoryOverviewAtom = atomWithQuery<InventoryOverview>((get) => {
+  const gameId = get(gameIdAtom)
+  return {
+    queryKey: ['inventoryOverview', gameId],
+    queryFn: async () => {
+      const res = await fetch(`${window.location.origin}/data/${gameId}/inventory.json`)
+      return res.json()
+    },
+  }
+})
+
+export const docAtomFamily = atomFamily((key: [InventoryTab, string]) => atomWithQuery<Doc>((get) => {
+  const gameId = get(gameIdAtom)
+  const type = key[0]
+  const name = key[1]
+  return {
+    queryKey: ['doc', gameId, type, name],
+    queryFn: async () => {
+      const res = await fetch(`${window.location.origin}/data/${gameId}/doc__${capitalizeFirstLetter(type)}__${name}.json`)
+      return res.json()
+    },
+  }
+}))
+
+export const docAtomLegacyFamily = atomFamily((key: [InventoryTab, string]) => atomWithQuery<Doc>((get) => {
+  const gameId = get(gameIdAtom)
+  const type = key[0]
+  const name = key[1]
+  return {
+    queryKey: ['doc', gameId, type, name],
+    queryFn: async () => {
+      const caps = capitalizeFirstLetter(type)
+      const legacy = caps == "Theorem" ? "Lemma" : caps
+      const res = await fetch(`${window.location.origin}/data/${gameId}/doc__${legacy}__${name}.json`)
+      return res.json()
+    },
+  }
+}))
+
+function capitalizeFirstLetter(val: InventoryTab) {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+
+/**
+ * The user's unlocked inventory.
+ * The setter adds the new constants to the existing inventory
+ * ignoring duplicates.
+ *  */
+export const inventoryAtom = atom(
+  get => {
+    const progress = get(progressAtom)
+    if (!progress) return null
+    return progress.inventory
+  },
+  (get, set, val: string[]) => {
+    const progress = get(progressAtom)
+    if (!progress) return
+    const newInventory = [...new Set([...progress.inventory, ...val])]
+    set(progressAtom, { ...progress, inventory: newInventory })
+  }
+)
 
 /** The user's inventory from local storage.
  *

@@ -25,7 +25,7 @@ router.get('/import/trigger/:owner/:repo', importTrigger)
 
 const server = app
   .use(express.static(clientDistPath)) // TODO: add a dist folder from inside the game
-  .use('/i18n/g/:owner/:repo/:lang/*', (req, res, next) => {
+  .use('/i18n/g/:owner/:repo/:lang', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
     const lang = req.params.lang
@@ -51,19 +51,37 @@ const server = app
 
     console.log(`[${new Date()}] ${anon_ip} requested translation for ${owner}/${repo} in ${lang}`)
 
-    const filename = req.params[0];
-    req.url = filename;
-    express.static(path.join(gameManager.getGameDir(owner,repo),".i18n",lang))(req, res, next);
+    req.url = "Game.json";
+    const staticHandler = express.static(
+      path.join(gameManager.getGameDir(owner, repo), ".i18n", lang),
+      { fallthrough: true }
+    );
+    staticHandler(req, res, (err) => {
+      if (err) return next(err);
+      // if missing, return empty json instead
+      res.setHeader("Content-Type", "application/json");
+      res.status(200).send("{}");
+    });
   })
-  .use('/data/g/:owner/:repo/*', (req, res, next) => {
+  .use('/data/g/:owner/:repo/*path', (req, res, next) => {
     const owner = req.params.owner;
     const repo = req.params.repo
-    const filename = req.params[0];
+    const filename = req.params.path.join('/');
     req.url = filename;
     console.debug(gameManager.getGameDir(owner,repo))
-    express.static(path.join(gameManager.getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
+    const staticHandler = express.static(
+      path.join(gameManager.getGameDir(owner,repo),".lake","gamedata"),
+      { fallthrough: true }
+    );
+    staticHandler(req, res, (err) => {
+      if (err) return next(err);
+      // if missing, return empty json instead
+      res.setHeader("Content-Type", "application/json");
+      res.status(200).send("{}");
+    });
   })
   .use('/data/stats', (req, res, next) => {
+    // TODO: this throws on Windows
     const statsScriptPath = path.join(__dirname, "..", "..", "scripts", "stats.sh");
     const statsProcess = spawn('/bin/bash', [statsScriptPath, process.pid.toString()])
     let outputData = ''

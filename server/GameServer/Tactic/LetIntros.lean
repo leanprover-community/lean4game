@@ -17,6 +17,16 @@ namespace GameServer
 
 open Lean Meta Elab Parser Tactic
 
+-- TODO: this has been deprecated in Lean4, use `Lean.Expr.isHave` instead
+def letFun? (e : Expr) : Option (Name × Expr × Expr × Expr) :=
+  match e with
+  | .app (.app (.app (.app (.const ``letFun _) t) _β) v) f =>
+    match f with
+    | .lam n _ b _ => some (n, t, v, b)
+    | _ => some (.anonymous, t, v, .app (f.liftLooseBVars 0 1) (.bvar 0))
+  | _ => none
+
+
 /--
 Copied from `Lean.Meta.getIntrosSize`.
 -/
@@ -25,7 +35,7 @@ private partial def getLetIntrosSize : Expr → Nat
   | .letE _ _ _ b _  => getLetIntrosSize b + 1
   | .mdata _ b       => getLetIntrosSize b
   | e                =>
-    if let some (_, _, _, b) := e.letFun? then
+    if let some (_, _, _, b) := letFun? e then
       getLetIntrosSize b + 1
     else
       0

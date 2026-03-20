@@ -1,7 +1,7 @@
 /* Partly copied from https://github.com/leanprover/vscode-lean4/blob/master/lean4-infoview/src/infoview/main.tsx */
 
 import * as React from 'react';
-import type { DidCloseTextDocumentParams, DidChangeTextDocumentParams, Location, DocumentUri } from 'vscode-languageserver-protocol';
+import type { DidCloseTextDocumentParams, DocumentUri } from 'vscode-languageserver-protocol';
 
 import 'tachyons/css/tachyons.css';
 import '@vscode/codicons/dist/codicon.css';
@@ -9,53 +9,55 @@ import '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/index.
 import '../../css/infoview.css'
 import "../../css/tab_bar.css"
 
-import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig, EditorApi, InfoviewApi } from '@leanprover/infoview-api';
+import { LeanFileProgressParams, LeanFileProgressProcessingInfo, defaultInfoviewConfig } from '@leanprover/infoview-api';
 import { useClientNotificationEffect, useEventResult, useServerNotificationEffect, useServerNotificationState } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { EditorContext, ConfigContext, ProgressContext, VersionContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts';
 import { RpcContext, WithRpcSessions, useRpcSessionAtPos } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
 import { ServerVersion } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/serverVersion';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDeleteLeft, faHome, faArrowRight, faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import { faDeleteLeft, faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
-import { GameIdContext } from '../../app';
-import { useAppDispatch, useAppSelector } from '../../hooks';
-import { LevelInfo, useGetGameInfoQuery } from '../../state/api';
-import { changedInventory, levelCompleted, selectCode, selectCompleted, selectInventory } from '../../state/progress';
 import { Markdown } from '../markdown';
 
 import { Infos } from './infos';
-import { AllMessages, Errors, WithLspDiagnosticsContext } from './messages';
+import { Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
-import { DeletedChatContext, InputModeContext, PreferencesContext, MonacoEditorContext, ProofContext, SelectionContext, WorldLevelIdContext } from './context';
-import { Typewriter, getInteractiveDiagsAt, hasErrors, hasInteractiveErrors } from './typewriter';
-import { InteractiveDiagnostic } from '@leanprover/infoview/*';
+import { MonacoEditorContext } from './context';
+import { Typewriter, getInteractiveDiagsAt, hasInteractiveErrors } from './typewriter';
 import { Button } from '../button';
 import { CircularProgress } from '@mui/material';
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
-import { store } from '../../state/store';
 import { Hint, Hints, MoreHelpButton, filterHints } from '../hints';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
 import { useGameTranslation } from '../../utils/translation';
+import { useAtom } from 'jotai';
+import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms';
+import { completedAtom } from '../../store/progress-atoms';
+import { gameInfoAtom, levelInfoAtom } from '../../store/query-atoms';
+import { crashedAtom, interimDiagsAtom, lockEditorModeAtom, proofAtom, typewriterContentAtom, typewriterModeAtom } from '../../store/editor-atoms';
+import { inventoryAtom } from '../../store/inventory-atoms';
+import { mobileAtom } from '../../store/preferences-atoms';
+import { deletedChatAtom, helpAtom, selectedStepAtom } from '../../store/chat-atoms';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
  */
-export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) {
+export function DualEditor({ codeviewRef } : { codeviewRef: any }) {
+  const [typewriterMode] = useAtom(typewriterModeAtom)
   const ec = React.useContext(EditorContext)
-  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
-  const showTypewriter = Boolean(ec) && typewriterMode && !lockEditorMode
+  const showTypewriter = Boolean(ec) && typewriterMode
   return <>
     <div className={showTypewriter ? 'hidden' : ''}>
-      <ExerciseStatement data={level} showLeanStatement={true} />
+      <ExerciseStatement showLeanStatement={true} />
       <div ref={codeviewRef} className={'codeview'}></div>
     </div>
     {ec ?
-      <DualEditorMain worldId={worldId} levelId={levelId} level={level} worldSize={worldSize} /> :
+      <DualEditorMain /> :
       // TODO: Style this if relevant.
       <></>
     }
@@ -63,40 +65,39 @@ export function DualEditor({ level, codeviewRef, levelId, worldId, worldSize }) 
 }
 
 /** The part of the two editors that needs the editor connection first */
-function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: string, levelId: number, level: LevelInfo, worldSize: number }) {
+function DualEditorMain() {
   const ec = React.useContext(EditorContext)
-  const gameId = React.useContext(GameIdContext)
-  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [{ data: levelInfo }] = useAtom(levelInfoAtom)
 
-  const {proof, setProof} = React.useContext(ProofContext)
+  const [, setCompleted] = useAtom(completedAtom)
 
-  const dispatch = useAppDispatch()
+  const [, addToInventory] = useAtom(inventoryAtom)
+  const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
+
+  const [proof] = useAtom(proofAtom)
 
   React.useEffect(() => {
     if (proof?.completed) {
-      dispatch(levelCompleted({ game: gameId, world: worldId, level: levelId }))
+      setCompleted(true)
 
       // On completion, add the names of all new items to the local storage
       let newTiles = [
-        ...level?.tactics,
-        ...level?.lemmas,
-        ...level?.definitions
+        ...levelInfo?.tactics ?? [],
+        ...levelInfo?.lemmas ?? [],
+        ...levelInfo?.definitions ?? []
       ].filter((tile) => tile.new).map((tile) => tile.name)
 
       // Add the proven statement to the local storage as well.
-      if (level?.statementName != null) {
-        newTiles.push(level?.statementName)
+      if (levelInfo?.statementName != null) {
+        newTiles.push(levelInfo?.statementName)
       }
-
-      let inv: string[] = selectInventory(gameId)(store.getState())
-
-      // add new items and remove duplicates
-      let newInv = [...inv, ...newTiles].filter((item, i, array) => array.indexOf(item) == i)
-
-      dispatch(changedInventory({ game: gameId, inventory: newInv }))
-
+      addToInventory(newTiles)
     }
-  }, [proof, level])
+  }, [proof, levelInfo])
 
   /* Set up updates to the global infoview state on editor events. */
   const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
@@ -116,10 +117,10 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
         <WithRpcSessions>
           <WithLspDiagnosticsContext>
             <ProgressContext.Provider value={allProgress}>
-              {(typewriterMode && !lockEditorMode) ?
-                <TypewriterInterfaceWrapper world={worldId} level={levelId} data={level} worldSize={worldSize}/>
+              {(typewriterMode) ?
+                <TypewriterInterfaceWrapper/>
                 :
-                <Main key={`${worldId}/${levelId}`} world={worldId} level={levelId} data={level} />
+                <Main key={`${worldId}/${levelId}`} />
               }
             </ProgressContext.Provider>
           </WithLspDiagnosticsContext>
@@ -137,24 +138,25 @@ function DualEditorMain({ worldId, levelId, level, worldSize }: { worldId: strin
  *
  * If `showLeanStatement` is true, it will additionally display the lean code.
  */
-function ExerciseStatement({ data, showLeanStatement = false }) {
+function ExerciseStatement({ showLeanStatement = false }) {
   const { t : gT } = useGameTranslation()
   const { t } = useTranslation()
-  const gameId = React.useContext(GameIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [{ data: levelInfo }] = useAtom(levelInfoAtom)
 
-  if (!(data?.descrText || data?.descrFormat)) { return <></> }
+  if (!(levelInfo?.descrText || levelInfo?.descrFormat)) { return <></> }
   return <>
     <div className="exercise-statement">
-      {data?.descrText ?
+      {levelInfo?.descrText ?
         <Markdown>
-          {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + t(data?.descrText, {ns: gameId})}
-        </Markdown> : data?.displayName &&
+          {(levelInfo?.displayName ? `**${t("Theorem")}** \`${levelInfo?.displayName}\`: ` : '') + t(levelInfo?.descrText, {ns: gameId})}
+        </Markdown> : levelInfo?.displayName &&
         <Markdown>
-          {(data?.displayName ? `**${t("Theorem")}** \`${data?.displayName}\`: ` : '') + gT(data?.descrText)}
+          {(levelInfo?.displayName ? `**${t("Theorem")}** \`${levelInfo?.displayName}\`: ` : '') + gT(levelInfo?.descrText ?? "")}
         </Markdown>
       }
-      {data?.descrFormat && showLeanStatement &&
-        <p><code className="lean-code">{data?.descrFormat}</code></p>
+      {levelInfo?.descrFormat && showLeanStatement &&
+        <p><code className="lean-code">{levelInfo?.descrFormat}</code></p>
       }
     </div>
   </>
@@ -162,32 +164,37 @@ function ExerciseStatement({ data, showLeanStatement = false }) {
 
 // TODO: This is only used in `EditorInterface`
 // while `TypewriterInterface` has this copy-pasted in.
-export function Main(props: { world: string, level: number, data: LevelInfo}) {
+export function Main() {
   let { t } = useTranslation()
   const { t: gT } = useGameTranslation()
-  const { typewriterMode, lockEditorMode } = React.useContext(InputModeContext)
+  const [lockEditorMode] = useAtom(lockEditorModeAtom)
   const ec = React.useContext(EditorContext);
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  const [gameId] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [{ data: levelInfo }] = useAtom(levelInfoAtom)
+  const [help, setHelp] = useAtom(helpAtom)
 
-  const { proof, setProof, setCrashed } = React.useContext(ProofContext)
-  const {selectedStep, setSelectedStep} = React.useContext(SelectionContext)
-  const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
+  const [typewriterMode] = useAtom(typewriterModeAtom)
+
+  const [proof, setProof] = useAtom(proofAtom)
+  const [, setCrashed] = useAtom(crashedAtom)
+  const [selectedStep, setSelectedStep] = useAtom(selectedStepAtom)
   const editor = React.useContext(MonacoEditorContext)
   const model = editor?.getModel()
   const uri = model?.uri.toString()
   const rpcSess = useRpcSessionAtPos({ uri: uri ?? '', line: 0, character: 0 })
 
   React.useEffect(() => {
-    if (!uri) {
+    if (!uri || !worldId || !levelId) {
       return
     }
     loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
   }, [rpcSess, uri, worldId, levelId, setProof, setCrashed])
 
-
   function toggleSelection(line: number) {
-    return (ev) => {
+    return (ev: any) => {
       console.debug('toggled selection')
       if (selectedStep == line) {
         setSelectedStep(undefined)
@@ -226,29 +233,29 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
     useEventResult(ec.events.changedCursorLocation, loc => loc ? { uri: loc.uri, ...loc.range.start } : undefined)
 
   React.useEffect(() => {
-    if (typewriterMode && !lockEditorMode) {
+    if (typewriterMode) {
       return
     }
     if (!uri) {
       return
     }
-    loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
+    loadGoals(rpcSess, uri, worldId!, levelId!, setProof, setCrashed)
   }, [typewriterMode, lockEditorMode, uri, worldId, levelId, rpcSess, setProof, setCrashed])
 
   useServerNotificationEffect('textDocument/publishDiagnostics', (params: any) => {
-    if (typewriterMode && !lockEditorMode) {
+    if (typewriterMode) {
       return
     }
     if (!uri || params?.uri !== uri) {
       return
     }
-    loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
+    loadGoals(rpcSess, uri, worldId!, levelId!, setProof, setCrashed)
   }, [typewriterMode, lockEditorMode, uri, worldId, levelId, rpcSess, setProof, setCrashed])
 
   const hintLine = (() => {
-    const isEditorMode = !(typewriterMode && !lockEditorMode)
+    const isEditorMode = !(typewriterMode)
     const curLine = Number.isFinite(curPos?.line)
-      ? curPos.line
+      ? curPos?.line
       : (Number.isFinite((curPos as any)?._line) ? (curPos as any)._line : undefined)
     const curChar = Number.isFinite(curPos?.character)
       ? curPos.character
@@ -327,7 +334,7 @@ export function Main(props: { world: string, level: number, data: LevelInfo}) {
       <Infos />
       {hintsToShow && (
         <Hints hints={hintsToShow}
-          showHidden={showHelp.has(hintStepIndex)} step={hintStepIndex}
+          showHidden={help.has(hintStepIndex)} step={hintStepIndex}
           selected={selectedStep} toggleSelection={toggleSelection(hintStepIndex)}
           lastLevel={hintStepIndex == proof?.steps.length - 1}/>
       )}
@@ -362,68 +369,17 @@ function Command({ proof, i, deleteProof }: { proof: ProofState, i: number, dele
   } else {
     return <div className="command">
       <div className="command-text">{proof?.steps[i].command}</div>
-      <Button to="" className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={deleteProof}>
+      <Button  className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={deleteProof}>
         <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;{t("Retry")}
       </Button>
     </div>
   }
 }
 
-// const MessageView = React.memo(({uri, diag}: MessageViewProps) => {
-//   const ec = React.useContext(EditorContext);
-//   const fname = escapeHtml(basename(uri));
-//   const {line, character} = diag.range.start;
-//   const loc: Location = { uri, range: diag.range };
-//   const text = TaggedText_stripTags(diag.message);
-//   const severityClass = diag.severity ? {
-//       [DiagnosticSeverity.Error]: 'error',
-//       [DiagnosticSeverity.Warning]: 'warning',
-//       [DiagnosticSeverity.Information]: 'information',
-//       [DiagnosticSeverity.Hint]: 'hint',
-//   }[diag.severity] : '';
-//   const title = `Line ${line+1}, Character ${character}`;
-
-//   // Hide "unsolved goals" messages
-//   let message;
-//   if ("append" in diag.message && "text" in diag.message.append[0] &&
-//     diag.message?.append[0].text === "unsolved goals") {
-//       message = diag.message.append[0]
-//   } else {
-//       message = diag.message
-//   }
-
-//   const { typewriterMode } = React.useContext(InputModeContext)
-
-//   return (
-//   // <details open>
-//       // <summary className={severityClass + ' mv2 pointer'}>{title}
-//       //     <span className="fr">
-//       //         <a className="link pointer mh2 dim codicon codicon-go-to-file"
-//       //            onClick={e => { e.preventDefault(); void ec.revealLocation(loc); }}
-//       //            title="reveal file location"></a>
-//       //         <a className="link pointer mh2 dim codicon codicon-quote"
-//       //            data-id="copy-to-comment"
-//       //            onClick={e => {e.preventDefault(); void ec.copyToComment(text)}}
-//       //            title="copy message to comment"></a>
-//       //         <a className="link pointer mh2 dim codicon codicon-clippy"
-//       //            onClick={e => {e.preventDefault(); void ec.api.copyToClipboard(text)}}
-//       //            title="copy message to clipboard"></a>
-//       //     </span>
-//       // </summary>
-//       <div className={severityClass + ' ml1 message'}>
-//           {!typewriterMode && <p className="mv2">{title}</p>}
-//           <pre className="font-code pre-wrap">
-//               <InteractiveMessage fmt={message} />
-//           </pre>
-//       </div>
-//   // </details>
-//   )
-// }, fastIsEqual)
-
 /** The tabs of goals that lean ahs after the command of this step has been processed */
 function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofStep: InteractiveGoalsWithHints, last : boolean, onClick? : any, onGoalChange?: (n?: number) => void }) {
   let { t } = useTranslation()
-  const {mobile} = React.useContext(PreferencesContext)
+  const [mobile] = useAtom(mobileAtom)
   const [selectedGoal, setSelectedGoal] = React.useState<number>(0)
 
   if (proofStep.goals.length == 0) {
@@ -446,9 +402,8 @@ function GoalsTabs({ proofStep, last, onClick, onGoalChange=(n)=>{}}: { proofSte
 }
 
 // Splitting up Typewriter into two parts is a HACK
-export function TypewriterInterfaceWrapper(props: { world: string, level: number, data: LevelInfo, worldSize: number }) {
+export function TypewriterInterfaceWrapper() {
   const ec = React.useContext(EditorContext)
-  const gameId = React.useContext(GameIdContext)
 
   useClientNotificationEffect(
     'textDocument/didClose',
@@ -474,32 +429,40 @@ export function TypewriterInterfaceWrapper(props: { world: string, level: number
     </div>
   }
 
-  return <TypewriterInterface props={props} />
+  return <TypewriterInterface />
 }
 
 /** The interface in command line mode */
-export function TypewriterInterface({props}) {
+export function TypewriterInterface() {
   let { t } = useTranslation()
   const ec = React.useContext(EditorContext)
-  const gameId = React.useContext(GameIdContext)
+  const [gameId, navigateToGame] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId, navigateToLevel] = useAtom(levelIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [help, setHelp] = useAtom(helpAtom)
+
   const editor = React.useContext(MonacoEditorContext)
   const model = editor?.getModel()
   const uri = model?.uri.toString() ?? ''
 
-  const gameInfo = useGetGameInfoQuery({game: gameId})
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  const worldSize = gameInfo?.worldSize?.[worldId ?? ""] ?? 0
+
   const fallbackUri = `file:///${worldId}/${levelId}.lean`
   const effectiveUri = uri || fallbackUri
-  let image: string = gameInfo.data?.worlds.nodes[worldId].image
+  let image: string | undefined = gameInfo?.worlds?.nodes[worldId!]?.image
 
 
   const [disableInput, setDisableInput] = React.useState<boolean>(false)
   const [loadingProgress, setLoadingProgress] = React.useState<number>(0)
-  const { setDeletedChat, showHelp, setShowHelp } = React.useContext(DeletedChatContext)
-  const {mobile} = React.useContext(PreferencesContext)
-  const { proof, setProof, crashed, setCrashed, interimDiags } = React.useContext(ProofContext)
-  const { setTypewriterInput } = React.useContext(InputModeContext)
-  const { selectedStep, setSelectedStep } = React.useContext(SelectionContext)
+  const [, setDeletedChat] = useAtom(deletedChatAtom)
+  const [mobile] = useAtom(mobileAtom)
+  const [proof, setProof ] = useAtom(proofAtom)
+  const [crashed, setCrashed ] = useAtom(crashedAtom)
+  const [interimDiags ] = useAtom(interimDiagsAtom)
+
+  const [, setTypewriter] = useAtom(typewriterContentAtom)
+  const [selectedStep, setSelectedStep] = useAtom(selectedStepAtom)
 
   const proofPanelRef = React.useRef<HTMLDivElement>(null)
   // const config = useEventResult(ec.events.changedInfoviewConfig) ?? defaultInfoviewConfig;
@@ -512,44 +475,44 @@ export function TypewriterInterface({props}) {
       return
     }
     setCrashed(false)
-    loadGoals(rpcSess, effectiveUri, worldId, levelId, setProof, setCrashed)
+    loadGoals(rpcSess, effectiveUri, worldId!, levelId!, setProof, setCrashed)
   }, [rpcSess, effectiveUri, worldId, levelId, setProof, setCrashed])
 
   /** Delete all proof lines starting from a given line.
   * Note that the first line (i.e. deleting everything) is `1`!
   */
   function deleteProof(line: number) {
-    return (ev) => {
+    return (ev: any) => {
       let deletedChat: Array<GameHint> = []
       proof?.steps.slice(line).map((step, i) => {
         let filteredHints = filterHints(step.goals[0]?.hints, proof?.steps[i-1]?.goals[0]?.hints)
 
         // Only add these hidden hints to the deletion stack which were visible
-        deletedChat = [...deletedChat, ...filteredHints.filter(hint => (!hint.hidden || showHelp.has(line + i)))]
+        deletedChat = [...deletedChat, ...filteredHints.filter(hint => (!hint.hidden || help.has(line + i)))]
       })
       setDeletedChat(deletedChat)
 
       // delete showHelp for deleted steps
-      setShowHelp(new Set(Array.from(showHelp).filter(i => i < line - 1)))
+      setHelp(new Set(Array.from(help).filter(i => i < line - 1)))
 
       editor.executeEdits("typewriter", [{
         range: monaco.Selection.fromPositions(
           { lineNumber: line, column: 1 },
-          editor.getModel().getFullModelRange().getEndPosition()
+          editor.getModel()?.getFullModelRange().getEndPosition()
         ),
         text: '',
         forceMoveMarkers: false
       }])
       setSelectedStep(undefined)
-      setTypewriterInput(proof?.steps[line].command)
+      setTypewriter(proof?.steps[line].command ?? "")
       // Reload proof on deleting
-      loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
+      loadGoals(rpcSess, uri, worldId!, levelId!, setProof, setCrashed)
       ev.stopPropagation()
     }
   }
 
   function toggleSelectStep(line: number) {
-    return (ev) => {
+    return (ev: any) => {
       if (mobile) {return}
       if (selectedStep == line) {
         setSelectedStep(undefined)
@@ -563,7 +526,7 @@ export function TypewriterInterface({props}) {
 
    // Scroll to the end of the proof if it is updated.
    React.useEffect(() => {
-    if (proof?.steps.length > 1) {
+    if (proof?.steps?.length && proof?.steps?.length > 1) {
       proofPanelRef.current?.lastElementChild?.scrollIntoView() //scrollTo(0,0)
     } else {
       proofPanelRef.current?.scrollTo(0,0)
@@ -598,14 +561,14 @@ export function TypewriterInterface({props}) {
     }
   })
 
-  let introText: Array<string> = t(props?.data?.introduction, {ns: gameId}).split(/\n(\s*\n)+/)
+  let introText: Array<string> = t(gameInfo?.introduction ?? "", {ns: gameId}).split(/\n(\s*\n)+/)
 
   return <div className="typewriter-interface">
     <RpcContext.Provider value={rpcSess}>
     <div className="content">
       <div className='world-image-container empty'>
         {image &&
-          <img className="contain" src={path.join("data", gameId, image)} alt="" />
+          <img className="contain" src={path.join("data", gameId!, image)} alt="" />
         }
 
       </div>
@@ -615,7 +578,7 @@ export function TypewriterInterface({props}) {
         </div> */}
       </div>
       <div className='proof' ref={proofPanelRef}>
-        <ExerciseStatement data={props.data} showLeanStatement={true} />
+        <ExerciseStatement showLeanStatement={true} />
         {((crashed && (interimDiags.length > 0 || proof?.steps.length > 0))) ? <div>
           <p className="crashed_message">{t("Crashed! Go to editor mode and fix your proof! Last server response:")}</p>
           {interimDiags.map((diag, index) => {
@@ -652,7 +615,7 @@ export function TypewriterInterface({props}) {
                 return <div key={`proof-step-${i}`} className={`step step-${i}` + (selectedStep == i ? ' selected' : '')}>
                   <Command proof={proof} i={i} deleteProof={deleteProof(i)} />
                   <Errors errors={step.diags} typewriterMode={true} />
-                  {mobile && i == 0 && props.data?.introduction &&
+                  {mobile && i == 0 && gameInfo?.introduction &&
                     introText?.filter(it => it.trim()).map(((it, i) =>
                       // Show the level's intro text as hints, too
                       <Hint key={`intro-p-${i}`}
@@ -661,7 +624,7 @@ export function TypewriterInterface({props}) {
                   }
                   {mobile &&
                     <Hints key={`hints-${i}`}
-                      hints={filteredHints} showHidden={showHelp.has(i)} step={i}
+                      hints={filteredHints} showHidden={help.has(i)} step={i}
                       selected={selectedStep} toggleSelection={toggleSelectStep(i)}/>
                   }
                   {/* <GoalsTabs proofStep={step} last={i == proof?.steps.length - (lastStepErrors ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - 1 - withErr ? (n) => setDisableInput(n > 0) : (n) => {}}/> */}
@@ -669,7 +632,7 @@ export function TypewriterInterface({props}) {
                     <GoalsTabs proofStep={step} last={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1)} onClick={toggleSelectStep(i)} onGoalChange={i == proof?.steps.length - (lastStepHasErrors(proof) ? 2 : 1) ? (n) => setDisableInput(n > 0) : (n) => {}}/>
                   }
                   {mobile && i == proof?.steps.length - 1 &&
-                    <MoreHelpButton />
+                    <MoreHelpButton selected={null} />
                   }
 
                   {/* Show a message that there are no goals left */}
@@ -695,18 +658,20 @@ export function TypewriterInterface({props}) {
             }
             {mobile && proof?.completed &&
               <div className="button-row mobile">
-                {props.level >= props.worldSize ?
-                  <Button to={`/${gameId}`}>
+                {levelId! >= worldSize ?
+                  <Button onClick={() => navigateToGame(gameId!)} >
                     <FontAwesomeIcon icon={faHome} />&nbsp;{t("Home")}
                   </Button>
                 :
-                  <Button to={`/${gameId}/world/${props.world}/level/${props.level + 1}`}>
+                  <Button onClick={() => navigateToLevel(levelId! + 1)} >
                     Next&nbsp;<FontAwesomeIcon icon={faArrowRight} />
                   </Button>
                 }
               </div>
             }
-          </> : <CircularProgress variant="determinate" value={100*(1 - 1.024 ** (- loadingProgress))} />
+          </> :
+          <CircularProgress />
+          // <CircularProgress variant="determinate" value={100*(1 - 1.024 ** (- Math.max(loadingProgress, 1)))} />
         // note: since we don't know the total number of files,
         // we use a function which strictly monotonely increases towards `100` as `x → ∞`
         // The base is chosen at random s.t. we get roughly 91% for `x = 100`.

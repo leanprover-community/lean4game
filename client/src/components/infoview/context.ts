@@ -4,9 +4,10 @@
 import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic } from '@leanprover/infoview-api';
-import { Diagnostic } from 'vscode-languageserver-types'
-import { GameHint, InteractiveGoal, InteractiveTermGoal,InteractiveGoalsWithHints, ProofState } from './rpc_api';
-import { PreferencesState } from '../../state/preferences';
+import { InteractiveTermGoal,InteractiveGoalsWithHints } from './rpc_api';
+import { Preferences, preferencesAtom } from '../../store/preferences-atoms';
+import { useAtom } from 'jotai';
+import { typewriterContentAtom } from '../../store/editor-atoms';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)
@@ -24,30 +25,6 @@ export type InfoStatus = 'updating' | 'error' | 'ready';
 //   /** Errors and warnings */
 //   errors: InteractiveDiagnostic[]       // TODO: Add correct type
 // }
-
-/** The context storing the proof step-by-step for the command line mode */
-export const ProofContext = React.createContext<{
-  /** The proof consists of multiple steps that are processed one after the other.
-   * In particular multi-line terms like `match`-statements will not be supported.
-   *
-   * Note that the first step will always have "" as command
-   */
-  proof: ProofState,
-  setProof: React.Dispatch<React.SetStateAction<ProofState>>
-  /** TODO: Workaround to capture a crash of the gameserver. */
-  interimDiags: Diagnostic[],
-  setInterimDiags: React.Dispatch<React.SetStateAction<Array<Diagnostic>>>
-  /** TODO: Workaround to capture a crash of the gameserver. */
-  crashed: Boolean,
-  setCrashed: React.Dispatch<React.SetStateAction<Boolean>>
-}>({
-  proof: {steps: [], diagnostics: [], completed: false, completedWithWarnings: false},
-  setProof: () => {},
-  interimDiags: [],
-  setInterimDiags: () => {},
-  crashed: false,
-  setCrashed: () => {}
-})
 
 
 // TODO: Do we still need that?
@@ -76,71 +53,13 @@ export interface ProofStateProps {
 //   setProofState: () => {},
 // })
 
-export interface IPreferencesContext extends PreferencesState{
+export interface IPreferencesContext extends Preferences{
   mobile: boolean, // The variables that actually control the page 'layout' can only be changed through layout.
-  setLayout: React.Dispatch<React.SetStateAction<PreferencesState["layout"]>>;
-  setIsSavePreferences: React.Dispatch<React.SetStateAction<PreferencesState["isSavePreferences"]>>;
-  setLanguage: React.Dispatch<React.SetStateAction<PreferencesState["language"]>>;
+  setLayout: React.Dispatch<React.SetStateAction<Preferences["layout"]>>;
+  setIsSavePreferences: React.Dispatch<React.SetStateAction<Preferences["isSavePreferences"]>>;
+  setLanguage: React.Dispatch<React.SetStateAction<Preferences["language"]>>;
   setIsSuggestionsMobileMode: any;
 }
-
-export const PreferencesContext = React.createContext<IPreferencesContext>({
-  mobile: false,
-  layout: "auto",
-  isSavePreferences: false,
-  language: "en",
-  isSuggestionsMobileMode: false,
-  setLayout: () => {},
-  setIsSavePreferences: () => {},
-  setLanguage: () => {},
-  setIsSuggestionsMobileMode: () => {},
-})
-
-export const WorldLevelIdContext = React.createContext<{
-  worldId : string,
-  levelId: number
-}>({
-  worldId : null,
-  levelId: 0,
-})
-
-/** Context to keep highlight selected proof step and corresponding chat messages. */
-export const SelectionContext = React.createContext<{
-  selectedStep : number,
-  setSelectedStep: React.Dispatch<React.SetStateAction<number>>
-}>({
-  selectedStep : undefined,
-  setSelectedStep: () => {}
-})
-
-/** Context for deleted Hints that are visible just a bit after they've been deleted */
-export const DeletedChatContext = React.createContext<{
-  deletedChat : GameHint[],
-  setDeletedChat: React.Dispatch<React.SetStateAction<Array<GameHint>>>
-  showHelp : Set<number>,
-  setShowHelp: React.Dispatch<React.SetStateAction<Set<number>>>
-}>({
-  deletedChat: undefined,
-  setDeletedChat: () => {},
-  showHelp: undefined,
-  setShowHelp: () => {}
-})
-
-export const InputModeContext = React.createContext<{
-  typewriterMode: boolean,
-  setTypewriterMode: React.Dispatch<React.SetStateAction<boolean>>,
-  typewriterInput: string,
-  setTypewriterInput: React.Dispatch<React.SetStateAction<string>>,
-  lockEditorMode: boolean,
-  setLockEditorMode: React.Dispatch<React.SetStateAction<boolean>>,
-}>({
-  typewriterMode: true,
-  setTypewriterMode: () => {},
-  typewriterInput: "",
-  setTypewriterInput: () => {},
-  lockEditorMode: false,
-  setLockEditorMode: () => {},
-});
 
 
 const SUFFIX_OVERRIDES: Record<string, string> = {
@@ -160,46 +79,46 @@ const PREFIX_OVERRIDES: Record<string, string> = {
   "simp": "simp only []",
 }
 export function useAppendTypewriterInput() {
-  let {typewriterInput, setTypewriterInput} = React.useContext(InputModeContext)
-  const {isSuggestionsMobileMode} = React.useContext(PreferencesContext)
+  const [typewriter, setTypewriter] = useAtom(typewriterContentAtom)
+  const [{ isSuggestionsMobileMode }] = useAtom(preferencesAtom)
   return (shiftKey: boolean, suffix: string, isTheorem: boolean, isAssumption: boolean) => {
     if (!isSuggestionsMobileMode && !shiftKey) {
       return false
     }
     // Automagically detect and adjust punctuation for mobile keyboardless usage
-    typewriterInput = typewriterInput.trim()
-    if (!typewriterInput.length) {
-      typewriterInput = Object.hasOwn(PREFIX_OVERRIDES, suffix) ? PREFIX_OVERRIDES[suffix] : isTheorem ? `rw [${suffix}]` : suffix
-      setTypewriterInput(typewriterInput + " ")
+    let _typewriter = typewriter.trim()
+    if (!typewriter.length) {
+      _typewriter = Object.hasOwn(PREFIX_OVERRIDES, suffix) ? PREFIX_OVERRIDES[suffix] : isTheorem ? `rw [${suffix}]` : suffix
+      setTypewriter(_typewriter + " ")
       return true
     }
     suffix = !isAssumption && Object.hasOwn(SUFFIX_OVERRIDES, suffix) ? SUFFIX_OVERRIDES[suffix] : suffix
     if (suffix === "ℕ") {
-      if (/ \d$/.test(typewriterInput)) {
-        suffix = ((+typewriterInput.slice(-2) + 1) % 10).toString()
-        typewriterInput = typewriterInput.slice(0, -2)
+      if (/ \d$/.test(_typewriter)) {
+        suffix = ((+_typewriter.slice(-2) + 1) % 10).toString()
+        _typewriter = _typewriter.slice(0, -2)
       } else {
         suffix = "0"
       }
       suffix = " " + suffix
-    } else if (suffix === "∈" && typewriterInput.endsWith("∈")) {
+    } else if (suffix === "∈" && _typewriter.endsWith("∈")) {
       suffix = " {} "
-    } else if (isAssumption && /^apply |^symm|^push_neg/.test(typewriterInput)) {
+    } else if (isAssumption && /^apply |^symm|^push_neg/.test(_typewriter)) {
       suffix = " at " + suffix
     } else if (suffix === "have") {
-      suffix = typewriterInput === "have :" ? "=" : " :="
-    } else if (/[\]}]$/.test(typewriterInput)) {
+      suffix = _typewriter === "have :" ? "=" : " :="
+    } else if (/[\]}]$/.test(_typewriter)) {
       if (isAssumption) {
         suffix = " at " + suffix
       } else {
-        const closing = typewriterInput.slice(-1)
-        typewriterInput = typewriterInput.slice(0, -1)
+        const closing = _typewriter.slice(-1)
+        _typewriter = _typewriter.slice(0, -1)
         if (suffix === "←") {
-          const imbalance = (typewriterInput.match(/\(/)?.length ?? 0) - (typewriterInput.match(/\)/)?.length ?? 0)
-          suffix = /[[,({]$/.test(typewriterInput) ? "←" : /\([^)]*$/.test(typewriterInput) ? ")" : " ("
+          const imbalance = (_typewriter.match(/\(/)?.length ?? 0) - (_typewriter.match(/\)/)?.length ?? 0)
+          suffix = /[[,({]$/.test(_typewriter) ? "←" : /\([^)]*$/.test(_typewriter) ? ")" : " ("
         } else {
-          if (!/[[,({]$/.test(typewriterInput)) {
-            suffix = (isTheorem && !typewriterInput.endsWith("←") && closing === "]" ? ", " : /^[ᶜ.]/.test(suffix) ? "" : " ") + suffix
+          if (!/[[,({]$/.test(_typewriter)) {
+            suffix = (isTheorem && !_typewriter.endsWith("←") && closing === "]" ? ", " : /^[ᶜ.]/.test(suffix) ? "" : " ") + suffix
           }
         }
         suffix = suffix + closing
@@ -207,7 +126,7 @@ export function useAppendTypewriterInput() {
     } else if (!/^[ᶜ.]/.test(suffix)) {
       suffix = " " + suffix
     }
-    setTypewriterInput(`${typewriterInput}${suffix} `.trimLeft())
+    setTypewriter(`${_typewriter}${suffix} `.trimStart())
     return true
   }
 }

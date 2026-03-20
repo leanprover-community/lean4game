@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Outlet, useParams } from "react-router-dom";
+import { useEffect, useRef } from 'react';
+import { useAtom } from 'jotai';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -8,38 +9,47 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
-import { PreferencesContext, WorldLevelIdContext} from './components/infoview/context';
-import UsePreferences from "./state/hooks/use_preferences"
 import i18n from './i18n';
 import { Popup } from './components/popup/popup';
+import { leanMonacoAtom, leanMonacoOptionsAtom } from './store/editor-atoms';
+import { LeanMonaco } from 'lean4monaco';
+import { preferencesAtom } from './store/preferences-atoms';
 
-export const GameIdContext = React.createContext<string>(undefined);
+function App({ children }: { children?: React.ReactNode }) {
 
-function App() {
+  const infoviewRef = useRef<HTMLDivElement>(null)
+  const [leanMonaco, setLeanMonaco] = useAtom(leanMonacoAtom)
+  const [leanMonacoOptions] = useAtom(leanMonacoOptionsAtom)
+  const [preferences] = useAtom(preferencesAtom)
 
-  const params = useParams()
-  const gameId = "g/" + params.owner + "/" + params.repo
-  const levelId = parseInt(params.levelId)
-  const worldId = params.worldId
+  useEffect(() => {
+    i18n.changeLanguage(preferences.language)
+  }, [preferences.language])
 
-  const {mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = UsePreferences()
+  // You need to start one `LeanMonaco` instance once in your application using a `useEffect`
+  useEffect(() => {
+    const _leanMonaco = new LeanMonaco()
+    setLeanMonaco(_leanMonaco)
+    _leanMonaco.setInfoviewElement(infoviewRef.current!)
 
-  React.useEffect(() => {
-    i18n.changeLanguage(language)
-  }, [language])
+    ;(async () => {
+      await _leanMonaco.start(leanMonacoOptions)
+      console.debug('[lean4game]: leanMonaco started')
+    })()
+
+    return () => {
+      if (leanMonaco && typeof leanMonaco?.dispose === "function") {
+        leanMonaco?.dispose?.()
+      }
+    }
+  }, [leanMonacoOptions, setLeanMonaco])
 
   return (
     <div className="app">
-      <GameIdContext.Provider value={gameId}>
-          <WorldLevelIdContext.Provider value={{worldId, levelId}}>
-          <PreferencesContext.Provider value={{mobile, layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode}}>
-            <React.Suspense>
-              <Outlet />
-            </React.Suspense>
-            <Popup />
-          </PreferencesContext.Provider>
-          </WorldLevelIdContext.Provider>
-      </GameIdContext.Provider>
+      <React.Suspense>
+        {children}
+      </React.Suspense>
+      <Popup />
     </div>
   )
 }

@@ -14,6 +14,7 @@ export type GameSession = {
 }
 const environment = process.env.NODE_ENV;
 const isDevelopment = environment === 'development';
+const noBwrap = process.env.NO_BWRAP == "true"
 
 export class GameManager {
   queueLength: {}
@@ -84,7 +85,7 @@ export class GameManager {
     if (!game_dir) return;
 
     let serverProcess: cp.ChildProcessWithoutNullStreams;
-    if (isDevelopment) {
+    if (noBwrap || isDevelopment) {
       if (customLeanServer) {
         // If the game still uses a custom Lean server, use it.
         // Note: `cwd` is important to be the `bin` directory as `Watchdog` calls `./gameserver` again

@@ -40,6 +40,10 @@ a {
   position: relative;
 }
 
+.landing-page .nav-button {
+  background-color: unset;
+}
+
 #menu-btn {
   background-color: unset;
 }

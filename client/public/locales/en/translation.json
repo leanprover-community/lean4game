@@ -19,7 +19,7 @@
   },
   "Server capacity": {
     "translation": "Server capacity",
-    "description": "<p>As this server runs lean on our university machines, it has a limited capacity. Our current estimate is about 70 simultaneous games.</p>"
+    "description": "<p>As this server runs lean on our university machines, it has a limited capacity. We estimate that our setup will support around 50 simultaneous games at high performance, and up to 180 simultaneous games at a slower pace.</p>"
   },
   "No Games": {
     "description": "No Games loaded. Use <1>http://localhost:3000/#/g/local/FOLDER</1> to open a game directly from a local folder."

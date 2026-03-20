@@ -1,13 +1,9 @@
 import React from "react"
-import { selectInventory } from "../../state/progress"
-import { InventoryTile } from "../../state/api"
-import { GameIdContext } from "../../app"
-import { WorldLevelIdContext } from "../infoview/context"
-import { store } from "../../state/store"
+import { InventoryTile } from "../../store/api"
 import { InventoryItem } from "./inventory_item"
-import { currentInventoryTilesAtom, InventoryTab, inventoryTabAtom } from "../../store/inventory-atoms"
+import { currentInventoryTilesAtom, inventoryAtom, InventoryTab } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
-import { useSelector } from "react-redux"
+import { levelIdAtom, worldIdAtom } from "../../store/location-atoms"
 
 export function InventoryList({tiles, docType, enableAll=false} : {
   tiles: InventoryTile[],
@@ -15,18 +11,19 @@ export function InventoryList({tiles, docType, enableAll=false} : {
   enableAll?: boolean,
 }) {
   const [currentTiles] = useAtom(currentInventoryTilesAtom)
-  const gameId = React.useContext(GameIdContext)
-  const {worldId, levelId} = React.useContext(WorldLevelIdContext)
+  const [worldId] = useAtom(worldIdAtom)
+  const [levelId] = useAtom(levelIdAtom)
+  const [inventory] = useAtom(inventoryAtom)
+
 
   // Add inventory items from local store as unlocked.
   // Items are unlocked if they are in the local store, or if the server says they should be
   // given the dependency graph. (OR-connection) (TODO: maybe add different logic for different
   // modi)
-  let inv: string[] = useSelector(selectInventory(gameId))
-  let modifiedItems : InventoryTile[] = tiles.map(tile => inv.includes(tile.name) ? {...tile, locked: false} : tile)
+  let modifiedItems : InventoryTile[] = tiles.map(tile => inventory?.includes(tile.name) ? {...tile, locked: false} : tile)
 
   // Item(s) proved in the preceeding level
-  let recentItems = modifiedItems.filter(x => x.world == worldId && x.level == levelId - 1)
+  let recentItems = levelId ? modifiedItems.filter(x => x.world == worldId && x.level == levelId - 1) : []
 
   return <>
     <div className="inventory-list">

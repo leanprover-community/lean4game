@@ -80,6 +80,7 @@ cd GameSkeleton
 lake update -R
 lake build
 ```
+(If your game depends on Mathlib, `lake update` should automatically download the Mathlib cache. If `lake build` starts to re-build Mathlib files, abort and fetch the cache again with `lake exe cache get` before building. In rare erroneous states, you might need to use `lake exe cache get!` to invalidate previously downloaded cache.)
 
 Clone the server repository into a directory next to the game:
 ```bash
@@ -98,29 +99,6 @@ npm install
 Run the game:
 ```bash
 npm start
-```
-
-You should see a message like this:
-```bash
-[server] > lean4-game@0.1.0 start:server
-[server] > (cd server && lake build) && (cd relay && cross-env NODE_ENV=development nodemon -e mjs --exec "node ./index.mjs")
-[server]
-[client]
-[client] > lean4-game@0.1.0 start:client
-[client] > cross-env NODE_ENV=development vite --host
-[client]
-[server] [nodemon] 3.0.#
-[server] [nodemon] to restart at any time, enter `rs`
-[server] [nodemon] watching path(s): *.*
-[server] [nodemon] watching extensions: mjs
-[server] [nodemon] starting `node ./index.mjs`
-[client]
-[client]   VITE v4.5.1  ready in \#\#\# ms
-[client]
-[client]   ➜  Local:   http://localhost:3000/
-[client]   ➜  Network: http://###.###.###.##:3000/
-[client] [vite-plugin-static-copy] Collected 7 items.
-[server] (node:#####) [DEP0040] [server] Listening on 8080
 ```
 
 This takes a little time. Eventually, the game is available on http://localhost:3000/#/g/local/GameSkeleton. Replace `GameSkeleton` with the folder name of your local game.

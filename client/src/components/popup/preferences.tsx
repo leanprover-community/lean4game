@@ -1,20 +1,20 @@
 import * as React from 'react'
-import { Input, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
-import { Markdown } from '../markdown'
-import { Switch, Button, ButtonGroup } from '@mui/material';
+import { MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
+import { Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import lean4gameConfig from '../../config.json'
 
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { IPreferencesContext, PreferencesContext } from "../infoview/context"
 import ReactCountryFlag from 'react-country-flag';
 import { useTranslation } from 'react-i18next';
+import { useAtom } from 'jotai';
+import { preferencesAtom } from '../../store/preferences-atoms';
 
 export function PreferencesPopup() {
   let { t } = useTranslation()
-  const {layout, isSavePreferences, language, isSuggestionsMobileMode, setLayout, setIsSavePreferences, setLanguage, setIsSuggestionsMobileMode} = React.useContext(PreferencesContext)
+  const [preferences, setPreferences] = useAtom(preferencesAtom)
 
   const marks = [
     {
@@ -34,12 +34,13 @@ export function PreferencesPopup() {
     },
   ];
 
-  const handlerChangeLayout = (_: Event, value: number) => {
-    setLayout(marks[value].key as IPreferencesContext["layout"])
+  const handlerChangeLayout = (_: Event, val: number | number[]) => {
+    const newLayout = val == 0 ? "mobile": val == 1 ? "auto" : "desktop"
+    setPreferences(prev => ({ ...prev, layout: newLayout }))
   }
 
   const handlerChangeLanguage = (ev: SelectChangeEvent<string>) => {
-    setLanguage(ev.target.value as IPreferencesContext["language"])
+    setPreferences(prev => ({ ...prev, language: ev.target.value }))
   }
 
   return <Typography variant="body1" component="div" className="settings">
@@ -52,12 +53,12 @@ export function PreferencesPopup() {
               control={
                 <Box sx={{ width: 300 }}>
                   <Select
-                    value={language}
+                    value={preferences.language}
                     label={t("Language")}
                     onChange={handlerChangeLanguage}>
                       {lean4gameConfig.languages.map(lang => {
                         return <MenuItem key={`menu-item-lang-${lang.iso}`} value={lang.iso}>
-                          {lean4gameConfig.useFlags && <ReactCountryFlag countryCode={lang.flag}/>}
+                          {preferences.useFlags && <ReactCountryFlag countryCode={lang.flag}/>}
                           &nbsp;
                           {lang.name}
                         </MenuItem>
@@ -72,6 +73,20 @@ export function PreferencesPopup() {
               and the game's default language is used.
             </p>
           </div>
+          <div className='preferences-item'>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={preferences.useFlags}
+                  onChange={() => setPreferences(prev => ({ ...prev, useFlags: !preferences.useFlags }))}
+                  name="checked"
+                  color="primary"
+                />
+              }
+              label={t("Use country flags to represent languages")}
+              labelPlacement="end"
+            />
+          </div>
         </div>
         <div className='preferences-category'>
           <div className='category-title'>
@@ -83,14 +98,14 @@ export function PreferencesPopup() {
                 <Box sx={{ width: 300 }}>
                   <Slider
                     aria-label={t("Always visible")}
-                    value={marks.find(item => item.key === layout).value}
+                    value={marks.find(item => item.key === preferences.layout)?.value}
                     step={1}
                     marks={marks}
                     max={2}
                     sx={{
                       '& .MuiSlider-track': { display: 'none', },
                     }}
-                    onChange={handlerChangeLayout}
+                    onChange={(ev, val) => handlerChangeLayout(ev, val)}
                   />
                 </Box>
               }
@@ -106,8 +121,8 @@ export function PreferencesPopup() {
             <FormControlLabel
               control={
                 <Switch
-                  checked={isSuggestionsMobileMode}
-                  onChange={() => setIsSuggestionsMobileMode(!isSuggestionsMobileMode)}
+                  checked={preferences.isSuggestionsMobileMode}
+                  onChange={() => setPreferences(prev => ({ ...prev, isSuggestionsMobileMode: !preferences.isSuggestionsMobileMode }))}
                   name="checked"
                   color="primary"
                 />
@@ -118,12 +133,15 @@ export function PreferencesPopup() {
           </div>
         </div>
         <div className='preferences-category tail-category'>
+          <div className='category-title'>
+            <h3>{t("Browser Storage")}</h3>
+          </div>
           <div className='preferences-item'>
             <FormControlLabel
               control={
                 <Switch
-                  checked={isSavePreferences}
-                  onChange={() => setIsSavePreferences(!isSavePreferences)}
+                  checked={preferences.isSavePreferences}
+                  onChange={() => setPreferences(prev => ({ ...prev, isSavePreferences: !preferences.isSavePreferences }))}
                   name="checked"
                   color="primary"
                 />

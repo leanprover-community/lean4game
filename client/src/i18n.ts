@@ -10,20 +10,21 @@ i18n
     backend: {
       // > see https://github.com/i18next/i18next-http-backend
       loadPath: function(lngs, namespaces: Array<string>) {
-        const lng = namespaces[0] === "g/hhu-adam/robo" ? "de" : lngs[0];
+        const lng = lngs[0];
+        const ns = namespaces[0]
 
-        if (namespaces[0].startsWith("g/")) {
-          return `/i18n/${namespaces[0]}/${lng}/Game.json`;
+        if (ns.startsWith("g/")) {
+          return `/i18n/${ns}/${lng}`;
         } else {
-          return `/locales/${lng}/${namespaces[0]}.json`;
+          return `/locales/${lng}/${ns}.json`;
         }
       }
     },
     // > language to use, more information here:
     // > https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
     lng: "en",
-    // we use natural language keys, so we don't need a fallback language.
-    fallbackLng: false,
+    // Fallback to English if other translations are missing
+    fallbackLng: "en",
     // > you can use the i18n.changeLanguage function to change the language manually:
     // > https://www.i18next.com/overview/api#changelanguage
     // > if you're using a language detector, do not define the lng option
