@@ -330,7 +330,7 @@ export function WelcomeAppBar({pageNumber, setPageNumber} : {
     </div>
     <div className="nav-btns">
       {mobile && <MobileNavButtons pageNumber={pageNumber} setPageNumber={setPageNumber} />}
-      {(gameInfo?.tile?.languages.length ?? 1 > 1) && <LanguageButton />}
+      {((gameInfo?.tile?.languages.length ?? 1) > 1) && <LanguageButton />}
       <MenuButton />
     </div>
     <LanguageDropdown />
@@ -399,7 +399,7 @@ export function LevelAppBar({isLoading, levelTitle, pageNumber=1, setPageNumber=
           <PreviousButton  />
           <NextButton worldSize={gameInfo?.worldSize?.[worldId]} />
           <InputModeButton isDropdown={false}/>
-          {(gameInfo?.tile?.languages.length ?? 1 > 1) && <LanguageButton />}
+          {((gameInfo?.tile?.languages.length ?? 1) > 1) && <LanguageButton />}
           <MenuButton  />
         </div>
         <LanguageDropdown />
