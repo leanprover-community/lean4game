@@ -28,13 +28,13 @@
   margin-bottom: 0.3em;
 }
 
-.hyp-group-title, .goal-title {
+.hyp-group-title, .goal-title, .goals-section-title {
   font-family: var(--ff-primary);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .goals-section-title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 500;
 }
 
@@ -228,7 +228,6 @@
 .exercise .command-text {
   flex: 1;
   background-color: #fff;
-  font-family: "Droid Sans Mono", "monospace", monospace;
   font-size: 14px;
   padding: 0.4em .6em 0;
 }
@@ -253,6 +252,10 @@
 .goal-tab {
   /* border: 2px dotted darkgreen; */
   display: flex;
+}
+
+.goal-tab , .lean4game-infoview, .exercise .command-text, .exercise .exercise-statement, code {
+  font-family: 'Noto Color Emoji', 'JuliaMono', 'monospace';
 }
 
 .goal-tab .goal, .goal-tab .hypotheses {

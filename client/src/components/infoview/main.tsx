@@ -326,12 +326,14 @@ export function Main() {
     ret = <div><p>{serverStoppedResult.message}</p><p className="error">{serverStoppedResult.reason}</p></div>
   } else {
     ret = <div className="infoview vscode-light">
-      {proof?.completedWithWarnings &&
-        <div className="level-completed">
-          {proof?.completed ? t("Level completed! 🎉") : t("Level completed with warnings 🎭")}
-        </div>
-      }
-      <Infos />
+      <div className="lean4game-infoview">
+        {proof?.completedWithWarnings &&
+          <div className="level-completed">
+            {proof?.completed ? t("Level completed! 🎉") : t("Level completed with warnings 🎭")}
+          </div>
+        }
+        <Infos />
+      </div>
       {hintsToShow && (
         <Hints hints={hintsToShow}
           showHidden={help.has(hintStepIndex)} step={hintStepIndex}

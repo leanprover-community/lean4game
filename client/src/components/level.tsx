@@ -307,8 +307,8 @@ function PlayableLevel() {
 
       const model = leanMonacoEditor.editor?.getModel()
       const fireCursorLocation = () => {
-        const selection = leanMonacoEditor.editor.getSelection()
-        const position = leanMonacoEditor.editor.getPosition()
+        const selection = leanMonacoEditor.editor?.getSelection()
+        const position = leanMonacoEditor.editor?.getPosition()
         if (!selection || !model) {
           if (!position || !model) {
             return
@@ -346,7 +346,7 @@ function PlayableLevel() {
       }
 
       fireCursorLocation()
-      leanMonacoEditor.editor.onDidChangeCursorSelection(() => {
+      leanMonacoEditor.editor?.onDidChangeCursorSelection(() => {
         fireCursorLocation()
       })
 
