@@ -24,8 +24,6 @@
     "cytoscape-elk": "^2.1.0",
     "cytoscape-klay": "^3.1.4",
     "debounce": "^1.2.1",
-    "express": "^4.18.2",
-    "got": "^14.4.6",
     "highlightjs-lean": "^1.2.0",
     "i18next": "^23.10.1",
     "i18next-http-backend": "^2.5.0",
@@ -36,8 +34,6 @@
     "lean4monaco": "1.1.7",
     "marked": "^4.3.0",
     "monaco-editor-wrapper": "^5.3.1",
-    "node-schedule": "^2.1.1",
-    "octokit": "^5.0.5",
     "react": "^18.2.0",
     "react-contenteditable": "^3.3.7",
     "react-country-flag": "^3.1.0",
@@ -53,10 +49,8 @@
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-    "uuid": "^11.1.0",
     "vscode-lean4": "github:leanprover/vscode-lean4#de0062c",
-    "web-worker": "^1.2.0",
-    "ws": "^8.18.1"
+    "web-worker": "^1.2.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-optional-chaining": "^7.23.0",
@@ -66,20 +60,13 @@
     "@testing-library/react": "^13.4.0",
     "@types/cytoscape": "^3.19.9",
     "@types/debounce": "^1.2.1",
-    "@types/express": "^5.0.2",
-    "@types/got": "^9.6.12",
-    "@types/ws": "^8.18.1",
     "@vitejs/plugin-react-swc": "^4.2.3",
-    "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "css-loader": "^6.7.3",
-    "cypress": "^14.5.0",
-    "cypress-iframe": "^1.0.1",
     "file-loader": "^6.2.0",
     "i18next-scanner": "^4.4.0",
     "i18next-scanner-typescript": "^1.2.0",
     "memfs": "^4.51.1",
-    "nodemon": "^3.1.14",
     "react-refresh": "^0.18.0",
     "rollup": "^4.34.9",
     "style-loader": "^3.3.1",
@@ -95,6 +82,7 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development vite --host",
-    "build": "cross-env NODE_ENV=production vite build"
+    "build": "cross-env NODE_ENV=production vite build",
+    "translate": "npx i18next-scanner --config i18next-scanner.config.cjs"
   }
 }
