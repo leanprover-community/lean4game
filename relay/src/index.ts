@@ -52,7 +52,16 @@ const server = app
     console.log(`[${new Date()}] ${anon_ip} requested translation for ${owner}/${repo} in ${lang}`)
 
     req.url = "Game.json";
-    express.static(path.join(gameManager.getGameDir(owner,repo),".i18n",lang))(req, res, next);
+    const staticHandler = express.static(
+      path.join(gameManager.getGameDir(owner, repo), ".i18n", lang),
+      { fallthrough: true }
+    );
+    staticHandler(req, res, (err) => {
+      if (err) return next(err);
+      // if missing, return empty json instead
+      res.setHeader("Content-Type", "application/json");
+      res.status(200).send("{}");
+    });
   })
   .use('/data/g/:owner/:repo/*path', (req, res, next) => {
     const owner = req.params.owner;
@@ -60,7 +69,16 @@ const server = app
     const filename = req.params.path.join('/');
     req.url = filename;
     console.debug(gameManager.getGameDir(owner,repo))
-    express.static(path.join(gameManager.getGameDir(owner,repo),".lake","gamedata"))(req, res, next);
+    const staticHandler = express.static(
+      path.join(gameManager.getGameDir(owner,repo),".lake","gamedata"),
+      { fallthrough: true }
+    );
+    staticHandler(req, res, (err) => {
+      if (err) return next(err);
+      // if missing, return empty json instead
+      res.setHeader("Content-Type", "application/json");
+      res.status(200).send("{}");
+    });
   })
   .use('/data/stats', (req, res, next) => {
     // TODO: this throws on Windows
