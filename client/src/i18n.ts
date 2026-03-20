@@ -14,7 +14,7 @@ i18n
         const ns = namespaces[0]
 
         if (ns.startsWith("g/")) {
-          return `/i18n/${ns}/${lng}/Game.json`;
+          return `/i18n/${ns}/${lng}`;
         } else {
           return `/locales/${lng}/${ns}.json`;
         }

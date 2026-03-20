@@ -27,6 +27,8 @@ export function Markdown(props: any) {
     rehypePlugins: [...props.remarkPlugins ?? [], rehypeKatex],
   };
   return (
-    <ReactMarkdown {...newProps} className="markdown" />
+    <div className="markdown">
+      <ReactMarkdown {...newProps} />
+    </div>
   );
 }

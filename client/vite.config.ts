@@ -13,11 +13,10 @@ const clientPort = process.env.CLIENT_PORT || 3000;
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  //root: 'client/src',
   build: {
     // Relative to the root
     // Note: This has to match the path in `relay/index.mjs`
-    outDir: 'client/dist',
+    outDir: 'dist',
   },
   plugins: [
     react(),
@@ -30,14 +29,14 @@ export default defineConfig({
       targets: [
         {
           src: [
-            normalizePath(path.resolve(__dirname, './node_modules/lean4monaco/node_modules/@leanprover/infoview/dist/*')),
-            normalizePath(path.resolve(__dirname, './node_modules/lean4monaco/dist/webview/webview.js')),
+            normalizePath(path.resolve(__dirname, '../node_modules/lean4monaco/node_modules/@leanprover/infoview/dist/*')),
+            normalizePath(path.resolve(__dirname, '../node_modules/lean4monaco/dist/webview/webview.js')),
           ],
           dest: 'infoview'
         },
         {
           src: [
-            normalizePath(path.resolve(__dirname, './node_modules/lean4monaco/node_modules/@leanprover/infoview/dist/codicon.ttf'))
+            normalizePath(path.resolve(__dirname, '../node_modules/lean4monaco/node_modules/@leanprover/infoview/dist/codicon.ttf'))
           ],
           dest: 'assets'
         }
@@ -49,7 +48,7 @@ export default defineConfig({
       },
     }),
   ],
-  publicDir: "client/public",
+  publicDir: "public",
   base: "/", // setting this to `/leangame/` means the server is now accessible at `localhost:3000/leangame`
   optimizeDeps: {
     exclude: ['games'],
