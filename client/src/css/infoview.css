@@ -29,8 +29,9 @@
 }
 
 /* Display hyp names as clickable buttons */
-.hyp-group .hyp-name {
+.hyp-group .hyp-name, .insert-button {
   border: 1px solid var(--clr-dark-gray);
+  border-radius: 4px;
   display: inline-block;
   padding-left: 4px;
   padding-right: 4px;
@@ -39,7 +40,7 @@
   height: 24px;
   text-align: center;
   cursor: pointer;
-  border-radius: 4px;
+  background-color: transparent;
 }
 
 .hyp-group-title, .goal-title, .goals-section-title {

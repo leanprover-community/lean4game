@@ -47,22 +47,24 @@
 
 .inventory-list {
   display: flex;
-  gap: .5em;
+  flex-direction: column;
+  gap: 0;
   flex-wrap : wrap;
 }
 
 .inventory .item {
   background: #fff;
-  border: solid 1px #777;
+  /* border: solid 1px #777; */
+  border-bottom: solid 1px var(--clr-dark-gray);
   padding-left: .5rem;
-  padding-right: 1.0rem;
-  padding-top: .1rem;
-  padding-bottom: .1rem;
+  padding-right: 1rem;
+  padding-top: .125rem;
+  padding-bottom: .125rem;
   position: relative;
 }
 
 .inventory .item.locked:not(.enabled) {
-  border: solid 1px #ccc;
+  /* border: solid 1px #ccc; */
   color: #ccc;
 }
 
@@ -81,19 +83,22 @@
   cursor: pointer;
 }
 
-.inventory .item .copy-button {
-	min-width: 3px;
-	min-height: 3px;
-	display: inline-block;
-	color: #ccc;
-	font-size: 0.6em;
-	padding-right: .2rem;
-	vertical-align: top;
-	position: absolute;
-	top: 0;
-	right: 0;
-	height: 100%;
-	width: 1rem;
-	align-items: end;
-	text-align: end;
+.inventory .item .insert-button {
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75em;
+  vertical-align: top;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.inventory .item .insert-button {
+  color: #ccc;
+
+
+  right:
+
 }

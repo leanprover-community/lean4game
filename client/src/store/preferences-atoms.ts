@@ -7,6 +7,7 @@ export interface Preferences {
   language: string
   isSuggestionsMobileMode: boolean // TODO: remove me
   useFlags: boolean
+  showLockedInventory: boolean
 }
 
 export function getWindowDimensions() {
@@ -22,6 +23,7 @@ const defaultPreferences: Preferences = {
   language: import.meta.env.VITE_CLIENT_DEFAULT_LANGUAGE || "en",
   isSuggestionsMobileMode: true,
   useFlags: false,
+  showLockedInventory: false,
 };
 
 const storage = createJSONStorage<Preferences>(() => localStorage)
