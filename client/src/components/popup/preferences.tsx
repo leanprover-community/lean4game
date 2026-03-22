@@ -117,7 +117,7 @@ export function PreferencesPopup() {
               control={
                 <Switch
                   checked={preferences.showLockedInventory}
-                  onChange={() => setPreferences(prev => ({ ...prev, hideLockedInventory: !preferences.showLockedInventory }))}
+                  onChange={() => setPreferences(prev => ({ ...prev, showLockedInventory: !preferences.showLockedInventory }))}
                   name="checked"
                   color="primary"
                 />

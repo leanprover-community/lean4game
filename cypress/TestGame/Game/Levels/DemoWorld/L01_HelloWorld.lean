@@ -36,6 +36,7 @@ DefinitionDoc Add as "+"
 
 NewDefinition Eq Add
 NewTactic rw rfl
+NewHiddenTactic simp
 NewTheorem Nat.add_comm
 -- NewTheorem Nat.add_comm Nat.add_assoc
 -- NewDefinition Nat Add Eq
