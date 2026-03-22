@@ -58,7 +58,6 @@ export interface IPreferencesContext extends Preferences{
   setLayout: React.Dispatch<React.SetStateAction<Preferences["layout"]>>;
   setIsSavePreferences: React.Dispatch<React.SetStateAction<Preferences["isSavePreferences"]>>;
   setLanguage: React.Dispatch<React.SetStateAction<Preferences["language"]>>;
-  setIsSuggestionsMobileMode: any;
 }
 
 
