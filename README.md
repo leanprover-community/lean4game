@@ -39,14 +39,11 @@ Contributions to `lean4game` are always welcome!
 
 ### Translation
 
-The interface can be translated to various languages. For adding a translation, one needs to do the following:
+We welcome translations of the game interface and of the various games hosted on the [Lean Game Server](https://adam.math.hhu.de) into different languages!  
 
-1. In `client/src/config.json`, add your new language. The "iso" key is the ISO language code, i.e. it should be accepted by "i18next" and "GNU gettext"; the "flag" key is once accepted by [react-country-flag](https://www.npmjs.com/package/react-country-flag).
-2. Run `npm run translate`. This should create a new file `client/public/locales/{language}/translation.json`. (Alternatively, you can copy-paste `client/public/locales/en/translation.json`.)
-3. Add all translations.
-4. Commit the changes you made to `config.json` together with the new `translation.json`.
-
-For translating games, see [Translating a game](doc/translate.md).
+* For translating the *interface*, please refer to [these instructions](doc/translation-interface.md).  
+* For translating *individual games*, please contact the maintainers (see [table below](#contact)) and consult any game specific translation guidelines.  Our [generic guidlines](doc/translation-guide-for-game-translators.md) may give a rough indication of the steps involved.
+* We also have some [guidelines for game maintainers](doc/translation-guide-for-game-maintainers.md) regarding translations.
 
 ## Security
 
@@ -54,7 +51,23 @@ Providing the use access to a Lean instance running on the server is a severe se
 
 ## Contact
 
-In case of technical problems with `adam.math.hhu.de` please contact us via <a href="mailto:matvey.lorkish@hhu.de?subject=Lean4Game: <Your%20Question>">e-mail</a>.
+In case of technical problems with/outages of the server at `adam.math.hhu.de` please contact <a href="mailto:matvey.lorkish@hhu.de?subject=Lean4Game: <Your%20Question>">Matvey Lorkish</a>.
+
+Bug reports and feature requests regarding the game interface should be filed on the [issues page](issues) of this repository.
+
+For specific games on the [Lean Game Server](https://adam.math.hhu.de), please refer to the github repositories linked to below or contact the maintainers.
+
+| Game/repository                                                                   | Maintainer                                              |
+|-----------------------------------------------------------------------------------|---------------------------------------------------------|
+| [Knights and Slaves](https://github.com/jadabouhawili/knightsandknaves-lean4game) | [Jad Abou Hawili](https://github.com/JadAbouHawili)     |
+| [Linear Algebra Game](https://github.com/zrtmrh/linearalgebragame)                | [ZRTMRH](https://github.com/ZRTMRH)                     |
+| [Logic Game](https://github.com/trequetrum/lean4game-logic)                       | [Trequetrum](https://github.com/Trequetrum)             |
+| [Natural Number Game (NNG)](https://github.com/leanprover-community/nng4)         | [Kevin Buzzard](https://github.com/kbuzzard)            |
+| [Real Analysis Game](https://github.com/alexkontorovich/realanalysisgame)         | [Alex Kontorovich](https://github.com/AlexKontorovich)  |
+| [Reintroduction to Proofs](https://github.com/emilyriehl/reintroductiontoproofs)  | [Emily Riehl](https://github.com/emilyriehl)            |
+| [Robo / Scribble](https://github.com/hhu-adam/robo)                               | [Marcus Zibrowius](https://github.com/TentativeConvert) |
+| [Set Theory Game](https://github.com/djvelleman/stg4)                             | [Dan Velleman](https://github.com/djvelleman)
+
 
 ## Credits
 
