@@ -439,7 +439,7 @@ function PlayableLevel() {
     const selection = editor?.getSelection();
     if (!typewriterMode && editor && selection) {
       // Delete last input attempt from command line
-      leanMonacoEditor?.editor.executeEdits("typewriter", [{
+      editor.executeEdits("typewriter", [{
         range: selection,
         text: "",
         forceMoveMarkers: false
