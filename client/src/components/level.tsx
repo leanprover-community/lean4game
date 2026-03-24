@@ -435,11 +435,12 @@ function PlayableLevel() {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    const model = leanMonacoEditor?.editor?.getModel()
-    if (!(typewriterMode) && model) {
+    const editor = leanMonacoEditor?.editor;
+    const selection = editor?.getSelection();
+    if (!typewriterMode && editor && selection) {
       // Delete last input attempt from command line
       leanMonacoEditor?.editor.executeEdits("typewriter", [{
-        range: model.getFullModelRange(),
+        range: selection,
         text: "",
         forceMoveMarkers: false
       }]);
