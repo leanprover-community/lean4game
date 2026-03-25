@@ -29,6 +29,7 @@ i18n
     // > https://www.i18next.com/overview/api#changelanguage
     // > if you're using a language detector, do not define the lng option
     returnEmptyString: false,
+    nsSeparator: false, // to allow `:` in the key
     interpolation: {
       // > react already safes from xss
       escapeValue: false
