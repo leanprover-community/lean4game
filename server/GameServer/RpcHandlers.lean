@@ -144,9 +144,13 @@ def findHints (goal : MVarId) (level : GameLevel) : MetaM (Array GameHint) := do
 
 def filterUnsolvedGoal (a : Array InteractiveDiagnostic) :
     Array InteractiveDiagnostic :=
-  a.filter (fun d => match d.message with
-  | .append ⟨(.tag (.expr (.text x)) _) :: _⟩ => x != "unsolved goals"
-  | _ => true)
+  a.filter (fun d =>
+    if let .append ⟨(.tag (.expr (.text "unsolved goals")) _) :: _⟩ := d.message
+    -- Start and end being the same indicates this diagnostic is for the top
+    -- level definition, not something entered by the user so should be ignored
+    then d.range.start != d.range.end
+    else true
+  )
 
 -- TODO: no need to have `RequestM`, just anything where `mut` works
 /-- Add custom diagnostics about whether the level is completed. -/
