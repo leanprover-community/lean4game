@@ -4,6 +4,7 @@ import { InventoryItem } from "./inventory_item"
 import { currentInventoryTilesAtom, inventoryAtom, InventoryTab } from "../../store/inventory-atoms"
 import { useAtom } from "jotai"
 import { levelIdAtom, worldIdAtom } from "../../store/location-atoms"
+import { preferencesAtom } from "../../store/preferences-atoms"
 
 export function InventoryList({tiles, docType, enableAll=false} : {
   tiles: InventoryTile[],

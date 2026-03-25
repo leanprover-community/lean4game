@@ -1,4 +1,4 @@
-import { faBan, faLock } from "@fortawesome/free-solid-svg-icons"
+import { faBan, faCheck, faClipboard, faLock, faReply } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -6,6 +6,7 @@ import { useAppendTypewriterInput } from "../infoview/context"
 import { InventoryTile } from "../../store/api"
 import { useAtom } from "jotai"
 import { selectedDocTileAtom } from "../../store/inventory-atoms"
+import { levelIdAtom } from "../../store/location-atoms"
 
 export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} : {
   tile: InventoryTile,
@@ -15,6 +16,10 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
 }) {
   const { t } = useTranslation()
   const [, setDoc] = useAtom(selectedDocTileAtom)
+  const [levelId] = useAtom(levelIdAtom)
+
+  const insertable: boolean = (levelId ?? 0) > 0 && (enableAll || !(tile.locked || tile.disabled))
+
   const icon = (!enableAll && tile.locked) ? <FontAwesomeIcon icon={faLock} /> :
                tile.disabled ? <FontAwesomeIcon icon={faBan} /> : null
   const className = tile.locked ? "locked" : tile.disabled ? "disabled" : tile.new ? "new" : ""
@@ -23,29 +28,30 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
   const title = (!enableAll && tile.locked) ? t("Not unlocked yet") :
                 tile.disabled ? t("Not available in this level") : (tile.altTitle ? tile.altTitle.substring(tile.altTitle.indexOf(' ') + 1) : '')
 
-  const [copied, setCopied] = useState(false)
+  const [inserted, setInserted] = useState(false)
 
   const appendTypewriterInput = useAppendTypewriterInput()
-  const handleClick = (ev: any) => {
-    if (appendTypewriterInput(ev.shiftKey, tile.displayName, isTheorem, false)) {
-      return
-    }
-    setDoc(tile)
-  }
+  const handleClick = (ev: any) => {setDoc(tile)}
 
-  const copyItemName = (ev: any) => {
-    navigator.clipboard.writeText(tile.displayName)
-    setCopied(true)
+  const insertItemName = (ev: any) => {
+    // navigator.clipboard.writeText(tile.displayName)
+    appendTypewriterInput(ev.shiftKey, tile.displayName, isTheorem, false)
+    setInserted(true)
     setInterval(() => {
-      setCopied(false)
+      setInserted(false)
     }, 3000);
     ev.stopPropagation()
   }
 
 return <div className={`item ${className}${enableAll ? ' enabled' : ''}${recent ? ' recent' : ''}`} onClick={handleClick} title={title}>
     {icon} {tile.displayName}
-    {/* <div className="copy-button" onClick={copyItemName}>
-      {copied ? <FontAwesomeIcon icon={faCheck} /> : <FontAwesomeIcon icon={faClipboard} />}
-    </div> */}
+    {insertable &&
+    <button
+        className="insert-button"
+        title={`insert '${tile.displayName}'`}
+        onClick={insertItemName}
+    >
+      {inserted ? <FontAwesomeIcon icon={faCheck} /> : <FontAwesomeIcon icon={faReply} />}
+    </button> }
   </div>
 }

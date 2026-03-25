@@ -112,25 +112,26 @@ export function PreferencesPopup() {
               label=""
             />
           </div>
+          <div className='preferences-item'>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={preferences.showLockedInventory}
+                  onChange={() => setPreferences(prev => ({ ...prev, showLockedInventory: !preferences.showLockedInventory }))}
+                  name="checked"
+                  color="primary"
+                />
+              }
+              label={t("Show locked inventory items")}
+              labelPlacement="end"
+            />
+          </div>
         </div>
         <div className='preferences-category'>
           <div className='category-title'>
             <h3>{t("Controls")}</h3>
           </div>
-          <div className='preferences-item'>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={preferences.isSuggestionsMobileMode}
-                  onChange={() => setPreferences(prev => ({ ...prev, isSuggestionsMobileMode: !preferences.isSuggestionsMobileMode }))}
-                  name="checked"
-                  color="primary"
-                />
-              }
-              label={t("Click on tactics/assumptions like mobile keyboard suggestions i.e. without autofocus or requiring Shift key")}
-              labelPlacement="end"
-            />
-          </div>
+          <p>---</p>
         </div>
         <div className='preferences-category tail-category'>
           <div className='category-title'>

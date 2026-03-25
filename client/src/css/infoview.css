@@ -28,6 +28,21 @@
   margin-bottom: 0.3em;
 }
 
+/* Display hyp names as clickable buttons */
+.hyp-group .hyp-name, .insert-button {
+  border: 1px solid var(--clr-dark-gray);
+  border-radius: 4px;
+  display: inline-block;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin: 2px;
+  min-width: 24px;
+  height: 24px;
+  text-align: center;
+  cursor: pointer;
+  background-color: transparent;
+}
+
 .hyp-group-title, .goal-title, .goals-section-title {
   font-family: var(--ff-primary);
   font-size: 1.1rem;
@@ -85,7 +100,6 @@
 .typewriter button, .undo-button {
   display: block;
   white-space: nowrap;
-  flex: 0;
   min-width: 6rem;
   height: var(--typewriter-control-height);
 }

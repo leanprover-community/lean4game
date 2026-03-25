@@ -264,8 +264,6 @@ elab "NewTactic" args:ident* : command => do
 /-- Declare tactics that are introduced by this level but do not show up in inventory. -/
 elab "NewHiddenTactic" args:ident* : command => do
   checkCommandNotDuplicated ((←getCurLevel).tactics.hidden) "NewHiddenTactic"
-  for name in args do
-    checkInventoryDoc .Tactic name (template := "")
   modifyCurLevel fun level => pure {level with
     tactics := {level.tactics with new := level.tactics.new ++ args.map (·.getId),
                                    hidden := level.tactics.hidden ++ args.map (·.getId)}}
@@ -779,22 +777,24 @@ elab "MakeGame" : command => do
     -- Basic inventory item availability: all locked.
     let Availability₀ : HashMap Name InventoryTile :=
       HashMap.ofList $
-        ← allItems.toList.mapM fun item => do
-          -- Using a match statement because the error message of `Option.get!` is not helpful.
-          match (← getInventoryItem? item inventoryType) with
-          | none =>
+        ← allItems.toList.filterMapM fun item => do
+          match hiddenItems.contains item, (← getInventoryItem? item inventoryType) with
+          | true, _ =>
+            -- drop hidden items
+            return none
+          | false, none =>
             -- Note: we did have a panic here before because lemma statement and doc entry
             -- had mismatching namespaces
             logError m!"There is no inventory item ({inventoryType}) for: {item}."
             panic s!"Inventory item {item} not found!"
-          | some data =>
-            return (item, {
+          | false, some data =>
+            return some (item, {
               name := item
               displayName := data.displayName
               category := data.category
               altTitle := data.statement
-              hidden := hiddenItems.contains item })
-
+              -- TODO: we don't need `hidden` anymore
+              hidden := false })
 
 
     -- Availability after a given world
@@ -806,7 +806,8 @@ elab "MakeGame" : command => do
       -- logInfo m!"Predecessors: {predecessors.toArray.map fun (a) => (a)}"
       for predWorldId in predecessors do
         for item in newItemsInWorld.getD predWorldId {} do
-          let data := (← getInventoryItem? item inventoryType).get!
+          let some data ← getInventoryItem? item inventoryType
+            | continue
           items := items.insert item {
             name := item
             displayName := data.displayName
@@ -826,7 +827,8 @@ elab "MakeGame" : command => do
 
         -- unlock items that are unlocked in this level
         for item in levelInfo.new do
-          let data := (← getInventoryItem? item inventoryType).get!
+          let some data ← getInventoryItem? item inventoryType
+            | continue
           items := items.insert item {
             name := item
             displayName := data.displayName
@@ -841,7 +843,8 @@ elab "MakeGame" : command => do
           match lemmaStatements.get? (worldId, levelId) with
           | none => pure ()
           | some name =>
-            let data := (← getInventoryItem? name inventoryType).get!
+            let some data ← getInventoryItem? name inventoryType
+              | continue
             items := items.insert name {
               name := name
               displayName := data.displayName
@@ -871,10 +874,13 @@ elab "MakeGame" : command => do
     allItemsByType := allItemsByType.insert inventoryType allItems
 
   let getTiles (type : InventoryType) : CommandElabM (Array InventoryTile) := do
-    (allItemsByType.getD type {}).toArray.mapM (fun name => do
-      let some item ← getInventoryItem? name type
-        | throwError "Expected item to exist: {name}"
-      return item.toTile)
+    (allItemsByType.getD type {}).toArray.filterMapM (fun name => do
+      match ← getInventoryItem? name type with
+      | none =>
+        if !(hiddenItems.contains name) then
+          logWarning s!"Expected item to exist: {name}"
+        return none
+      | some item => return some item.toTile)
   let inventory : InventoryOverview := {
     lemmas := (← getTiles .Theorem).map (fun tile => {tile with hidden := hiddenItems.contains tile.name})
     tactics := (← getTiles .Tactic).map (fun tile => {tile with hidden := hiddenItems.contains tile.name})

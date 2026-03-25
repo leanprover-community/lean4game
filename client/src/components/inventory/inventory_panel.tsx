@@ -37,14 +37,15 @@ export function InventoryPanel({levelInfo, visible = true} : {
   }, [levelInfo])
 
   return <div className={`column inventory-panel ${visible ? '' : 'hidden'}`}>
-    <div className="inventory">
-      <InventoryTabBar />
-      <InventorySubTabBar />
-      {levelInfo &&
+    {doc ?
+      <Documentation type={tab} />
+      :
+      <div className="inventory">
+        <InventoryTabBar />
+        <InventorySubTabBar />
         <InventoryList tiles={TabContent(tab, levelInfo)} docType={tab} enableAll={difficulty == 0} />
-      }
-    </div>
-    { doc && <Documentation type={tab} />}
+      </div>
+    }
 
   </div>
 }

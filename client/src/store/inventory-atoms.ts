@@ -4,6 +4,7 @@ import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { atomWithQuery } from "jotai-tanstack-query";
 import { atomFamily } from "jotai/utils";
 import { progressAtom } from "./progress-atoms";
+import { preferencesAtom } from "./preferences-atoms";
 
 /** Valid inventory tabs */
 export enum InventoryTab {
@@ -170,7 +171,12 @@ export const currentInventoryTilesAtom = atom(get => {
   const tab = get(inventoryTabAtom)
   const subtab = get(inventorySubtabAtom)
   const userInventory = get(userInventoryAtom)
+  const showLocked = get(preferencesAtom).showLockedInventory
+
   return get(inventoryTilesAtoms[tab])
-    .filter(it => !it.hidden && it.category == subtab)
-    .map(tile => userInventory.includes(tile.name) ? {...tile, locked: false} : tile)
+    .filter(it =>
+        !it.hidden &&
+        it.category == subtab &&
+        (showLocked || !it.locked)
+    ).map(tile => userInventory.includes(tile.name) ? {...tile, locked: false} : tile)
 })

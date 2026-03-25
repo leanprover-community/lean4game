@@ -87,7 +87,7 @@ interface HypProps {
 function Hyp({ hyp: h, mvarId }: HypProps) {
     const locs = React.useContext(LocationsContext)
 
-    const namecls: string = 'mr1 ' +
+    const namecls: string = 'mr1 hyp-name ' +
         (h.isInserted ? 'inserted-text ' : '') +
         (h.isRemoved ? 'removed-text ' : '')
 
@@ -97,7 +97,10 @@ function Hyp({ hyp: h, mvarId }: HypProps) {
             className={namecls + (isInaccessibleName(n) ? 'goal-inaccessible ' : '')}
             key={i}
             // FIXME: 3rd argument looks wrong
-            onClick={ev => void appendTypewriterInput(ev.shiftKey, n, h.isAssumption ?? false, h.isAssumption ?? false) }
+            onClick={ev => {
+                appendTypewriterInput(ev.shiftKey, n, h.isAssumption ?? false, h.isAssumption ?? false)
+                ev.stopPropagation()
+            } }
         >
             <SelectableLocation
                 locs={locs}
