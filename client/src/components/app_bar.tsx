@@ -17,7 +17,7 @@ import { gameIdAtom, levelIdAtom, navigateToLandingPageAtom, worldIdAtom } from 
 import { completedAtom, difficultyAtom, progressAtom } from '../store/progress-atoms'
 import { gameInfoAtom } from '../store/query-atoms'
 import { readGameIntroAtom } from '../store/chat-atoms'
-import { lockEditorModeAtom, typewriterModeAtom } from '../store/editor-atoms'
+import { lockEditorModeAtom, proofAtom, typewriterModeAtom } from '../store/editor-atoms'
 import { mobileAtom, preferencesAtom } from '../store/preferences-atoms'
 import { NavButton } from './navigation/nav_button'
 import { Flag } from './flag'
@@ -86,7 +86,7 @@ function NextButton({worldSize} : {worldSize: number }) {
   const [gameId, navigateToGame] = useAtom(gameIdAtom)
   const [levelId, navigateToLevel] = useAtom(levelIdAtom)
   const [difficulty] = useAtom(difficultyAtom)
-  const [completed] = useAtom(completedAtom)
+  const [proof] = useAtom(proofAtom)
   if (levelId === undefined) return null
   if (levelId == 0) return (
     <Button inverted={true}
@@ -100,7 +100,7 @@ function NextButton({worldSize} : {worldSize: number }) {
     <Button inverted={true}
         onClick={() => {navigateToLevel(levelId + 1); closeNav()}}
         title={t("next level")}
-        disabled={difficulty >= 2 && !(completed || levelId === 0)}
+        disabled={difficulty >= 2 && !(proof?.completed || levelId === 0)}
       >
       <FontAwesomeIcon icon={faArrowRight} />&nbsp;{t("Next")}
     </Button>

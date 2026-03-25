@@ -100,7 +100,6 @@
 .typewriter button, .undo-button {
   display: block;
   white-space: nowrap;
-  flex: 0;
   min-width: 6rem;
   height: var(--typewriter-control-height);
 }
