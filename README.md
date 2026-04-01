@@ -59,7 +59,7 @@ For specific games on the [Lean Game Server](https://adam.math.hhu.de), please r
 
 | Game/repository                                                                   | Maintainer                                              |
 |-----------------------------------------------------------------------------------|---------------------------------------------------------|
-| [Knights and Slaves](https://github.com/jadabouhawili/knightsandknaves-lean4game) | [Jad Abou Hawili](https://github.com/JadAbouHawili)     |
+| [Knights and Knaves](https://github.com/jadabouhawili/knightsandknaves-lean4game) | [Jad Abou Hawili](https://github.com/JadAbouHawili)     |
 | [Linear Algebra Game](https://github.com/zrtmrh/linearalgebragame)                | [ZRTMRH](https://github.com/ZRTMRH)                     |
 | [Logic Game](https://github.com/trequetrum/lean4game-logic)                       | [Trequetrum](https://github.com/Trequetrum)             |
 | [Natural Number Game (NNG)](https://github.com/leanprover-community/nng4)         | [Kevin Buzzard](https://github.com/kbuzzard)            |
