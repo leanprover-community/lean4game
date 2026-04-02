@@ -11,7 +11,6 @@
     "@fortawesome/free-regular-svg-icons": "^7.2.0",
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
     "@fortawesome/react-fontawesome": "^3.2.0",
-    "@leanprover/infoview": "^0.4.3",
     "@mui/material": "^5.11.1",
     "@reduxjs/toolkit": "^1.9.1",
     "@tanstack/query-core": "^5.90.20",
@@ -34,8 +33,7 @@
     "react-split": "^2.0.14",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
-    "remark-math": "^6.0.0",
-    "vscode-lean4": "github:leanprover/vscode-lean4#de0062c"
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@codingame/esbuild-import-meta-url-plugin": "^1.0.3",

@@ -126,14 +126,12 @@
 
 .typewriter .typewriter-input {
   flex: 0 0 auto;
-  width: 100%;
   align-self: flex-start;
   margin-top: 0;
 }
 
 .typewriter-input .monaco-editor,
 .typewriter-input .monaco-editor-background {
-  height: 100%;
   margin-top: 0;
 }
 
@@ -292,4 +290,12 @@
 .goal-sign line {
   stroke: var(--clr-dark-gray);
   stroke-width: 2;
+}
+
+.exercise-statement {
+  padding-left: .5em;
+  padding-right: .5em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  margin: 0;
 }

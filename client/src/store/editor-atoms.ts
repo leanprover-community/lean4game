@@ -4,7 +4,7 @@ import { gameIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
-import { ProofState } from "../components/infoview/rpc_api";
+import { ProofState } from "../../../infoview/rpc_api";
 import { Diagnostic } from 'vscode-languageserver-types'
 
 /** Options for the LeanMonaco instance */

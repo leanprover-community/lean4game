@@ -1,5 +1,4 @@
 .level-mobile {
-  height: 100%;
   flex: 1;
   min-height: 0;
   /* display: flex; */
@@ -24,32 +23,6 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
 }
 
-.inventory-panel, .exercise-panel, .doc-panel, .introduction-panel {
-  height: 100%;
-  width: 100%;
-  overflow: auto;
-  position: relative;
-}
-
-.infoview {
-  padding-top: 1em;
-  padding-bottom: 0;
-}
-
-.infoview, .exercise-statement {
-  padding-left: .5em;
-  padding-right: .5em;
-}
-
-.exercise-statement {
-  padding-top: 1em;
-  padding-bottom: 1em;
-}
-
-.exercise-statement p {
-  margin: 0;
-}
-
 .exercise-statement .lean-code {
   color: rgba(0, 32, 90, 0.87);
   font-size: 12px; /* TODO: is the monaco font-size hardcoded? */
@@ -57,22 +30,6 @@
 
 .conclusion {
   padding: 1em;
-}
-
-.infoview {
-  padding-top: 0em;
-}
-
-.exercise {
-  flex: 1 1 auto;
-  display: flex;
-  flex-flow: column;
-}
-
-.codeview {
-  flex: 1 1 auto;
-  min-height: 192px;
-
 }
 
 .exercise h4 {
@@ -192,7 +149,6 @@ td code  {
 } */
 
 .exercise {
-  height: 100%;
 }
 
 .chat {
@@ -208,7 +164,6 @@ td code  {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-
 }
 
 .chat-panel .button-row {
@@ -217,6 +172,7 @@ td code  {
   margin-right: .5em;
   min-height: 2.5em;
   border-top:  0.1em solid #aaa;
+  flex-shrink: 0;
 }
 
 .chat-panel .btn {
@@ -249,7 +205,6 @@ td code  {
 .typewriter-interface {
   display: flex;
   flex-flow: column;
-  height: 100%;
 }
 
 .typewriter {
