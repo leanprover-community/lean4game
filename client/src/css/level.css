@@ -295,41 +295,6 @@ td code  {
   width: 1.8rem;
 }
 
-.tmp-pusher {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-}
-
-.typewriter-interface .content, .world-image-container.empty {
-  background-color: #eee;
-}
-
-.world-image-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 0px; /* somehow this has a desired affect, but why? */
-  overflow: hidden;
-}
-
-.world-image-container img.contain {
-  object-fit: contain;
-}
-
-.world-image-container.center {
-  justify-content: center;
-}
-
-
-.world-image-container img.cover {
-  height: 100%;
-  object-fit: cover;
-}
-
-.typewriter-interface .proof {
-  background-color: #fff;
-}
-
 .toggle-width {
   min-width: 40px;
   text-align: center;

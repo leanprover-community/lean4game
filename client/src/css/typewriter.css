@@ -2,8 +2,52 @@
 
 .typewriter-canvas {
   position: absolute;
-  /* width: 100%;
-  height: 100%; */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   background-color: white;
-  border: 1px solid red;
+}
+
+.typewriter-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  overflow-y: auto;
+}
+
+.pusher {
+  flex: 1;
+  min-height: 0;
+  display: block;
+}
+
+.typewriter-canvas .typewriter-info {
+  background-color: #eee;
+}
+
+.world-image {
+  position: absolute;
+  max-height: 100%;
+  width: 100%;
+}
+
+.world-image.contain {
+  object-fit: contain;
+}
+
+.world-image.cover {
+  height: 100%;
+  object-fit: cover;
+}
+
+.typewriter-info .proof {
+  background-color: #fff;
+  border-radius: 8px 8px 0 0;
+}
+
+.proof {
+  z-index: 1;
 }

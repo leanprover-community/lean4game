@@ -209,10 +209,6 @@
   scroll-behavior: smooth;
 }
 
-.typewriter-interface .content .tmp-pusher {
-  flex: 1;
-}
-
 .exercise .command {
   background-color: #bbb;
   padding: .5em;
