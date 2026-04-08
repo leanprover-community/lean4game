@@ -6,7 +6,7 @@ import { atom } from "jotai";
 /**
  * The player's progress is stored in local storage under `game_progress`.
  *
- * The atoms here deal with reading from and reading to local storage.
+ * The atoms here deal with reading from and writing to local storage.
  */
 
 const defaultProgress: Progress = {
