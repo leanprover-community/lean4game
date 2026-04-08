@@ -6,6 +6,7 @@ import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
 import { ProofState } from "../components/infoview/rpc_api";
 import { Diagnostic } from 'vscode-languageserver-types'
+import { createDefaultLevelProgress } from "./progress-defaults"
 
 /** Options for the LeanMonaco instance */
 export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
@@ -32,8 +33,7 @@ export const codeAtom = atom(
     return levelProgress?.code
   },
   (get, set, val: string) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
+    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
     set(levelProgressAtom, { ...levelProgress, code: val })
   }
 )
@@ -46,8 +46,7 @@ export const selectionsAtom = atom(
     return levelProgress?.selections ?? []
   },
   (get, set, val: Selection[]) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
+    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
     set(levelProgressAtom, { ...levelProgress, selections: val })
   }
 )

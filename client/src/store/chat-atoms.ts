@@ -1,6 +1,7 @@
 import { atom } from "jotai"
 import { levelProgressAtom, progressAtom } from "./progress-atoms"
 import { GameHint } from "../components/infoview/rpc_api"
+import { createDefaultLevelProgress } from "./progress-defaults"
 
 /** User read the game introduction. Only relevant on mobile */
 export const readGameIntroAtom = atom(
@@ -22,8 +23,7 @@ export const helpAtom = atom(
     return new Set(levelProgress?.help ?? [])
   },
   (get, set, val: Set<number>) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
+    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
     set(levelProgressAtom, { ...levelProgress, help: [ ...val ] })
   }
 )

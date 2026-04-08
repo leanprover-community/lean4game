@@ -2,6 +2,7 @@ import { atom } from "jotai"
 import { levelIdAtom, worldIdAtom } from "./location-atoms"
 import { progressAtom } from "./progress-atoms"
 import { GameProgress, LevelProgress, Progress, WorldProgress, Selection, DEFAULT_DIFFICULTY } from "./progress-types";
+import { createDefaultLevelProgress, createDefaultWorldProgress } from "./progress-defaults"
 
 /** The current world progress */
 export const worldProgressAtom = atom(
@@ -30,14 +31,14 @@ export const levelProgressAtom = atom(
   get => {
     const levelId = get(levelIdAtom)
     const worldProgress = get(worldProgressAtom)
-    if (!levelId || !worldProgress) return null
-    return worldProgress[levelId]
+    if (levelId == null || !worldProgress) return null
+    return worldProgress[levelId] ?? createDefaultLevelProgress()
   },
   (get, set, val: LevelProgress | null) => {
     const levelId = get(levelIdAtom)
     const worldProgress = get(worldProgressAtom)
-    if (!levelId || !worldProgress) return
-    const copied = { ...worldProgress }
+    if (levelId == null) return
+    const copied = { ...(worldProgress ?? createDefaultWorldProgress()) }
     if (val) {
       copied[levelId] = val
     } else {
@@ -118,8 +119,7 @@ export const completedAtom = atom(
     return levelProgress?.completed ?? false
   },
   (get, set, val: boolean) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
+    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
     set(levelProgressAtom, { ...levelProgress, completed: val })
   }
 )
@@ -130,8 +130,7 @@ export const codeAtom = atom(
     return levelProgress?.code
   },
   (get, set, val: string) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
+    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
     set(levelProgressAtom, { ...levelProgress, code: val })
   }
 )
@@ -142,8 +141,7 @@ export const helpAtom = atom(
     return levelProgress?.help ?? []
   },
   (get, set, val: number[]) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
+    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
     set(levelProgressAtom, { ...levelProgress, help: val })
   }
 )
@@ -154,8 +152,7 @@ export const selectionsAtom = atom(
     return levelProgress?.selections ?? []
   },
   (get, set, val: Selection[]) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
+    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
     set(levelProgressAtom, { ...levelProgress, selections: val })
   }
 )
