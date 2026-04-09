@@ -36,7 +36,7 @@ export const levelProgressAtom = atom(
   (get, set, val: LevelProgress | null) => {
     const levelId = get(levelIdAtom)
     const worldProgress = get(worldProgressAtom)
-    if (levelId == null) return
+    if (!levelId) return
     const copied = { ...(worldProgress ?? defaultWorldProgress) }
     if (val) {
       copied[levelId] = val
