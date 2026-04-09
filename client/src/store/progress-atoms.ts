@@ -2,7 +2,6 @@ import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { GameProgress, LevelProgress, Progress, WorldProgress, Selection, DEFAULT_DIFFICULTY } from "./progress-types";
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { atom } from "jotai";
-import { createDefaultLevelProgress, createDefaultWorldProgress } from "./progress-defaults"
 
 /**
  * The player's progress is stored in local storage under `game_progress`.
@@ -12,6 +11,15 @@ import { createDefaultLevelProgress, createDefaultWorldProgress } from "./progre
 
 const defaultProgress: Progress = {
   games: {}
+}
+
+export const defaultWorldProgress: WorldProgress = {readIntro: false}
+
+export const defaultLevelProgress: LevelProgress = {
+  code: "",
+  selections: [],
+  completed: false,
+  help: [],
 }
 
 const defaultGameProgress: GameProgress =
@@ -59,7 +67,7 @@ export const worldProgressAtom = atom(
     const worldId = get(worldIdAtom)
     const progress = get(progressAtom)
     if (!worldId || !progress) return null
-    return progress.data[worldId]
+    return progress.data[worldId] ?? defaultWorldProgress
   },
   (get, set, val: WorldProgress | null) => {
     const worldId = get(worldIdAtom)
@@ -81,13 +89,13 @@ export const levelProgressAtom = atom(
     const levelId = get(levelIdAtom)
     const worldProgress = get(worldProgressAtom)
     if (levelId == null || !worldProgress) return null
-    return worldProgress[levelId] ?? createDefaultLevelProgress()
+    return worldProgress[levelId] ?? defaultLevelProgress
   },
   (get, set, val: LevelProgress | null) => {
     const levelId = get(levelIdAtom)
     const worldProgress = get(worldProgressAtom)
     if (levelId == null) return
-    const copied = { ...(worldProgress ?? createDefaultWorldProgress()) }
+    const copied = { ...(worldProgress ?? defaultWorldProgress) }
     if (val) {
       copied[levelId] = val
     } else {
@@ -121,7 +129,7 @@ export const completedAtom = atom(
     return levelProgress?.completed ?? false
   },
   (get, set, val: boolean) => {
-    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
+    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
     set(levelProgressAtom, { ...levelProgress, completed: val })
   }
 )

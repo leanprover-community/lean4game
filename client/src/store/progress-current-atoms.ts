@@ -1,8 +1,7 @@
 import { atom } from "jotai"
 import { levelIdAtom, worldIdAtom } from "./location-atoms"
-import { progressAtom } from "./progress-atoms"
+import { progressAtom, defaultLevelProgress, defaultWorldProgress } from "./progress-atoms"
 import { GameProgress, LevelProgress, Progress, WorldProgress, Selection, DEFAULT_DIFFICULTY } from "./progress-types";
-import { createDefaultLevelProgress, createDefaultWorldProgress } from "./progress-defaults"
 
 /** The current world progress */
 export const worldProgressAtom = atom(
@@ -10,7 +9,7 @@ export const worldProgressAtom = atom(
     const worldId = get(worldIdAtom)
     const progress = get(progressAtom)
     if (!worldId || !progress) return null
-    return progress.data[worldId]
+    return progress.data[worldId] ?? defaultWorldProgress
   },
   (get, set, val: WorldProgress | null) => {
     const worldId = get(worldIdAtom)
@@ -32,13 +31,13 @@ export const levelProgressAtom = atom(
     const levelId = get(levelIdAtom)
     const worldProgress = get(worldProgressAtom)
     if (levelId == null || !worldProgress) return null
-    return worldProgress[levelId] ?? createDefaultLevelProgress()
+    return worldProgress[levelId] ?? defaultLevelProgress
   },
   (get, set, val: LevelProgress | null) => {
     const levelId = get(levelIdAtom)
     const worldProgress = get(worldProgressAtom)
     if (levelId == null) return
-    const copied = { ...(worldProgress ?? createDefaultWorldProgress()) }
+    const copied = { ...(worldProgress ?? defaultWorldProgress) }
     if (val) {
       copied[levelId] = val
     } else {
@@ -119,7 +118,7 @@ export const completedAtom = atom(
     return levelProgress?.completed ?? false
   },
   (get, set, val: boolean) => {
-    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
+    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
     set(levelProgressAtom, { ...levelProgress, completed: val })
   }
 )
@@ -130,7 +129,7 @@ export const codeAtom = atom(
     return levelProgress?.code
   },
   (get, set, val: string) => {
-    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
+    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
     set(levelProgressAtom, { ...levelProgress, code: val })
   }
 )
@@ -141,7 +140,7 @@ export const helpAtom = atom(
     return levelProgress?.help ?? []
   },
   (get, set, val: number[]) => {
-    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
+    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
     set(levelProgressAtom, { ...levelProgress, help: val })
   }
 )
@@ -152,7 +151,7 @@ export const selectionsAtom = atom(
     return levelProgress?.selections ?? []
   },
   (get, set, val: Selection[]) => {
-    const levelProgress = get(levelProgressAtom) ?? createDefaultLevelProgress()
+    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
     set(levelProgressAtom, { ...levelProgress, selections: val })
   }
 )
