@@ -2,7 +2,7 @@ import { useAtom } from "jotai"
 import { leanMonacoAtom, typewriterModeAtom } from "../../store/editor-atoms"
 import React, { useEffect, useLayoutEffect, useRef } from "react"
 import { ExerciseStatement } from "./ExerciseStatement"
-import { Typewriter } from "./Typewriter"
+import { Typewriter } from "./typewriter"
 
 /**
  * Note: It is important that the `div` with `codeViewRef` is
