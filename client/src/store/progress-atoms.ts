@@ -6,11 +6,20 @@ import { atom } from "jotai";
 /**
  * The player's progress is stored in local storage under `game_progress`.
  *
- * The atoms here deal with reading from and reading to local storage.
+ * The atoms here deal with reading from and writing to local storage.
  */
 
 const defaultProgress: Progress = {
   games: {}
+}
+
+export const defaultWorldProgress: WorldProgress = {readIntro: false}
+
+export const defaultLevelProgress: LevelProgress = {
+  code: "",
+  selections: [],
+  completed: false,
+  help: [],
 }
 
 const defaultGameProgress: GameProgress =
@@ -58,7 +67,7 @@ export const worldProgressAtom = atom(
     const worldId = get(worldIdAtom)
     const progress = get(progressAtom)
     if (!worldId || !progress) return null
-    return progress.data[worldId]
+    return progress.data[worldId] ?? defaultWorldProgress
   },
   (get, set, val: WorldProgress | null) => {
     const worldId = get(worldIdAtom)
@@ -79,14 +88,14 @@ export const levelProgressAtom = atom(
   get => {
     const levelId = get(levelIdAtom)
     const worldProgress = get(worldProgressAtom)
-    if (!levelId || !worldProgress) return null
-    return worldProgress[levelId]
+    if (levelId == null || !worldProgress) return null
+    return worldProgress[levelId] ?? defaultLevelProgress
   },
   (get, set, val: LevelProgress | null) => {
     const levelId = get(levelIdAtom)
     const worldProgress = get(worldProgressAtom)
-    if (!levelId || !worldProgress) return
-    const copied = { ...worldProgress }
+    if (!levelId) return
+    const copied = { ...(worldProgress ?? defaultWorldProgress) }
     if (val) {
       copied[levelId] = val
     } else {
@@ -120,8 +129,7 @@ export const completedAtom = atom(
     return levelProgress?.completed ?? false
   },
   (get, set, val: boolean) => {
-    const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
+    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
     set(levelProgressAtom, { ...levelProgress, completed: val })
   }
 )
