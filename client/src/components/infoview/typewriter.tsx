@@ -1,158 +1,88 @@
-import * as React from 'react'
-import { useRef, useState, useEffect } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
-import { DiagnosticSeverity, PublishDiagnosticsParams, DocumentUri } from 'vscode-languageserver-protocol';
-import { useServerNotificationEffect } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
-import { InteractiveDiagnostic } from '@leanprover/infoview-api';
-import { Diagnostic } from 'vscode-languageserver-types';
-import { RpcContext } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/rpcSessions';
-import { MonacoEditorContext } from './context'
-import { lastStepHasErrors, loadGoals } from './goals'
-import { ProofState } from './rpc_api'
-import { useTranslation } from 'react-i18next'
-import { useAtom } from 'jotai'
-import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
-import { preferencesAtom } from '../../store/preferences-atoms'
-import { crashedAtom, interimDiagsAtom, proofAtom, typewriterContentAtom } from '../../store/editor-atoms'
-import { deletedChatAtom } from '../../store/chat-atoms'
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 
-export interface GameDiagnosticsParams {
-  uri: DocumentUri;
-  diagnostics: Diagnostic[];
+import "../../css/typewriter.css"
+import { useTranslation } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+import { useAtom, useSetAtom } from "jotai";
+import { gameInfoAtom } from "../../store/query-atoms";
+
+import { DiagnosticSeverity, PublishDiagnosticsParams, DocumentUri } from 'vscode-languageserver-protocol';
+import * as monaco from 'monaco-editor'
+import { levelIdAtom, gameIdAtom, worldIdAtom } from "../../store/location-atoms";
+import { leanMonacoEditorAtom, typewriterContentAtom, interimDiagsAtom, crashedAtom, leanMonacoEditorModelAtom, leanMonacoEditorUriAtom, hasLeanMonacoEditorAtom, lastProofStepErrorCommandAtom, restoreErrorCommandEffect, oneLineEditorAtom, syncTypewriterToEditorEffect, syncEditorPositionEffect, isProcessingAtom, runCommandAtom } from "../../store/editor-atoms";
+import { deletedChatAtom } from '../../store/chat-atoms'
+import { preferencesAtom } from '../../store/preferences-atoms'
+
+import path from "node:path";
+import { proofAtom } from "../../store/editor-atoms";
+import { ExerciseStatement } from "./ExerciseStatement";
+import { ProofStep } from "./ProofStep";
+
+/**
+ * Der Typewriter bestehend aus Eingabezeile, Beweisschritten, Aufgabenstellung und Hintergrundbild
+ */
+export function Typewriter() {
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const [gameId, navigateToGame] = useAtom(gameIdAtom)
+  const [worldId] = useAtom(worldIdAtom)
+  const [proof, setProof ] = useAtom(proofAtom)
+
+  const proofPanelRef = useRef<HTMLDivElement>(null)
+
+  let image = gameInfo?.worlds?.nodes[worldId!]?.image
+
+  return <div className="typewriter-canvas">
+    <div className="typewriter-info">
+      {image && <img className="world-image contain" src={path.join("data", gameId!, image)} alt="" />}
+      <div className="pusher" />
+      <div className='proof' ref={proofPanelRef}>
+        <ExerciseStatement showLeanStatement={true} />
+        {proof?.steps.map((step, i) => <ProofStep step={step} idx={i} />)}
+      </div>
+    </div>
+    <TypewriterCommandLine />
+  </div>
 }
 
 /** The input field */
-export function Typewriter({disabled}: {disabled?: boolean}) {
+export function TypewriterCommandLine() {
   let { t } = useTranslation()
 
-  /** Reference to the hidden multi-line editor */
-  const editor = React.useContext(MonacoEditorContext)
-  const model = editor?.getModel()
-  const uri = model?.uri.toString() ?? ''
-  const hasEditor = Boolean(editor && model)
-
-  const [worldId] = useAtom(worldIdAtom)
-  const [levelId] = useAtom(levelIdAtom)
-
-  const [oneLineEditor, setOneLineEditor] = useState<monaco.editor.IStandaloneCodeEditor>()
-  const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)
-  const [processing, setProcessing] = useState(false)
-
   const [typewriter, setTypewriter] = useAtom(typewriterContentAtom)
+  const [oneLineEditor, setOneLineEditor] = useAtom(oneLineEditorAtom)
+  const [proof] = useAtom(proofAtom)
+  const [isProcessing] = useAtom(isProcessingAtom)
+  const runCommand = useSetAtom(runCommandAtom)
 
-  const inputRef = useRef<HTMLDivElement>()
+  useAtom(syncTypewriterToEditorEffect)
+  useAtom(syncEditorPositionEffect)
+  useAtom(restoreErrorCommandEffect)
 
-  const [proof, setProof] = useAtom(proofAtom)
-  const [interimDiags, setInterimDiags] = useAtom(interimDiagsAtom)
-  const [, setCrashed] = useAtom(crashedAtom)
-
-  // state to store the last batch of deleted messages
-  const [, setDeletedChat] = useAtom(deletedChatAtom)
-
-  const rpcSess = React.useContext(RpcContext)
-
-  // Run the command
-  const runCommand = React.useCallback(() => {
-    if (processing || !hasEditor) {return}
-
-    // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
-    setDeletedChat([])
-
-    const pos = editor.getPosition()
-    if (typewriter) {
-      setProcessing(true)
-      editor.executeEdits("typewriter", [{
-        range: monaco.Selection.fromPositions(
-          pos,
-          editor.getModel()?.getFullModelRange().getEndPosition()
-        ),
-        text: typewriter.trim() + "\n",
-        forceMoveMarkers: false
-      }])
-      setTypewriter('')
-      // Load proof after executing edits
-      loadGoals(rpcSess, uri, worldId!, levelId!, setProof, setCrashed)
-    }
-
-    editor.setPosition(pos)
-  }, [typewriter, editor])
-
-  const [{ isSuggestionsMobileMode }] = useAtom(preferencesAtom)
+  const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
+  const inputRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (oneLineEditor && oneLineEditor.getValue() !== typewriter) {
-      oneLineEditor.setValue(typewriter)
-      oneLineEditor.setPosition({ column: typewriter.length + 1, lineNumber: 1 })
-      isSuggestionsMobileMode || oneLineEditor.focus()
-    }
-  }, [typewriter])
+    console.log("TypewriterCommandLine: Editor initialization useEffect")
 
-  useEffect(() => {
-    if (oneLineEditor && hasEditor) {
-      oneLineEditor.setPosition({ column: editor.getValue().length + 1, lineNumber: 1 })
-      isSuggestionsMobileMode || oneLineEditor.focus()
-    }
-  }, [oneLineEditor, hasEditor, isSuggestionsMobileMode, editor])
-
-  /** If the last step has an error, add the command to the typewriter. */
-  useEffect(() => {
-    if (lastStepHasErrors(proof)) {
-      setTypewriter(proof?.steps[proof?.steps.length - 1].command)
-    }
-  }, [proof])
-
-  // React when answer from the server comes back
-  useServerNotificationEffect('textDocument/publishDiagnostics', (params: PublishDiagnosticsParams) => {
-    if (!hasEditor) {
-      return
-    }
-    if (params.uri == uri) {
-      setProcessing(false)
-
-      const seriousDiags = params.diagnostics.filter(diag =>
-        diag.severity === DiagnosticSeverity.Error || diag.severity === DiagnosticSeverity.Warning
-      )
-      setInterimDiags(seriousDiags)
-      // loadGoals(rpcSess, uri, worldId, levelId, setProof, setCrashed)
-
-      // TODO: loadAllGoals()
-      if (!hasErrors(params.diagnostics)) {
-        //setTypewriterInput("")
-        editor.setPosition(editor.getModel().getFullModelRange().getEndPosition())
-      }
-    } else {
-      // console.debug(`expected uri: ${uri}, got: ${params.uri}`)
-      // console.debug(params)
-    }
-    // TODO: This is the wrong place apparently. Where do wee need to load them?
-    // TODO: instead of loading all goals every time, we could only load the last one
-    // loadAllGoals()
-  }, [uri, hasEditor, editor]);
-
-  // // React when answer from the server comes back
-  // useServerNotificationEffect('$/game/publishDiagnostics', (params: GameDiagnosticsParams) => {
-  //   console.log('Received game diagnostics')
-  //   console.log(`diag. uri : ${params.uri}`)
-  //   console.log(params.diagnostics)
-
-  // }, [uri]);
-
-
-  useEffect(() => {
+    // Guard: only create once
     if (oneLineEditorRef.current) {
+      console.log("Editor already exists, skipping initialization")
       return
     }
-    const myEditor = monaco.editor.create(inputRef.current!, {
+
+    // Guard: wait for DOM element
+    if (!inputRef.current) {
+      console.log("inputRef.current is not ready yet")
+      return
+    }
+
+    const editorConfig: monaco.editor.IStandaloneEditorConstructionOptions = {
       value: typewriter,
       language: "lean4",
       quickSuggestions: false,
-      // lightbulb: {
-      //   enabled: true
-      // },
       unicodeHighlight: {
-          ambiguousCharacters: false,
+        ambiguousCharacters: false,
       },
       automaticLayout: true,
       minimap: {
@@ -179,79 +109,65 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       overviewRulerBorder: false,
       theme: 'vs-code-theme-converted',
       contextmenu: false
-    })
+    }
+
+    console.log("Creating Monaco editor instance...")
+    const myEditor = monaco.editor.create(inputRef.current, editorConfig)
 
     const layoutInput = () => {
       const lineHeight = myEditor.getOption(monaco.editor.EditorOption.lineHeight)
       const height = Math.min(myEditor.getContentHeight(), lineHeight + 2, window.innerHeight / 3)
-      inputRef.current.style.height = `${height}px`
-      myEditor.layout({
-        width: inputRef.current.clientWidth,
-        height
-      })
+      if (inputRef.current) {
+        inputRef.current.style.height = `${height}px`
+        console.log(`Single-line editor width: ${inputRef.current.clientWidth}`)
+        myEditor.layout({
+          width: inputRef.current.clientWidth,
+          height
+        })
+      }
     }
+
     myEditor.onDidContentSizeChange(layoutInput)
     layoutInput()
 
-    oneLineEditorRef.current = myEditor
-    setOneLineEditor(myEditor)
-
-    // const abbrevRewriter = new AbbreviationRewriter(new AbbreviationProvider(), myEditor.getModel(), myEditor)
-
-    return () => {
-      // abbrevRewriter.dispose()
-      myEditor.dispose()
-      oneLineEditorRef.current = null
-      setOneLineEditor(undefined)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!oneLineEditor) return
-    // Ensure that our one-line editor can only have a single line
-    const l = oneLineEditor.getModel()?.onDidChangeContent((e) => {
-      const value = oneLineEditor.getValue()
+    const changeDisposable = myEditor.getModel()?.onDidChangeContent(() => {
+      const value = myEditor.getValue()
+      console.log(`Editor content changed to: "${value}"`)
       setTypewriter(value)
+
+      // Prevent newlines (single-line behavior)
       const newValue = value.replace(/[\n\r]/g, '')
-      if (value != newValue) {
-        oneLineEditor.setValue(newValue)
+      if (value !== newValue) {
+        myEditor.setValue(newValue)
       }
     })
-    return () => {
-      if (typeof (l as any)?.dispose === 'function') {
-        l.dispose()
-      } else if (typeof l === 'function') {
-        l()
-      }
-    }
-  }, [oneLineEditor, setTypewriter])
 
-  useEffect(() => {
-    if (!oneLineEditor) return
-    // Run command when pressing enter (and block newline insertion)
-    const l = oneLineEditor.onKeyDown((ev) => {
+    const keyDownDisposable = myEditor.onKeyDown((ev) => {
       if (ev.code === "Enter" || ev.code === "NumpadEnter") {
         ev.preventDefault()
+        console.log("Enter pressed, running command...")
         runCommand()
       }
     })
-    return () => {
-      if (typeof (l as any)?.dispose === 'function') {
-        l.dispose()
-      } else if (typeof l === 'function') {
-        l()
-      }
-    }
-  }, [oneLineEditor, runCommand])
 
-  // // BUG: Causes `file closed` error
-  // //TODO: Intention is to run once when loading, does that work?
-  // useEffect(() => {
-  //   console.debug(`time to update: ${uri} \n ${rpcSess}`)
-  //   console.debug(rpcSess)
-  //   // console.debug('LOAD ALL GOALS')
-  //   // TODO: loadAllGoals()
-  // }, [rpcSess])
+    oneLineEditorRef.current = myEditor
+    setOneLineEditor(myEditor)
+    console.log("Editor initialized successfully")
+
+    return () => {
+      console.log("Cleaning up editor...")
+      changeDisposable?.dispose()
+      keyDownDisposable?.dispose()
+      myEditor.dispose()
+      oneLineEditorRef.current = null
+      setOneLineEditor(null)
+    }
+  }, [typewriter, setTypewriter, setOneLineEditor, runCommand])
+
+  //const oneLineEditorRef = useRef<any>(null)
+  //const [typewriterContent, setTypewriterContent] = useState("")
+  //const leanMonacoEditor = useAtom(leanMonacoEditorAtom)
+  //let inputRef = getInputRef()
 
   /** Process the entered command */
   const handleSubmit : React.FormEventHandler<HTMLFormElement> = (ev) => {
@@ -260,42 +176,98 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
   }
 
   // do not display if the proof is completed (with potential warnings still present)
-  return <div className={`typewriter${proof?.completedWithWarnings ? ' hidden' : ''}${disabled ? ' disabled' : ''}`}>
+  return <div className="typewriter">
       <form onSubmit={handleSubmit}>
         <div className="typewriter-input-wrapper">
           <div ref={inputRef} className="typewriter-input" />
         </div>
-        <button type="submit" disabled={processing} className="btn btn-inverted">
+        <button type="submit" disabled={false /* TODO */} className="btn btn-inverted">
           <FontAwesomeIcon icon={faWandMagicSparkles} />&nbsp;{t("Execute")}
         </button>
       </form>
     </div>
 }
 
-/** Checks whether the diagnostics contain any errors or warnings to check whether the level has
-   been completed.*/
-export function hasErrors(diags: Diagnostic[]) {
-  return diags.some(
-    (d) =>
-      !d.message.startsWith("unsolved goals") &&
-      (d.severity == DiagnosticSeverity.Error ) // || d.severity == DiagnosticSeverity.Warning
-  )
-}
+export function getInputRef() {
+  const [typewriter, setTypewriter] = useAtom(typewriterContentAtom)
+  const [oneLineEditor, setOneLineEditor] = useAtom(oneLineEditorAtom)
+  // added mutability so oneLineEditorRef.current can be reassigned
+  const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null) as MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>
+  const inputRef = useRef<HTMLDivElement>()
 
-// TODO: Didn't manage to unify this with the one above
-export function hasInteractiveErrors (diags: InteractiveDiagnostic[]) {
-  return (typeof diags !== 'undefined') && diags.some(
-    (d) => (d.severity == DiagnosticSeverity.Error ) // || d.severity == DiagnosticSeverity.Warning
-  )
-}
+  useAtom(syncTypewriterToEditorEffect)
+  useAtom(syncEditorPositionEffect)
 
-export function getInteractiveDiagsAt (proof: ProofState, k : number) {
-  if (k == 0) {
-    return []
-  } else if (k >= proof?.steps.length-1) {
-    // TODO: Do we need that?
-    return proof?.diagnostics.filter(msg => msg.range.start.line >= proof?.steps.length-1)
-  } else {
-    return proof?.diagnostics.filter(msg => msg.range.start.line == k-1)
-  }
+  useEffect(() => {
+    console.log("getInputRef useEffect")
+    if (oneLineEditorRef.current) {
+      console.log("oneLineEditorRef.current is")
+      return
+    }
+
+    const editorConfig: monaco.editor.IStandaloneEditorConstructionOptions = {
+      value: typewriter,
+      language: "lean4",
+      quickSuggestions: false,
+      // lightbulb: {
+      //   enabled: true
+      // },
+      unicodeHighlight: {
+        ambiguousCharacters: false,
+      },
+      automaticLayout: true,
+      minimap: {
+        enabled: false
+      },
+      lineNumbers: 'off',
+      tabSize: 2,
+      wordWrap: 'on',
+      glyphMargin: false,
+      folding: false,
+      lineDecorationsWidth: 0,
+      lineNumbersMinChars: 0,
+      'semanticHighlighting.enabled': true,
+      overviewRulerLanes: 0,
+      hideCursorInOverviewRuler: true,
+      padding: {
+        top: 0,
+        bottom: 0,
+      },
+      scrollbar: {
+        verticalScrollbarSize: 3
+      },
+      scrollBeyondLastLine: false,
+      overviewRulerBorder: false,
+      theme: 'vs-code-theme-converted',
+      contextmenu: false
+    };
+
+    const myEditor = monaco.editor.create(inputRef.current!, editorConfig)
+
+    const layoutInput = () => {
+      const lineHeight = myEditor.getOption(monaco.editor.EditorOption.lineHeight)
+      const height = Math.min(myEditor.getContentHeight(), lineHeight + 2, window.innerHeight / 3)
+      inputRef.current!.style.height = `${height}px`
+      console.log(`width of single line editor: ${inputRef.current!.clientWidth}`)
+      myEditor.layout({
+        width: inputRef.current!.clientWidth,
+        height
+      })
+    }
+
+    myEditor.onDidContentSizeChange(layoutInput)
+    layoutInput()
+
+    oneLineEditorRef.current = myEditor
+    setOneLineEditor(myEditor)
+
+    return () => {
+      // abbrevRewriter.dispose()
+      myEditor.dispose()
+      oneLineEditorRef.current = null
+      setOneLineEditor(null)
+    }
+  }, [])
+
+  return inputRef
 }

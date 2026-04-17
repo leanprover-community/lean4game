@@ -7,14 +7,8 @@ import { CircularProgress } from '@mui/material'
 import type { Location } from 'vscode-languageserver-protocol'
 import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions } from 'lean4monaco'
 import { setupMonacoClient } from 'lean4monaco/dist/monacoleanclient'
-import type { EditorApi, InfoviewApi } from '@leanprover/infoview-api'
-import { EditorContext } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/contexts'
-import { EditorConnection, EditorEvents } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/editorConnection'
-import { EventEmitter } from '../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/event'
 import { Button } from './button'
 import { Markdown } from './markdown'
-import { MonacoEditorContext } from './infoview/context'
-import { DualEditor } from './infoview/main'
 import { DeletedHints, Hint, Hints, MoreHelpButton, filterHints } from './hints'
 import path from 'path';
 
@@ -24,7 +18,6 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import '../css/level.css'
 import { LevelAppBar } from './app_bar'
-import { isLastStepWithErrors, lastStepHasErrors } from './infoview/goals'
 import { useTranslation } from 'react-i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
@@ -35,6 +28,7 @@ import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
 import { deletedChatAtom, helpAtom, selectedStepAtom } from '../store/chat-atoms'
 import { inventoryOverviewAtom } from '../store/inventory-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
+import { GameEditor } from './infoview/GameEditor'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
   const maybeLeanMonaco = leanMonaco as unknown as {
@@ -61,6 +55,13 @@ const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: Lean
     }
   }
 }
+
+//FIXME: implement
+function lastStepHasErrors(x: any) {return false}
+
+
+//FIXME: implement
+function isLastStepWithErrors(x: any, y: any) {return false}
 
 function Level() {
   const { t: gT, i18n } = useGameTranslation()
@@ -199,12 +200,9 @@ function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visible: bo
 }
 
 
-function ExercisePanel({codeviewRef, infoviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, infoviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
-  return <div className={`exercise-panel ${visible ? '' : 'hidden'}`}>
-    <div ref={infoviewRef} className="infoview" style={{display: 'none'}}></div>
-    <div className="exercise">
-      <DualEditor codeviewRef={codeviewRef} />
-    </div>
+function ExercisePanel({codeviewRef, visible=true}: {codeviewRef: React.MutableRefObject<HTMLDivElement>, visible?: boolean}) {
+  return <div className={`exercise-panel exercise ${visible ? '' : 'hidden'}`}>
+    <GameEditor codeviewRef={codeviewRef} />
   </div>
 }
 
@@ -212,7 +210,6 @@ function PlayableLevel() {
   let { t } = useTranslation()
   const { t : gT } = useGameTranslation()
   const codeviewRef = useRef<HTMLDivElement>(null)
-  const infoviewRef = useRef<HTMLDivElement>(null)
   const [leanMonaco] = useAtom(leanMonacoAtom)
   const [gameId] = useAtom(gameIdAtom)
   const [worldId] = useAtom(worldIdAtom)
@@ -236,7 +233,6 @@ function PlayableLevel() {
   function closeInventoryDoc () {setInventoryDoc(null)}
 
   const [leanMonacoEditor, setLeanMonacoEditor] = useState<LeanMonacoEditor|null>(null)
-  const [editorConnection, setEditorConnection] = useState<null|EditorConnection>(null)
 
   // Start the editor
   useEffect(() => {
@@ -250,108 +246,6 @@ function PlayableLevel() {
         await leanMonacoEditor.start(codeviewRef.current!, uriStr, code ?? "")
         console.debug('[demo]: editor started')
         setLeanMonacoEditor(leanMonacoEditor)
-
-        // TODO: old stuff from here on
-
-        const infoProvider = leanMonaco.infoProvider as {
-        editorApi: EditorApi
-        webviewPanel?: { api: InfoviewApi, visible: boolean }
-        sendConfig?: () => Promise<void>
-        sendPosition?: () => Promise<void>
-      } | undefined
-
-      if (!infoProvider?.editorApi) {
-        console.warn('Lean infoview is not ready yet.')
-        return
-      }
-
-      const editorEvents: EditorEvents = {
-        initialize: new EventEmitter(),
-        gotServerNotification: new EventEmitter(),
-        sentClientNotification: new EventEmitter(),
-        serverRestarted: new EventEmitter(),
-        serverStopped: new EventEmitter(),
-        changedCursorLocation: new EventEmitter(),
-        changedInfoviewConfig: new EventEmitter(),
-        runTestScript: new EventEmitter(),
-        requestedAction: new EventEmitter(),
-      }
-
-      const infoviewApi: InfoviewApi = {
-        initialize: async l => editorEvents.initialize.fire(l),
-        gotServerNotification: async (method, params) => {
-          editorEvents.gotServerNotification.fire([method, params])
-        },
-        sentClientNotification: async (method, params) => {
-          editorEvents.sentClientNotification.fire([method, params])
-        },
-        serverRestarted: async r => editorEvents.serverRestarted.fire(r),
-        serverStopped: async serverStoppedReason => {
-          editorEvents.serverStopped.fire(serverStoppedReason)
-        },
-        changedCursorLocation: async loc => editorEvents.changedCursorLocation.fire(loc),
-        changedInfoviewConfig: async conf => editorEvents.changedInfoviewConfig.fire(conf),
-        requestedAction: async action => editorEvents.requestedAction.fire(action),
-        runTestScript: async script => new Function(script)(),
-        getInfoviewHtml: async () => document.body.innerHTML,
-      }
-
-      infoProvider.webviewPanel = {
-        api: infoviewApi,
-        visible: true,
-      }
-
-      const editorConnection = new EditorConnection(infoProvider.editorApi, editorEvents)
-      setEditorConnection(editorConnection)
-
-      const model = leanMonacoEditor.editor?.getModel()
-      const fireCursorLocation = () => {
-        const selection = leanMonacoEditor.editor?.getSelection()
-        const position = leanMonacoEditor.editor?.getPosition()
-        if (!selection || !model) {
-          if (!position || !model) {
-            return
-          }
-          const loc: Location = {
-            uri: model.uri.toString(),
-            range: {
-              start: {
-                line: position.lineNumber - 1,
-                character: position.column - 1,
-              },
-              end: {
-                line: position.lineNumber - 1,
-                character: position.column - 1,
-              },
-            },
-          }
-          editorEvents.changedCursorLocation.fire(loc)
-          return
-        }
-        const loc: Location = {
-          uri: model.uri.toString(),
-          range: {
-            start: {
-              line: selection.startLineNumber - 1,
-              character: selection.startColumn - 1,
-            },
-            end: {
-              line: selection.endLineNumber - 1,
-              character: selection.endColumn - 1,
-            },
-          },
-        }
-        editorEvents.changedCursorLocation.fire(loc)
-      }
-
-      fireCursorLocation()
-      leanMonacoEditor.editor?.onDidChangeCursorSelection(() => {
-        fireCursorLocation()
-      })
-
-      await infoProvider.sendConfig?.()
-      await infoProvider.sendPosition?.()
-
       })()
 
       return () => {
@@ -360,36 +254,10 @@ function PlayableLevel() {
     }
   }, [leanMonaco, worldId, levelId])
 
-  // /** Unused. Was implementing an undo button, which has been replaced by `deleteProof` inside
-  //  * `TypewriterInterface`.
-  //  */
-  // const handleUndo = () => {
-  //   const endPos = leanMonacoEditor?.editor.getModel().getFullModelRange().getEndPosition()
-  //   let range
-  //   console.log(endPos?.column)
-  //   if (endPos?.column === 1) {
-  //     range = monaco.Selection.fromPositions(
-  //       new monaco.Position(endPos.lineNumber - 1, 1),
-  //       endPos
-  //     )
-  //   } else {
-  //     range = monaco.Selection.fromPositions(
-  //       new monaco.Position(endPos.lineNumber, 1),
-  //       endPos
-  //     )
-  //   }
-  //   leanMonacoEditor?.editor.executeEdits("undo-button", [{
-  //     range,
-  //     text: "",
-  //     forceMoveMarkers: false
-  //   }]);
-  // }
-
   // Select and highlight proof steps and corresponding hints
   // TODO: with the new design, there is no difference between the introduction and
   // a hint at the beginning of the proof...
   const [selectedStep, setSelectedStep] = useState<number>()
-
 
   useEffect (() => {
     // Lock editor mode
@@ -398,13 +266,6 @@ function PlayableLevel() {
 
       if (model) {
         let code = model.getLinesContent()
-
-        // console.log(`insert. code: ${code}`)
-        // console.log(`insert. join: ${code.join('')}`)
-        // console.log(`insert. trim: ${code.join('').trim()}`)
-        // console.log(`insert. length: ${code.join('').trim().length}`)
-        // console.log(`insert. range: ${editor.getModel().getFullModelRange()}`)
-
 
         // TODO: It does seem that the template is always indented by spaces.
         // This is a hack, assuming there are exactly two.
@@ -492,37 +353,28 @@ function PlayableLevel() {
   }, [leanMonacoEditor, leanMonacoEditor?.editor, typewriterMode, lockEditorMode])
 
   return <>
-    <div style={levelInfoIsLoading? undefined : {display: "none"}} className="app-content loading"><CircularProgress /></div>
-            <EditorContext.Provider value={editorConnection}>
-              <MonacoEditorContext.Provider value={leanMonacoEditor?.editor}>
-                <LevelAppBar
-                  pageNumber={pageNumber} setPageNumber={setPageNumber}
-                  isLoading={levelInfoIsLoading}
-                  levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${worldId ? gameInfo?.worldSize?.[worldId] ?? "" : ""}` +
-                    (levelInfo?.title && ` : ${gT(levelInfo?.title ?? "")}`)}
-                  />
-                {mobile?
-                  // TODO: This is copied from the `Split` component below...
-                  <>
-                    <div className={`app-content level-mobile ${levelInfoIsLoading ? 'hidden' : ''}`}>
-                      <ExercisePanel
-                        codeviewRef={codeviewRef}
-                        infoviewRef={infoviewRef}
-                        visible={pageNumber == 0} />
-                      <InventoryPanel levelInfo={levelInfo} visible={pageNumber == 1} />
-                    </div>
-                  </>
-                :
-                  <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${levelInfoIsLoading ? 'hidden' : ''}`}>
-                    <ChatPanel lastLevel={lastLevel}/>
-                    <ExercisePanel
-                      codeviewRef={codeviewRef}
-                      infoviewRef={infoviewRef} />
-                    <InventoryPanel levelInfo={levelInfo} />
-                  </Split>
-                }
-              </MonacoEditorContext.Provider>
-            </EditorContext.Provider>
+    { levelInfoIsLoading && <div className="app-content loading"><CircularProgress /></div>}
+    <LevelAppBar
+      pageNumber={pageNumber} setPageNumber={setPageNumber}
+      isLoading={levelInfoIsLoading}
+      levelTitle={(mobile ? "" : t("Level")) + ` ${levelId} / ${worldId ? gameInfo?.worldSize?.[worldId] ?? "" : ""}` +
+        (levelInfo?.title && ` : ${gT(levelInfo?.title ?? "")}`)}
+      />
+    {mobile?
+      // TODO: This is copied from the `Split` component below...
+      <>
+        <div className={`app-content level-mobile ${levelInfoIsLoading ? 'hidden' : ''}`}>
+          <ExercisePanel codeviewRef={codeviewRef} visible={pageNumber == 0} />
+          <InventoryPanel levelInfo={levelInfo} visible={pageNumber == 1} />
+        </div>
+      </>
+    :
+      <Split minSize={0} snapOffset={200} sizes={[25, 50, 25]} className={`app-content level ${levelInfoIsLoading ? 'hidden' : ''}`}>
+        <ChatPanel lastLevel={lastLevel}/>
+        <ExercisePanel codeviewRef={codeviewRef} />
+        <InventoryPanel levelInfo={levelInfo} />
+      </Split>
+    }
   </>
 }
 

@@ -12,7 +12,7 @@ import { RpcContext, useRpcSessionAtPos } from '../../../../node_modules/vscode-
 
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
-import { typewriterModeAtom } from '../../store/editor-atoms'
+import { typewriterModeAtom } from '../client/src/store/editor-atoms'
 
 interface MessageViewProps {
     uri: DocumentUri;
