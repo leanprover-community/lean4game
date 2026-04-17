@@ -18,6 +18,14 @@
   overflow-y: auto;
 }
 
+.typewriter-input {
+  width: 100%;
+  flex: 1;
+  border: 1px solid;
+  align-self: flex-start;
+  margin-top: 0;
+}
+
 .pusher {
   flex: 1;
   min-height: 0;
