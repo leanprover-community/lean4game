@@ -1,15 +1,30 @@
-import { editor } from 'monaco-editor'
-
+import { editor, Selection as selector, } from 'monaco-editor'
 import { atom } from "jotai";
 import { atomEffect } from 'jotai-effect';
-import { LeanMonaco, LeanMonacoOptions, LeanMonacoEditor } from 'lean4monaco'
-import { gameIdAtom } from "./location-atoms";
+import { LeanMonaco, LeanMonacoOptions, LeanMonacoEditor, RpcSessionAtPos} from 'lean4monaco'
+import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
 import { ProofState } from "../../../infoview/rpc_api";
 import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver-types'
 import { preferencesAtom } from './preferences-atoms';
+import { deletedChatAtom } from './chat-atoms';
+import { DocumentPosition } from '../components/infoview/types';
+
+/** The unique leanMonaco instance for the entire application */
+export const leanMonacoAtom = atom<LeanMonaco | null>(null)
+export const leanMonacoEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
+export const oneLineEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
+/** The proof consists of multiple steps that are processed one after the other.
+ * In particular multi-line terms like `match`-statements will not be supported.
+ *
+ * Note that the first step will always have "" as command
+ */
+export const proofAtom = atom<ProofState>()
+export const rpcSessionAtom = atom<RpcSessionAtPos | null>(null)
+export const isProcessingAtom = atom<Boolean>(false)
+export const typewriterContentAtom = atom<string>("")
 
 /** Options for the LeanMonaco instance */
 export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
@@ -26,10 +41,6 @@ export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
     "editor.wordWrap": true,
   }
 }})
-
-export const rpcSessionAtom = atom
-
-export const leanMonacoEditorAtom = atom<editor.IStandaloneCodeEditor>(null as any)
 
 export const leanMonacoEditorModelAtom = atom(
   (get) => {
@@ -52,9 +63,6 @@ export const hasLeanMonacoEditorAtom = atom(
     return Boolean(editor && model)
   })
 
-/** The unique leanMonaco instance for the entire application */
-export const leanMonacoAtom = atom<LeanMonaco | null>(null)
-
 export const codeAtom = atom(
   get => {
     const levelProgress = get(levelProgressAtom)
@@ -66,8 +74,6 @@ export const codeAtom = atom(
     set(levelProgressAtom, { ...levelProgress, code: val })
   }
 )
-
-export const typewriterContentAtom = atom<string>("")
 
 export const selectionsAtom = atom(
   get => {
@@ -105,13 +111,6 @@ export const typewriterModeAtom = atom(
     set(progressAtom, { ...progress, typewriterMode: valMod })
   }
 )
-
-/** The proof consists of multiple steps that are processed one after the other.
- * In particular multi-line terms like `match`-statements will not be supported.
- *
- * Note that the first step will always have "" as command
- */
-export const proofAtom = atom<ProofState>()
 
 export const restoreErrorCommandEffect = atomEffect(
   (get, set) => {
@@ -183,7 +182,6 @@ export const syncTypewriterToEditorEffect = atomEffect(
   }
 )
 
-export const oneLineEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
 
 export const syncEditorPositionEffect = atomEffect(
   (get, set) => {
@@ -202,5 +200,95 @@ export const syncEditorPositionEffect = atomEffect(
     if (!isSuggestionsMobileMode) {
       oneLineEditor.focus()
     }
+  }
+)
+
+export const runCommandAtom = atom(
+  null,
+  (get, set) => {
+    console.log("start running command")
+    const processing = get(isProcessingAtom)
+    const editor = get(oneLineEditorAtom)
+
+    if (!editor){
+      console.log("oneLineEditor not initialized")
+      return
+    }
+
+    const hasEditor = get(hasLeanMonacoEditorAtom)
+    const typewriter = get(typewriterContentAtom)
+
+    if (processing || !hasEditor) {
+      console.log("Editor not available or a process is currently running.")
+      console.log(`Currently running a process: ${processing}`)
+      console.log(`Does Editor exist: ${hasEditor}`)
+      return
+    }
+
+    // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
+    set(deletedChatAtom, [])
+
+    const pos = editor.getPosition()
+
+    if (typewriter) {
+      set(isProcessingAtom, true)
+
+      editor.executeEdits("typewriter", [{
+        range: selector.fromPositions(
+          pos!,
+          editor.getModel()?.getFullModelRange().getEndPosition()
+        ),
+        text: typewriter.trim() + "\n",
+        forceMoveMarkers: false
+      }])
+      set(typewriterContentAtom, '')
+      // Load proof after executing edits
+      set(loadGoalsAtom)
+    }
+
+    editor.setPosition(pos!)
+  }
+)
+
+export const loadGoalsAtom = atom(
+  null,
+  (get, set) => {
+    const rpcSess = get(rpcSessionAtom)
+
+    if (!rpcSess) {
+      console.error("RpcSession is not available");
+      return;
+    }
+
+    const uri = get(leanMonacoEditorUriAtom)
+    const worldId = get(worldIdAtom)
+    const levelId = get(levelIdAtom)
+
+    console.info('sending rpc request to load the proof state')
+    rpcSess.call('Game.getProofState',
+        {
+            ...DocumentPosition.toTdpp({line: 0, character: 0, uri: uri}),
+            worldId, levelId
+        }
+    ).then(
+      (proof: ProofState) => {
+        if (typeof proof !== 'undefined') {
+          console.info(`received a proof state!`)
+          console.log(proof)
+          set(proofAtom, proof)
+          set(crashedAtom, false)
+        } else {
+          console.warn('received undefined proof state!')
+          // Avoid transient crash state while the server warms up.
+        }
+      }
+    ).catch((error: string) => {
+      if (error === 'No connection to Lean') {
+        console.warn(error)
+        return
+      }
+      set(crashedAtom, true)
+      console.warn(error)
+    })
   }
 )
