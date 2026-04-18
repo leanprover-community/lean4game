@@ -74,7 +74,7 @@ Hint (hidden := true) "some hidden hint"
 ## 5. Strict context matching
 
 If you use the attribute `(strict := true)` a hint is only shown if the entire context
-matches exactly the one where the hint is placed. With `(hint := false)`, which is the default,
+matches exactly the one where the hint is placed. With `(strict := false)`, which is the default,
 it does not matter if additional assumptions are present in the player's context.
 
 ```
