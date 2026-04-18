@@ -74,16 +74,15 @@ Hint (hidden := true) "some hidden hint"
 ## 5. Strict context matching
 
 If you use the attribute `(strict := true)` a hint is only shown if the entire context
-matches exactly the one where the hint is placed. With `(hint := false)`, which is the default,
+matches exactly the one where the hint is placed. With `(strict := false)`, which is the default,
 it does not matter if additional assumptions are present in the player's context.
 
 ```
 Hint (strict := true) "now use `have` to create a new assumption."
 ```
 
-You should probably use `(strict := true)` if you want to give fine-grained details about
-tactics like `have` which do not modify the goal or any existing assumptions, but only
-create new assumptions.
+It is recommended to use `(strict := true)` if you want to instruct the user to use tactics like `have`,`by_cases`, and `obtain` which do not modify the goal or any existing assumptions, but only
+create new assumptions ensuring that such a hint only appears once.
 
 ## 6. Formatting
 
