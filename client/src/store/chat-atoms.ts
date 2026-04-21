@@ -1,5 +1,5 @@
 import { atom } from "jotai"
-import { levelProgressAtom, progressAtom } from "./progress-atoms"
+import { levelProgressAtom, progressAtom, defaultLevelProgress } from "./progress-atoms"
 import { GameHint } from "../components/infoview/rpc_api"
 
 /** User read the game introduction. Only relevant on mobile */
@@ -23,7 +23,7 @@ export const helpAtom = atom(
   },
   (get, set, val: Set<number>) => {
     const levelProgress = get(levelProgressAtom)
-    if (!levelProgress) return
+    if (levelProgress == null) return
     set(levelProgressAtom, { ...levelProgress, help: [ ...val ] })
   }
 )
