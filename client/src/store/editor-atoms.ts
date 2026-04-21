@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { LeanMonaco, LeanMonacoOptions } from 'lean4monaco'
 import { gameIdAtom } from "./location-atoms";
-import { levelProgressAtom, progressAtom, defaultLevelProgress } from "./progress-atoms";
+import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
 import { ProofState } from "../components/infoview/rpc_api";
