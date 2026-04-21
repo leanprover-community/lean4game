@@ -22,7 +22,8 @@ export const helpAtom = atom(
     return new Set(levelProgress?.help ?? [])
   },
   (get, set, val: Set<number>) => {
-    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
+    const levelProgress = get(levelProgressAtom)
+    if (levelProgress == null) return
     set(levelProgressAtom, { ...levelProgress, help: [ ...val ] })
   }
 )

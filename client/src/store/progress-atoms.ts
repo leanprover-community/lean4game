@@ -129,7 +129,8 @@ export const completedAtom = atom(
     return levelProgress?.completed ?? false
   },
   (get, set, val: boolean) => {
-    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
+    const levelProgress = get(levelProgressAtom)
+    if (levelProgress == null) return
     set(levelProgressAtom, { ...levelProgress, completed: val })
   }
 )

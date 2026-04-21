@@ -32,7 +32,8 @@ export const codeAtom = atom(
     return levelProgress?.code
   },
   (get, set, val: string) => {
-    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
+    const levelProgress = get(levelProgressAtom)
+    if (levelProgress == null) return
     set(levelProgressAtom, { ...levelProgress, code: val })
   }
 )
@@ -45,7 +46,8 @@ export const selectionsAtom = atom(
     return levelProgress?.selections ?? []
   },
   (get, set, val: Selection[]) => {
-    const levelProgress = get(levelProgressAtom) ?? defaultLevelProgress
+    const levelProgress = get(levelProgressAtom)
+    if (levelProgress == null) return
     set(levelProgressAtom, { ...levelProgress, selections: val })
   }
 )
