@@ -35,6 +35,7 @@ import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
 import { deletedChatAtom, helpAtom, selectedStepAtom } from '../store/chat-atoms'
 import { inventoryOverviewAtom } from '../store/inventory-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
+import { readWorldIntroAtom } from '../store/progress-atoms'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
   const maybeLeanMonaco = leanMonaco as unknown as {
@@ -550,6 +551,7 @@ function IntroductionPanel() {
   const [worldId] = useAtom(worldIdAtom)
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [, navigateToLevel] = useAtom(levelIdAtom)
+  const [, readWorldIntro] = useAtom(readWorldIntroAtom)
 
   const [mobile] = useAtom(mobileAtom)
 
@@ -572,7 +574,7 @@ function IntroductionPanel() {
         <Button onClick={() => {if (gameId) navigateToGame(gameId)}}>
           <FontAwesomeIcon icon={faHome} />
           </Button> :
-        <Button ref={focusRef} onClick={() => navigateToLevel(1)}>
+        <Button ref={focusRef} onClick={() => {readWorldIntro(); navigateToLevel(1)}}>
           {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>
       }

@@ -2,6 +2,7 @@ import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { GameProgress, LevelProgress, Progress, WorldProgress, Selection, DEFAULT_DIFFICULTY } from "./progress-types";
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { atom } from "jotai";
+import { levelProgressAtomFamily } from "./world-tree-atoms";
 
 /**
  * The player's progress is stored in local storage under `game_progress`.
@@ -122,6 +123,12 @@ export const difficultyAtom = atom(
     set(progressAtom, { ...progress, difficulty: val })
   }
 )
+
+export const readWorldIntroAtom = atom(null, (get, set) => {
+  const worldProgress = get(worldProgressAtom)
+  if (worldProgress == null) return
+  set(worldProgressAtom, { ...worldProgress, readIntro: true })
+})
 
 export const completedAtom = atom(
   get => {
