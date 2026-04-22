@@ -81,7 +81,7 @@ it does not matter if additional assumptions are present in the player's context
 Hint (strict := true) "now use `have` to create a new assumption."
 ```
 
-It is recommended to use `(strict := true)` if you want to instruct the user to use tactics like `have`, `cases` ,`by_cases`, `obtain` in a way that does not modify the goal or any existing assumptions, but only creates new assumptions ensuring that such a hint only appears once.
+It is recommended to use `(strict := true)` if you want to instruct the user to use tactics like `have`, `by_cases` etc... in a way that does not modify the goal or any existing assumptions, but only creates new assumptions ensuring that such a hint only appears once.
 
 ## 6. Formatting
 
