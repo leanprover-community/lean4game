@@ -1,11 +1,4 @@
-/**
- *  @fileOverview Defines the interface for the communication with the server.
- *
- * This file is based on `vscode-lean4/vscode-lean4/src/rpcApi.ts`
- */
-import type { Range } from 'vscode-languageserver-protocol';
-import type { ContextInfo, FVarId, CodeWithInfos, MVarId } from '@leanprover/infoview-api';
-import { InteractiveDiagnostic, TermInfo } from '@leanprover/infoview/*';
+import { CodeWithInfos, ContextInfo, FVarId, InteractiveDiagnostic, MVarId, TermInfo } from '@leanprover/infoview-api'
 
 export interface InteractiveHypothesisBundle {
   /** The pretty names of the variables in the bundle. Anonymous names are rendered

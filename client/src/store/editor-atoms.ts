@@ -6,11 +6,10 @@ import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
-import { ProofState } from "../../../infoview/rpc_api";
 import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver-types'
 import { preferencesAtom } from './preferences-atoms';
 import { deletedChatAtom } from './chat-atoms';
-import { DocumentPosition } from '../components/infoview/types';
+import { ProofState } from '../api/rpc_api';
 
 /** The unique leanMonaco instance for the entire application */
 export const leanMonacoAtom = atom<LeanMonaco | null>(null)
