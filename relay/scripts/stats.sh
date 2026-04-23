@@ -3,7 +3,7 @@
 # Load python interpreter
 python=/usr/bin/python3
 # Load python script
-cpu_usage=$CPU_SCRIPT
+cpu_usage=${CPU_SCRIPT:-$(dirname "$0")/cpu_usage.py}
 # Execute python script
 cpu=$($python $cpu_usage)
 # Calculate memory usage by computing (used memory - cached/buffer memory) divided by total memory

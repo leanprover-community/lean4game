@@ -16,7 +16,7 @@ import { gameIdAtom, navigateAcrossWorldsAtom } from '../store/location-atoms'
 import { difficultyAtom } from '../store/progress-atoms'
 import { gameInfoAtom } from '../store/query-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
-import { levelCompletedAtomFamily, worldCompletedAtom, worldDependenciesCompletedAtomFamily } from '../store/world-tree-atoms'
+import { firstIncompleteLevelAtomFamily, levelCompletedAtomFamily, worldCompletedAtom, worldDependenciesCompletedAtomFamily, worldProgressAtomFamily } from '../store/world-tree-atoms'
 
 // Settings for the world tree
 cytoscape.use( klay )
@@ -54,6 +54,7 @@ export function LevelIcon({ world, level, position }:
   const [difficulty] = useAtom(difficultyAtom)
   const [levelUnlocked] = useAtom(levelCompletedAtomFamily(`${world}:${level-1}`))
   const [worldUnlocked] = useAtom(worldDependenciesCompletedAtomFamily(world))
+  const [worldProgress] = useAtom(worldProgressAtomFamily(world))
   const [completed] = useAtom(levelCompletedAtomFamily(`${world}:${level}`))
 
   const unlocked = level <= 1 ? worldUnlocked && levelUnlocked : levelUnlocked
@@ -89,8 +90,14 @@ export function LevelIcon({ world, level, position }:
     // spiraling case
     s * position.y - Math.cos(level * betaSpiral(level)) * (R + 2*r*(level-1)/(NSPIRAL+1))
 
+  // Show world intro if it hasn't been read so far
+  let targetLevel = level
+  if (level <= 1) {
+    targetLevel = (worldProgress?.readIntro) ? 1 : 0
+  }
+
   return (
-    <a onClick={() => {if (!levelDisabled) navigateAcrossWorlds(world, level == 1 ? 0 : level)}}
+    <a onClick={() => {if (!levelDisabled) navigateAcrossWorlds(world, targetLevel)}}
         className={`level${levelDisabled ? ' disabled' : ''}`}>
       <circle fill={completed ? lightgreen : unlocked? blue : lightgrey} cx={x} cy={y} r={r} />
       <foreignObject className="level-title-wrapper" x={x} y={y}
@@ -118,6 +125,7 @@ export function WorldIcon({world, title, position}:
   const [unlocked] = useAtom(worldDependenciesCompletedAtomFamily(world))
   const [completed] = useAtom(worldCompletedAtom(world))
   const worldDisabled = (difficulty >= 2 && !(unlocked || completed))
+  const [firstUncompleted] = useAtom(firstIncompleteLevelAtomFamily(world))
   const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
 
   // See level icons. Match radius computed there minus `1.2*r`
@@ -131,7 +139,7 @@ export function WorldIcon({world, title, position}:
   let labelOffset = R + 2.5 * r
 
   return <a
-      onClick={() => {if (!worldDisabled) navigateAcrossWorlds(world, 0)}}
+      onClick={() => {if (!worldDisabled) navigateAcrossWorlds(world, firstUncompleted)}}
       className={`world${worldDisabled ? ' disabled' : ''}`}>
     <circle className="world-circle" cx={s*position.x} cy={s*position.y} r={R}
         fill={completed ? green : unlocked ? blue : grey}/>

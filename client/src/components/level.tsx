@@ -28,6 +28,7 @@ import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
 import { deletedChatAtom, helpAtom, selectedStepAtom } from '../store/chat-atoms'
 import { inventoryOverviewAtom } from '../store/inventory-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
+import { readWorldIntroAtom } from '../store/progress-atoms'
 import { GameEditor } from './infoview/GameEditor'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
@@ -216,7 +217,7 @@ function PlayableLevel() {
   const [levelId] = useAtom(levelIdAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
   const [mobile] = useAtom(mobileAtom)
-  const [code] = useAtom(codeAtom)
+  const [code, setCode] = useAtom(codeAtom)
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [{ data: levelInfo, isLoading: levelInfoIsLoading }] = useAtom(levelInfoAtom)
   // Only for mobile layout
@@ -253,6 +254,23 @@ function PlayableLevel() {
       }
     }
   }, [leanMonaco, worldId, levelId])
+
+  // Persist editor text into progress whenever the model changes.
+  useEffect(() => {
+    const editor = leanMonacoEditor?.editor
+    if (!editor) {
+      return
+    }
+
+    setCode(editor.getValue())
+    const disposable = editor.onDidChangeModelContent(() => {
+      setCode(editor.getValue())
+    })
+
+    return () => {
+      disposable.dispose()
+    }
+  }, [leanMonacoEditor?.editor, setCode])
 
   // Select and highlight proof steps and corresponding hints
   // TODO: with the new design, there is no difference between the introduction and
@@ -385,6 +403,7 @@ function IntroductionPanel() {
   const [worldId] = useAtom(worldIdAtom)
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [, navigateToLevel] = useAtom(levelIdAtom)
+  const [, readWorldIntro] = useAtom(readWorldIntroAtom)
 
   const [mobile] = useAtom(mobileAtom)
 
@@ -407,7 +426,7 @@ function IntroductionPanel() {
         <Button onClick={() => {if (gameId) navigateToGame(gameId)}}>
           <FontAwesomeIcon icon={faHome} />
           </Button> :
-        <Button ref={focusRef} onClick={() => navigateToLevel(1)}>
+        <Button ref={focusRef} onClick={() => {readWorldIntro(); navigateToLevel(1)}}>
           {t("Start")}&nbsp;<FontAwesomeIcon icon={faArrowRight} />
         </Button>
       }
