@@ -42,11 +42,15 @@ export const worldCompletedAtom = atomFamily((worldId: string) => atom<boolean>(
 }))
 
 /** The first uncompleted level or `0` */
-export const firstIncompleteLevel = atomFamily((worldId: string) => atom<number>(get => {
+export const firstIncompleteLevelAtomFamily = atomFamily((worldId: string) => atom<number>(get => {
+  // note: `findIndex` returns `-1` on failure
   const firstIncompleteLevel = get(levelsCompletedAtomFamily(worldId)).findIndex(it => !it)
-  // note: `findIndex` returns `-1` on failure, therefore the indices
-  // `-1, 0, 1` indicate all that the introduction should be shown
-  return firstIncompleteLevel >= 1 ? firstIncompleteLevel : 0
+
+  if (firstIncompleteLevel > 1) return firstIncompleteLevel
+
+  const readIntro = get(worldProgressAtomFamily(worldId))?.readIntro
+
+  return readIntro ? 1 : 0
 }))
 
 /** A world is unlocked if all dependency worlds have been completed */
