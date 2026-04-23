@@ -493,9 +493,7 @@ def getLevel? (levelId : LevelId) : m (Option GameLevel) := do
     | dbg_trace "no game id" return none
   let some world := game.worlds.nodes.get? levelId.world
     | dbg_trace "no world id" return none
-  let some level := world.levels.get? levelId.level
-    | dbg_trace "no level id" return none
-  return level
+  return world.levels.get? levelId.level
 
 def getCurGame [Monad m] : m Game := do
   let some game ← getGame? (← getCurGameId)

@@ -1,28 +1,20 @@
 msgid ""
 msgstr "Project-Id-Version: Game v4.29.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-21\n"
+"POT-Creation-Date: 2026-04-23\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
 
-#: Game.Levels.DemoWorld
-msgid "Test World"
-msgstr ""
-
-#: GameServer.RpcHandlers
-msgid "level completed with warnings… 🎭"
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "Test Level"
-msgstr ""
-
 #. §0: `ℕ`
 #: Game.Levels.DemoWorld.L01_HelloWorld
 msgid "Commutativity on §0"
+msgstr ""
+
+#: Game.Levels.DemoWorld
+msgid "Test World"
 msgstr ""
 
 #: GameServer.RpcHandlers
@@ -32,6 +24,48 @@ msgstr ""
 #. §0: $\\textbf{LaTeX}$
 #: Game.Levels.DemoWorld.L01_HelloWorld
 msgid "This is a test level. There can be §0"
+msgstr ""
+
+#: GameServer.RpcHandlers
+msgid "intermediate goal solved! 🎉"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L02_HypothesisNames
+#: Game.Levels.DemoWorld.L03_NonProp
+msgid "Done!"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "Addition"
+msgstr ""
+
+#: Game
+msgid "This is a test game."
+msgstr ""
+
+#: Game
+#: Game
+msgid "Test Game"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "An equality"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L03_NonProp
+msgid "now apply!"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L03_NonProp
+msgid "intro first!"
+msgstr ""
+
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "Test Level"
+msgstr ""
+
+#: GameServer.RpcHandlers
+msgid "level completed with warnings… 🎭"
 msgstr ""
 
 #: Game.Levels.DemoWorld.L01_HelloWorld
@@ -44,22 +78,18 @@ msgstr ""
 msgid "You should use §0 now."
 msgstr ""
 
-#: GameServer.RpcHandlers
-msgid "intermediate goal solved! 🎉"
-msgstr ""
-
-#: Game.Levels.DemoWorld.L02_HypothesisNames
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "Done!"
-msgstr ""
-
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "Non-Prop-Valued"
+#. §0: `«{h}»`
+#: Game.Levels.DemoWorld.L01_HelloWorld
+msgid "Maybe you should use §0 now."
 msgstr ""
 
 #: Game.Levels.DemoWorld.L02_HypothesisNames
 #: Game.Levels.DemoWorld.L03_NonProp
 msgid "This is a test level."
+msgstr ""
+
+#: Game.Levels.DemoWorld.L03_NonProp
+msgid "Non-Prop-Valued"
 msgstr ""
 
 #: Game
@@ -70,33 +100,12 @@ msgstr ""
 msgid "This last message appears if the level is solved."
 msgstr ""
 
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "Addition"
-msgstr ""
-
-#: Game
-msgid "This is a test game."
-msgstr ""
-
 #: Game
 msgid "This is the introduction text of the game."
 msgstr ""
 
-#: Game
-#: Game
-msgid "Test Game"
-msgstr ""
-
 #: Game.Levels.DemoWorld.L02_HypothesisNames
 msgid "Hypothesis Names"
-msgstr ""
-
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "now apply!"
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "An equality"
 msgstr ""
 
 #: Game.Levels.DemoWorld
@@ -107,8 +116,4 @@ msgstr ""
 #. §1: `«{g}»`
 #: Game.Levels.DemoWorld.L01_HelloWorld
 msgid "You can either start using §0 or §1."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "intro first!"
 msgstr ""

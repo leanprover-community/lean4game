@@ -82,7 +82,7 @@ describe('Basic Lean4Game Features', () => {
       cy.contains('x + x = 4', { timeout: 10000 }).should('be.visible')
 
       // Check that the progressive hint appears
-      cy.contains('You should use h now').should('be.visible')
+      cy.contains('Maybe you should use h now').should('be.visible')
     })
 
     it('should show goal and hint in editor mode', () => {
