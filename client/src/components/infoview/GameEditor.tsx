@@ -19,7 +19,7 @@ export function GameEditor({ codeviewRef } : { codeviewRef: React.MutableRefObje
 
   return <>
     <ExerciseStatement showLeanStatement={true} />
-    <div ref={codeviewRef} className={'codeview'} />
+    <div ref={codeviewRef} className='codeview' />
     <div className='infoview' ref={infoviewRef} />
     {typewriterMode && <Typewriter />}
   </>
