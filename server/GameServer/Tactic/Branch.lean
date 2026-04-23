@@ -9,6 +9,10 @@ open Lean Elab I18n
 proof state. We use it to define Hints for alternative proof methods or dead ends. -/
 elab (name := Branch) "Branch" t:tacticSeq : tactic => do
   let b ← saveState
+
+  let envBefore ← getEnv
+  let translationStateBefore := untranslatedKeysExt.getState envBefore
+
   Tactic.evalTactic t
 
   -- Show an info whether the branch proofs all remaining goals.
@@ -21,9 +25,10 @@ elab (name := Branch) "Branch" t:tacticSeq : tactic => do
 
   -- data to keep
   let msgs ← Core.getMessageLog
-  let env ← getEnv
-  let gameExtState := gameExt.getState env
-  let translationExtState := untranslatedKeysExt.getState env
+  let envAfter ← getEnv
+  let gameExtState := gameExt.getState envAfter
+  let translationStateAfter := untranslatedKeysExt.getState envAfter
+  let newHints := translationStateAfter.drop translationStateBefore.size
 
   -- restore state
   b.restore
@@ -31,4 +36,6 @@ elab (name := Branch) "Branch" t:tacticSeq : tactic => do
   -- add data which should be kept
   Core.setMessageLog msgs
   modifyEnv (fun env => gameExt.setState env gameExtState)
-  modifyEnv (fun env => untranslatedKeysExt.setState env translationExtState)
+
+  for hint in newHints do
+    modifyEnv (fun env => untranslatedKeysExt.addEntry env hint)

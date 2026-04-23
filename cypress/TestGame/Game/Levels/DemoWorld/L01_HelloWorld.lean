@@ -14,7 +14,7 @@ Statement (h : x = 2) (g: y = 4) : x + x = y := by
         using `{h}` or `{g}`."
   Branch
     rw [g]
-    Hint "You should use `{h}` now."
+    Hint "Maybe you should use `{h}` now."
     rw [h]
   rw [h]
   Hint "You should use `{g}` now."
