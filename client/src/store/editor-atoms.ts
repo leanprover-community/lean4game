@@ -1,7 +1,7 @@
 import { editor, Selection as selector, } from 'monaco-editor'
 import { atom } from "jotai";
 import { atomEffect } from 'jotai-effect';
-import { LeanMonaco, LeanMonacoOptions, LeanMonacoEditor, RpcSessionAtPos} from 'lean4monaco'
+import { LeanMonaco, LeanMonacoOptions, LeanMonacoEditor, RpcSessionAtPos, DocumentPosition} from 'lean4monaco'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
@@ -13,16 +13,22 @@ import { ProofState } from '../api/rpc_api';
 
 /** The unique leanMonaco instance for the entire application */
 export const leanMonacoAtom = atom<LeanMonaco | null>(null)
+
 export const leanMonacoEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
+
 export const oneLineEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
+
 /** The proof consists of multiple steps that are processed one after the other.
  * In particular multi-line terms like `match`-statements will not be supported.
  *
  * Note that the first step will always have "" as command
  */
 export const proofAtom = atom<ProofState>()
+
 export const rpcSessionAtom = atom<RpcSessionAtPos | null>(null)
+
 export const isProcessingAtom = atom<Boolean>(false)
+
 export const typewriterContentAtom = atom<string>("")
 
 /** Options for the LeanMonaco instance */
@@ -114,7 +120,6 @@ export const typewriterModeAtom = atom(
 export const restoreErrorCommandEffect = atomEffect(
   (get, set) => {
     const errorCommand = get(lastProofStepErrorCommandAtom)
-
     if (errorCommand) {
       set(typewriterContentAtom, errorCommand)
     }
@@ -127,9 +132,7 @@ export const lastProofStepHasErrorsAtom = atom(
     if (!proof?.steps.length) {
       return false
     }
-
     let diags = [...proof.steps[proof.steps.length - 1].diags, ...proof.diagnostics]
-
     return diags.some(
       (d) => (d.severity == DiagnosticSeverity.Error)
     )
@@ -140,11 +143,9 @@ export const lastProofStepErrorCommandAtom = atom(
   (get) => {
     const proof = get(proofAtom)
     const hasErrors = get(lastProofStepHasErrorsAtom)
-
     if (!hasErrors || !proof?.steps) {
       return null
     }
-
     return proof.steps[proof.steps.length - 1].command
   }
 )
