@@ -27,7 +27,6 @@ elab (name := Branch) "Branch" t:tacticSeq : tactic => do
   let msgs ← Core.getMessageLog
   let envAfter ← getEnv
   let gameExtState := gameExt.getState envAfter
-
   let translationStateAfter := untranslatedKeysExt.getState envAfter
   let newHints := translationStateAfter.drop translationStateBefore.size
 
