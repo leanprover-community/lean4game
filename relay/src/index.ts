@@ -19,6 +19,9 @@ const gameManager = new GameManager(__dirname)
 const PORT = process.env.PORT || 8080
 const API = process.env.API_PORT
 
+const environment = process.env.NODE_ENV;
+const isDevelopment = environment === 'development';
+
 let router = express.Router();
 router.get('/import/status/:owner/:repo', importStatus)
 router.get('/import/trigger/:owner/:repo', importTrigger)
@@ -100,6 +103,63 @@ const server = app
         console.error(`[${new Date()}] stats.sh exited with code ${code}. Error: ${errorData}`)
       }
     })
+  })
+  // endpoint `games`: list of available games for landing page
+  .use('/api/games', async (req: any, res: any) => {
+    try {
+      const games = [];
+
+      // TODO: should be a config file
+      const featuredGameNames = [
+        {owner: "leanprover-community", game: "nng4"},
+        {owner: "hhu-adam", game: "robo"},
+        {owner: "alexkontorovich", game: "realanalysisgame"},
+        {owner: "djvelleman", game: "stg4"},
+        {owner: "trequetrum", game: "lean4game-logic"},
+        {owner: "emilyriehl", game: "reintroductiontoproofs"},
+        {owner: "jadabouhawili", game: "knightsandknaves-lean4game"},
+        {owner: "zrtmrh", game: "linearalgebragame"}
+      ]
+
+      // Load featured games
+      for (const entry of featuredGameNames) {
+        const gameJsonPath = path.join(__dirname, "..", "..", "..", "games", entry.owner, entry.game, ".lake", "gamedata", "game.json")
+        let gameJson : any;
+          try {
+            const raw = await fs.promises.readFile(gameJsonPath, "utf-8");
+            gameJson = JSON.parse(raw);
+          } catch (err) {
+            continue
+          }
+          games.push({owner: entry.owner, game: entry.game, tile: gameJson.tile})
+      }
+
+      // Load local games
+      if (isDevelopment){
+        const BASE_DIR = path.join(__dirname, "..", "..", "..", "..")
+        const entries = await fs.promises.readdir(BASE_DIR, {
+          withFileTypes: true,
+        });
+
+        for (const entry of entries) {
+          if (!entry.isDirectory()) continue;
+          const gameJsonPath = path.join(BASE_DIR, entry.name, ".lake", "gamedata", "game.json");
+          let gameJson : any;
+          try {
+            const raw = await fs.promises.readFile(gameJsonPath, "utf-8");
+            gameJson = JSON.parse(raw);
+          } catch (err) {
+            continue
+          }
+          games.push({owner: "local", game: entry.name, tile: gameJson.tile})
+        }
+      }
+
+      res.json(games);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to load game tiles" });
+    }
   })
   .use('/', router)
   .listen(PORT, () => console.log(`Server listening on ${PORT}`));

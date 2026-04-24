@@ -19,5 +19,5 @@
     "skipLibCheck": true,
     "sourceMap": true
   },
-  "include": ["./src/"]
+  "include": ["./src/", "src/config.json"]
 }

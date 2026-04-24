@@ -16,6 +16,12 @@ export interface GameTile {
   image: string
 }
 
+export interface GameTileWithName {
+  owner: string
+  game: string
+  tile: GameTile
+}
+
 export interface GameInfo {
   title?: string,
   introduction: string,
