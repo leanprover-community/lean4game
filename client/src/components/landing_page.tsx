@@ -19,18 +19,16 @@ import { navOpenAtom } from '../store/navigation-atoms';
 import { gameIdAtom } from '../store/location-atoms';
 import { gameInfoAtomFamily } from '../store/query-atoms';
 import { preferencesAtom } from '../store/preferences-atoms';
+import { gameTilesAtom } from '../store/tiles-atoms';
+import { GameTileWithName } from '../store/api';
 
-function Tile({gameId}: {gameId: string}) {
+function Tile({tileWithName}: {tileWithName: GameTileWithName}) {
   const { t, i18n } = useTranslation()
-  const [{ data: gameInfo }] = useAtom(gameInfoAtomFamily(gameId))
   const [, navigateToGame] = useAtom(gameIdAtom)
   const [preferences] = useAtom(preferencesAtom)
 
-  const gameTile = gameInfo?.tile
-
-  if (!gameTile) {
-    return <></>
-  }
+  const gameTile = tileWithName.tile
+  const gameId = `g/${tileWithName.owner}/${tileWithName.game}`
 
   return <div className="game" onClick={() => navigateToGame(gameId)}>
       <div className="wrapper">
@@ -77,6 +75,7 @@ function Tile({gameId}: {gameId: string}) {
 function LandingPage() {
   const [, setPopup] = useAtom(popupAtom)
   const [navOpen] = useAtom(navOpenAtom)
+  const [tiles] = useAtom(gameTilesAtom)
 
   const [usageCPU, setUsageCPU] = React.useState<number>()
   const [usageMem, setUsageMem] = React.useState<number>()
@@ -86,8 +85,7 @@ function LandingPage() {
   const { t, i18n } = useTranslation()
 
   // Load the namespaces of all games
-  // TODO: should `allGames` contain game-ids starting with `g/`?
-  i18n.loadNamespaces(lean4gameConfig.allGames.map(id => `g/${id}`))
+  i18n.loadNamespaces(tiles.map(tileWithName => `g/${tileWithName.owner}/${tileWithName.game}`))
 
   /** Parse `games/stats.csv` if present and display server capacity. */
   React.useEffect(() => {
@@ -126,12 +124,12 @@ function LandingPage() {
     </header>
     <div className="game-list">
       {
-      lean4gameConfig.allGames.map((id, i) => (
-          <Tile
-            key={id}
-            gameId={`g/${id}`}
+      tiles.map((tileWithName, i) => {
+          return <Tile
+            key={tileWithName.owner + tileWithName.game}
+            tileWithName={tileWithName}
           />
-        ))
+        })
       }
       {/* {allTiles.filter(x => x != null).length == 0 ?
         <p>

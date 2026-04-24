@@ -1,15 +1,4 @@
 {
-  "allGames": [
-    "leanprover-community/nng4",
-    "hhu-adam/robo",
-    "alexkontorovich/realanalysisgame",
-    "djvelleman/stg4",
-    "trequetrum/lean4game-logic",
-    "emilyriehl/reintroductiontoproofs",
-    "jadabouhawili/knightsandknaves-lean4game",
-    "zrtmrh/linearalgebragame"
-  ],
-
   "languages": [
     {
       "iso": "en",
