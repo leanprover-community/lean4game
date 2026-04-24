@@ -340,13 +340,17 @@ export function WorldTreePanel() {
 
   let dx = bounds ? s*(bounds.x2 - bounds.x1) + 2*padding : 100
 
-  return <div className="column">
+  return (
+    <div className="panel">
       <WorldSelectionMenu />
-      <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
-          width={bounds ? `${ds * dx}` : ''}
-          viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
-          className="world-selection" >
-        {svgElements}
-      </svg>
-  </div>
+      <div className="world-tree">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
+            width={bounds ? `${ds * dx}` : ''}
+            viewBox={bounds ? `${s*bounds.x1 - padding} ${s*bounds.y1 - padding} ${dx} ${s*(bounds.y2 - bounds.y1) + 2 * padding}` : ''}
+            className="world-selection" >
+          {svgElements}
+        </svg>
+      </div>
+    </div>
+  )
 }

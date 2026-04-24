@@ -19,30 +19,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDeleteLeft, faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 
-import { Markdown } from '../markdown';
+import { Markdown } from '../client/src/components/markdown';
 
 import { Infos } from './infos';
 import { Errors, WithLspDiagnosticsContext } from './messages';
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from './goals';
 import { MonacoEditorContext } from './context';
 import { Typewriter, getInteractiveDiagsAt, hasInteractiveErrors } from './typewriter';
-import { Button } from '../button';
+import { Button } from '../client/src/components/button';
 import { CircularProgress } from '@mui/material';
 import { GameHint, InteractiveGoalsWithHints, ProofState } from './rpc_api';
-import { Hint, Hints, MoreHelpButton, filterHints } from '../hints';
+import { Hint, Hints, MoreHelpButton, filterHints } from '../client/src/components/hints';
 import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-infoview/src/infoview/util';
 import { DiagnosticSeverity } from 'vscode-languageclient';
 import { useTranslation } from 'react-i18next';
 import path from 'path';
-import { useGameTranslation } from '../../utils/translation';
+import { useGameTranslation } from '../client/src/utils/translation';
 import { useAtom } from 'jotai';
-import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms';
-import { completedAtom } from '../../store/progress-atoms';
-import { gameInfoAtom, levelInfoAtom } from '../../store/query-atoms';
-import { crashedAtom, interimDiagsAtom, lockEditorModeAtom, proofAtom, typewriterContentAtom, typewriterModeAtom } from '../../store/editor-atoms';
-import { inventoryAtom } from '../../store/inventory-atoms';
-import { mobileAtom } from '../../store/preferences-atoms';
-import { deletedChatAtom, helpAtom, selectedStepAtom } from '../../store/chat-atoms';
+import { gameIdAtom, levelIdAtom, worldIdAtom } from '../client/src/store/location-atoms';
+import { completedAtom } from '../client/src/store/progress-atoms';
+import { gameInfoAtom, levelInfoAtom } from '../client/src/store/query-atoms';
+import { crashedAtom, interimDiagsAtom, lockEditorModeAtom, proofAtom, typewriterContentAtom, typewriterModeAtom } from '../client/src/store/editor-atoms';
+import { inventoryAtom } from '../client/src/store/inventory-atoms';
+import { mobileAtom } from '../client/src/store/preferences-atoms';
+import { deletedChatAtom, helpAtom, selectedStepAtom } from '../client/src/store/chat-atoms';
 
 /** Wrapper for the two editors. It is important that the `div` with `codeViewRef` is
  * always present, or the monaco editor cannot start.
@@ -127,38 +127,6 @@ function DualEditorMain() {
         </WithRpcSessions>
       </VersionContext.Provider>
     </ConfigContext.Provider>
-  </>
-}
-
-/** The mathematical formulation of the statement, supporting e.g. Latex
- * It takes three forms, depending on the precence of name and description:
- * - Theorem xyz: description
- * - Theorem xyz
- * - Exercises: description
- *
- * If `showLeanStatement` is true, it will additionally display the lean code.
- */
-function ExerciseStatement({ showLeanStatement = false }) {
-  const { t : gT } = useGameTranslation()
-  const { t } = useTranslation()
-  const [gameId] = useAtom(gameIdAtom)
-  const [{ data: levelInfo }] = useAtom(levelInfoAtom)
-
-  if (!(levelInfo?.descrText || levelInfo?.descrFormat)) { return <></> }
-  return <>
-    <div className="exercise-statement">
-      {levelInfo?.descrText ?
-        <Markdown>
-          {(levelInfo?.displayName ? `**${t("Theorem")}** \`${levelInfo?.displayName}\`: ` : '') + t(levelInfo?.descrText, {ns: gameId})}
-        </Markdown> : levelInfo?.displayName &&
-        <Markdown>
-          {(levelInfo?.displayName ? `**${t("Theorem")}** \`${levelInfo?.displayName}\`: ` : '') + gT(levelInfo?.descrText ?? "")}
-        </Markdown>
-      }
-      {levelInfo?.descrFormat && showLeanStatement &&
-        <p><code className="lean-code">{levelInfo?.descrFormat}</code></p>
-      }
-    </div>
   </>
 }
 

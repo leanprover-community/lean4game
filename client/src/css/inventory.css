@@ -1,14 +1,9 @@
-.inventory-panel {
-  position: relative;
-}
 
 .inventory-panel .documentation {
   position: absolute;
   display: block;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
   z-index: 10;
   background-color: white;
 }
@@ -26,8 +21,8 @@
   font-size: .7rem;
 }
 
-.inventory, .inventory-panel .documentation {
-  padding: 0 1em 1em 1em;
+.inventory-list {
+  padding: 0 1em;
 }
 
 .inventory h2, .inventory-panel .documentation h2, .inventory-panel .documentation h1 {
@@ -45,12 +40,6 @@
   transition: display 2s;
 }
 
-.inventory-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  flex-wrap : wrap;
-}
 
 .inventory .item {
   background: #fff;

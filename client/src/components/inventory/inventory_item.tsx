@@ -2,7 +2,6 @@ import { faBan, faCheck, faClipboard, faLock, faReply } from "@fortawesome/free-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useAppendTypewriterInput } from "../infoview/context"
 import { InventoryTile } from "../../store/api"
 import { useAtom } from "jotai"
 import { selectedDocTileAtom } from "../../store/inventory-atoms"
@@ -30,7 +29,12 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
 
   const [inserted, setInserted] = useState(false)
 
-  const appendTypewriterInput = useAppendTypewriterInput()
+  // const appendTypewriterInput = useAppendTypewriterInput()
+
+  // FIXME: implement
+  function appendTypewriterInput(a: any, b: any, c: any, d: any) {}
+
+
   const handleClick = (ev: any) => {setDoc(tile)}
 
   const insertItemName = (ev: any) => {

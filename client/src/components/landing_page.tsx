@@ -61,7 +61,7 @@ function Tile({tileWithName}: {tileWithName: GameTileWithName}) {
               if (preferences.useFlags && langOpt?.flag) {
                 return <ReactCountryFlag key={`flag-${lang}`} title={langOpt.name} countryCode={langOpt.flag} className="emojiFlag"/>
               } else {
-                return <span title={langOpt?.name}>{lang}</span>
+                return <span key={`iso-${lang}`} title={langOpt?.name}>{lang}</span>
               }
             })}
           </td>

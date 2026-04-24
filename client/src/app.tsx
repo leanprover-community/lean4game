@@ -9,6 +9,10 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
+import './css/infoview.css'
+import "./css/tab_bar.css"
+import "./css/layout.css"
+
 import i18n from './i18n';
 import { Popup } from './components/popup/popup';
 import { leanMonacoAtom, leanMonacoOptionsAtom } from './store/editor-atoms';
@@ -17,7 +21,6 @@ import { preferencesAtom } from './store/preferences-atoms';
 
 function App({ children }: { children?: React.ReactNode }) {
 
-  const infoviewRef = useRef<HTMLDivElement>(null)
   const [leanMonaco, setLeanMonaco] = useAtom(leanMonacoAtom)
   const [leanMonacoOptions] = useAtom(leanMonacoOptionsAtom)
   const [preferences] = useAtom(preferencesAtom)
@@ -30,7 +33,6 @@ function App({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
     const _leanMonaco = new LeanMonaco()
     setLeanMonaco(_leanMonaco)
-    _leanMonaco.setInfoviewElement(infoviewRef.current!)
 
     ;(async () => {
       await _leanMonaco.start(leanMonacoOptions)
@@ -45,12 +47,12 @@ function App({ children }: { children?: React.ReactNode }) {
   }, [leanMonacoOptions, setLeanMonaco])
 
   return (
-    <div className="app">
+    <>
       <React.Suspense>
         {children}
       </React.Suspense>
       <Popup />
-    </div>
+    </>
   )
 }
 

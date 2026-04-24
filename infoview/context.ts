@@ -5,9 +5,9 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { InteractiveDiagnostic } from '@leanprover/infoview-api';
 import { InteractiveTermGoal,InteractiveGoalsWithHints } from './rpc_api';
-import { Preferences, preferencesAtom } from '../../store/preferences-atoms';
+import { Preferences, preferencesAtom } from '../client/src/store/preferences-atoms';
 import { useAtom } from 'jotai';
-import { typewriterContentAtom } from '../../store/editor-atoms';
+import { typewriterContentAtom } from '../client/src/store/editor-atoms';
 
 export const MonacoEditorContext = React.createContext<monaco.editor.IStandaloneCodeEditor>(
   null as any)

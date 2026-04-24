@@ -18,8 +18,8 @@ import { InteractiveTermGoal, InteractiveGoals, ProofState } from './rpc_api'
 import { MonacoEditorContext, InfoStatus } from './context'
 import { useTranslation } from 'react-i18next'
 import { useAtom } from 'jotai'
-import { levelIdAtom, worldIdAtom } from '../../store/location-atoms'
-import { proofAtom, typewriterModeAtom } from '../../store/editor-atoms'
+import { levelIdAtom, worldIdAtom } from '../client/src/store/location-atoms'
+import { proofAtom, typewriterModeAtom } from '../client/src/store/editor-atoms'
 
 // TODO: All about pinning could probably be removed
 type InfoKind = 'cursor' | 'pin'

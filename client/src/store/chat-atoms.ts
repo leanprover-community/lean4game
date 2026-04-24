@@ -1,6 +1,6 @@
 import { atom } from "jotai"
 import { levelProgressAtom, progressAtom, defaultLevelProgress } from "./progress-atoms"
-import { GameHint } from "../components/infoview/rpc_api"
+import { GameHint } from "../../../infoview/rpc_api"
 
 /** User read the game introduction. Only relevant on mobile */
 export const readGameIntroAtom = atom(

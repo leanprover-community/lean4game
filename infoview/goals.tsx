@@ -16,10 +16,10 @@ import { DocumentPosition } from '../../../../node_modules/vscode-lean4/lean4-in
 import { DiagnosticSeverity } from 'vscode-languageserver-protocol';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
-import { gameIdAtom } from '../../store/location-atoms';
-import { typewriterModeAtom } from '../../store/editor-atoms';
-import { gameInfoAtom } from '../../store/query-atoms';
-import { mobileAtom } from '../../store/preferences-atoms';
+import { gameIdAtom } from '../client/src/store/location-atoms';
+import { typewriterModeAtom } from '../client/src/store/editor-atoms';
+import { gameInfoAtom } from '../client/src/store/query-atoms';
+import { mobileAtom } from '../client/src/store/preferences-atoms';
 
 /** Returns true if `h` is inaccessible according to Lean's default name rendering. */
 function isInaccessibleName(h: string): boolean {
