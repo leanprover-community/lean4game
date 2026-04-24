@@ -13,5 +13,5 @@ const gameTilesQueryAtom = atomWithQuery<GameTileWithName[]>((get) => {
   }
 })
 
-/** Tiles aller verfügbaren Spiele */
+/** Tiles of all available games */
 export const gameTilesAtom = atom(get => get(gameTilesQueryAtom).data ?? [])
