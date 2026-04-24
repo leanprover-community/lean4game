@@ -23,7 +23,7 @@
     "jotai-effect": "^2.2.3",
     "jotai-location": "^0.6.2",
     "jotai-tanstack-query": "^0.11.0",
-    "lean4monaco": "^1.1.10",
+    "lean4monaco": "^1.1.13",
     "monaco-editor-wrapper": "^5.3.1",
     "react": "^18.2.0",
     "react-country-flag": "^3.1.0",

@@ -10,6 +10,10 @@ import * as monaco from 'monaco-editor'
 import { typewriterContentAtom, restoreErrorCommandEffect, oneLineEditorAtom, syncTypewriterToEditorEffect, syncEditorPositionEffect, isProcessingAtom, runCommandAtom } from "../../../store/editor-atoms";
 import { proofAtom } from "../../../store/editor-atoms";
 
+// bitte schön :)
+import { RpcSessions } from "@leanprover/infoview-api";
+import { WithRpcSessions } from "lean4monaco";
+
 /** The input field */
 export function TypewriterCommandLine() {
   let { t } = useTranslation()
