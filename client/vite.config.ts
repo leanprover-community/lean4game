@@ -69,6 +69,9 @@ export default defineConfig({
       '/data': {
         target: `http://localhost:${backendPort}`,
       },
+      '/api': {
+        target: `http://localhost:${backendPort}`,
+      },
       '/i18n': {
         target: `http://localhost:${backendPort}`,
       },
