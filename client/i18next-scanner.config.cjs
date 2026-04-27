@@ -68,12 +68,11 @@ function flush(done) {
   done();
 }
 
-
 module.exports = {
   input: [
-    'client/src/**/*.{tsx,ts}',
+    'src/**/*.{tsx,ts}',
     // Use ! to filter out files or directories
-    '!client/i18n/**',
+    '!i18n/**',
     '!**/node_modules/**',
   ],
   options: {
@@ -111,8 +110,8 @@ module.exports = {
       return ''; // Return empty string for other languages
     },
     resource: {
-      loadPath: './client/public/locales/{{lng}}/{{ns}}.json',
-      savePath: './client/public/locales/{{lng}}/{{ns}}.json',
+      loadPath: './public/locales/{{lng}}/{{ns}}.json',
+      savePath: './public/locales/{{lng}}/{{ns}}.json',
       jsonIndent: 2,
       lineEnding: '\n'
     },
