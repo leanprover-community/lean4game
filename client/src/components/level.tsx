@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { useAtom } from 'jotai'
-import { codeAtom, leanMonacoAtom, lockEditorModeAtom, proofAtom, selectionsAtom, typewriterModeAtom } from '../store/editor-atoms'
+import { codeAtom, leanMonacoAtom, leanMonacoEditorAtom, lockEditorModeAtom, proofAtom, typewriterModeAtom } from '../store/editor-atoms'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../store/location-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
 import { deletedChatAtom, helpAtom, selectedStepAtom } from '../store/chat-atoms'
@@ -233,7 +233,7 @@ function PlayableLevel() {
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string} | null>(null)
   function closeInventoryDoc () {setInventoryDoc(null)}
 
-  const [leanMonacoEditor, setLeanMonacoEditor] = useState<LeanMonacoEditor|null>(null)
+  const [leanMonacoEditor, setLeanMonacoEditor] = useAtom(leanMonacoEditorAtom)//useState<LeanMonacoEditor|null>(null)
 
   // Start the editor
   useEffect(() => {
@@ -246,7 +246,7 @@ function PlayableLevel() {
         console.debug('[demo]: starting editor')
         await leanMonacoEditor.start(codeviewRef.current!, uriStr, code ?? "")
         console.debug('[demo]: editor started')
-        setLeanMonacoEditor(leanMonacoEditor)
+        setLeanMonacoEditor(leanMonacoEditor.editor)
       })()
 
       return () => {
@@ -257,7 +257,7 @@ function PlayableLevel() {
 
   // Persist editor text into progress whenever the model changes.
   useEffect(() => {
-    const editor = leanMonacoEditor?.editor
+    const editor = leanMonacoEditor //?.editor
     if (!editor) {
       return
     }
@@ -270,7 +270,7 @@ function PlayableLevel() {
     return () => {
       disposable.dispose()
     }
-  }, [leanMonacoEditor?.editor, setCode])
+  }, [leanMonacoEditor, setCode]) //[leanMonacoEditor?.editor, setCode])
 
   // Select and highlight proof steps and corresponding hints
   // TODO: with the new design, there is no difference between the introduction and
@@ -280,7 +280,7 @@ function PlayableLevel() {
   useEffect (() => {
     // Lock editor mode
     if (levelInfo?.template) {
-      const model = leanMonacoEditor?.editor?.getModel()
+      const model = leanMonacoEditor?.getModel()//leanMonacoEditor?.editor?.getModel()
 
       if (model) {
         let code = model.getLinesContent()
@@ -291,7 +291,8 @@ function PlayableLevel() {
           console.debug(`inserting template:\n${levelInfo?.template}`)
           // TODO: This does not work! HERE
           // Probably overwritten by a query to the server
-          leanMonacoEditor?.editor.executeEdits("template-writer", [{
+          // DOC: REMOVED editor here
+          leanMonacoEditor?.executeEdits("template-writer", [{
             range: model.getFullModelRange(),
             text: levelInfo?.template + `\n`,
             forceMoveMarkers: true
@@ -302,7 +303,7 @@ function PlayableLevel() {
       }
     } else {
     }
-  }, [levelInfo, levelId, worldId, gameId, leanMonacoEditor?.editor])
+  }, [levelInfo, levelId, worldId, gameId, leanMonacoEditor]) //[levelInfo, levelId, worldId, gameId, leanMonacoEditor?.editor])
 
 
   useEffect(() => {
@@ -313,7 +314,7 @@ function PlayableLevel() {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    const editor = leanMonacoEditor?.editor;
+    const editor = leanMonacoEditor //?.editor;
     const selection = editor?.getSelection();
     if (!typewriterMode && editor && selection) {
       // Delete last input attempt from command line
@@ -322,7 +323,7 @@ function PlayableLevel() {
         text: "",
         forceMoveMarkers: false
       }]);
-      leanMonacoEditor?.editor.focus()
+      leanMonacoEditor?.focus() // leanMonacoEditor?.editor.focus()
     }
   }, [typewriterMode])
 
@@ -344,10 +345,11 @@ function PlayableLevel() {
 
   // Effect when command line mode gets enabled
   useEffect(() => {
-    const model = leanMonacoEditor?.editor?.getModel()
+    const model = leanMonacoEditor?.getModel() //.editor?.getModel()
     if (model&& (typewriterMode)) {
       let code = model.getLinesContent().filter(line => line.trim())
-      leanMonacoEditor?.editor.executeEdits("typewriter", [{
+      // REMOVED .editor call
+      leanMonacoEditor?.executeEdits("typewriter", [{
         range: model.getFullModelRange(),
         text: code.length ? code.join('\n') + '\n' : '',
         forceMoveMarkers: true
@@ -368,7 +370,7 @@ function PlayableLevel() {
       //   editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
       // }
     }
-  }, [leanMonacoEditor, leanMonacoEditor?.editor, typewriterMode, lockEditorMode])
+  }, [leanMonacoEditor, leanMonacoEditor, typewriterMode, lockEditorMode]) //[leanMonacoEditor, leanMonacoEditor?.editor, typewriterMode, lockEditorMode])
 
   return <>
     { levelInfoIsLoading && <div className="app-content loading"><CircularProgress /></div>}

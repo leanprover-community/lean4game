@@ -1,7 +1,8 @@
 import { editor, Selection as selector, } from 'monaco-editor'
 import { atom } from "jotai";
 import { atomEffect } from 'jotai-effect';
-import { LeanMonaco, LeanMonacoOptions, LeanMonacoEditor, RpcSessionAtPos, DocumentPosition} from 'lean4monaco'
+import { LeanMonaco, LeanMonacoOptions, LeanMonacoEditor, DocumentPosition} from 'lean4monaco'
+import { RpcSessionAtPos } from 'lean4monaco/dist/vscode-lean4/lean4-infoview-api/src/rpcSessions'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
@@ -10,6 +11,9 @@ import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver-types'
 import { preferencesAtom } from './preferences-atoms';
 import { deletedChatAtom } from './chat-atoms';
 import { ProofState } from '../api/rpc_api';
+import { EditorConnection } from '../components/infoview/editor/EditorConnection';
+
+export const editorConnectionAtom = atom<EditorConnection | null>(null)
 
 /** The unique leanMonaco instance for the entire application */
 export const leanMonacoAtom = atom<LeanMonaco | null>(null)
@@ -64,7 +68,9 @@ export const leanMonacoEditorUriAtom = atom(
 export const hasLeanMonacoEditorAtom = atom(
   (get) => {
     const editor = get(leanMonacoEditorAtom)
+    console.log(`hasLeanMonacoEditorAtom: editor state is ${editor}`)
     const model = get(leanMonacoEditorModelAtom)
+    console.log(`hasLeanMonacoEditorAtom: model state is ${model}`)
     return Boolean(editor && model)
   })
 
