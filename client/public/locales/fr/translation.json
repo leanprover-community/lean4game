@@ -1,28 +1,14 @@
 {
-  "Caption": {
-    "translation": "Serveur de jeux Lean"
-  },
-  "Subcaption": {
-    "description": "Un répertoire de jeux d'apprentissage pour l'assistant de preuve <1>Lean</1> <i>(Lean 4)</i> et sa bibliothèque mathématique <2>mathlib</2>"
-  },
-  "Development notes": {
-    "translation": "Notes de développement",
-    "description": "<p>La plupart des aspects des jeux et de l'infrastructure sont encore en développement. N'hésitez pas à créer un <1>GitHub Issue</1> pour tout problème que vous rencontrez !</p>"
-  },
-  "Adding new games": {
-    "translation": "Ajouter de nouveaux jeux",
-    "description": "Si vous envisagez d'écrire votre propre jeu, vous devriez utiliser le <1>GameSkeleton Github Repo</1> comme modèle et lire <2>Comment créer un jeu</2>.<p>Vous pouvez directement charger vos jeux sur le serveur et y jouer en utilisant l'URL correcte. Les <3>instructions ci-dessus</3> expliquent également les détails pour charger votre jeu sur le serveur. Nous vous encourageons à nous contacter si vous avez des questions.</p><p>Les jeux en vedette sur cette page sont ajoutés manuellement. Contactez-nous et nous ajouterons volontiers le vôtre.</p>"
-  },
-  "Funding": {
-    "translation": "Financement"
-  },
-  "Server capacity": {
-    "translation": "Capacité du serveur",
-    "description": "<p>Comme ce serveur exécute Lean sur nos machines universitaires, il a une capacité limitée. Nous estimons que notre configuration permettra de prendre en charge environ 50 parties simultanées à haute performance et jusqu'à 180 parties simultanées à un rythme plus lent.</p>"
-  },
-  "No Games": {
-    "description": "Aucun jeu chargé. Utilisez <1>http://localhost:3000/#/g/local/FOLDER</1> pour ouvrir un jeu directement depuis un dossier local."
-  },
+  "Caption.translation": "Serveur de jeux Lean",
+  "Subcaption.description": "Un répertoire de jeux d'apprentissage pour l'assistant de preuve <1>Lean</1> <i>(Lean 4)</i> et sa bibliothèque mathématique <2>mathlib</2>",
+  "Development notes.translation": "Notes de développement",
+  "Development notes.description": "<p>La plupart des aspects des jeux et de l'infrastructure sont encore en développement. N'hésitez pas à créer un <1>GitHub Issue</1> pour tout problème que vous rencontrez !</p>",
+  "Adding new games.translation": "Ajouter de nouveaux jeux",
+  "Adding new games.description": "Si vous envisagez d'écrire votre propre jeu, vous devriez utiliser le <1>GameSkeleton Github Repo</1> comme modèle et lire <2>Comment créer un jeu</2>.<p>Vous pouvez directement charger vos jeux sur le serveur et y jouer en utilisant l'URL correcte. Les <3>instructions ci-dessus</3> expliquent également les détails pour charger votre jeu sur le serveur. Nous vous encourageons à nous contacter si vous avez des questions.</p><p>Les jeux en vedette sur cette page sont ajoutés manuellement. Contactez-nous et nous ajouterons volontiers le vôtre.</p>",
+  "Funding.translation": "Financement",
+  "Server capacity.translation": "Capacité du serveur",
+  "Server capacity.description": "<p>Comme ce serveur exécute Lean sur nos machines universitaires, il a une capacité limitée. Nous estimons que notre configuration permettra de prendre en charge environ 50 parties simultanées à haute performance et jusqu'à 180 parties simultanées à un rythme plus lent.</p>",
+  "No Games.description": "Aucun jeu chargé. Utilisez <1>http://localhost:3000/#/g/local/FOLDER</1> pour ouvrir un jeu directement depuis un dossier local.",
   "Intro": "Introduction",
   "Game Introduction": "Introduction au jeu",
   "Start": "Commencer",
