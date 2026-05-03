@@ -1,28 +1,14 @@
 {
-  "Caption": {
-    "translation": "Servidor de Juegos de Lean"
-  },
-  "Subcaption": {
-    "description": "Un repositorio de juegos educativos sobre el asistente de demostración <1>Lean</1>, <i>(Lean 4)</i> y su librería matemática <5>mathlib</5> "
-  },
-  "Development notes": {
-    "translation": "Notas de desarrollo",
-    "description": "<p>La mayoría de los aspectos de los juegos y la infrastructura siguen en desarrollo. Por favor, reporta cualquier problema que encuentres en <1>GitHub</1>.</p>"
-  },
-  "Adding new games": {
-    "translation": "Cómo añadir juegos",
-    "description": "Si quieres escribir tu propio juego, utiliza el repositorio de GitHub <1>GameSkeleton</1> como plantilla y lee el tutorial sobre <2>cómo crear un juego</2>.<p>Puedes cargar tus juegos directamente al servidor y jugarlos usando la URL adecuada. Las <3>instrucciones anteriores</3> también detallan cómo cargar tus juegos al servidor. Si tienes preguntas, puedes ponerte en contacto con nosotros.</p><p>Los juegos en esta página son añadidos manualmente. Por favor, contáctanos y añadiremos el tuyo con gusto.</p>"
-  },
-  "Funding": {
-    "translation": "Financiación"
-  },
-  "Server capacity": {
-    "translation": "Capacidad del servidor",
-    "description": "<p>Como este servidor corre en máquinas de nuestra universidad, tiene una capacidad limitada. Estimamos que nuestra configuración admitirá alrededor de 50 partidas simultáneas con un alto rendimiento y hasta 180 partidas simultáneas a un ritmo más lento.</p>."
-  },
-  "No Games": {
-    "description": "No se ha cargado ningún juego. Usa <1>http://localhost:3000/#/g/local/FOLDER</1> para abrir un juego directamente desde una carpeta local"
-  },
+  "Caption.translation": "Servidor de Juegos de Lean",
+  "Subcaption.description": "Un repositorio de juegos educativos sobre el asistente de demostración <1>Lean</1>, <i>(Lean 4)</i> y su librería matemática <5>mathlib</5> ",
+  "Development notes.translation": "Notas de desarrollo",
+  "Development notes.description": "<p>La mayoría de los aspectos de los juegos y la infrastructura siguen en desarrollo. Por favor, reporta cualquier problema que encuentres en <1>GitHub</1>.</p>",
+  "Adding new games.translation": "Cómo añadir juegos",
+  "Adding new games.description": "Si quieres escribir tu propio juego, utiliza el repositorio de GitHub <1>GameSkeleton</1> como plantilla y lee el tutorial sobre <2>cómo crear un juego</2>.<p>Puedes cargar tus juegos directamente al servidor y jugarlos usando la URL adecuada. Las <3>instrucciones anteriores</3> también detallan cómo cargar tus juegos al servidor. Si tienes preguntas, puedes ponerte en contacto con nosotros.</p><p>Los juegos en esta página son añadidos manualmente. Por favor, contáctanos y añadiremos el tuyo con gusto.</p>",
+  "Funding.translation": "Financiación",
+  "Server capacity.translation": "Capacidad del servidor",
+  "Server capacity.description": "<p>Como este servidor corre en máquinas de nuestra universidad, tiene una capacidad limitada. Estimamos que nuestra configuración admitirá alrededor de 50 partidas simultáneas con un alto rendimiento y hasta 180 partidas simultáneas a un ritmo más lento.</p>.",
+  "No Games.description": "No se ha cargado ningún juego. Usa <1>http://localhost:3000/#/g/local/FOLDER</1> para abrir un juego directamente desde una carpeta local",
   "Intro": "Introducción",
   "Game Introduction": "Introducción al juego",
   "Start": "Empezar",
