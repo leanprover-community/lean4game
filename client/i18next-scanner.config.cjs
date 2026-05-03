@@ -77,7 +77,16 @@ module.exports = {
   ],
   options: {
     debug: true,
-    removeUnusedKeys: true,
+    /**
+     * For example, the return value of a `TabTitle` element is
+     * subject to translation, but it is removed because it cannot
+     * be detected by i18next-scanner.
+     * 
+     * The relevant section will be displayed as a warning when
+     * `npm run translate` is executed, and resolving the warning
+     * will restore it to `true`.
+     */
+    removeUnusedKeys: false,
     func: {
       list: ['i18next.t', 'i18n.t', 't'],
       extensions: ['.js', '.jsx'] // not .ts or .tsx since we use i18next-scanner-typescript!
@@ -147,5 +156,4 @@ module.exports = {
       done();
     }
   ),
-
 };
