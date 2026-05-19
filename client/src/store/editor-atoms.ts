@@ -75,7 +75,7 @@ export const currentRpcSessionAtom = atom<RpcSessionAtPos>()
 /** The editor powering the typewriter (single line) input */
 export const oneLineEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
 
-/** Query which receives the goals throughout the proof over RPC */
+/** The analysied proof, received over RPC  */
 export const proofQueryAtom = atomWithQuery<ProofState>((get) => {
   const worldId = get(worldIdAtom)
   const levelId = get(levelIdAtom)
@@ -84,7 +84,6 @@ export const proofQueryAtom = atomWithQuery<ProofState>((get) => {
   return {
     queryKey: ['proof', worldId, levelId, rpcSess?.sessionId, code],
     queryFn: async () => {
-      console.debug('refetching...')
       if (!rpcSess) return undefined
       const res = await rpcSess.client.sendRequest(
         '$/lean/rpc/call',
@@ -358,48 +357,5 @@ export const runCommandAtom = atom(
     }
 
     editor.setPosition(pos!)
-  }
-)
-
-export const loadGoalsAtom = atom(
-  null,
-  (get, set) => {
-    const rpcSess = get(currentRpcSessionAtom)
-
-    if (!rpcSess) {
-      console.error("RpcSession is not available");
-      return;
-    }
-
-    const uri = get(leanMonacoEditorUriAtom)
-    const worldId = get(worldIdAtom)
-    const levelId = get(levelIdAtom)
-
-    console.info('sending rpc request to load the proof state')
-    rpcSess.call('Game.getProofState',
-        {
-            ...DocumentPosition.toTdpp({line: 0, character: 0, uri: uri}),
-            worldId, levelId
-        }
-    ).then(
-      (proof: unknown) => {
-        if (typeof proof !== 'undefined') {
-          console.info(`received a proof state!`)
-          console.log(proof)
-          set(proofAtom, proof as any) // TODO
-          set(crashedAtom, false)
-        } else {
-          console.warn('received undefined proof state!')
-          // Avoid transient crash state while the server warms up.
-        }
-      }
-    ).catch((error: string) => {
-      if (error === 'No connection to Lean') {
-        console.warn(error)
-        return
-      }
-      set(crashedAtom, true)
-      console.warn(error)
-    })
   }
 )

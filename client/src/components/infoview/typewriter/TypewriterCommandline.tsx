@@ -11,31 +11,18 @@ import { typewriterContentAtom, oneLineEditorAtom,  runCommandAtom, codeAtom, mo
 import { proofAtom } from "../../../store/editor-atoms";
 
 import { twMerge } from "tailwind-merge";
-import { DocumentPosition } from "lean4monaco";
 import { levelIdAtom, worldIdAtom } from "../../../store/location-atoms";
-import { ProofState } from "../../../api/rpc_api";
+import { deletedChatAtom } from "../../../store/chat-atoms";
 
 /** The input field */
 export function TypewriterCommandLine() {
   let { t } = useTranslation()
-  const [worldId] = useAtom(worldIdAtom)
-  const [levelId] = useAtom(levelIdAtom)
   const [isProcessing, setProcessing] = useState(false)
   const [oneLineEditor, setOneLineEditor] = useAtom(oneLineEditorAtom)
   const [model] = useAtom(modelAtom)
-  const [uri] = useAtom(uriAtom)
   const [code] = useAtom(codeAtom)
-  const [rpcSess] = useAtom(currentRpcSessionAtom)
-  const [proof, setProof] = useAtom(proofAtom)
-
-
-
+  const [, setDeletedChatAtom] = useAtom(deletedChatAtom)
   const [typewriter, setTypewriter] = useAtom(typewriterContentAtom)
-
-  // useAtom(syncTypewriterToEditorEffect)
-  // useAtom(syncEditorPositionEffect)
-  // useAtom(restoreErrorCommandEffect)
-
   const oneLineEditorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const inputRef = useRef<HTMLDivElement>(null)
 
@@ -46,11 +33,6 @@ export function TypewriterCommandLine() {
       handleSubmit()
     }
   }
-
-  //const oneLineEditorRef = useRef<any>(null)
-  //const [typewriterContent, setTypewriterContent] = useState("")
-  //const leanMonacoEditor = useAtom(editorAtom)
-  //let inputRef = getInputRef()
 
   /** Wrapper to set the typewriter to processing. */
   function handleSubmit(ev?: FormEvent<HTMLFormElement>) {
@@ -69,13 +51,15 @@ export function TypewriterCommandLine() {
     const newCode = oldCode.length > 0 ? `${oldCode}\n${content}\n` : `${content}\n`
     model?.setValue(newCode)
 
+    // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
+    setDeletedChatAtom([])
+
     // Clear typewriter
     oneLineEditor?.getModel()?.setValue('')
   }
 
+  // start the editor used in the typewriter command line
   useEffect(() => {
-    console.log("TypewriterCommandLine: Editor initialization useEffect")
-
     // Guard: only create once
     if (oneLineEditorRef.current) {
       console.log("Editor already exists, skipping initialization")
