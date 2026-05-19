@@ -7,12 +7,12 @@ import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import { useAtom, useSetAtom } from "jotai";
 
 import * as monaco from 'monaco-editor'
-import { typewriterContentAtom, restoreErrorCommandEffect, oneLineEditorAtom, syncTypewriterToEditorEffect, syncEditorPositionEffect, isProcessingAtom, runCommandAtom } from "../../../store/editor-atoms";
+import { typewriterContentAtom, restoreErrorCommandEffect, oneLineEditorAtom, syncTypewriterToEditorEffect, syncEditorPositionEffect, isProcessingAtom, runCommandAtom, editorConnectionAtom, rpcSessionAtPosAtom, leanMonacoEditorModelAtom, rpcSessionsAtom } from "../../../store/editor-atoms";
 import { proofAtom } from "../../../store/editor-atoms";
 
 // bitte schön :)
-import { RpcSessions } from "@leanprover/infoview-api";
-import { WithRpcSessions } from "lean4monaco";
+// Diese imports habe ich doch woanders gebraucht
+import { DocumentPosition, RpcSessionAtPos, RpcSessions} from "lean4monaco";
 
 /** The input field */
 export function TypewriterCommandLine() {
@@ -147,13 +147,13 @@ export function TypewriterCommandLine() {
 
   // do not display if the proof is completed (with potential warnings still present)
   return <div className="typewriter">
-      <form onSubmit={handleSubmit}>
-        <div className="typewriter-input-wrapper">
-          <div ref={inputRef} className="typewriter-input" />
-        </div>
-        <button type="submit" disabled={false /* TODO */} className="btn btn-inverted">
-          <FontAwesomeIcon icon={faWandMagicSparkles} />&nbsp;{t("Execute")}
-        </button>
-      </form>
-    </div>
+        <form onSubmit={handleSubmit}>
+          <div className="typewriter-input-wrapper">
+            <div ref={inputRef} className="typewriter-input" />
+          </div>
+          <button type="submit" disabled={false /* TODO */} className="btn btn-inverted">
+            <FontAwesomeIcon icon={faWandMagicSparkles} />&nbsp;{t("Execute")}
+          </button>
+        </form>
+      </div>
 }
