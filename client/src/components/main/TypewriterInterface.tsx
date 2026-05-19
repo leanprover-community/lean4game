@@ -8,7 +8,7 @@ import { gameIdAtom, levelIdAtom, worldIdAtom } from "../../store/location-atoms
 import { gameInfoAtom } from "../../store/query-atoms"
 import { deletedChatAtom, helpAtom, selectedStepAtom } from "../../store/chat-atoms"
 import { mobileAtom } from "../../store/preferences-atoms"
-import { crashedAtom, editorConnectionAtom, interimDiagsAtom, leanMonacoEditorAtom, proofAtom, rpcSessionAtPosAtom, typewriterContentAtom } from "../../store/editor-atoms"
+import { crashedAtom, editorConnectionAtom, interimDiagsAtom, editorAtom, proofAtom, rpcSessionAtPosAtom, typewriterContentAtom } from "../../store/editor-atoms"
 import { Goal, isLastStepWithErrors, lastStepHasErrors, loadGoals } from "../../../../infoview/goals"
 import { filterHints, Hint, Hints, MoreHelpButton } from "../hints"
 import { GameHint } from "../infoview/types"
@@ -37,7 +37,7 @@ export function TypewriterInterface() {
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [help, setHelp] = useAtom(helpAtom)
 
-  const [editor] = useAtom(leanMonacoEditorAtom)//React.useContext(MonacoEditorContext)
+  const [editor] = useAtom(editorAtom)//React.useContext(MonacoEditorContext)
   const model = editor?.getModel()
   const uri = model?.uri.toString() ?? ''
 

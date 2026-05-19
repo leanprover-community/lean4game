@@ -2,7 +2,7 @@
 
 import { useTranslation } from "react-i18next";
 import { useGameTranslation } from "../../utils/translation";
-import { crashedAtom, editorConnectionAtom, leanMonacoEditorAtom, lockEditorModeAtom, proofAtom, serverVersionAtom, typewriterModeAtom } from "../../store/editor-atoms";
+import { crashedAtom, editorConnectionAtom, editorAtom, lockEditorModeAtom, proofAtom, serverVersionAtom, typewriterModeAtom } from "../../store/editor-atoms";
 import { useAtom } from "jotai";
 import React from "react";
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "../../store/location-atoms";
@@ -36,7 +36,7 @@ export function Main() {
   const [proof, setProof] = useAtom(proofAtom)
   const [, setCrashed] = useAtom(crashedAtom)
   const [selectedStep, setSelectedStep] = useAtom(selectedStepAtom)
-  const [editor,] = useAtom(leanMonacoEditorAtom)//React.useContext(MonacoEditorContext)
+  const [editor,] = useAtom(editorAtom)//React.useContext(MonacoEditorContext)
   const [, setServerVersion] = useAtom(serverVersionAtom)
   const model = editor?.getModel()
   const uri = model?.uri.toString()

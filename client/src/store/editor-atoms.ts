@@ -1,8 +1,7 @@
 import { editor, Selection as selector, } from 'monaco-editor'
 import { atom } from "jotai";
 import { atomEffect } from 'jotai-effect';
-import { LeanMonaco, LeanMonacoOptions, LeanMonacoEditor, DocumentPosition} from 'lean4monaco'
-import { RpcSessionAtPos, RpcSessions } from 'lean4monaco/dist/vscode-lean4/lean4-infoview-api/src/rpcSessions'
+import { LeanMonaco, LeanMonacoOptions, DocumentPosition, RpcSessionAtPos, LeanClient} from 'lean4monaco'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
@@ -11,9 +10,121 @@ import { Diagnostic, DiagnosticSeverity, DocumentUri } from 'vscode-languageserv
 import { preferencesAtom } from './preferences-atoms';
 import { deletedChatAtom } from './chat-atoms';
 import { ProofState } from '../api/rpc_api';
-import { EditorConnection } from "lean4monaco/dist/vscode-lean4/lean4-infoview/src/infoview/editorConnection"
-import { ServerVersion }  from 'lean4monaco/dist/vscode-lean4/lean4-infoview/src/infoview/serverVersion'
+
 import { defaultInfoviewConfig, InfoviewConfig, LeanFileProgressProcessingInfo } from '@leanprover/infoview-api';
+import { atomWithQuery } from 'jotai-tanstack-query';
+import { Rpc } from 'lean4monaco/dist/vscode-lean4/vscode-lean4/src/rpc';
+
+/** The code of the current level as stored in local storage.
+ *
+ * The setter must not be used directly, expect inside the
+ * listener which listens to changes of the editor's content.
+ * This is because the editor won't update leading to inconsistent state.
+ *
+ * Instead, use `codeAtom` to set the editor's content and the code
+ * in storage.
+*/
+export const codeStorageAtom = atom(
+  get => {
+    const levelProgress = get(levelProgressAtom)
+    return levelProgress?.code
+  },
+  (get, set, val: string) => {
+    const levelProgress = get(levelProgressAtom)
+    if (levelProgress == null) return
+    set(levelProgressAtom, { ...levelProgress, code: val })
+  }
+)
+
+/** The unique leanMonaco instance for the entire application */
+export const leanMonacoAtom = atom<LeanMonaco | null>(null)
+
+/** The active client. lean4game only uses one client simultaneously */
+export const clientAtom = atom<LeanClient>()
+//   get => {
+//   const clients = get(leanMonacoAtom)?.clientProvider?.getClients() ?? []
+//   return clients?.[0]
+// })
+
+/** The current (multiline) editor */
+export const editorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
+
+/** The model of the current editor */
+export const modelAtom = atom(get => get(editorAtom)?.getModel() ?? undefined)
+
+/**
+ * The code of the current level as stored in local storage.
+ *
+ * Can be used to manually update the editor's content which
+ * in turn keeps the code in local storage up to date.
+*/
+export const codeAtom = atom(
+  get => get(codeStorageAtom),
+  (get, set, val: string) => {
+    const model = get(modelAtom)
+    model?.setValue(val)
+  }
+)
+
+/** The URI of the currently opened file */
+export const uriAtom = atom(get => get(modelAtom)?.uri)
+
+/** The currently used RPC session */
+export const currentRpcSessionAtom = atom<RpcSessionAtPos>()
+
+/** The editor powering the typewriter (single line) input */
+export const oneLineEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
+
+/** Query which receives the goals throughout the proof over RPC */
+export const proofQueryAtom = atomWithQuery<ProofState>((get) => {
+  const worldId = get(worldIdAtom)
+  const levelId = get(levelIdAtom)
+  const code = get(codeStorageAtom)
+  const rpcSess = get(currentRpcSessionAtom)
+  return {
+    queryKey: ['proof', worldId, levelId, rpcSess?.sessionId, code],
+    queryFn: async () => {
+      console.debug('refetching...')
+      if (!rpcSess) return undefined
+      const res = await rpcSess.client.sendRequest(
+        '$/lean/rpc/call',
+        {
+          method: "Game.getProofState",
+          params: {
+            textDocument: {uri: rpcSess.uri},
+            position: {line: 0, character: 0},
+            worldId,
+            levelId,
+          },
+          textDocument: {uri: rpcSess.uri},
+          position: {line: 0, character: 0},
+          sessionId: rpcSess.sessionId
+        }
+      )
+      return res
+    },
+    enabled: rpcSess?.sessionId != undefined && code != undefined && worldId != undefined && levelId != undefined
+  }
+})
+
+/**
+ * The proof consists of multiple steps that are processed one after the other.
+ * In particular multi-line terms like `match`-statements will not be supported.
+ *
+ * Note that the first step will always have "" as command
+ */
+export const proofAtom = atom(get => get(proofQueryAtom).data)
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 I went up the dependency graph starting from the former
@@ -26,29 +137,17 @@ export const leanFileProgressAtom = atom<Map<string, LeanFileProgressProcessingI
 
 export const lspDiagnosticsAtom = atom<Map<DocumentUri, Diagnostic[]>>(new Map());
 
-export const serverVersionAtom = atom<ServerVersion>(new ServerVersion(''))
+// export const serverVersionAtom = atom<ServerVersion>(new ServerVersion(''))
 
 export const infoviewConfigAtom = atom<InfoviewConfig>(defaultInfoviewConfig)
 
-export const editorConnectionAtom = atom<EditorConnection | null>(null)
+// export const editorConnectionAtom = atom<EditorConnection | null>(null)
 
-/** The unique leanMonaco instance for the entire application */
-export const leanMonacoAtom = atom<LeanMonaco | null>(null)
 
-export const leanMonacoEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
 
-export const oneLineEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
+// export const rpcSessionsAtom = atom<RpcSessions | null>(null)
 
-/** The proof consists of multiple steps that are processed one after the other.
- * In particular multi-line terms like `match`-statements will not be supported.
- *
- * Note that the first step will always have "" as command
- */
-export const proofAtom = atom<ProofState>()
-
-export const rpcSessionsAtom = atom<RpcSessions | null>(null)
-
-export const rpcSessionAtPosAtom = atom<RpcSessionAtPos | null>(null)
+// export const rpcSessionAtPosAtom = atom<RpcSessionAtPos | null>(null)
 
 export const isProcessingAtom = atom<Boolean>(false)
 
@@ -72,7 +171,7 @@ export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
 
 export const leanMonacoEditorModelAtom = atom(
   (get) => {
-    const editor = get(leanMonacoEditorAtom)
+    const editor = get(editorAtom)
     return editor?.getModel()
   }
 )
@@ -84,26 +183,14 @@ export const leanMonacoEditorUriAtom = atom(
   }
 )
 
-export const hasLeanMonacoEditorAtom = atom(
+export const haseditorAtom = atom(
   (get) => {
-    const editor = get(leanMonacoEditorAtom)
-    console.log(`hasLeanMonacoEditorAtom: editor state is ${editor}`)
+    const editor = get(editorAtom)
+    console.log(`haseditorAtom: editor state is ${editor}`)
     const model = get(leanMonacoEditorModelAtom)
-    console.log(`hasLeanMonacoEditorAtom: model state is ${model}`)
+    console.log(`haseditorAtom: model state is ${model}`)
     return Boolean(editor && model)
   })
-
-export const codeAtom = atom(
-  get => {
-    const levelProgress = get(levelProgressAtom)
-    return levelProgress?.code
-  },
-  (get, set, val: string) => {
-    const levelProgress = get(levelProgressAtom)
-    if (levelProgress == null) return
-    set(levelProgressAtom, { ...levelProgress, code: val })
-  }
-)
 
 export const selectionsAtom = atom(
   get => {
@@ -207,12 +294,11 @@ export const syncTypewriterToEditorEffect = atomEffect(
   }
 )
 
-
 export const syncEditorPositionEffect = atomEffect(
   (get, set) => {
     const oneLineEditor = get(oneLineEditorAtom)
-    const editor = get(leanMonacoEditorAtom)
-    const hasEditor = get(hasLeanMonacoEditorAtom)
+    const editor = get(editorAtom)
+    const hasEditor = get(haseditorAtom)
     const { isSuggestionsMobileMode } = get(preferencesAtom)
 
     if (!oneLineEditor || !hasEditor || !editor) return
@@ -240,7 +326,7 @@ export const runCommandAtom = atom(
       return
     }
 
-    const hasEditor = get(hasLeanMonacoEditorAtom)
+    const hasEditor = get(haseditorAtom)
     const typewriter = get(typewriterContentAtom)
 
     if (processing || !hasEditor) {
@@ -278,7 +364,7 @@ export const runCommandAtom = atom(
 export const loadGoalsAtom = atom(
   null,
   (get, set) => {
-    const rpcSess = get(rpcSessionAtPosAtom)
+    const rpcSess = get(currentRpcSessionAtom)
 
     if (!rpcSess) {
       console.error("RpcSession is not available");
@@ -296,11 +382,11 @@ export const loadGoalsAtom = atom(
             worldId, levelId
         }
     ).then(
-      (proof: ProofState) => {
+      (proof: unknown) => {
         if (typeof proof !== 'undefined') {
           console.info(`received a proof state!`)
           console.log(proof)
-          set(proofAtom, proof)
+          set(proofAtom, proof as any) // TODO
           set(crashedAtom, false)
         } else {
           console.warn('received undefined proof state!')

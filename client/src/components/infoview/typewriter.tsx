@@ -1,19 +1,9 @@
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 
 import "../../css/typewriter.css"
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { gameInfoAtom } from "../../store/query-atoms";
-
-import { DiagnosticSeverity, PublishDiagnosticsParams, DocumentUri } from 'vscode-languageserver-protocol';
-import * as monaco from 'monaco-editor'
-import { levelIdAtom, gameIdAtom, worldIdAtom } from "../../store/location-atoms";
-import { leanMonacoEditorAtom, typewriterContentAtom, interimDiagsAtom, crashedAtom, leanMonacoEditorModelAtom, leanMonacoEditorUriAtom, hasLeanMonacoEditorAtom, lastProofStepErrorCommandAtom, restoreErrorCommandEffect, oneLineEditorAtom, syncTypewriterToEditorEffect, syncEditorPositionEffect, isProcessingAtom, runCommandAtom } from "../../store/editor-atoms";
-import { deletedChatAtom } from '../../store/chat-atoms'
-import { preferencesAtom } from '../../store/preferences-atoms'
-
+import { gameIdAtom, worldIdAtom } from "../../store/location-atoms";
 import path from "node:path";
 import { proofAtom } from "../../store/editor-atoms";
 import { ExerciseStatement } from "./ExerciseStatement";

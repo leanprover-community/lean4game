@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgress } from '@mui/material'
 import type { Location } from 'vscode-languageserver-protocol'
-import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions } from 'lean4monaco'
+import { LeanMonaco, LeanMonacoEditor, LeanMonacoOptions, RpcSessionAtPos } from 'lean4monaco'
 import { setupMonacoClient } from 'lean4monaco/dist/monacoleanclient'
 import { Button } from './button'
 import { Markdown } from './markdown'
@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { useGameTranslation } from '../utils/translation'
 import { InventoryPanel } from './inventory/inventory_panel'
 import { useAtom } from 'jotai'
-import { codeAtom, leanMonacoAtom, leanMonacoEditorAtom, lockEditorModeAtom, proofAtom, typewriterModeAtom } from '../store/editor-atoms'
+import { leanMonacoAtom, editorAtom, lockEditorModeAtom, proofAtom, typewriterModeAtom, codeStorageAtom, modelAtom, clientAtom, uriAtom, currentRpcSessionAtom } from '../store/editor-atoms'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../store/location-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../store/query-atoms'
 import { deletedChatAtom, helpAtom, selectedStepAtom } from '../store/chat-atoms'
@@ -30,6 +30,7 @@ import { inventoryOverviewAtom } from '../store/inventory-atoms'
 import { mobileAtom } from '../store/preferences-atoms'
 import { readWorldIntroAtom } from '../store/progress-atoms'
 import { GameEditor } from './infoview/GameEditor'
+import { RpcConnectParams } from '@leanprover/infoview-api'
 
 const reconfigureLeanMonacoClient = async (leanMonaco: LeanMonaco, options: LeanMonacoOptions) => {
   const maybeLeanMonaco = leanMonaco as unknown as {
@@ -217,7 +218,7 @@ function PlayableLevel() {
   const [levelId] = useAtom(levelIdAtom)
   const [typewriterMode, setTypewriterMode] = useAtom(typewriterModeAtom)
   const [mobile] = useAtom(mobileAtom)
-  const [code, setCode] = useAtom(codeAtom)
+  const [code, setCode] = useAtom(codeStorageAtom)
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [{ data: levelInfo, isLoading: levelInfoIsLoading }] = useAtom(levelInfoAtom)
   // Only for mobile layout
@@ -233,9 +234,13 @@ function PlayableLevel() {
   const [inventoryDoc, setInventoryDoc] = useState<{name: string, type: string} | null>(null)
   function closeInventoryDoc () {setInventoryDoc(null)}
 
-  const [leanMonacoEditor, setLeanMonacoEditor] = useAtom(leanMonacoEditorAtom)//useState<LeanMonacoEditor|null>(null)
+  const [editor, setEditor] = useAtom(editorAtom)
+  const [model] = useAtom(modelAtom)
+  const [client, setClient] = useAtom(clientAtom)
+  const [uri] = useAtom(uriAtom)
+  const [rpcSess, setRpcSess] = useAtom(currentRpcSessionAtom)
 
-  // Start the editor
+  // Start the editor, following lean4monaco demo
   useEffect(() => {
     if (leanMonaco) {
       const leanMonacoEditor = new LeanMonacoEditor()
@@ -243,10 +248,10 @@ function PlayableLevel() {
 
       ;(async () => {
         await leanMonaco!.whenReady
-        console.debug('[demo]: starting editor')
+        console.debug('[lean4game]: starting editor')
         await leanMonacoEditor.start(codeviewRef.current!, uriStr, code ?? "")
-        console.debug('[demo]: editor started')
-        setLeanMonacoEditor(leanMonacoEditor.editor)
+        console.debug('[lean4game]: editor started')
+        setEditor(leanMonacoEditor.editor)
       })()
 
       return () => {
@@ -257,10 +262,7 @@ function PlayableLevel() {
 
   // Persist editor text into progress whenever the model changes.
   useEffect(() => {
-    const editor = leanMonacoEditor //?.editor
-    if (!editor) {
-      return
-    }
+    if (!editor) return
 
     setCode(editor.getValue())
     const disposable = editor.onDidChangeModelContent(() => {
@@ -270,7 +272,53 @@ function PlayableLevel() {
     return () => {
       disposable.dispose()
     }
-  }, [leanMonacoEditor, setCode]) //[leanMonacoEditor?.editor, setCode])
+  }, [editor, setCode])
+
+  // wait until the client exists
+  // TODO: it didn't work to define an atom `get(editorAtom)?.clientProvider?.getClients()?.[0]`
+  // is there a way to tell atoms to fully reevaluate until they get a non-null result?
+  useEffect(() => {
+    const updateClient = () => {
+      const clients = leanMonaco?.clientProvider?.getClients()
+      const firstClient = clients?.[0] ?? null
+      if (firstClient) {
+        setClient(firstClient)
+        return true
+      }
+      return false
+    }
+    updateClient()
+    const interval = setInterval(() => {
+      // try to get `client` until successful
+      if (updateClient()) {
+        clearInterval(interval)
+      }
+    }, 500)
+    return () => clearInterval(interval)
+  }, [leanMonaco?.clientProvider])
+
+  // Start RPC session
+  useEffect(() => {
+    function updateRpcSession() {
+      if (rpcSess) return true
+      if (!client || !uri) return false
+      console.debug('rpc session connecting...')
+      client.sendRequest('$/lean/rpc/connect', {uri: uri.toString()} as RpcConnectParams).then(result => {
+        const sessionId = result.sessionId
+        console.debug(`rpc session id: ${sessionId}`)
+        const _rpcSess = new RpcSessionAtPos(client, sessionId, uri.toString())
+        setRpcSess(_rpcSess)
+      })
+    }
+    updateRpcSession()
+    const interval = setInterval(() => {
+      // try to get `rpcSess` until successful
+      if (updateRpcSession()) {
+        clearInterval(interval)
+      }
+    }, 500)
+    return () => clearInterval(interval)
+  }, [client, uri, rpcSess])
 
   // Select and highlight proof steps and corresponding hints
   // TODO: with the new design, there is no difference between the introduction and
@@ -280,7 +328,6 @@ function PlayableLevel() {
   useEffect (() => {
     // Lock editor mode
     if (levelInfo?.template) {
-      const model = leanMonacoEditor?.getModel()//leanMonacoEditor?.editor?.getModel()
 
       if (model) {
         let code = model.getLinesContent()
@@ -292,7 +339,7 @@ function PlayableLevel() {
           // TODO: This does not work! HERE
           // Probably overwritten by a query to the server
           // DOC: REMOVED editor here
-          leanMonacoEditor?.executeEdits("template-writer", [{
+          editor?.executeEdits("template-writer", [{
             range: model.getFullModelRange(),
             text: levelInfo?.template + `\n`,
             forceMoveMarkers: true
@@ -303,7 +350,7 @@ function PlayableLevel() {
       }
     } else {
     }
-  }, [levelInfo, levelId, worldId, gameId, leanMonacoEditor]) //[levelInfo, levelId, worldId, gameId, leanMonacoEditor?.editor])
+  }, [levelInfo, levelId, worldId, gameId, editor])
 
 
   useEffect(() => {
@@ -314,7 +361,6 @@ function PlayableLevel() {
   }, [gameId, worldId, levelId])
 
   useEffect(() => {
-    const editor = leanMonacoEditor //?.editor;
     const selection = editor?.getSelection();
     if (!typewriterMode && editor && selection) {
       // Delete last input attempt from command line
@@ -323,7 +369,7 @@ function PlayableLevel() {
         text: "",
         forceMoveMarkers: false
       }]);
-      leanMonacoEditor?.focus() // leanMonacoEditor?.editor.focus()
+      editor?.focus() // leanMonacoEditor?.editor.focus()
     }
   }, [typewriterMode])
 
@@ -345,11 +391,10 @@ function PlayableLevel() {
 
   // Effect when command line mode gets enabled
   useEffect(() => {
-    const model = leanMonacoEditor?.getModel() //.editor?.getModel()
     if (model&& (typewriterMode)) {
       let code = model.getLinesContent().filter(line => line.trim())
       // REMOVED .editor call
-      leanMonacoEditor?.executeEdits("typewriter", [{
+      editor?.executeEdits("typewriter", [{
         range: model.getFullModelRange(),
         text: code.length ? code.join('\n') + '\n' : '',
         forceMoveMarkers: true
@@ -370,7 +415,7 @@ function PlayableLevel() {
       //   editor.setSelection(monaco.Selection.fromPositions(endPos, endPos))
       // }
     }
-  }, [leanMonacoEditor, leanMonacoEditor, typewriterMode, lockEditorMode]) //[leanMonacoEditor, leanMonacoEditor?.editor, typewriterMode, lockEditorMode])
+  }, [editor, typewriterMode, lockEditorMode]) // TODO: typewriterMode too?
 
   return <>
     { levelInfoIsLoading && <div className="app-content loading"><CircularProgress /></div>}
@@ -420,7 +465,7 @@ function IntroductionPanel() {
     <div className="chat">
       {text?.filter(t => t.trim()).map(((t, i) =>
         <Hint key={`intro-p-${i}`}
-          hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={null} toggleSelection={undefined} />
+          hint={{text: t, hidden: false, rawText: t, varNames: []}} step={0} selected={undefined} toggleSelection={undefined} />
       ))}
     </div>
     <div className={`button-row${mobile ? ' mobile' : ''}`}>
