@@ -1,19 +1,39 @@
-import { editor, Selection as selector, } from 'monaco-editor'
+import { editor } from 'monaco-editor'
 import { atom } from "jotai";
 import { atomEffect } from 'jotai-effect';
-import { LeanMonaco, LeanMonacoOptions, DocumentPosition, RpcSessionAtPos, LeanClient} from 'lean4monaco'
+import { LeanMonaco, LeanMonacoOptions, RpcSessionAtPos, LeanClient} from 'lean4monaco'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
 import { Diagnostic, DiagnosticSeverity, DocumentUri } from 'vscode-languageserver-types'
 import { preferencesAtom } from './preferences-atoms';
-import { deletedChatAtom } from './chat-atoms';
 import { ProofState } from '../api/rpc_api';
 
 import { defaultInfoviewConfig, InfoviewConfig, LeanFileProgressProcessingInfo } from '@leanprover/infoview-api';
 import { atomWithQuery } from 'jotai-tanstack-query';
-import { Rpc } from 'lean4monaco/dist/vscode-lean4/vscode-lean4/src/rpc';
+
+/** The unique leanMonaco instance for the entire application */
+export const leanMonacoAtom = atom<LeanMonaco | null>(null)
+
+/** The active client. lean4game only uses one client simultaneously */
+export const clientAtom = atom<LeanClient>()
+//   get => {
+//   const clients = get(leanMonacoAtom)?.clientProvider?.getClients() ?? []
+//   return clients?.[0]
+// })
+
+/** The current (multiline) editor */
+export const editorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
+
+/** The model of the current editor */
+export const modelAtom = atom(get => get(editorAtom)?.getModel() ?? undefined)
+
+/** The URI of the currently opened file */
+export const uriAtom = atom(get => get(modelAtom)?.uri)
+
+/** The currently used RPC session */
+export const rpcSessionAtom = atom<RpcSessionAtPos>()
 
 /** The code of the current level as stored in local storage.
  *
@@ -36,22 +56,6 @@ export const codeStorageAtom = atom(
   }
 )
 
-/** The unique leanMonaco instance for the entire application */
-export const leanMonacoAtom = atom<LeanMonaco | null>(null)
-
-/** The active client. lean4game only uses one client simultaneously */
-export const clientAtom = atom<LeanClient>()
-//   get => {
-//   const clients = get(leanMonacoAtom)?.clientProvider?.getClients() ?? []
-//   return clients?.[0]
-// })
-
-/** The current (multiline) editor */
-export const editorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
-
-/** The model of the current editor */
-export const modelAtom = atom(get => get(editorAtom)?.getModel() ?? undefined)
-
 /**
  * The code of the current level as stored in local storage.
  *
@@ -66,21 +70,15 @@ export const codeAtom = atom(
   }
 )
 
-/** The URI of the currently opened file */
-export const uriAtom = atom(get => get(modelAtom)?.uri)
-
-/** The currently used RPC session */
-export const currentRpcSessionAtom = atom<RpcSessionAtPos>()
-
 /** The editor powering the typewriter (single line) input */
 export const oneLineEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
 
-/** The analysied proof, received over RPC  */
+/** The analysed proof, received over RPC  */
 export const proofQueryAtom = atomWithQuery<ProofState>((get) => {
   const worldId = get(worldIdAtom)
   const levelId = get(levelIdAtom)
   const code = get(codeStorageAtom)
-  const rpcSess = get(currentRpcSessionAtom)
+  const rpcSess = get(rpcSessionAtom)
   return {
     queryKey: ['proof', worldId, levelId, rpcSess?.sessionId, code],
     queryFn: async () => {
@@ -119,6 +117,9 @@ export const proofAtom = atom(get => get(proofQueryAtom).data)
 
 
 
+/*
+ * FIXME: everything below here is not curated yet!
+ */
 
 
 
@@ -310,52 +311,5 @@ export const syncEditorPositionEffect = atomEffect(
     if (!isSuggestionsMobileMode) {
       oneLineEditor.focus()
     }
-  }
-)
-
-export const runCommandAtom = atom(
-  null,
-  (get, set) => {
-    console.log("start running command")
-    const processing = get(isProcessingAtom)
-    const editor = get(oneLineEditorAtom)
-
-    if (!editor){
-      console.log("oneLineEditor not initialized")
-      return
-    }
-
-    const hasEditor = get(haseditorAtom)
-    const typewriter = get(typewriterContentAtom)
-
-    if (processing || !hasEditor) {
-      console.log("Editor not available or a process is currently running.")
-      console.log(`Currently running a process: ${processing}`)
-      console.log(`Does Editor exist: ${hasEditor}`)
-      return
-    }
-
-    // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
-    set(deletedChatAtom, [])
-
-    const pos = editor.getPosition()
-
-    if (typewriter) {
-      set(isProcessingAtom, true)
-      console.log("[runCommand] start executing edits")
-      editor.executeEdits("typewriter", [{
-        range: selector.fromPositions(
-          pos!,
-          editor.getModel()?.getFullModelRange().getEndPosition()
-        ),
-        text: typewriter.trim() + "\n",
-        forceMoveMarkers: false
-      }])
-      set(typewriterContentAtom, '')
-      // Load proof after executing edits
-      set(loadGoalsAtom)
-    }
-
-    editor.setPosition(pos!)
   }
 )

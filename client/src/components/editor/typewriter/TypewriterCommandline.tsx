@@ -1,17 +1,12 @@
-import React, { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import "../../../css/typewriter.css"
 import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
-import { useAtom, useSetAtom } from "jotai";
-
+import { useAtom } from "jotai";
 import * as monaco from 'monaco-editor'
-import { typewriterContentAtom, oneLineEditorAtom,  runCommandAtom, codeAtom, modelAtom, uriAtom, currentRpcSessionAtom } from "../../../store/editor-atoms";
-import { proofAtom } from "../../../store/editor-atoms";
-
+import { typewriterContentAtom, oneLineEditorAtom, codeAtom, modelAtom } from "../../../store/editor-atoms";
 import { twMerge } from "tailwind-merge";
-import { levelIdAtom, worldIdAtom } from "../../../store/location-atoms";
 import { deletedChatAtom } from "../../../store/chat-atoms";
 
 /** The input field */

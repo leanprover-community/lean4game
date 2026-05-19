@@ -1,5 +1,4 @@
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
-
+import React, { useRef } from "react";
 import "../../css/typewriter.css"
 import { useAtom } from "jotai";
 import { gameInfoAtom } from "../../store/query-atoms";
@@ -29,7 +28,7 @@ export function Typewriter() {
       <div className="pusher" />
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement showLeanStatement={true} />
-        {proof?.steps.map((step, i) => <ProofStep step={step} idx={i} />)}
+        {proof?.steps.map((step, i) => <ProofStep key={i} step={step} idx={i} />)}
       </div>
     </div>
     <TypewriterCommandLine />

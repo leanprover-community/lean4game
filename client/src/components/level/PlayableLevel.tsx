@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 import { useGameTranslation } from "../../utils/translation"
 import { useEffect, useRef, useState } from "react"
 import { useAtom } from "jotai"
-import { clientAtom, codeStorageAtom, currentRpcSessionAtom, editorAtom, leanMonacoAtom, lockEditorModeAtom, modelAtom, typewriterModeAtom, uriAtom } from "../../store/editor-atoms"
+import { clientAtom, codeStorageAtom, rpcSessionAtom, editorAtom, leanMonacoAtom, lockEditorModeAtom, modelAtom, typewriterModeAtom, uriAtom } from "../../store/editor-atoms"
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "../../store/location-atoms"
 import { mobileAtom } from "../../store/preferences-atoms"
 import { gameInfoAtom, levelInfoAtom } from "../../store/query-atoms"
@@ -46,7 +46,7 @@ export function PlayableLevel() {
   const [model] = useAtom(modelAtom)
   const [client, setClient] = useAtom(clientAtom)
   const [uri] = useAtom(uriAtom)
-  const [rpcSess, setRpcSess] = useAtom(currentRpcSessionAtom)
+  const [rpcSess, setRpcSess] = useAtom(rpcSessionAtom)
 
   // Start the editor, following lean4monaco demo
   useEffect(() => {
