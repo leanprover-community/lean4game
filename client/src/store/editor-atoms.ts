@@ -2,16 +2,33 @@ import { editor, Selection as selector, } from 'monaco-editor'
 import { atom } from "jotai";
 import { atomEffect } from 'jotai-effect';
 import { LeanMonaco, LeanMonacoOptions, LeanMonacoEditor, DocumentPosition} from 'lean4monaco'
-import { RpcSessionAtPos } from 'lean4monaco/dist/vscode-lean4/lean4-infoview-api/src/rpcSessions'
+import { RpcSessionAtPos, RpcSessions } from 'lean4monaco/dist/vscode-lean4/lean4-infoview-api/src/rpcSessions'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { levelProgressAtom, progressAtom } from "./progress-atoms";
 import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
-import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver-types'
+import { Diagnostic, DiagnosticSeverity, DocumentUri } from 'vscode-languageserver-types'
 import { preferencesAtom } from './preferences-atoms';
 import { deletedChatAtom } from './chat-atoms';
 import { ProofState } from '../api/rpc_api';
-import { EditorConnection } from '../components/infoview/editor/EditorConnection';
+import { EditorConnection } from "lean4monaco/dist/vscode-lean4/lean4-infoview/src/infoview/editorConnection"
+import { ServerVersion }  from 'lean4monaco/dist/vscode-lean4/lean4-infoview/src/infoview/serverVersion'
+import { defaultInfoviewConfig, InfoviewConfig, LeanFileProgressProcessingInfo } from '@leanprover/infoview-api';
+
+/*
+I went up the dependency graph starting from the former
+info.tsx  -> infos.ts -> main.tsx -> level.tsx -> index.tsx and extracted
+contexts by their respective atoms. Some of the atoms do not belong here
+and have been put here temporarly during my refactoring attempts.
+*/
+
+export const leanFileProgressAtom = atom<Map<string, LeanFileProgressProcessingInfo[]>>(new Map())
+
+export const lspDiagnosticsAtom = atom<Map<DocumentUri, Diagnostic[]>>(new Map());
+
+export const serverVersionAtom = atom<ServerVersion>(new ServerVersion(''))
+
+export const infoviewConfigAtom = atom<InfoviewConfig>(defaultInfoviewConfig)
 
 export const editorConnectionAtom = atom<EditorConnection | null>(null)
 
@@ -29,7 +46,9 @@ export const oneLineEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
  */
 export const proofAtom = atom<ProofState>()
 
-export const rpcSessionAtom = atom<RpcSessionAtPos | null>(null)
+export const rpcSessionsAtom = atom<RpcSessions | null>(null)
+
+export const rpcSessionAtPosAtom = atom<RpcSessionAtPos | null>(null)
 
 export const isProcessingAtom = atom<Boolean>(false)
 
@@ -238,7 +257,7 @@ export const runCommandAtom = atom(
 
     if (typewriter) {
       set(isProcessingAtom, true)
-
+      console.log("[runCommand] start executing edits")
       editor.executeEdits("typewriter", [{
         range: selector.fromPositions(
           pos!,
@@ -259,7 +278,7 @@ export const runCommandAtom = atom(
 export const loadGoalsAtom = atom(
   null,
   (get, set) => {
-    const rpcSess = get(rpcSessionAtom)
+    const rpcSess = get(rpcSessionAtPosAtom)
 
     if (!rpcSess) {
       console.error("RpcSession is not available");
