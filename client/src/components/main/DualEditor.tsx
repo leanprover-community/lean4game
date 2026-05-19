@@ -81,6 +81,7 @@ function DualEditorMain() {
 
   React.useEffect(() => {
     if (proof?.completed) {
+      console.log(`[DualEditorMain] Start proof-completion procedure`)
       setCompleted(true)
 
       // On completion, add the names of all new items to the local storage
@@ -124,7 +125,9 @@ function DualEditorMain() {
     if (!editorConnection) return;
 
     const unsubscribeServer = editorConnection.events.serverRestarted.on((result) => {
-      setServerVersion(new ServerVersion(result.serverInfo?.version ?? ''));
+      const serverVersion = new ServerVersion(result.serverInfo?.version ?? '')
+      console.log(`[DualEditorMain] Setting server session after restart: ${serverVersion}`)
+      setServerVersion(serverVersion);
     });
 
     return () => unsubscribeServer?.dispose();
