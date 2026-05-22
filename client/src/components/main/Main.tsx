@@ -10,7 +10,7 @@ import { gameInfoAtom, levelInfoAtom } from "../../store/query-atoms";
 import { helpAtom, selectedStepAtom } from "../../store/chat-atoms";
 import { useRpcSessionAtPos } from "lean4monaco/dist/vscode-lean4/lean4-infoview/src/infoview/rpcSessions";
 import { lastStepHasErrors, loadGoals } from "../../../../infoview/goals";
-import { DocumentPosition } from "../infoview/editor/util";
+import { DocumentPosition } from "../editor/editor/util";
 import { useServerNotificationEffect, useServerNotificationState, useEventResult, useClientNotificationEffect } from "lean4monaco/dist/vscode-lean4/lean4-infoview/src/infoview/util";
 import { defaultInfoviewConfig, LeanFileProgressParams, LeanFileProgressProcessingInfo } from "@leanprover/infoview-api";
 import type { DidCloseTextDocumentParams, DocumentUri } from 'vscode-languageserver-protocol'

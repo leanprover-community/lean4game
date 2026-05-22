@@ -6,6 +6,7 @@
   left: 0;
   z-index: 10;
   background-color: white;
+  padding: 1em;
 }
 
 .documentation .nav-button {

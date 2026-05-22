@@ -97,7 +97,10 @@ export const proofQueryAtom = atomWithQuery<ProofState>((get) => {
           position: {line: 0, character: 0},
           sessionId: rpcSess.sessionId
         }
-      )
+      ).catch((err) => {
+        console.warn(err)
+        return null
+      })
       return res
     },
     enabled: rpcSess?.sessionId != undefined && code != undefined && worldId != undefined && levelId != undefined

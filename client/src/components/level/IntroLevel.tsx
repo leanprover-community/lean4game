@@ -22,8 +22,6 @@ export function IntroLevel() {
 
   const [mobile] = useAtom(mobileAtom)
 
-  const [{ data: inventory }] = useAtom(inventoryOverviewAtom)
-
   const [{ data: gameInfo, isLoading: isLoadingGameInfo }] = useAtom(gameInfoAtom)
 
 
@@ -44,7 +42,7 @@ export function IntroLevel() {
             }
 
           </div>
-          <InventoryPanel levelInfo={inventory} />
+          <InventoryPanel />
         </Split>
       }
 

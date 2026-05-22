@@ -1,9 +1,9 @@
 import { atomWithQuery } from 'jotai-tanstack-query'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from './location-atoms'
 import { Doc, GameInfo, InventoryOverview, LevelInfo } from './api'
-import { atomFamily } from 'jotai/utils'
 import { atom } from 'jotai'
 import { InventoryTab } from './inventory-atoms'
+import { atomFamily } from 'jotai-family'
 
 /** The info about all games */
 export const gameInfoAtomFamily = atomFamily((gameId: string) => atomWithQuery<GameInfo>(() => {

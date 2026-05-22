@@ -116,6 +116,8 @@ export function PlayableLevel() {
         console.debug(`rpc session id: ${sessionId}`)
         const _rpcSess = new RpcSessionAtPos(client, sessionId, uri.toString())
         setRpcSess(_rpcSess)
+      }).catch((err) => {
+        console.debug("rpc connect failed: ", err)
       })
     }
     updateRpcSession()
