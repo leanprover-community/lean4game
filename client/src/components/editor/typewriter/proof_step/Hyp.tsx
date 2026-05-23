@@ -1,4 +1,4 @@
-import { InteractiveHypothesisBundle, InteractiveHypothesisBundle_nonAnonymousNames, MVarId } from "@leanprover/infoview-api"
+import { InteractiveHypothesisBundle, InteractiveHypothesisBundle_nonAnonymousNames, MVarId, TaggedText_stripTags } from "@leanprover/infoview-api"
 import React from "react"
 
 interface HypProps {
@@ -31,7 +31,7 @@ export function Hyp({ hyp: h, mvarId }: HypProps) {
     return <div>
         <strong className="goal-hyp">{names}</strong>
         :&nbsp;
-        h.type
+        {TaggedText_stripTags(h.type)}
         {h.val && `&nbsp;:=&nbsp;${h.val}`}
     </div>
 }

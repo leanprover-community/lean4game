@@ -1,7 +1,7 @@
 // TODO: Should not use index as key.
 import React from "react";
 
-import { InteractiveDiagnostic, MsgEmbed, TaggedText } from "@leanprover/infoview-api";
+import { InteractiveDiagnostic, MsgEmbed, TaggedText, TaggedText_stripTags } from "@leanprover/infoview-api";
 import { DiagnosticSeverity } from "vscode-languageserver-types";
 
 /** A list of messages (info/warning/error) that are produced after this command */
@@ -37,7 +37,7 @@ function Error({error, typewriterMode} : {error : InteractiveDiagnostic, typewri
   return <div className={severityClass + ' ml1 message'}>
     {!typewriterMode && <p className="mv2">{title}</p>}
     <pre className="font-code pre-wrap">
-      <p>{message.text /* FIXME */}</p>
+      <p>{TaggedText_stripTags(message)}</p>
     </pre>
   </div>
 }

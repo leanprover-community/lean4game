@@ -6,7 +6,7 @@ import { mobileAtom } from "../../../../store/preferences-atoms";
 import { useTranslation } from "react-i18next";
 import { InteractiveGoal, ProofState } from "../../../../api/rpc_api";
 import { Hyp } from "./Hyp";
-import { InteractiveHypothesisBundle } from "@leanprover/infoview-api";
+import { InteractiveHypothesisBundle, TaggedText_stripTags } from "@leanprover/infoview-api";
 
 
 export function Goal({goal} : { goal: InteractiveGoal}) {
@@ -47,8 +47,7 @@ export function Goal({goal} : { goal: InteractiveGoal}) {
       }
       <div key={'goal'} className="goal">
         {(mobile || !typewriterMode) && <div className="goal-title">{t("Goal")}:</div> }
-            Goal
-            {/* FIXME: <InteractiveCode fmt={goal.type} /> */}
+            {TaggedText_stripTags(goal.type)}
       </div>
     </>
   )
