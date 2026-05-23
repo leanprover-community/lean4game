@@ -78,7 +78,7 @@ export const appendCodeLineAtom = atom(null, (get, set, line: string) => {
   const code = get(codeAtom)
 
   const oldCode = code?.trimEnd() ?? ''
-  const newCode = oldCode.length > 0 ? `${oldCode}\n${content}\n` : `${content}\n`
+  const newCode = oldCode.length > 0 ? `${oldCode}\n${line}\n` : `${line}\n`
   set(codeAtom, newCode)
 })
 
