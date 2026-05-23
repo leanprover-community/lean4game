@@ -9,9 +9,16 @@ import '@fontsource/roboto/700.css';
 
 import './css/reset.css';
 import './css/app.css';
-import './css/infoview.css'
+import './css/error_page.css';
+import "./css/infoview.css"
+import "./css/landing_page.css"
+import './css/layout.css';
+import './css/level.css';
+import "./css/popup.css"
 import "./css/tab_bar.css"
-import "./css/layout.css"
+import "./css/typewriter.css"
+import "./css/welcome.css"
+import "./css/world_tree.css"
 
 import i18n from './i18n';
 import { Popup } from './components/popup/popup';

@@ -1,13 +1,14 @@
 import React, { useRef } from "react";
-import "../../css/typewriter.css"
 import { useAtom } from "jotai";
-import { gameInfoAtom } from "../../store/query-atoms";
-import { gameIdAtom, worldIdAtom } from "../../store/location-atoms";
+import { gameInfoAtom } from "../../../store/query-atoms";
+import { gameIdAtom, worldIdAtom } from "../../../store/location-atoms";
 import path from "node:path";
-import { proofAtom } from "../../store/editor-atoms";
-import { ExerciseStatement } from "./ExerciseStatement";
-import { ProofStep } from "./ProofStep";
-import { TypewriterCommandLine } from "./typewriter/TypewriterCommandline";
+import { proofAtom } from "../../../store/editor-atoms";
+import { ExerciseStatement } from "../ExerciseStatement";
+import { ProofStep } from "./proof_step/ProofStep";
+import { TypewriterCommandLine } from "./TypewriterCommandline";
+import { LoadingIcon } from "../../utils";
+import { CircularProgress } from "@mui/material";
 
 /**
  * Der Typewriter bestehend aus Eingabezeile, Beweisschritten, Aufgabenstellung und Hintergrundbild
@@ -28,7 +29,8 @@ export function Typewriter() {
       <div className="pusher" />
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement showLeanStatement={true} />
-        {proof?.steps.map((step, i) => <ProofStep key={i} step={step} idx={i} />)}
+        {proof ? proof.steps.map((step, i) => <ProofStep key={i} step={step} idx={i} />)
+      : <CircularProgress />}
       </div>
     </div>
     <TypewriterCommandLine />

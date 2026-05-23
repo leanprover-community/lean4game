@@ -12,6 +12,9 @@ import { ProofState } from '../api/rpc_api';
 
 import { defaultInfoviewConfig, InfoviewConfig, LeanFileProgressProcessingInfo } from '@leanprover/infoview-api';
 import { atomWithQuery } from 'jotai-tanstack-query';
+import { oneLineEditorAtom } from '../components/editor/typewriter/typewriter-atoms';
+import { deletedChatAtom, helpAtom, selectedStepAtom } from './chat-atoms';
+import { filterHints } from '../components/hints';
 
 /** The unique leanMonaco instance for the entire application */
 export const leanMonacoAtom = atom<LeanMonaco | null>(null)
@@ -70,8 +73,41 @@ export const codeAtom = atom(
   }
 )
 
-/** The editor powering the typewriter (single line) input */
-export const oneLineEditorAtom = atom<editor.IStandaloneCodeEditor | null>(null)
+/** Appends a new line of code at the end of the current code */
+export const appendCodeLineAtom = atom(null, (get, set, line: string) => {
+  const code = get(codeAtom)
+
+  const oldCode = code?.trimEnd() ?? ''
+  const newCode = oldCode.length > 0 ? `${oldCode}\n${content}\n` : `${content}\n`
+  set(codeAtom, newCode)
+})
+
+/** Delete all code starting at line `line` */
+export const deleteCodeFromLineAtom = atom(null, (get, set, line: number) => {
+  const code = get(codeAtom)
+  if (code == undefined) return
+
+  set(selectedStepAtom, undefined)
+  set(typewriterContentAtom, "")
+
+  const help = get(helpAtom)
+  const proof = get(proofAtom)
+  if (proof) {
+    const newDeletedChat = proof.steps.slice(line).flatMap((step, i) => {
+      let filteredHints = filterHints(step.goals[0]?.hints, proof.steps[i-1]?.goals[0]?.hints)
+      return filteredHints.filter(hint => (!hint.hidden || help.has(line + i)))
+    })
+    set(deletedChatAtom, newDeletedChat)
+  }
+
+  // delete the info about displayed help where the lines were deleted
+  const newHelp = new Set(Array.from(help).filter(i => i < line - 1))
+  set(helpAtom, newHelp)
+
+  const lines = code.split("\n")
+  const newCode = lines.slice(0, line).join("\n")
+  set(codeAtom, newCode)
+})
 
 /** The analysed proof, received over RPC  */
 export const proofQueryAtom = atomWithQuery<ProofState>((get) => {

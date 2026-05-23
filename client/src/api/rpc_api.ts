@@ -1,25 +1,6 @@
-import { CodeWithInfos, ContextInfo, FVarId, InteractiveDiagnostic, MVarId, TermInfo } from '@leanprover/infoview-api'
+import { CodeWithInfos, ContextInfo, FVarId, InteractiveDiagnostic, InteractiveGoalCore, MVarId, TermInfo } from '@leanprover/infoview-api'
 
-export interface InteractiveHypothesisBundle {
-  /** The pretty names of the variables in the bundle. Anonymous names are rendered
-   * as `"[anonymous]"` whereas inaccessible ones have a `✝` appended at the end.
-   * Use `InteractiveHypothesisBundle_nonAnonymousNames` to filter anonymouse ones out. */
-  names: string[];
-  fvarIds?: FVarId[];
-  type: CodeWithInfos;
-  val?: CodeWithInfos;
-  isInstance?: boolean;
-  isType?: boolean;
-  isInserted?: boolean;
-  isRemoved?: boolean;
-  isAssumption?: boolean;
-}
 
-export interface InteractiveGoalCore {
-  hyps: InteractiveHypothesisBundle[];
-  type: CodeWithInfos;
-  ctx?: ContextInfo;
-}
 
 export interface InteractiveGoal extends InteractiveGoalCore {
   userName?: string;

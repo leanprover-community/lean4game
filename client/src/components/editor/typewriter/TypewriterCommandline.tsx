@@ -5,9 +5,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import { useAtom } from "jotai";
 import * as monaco from 'monaco-editor'
-import { typewriterContentAtom, oneLineEditorAtom, codeAtom, modelAtom } from "../../../store/editor-atoms";
+import { typewriterContentAtom, codeAtom, modelAtom } from "../../../store/editor-atoms";
 import { twMerge } from "tailwind-merge";
 import { deletedChatAtom } from "../../../store/chat-atoms";
+import { oneLineEditorAtom } from "./typewriter-atoms";
 
 /** The input field */
 export function TypewriterCommandLine() {
@@ -42,9 +43,7 @@ export function TypewriterCommandLine() {
     if (content.length == 0) return
 
     // Add typewriter content to the editor
-    const oldCode = code?.trimEnd() ?? ''
-    const newCode = oldCode.length > 0 ? `${oldCode}\n${content}\n` : `${content}\n`
-    model?.setValue(newCode)
+
 
     // TODO: Desired logic is to only reset this after a new *error-free* command has been entered
     setDeletedChatAtom([])
