@@ -222,10 +222,10 @@ If you do not provide any content for the inventory, the game will try to find a
 You have a few options to disable inventory items that have been unlocked in previous levels:
 
 ```lean
-DisabledTactic, DisabledTheorem, OnlyTactic, OnlyTheorem
+DisabledTactic, DisabledTheorem, DisabledDefinition, OnlyTactic, OnlyTheorem, OnlyDefinition
 ```
 
-have the same syntax as above. The former two disable items for this level, the latter two
+have the same syntax as above. The former three disable items for this level, the latter three
 disable all items except the ones specified.
 
 #### Theorem Tab
