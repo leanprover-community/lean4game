@@ -97,7 +97,7 @@ export function TypewriterCommandLine() {
       },
       scrollBeyondLastLine: false,
       overviewRulerBorder: false,
-      theme: 'vs-code-theme-converted',
+      theme: 'Visual Studio Light',
       contextmenu: false
     }
 
