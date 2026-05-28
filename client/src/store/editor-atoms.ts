@@ -192,6 +192,30 @@ export const isProcessingAtom = atom<Boolean>(false)
 
 export const typewriterContentAtom = atom<string>("")
 
+export const typewriterAtom = atom(
+  (get) => {get(typewriterContentAtom)},
+  (get, set, val: string) => {
+    const oneLineEditor = get(oneLineEditorAtom)
+    const { isSuggestionsMobileMode } = get(preferencesAtom)
+
+    if (!oneLineEditor) {
+      console.log("[TypewriterAtom] oneLineEditor is False")
+      return
+    }
+
+    console.log(`[TypewriterAtom] Set value in oneLineEditor to ${val}`)
+    oneLineEditor.setValue(val)
+    oneLineEditor.setPosition({
+      column: val.length + 1,
+      lineNumber: 1
+    })
+
+    if (!isSuggestionsMobileMode) {
+      oneLineEditor.focus()
+    }
+  }
+)
+
 /** Options for the LeanMonaco instance */
 export const leanMonacoOptionsAtom = atom<LeanMonacoOptions>(get => {
   const gameId = get(gameIdAtom)
