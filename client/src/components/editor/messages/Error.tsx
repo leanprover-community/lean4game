@@ -34,10 +34,14 @@ function Error({error, typewriterMode} : {error : InteractiveDiagnostic, typewri
       message = error.message
   }
 
-  return <div className={severityClass + ' ml1 message'}>
+  const messageString = TaggedText_stripTags(message);
+
+  return (messageString.trim().length > 0 && (
+  <div className={severityClass + ' ml1 message'}>
     {!typewriterMode && <p className="mv2">{title}</p>}
     <pre className="font-code pre-wrap">
-      <p>{TaggedText_stripTags(message)}</p>
+      <p>{messageString}</p>
     </pre>
   </div>
+  ))
 }
