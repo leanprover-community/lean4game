@@ -37,7 +37,7 @@ export function Command({ proof, i }: { proof: ProofState, i: number }) {
   } else {
     return <div className="command">
       <div className="command-text">{proof.steps[i].command}</div>
-      <Button  className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={ev => {
+      <Button className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={ev => {
         deleteCodeFromLine(i)
         ev.stopPropagation()
       }}>

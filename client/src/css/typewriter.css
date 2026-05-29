@@ -1,4 +1,9 @@
-
+.centered-spinner {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: -1.5rem;
+}
 
 .typewriter-canvas {
   position: absolute;

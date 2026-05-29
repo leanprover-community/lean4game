@@ -30,7 +30,7 @@ export function Typewriter() {
       <div className='proof' ref={proofPanelRef}>
         <ExerciseStatement showLeanStatement={true} />
         {proof ? proof.steps.map((step, i) => <ProofStep key={i} step={step} idx={i} />)
-      : <CircularProgress />}
+      : <div className="centered-spinner"><CircularProgress /></div>}
       </div>
     </div>
     <TypewriterCommandLine />
