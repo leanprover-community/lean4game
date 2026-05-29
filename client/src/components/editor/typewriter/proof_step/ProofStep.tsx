@@ -13,6 +13,7 @@ import { useGameTranslation } from "../../../../utils/translation";
 import { filterHints, Hint, Hints } from "../../../hints";
 import { i } from "@tanstack/query-core/build/legacy/hydration-BlEVG2Lp";
 import { GoalsTabs } from "./GoalsTab";
+import { GameHint } from "../../types";
 
 export function ProofStep({step, idx}: {step:InteractiveGoalsWithHints, idx: number}) {
   const {t : gT} = useGameTranslation()
@@ -30,7 +31,7 @@ export function ProofStep({step, idx}: {step:InteractiveGoalsWithHints, idx: num
   }
 
   // TODO: this should be an atom
-  let filteredHints = proof ? filterHints(step.goals[0]?.hints, proof.steps[idx-1]?.goals[0]?.hints) : []
+  let filteredHints: GameHint[] = proof ? filterHints(step.goals[0]?.hints, proof.steps[idx-1]?.goals[0]?.hints) : []
 
   if (!proof) return
 
