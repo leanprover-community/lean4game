@@ -9,3 +9,18 @@ contact_links:
   - name: Real Analysis Game
     url: https://github.com/alexkontorovich/realanalysisgame/issues/new/choose
     about: Raise issues regarding the contents of the game Robo/Scribble    
+  - name: Set Theory Game
+    url: https://github.com/djvelleman/stg4/issues/new/choose
+    about: Raise issues regarding the contents of the Set Theory Game
+  - name: Logic Game
+    url: https://github.com/trequetrum/lean4game-logic/issues/new/choose
+    about: Raise issues regarding the contents of the Logic Game
+  - name: Reintroduction to Proofs 
+    url: https://github.com/emilyriehl/reintroductiontoproofs/issues/new/choose
+    about: Raise issues regarding the contents of the game Reintroduction to Proofs
+  - name: Knights and Knaves
+    url: https://github.com/jadabouhawili/knightsandknaves-lean4game/issues/new/choose
+    about: Raise issues regarding the contents of the game Knights and Knaves
+  - name: Linear Algebra Game
+    url: https://github.com/zrtmrh/linearalgebragame/issues/new/choose
+    about: Raise issues regarding the contents of the Linear Algebra Game
