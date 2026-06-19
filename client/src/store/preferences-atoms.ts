@@ -17,10 +17,26 @@ export function getWindowDimensions() {
 
 export const AUTO_SWITCH_THRESHOLD = 800
 
+// Determine initial language from URL `?lang=...`, a dedicated stored key, or env default
+function detectInitialLanguage(): string {
+  try {
+    const params = new URLSearchParams(window.location.search)
+    const urlLang = params.get('lang')
+    if (urlLang) return urlLang
+  } catch (e) {}
+
+  try {
+    const storedLang = localStorage.getItem('language')
+    if (storedLang) return storedLang
+  } catch (e) {}
+
+  return import.meta.env.VITE_CLIENT_DEFAULT_LANGUAGE || "en"
+}
+
 const defaultPreferences: Preferences = {
   layout: "auto",
   isSavePreferences: false,
-  language: import.meta.env.VITE_CLIENT_DEFAULT_LANGUAGE || "en",
+  language: detectInitialLanguage(),
   isSuggestionsMobileMode: true,
   useFlags: false,
   showLockedInventory: true,
@@ -31,6 +47,11 @@ const storage = createJSONStorage<Preferences>(() => localStorage)
 const conditionalStorage = {
   ...storage,
   setItem: (key: string, value: Preferences) => {
+    // Always persist the currently selected language separately so it survives refreshes
+    try {
+      localStorage.setItem('language', value.language)
+    } catch (e) {}
+
     if (value.isSavePreferences) {
       storage.setItem(key, value)
     } else {
