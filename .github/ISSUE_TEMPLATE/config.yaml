@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Natural Number Game
+    url: https://github.com/leanprover-community/nng4/issues/new/choose
+    about: Raise issues regarding the contents of the Natural Number Game
+  - name: Robo/Scribble
+    url: https://github.com/hhu-adam/robo/issues/new/choose
+    url: Raise issues regarding the contents of the game Robo/Scribble
+  - name: Real Analysis Game
+    url: https://github.com/alexkontorovich/realanalysisgame/issues/new/choose
+    about: Raise issues regarding the contents of the game Robo/Scribble    
