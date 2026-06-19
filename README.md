@@ -51,11 +51,7 @@ Providing the use access to a Lean instance running on the server is a severe se
 
 ## Contact
 
-In case of technical problems with/outages of the server at `adam.math.hhu.de` please contact <a href="mailto:matvey.lorkish@hhu.de?subject=Lean4Game: <Your%20Question>">Matvey Lorkish</a>.
-
-Bug reports and feature requests regarding the game interface should be filed on the [issues page](issues) of this repository.
-
-For specific games on the [Lean Game Server](https://adam.math.hhu.de), please refer to the github repositories linked to below or contact the maintainers.
+In case of a server outage at `adam.math.hhu.de` please open an [issue](issues) and/or contact us by <a href="mailto:adam@math.hhu.de?subject=Server Outage">email</a>.  Bug reports and feature requests regarding the game interface should be filed on the [issues page](issues) of this repository.   For specific games on the [Lean Game Server](https://adam.math.hhu.de), please refer to the github repositories linked to below or contact the maintainers.
 
 | Game/repository                                                                   | Maintainer                                              |
 |-----------------------------------------------------------------------------------|---------------------------------------------------------|
