@@ -37,11 +37,13 @@ The documentation is very much work in progress but the links below should be up
 
 Contributions to `lean4game` are always welcome!
 
+Check out the [Development Instructions](./doc/development.md)
+
 ### Translation
 
-We welcome translations of the game interface and of the various games hosted on the [Lean Game Server](https://adam.math.hhu.de) into different languages!  
+We welcome translations of the game interface and of the various games hosted on the [Lean Game Server](https://adam.math.hhu.de) into different languages!
 
-* For translating the *interface*, please refer to [these instructions](doc/translation-interface.md).  
+* For translating the *interface*, please refer to [these instructions](doc/translation-interface.md).
 * For translating *individual games*, please contact the maintainers (see [table below](#contact)) and consult any game specific translation guidelines.  Our [generic guidlines](doc/translation-guide-for-game-translators.md) may give a rough indication of the steps involved.
 * We also have some [guidelines for game maintainers](doc/translation-guide-for-game-maintainers.md) regarding translations.
 
