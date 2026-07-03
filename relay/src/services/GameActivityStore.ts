@@ -10,6 +10,12 @@ export interface GameActivity {
 
 export type GameActivityRegistry = Record<string, GameActivity>
 
+export enum GameActivityEvent {
+  Import = 'import',
+  Play = 'play',
+  Seen = 'seen',
+}
+
 /** Persist import and real-play timestamps without storing player identities. */
 export class GameActivityStore {
   private readonly filePath: string
@@ -29,18 +35,18 @@ export class GameActivityStore {
   }
 
   recordImport(owner: string, repo: string, now: Date = new Date()): Promise<void> {
-    return this.update(owner, repo, 'import', now)
+    return this.update(owner, repo, GameActivityEvent.Import, now)
   }
 
   recordPlay(owner: string, repo: string, now: Date = new Date()): Promise<void> {
-    return this.update(owner, repo, 'play', now)
+    return this.update(owner, repo, GameActivityEvent.Play, now)
   }
 
   recordSeen(owner: string, repo: string, now: Date = new Date()): Promise<void> {
-    return this.update(owner, repo, 'seen', now)
+    return this.update(owner, repo, GameActivityEvent.Seen, now)
   }
 
-  private update(owner: string, repo: string, event: 'import' | 'play' | 'seen', now: Date): Promise<void> {
+  private update(owner: string, repo: string, event: GameActivityEvent, now: Date): Promise<void> {
     const key = `${owner.toLowerCase()}/${repo.toLowerCase()}`
     const timestamp = now.toISOString()
 
@@ -53,10 +59,10 @@ export class GameActivityStore {
         lastPlayedAt: null,
       }
 
-      if (event === 'import') {
+      if (event === GameActivityEvent.Import) {
         activity.firstImportedAt ??= timestamp
         activity.lastImportedAt = timestamp
-      } else if (event === 'play') {
+      } else if (event === GameActivityEvent.Play) {
         activity.lastPlayedAt = timestamp
       }
       registry[key] = activity
