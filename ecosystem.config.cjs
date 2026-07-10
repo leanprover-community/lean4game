@@ -2,7 +2,7 @@
 module.exports = {
   apps : [{
     name   : "lean4game",
-    script : "relay/dist/index.js",
+    script : "relay/dist/src/index.js",
     env: {
       LEAN4GAME_GITHUB_USER: "",
       LEAN4GAME_GITHUB_TOKEN: "",
