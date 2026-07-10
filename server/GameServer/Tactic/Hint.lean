@@ -42,7 +42,7 @@ elab (name := Hint) "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => d
     -- want the text to possibly contain quotation of the local variables which might have been
     -- named differently by the player.
     let varsName := `vars
-    let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr)) fun vars => do
+    let text ← withLocalDeclD varsName (mkApp (mkConst ``Array [Level.zero]) (mkConst ``Expr)) fun vars => do
       let mut text ← `(m! $msg)
       let goalDecl ← goal.getDecl
       let decls := goalDecl.lctx.decls.toArray.filterMap id

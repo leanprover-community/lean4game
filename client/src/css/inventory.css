@@ -23,6 +23,10 @@
 }
 
 .inventory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex-wrap : wrap;
   padding: 0 1em;
 }
 
@@ -39,6 +43,13 @@
 .inventory-panel .documentation.hidden {
   display: none;
   transition: display 2s;
+}
+
+.inventory {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 100%;
 }
 
 
@@ -87,8 +98,4 @@
 
 .inventory .item .insert-button {
   color: #ccc;
-
-
-  right:
-
 }

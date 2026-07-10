@@ -23,7 +23,7 @@ const defaultPreferences: Preferences = {
   language: import.meta.env.VITE_CLIENT_DEFAULT_LANGUAGE || "en",
   isSuggestionsMobileMode: true,
   useFlags: false,
-  showLockedInventory: false,
+  showLockedInventory: true,
 };
 
 const storage = createJSONStorage<Preferences>(() => localStorage)

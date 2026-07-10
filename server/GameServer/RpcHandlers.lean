@@ -213,7 +213,12 @@ def getProofState (p : ProofStateParams) : RequestM (RequestTask (Option ProofSt
   bindTaskCostly doc.cmdSnaps.waitAll fun (snaps, _) => do
     mapTaskCostly doc.reporter fun () => do
       let mut steps : Array <| InteractiveGoalsWithHints := #[]
-      let mut diag : Array InteractiveDiagnostic ← doc.diagnosticsRef.get
+
+      let mut diag : Array InteractiveDiagnostic ← doc.diagnosticsMutex.atomically do
+        let ds ← get
+        let stickyDiags ← ds.stickyDiagsRef.get
+        let diags := ds.diags
+        return stickyDiags ++ diags |>.toArray
 
       -- Level is completed if there are no errors or warnings
       let completedWithWarnings : Bool := ¬ diag.any (·.severity? == some .error)

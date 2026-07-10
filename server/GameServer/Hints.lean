@@ -32,7 +32,7 @@ instance : Repr GoalHintEntry := {
  TODO: explain better. -/
 unsafe def evalHintMessageUnsafe : Expr → MetaM (Array Expr → MessageData) :=
   evalExpr (Array Expr → MessageData)
-    (.forallE default (mkApp (mkConst ``Array [levelZero]) (mkConst ``Expr))
+    (.forallE default (mkApp (mkConst ``Array [Level.zero]) (mkConst ``Expr))
       (mkConst ``MessageData) .default)
 
 @[implemented_by evalHintMessageUnsafe]

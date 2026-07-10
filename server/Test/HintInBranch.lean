@@ -9,10 +9,12 @@ World "Test"
 Level 1
 
 /--
-info: There are 3 keys for tranlation: [level completed! 🎉, level completed with warnings… 🎭, intermediate goal solved! 🎉]
+info: There are 3 keys marked for translation: [level completed! 🎉,
+ level completed with warnings… 🎭,
+ intermediate goal solved! 🎉]
 -/
 #guard_msgs in
-ListTranslations
+print_translation_keys
 
 Statement (n : Nat) : 0 + n = n := by
   Template
@@ -27,7 +29,7 @@ Statement (n : Nat) : 0 + n = n := by
   simp
 
 /--
-info: There are 6 keys for tranlation: [level completed! 🎉,
+info: There are 6 keys marked for translation: [level completed! 🎉,
  level completed with warnings… 🎭,
  intermediate goal solved! 🎉,
  outside,
@@ -35,7 +37,7 @@ info: There are 6 keys for tranlation: [level completed! 🎉,
  outside again]
 -/
 #guard_msgs in
-ListTranslations
+print_translation_keys
 
 Level 2
 
@@ -47,4 +49,4 @@ Statement : True := by
 
 /-- some hint inside branch -/
 #guard_msgs (substring := true) in
-ListTranslations
+print_translation_keys

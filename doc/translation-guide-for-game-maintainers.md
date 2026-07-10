@@ -22,7 +22,7 @@ Share the files `Game.pot`, `glossary.csv` and any guidelines for translation wi
 
 ### 3. Review
 
-We strongly recommend getting translations reviewed by a member of the lean community familiar with the language before publication.  This is to prevent both illegible machine translations as well as offensive or inappropriate language from appearing on the server.  We recommend the tool [Poedit](https://poedit.net/) for working with `.pot` and `.po` files.  Among other advantages, it allows you to specifically review a given range of sentences, e.g. 50–100 at a time, so you can distribute the review workload.
+We strongly recommend getting translations reviewed by a member of the lean community familiar with the language before publication.  This is to prevent both illegible machine translations as well as offensive or inappropriate language from appearing on the server.  We recommend using a dedicated tool like [Poedit](https://poedit.net/) for working with `.pot` and `.po` files.  
 
 ### 4. Publication
 - Save the `.po` file with the translations to
