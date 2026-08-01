@@ -21,6 +21,7 @@ import { gameInfoAtomFamily } from '../store/query-atoms';
 import { preferencesAtom } from '../store/preferences-atoms';
 import { gameTilesAtom } from '../store/tiles-atoms';
 import { GameTileWithName } from '../store/api';
+import { getGameI18n } from '../i18n';
 
 function Tile({tileWithName}: {tileWithName: GameTileWithName}) {
   const { t, i18n } = useTranslation()
@@ -29,20 +30,22 @@ function Tile({tileWithName}: {tileWithName: GameTileWithName}) {
 
   const gameTile = tileWithName.tile
   const gameId = `g/${tileWithName.owner}/${tileWithName.game}`
+  const gameI18n = getGameI18n(tileWithName.settings?.allowEmptyTranslations ?? false)
+  const gameT = gameI18n.getFixedT(i18n.resolvedLanguage ?? i18n.language)
 
   return <div className="game" onClick={() => navigateToGame(gameId)}>
       <div className="wrapper">
-        <div className="title">{t(gameTile.title, {ns: gameId})}</div>
-        <div className="short-description">{t(gameTile.short, { ns: gameId })}
+        <div className="title">{gameT(gameTile.title, {ns: gameId})}</div>
+        <div className="short-description">{gameT(gameTile.short, { ns: gameId })}
         </div>
         { gameTile.image ? <img className="image" src={path.join("data", gameId, gameTile.image)} alt="" /> : <div className="image"/> }
-        <div className="long description"><Markdown>{t(gameTile.long, { ns: gameId })}</Markdown></div>
+        <div className="long description"><Markdown>{gameT(gameTile.long, { ns: gameId })}</Markdown></div>
       </div>
       <table className="info">
         <tbody>
         <tr>
           <td title="consider playing these games first.">{t("Prerequisites")}</td>
-          <td><Markdown>{t(gameTile.prerequisites.join(', '), { ns: gameId })}</Markdown></td>
+          <td><Markdown>{gameT(gameTile.prerequisites.join(', '), { ns: gameId })}</Markdown></td>
         </tr>
         <tr>
           <td>{t("Worlds")}</td>

@@ -278,6 +278,17 @@ describe('Basic Lean4Game Features', () => {
       cy.contains('Du kannst mit h oder g starten.').should('be.visible')
     })
 
+    it('should render an intentionally empty game translation', () => {
+      cy.get('#menu-btn').click()
+      cy.contains('Preferences').click()
+      cy.get('.MuiSelect-select').click()
+      cy.get('li[data-value="de"]').click({ force: true })
+      cy.get('.codicon').click()
+
+      cy.contains('This is the introduction text of the game.').should('not.exist')
+      cy.get('.chat-panel .hint').should('not.exist')
+    })
+
     it('should not change language of hints to selected language if translation is not available', () => {
       navigateToLevel()
       // Click menu button to open dropdown

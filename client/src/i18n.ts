@@ -9,7 +9,7 @@ i18n
     ns: ['translation'],
     backend: {
       // > see https://github.com/i18next/i18next-http-backend
-      loadPath: function(lngs, namespaces: Array<string>) {
+      loadPath: function(lngs: string[], namespaces: string[]) {
         const lng = lngs[0];
         const ns = namespaces[0]
 
@@ -36,4 +36,20 @@ i18n
     }
   });
 
-  export default i18n;
+let emptyStringI18n: typeof i18n | undefined
+
+/**
+ * Return an i18next instance for game strings.
+ *
+ * The clone shares loaded resources with the main instance, but treats an
+ * explicit empty string as a valid translation. Keeping this option on a
+ * separate instance prevents intentionally empty game strings from changing
+ * fallback behaviour for the interface or for games which have not opted in.
+ */
+export function getGameI18n(allowEmptyTranslations: boolean): typeof i18n {
+  if (!allowEmptyTranslations) return i18n
+  emptyStringI18n ??= i18n.cloneInstance({ returnEmptyString: true })
+  return emptyStringI18n
+}
+
+export default i18n;

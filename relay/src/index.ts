@@ -131,7 +131,7 @@ const server = app
           } catch (err) {
             continue
           }
-          games.push({owner: entry.owner, game: entry.game, tile: gameJson.tile})
+          games.push({owner: entry.owner, game: entry.game, tile: gameJson.tile, settings: gameJson.settings})
       }
 
       // Load local games
@@ -151,7 +151,7 @@ const server = app
           } catch (err) {
             continue
           }
-          games.push({owner: "local", game: entry.name, tile: gameJson.tile})
+          games.push({owner: "local", game: entry.name, tile: gameJson.tile, settings: gameJson.settings})
         }
       }
 
