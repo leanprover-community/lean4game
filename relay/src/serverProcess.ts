@@ -80,6 +80,44 @@ export class GameManager {
     }
   }
 
+  /**
+   * The directory of the game's copy of the `GameServer` lake package.
+   *
+   * Usually this is a git dependency in `.lake/packages/`, but when developing the game engine
+   * (`lake update -R -Klean4game.local`) it is a local path dependency, which lake records in
+   * the game's manifest.
+   */
+  getGameServerDir(gameDir: string) : string | null {
+    const manifestPath = path.join(gameDir, 'lake-manifest.json')
+    if (fs.existsSync(manifestPath)) {
+      try {
+        const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+        const pkg = (manifest.packages ?? []).find((p: any) => p.name === 'GameServer')
+        if (pkg) {
+          const packagesDir = manifest.packagesDir ?? path.join('.lake', 'packages')
+          const dir = pkg.type === 'path'
+            ? path.resolve(gameDir, pkg.dir)
+            : path.join(gameDir, packagesDir, pkg.name, pkg.subDir ?? '')
+          if (fs.existsSync(dir)) return dir
+        }
+      } catch (e) {
+        console.error(`[${new Date()}] Could not read ${manifestPath}: ${e}`)
+      }
+    }
+    // Fallback for the usual layout in case the manifest is missing or unreadable
+    const dir = path.join(gameDir, '.lake', 'packages', 'GameServer', 'server')
+    return fs.existsSync(dir) ? dir : null
+  }
+
+  /** Whether the game's `GameServer` provides the `LevelScope` command (v4.31.0 and later). */
+  gameServerHasLevelScope(gameDir: string) : boolean {
+    const gameServerDir = this.getGameServerDir(gameDir)
+    if (!gameServerDir) return false
+    const runnerPath = path.join(gameServerDir, 'GameServer', 'Runner.lean')
+    return fs.existsSync(runnerPath) &&
+      fs.readFileSync(runnerPath, 'utf8').includes('elab "LevelScope"')
+  }
+
   createGameProcess(owner: string, repo: string, customLeanServer: string | null) {
     let game_dir = this.getGameDir(owner, repo);
     if (!game_dir) return;
@@ -187,6 +225,16 @@ export class GameManager {
     const gameDataPath = path.join(gameDir, '.lake', 'gamedata', `game.json`)
     const gameData = JSON.parse(fs.readFileSync(gameDataPath, 'utf8'))
 
+    // `LevelScope` is a command that applies the level's `open`s/`set_option`s before the
+    // `Runner` command is *parsed*, which is what makes scoped notation available to the
+    // player. Games pinned to an older `GameServer` do not know that command, so we only
+    // emit it if their copy of the library provides it.
+    const usesLevelScope = this.gameServerHasLevelScope(gameDir)
+    if (!usesLevelScope) {
+      console.warn(`[${new Date()}] Game uses a 'GameServer' without the 'LevelScope' command; ` +
+        `scoped notation will not be available in the editor: ${gameDir}`)
+    }
+
     /** Sending messages from the client to the server */
     socketConnection.forward(serverConnection, (message: any) => {
       if (message?.error) {
@@ -234,9 +282,14 @@ export class GameManager {
         }
 
         let content = message.params.textDocument.text;
+        // Note: `LevelScope` and `Runner` have to stay on the same line as each other so that
+        // the proof still starts on line `PROOF_START_LINE`.
+        const levelIdArgs =
+          `${JSON.stringify(gameData.name)} ${JSON.stringify(worldId)} ${levelId} `
         message.params.textDocument.text =
-          `import ${levelData.module} import GameServer.Runner \nRunner ` +
-          `${JSON.stringify(gameData.name)} ${JSON.stringify(worldId)} ${levelId} ` +
+          `import ${levelData.module} import GameServer.Runner \n` +
+          (usesLevelScope ? `LevelScope ${levelIdArgs}` : ``) +
+          `Runner ` + levelIdArgs +
           `(difficulty := ${difficulty}) ` +
           `(inventory := [${inventory.map(s => JSON.stringify(s)).join(',')}]) ` +
           `:= by\n${content}\n`
