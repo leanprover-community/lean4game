@@ -15,7 +15,7 @@ defaults:
   run:
     shell: bash
 env:
-  NODE_VERSION: 24
+  NODE_VERSION: 26
 jobs:
   test:
     strategy:
