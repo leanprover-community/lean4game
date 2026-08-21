@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { GameHint, ProofState } from "../../../../api/rpc_api"
 import React from "react"
-import { Button } from "@mui/material"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDeleteLeft } from "@fortawesome/free-solid-svg-icons"
 import { filterHints } from "../../../hints"
@@ -9,6 +8,7 @@ import { deletedChatAtom, helpAtom } from "../../../../store/chat-atoms"
 import { useAtom } from "jotai"
 import { editor } from 'monaco-editor'
 import { codeAtom, deleteCodeFromLineAtom, lastProofStepHasErrorsAtom } from "../../../../store/editor-atoms"
+import { Button } from "../../../button"
 
 //FIXME: implement
 function isLastStepWithErrors(x: any, y: any) {
@@ -38,7 +38,7 @@ export function Command({ proof, i }: { proof: ProofState, i: number }) {
     return <div className="command">
       <div className="command-text">{proof.steps[i].command}</div>
       <Button className="undo-button btn btn-inverted" title={t("Retry proof from here")} onClick={ev => {
-        deleteCodeFromLine(i)
+        deleteCodeFromLine(i-1)
         ev.stopPropagation()
       }}>
         <FontAwesomeIcon icon={faDeleteLeft} />&nbsp;{t("Retry")}

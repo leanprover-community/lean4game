@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { gameInfoAtom } from "../../../store/query-atoms";
 import { gameIdAtom, worldIdAtom } from "../../../store/location-atoms";
 import path from "node:path";
-import { proofAtom } from "../../../store/editor-atoms";
+import { proofAtom, proofQueryAtom } from "../../../store/editor-atoms";
 import { ExerciseStatement } from "../ExerciseStatement";
 import { ProofStep } from "./proof_step/ProofStep";
 import { TypewriterCommandLine } from "./TypewriterCommandline";

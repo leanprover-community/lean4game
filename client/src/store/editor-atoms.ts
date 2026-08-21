@@ -70,6 +70,13 @@ export const codeAtom = atom(
   (get, set, val: string) => {
     const model = get(modelAtom)
     model?.setValue(val)
+
+    // FIXME: This is hacky. Changes to `codeAtom)` already retriggers this query, but too fast so
+    // the Lean server answers with the old file. The old version used
+    // `useServerNotificationEffect('textDocument/publishDiagnostics' ...)`
+    // to wait until the server publishes diagnostics, then ask for the proof, but I
+    // didn't get that to work yet...
+    setTimeout( () => { get(proofQueryAtom).refetch() }, 1000 );
   }
 )
 
@@ -113,7 +120,7 @@ export const deleteCodeFromLineAtom = atom(null, (get, set, line: number) => {
 export const proofQueryAtom = atomWithQuery<ProofState>((get) => {
   const worldId = get(worldIdAtom)
   const levelId = get(levelIdAtom)
-  const code = get(codeStorageAtom)
+  const code = get(codeAtom)
   const rpcSess = get(rpcSessionAtom)
   return {
     queryKey: ['proof', worldId, levelId, rpcSess?.sessionId, code],

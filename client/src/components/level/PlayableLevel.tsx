@@ -29,6 +29,7 @@ export function PlayableLevel() {
   const [code, setCode] = useAtom(codeStorageAtom)
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [{ data: levelInfo, isLoading: levelInfoIsLoading }] = useAtom(levelInfoAtom)
+
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
   // set to true to prevent switching between typewriter and editor

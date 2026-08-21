@@ -2,6 +2,8 @@
 .inventory-panel .documentation {
   position: absolute;
   display: block;
+  width: 100%;
+  height: 100%;
   top: 0;
   left: 0;
   z-index: 10;
@@ -27,7 +29,7 @@
   flex-direction: column;
   gap: 0;
   flex-wrap : wrap;
-  padding: 0 1em;
+  padding: 0;
 }
 
 .inventory h2, .inventory-panel .documentation h2, .inventory-panel .documentation h1 {
@@ -57,8 +59,8 @@
   background: #fff;
   /* border: solid 1px #777; */
   border-bottom: solid 1px var(--clr-dark-gray);
-  padding-left: .5rem;
-  padding-right: 1rem;
+  padding-left: 1.5rem;
+  padding-right: 2rem;
   padding-top: .125rem;
   padding-bottom: .125rem;
   position: relative;
@@ -93,7 +95,7 @@
   vertical-align: top;
   position: absolute;
   top: 0;
-  right: 0;
+  right: .25rem;
 }
 
 .inventory .item .insert-button {
