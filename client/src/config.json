@@ -39,6 +39,11 @@
       "iso": "fr",
       "flag": "FR",
       "name": "Français"
-    }
+    },
+    {
+      "iso": "ru",
+      "flag": "RU",
+      "name": "Русский"
+  }
   ]
 }
