@@ -5,17 +5,17 @@ contact_links:
     about: Raise issues regarding the contents of the Natural Number Game
   - name: Robo/Scribble
     url: https://github.com/hhu-adam/robo/issues/new/choose
-    url: Raise issues regarding the contents of the game Robo/Scribble
+    about: Raise issues regarding the contents of the game Robo/Scribble
   - name: Real Analysis Game
     url: https://github.com/alexkontorovich/realanalysisgame/issues/new/choose
-    about: Raise issues regarding the contents of the game Robo/Scribble    
+    about: Raise issues regarding the contents of the game Robo/Scribble
   - name: Set Theory Game
     url: https://github.com/djvelleman/stg4/issues/new/choose
     about: Raise issues regarding the contents of the Set Theory Game
   - name: Logic Game
     url: https://github.com/trequetrum/lean4game-logic/issues/new/choose
     about: Raise issues regarding the contents of the Logic Game
-  - name: Reintroduction to Proofs 
+  - name: Reintroduction to Proofs
     url: https://github.com/emilyriehl/reintroductiontoproofs/issues/new/choose
     about: Raise issues regarding the contents of the game Reintroduction to Proofs
   - name: Knights and Knaves
