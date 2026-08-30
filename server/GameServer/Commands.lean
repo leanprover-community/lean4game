@@ -131,13 +131,15 @@ elab "CoverImage" t:str : command => do
   modifyCurGame fun game => pure {game with
     tile := {game.tile with image := file}}
 
-syntax settingsArg := atomic(" (" (&"allowEmptyTranslations" <|> &"unbundleHyps") " := " withoutPosition(term) ")")
+syntax settingsArg := atomic(" (" (&"allowEmptyTranslations" <|> &"fallbackLanguage" <|> &"hideMissingTranslations" <|> &"unbundleHyps") " := " withoutPosition(term) ")")
 
 /--
 Settings to customise the game appearance. Usage `Settings (setting1 := val1) (setting2 := val2)`.
 Valid settings are:
 
 * (allowEmptyTranslations := false)
+* (fallbackLanguage := "en")
+* (hideMissingTranslations := false)
 * (unbundleHyps := false)
  -/
 elab "Settings " args:settingsArg* : command => do
@@ -148,6 +150,12 @@ elab "Settings " args:settingsArg* : command => do
       settings := { settings with allowEmptyTranslations := true }
     | `(settingsArg| (allowEmptyTranslations := false)) =>
       settings := { settings with allowEmptyTranslations := false }
+    | `(settingsArg| (fallbackLanguage := $language:str)) =>
+      settings := { settings with fallbackLanguage := language.getString }
+    | `(settingsArg| (hideMissingTranslations := true)) =>
+      settings := { settings with hideMissingTranslations := true }
+    | `(settingsArg| (hideMissingTranslations := false)) =>
+      settings := { settings with hideMissingTranslations := false }
     | `(settingsArg| (unbundleHyps := true)) => settings := { settings with unbundleHyps := true }
     | `(settingsArg| (unbundleHyps := false)) => settings := { settings with unbundleHyps := false }
     | _ => throwUnsupportedSyntax

@@ -25,6 +25,8 @@ export interface GameTileWithName {
 
 export interface GameSettings {
   allowEmptyTranslations?: boolean
+  fallbackLanguage?: string
+  hideMissingTranslations?: boolean
   unbundleHyps: boolean
 }
 

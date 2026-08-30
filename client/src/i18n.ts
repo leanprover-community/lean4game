@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import Backend from "i18next-http-backend"
 import { initReactI18next } from "react-i18next";
+import type { GameSettings } from "./store/api";
 
 i18n
 .use(initReactI18next)
@@ -36,20 +37,34 @@ i18n
     }
   });
 
-let emptyStringI18n: typeof i18n | undefined
+const gameI18nInstances = new Map<string, typeof i18n>()
 
 /**
  * Return an i18next instance for game strings.
  *
- * The clone shares loaded resources with the main instance, but treats an
- * explicit empty string as a valid translation. Keeping this option on a
- * separate instance prevents intentionally empty game strings from changing
- * fallback behaviour for the interface or for games which have not opted in.
+ * The clone shares loaded resources with the main instance, but keeps game
+ * fallback and missing-translation policy separate from the interface and
+ * other games.
  */
-export function getGameI18n(allowEmptyTranslations: boolean): typeof i18n {
-  if (!allowEmptyTranslations) return i18n
-  emptyStringI18n ??= i18n.cloneInstance({ returnEmptyString: true })
-  return emptyStringI18n
+export function getGameI18n(settings?: GameSettings): typeof i18n {
+  const fallbackLanguage = settings?.fallbackLanguage ?? "en"
+  const allowEmptyTranslations = settings?.allowEmptyTranslations ?? false
+  const hideMissingTranslations = settings?.hideMissingTranslations ?? false
+
+  if (fallbackLanguage === "en" && !allowEmptyTranslations && !hideMissingTranslations) {
+    return i18n
+  }
+
+  const key = JSON.stringify({ fallbackLanguage, allowEmptyTranslations, hideMissingTranslations })
+  let gameI18n = gameI18nInstances.get(key)
+  if (!gameI18n) {
+    gameI18n = i18n.cloneInstance({
+      fallbackLng: fallbackLanguage,
+      returnEmptyString: allowEmptyTranslations || hideMissingTranslations,
+    })
+    gameI18nInstances.set(key, gameI18n)
+  }
+  return gameI18n
 }
 
 export default i18n;

@@ -27,25 +27,40 @@ function Tile({tileWithName}: {tileWithName: GameTileWithName}) {
   const { t, i18n } = useTranslation()
   const [, navigateToGame] = useAtom(gameIdAtom)
   const [preferences] = useAtom(preferencesAtom)
+  const [, rerenderAfterFallbackLoad] = React.useState(0)
 
   const gameTile = tileWithName.tile
   const gameId = `g/${tileWithName.owner}/${tileWithName.game}`
-  const gameI18n = getGameI18n(tileWithName.settings?.allowEmptyTranslations ?? false)
+  const fallbackLanguage = tileWithName.settings?.fallbackLanguage ?? "en"
+  React.useEffect(() => {
+    let active = true
+    void i18n.loadLanguages(fallbackLanguage).then(() => {
+      if (active) rerenderAfterFallbackLoad(n => n + 1)
+    })
+    return () => { active = false }
+  }, [fallbackLanguage, i18n])
+  const gameI18n = getGameI18n(tileWithName.settings)
   const gameT = gameI18n.getFixedT(i18n.resolvedLanguage ?? i18n.language)
+  const gameTranslationOptions = {
+    ns: gameId,
+    fallbackLng: fallbackLanguage,
+    returnEmptyString: tileWithName.settings?.allowEmptyTranslations || tileWithName.settings?.hideMissingTranslations,
+    ...(tileWithName.settings?.hideMissingTranslations ? { defaultValue: "" } : {}),
+  }
 
   return <div className="game" onClick={() => navigateToGame(gameId)}>
       <div className="wrapper">
-        <div className="title">{gameT(gameTile.title, {ns: gameId})}</div>
-        <div className="short-description">{gameT(gameTile.short, { ns: gameId })}
+        <div className="title">{gameT(gameTile.title, gameTranslationOptions)}</div>
+        <div className="short-description">{gameT(gameTile.short, gameTranslationOptions)}
         </div>
         { gameTile.image ? <img className="image" src={path.join("data", gameId, gameTile.image)} alt="" /> : <div className="image"/> }
-        <div className="long description"><Markdown>{gameT(gameTile.long, { ns: gameId })}</Markdown></div>
+        <div className="long description"><Markdown>{gameT(gameTile.long, gameTranslationOptions)}</Markdown></div>
       </div>
       <table className="info">
         <tbody>
         <tr>
           <td title="consider playing these games first.">{t("Prerequisites")}</td>
-          <td><Markdown>{gameT(gameTile.prerequisites.join(', '), { ns: gameId })}</Markdown></td>
+          <td><Markdown>{gameT(gameTile.prerequisites.join(', '), gameTranslationOptions)}</Markdown></td>
         </tr>
         <tr>
           <td>{t("Worlds")}</td>
