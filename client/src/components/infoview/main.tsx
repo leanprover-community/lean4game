@@ -141,7 +141,6 @@ function DualEditorMain() {
 function ExerciseStatement({ showLeanStatement = false }) {
   const { t : gT } = useGameTranslation()
   const { t } = useTranslation()
-  const [gameId] = useAtom(gameIdAtom)
   const [{ data: levelInfo }] = useAtom(levelInfoAtom)
 
   if (!(levelInfo?.descrText || levelInfo?.descrFormat)) { return <></> }
@@ -149,7 +148,7 @@ function ExerciseStatement({ showLeanStatement = false }) {
     <div className="exercise-statement">
       {levelInfo?.descrText ?
         <Markdown>
-          {(levelInfo?.displayName ? `**${t("Theorem")}** \`${levelInfo?.displayName}\`: ` : '') + t(levelInfo?.descrText, {ns: gameId})}
+          {(levelInfo?.displayName ? `**${t("Theorem")}** \`${levelInfo?.displayName}\`: ` : '') + gT(levelInfo?.descrText)}
         </Markdown> : levelInfo?.displayName &&
         <Markdown>
           {(levelInfo?.displayName ? `**${t("Theorem")}** \`${levelInfo?.displayName}\`: ` : '') + gT(levelInfo?.descrText ?? "")}
