@@ -4,7 +4,7 @@ import App from './app'
 import { Provider } from 'react-redux'
 import Welcome from './components/welcome'
 import LandingPage from './components/landing_page'
-import Level from './components/level'
+import Level from './components/level/Level'
 import './i18n';
 import { useAtom } from 'jotai'
 import { gameIdAtom, hashSegmentsAtom, levelIdAtom, pathSegmentsAtom, redirectAtom, worldIdAtom } from './store/location-atoms'

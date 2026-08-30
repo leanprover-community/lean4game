@@ -126,14 +126,12 @@
 
 .typewriter .typewriter-input {
   flex: 0 0 auto;
-  width: 100%;
   align-self: flex-start;
   margin-top: 0;
 }
 
 .typewriter-input .monaco-editor,
 .typewriter-input .monaco-editor-background {
-  height: 100%;
   margin-top: 0;
 }
 
@@ -211,10 +209,6 @@
   scroll-behavior: smooth;
 }
 
-.typewriter-interface .content .tmp-pusher {
-  flex: 1;
-}
-
 .exercise .command {
   background-color: #bbb;
   padding: .5em;
@@ -225,6 +219,7 @@
   margin-bottom: 1.5rem;
   display: flex;
   flex-direction: row;
+  gap: .5em;
 }
 
 .exercise .failed-command {
@@ -248,6 +243,7 @@
 
 .undo-button {
   color: #888;
+  background-color: white;
 }
 
 .crashed_message {
@@ -292,4 +288,12 @@
 .goal-sign line {
   stroke: var(--clr-dark-gray);
   stroke-width: 2;
+}
+
+.exercise-statement {
+  padding-left: .5em;
+  padding-right: .5em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  margin: 0;
 }

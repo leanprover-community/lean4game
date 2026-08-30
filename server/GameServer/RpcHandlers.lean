@@ -354,8 +354,6 @@ def getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Optio
 
 end GameServer
 
-
-
 @[server_rpc_method]
 def Game.getInteractiveGoals (p : Lsp.PlainGoalParams) : RequestM (RequestTask (Option Widget.InteractiveGoals)) :=
   FileWorker.getInteractiveGoals p

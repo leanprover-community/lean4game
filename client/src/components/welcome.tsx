@@ -38,7 +38,7 @@ function IntroductionPanel({setPageNumber}: {setPageNumber: (val: number) => voi
   // let text: Array<string> = introduction.split(/\n(\s*\n)+/)
   let text: Array<string> = gameInfo?.introduction ? [gT(gameInfo.introduction)] : []
 
-  return <div className="column chat-panel">
+  return <div className="panel chat-panel">
     <div className="chat">
       {text?.map(((t, i) =>
         t.trim() ?

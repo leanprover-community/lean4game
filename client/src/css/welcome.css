@@ -3,25 +3,7 @@
   fill: var(--clr-primary)
 } */
 
-.welcome {
-  height: 100%;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-}
-
-.welcome.mobile .column {
-  width: 100%;
-}
-
-.app-content {
-  height: 100%
-}
-
-.welcome .column {
-  height: 100%;
-  overflow: auto;
-  position: relative;
+.panel {
   scroll-behavior: smooth;
 }
 

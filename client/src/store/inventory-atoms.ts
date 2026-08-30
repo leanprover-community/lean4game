@@ -2,9 +2,9 @@ import { Atom, atom } from "jotai";
 import { Doc, InventoryOverview, InventoryTile } from "./api";
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
 import { atomWithQuery } from "jotai-tanstack-query";
-import { atomFamily } from "jotai/utils";
 import { progressAtom } from "./progress-atoms";
 import { preferencesAtom } from "./preferences-atoms";
+import { atomFamily } from "jotai-family";
 
 /** Valid inventory tabs */
 export enum InventoryTab {

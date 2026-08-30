@@ -1,7 +1,7 @@
 import { atom } from "jotai"
-import { atomFamily } from "jotai/utils"
 import { progressAtom } from "./progress-atoms"
 import { gameInfoAtom, gameInfoAtomFamily } from "./query-atoms"
+import { atomFamily } from "jotai-family"
 
 /** World progress family */
 export const worldProgressAtomFamily = atomFamily((worldId: string) => atom(get => {
