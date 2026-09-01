@@ -29,6 +29,8 @@ Then, depending on the setup you use, do one of the following:
     npm install
     ```
     where `{VERSION_TAG}` is the tag from above of the form `v4.X.0`
+    Note: It is recommended to delete `node_modules` , `client/node_modules` , `server/.lake` , `relay/dist` first
+
 * **Gitpod/Codespaces**: Create a fresh one
 
 This will update your game (and the mathlib version you might be using) to the new lean version.
