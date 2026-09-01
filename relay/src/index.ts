@@ -9,6 +9,7 @@ import { spawn } from 'child_process'
 import { GameManager } from './serverProcess.js';
 import { GameSessionsObserver } from './websocket.js';
 import { WebSocketServer } from 'ws';
+import { gameActivityStore } from './services/GameActivityStore.js';
 // import fs from 'fs'
 // const __filename = url.fileURLToPath(import.meta.url);
 
@@ -21,6 +22,28 @@ const API = process.env.API_PORT
 
 const environment = process.env.NODE_ENV;
 const isDevelopment = environment === 'development';
+
+async function registerInstalledGames() {
+  const gamesPath = path.join(process.cwd(), 'games')
+  try {
+    const owners = await fs.promises.readdir(gamesPath, { withFileTypes: true })
+    for (const owner of owners) {
+      if (!owner.isDirectory() || owner.name.startsWith('.') || owner.name === 'tmp') continue
+      const repos = await fs.promises.readdir(path.join(gamesPath, owner.name), { withFileTypes: true })
+      for (const repo of repos) {
+        if (!repo.isDirectory() || repo.name.startsWith('.')) continue
+        await gameActivityStore.recordSeen(owner.name, repo.name)
+      }
+    }
+  } catch (error: any) {
+    if (error?.code !== 'ENOENT') {
+      console.error("Failed to register installed games: " + error)
+    }
+  }
+}
+
+registerInstalledGames()
+  .catch(error => console.error("Failed to initialize game activity: " + error))
 
 let router = express.Router();
 router.get('/import/status/:owner/:repo', importStatus)
@@ -104,6 +127,18 @@ const server = app
       }
     })
   })
+  .get('/api/game-activity', async (_req, res) => {
+    if (!isDevelopment) {
+      res.sendStatus(404)
+      return
+    }
+    try {
+      res.json({ games: await gameActivityStore.getAll() })
+    } catch (error) {
+      console.error("Failed to read game activity: " + error)
+      res.status(500).json({ error: 'Failed to read game activity' })
+    }
+  })
   // endpoint `games`: list of available games for landing page
   .use('/api/games', async (req: any, res: any) => {
     try {
@@ -176,5 +211,13 @@ webSocketServer.addListener("connection", (ws, req) => { observerService.startOb
 observer.use('/api/game-sessions', (req, res) => {
     const measurement = observerService.getAllConnectedPlayers()
     res.status(200).send(measurement)
+  })
+  .use('/api/game-activity', async (_req, res) => {
+    try {
+      res.json({ games: await gameActivityStore.getAll() })
+    } catch (error) {
+      console.error("Failed to read game activity: " + error)
+      res.status(500).json({ error: 'Failed to read game activity' })
+    }
   })
 .listen(API, () => console.log(`API listening on ${API}`));

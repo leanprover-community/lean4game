@@ -28,7 +28,18 @@ For example for `npm start`, `npm run production`, `npm run start:relay`.
 
 | name | values | default | description |
 | ---- | ------ | ------- | ----------- |
-| `PORT` | a number | `8080` | sets the port for the backend server |
-| `API_PORT` | a number | `undefined` | TODO: describe |
+| `PORT` | Port number | `8080` | sets the port for the backend server |
+| `API_PORT` | Port number | `undefined` | sets the port for the separate API server |
+| `NODE_ENV` | `development`, `production` | set by npm scripts | Selects development or production behavior. |
+| `GAME_ACTIVITY_FILE` | file path | `games/.lean4game/activity.json` | Optional path for the game activity metadata file. |
+| `LEAN4GAME_GITHUB_USER` | GitHub username | not set | GitHub username sent with GitHub artifact download requests. |
+| `LEAN4GAME_GITHUB_TOKEN` | GitHub access token | not set | Token used to request and download game artifacts from GitHub. For public games, a read-only token is enough. |
+| `ISSUE_CONTACT` | URL | not set | Link shown when an import cannot start because of the disk-space check. |
+| `RESERVED_DISC_SPACE_MB` | number of megabytes | not set | Value used by the disk-space check before importing a game artifact. |
 | `NO_BWRAP` | `true`, `false` | `false` | to disable to use of `bubblewrap` in production mode. This means `Lean` runs without any container on your system, which imposes a security risk! |
-| ... |  |  | TODO |
+
+#### API
+
+In production, `/api/game-activity` is not exposed on the public server. It is available on the separate API server configured with `API_PORT`, together with `/api/game-sessions`.
+
+The `/api/game-activity` endpoint lists all games known to the activity registry, including games that are not shown on the landing page.

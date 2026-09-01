@@ -5,6 +5,7 @@ import { safeImport } from './middleware.js'
 import { Octokit } from 'octokit';
 import { spawn } from 'child_process'
 import { fileURLToPath } from 'url';
+import { gameActivityStore } from './services/GameActivityStore.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,7 +42,8 @@ async function runProcess(id, cmd, args, cwd) {
     });
 
     ls.on('close', (code) => {
-      resolve()
+      if (code === 0) resolve()
+      else reject(new Error(cmd + " exited with code " + code))
     });
   })
 }
@@ -116,6 +118,15 @@ async function doImport (owner, repo, id) {
     await runProcess(id, "/bin/bash", [unpackingScript, gamesPath, artifactId, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
     // Install necessary toolchain
     await runProcess(id, "/bin/bash", [toolchainScript, gamesPath, owner.toLowerCase(), repo.toLowerCase()], path.join(__dirname, "..", ".."))
+
+    const gameJsonPath = path.join(
+      gamesPath, owner.toLowerCase(), repo.toLowerCase(), ".lake", "gamedata", "game.json"
+    )
+    if (!fs.existsSync(gameJsonPath)) {
+      throw new Error("Imported artifact does not contain " + gameJsonPath)
+    }
+    await gameActivityStore.recordImport(owner, repo)
+    progress[id].output += `Activity registry updated.\n`
 
 
     // let manifest = fs.readFileSync(`tmp/artifact_${artifactId}_inner/manifest.json`);
