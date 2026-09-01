@@ -68,17 +68,25 @@ function flush(done) {
   done();
 }
 
-
 module.exports = {
   input: [
-    'client/src/**/*.{tsx,ts}',
+    'src/**/*.{tsx,ts}',
     // Use ! to filter out files or directories
-    '!client/i18n/**',
+    '!i18n/**',
     '!**/node_modules/**',
   ],
   options: {
     debug: true,
-    removeUnusedKeys: true,
+    /**
+     * For example, the return value of a `TabTitle` element is
+     * subject to translation, but it is removed because it cannot
+     * be detected by i18next-scanner.
+     * 
+     * The relevant section will be displayed as a warning when
+     * `npm run translate` is executed, and resolving the warning
+     * will restore it to `true`.
+     */
+    removeUnusedKeys: false,
     func: {
       list: ['i18next.t', 'i18n.t', 't'],
       extensions: ['.js', '.jsx'] // not .ts or .tsx since we use i18next-scanner-typescript!
@@ -111,8 +119,8 @@ module.exports = {
       return ''; // Return empty string for other languages
     },
     resource: {
-      loadPath: './client/public/locales/{{lng}}/{{ns}}.json',
-      savePath: './client/public/locales/{{lng}}/{{ns}}.json',
+      loadPath: './public/locales/{{lng}}/{{ns}}.json',
+      savePath: './public/locales/{{lng}}/{{ns}}.json',
       jsonIndent: 2,
       lineEnding: '\n'
     },
@@ -148,5 +156,4 @@ module.exports = {
       done();
     }
   ),
-
 };
