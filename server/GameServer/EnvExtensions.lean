@@ -401,6 +401,16 @@ structure Game.Settings where
   -/
   allowEmptyTranslations : Bool := false
   /--
+  The language used for game strings when the player's selected language does
+  not contain a translation.
+  -/
+  fallbackLanguage : String := "en"
+  /--
+  If `true`, game strings without a translation in either the selected or
+  fallback language are rendered as empty instead of their source text.
+  -/
+  hideMissingTranslations : Bool := false
+  /--
   If `true`, display two hypotheses `A : Prop` and `B : Prop`
   instead of a joint `A B : Prop`.
   -/
@@ -415,8 +425,12 @@ instance : FromJson Game.Settings where
       | .ok value => fromJson? value
       | .error _ => .ok defaultValue
     let allowEmptyTranslations ← getBoolD "allowEmptyTranslations" false
+    let fallbackLanguage ← match json.getObjVal? "fallbackLanguage" with
+      | .ok value => fromJson? value
+      | .error _ => .ok "en"
+    let hideMissingTranslations ← getBoolD "hideMissingTranslations" false
     let unbundleHyps ← getBoolD "unbundleHyps" false
-    return { allowEmptyTranslations, unbundleHyps }
+    return { allowEmptyTranslations, fallbackLanguage, hideMissingTranslations, unbundleHyps }
 
 instance : Inhabited Game.Settings where
   default := {}

@@ -11,7 +11,7 @@ This is additional information about the game.
 "
 
 Languages "English"
-Settings (allowEmptyTranslations := true)
+Settings (allowEmptyTranslations := true) (fallbackLanguage := "de") (hideMissingTranslations := true)
 CaptionShort "Test Game"
 CaptionLong "This is a test game."
 -- Prerequisites "" -- add this if your game depends on other games
