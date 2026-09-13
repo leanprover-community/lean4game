@@ -23,6 +23,8 @@ export interface GameDiagnosticsParams {
   diagnostics: Diagnostic[];
 }
 
+const isSuggestionsMobileMode = 'ontouchstart' in document.documentElement;
+
 /** The input field */
 export function Typewriter({disabled}: {disabled?: boolean}) {
   let { t } = useTranslation()
@@ -79,8 +81,6 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
     editor.setPosition(pos)
   }, [typewriter, editor])
 
-  const [{ isSuggestionsMobileMode }] = useAtom(preferencesAtom)
-
   useEffect(() => {
     if (oneLineEditor && oneLineEditor.getValue() !== typewriter) {
       oneLineEditor.setValue(typewriter)
@@ -94,7 +94,7 @@ export function Typewriter({disabled}: {disabled?: boolean}) {
       oneLineEditor.setPosition({ column: editor.getValue().length + 1, lineNumber: 1 })
       isSuggestionsMobileMode || oneLineEditor.focus()
     }
-  }, [oneLineEditor, hasEditor, isSuggestionsMobileMode, editor])
+  }, [oneLineEditor, hasEditor, editor])
 
   /** If the last step has an error, add the command to the typewriter. */
   useEffect(() => {

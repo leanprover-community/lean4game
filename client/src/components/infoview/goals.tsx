@@ -98,7 +98,7 @@ function Hyp({ hyp: h, mvarId }: HypProps) {
             key={i}
             // FIXME: 3rd argument looks wrong
             onClick={ev => {
-                appendTypewriterInput(ev.shiftKey, n, h.isAssumption ?? false, h.isAssumption ?? false)
+                appendTypewriterInput(n, h.isAssumption ?? false, h.isAssumption ?? false)
                 ev.stopPropagation()
             } }
         >

@@ -35,7 +35,7 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
 
   const insertItemName = (ev: any) => {
     // navigator.clipboard.writeText(tile.displayName)
-    appendTypewriterInput(ev.shiftKey, tile.displayName, isTheorem, false)
+    appendTypewriterInput(tile.displayName, isTheorem, false)
     setInserted(true)
     setInterval(() => {
       setInserted(false)

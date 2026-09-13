@@ -79,11 +79,7 @@ const PREFIX_OVERRIDES: Record<string, string> = {
 }
 export function useAppendTypewriterInput() {
   const [typewriter, setTypewriter] = useAtom(typewriterContentAtom)
-  const [{ isSuggestionsMobileMode }] = useAtom(preferencesAtom)
-  return (shiftKey: boolean, suffix: string, isTheorem: boolean, isAssumption: boolean) => {
-    if (!isSuggestionsMobileMode && !shiftKey) {
-      return false
-    }
+  return (suffix: string, isTheorem: boolean, isAssumption: boolean) => {
     // Automagically detect and adjust punctuation for mobile keyboardless usage
     let _typewriter = typewriter.trim()
     if (!typewriter.length) {
