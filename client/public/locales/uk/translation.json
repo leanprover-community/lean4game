@@ -24,6 +24,7 @@
   "No Games": {
     "description": "Немає завантажених ігор. Використовуйте <1>http://localhost:3000/#/g/local/FOLDER</1>, щоб відкрити гру безпосередньо з локальної папки."
   },
+  "Tactics": "Тактики",
   "Progress saving": {
     "translation": "Збереження прогресу",
     "description": "Гра зберігає ваш прогрес у локальному сховищі браузера. Якщо ви видалите ці дані, прогрес буде втрачено!<br/>Попередження: у більшості браузерів видалення файлів cookie також призводить до очищення локального сховища (або «локальних даних сайту»). Обов’язково збережіть (завантажте) свій ігровий прогрес перед цим!"
@@ -55,6 +56,7 @@
   "Editor mode is enforced!": "Примусовий режим редактора!",
   "Editor mode": "Режим редактора",
   "Typewriter mode": "Режим друку",
+  "information, Impressum, privacy policy": "інформація, імпресум, політика конфіденційності",
   "Preferences": "Уподобання",
   "Game Info & Credits": "Інформація про гру та кредити",
   "Game Info": "Інформація про гру",
@@ -77,6 +79,7 @@
   "No Goals": "Немає мети",
   "Loading goal…": "Завантажуємо мету…",
   "Click somewhere in the Lean file to enable the infoview.": "Натисніть десь у файлі Lean, щоб увімкнути інформаційне вікно.",
+  "Waiting for Lean server to start…": "Очікування запуску Lean-сервера…",
   "Level completed! 🎉": "Рівень пройдено! 🎉",
   "Level completed with warnings 🎭": "Рівень пройдено з попередженнями 🎭",
   "Active Goal": "Активна ціль",
@@ -85,12 +88,16 @@
   "Character": "Символ",
   "Loading messages…": "Завантаження повідомлень…",
   "Execute": "Виконати",
+  "Definitions": "Визначення",
+  "Theorems": "Теореми",
   "Not unlocked yet": "Ще не розблоковано",
   "Not available in this level": "Недоступно на цьому рівні",
+  "This server has been developed as part of the project <1>ADAM : Anticipating the Digital Age of Mathematics</1> at Heinrich-Heine-Universität in Düsseldorf.": "Цей сервер був розроблений в рамках проекту <1>ADAM : Anticipating the Digital Age of Mathematics</1> в університеті Генріха Гейне в Дюссельдорфі.",
   "Prerequisites": "Передумови",
   "Worlds": "Світи",
   "Levels": "Рівні",
   "Language": "Мови",
+  "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>Ви хочете безповоротно видалити збережений прогрес?</p><p>(Це видаляє ваші докази та зібраний інвентар. Збереження з інших ігор не видаляються.)</p>",
   "Delete Progress?": "Видалити прогрес?",
   "Delete": "Видалити",
   "Download & Delete": "Скачати та видалити",
