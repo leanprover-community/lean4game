@@ -16,8 +16,8 @@ export function RulesHelpPopup () {
     <h2>{t("Game Rules")}</h2>
     <Trans>
       <p>
-        Game rules determine if it is allowed to skip levels and if the games runs checks to only
-        allow unlocked tactics and theorems in proofs.
+        Game rules determine whether skipping levels is permitted, and whether the game ensures
+        that only unlocked tactics and theorems are used in proofs.
       </p>
       <p>
         Note: "Unlocked" tactics (or theorems) are determined by two things: The set of minimal
