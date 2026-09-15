@@ -93,6 +93,62 @@ where addMessageByDifficulty (s : MessageData) :=
     logAt stx s (if difficulty > 1 then .error else .warning)
   else pure ()
 
+/--
+The scope of the level (i.e. the `open`s, the current namespace, the `set_option`s and the
+`variable`s active at the `Statement` in the level file).
+
+All position information is stripped from the syntax it contains: these positions point into
+the level file and would otherwise be reported in the player's editor.
+-/
+def levelScope (level : GameLevel) : Elab.Command.Scope :=
+  { level.scope with
+    varDecls := level.scope.varDecls.map (⟨·.raw.rewriteBottomUp fun stx => stx.setInfo .none⟩)
+    attrs :=  level.scope.attrs.map (⟨·.raw.rewriteBottomUp fun stx => stx.setInfo .none⟩)
+  }
+
+/-- Activate the scoped declarations (`scoped notation`, `scoped instance`, `scoped attribute`,
+…) of all namespaces that are open in `scope`. -/
+def activateScopedInScope (scope : Elab.Command.Scope) : CommandElabM Unit := do
+  for od in scope.openDecls do
+    let .simple ns _ := od
+      | pure ()
+    activateScoped ns
+  -- entering `namespace A.B` activates the scoped declarations of both `A` and `A.B`
+  let mut ns := Name.anonymous
+  for component in scope.currNamespace.components do
+    ns := ns ++ component
+    activateScoped ns
+
+/--
+Set the scope of the level (`open`s, current namespace, `set_option`s, `variable`s) in the
+command state.
+
+This needs to be a command of its own, placed *before* `Runner`: Lean parses each command with
+the scope the command state has *before* that command is parsed. Everything that influences
+parsing – most notably `scoped notation` such as `𝓝` from `open Topology` – is therefore only
+available in the player's proof if the corresponding `open` has already been processed by an
+earlier command. The `withScope` inside `Runner` only affects elaboration and comes too late for
+the parser, which has already turned `𝓝 x` into an application of the unknown identifier `𝓝`.
+-/
+elab "LevelScope" gameId:str worldId:str levelId:num : command => do
+  let levelId := {game := gameId.getString, world := worldId.getString, level := levelId.getNat}
+
+  let some level ← getLevel? levelId
+    | logError m!"Level not found: {levelId}"
+
+  let scope := levelScope level
+  -- Only apply what the *parser* of the following command needs, i.e. the namespace and the
+  -- `open`s. Everything else (options, `variable`s, …) is applied by `Runner` itself.
+  --
+  -- In particular the level's options must not be copied here: they are recorded while the game
+  -- is built with `lake build` and hence contain `internal.cmdlineSnapshots := true`. Applied to
+  -- the scope of the file, that makes the language server drop the info tree of the `Runner`
+  -- command, and the game can then no longer display any goals or hints.
+  modifyScope fun fileScope => { fileScope with
+    currNamespace := scope.currNamespace
+    openDecls := scope.openDecls }
+  activateScopedInScope scope
+
 -- TODO(Alex): Use config parser?
 -- TODO(Alex): Ensure Runner is the last command in the file
 /-- Run a game level -/
@@ -108,17 +164,12 @@ elab "Runner" gameId:str worldId:str levelId:num
   let some level ← getLevel? levelId
     | logError m!"Level not found: {levelId}"
 
-  -- use open namespaces and options as in the level file
-  let scope := { level.scope with
-    varDecls := level.scope.varDecls.map (⟨·.raw.rewriteBottomUp fun stx => stx.setInfo .none⟩)
-    attrs :=  level.scope.attrs.map (⟨·.raw.rewriteBottomUp fun stx => stx.setInfo .none⟩)
-  }
+  -- use open namespaces and options as in the level file.
+  -- Note: this only affects elaboration; for anything that affects parsing (i.e. scoped
+  -- notation) the `LevelScope` command above has to be run as a separate, earlier command.
+  let scope := levelScope level
   Elab.Command.withScope (fun _ => scope) do
-    for od in scope.openDecls do
-      let .simple ns _ := od
-        | pure ()
-      activateScoped ns
-    activateScoped scope.currNamespace
+    activateScopedInScope scope
 
     -- Position before first tactic and any prepended whitespace
     let startPos := byStx.getTailInfo.getRange?.getD (Lean.Syntax.Range.mk 0 0) |>.stop
