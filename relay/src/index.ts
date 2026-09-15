@@ -107,9 +107,12 @@ const server = app
     });
   })
   .use('/data/stats', (req, res, next) => {
-    // TODO: this throws on Windows
-    const statsScriptPath = path.join(__dirname, "..", "..", "scripts", "stats.sh");
-    const statsProcess = spawn('/bin/bash', [statsScriptPath, process.pid.toString()])
+    const statsScriptPath =
+      process.platform !== 'win32'
+        ? path.join(__dirname, "..", "..", "scripts", "stats.sh")
+        // TODO: If you install on the folder which was created with uppercase, it will fails. Also it's assume WSL is installed.
+        : path.join(__dirname, "..", "..", "scripts", "stats.sh").replaceAll("\\", "/").toLowerCase().replace(/^(\w)\:/, "/mnt/$1");
+    const statsProcess = spawn(process.platform === 'win32' ? 'bash' : '/bin/bash', [statsScriptPath, process.pid.toString()])
     let outputData = ''
     let errorData = ''
     statsProcess.stdout.on('data', (data) => {
@@ -172,6 +175,7 @@ const server = app
       // Load local games
       if (isDevelopment){
         const BASE_DIR = path.join(__dirname, "..", "..", "..", "..")
+        console.log(`Scanning ${BASE_DIR} for locally installed games in development mode`);
         const entries = await fs.promises.readdir(BASE_DIR, {
           withFileTypes: true,
         });
