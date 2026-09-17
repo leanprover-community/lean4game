@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useContext } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation, UseTranslationResponse } from 'react-i18next'
 import { gameIdAtom } from '../store/location-atoms';
 import { gameInfoAtom } from '../store/query-atoms';
@@ -61,16 +61,31 @@ function normalizeKeyString(key: string): string{
 export function useGameTranslation(): UseTranslationResponse<'translation', undefined> {
   const [gameId] = useAtom(gameIdAtom)
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  const settings = gameInfo?.settings
 
   const { t, i18n, ...rest } = useTranslation()
-  const gameI18n = getGameI18n(gameInfo?.settings?.allowEmptyTranslations ?? false)
+  const fallbackLanguage = settings?.fallbackLanguage ?? "en"
+  const [, rerenderAfterFallbackLoad] = useState(0)
+  useEffect(() => {
+    let active = true
+    void i18n.loadLanguages(fallbackLanguage).then(() => {
+      if (active) rerenderAfterFallbackLoad(n => n + 1)
+    })
+    return () => { active = false }
+  }, [fallbackLanguage, i18n])
+  const gameI18n = getGameI18n(settings)
   const gameT = gameI18n.getFixedT(i18n.resolvedLanguage ?? i18n.language)
   const pattern = /(?<!\\)§(\d+)/g;
   const modifiedT = ((key: string | undefined) => {
     if (!key) return ""
     const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
     // look-up the unmodified `key` in case of failure for backwards compatibility.
-    let translatedKey = gameT([keyWithoutBlocks, key], {ns: gameId})
+    let translatedKey = gameT([keyWithoutBlocks, key], {
+      ns: gameId,
+      fallbackLng: fallbackLanguage,
+      returnEmptyString: settings?.allowEmptyTranslations || settings?.hideMissingTranslations,
+      ...(settings?.hideMissingTranslations ? { defaultValue: "" } : {}),
+    })
     return translatedKey.replace(pattern, (_, num: string) => codeBlocks[Number(num)] ?? num);
   }) as typeof t
   return { t: modifiedT, i18n, ...rest }
