@@ -3,8 +3,8 @@ open Lake DSL
 
 package GameServer
 
-require "leanprover-community" / batteries @ git "v4.31.0"
-require "hhu-adam" / i18n @ git "v4.31.0"
+require "leanprover-community" / batteries @ git "main"
+require "hhu-adam" / i18n @ git "main"
 
 -- dev dependency
 -- require "leanprover-community" / importGraph @ git "main"

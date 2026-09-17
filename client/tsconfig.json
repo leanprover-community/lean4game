@@ -20,6 +20,6 @@
   },
   "include": [
     "./src/",
-    "./src/config.json",
+    "./src/config.json", "../infoview", "../infoview", "../infoview",
   ]
 }

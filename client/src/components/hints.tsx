@@ -1,7 +1,5 @@
-import { GameHint, InteractiveGoalsWithHints } from "./infoview/rpc_api";
 import * as React from 'react';
 import { Markdown } from './markdown';
-import { lastStepHasErrors } from "./infoview/goals";
 import { Button } from "./button";
 import { useGameTranslation } from "../utils/translation";
 import { useTranslation } from "react-i18next";
@@ -9,6 +7,11 @@ import { useAtom } from "jotai";
 import { gameIdAtom } from "../store/location-atoms";
 import { deletedChatAtom, helpAtom } from "../store/chat-atoms";
 import { proofAtom } from "../store/editor-atoms";
+import { GameHint, InteractiveGoalsWithHints } from './infoview/types';
+
+//FIXME: implement
+function lastStepHasErrors(x: any) {return false}
+
 
 /** Plug-in the variable names in a hint. We do this client-side to prepare
  * for i18n in the future. i.e. one should be able translate the `rawText`

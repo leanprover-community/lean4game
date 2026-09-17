@@ -2,11 +2,13 @@ import { faBan, faCheck, faClipboard, faLock, faReply } from "@fortawesome/free-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useAppendTypewriterInput } from "../infoview/context"
 import { InventoryTile } from "../../store/api"
 import { useAtom } from "jotai"
 import { selectedDocTileAtom } from "../../store/inventory-atoms"
 import { levelIdAtom } from "../../store/location-atoms"
+import { typewriterAtom, typewriterContentAtom } from "../../store/editor-atoms"
+import { preferencesAtom } from "../../store/preferences-atoms"
+import { useAppendTypewriterInput } from "../editor/typewriter/useAppendTypewriterInput"
 
 export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} : {
   tile: InventoryTile,
@@ -17,6 +19,9 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
   const { t } = useTranslation()
   const [, setDoc] = useAtom(selectedDocTileAtom)
   const [levelId] = useAtom(levelIdAtom)
+  const [typewriterContent,] = useAtom(typewriterContentAtom)
+  const [, setTypewriter] = useAtom(typewriterAtom)
+  const [{ isSuggestionsMobileMode }] = useAtom(preferencesAtom)
 
   const insertable: boolean = (levelId ?? 0) > 0 && (enableAll || !(tile.locked || tile.disabled))
 
@@ -31,6 +36,7 @@ export function InventoryItem({tile, isTheorem, recent=false, enableAll=false} :
   const [inserted, setInserted] = useState(false)
 
   const appendTypewriterInput = useAppendTypewriterInput()
+
   const handleClick = (ev: any) => {setDoc(tile)}
 
   const insertItemName = (ev: any) => {

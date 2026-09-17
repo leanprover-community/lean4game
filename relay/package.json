@@ -1,5 +1,5 @@
 {
-  "name": "lean4game-server",
+  "name": "@lean4game/server",
   "type": "module",
   "private": true,
   "dependencies": {
