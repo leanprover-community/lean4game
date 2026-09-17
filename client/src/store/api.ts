@@ -20,6 +20,12 @@ export interface GameTileWithName {
   owner: string
   game: string
   tile: GameTile
+  settings?: GameSettings
+}
+
+export interface GameSettings {
+  allowEmptyTranslations?: boolean
+  unbundleHyps: boolean
 }
 
 export interface GameInfo {
@@ -32,9 +38,7 @@ export interface GameInfo {
   conclusion?: string,
   tile?: GameTile,
   image?: string
-  settings?: {
-    unbundleHyps: boolean,
-  } | undefined
+  settings?: GameSettings
 }
 
 export interface InventoryTile {

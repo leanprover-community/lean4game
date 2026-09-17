@@ -6,6 +6,7 @@ import { ChildProcess } from 'child_process';
 import { GameManager, GameSession } from './serverProcess.js'
 import { IncomingMessage } from 'http';
 import { randomUUID, UUID } from 'crypto';
+import { gameActivityStore } from './services/GameActivityStore.js';
 
 interface Player {
   id: UUID,
@@ -107,8 +108,17 @@ export class GameSessionsObserver {
     });
     const serverConnection = jsonrpcserver.createProcessStreamConnection(this.players.get(ws).process);
 
+    let activityRecorded = false
     this.gameManager.messageTranslation(
-      socketConnection, serverConnection, gameDir, gameSession.usesCustomLeanServer
+      socketConnection, serverConnection, gameDir, gameSession.usesCustomLeanServer,
+      () => {
+        if (activityRecorded) return
+        activityRecorded = true
+        const [owner, repo] = game.split('/', 2)
+        gameActivityStore.recordPlay(owner, repo)
+          .then(() => console.info("Recorded play activity for " + game))
+          .catch(error => console.error("Failed to record play activity for " + game + ": " + error))
+      }
     )
 
     socketConnection.onClose(() => {

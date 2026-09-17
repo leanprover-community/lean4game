@@ -33,6 +33,14 @@ We strongly recommend getting translations reviewed by a member of the lean comm
 - Call `lake exe i18n --export-json` to create all `.json` files `.i18n/{language}/Game.json` which the server needs.
 - Add the new translation (i.e. `.po` and `.json`, but not the `.mo` files) to your git repository, push your results, and [publish the game](publish_game.md).
 
+  To allow intentionally empty translations, opt in from `Game.lean`:
+
+  ```lean
+  Settings (allowEmptyTranslations := true)
+  ```
+
+  Then mark an intentionally empty PO translation with `#, lean-empty` before exporting JSON. Unmarked empty translations are omitted and fall back to the original string. Games which do not enable this setting retain the existing fallback behaviour.
+
 - The server has a finite set of languages you can select.  If your language appears in the language list under `Menu` `>` `Preferences` in the game, you should now see your translations.
 
   If your language does not exist, please ask your translators to also [translate the game interface](translation-interface.md), or [open an issue](https://github.com/leanprover-community/lean4game/issues) requesting this new language.

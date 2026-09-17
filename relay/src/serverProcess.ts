@@ -141,7 +141,8 @@ export class GameManager {
     socketConnection: jsonrpcserver.IConnection,
     serverConnection: jsonrpcserver.IConnection,
     gameDir: string,
-    usesCustomLeanServer: boolean
+    usesCustomLeanServer: boolean,
+    onLevelOpened?: () => void
   ) {
 
     let shift = (line: number, offset: number) => Math.max(0, line + offset)
@@ -196,6 +197,7 @@ export class GameManager {
       // backwards compatibility for versions ≤ v4.7.0
       if (usesCustomLeanServer) {
         if (isDevelopment) { console.log(`CLIENT: ${JSON.stringify(message)}`); }
+        if (message.method === "textDocument/didOpen") onLevelOpened?.()
         return message
       }
 
@@ -226,6 +228,7 @@ export class GameManager {
           console.error(`[${new Date()}] Missing level data: ${levelDataPath}`)
         }
         const levelData = JSON.parse(fs.readFileSync(levelDataPath, 'utf8'))
+        onLevelOpened?.()
 
         if (difficulty === undefined || inventory === undefined) {
           console.error("Did not receive difficulty/inventory from client!")

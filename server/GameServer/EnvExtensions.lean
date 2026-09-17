@@ -396,11 +396,27 @@ deriving Inhabited, ToJson, FromJson
 /-- Settings which modify the game's frontend display. -/
 structure Game.Settings where
   /--
+  If `true`, translations explicitly exported as empty strings are rendered as
+  empty instead of falling back to their source text.
+  -/
+  allowEmptyTranslations : Bool := false
+  /--
   If `true`, display two hypotheses `A : Prop` and `B : Prop`
   instead of a joint `A B : Prop`.
   -/
   unbundleHyps : Bool := false
-deriving Repr, ToJson, FromJson
+deriving Repr, ToJson
+
+instance : FromJson Game.Settings where
+  fromJson? json := do
+    let .obj _ := json | throw "Game.Settings: object expected"
+    let getBoolD (key : String) (defaultValue : Bool) : Except String Bool :=
+      match json.getObjVal? key with
+      | .ok value => fromJson? value
+      | .error _ => .ok defaultValue
+    let allowEmptyTranslations ← getBoolD "allowEmptyTranslations" false
+    let unbundleHyps ← getBoolD "unbundleHyps" false
+    return { allowEmptyTranslations, unbundleHyps }
 
 instance : Inhabited Game.Settings where
   default := {}

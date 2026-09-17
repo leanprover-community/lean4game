@@ -2,6 +2,8 @@ import { useAtom } from 'jotai';
 import { useContext } from 'react'
 import { useTranslation, UseTranslationResponse } from 'react-i18next'
 import { gameIdAtom } from '../store/location-atoms';
+import { gameInfoAtom } from '../store/query-atoms';
+import { getGameI18n } from '../i18n';
 
 /**
  * This file provides the tools to process translations created by the Lean package `lean-i18n`.
@@ -58,15 +60,18 @@ function normalizeKeyString(key: string): string{
  */
 export function useGameTranslation(): UseTranslationResponse<'translation', undefined> {
   const [gameId] = useAtom(gameIdAtom)
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
 
-  const { t, ...rest } = useTranslation()
+  const { t, i18n, ...rest } = useTranslation()
+  const gameI18n = getGameI18n(gameInfo?.settings?.allowEmptyTranslations ?? false)
+  const gameT = gameI18n.getFixedT(i18n.resolvedLanguage ?? i18n.language)
   const pattern = /(?<!\\)§(\d+)/g;
   const modifiedT = ((key: string | undefined) => {
     if (!key) return ""
     const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
     // look-up the unmodified `key` in case of failure for backwards compatibility.
-    let translatedKey = t([keyWithoutBlocks, key], {ns: gameId})
+    let translatedKey = gameT([keyWithoutBlocks, key], {ns: gameId})
     return translatedKey.replace(pattern, (_, num: string) => codeBlocks[Number(num)] ?? num);
   }) as typeof t
-  return { t: modifiedT, ...rest }
+  return { t: modifiedT, i18n, ...rest }
 }

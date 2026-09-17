@@ -20,6 +20,20 @@ We recommend using  [Poedit](https://poedit.net/) to work on the translations.  
 
 You can now enter your translations line by line in Poedit.  Be careful to preserve the [formatting](#string-format).
 
+### Intentionally empty translations
+
+An empty translation normally means that the original text should be shown as a fallback. To deliberately hide a game string, add the custom `lean-empty` flag to its PO entry:
+
+```po
+#, lean-empty
+msgid "Intro XYZ Level 05"
+msgstr ""
+```
+
+After exporting the JSON file, the game will render this entry as empty. Do not use this flag merely for a translation that has not been completed.
+
+The game maintainer must also enable intentionally empty translations with `Settings (allowEmptyTranslations := true)` in `Game.lean`.
+
 There are various tools that can significantly simplify the translation process, but these typically require a paid subscription (for Poedit and/or an AI tool).  Please contact the maintainers of the game if you're willing to help, but do not have access to such tools.  
 
 ### (Optional:) Choose a different source language
@@ -51,4 +65,3 @@ In the strings in `Game.pot`, codeblocks (starting with one or many backticks (\
 ## 4. Ask someone to review your translation
 
 Ideally, please ask someone from the lean community to review your translation, or ask the game's maintainer to find someone for you.
-
