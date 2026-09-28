@@ -278,18 +278,25 @@ describe('Basic Lean4Game Features', () => {
       cy.contains('Du kannst mit h oder g starten.').should('be.visible')
     })
 
-    it('should render an intentionally empty game translation', () => {
+    it('should keep an intentionally empty fallback translation empty', () => {
       cy.get('#menu-btn').click()
       cy.contains('Preferences').click()
       cy.get('.MuiSelect-select').click()
-      cy.get('li[data-value="de"]').click({ force: true })
+      cy.get('li[data-value="zh"]').click({ force: true })
       cy.get('.codicon').click()
 
       cy.contains('This is the introduction text of the game.').should('not.exist')
       cy.get('.chat-panel .hint').should('not.exist')
     })
 
-    it('should not change language of hints to selected language if translation is not available', () => {
+    it('should hide a game string missing from both translation languages', () => {
+      cy.get('#menu-btn').click()
+      cy.contains('Game Info').click()
+
+      cy.contains('This is additional information about the game.').should('not.exist')
+    })
+
+    it('should use the game fallback language when the selected translation is unavailable', () => {
       navigateToLevel()
       // Click menu button to open dropdown
       cy.get('#menu-btn').click()
@@ -305,8 +312,8 @@ describe('Basic Lean4Game Features', () => {
       // Close preferences
       cy.get('.codicon').click()
 
-      // Check that displayed language is english
-      cy.contains('You can either start using h or g.').should('be.visible')
+      // The TestGame config chooses German, rather than the global English fallback.
+      cy.contains('Du kannst mit h oder g starten.').should('be.visible')
     })
   })
 })

@@ -12,6 +12,8 @@ The game server supports internationalisation ("i18n") using [lean-i18n](https:/
 
   For games written in a language different than English, you should set the correct source language (`sourceLang`) in `.i18n/config.json`. Afterwards, on `lake build` the template should appear under the chosen language, and can be translated (e.g. into English) as described above.  
 
+- A game can set its fallback translation with `Settings (fallbackLanguage := "en")`. When a player's selected language has no game translation, Lean4Game uses this language instead. For games whose source strings should never be shown to players, add `hideMissingTranslations := true`; strings missing from both languages are then empty. The default fallback is English and source strings remain visible, which is useful while developing a game.
+
 - *Optional:*  You can simplify the work of translators by providing an additional glossary of mathematical terminology, lean concepts and other key words that appear in your game and which you anticipate will be difficult to translate (words that a machine translator would probably get wrong). Just make a list of such words in a text file, one word per line, and save it as `.i18n/en/glossary.csv`.
 
 - *Optional:* We recommend maintaining a game-specific translation guide in addition to our generic [guide for translators](translation-guide-for-game-translators.md); see [Robo/Scribble](https://github.com/hhu-adam/Robo/blob/main/docs/TranslationGuide.md) for an example.
