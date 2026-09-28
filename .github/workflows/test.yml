@@ -47,16 +47,16 @@ jobs:
     steps:
       - name: Setup firefox (macOS)
         if: matrix.os == 'macos-latest' && matrix.browser == 'firefox'
-        uses: browser-actions/setup-firefox@v1
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - uses: leanprover/lean-action@v1
+      - uses: leanprover/lean-action@50fcf42d2e460296f1a34b402e990d1b24f8b596 # v1
         with:
           build: true
           test: true
@@ -79,7 +79,7 @@ jobs:
 
       - name: Upload Cypress screenshots
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: "cypress-screenshots-${{ matrix.name }}-${{ matrix.browser }}"
           path: cypress/screenshots
