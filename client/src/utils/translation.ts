@@ -69,8 +69,10 @@ export function useGameTranslation(): UseTranslationResponse<'translation', unde
   const modifiedT = ((key: string | undefined) => {
     if (!key) return ""
     const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
-    // look-up the unmodified `key` in case of failure for backwards compatibility.
-    let translatedKey = gameT([keyWithoutBlocks, key], {ns: gameId})
+    // lean-i18n doubles backslashes outside code blocks in catalog keys.
+    const escapedKey = keyWithoutBlocks.replace(/\\/g, '\\\\')
+    // Keep the older placeholder and raw keys as fallbacks for existing catalogs.
+    let translatedKey = gameT([escapedKey, keyWithoutBlocks, key], {ns: gameId})
     return translatedKey.replace(pattern, (_, num: string) => codeBlocks[Number(num)] ?? num);
   }) as typeof t
   return { t: modifiedT, i18n, ...rest }
