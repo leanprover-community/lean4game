@@ -42,7 +42,17 @@ describe('Basic Lean4game Interface', () => {
         })
       })
     })
-    describe('Info', () => {})
+    describe('Info', () => {
+      it('shows the progress saving notice once', () => {
+        cy.visit('/#/g/test/TestGame')
+        cy.get('#menu-btn').click()
+        cy.contains('.menu.dropdown .btn', 'Game Info').click()
+        cy.contains('h2', 'Progress saving').should('be.visible')
+        cy.get('.welcome-text').invoke('text').then(text => {
+          expect(text.split('The game stores your progress').length - 1).to.eq(1)
+        })
+      })
+    })
     describe('Preferences', () => {})
     describe('Privacy', () => {
       it('landing page footer', () => {

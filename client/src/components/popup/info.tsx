@@ -24,13 +24,9 @@ export function InfoPopup () {
     <Typography variant="body1" component="div" className="welcome-text">
       <Markdown>{gT(gameInfo?.info ?? "")}</Markdown>
       <hr />
-      <Trans>
+      <>
         <h2>{t("Progress saving.translation", { defaultValue: "Progress saving" })}</h2>
         <p>
-          <Trans
-            i18nKey="Progress saving.description"
-            defaults="The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br/>Warning: In most browsers, deleting cookies will also clear the local storage (or 'local site data'). Make sure to download your game progress first!"
-          />
           <Trans
             i18nKey="Progress saving.description"
             defaults="The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br/>Warning: In most browsers, deleting cookies will also clear the local storage (or 'local site data'). Make sure to download your game progress first!"
@@ -62,7 +58,7 @@ export function InfoPopup () {
             components={{1: <a target="_blank" href="https://hhu-adam.github.io"/>}}
           />
         </p>
-      </Trans>
+      </>
     </Typography>
   </>
 }
