@@ -1,0 +1,16 @@
+{
+  "announcements": [
+    {
+      "id": "translators-needed",
+      "priority": 10,
+      "title": {
+        "en": "Translators needed",
+        "de": "Unterstützung bei Übersetzungen gesucht"
+      },
+      "message": {
+        "en": "We are actively looking for volunteers to translate the existing games to languages not yet available, in particular for the Natural Number Game and Robo/Scribble. If you are interested, please [get in touch](https://github.com/TentativeConvert). See [these guidelines](https://github.com/hhu-adam/Robo/blob/main/docs/TranslationGuide.md) to get an idea of the effort involved.",
+        "de": "Wir suchen Freiwillige, die bestehende Spiele in weitere Sprachen übersetzen, insbesondere das Natural Number Game und Robo/Scribble. Bei Interesse bitte [Kontakt aufnehmen](https://github.com/TentativeConvert). Die [Übersetzungsanleitung](https://github.com/hhu-adam/Robo/blob/main/docs/TranslationGuide.md) gibt einen Eindruck vom Aufwand."
+      }
+    }
+  ]
+}
