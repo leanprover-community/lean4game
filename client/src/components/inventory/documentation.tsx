@@ -8,11 +8,13 @@ import { NavButton } from "../navigation/nav_button"
 import { useGameTranslation } from "../../utils/translation"
 import { navigateAcrossWorldsAtom } from "../../store/location-atoms"
 import { difficultyAtom } from "../../store/progress-atoms"
+import { gameInfoAtom } from "../../store/query-atoms"
 
 /** The `documentation` */
 export function Documentation({ type } : {type : InventoryTab}) {
   const { t } = useTranslation()
   const { t: gT } = useGameTranslation()
+  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [, navigateAcrossWorlds] = useAtom(navigateAcrossWorldsAtom)
   const [difficulty] = useAtom(difficultyAtom)
   const [, addToInventory] = useAtom(inventoryAtom)
@@ -24,6 +26,8 @@ export function Documentation({ type } : {type : InventoryTab}) {
   const [{ data: legacyDocEntry }] = useAtom(docAtomLegacyFamily([type, docTile?.name ?? ""]))
 
   if (!docTile) return null
+
+  const worldTitle = docTile.world ? gameInfo?.worlds?.nodes[docTile.world]?.title : undefined
 
   // Set `inventoryDoc` to `null` to close the doc
 
@@ -56,7 +60,7 @@ export function Documentation({ type } : {type : InventoryTab}) {
           {docTile.proven && <li>Proven in: <a onClick={() => {
             if (!docTile.world || !docTile.level) return
             navigateAcrossWorlds(docTile.world, docTile.level)
-          }}>{docTile.world} level {docTile.level}</a></li>}
+          }}>{worldTitle ? gT(worldTitle) : docTile.world} level {docTile.level}</a></li>}
         </ul>
       </>
     }
