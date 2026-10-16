@@ -3,7 +3,7 @@
     "translation": "Игровой сервер Lean"
   },
   "Subcaption": {
-    "description": "Репозиторий обучающих игр для инструмента интерактивного доказательства теорем <1>Lean 4</1> и его математической библиотеки <2>mathlib</2>"
+    "description": "Репозиторий обучающих игр для системы интерактивного доказательства теорем <1>Lean</1> <i>(Lean 4)</i> и её математической библиотеки <2>mathlib</2>"
   },
   "Development notes": {
     "translation": "Заметки о разработке",
@@ -11,7 +11,7 @@
   },
   "Adding new games": {
     "translation": "Добавление новых игр",
-    "description": "Если вы планируете написать собственную игру, используйте <1>репозиторий GameSkeleton на GitHub</1> в качестве шаблона и прочитайте <2>Как создать игру</2>.<p>Вы можете напрямую загрузить свою игру на сервер и играть в неё, перейдя по соответствующему URL-адресу. В <3>инструкциях выше</3> также подробно объясняется, как загрузить игру на сервер. Будем рады, если вы свяжетесь с нами при возникновении вопросов.</p><p>Игры, представленные на этой странице, добавляются вручную. Свяжитесь с нами, и мы с радостью добавим вашу игру.</p>"
+    "description": "Если вы планируете написать собственную игру, используйте <1>репозиторий GameSkeleton на GitHub</1> в качестве шаблона и прочитайте руководство «<2>Как создать игру</2>».<p>Вы можете напрямую загрузить свою игру на сервер и играть в неё, перейдя по соответствующему URL-адресу. В <3>инструкциях выше</3> также подробно объясняется, как загрузить игру на сервер. Будем рады, если вы свяжетесь с нами при возникновении вопросов.</p><p>Игры, представленные на этой странице, добавляются вручную. Свяжитесь с нами, и мы с радостью добавим вашу игру.</p>"
   },
   "Funding": {
     "translation": "Финансирование",
@@ -19,24 +19,24 @@
   },
   "Server capacity": {
     "translation": "Мощность сервера",
-    "description": "<p>Поскольку сервер работает на университетских машинах, его мощность ограничена. По нашим оценкам, текущая конфигурация поддерживает около 50 одновременных игр с высокой производительностью и до 180 одновременных игр со снижением скорости отклика.</p>"
+    "description": "<p>Поскольку этот сервер работает на наших университетских машинах, его мощность ограничена. По нашей текущей оценке, он поддерживает около 70 одновременных игр.</p>"
   },
   "No Games": {
     "description": "Игры не загружены. Используйте <1>http://localhost:3000/#/g/local/FOLDER</1>, чтобы открыть игру напрямую из локальной папки."
   },
+  "Tactics": "Тактики",
   "Progress saving": {
     "translation": "Сохранение прогресса",
     "description": "Игра сохраняет ваш прогресс в локальном хранилище браузера. Если вы его очистите, прогресс будет утерян!<br/>Внимание: в большинстве браузеров удаление файлов cookie также очищает локальное хранилище (или «локальные данные сайта»). Обязательно сначала скачайте файл с вашим игровым прогрессом!"
-  },
-  "Development": {
-    "translation": "Разработка",
-    "description": "Игровой движок создан <strong>Александром Бенткампом</strong> и <strong>Йоном Ойгстером</strong> на основе прототипа <strong>Патрика Массо</strong>. Исходный код этого игрового движка Lean <1>доступен на GitHub</1>. Если у вас возникнут какие-либо проблемы, создайте <2>issue на GitHub</2> или свяжитесь с нами напрямую."
   },
   "Accessibility": {
     "translation": "Доступность",
     "description": "Если у вас возникли проблемы с доступностью интерфейса, свяжитесь с нами! Мы делаем всё возможное, чтобы наша платформа была удобна для всех."
   },
-  "Tactics": "Тактики",
+  "Development": {
+    "translation": "Разработка",
+    "description": "Игровой движок создан <strong>Александром Бенткампом</strong> и <strong>Йоном Ойгстером</strong> на основе прототипа <strong>Патрика Массо</strong>. Исходный код этого игрового движка Lean <1>доступен на GitHub</1>. Если у вас возникнут какие-либо проблемы, создайте <2>issue на GitHub</2> или свяжитесь с нами напрямую."
+  },
   "<p>Game rules determine if it is allowed to skip levels and if the games runs checks to only allow unlocked tactics and theorems in proofs.</p><1>Note: \"Unlocked\" tactics (or theorems) are determined by two things: The set of minimal tactics needed to solve a level, plus any tactics you unlocked in another level. That means if you unlock <1>simp</1> in a level, you can use it henceforth in any level.</1><p>The options are:</p>": "<p>Правила игры определяют, можно ли пропускать уровни, и следит ли игра за тем, чтобы в доказательствах использовались только разблокированные тактики и теоремы.</p><1>Примечание: «разблокированные» тактики (или теоремы) определяются двумя факторами: набором минимальных тактик, необходимых для решения уровня, а также любыми тактиками, которые вы разблокировали на других уровнях. Это значит, что если вы разблокируете <1>simp</1> на одном уровне, то сможете использовать её в дальнейшем на любом уровне.</1><p>Доступны следующие варианты:</p>",
   "Game Rules": "Правила игры",
   "levels": "уровни",
@@ -46,19 +46,33 @@
   "none": "отключены",
   "Rules": "Правила",
   "Intro": "Введение",
+  "Game Introduction": "Введение в игру",
   "Start": "Начать",
+  "Inventory": "Инвентарь",
+  "next level": "следующий уровень",
   "Next": "Далее",
+  "previous level": "предыдущий уровень",
   "Previous": "Назад",
   "Editor mode is enforced!": "Режим редактора включён принудительно!",
   "Editor mode": "Режим редактора",
+  "Editor Mode": "Режим редактора",
   "Typewriter mode": "Режим печатной машинки",
+  "Typewriter Mode": "Режим печатной машинки",
+  "information, Impressum, privacy policy": "сведения, юридическая информация, политика конфиденциальности",
   "Preferences": "Настройки",
+  "Game Info & Credits": "Информация об игре и авторах",
   "Game Info": "Информация об игре",
+  "Clear Progress": "Очистить прогресс",
   "Erase": "Стереть",
+  "Download Progress": "Скачать прогресс",
   "Download": "Скачать",
+  "Load Progress from JSON": "Загрузить прогресс из JSON",
   "Upload": "Загрузить",
   "Home": "Главная",
+  "home": "главная",
   "back to games selection": "вернуться к выбору игр",
+  "close inventory": "закрыть инвентарь",
+  "show inventory": "показать инвентарь",
   "Show more help!": "Показать дополнительные подсказки!",
   "Goal": "Цель",
   "Current Goal": "Текущая цель",
@@ -79,16 +93,39 @@
   "Execute": "Выполнить",
   "Definitions": "Определения",
   "Theorems": "Теоремы",
+  "Theorem": "Теорема",
   "Not unlocked yet": "Ещё не разблокировано",
   "Not available in this level": "Недоступно на этом уровне",
+  "Unlock this item!": "Разблокировать этот элемент!",
+  "This server has been developed as part of the project <1>ADAM : Anticipating the Digital Age of Mathematics</1> at Heinrich-Heine-Universität in Düsseldorf.": "Этот сервер был разработан в рамках проекта <1>ADAM : Anticipating the Digital Age of Mathematics</1> в Дюссельдорфском университете имени Генриха Гейне.",
   "Prerequisites": "Требования",
   "Worlds": "Миры",
   "Levels": "Уровни",
   "Language": "Язык",
+  "If a game does not exist in the language selected, this setting has no effect and the game's default language is used.": "Если игра не переведена на выбранный язык, эта настройка не действует и используется язык игры по умолчанию.",
+  "Use country flags to represent languages": "Использовать флаги стран для обозначения языков",
+  "Show locked inventory items": "Показывать заблокированные элементы инвентаря",
+  "Controls": "Управление",
+  "Click on tactics/assumptions like mobile keyboard suggestions i.e. without autofocus or requiring Shift key": "Нажатие на тактики/предположения работает как подсказки мобильной клавиатуры, т. е. без автофокуса и без удержания клавиши Shift",
+  "Browser Storage": "Хранилище браузера",
+  "User": "Пользователей",
+  "Users": "Пользователей",
+  " online.": " онлайн.",
+  " online": " онлайн",
+  "online.": "онлайн.",
+  "online": "онлайн",
   "RAM": "RAM",
   "CPU": "CPU",
+  " used": " использовано",
+  "used": "использовано",
   "<p>Do you want to delete your saved progress irreversibly?</p><p>(This deletes your proofs and your collected inventory. Saves from other games are not deleted.)</p>": "<p>Вы действительно хотите безвозвратно удалить сохранённый прогресс?</p><p>(В результате будут удалены ваши доказательства и собранный инвентарь. Сохранения в других играх затронуты не будут.)</p>",
+  "<p>Do you want to delete your saved progress irreversibly?</p>": "<p>Вы действительно хотите безвозвратно удалить сохранённый прогресс?</p>",
+  "<p>Deleting everything will delete all your proofs and your collected inventory! It's recommended to download your progress first.</p><p>(Saves from other games are not deleted.)</p>": "<p>Полное удаление сотрёт все ваши доказательства и собранный инвентарь! Рекомендуем сначала скачать файл с вашим прогрессом.</p><p>(Сохранения в других играх затронуты не будут.)</p>",
   "Delete Progress?": "Удалить прогресс?",
+  "Delete this Level": "Удалить этот уровень",
+  "Delete this World": "Удалить этот мир",
+  "Delete Everything": "Удалить всё",
+  "Download & Delete everything": "Скачать и удалить всё",
   "Delete": "Удалить",
   "Download & Delete": "Скачать и удалить",
   "Cancel": "Отмена",
@@ -101,25 +138,18 @@
   "Mobile": "Мобильный",
   "Auto": "Авто",
   "Desktop": "Компьютер",
-  "<0>If you are considering writing your own game, you should use the <1>GameSkeleton Github Repo</1> as a template and read <3>How to Create a Game</3>.</0><1>You can directly load your games into the server and play it using the correct URL. The <1>instructions above</1> also explain the details for how to load your game to the server. We'd like to encourage you to contact us if you have any questions.</1><p>Featured games on this page are added manually. Please get in contact and we'll happily add yours.</p>": "<0>Если вы планируете написать собственную игру, используйте <1>репозиторий GameSkeleton на GitHub</1> в качестве шаблона и прочитайте <3>Как создать игру</3>.</0><1>Вы можете напрямую загрузить свою игру на сервер и играть в неё, перейдя по соответствующему URL-адресу. В <1>инструкциях выше</1> также подробно объясняется, как загрузить игру на сервер. Будем рады, если вы свяжетесь с нами при возникновении вопросов.</1><p>Игры, представленные на этой странице, добавляются вручную. Свяжитесь с нами, и мы с радостью добавим вашу игру.</p>",
   "Level": "Уровень",
   "Introduction": "Введение",
   "Retry proof from here": "Повторить доказательство отсюда",
   "Retry": "Повторить",
   "Failed command": "Ошибка при выполнении команды",
-  " used": " использовано",
   "view the Lean game server on Github": "посмотреть Lean Game Server на GitHub",
-  "Theorem": "Теорема",
   "Impressum": "Юридическая информация",
   "Privacy Policy": "Политика конфиденциальности",
-  "<0>Impressum</0><1><strong>Contact:</strong><br/>Marcus Zibrowius, Jon Eugster<br/>Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br/>Universitätsstr. 1<br/>40225 Düsseldorf<br/>Germany<br/>+49 211 81-14690<br/><14>Contact Details</14></1><2><strong>Legal form:</strong><br/>The Heinrich Heine University Düsseldorf is a corporation under public law. It is legally represented by the Rector Prof. Dr. Anja Steinbeck. The responsible supervisory authority is the Ministry of Culture and Science of North Rhine-Westphalia, Völklinger Straße 49, 40221 Düsseldorf.</2><3><strong>VAT identification number:</strong><br/>according to §27a Sales Tax Act<br/>DE 811222416</3><4><0>Impressum HHU</0></4>": "<0>Юридическая информация</0><1><strong>Контакты:</strong><br/>Marcus Zibrowius, Jon Eugster<br/>Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br/>Universitätsstr. 1<br/>40225 Düsseldorf<br/>Germany<br/>+49 211 81-14690<br/><14>Контактные данные</14></1><2><strong>Организационно-правовая форма:</strong><br/>Дюссельдорфский университет имени Генриха Гейне является юридическим лицом публичного права. Его официальным представителем является ректор проф. д-р Аня Штайнбек (Anja Steinbeck). Ответственный надзорный орган — Министерство культуры и науки земли Северный Рейн-Вестфалия, Völklinger Straße 49, 40221 Düsseldorf.</2><3><strong>Идентификационный номер плательщика НДС:</strong><br/>согласно §27a Закона о налоге с оборота<br/>DE 811222416</3><4><0>Юридическая информация HHU</0></4>",
-  "<0>Progress saving</0><1>The game stores your progress in your local browser storage. If you delete it, your progress will be lost!<br/>Warning: In most browsers, deleting cookies will also clear the local storage (or \"local site data\"). Make sure to download your game progress first!</1><2>Development</2><3>The game engine has been created by <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>. On a prototype by <strong>Patrick Massot</strong>.</3><4>The source code of this Lean game engine is <1>available on Github</1>. If you experience any problems, please file an <3>Issue on Github</3> or get directly in contact.</4><5>Funding</5><6>The game engine has been developed as part of the project <1>ADAM: Anticipating the Digital Age of Mathematics</1> at Heinrich-Heine-Universität Düsseldorf. It is funded by the <i>Stiftung Innovation in der Hochschullehre</i> as part of project <i>Freiraum 2022</i>.</6>": "<0>Сохранение прогресса</0><1>Игра сохраняет ваш прогресс в локальном хранилище браузера. Если вы его очистите, прогресс будет утерян!<br/>Внимание: в большинстве браузеров удаление файлов cookie также очищает локальное хранилище (или «локальные данные сайта»). Обязательно сначала скачайте файл с вашим игровым прогрессом!</1><2>Разработка</2><3>Игровой движок создан <strong>Александром Бенткампом</strong> и <strong>Йоном Ойгстером</strong> на основе прототипа <strong>Патрика Массо</strong>.</3><4>Исходный код этого игрового движка Lean <1>доступен на GitHub</1>. Если у вас возникнут какие-либо проблемы, создайте <3>issue на GitHub</3> или свяжитесь с нами напрямую.</4><5>Финансирование</5><6>Игровой движок разработан в рамках проекта <1>ADAM: Anticipating the Digital Age of Mathematics</1> в Дюссельдорфском университете имени Генриха Гейне. Проект финансируется фондом <i>Stiftung Innovation in der Hochschullehre</i> в рамках программы <i>Freiraum 2022</i>.</6>",
-  "<0>Privacy Policy</0><p>Our server collects metadata (such as IP address, browser, operating system) and the data that the user enters into the editor. The data is used to compute the Lean output and display it to the user. The information will be stored as long as the user stays on our website and will be deleted immediately afterwards. We keep logs to improve our software, but the contained data is anonymized.</p><p>We do not use cookies, but your game progress is stored in the browser as site data. Your game progress is not saved on the server; if you delete your browser storage, it is completely gone.</p><p>Our server is located in Germany.</p><4><strong>Contact:</strong><br/>Marcus Zibrowius, Jon Eugster<br/>Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br/>Universitätsstr. 1<br/>40225 Düsseldorf<br/>Germany<br/>+49 211 81-14690<br/><14>Contact Details</14></4>": "<0>Политика конфиденциальности</0><p>Наш сервер собирает метаданные (например, IP-адрес, браузер, операционную систему), а также данные, которые пользователь вводит в редакторе. Эти данные используются для вычисления результата работы Lean и отображения его пользователю. Информация хранится, пока пользователь находится на нашем сайте, и удаляется сразу после этого. Мы ведём журналы для улучшения нашего программного обеспечения, однако содержащиеся в них данные обезличены.</p><p>Мы не используем файлы cookie, однако ваш игровой прогресс сохраняется в браузере в виде данных сайта. Игровой прогресс не сохраняется на сервере; если вы очистите хранилище браузера, он будет полностью утерян.</p><p>Наш сервер расположен в Германии.</p><4><strong>Контакты:</strong><br/>Marcus Zibrowius, Jon Eugster<br/>Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br/>Universitätsstr. 1<br/>40225 Düsseldorf<br/>Germany<br/>+49 211 81-14690<br/><14>Контактные данные</14></4>",
-  "home": "главная",
+  "<0>Impressum</0><1><strong>Contact:</strong><br/>Marcus Zibrowius<br/>Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br/>Universitätsstr. 1<br/>40225 Düsseldorf<br/>Germany<br/>+49 211 81-14690<br/><14>Contact Details</14></1><2><strong>Legal form:</strong><br/>The Heinrich Heine University Düsseldorf is a corporation under public law. It is legally represented by the Rector Prof. Dr. Anja Steinbeck. The responsible supervisory authority is the Ministry of Culture and Science of North Rhine-Westphalia, Völklinger Straße 49, 40221 Düsseldorf.</2><3><strong>VAT identification number:</strong><br/>according to §27a Sales Tax Act<br/>DE 811222416</3><4><0>Impressum HHU</0></4>": "<0>Юридическая информация</0><1><strong>Контакты:</strong><br/>Marcus Zibrowius<br/>Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br/>Universitätsstr. 1<br/>40225 Düsseldorf<br/>Germany<br/>+49 211 81-14690<br/><14>Контактные данные</14></1><2><strong>Организационно-правовая форма:</strong><br/>Дюссельдорфский университет имени Генриха Гейне является юридическим лицом публичного права. Его официальным представителем является ректор проф. д-р Аня Штайнбек (Anja Steinbeck). Ответственный надзорный орган — Министерство культуры и науки земли Северный Рейн-Вестфалия, Völklinger Straße 49, 40221 Düsseldorf.</2><3><strong>Идентификационный номер плательщика НДС:</strong><br/>согласно §27a Закона о налоге с оборота<br/>DE 811222416</3><4><0>Юридическая информация HHU</0></4>",
+  "<0>Privacy Policy</0><p>Our server collects metadata (such as IP address, browser, operating system) and the data that the user enters into the editor. The data is used to compute the Lean output and display it to the user. The information will be stored as long as the user stays on our website and will be deleted immediately afterwards. We keep logs to improve our software, but the contained data is anonymized.</p><p>We do not use cookies, but your game progress is stored in the browser as site data. Your game progress is not saved on the server; if you delete your browser storage, it is completely gone.</p><p>Our server is located in Germany.</p><4><strong>Contact:</strong><br/>Marcus Zibrowius<br/>Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br/>Universitätsstr. 1<br/>40225 Düsseldorf<br/>Germany<br/>+49 211 81 13858<br/><14>Contact Details</14><br/><16>Technical Contact</16></4>": "<0>Политика конфиденциальности</0><p>Наш сервер собирает метаданные (например, IP-адрес, браузер, операционную систему), а также данные, которые пользователь вводит в редакторе. Эти данные используются для вычисления результата работы Lean и отображения его пользователю. Информация хранится, пока пользователь находится на нашем сайте, и удаляется сразу после этого. Мы ведём журналы для улучшения нашего программного обеспечения, однако содержащиеся в них данные обезличены.</p><p>Мы не используем файлы cookie, однако ваш игровой прогресс сохраняется в браузере в виде данных сайта. Игровой прогресс не сохраняется на сервере; если вы очистите хранилище браузера, он будет полностью утерян.</p><p>Наш сервер расположен в Германии.</p><4><strong>Контакты:</strong><br/>Marcus Zibrowius<br/>Mathematisches Institut der Heinrich-Heine-Universität Düsseldorf<br/>Universitätsstr. 1<br/>40225 Düsseldorf<br/>Germany<br/>+49 211 81 13858<br/><14>Контактные данные</14><br/><16>Технический контакт</16></4>",
   "close language menu": "закрыть меню выбора языка",
   "open language menu": "открыть меню выбора языка",
   "close menu": "закрыть меню",
-  "open menu": "открыть меню",
-  "Editor Mode": "Режим редактора",
-  "Typewriter Mode": "Режим печатной машинки"
+  "open menu": "открыть меню"
 }
