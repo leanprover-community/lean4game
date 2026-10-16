@@ -69,8 +69,7 @@ export function PreferencesPopup() {
               label=""
             />
             <p>
-              If a game does not exist in the language selected, this setting has no effect
-              and the game's default language is used.
+              {t("If a game does not exist in the language selected, this setting has no effect and the game's default language is used.")}
             </p>
           </div>
           <div className='preferences-item'>
