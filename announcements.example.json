@@ -1,15 +1,27 @@
 {
   "announcements": [
     {
-      "id": "translators-needed",
-      "priority": 10,
+      "id": "example-english-fallback",
+      "priority": 0,
       "title": {
-        "en": "Translators needed",
-        "de": "Unterstützung bei Übersetzungen gesucht"
+        "en": "English fallback example"
       },
       "message": {
-        "en": "We are actively looking for volunteers to translate the existing games to languages not yet available, in particular for the Natural Number Game and Robo/Scribble. If you are interested, please [get in touch](https://github.com/TentativeConvert). See [these guidelines](https://github.com/hhu-adam/Robo/blob/main/docs/TranslationGuide.md) to get an idea of the effort involved.",
-        "de": "Wir suchen Freiwillige, die bestehende Spiele in weitere Sprachen übersetzen, insbesondere das Natural Number Game und Robo/Scribble. Bei Interesse bitte [Kontakt aufnehmen](https://github.com/TentativeConvert). Die [Übersetzungsanleitung](https://github.com/hhu-adam/Robo/blob/main/docs/TranslationGuide.md) gibt einen Eindruck vom Aufwand."
+        "en": "This test notice only has English text, so it appears in English for every language. It has a lower priority than the formatting demo and appears below it, even though it comes first in the file.\n\nWith no `startsAt` or `endsAt`, it stays visible until you remove it from the file."
+      }
+    },
+    {
+      "id": "example-formatting-and-schedule",
+      "priority": 10,
+      "startsAt": "2020-01-01T00:00:00Z",
+      "endsAt": "2100-01-01T00:00:00Z",
+      "title": {
+        "en": "Test announcement: formatting, translations, and scheduling",
+        "de": "Testankündigung: Formatierung, Übersetzungen und Zeitplanung"
+      },
+      "message": {
+        "en": "This is a **test announcement**. No maintenance or downtime is scheduled. Switch the homepage language to German to see its translation.\n\n### Markdown formatting\n\nYou can use **bold**, *italic*, ~~strikethrough~~, `inline code`, and [links](https://example.com).\n\n- Add bullet lists.\n- Use multiple paragraphs.\n\n1. Edit the announcement file.\n2. Reload the homepage or wait up to one minute for it to refresh.\n\n> Blockquotes can highlight a useful detail.\n\n```text\nCode blocks preserve line breaks.\n```\n\n| Feature | Example |\n| --- | --- |\n| Math | $1 + 1 = 2$ |\n| Priority | Higher numbers appear first |\n\n### Scheduling\n\nThis notice is visible from 1 January 2020 (inclusive) until 1 January 2100 (exclusive), using UTC. These deliberately broad dates keep the demo visible. Change `startsAt` and `endsAt` to try scheduling, or omit them to keep a notice active indefinitely.",
+        "de": "Dies ist eine **Testankündigung**. Es sind keine Wartungsarbeiten oder Ausfallzeiten geplant. Wechsle die Sprache der Startseite zu Englisch, um die englische Fassung zu sehen.\n\n### Markdown-Formatierung\n\nDu kannst **Fettdruck**, *Kursivschrift*, ~~Durchstreichungen~~, `Inline-Code` und [Links](https://example.com) verwenden.\n\n- Füge Aufzählungen hinzu.\n- Verwende mehrere Absätze.\n\n1. Bearbeite die Ankündigungsdatei.\n2. Lade die Startseite neu oder warte bis zu einer Minute auf die Aktualisierung.\n\n> Zitate können ein hilfreiches Detail hervorheben.\n\n```text\nCodeblöcke behalten Zeilenumbrüche bei.\n```\n\n| Funktion | Beispiel |\n| --- | --- |\n| Mathematik | $1 + 1 = 2$ |\n| Priorität | Höhere Zahlen erscheinen zuerst |\n\n### Zeitplanung\n\nDiese Ankündigung ist vom 1. Januar 2020 (einschließlich) bis zum 1. Januar 2100 (ausschließlich) in UTC sichtbar. Dieser absichtlich große Zeitraum hält das Beispiel sichtbar. Ändere `startsAt` und `endsAt`, um die Zeitplanung auszuprobieren, oder lasse sie weg, damit eine Ankündigung unbefristet aktiv bleibt."
       }
     }
   ]
