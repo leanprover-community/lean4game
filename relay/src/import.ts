@@ -129,7 +129,8 @@ async function doImport (owner, repo, id) {
 
     progress[id].done = true
     progress[id].output += `Done!\n`
-    progress[id].output += `Play the game at: {your website}/#/g/${owner}/${repo}\n`
+    const gameUrl = `/#/g/${owner}/${repo}`
+    progress[id].output += `Play the game at: <a href="${gameUrl}">${gameUrl}</a>\n`
   } finally {
     // Use the download path to remove partial ZIPs and failed extractions too.
     if (artifactPath) {
