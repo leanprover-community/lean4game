@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 
 const TOKEN = process.env.LEAN4GAME_GITHUB_TOKEN
 const USERNAME = process.env.LEAN4GAME_GITHUB_USER
-const CONTACT = process.env.ISSUE_CONTACT
+const CONTACT = process.env.ISSUE_CONTACT || 'https://github.com/leanprover-community/lean4game/issues'
 
 const octokit = new Octokit({
   auth: TOKEN
@@ -154,8 +154,7 @@ export const importTrigger = (req, res) => {
     .catch((err: Error) => {
       const message = err.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       progress[id].output += `${message}\n
-      Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve
-      this issue.`
+      Please <a href="${CONTACT}">report this issue</a> and include the error above.`
       // A failed attempt must not block the next trigger.
       progress[id].done = true
       console.error(err)
