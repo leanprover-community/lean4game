@@ -1,9 +1,9 @@
 import fs from 'fs';
 import got from 'got'
 import path from 'path';
-import { safeImport } from './middleware.js'
 import { Octokit } from 'octokit';
 import { spawn } from 'child_process'
+import { pipeline } from 'node:stream/promises'
 import { fileURLToPath } from 'url';
 import { gameActivityStore } from './services/GameActivityStore.js';
 
@@ -23,22 +23,14 @@ const progress = {}
 async function runProcess(id, cmd, args, cwd) {
   return new Promise<void>((resolve, reject) => {
     const ls = spawn(cmd, args, {cwd});
+    ls.on('error', reject);
 
     ls.stdout.on('data', (data) => {
       progress[id].output += data.toString()
     });
 
     ls.stderr.on('data', (data) => {
-      try {
-        if (args[0].includes("unpack.sh")){
-          throw new Error(".zip file of artifact could not be fetched. Make sure it exists and is not expired. \n")
-        } else {
-          progress[id].output += data.toString()
-        }
-      } catch(e){
-        progress[id].output += `Error: ${e.toString()}\n${e.stack}`
-      }
-
+      progress[id].output += data.toString()
     });
 
     ls.on('close', (code) => {
@@ -50,40 +42,36 @@ async function runProcess(id, cmd, args, cwd) {
 
 async function download(id, url, dest) {
   let numProgressChars = 0
-  return new Promise<void>((resolve, reject) => {
-    // The options argument is optional so you can omit it
-    progress[id].output += "Progress: " + "[" + "_".repeat(50) + "]"
-    got.stream.get(url, {
-     headers: {
-       'accept': 'application/vnd.github+json',
-       'User-Agent': USERNAME,
-       'X-GitHub-Api-Version': '2022-11-28',
-       'Authorization': 'Bearer ' + TOKEN
-     }
-    })
-    // choose latest artifact
-    .on('downloadProgress', downloadProgress => {
-      let step = Math.round((downloadProgress.percent * 100) / 2);
-      if (step > numProgressChars && downloadProgress.transferred != 0) {
-        progress[id].output = progress[id].output.replace(/\[[#_]*\]/, `[${'#'.repeat(numProgressChars) + "_".repeat(50 - numProgressChars)}] `)
-        numProgressChars = step
-      }
-    })
-    .on('error', function (err) {
-      reject(err)
-    })
-    .on('end', function () {
-      progress[id].output += "\n"
-      resolve()
-    })
-    .pipe(fs.createWriteStream(dest));
+  progress[id].output += "Progress: " + "[" + "_".repeat(50) + "]"
+  const source = got.stream.get(url, {
+    // Stop stalled transfers; active downloads can take longer than a minute.
+    timeout: { socket: 60_000 },
+    headers: {
+      'accept': 'application/vnd.github+json',
+      'User-Agent': USERNAME,
+      'X-GitHub-Api-Version': '2022-11-28',
+      'Authorization': 'Bearer ' + TOKEN
+    }
+  }).on('downloadProgress', downloadProgress => {
+    let step = Math.round((downloadProgress.percent * 100) / 2);
+    if (step > numProgressChars && downloadProgress.transferred != 0) {
+      progress[id].output = progress[id].output.replace(/\[[#_]*\]/, `[${'#'.repeat(numProgressChars) + "_".repeat(50 - numProgressChars)}] `)
+      numProgressChars = step
+    }
   })
+  // Finish writing the file before unpacking it.
+  await pipeline(source, fs.createWriteStream(dest))
+  progress[id].output += "\n"
 }
 
 async function doImport (owner, repo, id) {
   progress[id].output += `Import starting in a few seconds...\n`
   await new Promise(resolve => setTimeout(resolve, 3000))
   let artifactId = null
+  let artifactPath: string
+  const gamesPath = path.join(__dirname, "..", "..", "..", "games");
+  const gamesTmpPath = path.join(gamesPath, "tmp");
+  // Let the trigger report failures; cleanup still runs in finally.
   try {
     const artifacts = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
       owner,
@@ -96,12 +84,10 @@ async function doImport (owner, repo, id) {
       .reduce((acc, cur) => acc.created_at < cur.created_at ? cur : acc)
 
     artifactId = artifact.id
+    artifactPath = path.join(gamesTmpPath, `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}`)
     const url = artifact.archive_download_url
     const unpackingScript = path.join(__dirname, "..", "..", "scripts", "unpack.sh")
     const toolchainScript = path.join(__dirname, "..", "..", "scripts", "install_toolchain.sh")
-
-    const gamesPath = path.join(__dirname, "..", "..", "..", "games");
-    const gamesTmpPath = path.join(__dirname, "..", "..", "..", "games", "tmp");
 
     // Make sure the download folder exists
     if (!fs.existsSync(gamesPath)){
@@ -111,7 +97,7 @@ async function doImport (owner, repo, id) {
       fs.mkdirSync(gamesTmpPath);
     }
     progress[id].output += `Download from ${url}\n`
-    await download(id, url, path.join(__dirname, "..", "..", "..", "games", "tmp", `${owner.toLowerCase()}_${repo.toLowerCase()}_${artifactId}.zip`))
+    await download(id, url, `${artifactPath}.zip`)
     progress[id].output += `Download finished.\n`
 
     // Unpack downloaded game
@@ -144,13 +130,12 @@ async function doImport (owner, repo, id) {
     progress[id].done = true
     progress[id].output += `Done!\n`
     progress[id].output += `Play the game at: {your website}/#/g/${owner}/${repo}\n`
-  } catch (e) {
-    progress[id].output += `Error: ${e.toString()}\n${e.stack}`
   } finally {
-    // clean-up temp. files
-    if (artifactId) {
-      fs.rmSync(path.join(__dirname, "..", "games", "tmp", `${owner}_${repo}_${artifactId}.zip`), {force: true, recursive: false});
-      fs.rmSync(path.join(__dirname, "..", "games", "tmp", `${owner}_${repo}_${artifactId}`), {force: true, recursive: true});
+    // Use the download path to remove partial ZIPs and failed extractions too.
+    if (artifactPath) {
+      fs.rmSync(`${artifactPath}.zip`, {force: true, recursive: false});
+      fs.rmSync(artifactPath, {force: true, recursive: true});
+      fs.rmSync(`${artifactPath}_game`, {force: true, recursive: true});
     }
     progress[id].done = true
   }
@@ -165,12 +150,15 @@ export const importTrigger = (req, res) => {
 
   if(!progress[id] || progress[id].done) {
     progress[id] = {output: "", done: false}
-    safeImport(owner, repo, id, doImport)
+    doImport(owner, repo, id)
     .catch((err: Error) => {
-      progress[id].output += `Upload of file would exceed allocated memory on the server.\n
+      const message = err.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      progress[id].output += `${message}\n
       Please notify server admins via <a href=${CONTACT}>the LEAN zulip instance</a> to resolve
       this issue.`
-      throw err
+      // A failed attempt must not block the next trigger.
+      progress[id].done = true
+      console.error(err)
     })
   }
 

@@ -78,6 +78,11 @@ export class GameSessionsObserver {
   startObservedGame(ws: WebSocket, req: IncomingMessage) {
     const ip = anonymize(req.headers['x-forwarded-for'] as string || req.socket.remoteAddress);
     let gameSession: GameSession = this.gameManager.startGame(req, ip)
+    // Close this connection if the game could not start.
+    if (!gameSession) {
+      ws.close(1011, 'Game could not be started')
+      return
+    }
     let ps = gameSession.process
     let game = gameSession.game
     let gameDir = gameSession.gameDir
