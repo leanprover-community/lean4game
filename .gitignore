@@ -8,4 +8,5 @@ logs/
 relay/prev_cpu_metric
 test.ecosystem.config.cjs
 prod.ecosystem.config.cjs
+announcements.json
 cypress/screenshots
