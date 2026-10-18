@@ -64,8 +64,8 @@ In case of a server outage at `adam.math.hhu.de` please open an [issue](issues) 
 | [Real Analysis Game](https://github.com/alexkontorovich/realanalysisgame)         | [Alex Kontorovich](https://github.com/AlexKontorovich)  |
 | [Reintroduction to Proofs](https://github.com/emilyriehl/reintroductiontoproofs)  | [Emily Riehl](https://github.com/emilyriehl)            |
 | [Robo / Scribble](https://github.com/hhu-adam/robo)                               | [Marcus Zibrowius](https://github.com/TentativeConvert) |
-| [Set Theory Game](https://github.com/djvelleman/stg4)                             | [Dan Velleman](https://github.com/djvelleman)
-
+| [Set Theory Game](https://github.com/djvelleman/stg4)                             | [Dan Velleman](https://github.com/djvelleman)           |
+| [Number Theory Game](https://github.com/k88-b/numbertheorygame)                   | [Konstantin Belyanin](https://github.com/k88-b)
 
 ## Credits
 
