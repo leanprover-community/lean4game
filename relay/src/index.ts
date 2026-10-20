@@ -156,7 +156,8 @@ const server = app
         {owner: "trequetrum", game: "lean4game-logic"},
         {owner: "emilyriehl", game: "reintroductiontoproofs"},
         {owner: "jadabouhawili", game: "knightsandknaves-lean4game"},
-        {owner: "zrtmrh", game: "linearalgebragame"}
+        {owner: "zrtmrh", game: "linearalgebragame"},
+        {owner: "k88-b", game: "numbertheorygame"}
       ]
 
       // Load featured games

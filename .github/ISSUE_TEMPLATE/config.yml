@@ -24,3 +24,7 @@ contact_links:
   - name: Linear Algebra Game
     url: https://github.com/zrtmrh/linearalgebragame/issues/new/choose
     about: Raise issues regarding the contents of the Linear Algebra Game
+  - name: Number Theory Game
+    url: https://github.com/k88-b/numbertheorygame/issues/new/choose
+    about: Raise issues regarding the contents of the Number Theory Game
+
