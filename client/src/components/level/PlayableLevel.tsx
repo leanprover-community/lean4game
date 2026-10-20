@@ -2,9 +2,11 @@ import { useTranslation } from "react-i18next"
 import { useGameTranslation } from "../../utils/translation"
 import { useEffect, useRef, useState } from "react"
 import { useAtom } from "jotai"
-import { clientAtom, codeStorageAtom, rpcSessionAtom, editorAtom, leanMonacoAtom, lockEditorModeAtom, modelAtom, typewriterModeAtom, uriAtom } from "../../store/editor-atoms"
+import { clientAtom, codeStorageAtom, rpcSessionAtom, editorAtom, leanMonacoAtom, lockEditorModeAtom, modelAtom, proofAtom, typewriterModeAtom, uriAtom } from "../../store/editor-atoms"
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "../../store/location-atoms"
 import { mobileAtom } from "../../store/preferences-atoms"
+import { completedAtom } from "../../store/progress-atoms"
+import { inventoryAtom } from "../../store/inventory-atoms"
 import { gameInfoAtom, levelInfoAtom } from "../../store/query-atoms"
 import { LeanMonacoEditor, RpcSessionAtPos } from "lean4monaco"
 import { RpcConnectParams } from "@leanprover/infoview-api"
@@ -29,6 +31,9 @@ export function PlayableLevel() {
   const [code, setCode] = useAtom(codeStorageAtom)
   const [{ data: gameInfo }] = useAtom(gameInfoAtom)
   const [{ data: levelInfo, isLoading: levelInfoIsLoading }] = useAtom(levelInfoAtom)
+  const [proof] = useAtom(proofAtom)
+  const [, setCompleted] = useAtom(completedAtom)
+  const [, addToInventory] = useAtom(inventoryAtom)
 
   // Only for mobile layout
   const [pageNumber, setPageNumber] = useState(0)
@@ -170,6 +175,27 @@ export function PlayableLevel() {
     setTypewriterInput("")
 
   }, [gameId, worldId, levelId])
+
+  useEffect(() => {
+    // Wait until `levelInfo` for the current `levelId` has loaded so navigating
+    // from a completed level to the next level doesn't prematurely mark the new level completed
+    if (proof?.completed && !levelInfoIsLoading && levelInfo?.index === levelId) {
+      setCompleted(true)
+
+      // On completion, add the names of all new items to the local storage
+      let newTiles = [
+        ...levelInfo?.tactics ?? [],
+        ...levelInfo?.lemmas ?? [],
+        ...levelInfo?.definitions ?? []
+      ].filter((tile) => tile.new).map((tile) => tile.name)
+
+      // Add the proven statement to the local storage as well.
+      if (levelInfo?.statementName != null) {
+        newTiles.push(levelInfo?.statementName)
+      }
+      addToInventory(newTiles)
+    }
+  }, [proof, levelInfo, levelInfoIsLoading, levelId])
 
   useEffect(() => {
     const selection = editor?.getSelection();

@@ -30,7 +30,30 @@ describe('Basic Lean4game Interface', () => {
     })
   })
   describe('Popup', () => {
-    describe('Erase', () => {})
+    describe('Erase', () => {
+      it('opens erase popup and shows download and delete options', () => {
+        cy.visit('/#/g/test/TestGame')
+        cy.get('#menu-btn').click()
+        cy.contains('.menu.dropdown .btn', 'Erase').click()
+        cy.contains('h2', 'Delete Progress?').should('be.visible')
+        cy.contains('Download & Delete everything').should('be.visible')
+      })
+    })
+    describe('Download', () => {
+      it('renders download button in dropdown menu and downloads non-empty progress JSON', () => {
+        cy.visit('/#/g/test/TestGame')
+        cy.get('#menu-btn').click()
+        cy.contains('.menu.dropdown .btn', 'Download').should('be.visible').click()
+        const now = new Date()
+        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+        const downloadsFolder = Cypress.config('downloadsFolder')
+        cy.readFile(`${downloadsFolder}/lean4game-test_TestGame-${dateStr}.json`).then((content) => {
+          expect(content).to.be.an('object')
+          expect(content).to.have.property('inventory')
+          expect(content).to.have.property('data')
+        })
+      })
+    })
     describe('Impressum', () => {
       it('landing page footer', () => {
         cy.visit('/#/')
@@ -73,6 +96,44 @@ describe('Basic Lean4game Interface', () => {
         cy.contains('🔓')
       })
     })
-    describe('Upload', () => {})
+    describe('Upload', () => {
+      it('opens upload popup and displays progress upload options', () => {
+        cy.visit('/#/g/test/TestGame')
+        cy.get('#menu-btn').click()
+        cy.contains('.menu.dropdown .btn', 'Upload').click()
+        cy.contains('h2', 'Upload Saved Progress').should('be.visible')
+        cy.contains('downloading your current progress').should('be.visible')
+      })
+      it('uploads progress JSON and persists it to localStorage', () => {
+        cy.visit('/#/g/test/TestGame')
+        cy.get('#menu-btn').click()
+        cy.contains('.menu.dropdown .btn', 'Upload').click()
+        const sampleProgress = {
+          inventory: ['rfl'],
+          data: {
+            World1: {
+              readIntro: true,
+              1: { code: 'rfl\n', selections: [], completed: true, help: [] }
+            }
+          },
+          readIntro: true,
+          difficulty: 2
+        }
+        cy.get('.modal input[type="file"]').selectFile({
+          contents: Cypress.Buffer.from(JSON.stringify(sampleProgress)),
+          fileName: 'lean4game-test_TestGame-2026-01-01.json',
+          mimeType: 'application/json'
+        })
+        cy.contains('.modal button', 'Load selected file').should('not.be.disabled').click()
+        cy.get('.modal').should('not.exist')
+        cy.window().then((win) => {
+          const raw = win.localStorage.getItem('game_progress')
+          expect(raw).to.not.be.null
+          const parsed = JSON.parse(raw!)
+          expect(parsed.games['g/test/TestGame'].inventory).to.deep.equal(['rfl'])
+          expect(parsed.games['g/test/TestGame'].data.World1['1'].completed).to.equal(true)
+        })
+      })
+    })
   })
 })
