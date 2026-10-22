@@ -11,6 +11,31 @@ export function Errors ({errors, typewriterMode} : {errors : InteractiveDiagnost
   </div>
 }
 
+/**
+ * The plain text of a message. Unlike `TaggedText_stripTags`, this keeps the text inside
+ * embedded expressions, goals, widgets and traces: Lean puts most of a message's text into
+ * `expr` embeds, so stripping the tags would leave e.g. "Invalid rewrite argument ..." empty.
+ */
+function messageToString(msg: TaggedText<MsgEmbed>): string {
+  if ("text" in msg) {
+    return msg.text
+  } else if ("append" in msg) {
+    return msg.append.map(messageToString).join("")
+  }
+  const [embed, inner] = msg.tag
+  if ("expr" in embed) {
+    return TaggedText_stripTags(embed.expr)
+  } else if ("goal" in embed) {
+    const hyps = embed.goal.hyps.map(h => `${h.names.join(" ")} : ${TaggedText_stripTags(h.type)}\n`)
+    return hyps.join("") + (embed.goal.goalPrefix ?? "⊢ ") + TaggedText_stripTags(embed.goal.type)
+  } else if ("widget" in embed) {
+    return messageToString(embed.widget.alt)
+  } else if ("trace" in embed) {
+    return messageToString(embed.trace.msg)
+  }
+  return messageToString(inner)
+}
+
 /** A list of messages (info/warning/error) that are produced after this command */
 function Error({error, typewriterMode} : {error : InteractiveDiagnostic, typewriterMode : boolean}) {
   // The first step will always have an empty command
@@ -34,7 +59,7 @@ function Error({error, typewriterMode} : {error : InteractiveDiagnostic, typewri
       message = error.message
   }
 
-  const messageString = TaggedText_stripTags(message);
+  const messageString = messageToString(message);
 
   return (messageString.trim().length > 0 && (
   <div className={severityClass + ' ml1 message'}>
