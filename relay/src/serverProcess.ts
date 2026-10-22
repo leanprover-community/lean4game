@@ -4,6 +4,7 @@ import { IncomingMessage } from 'http';
 import * as jsonrpcserver from 'vscode-ws-jsonrpc/server';
 import fs from 'fs';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
 type Tag = { owner: string; repo: string; };
 export type GameSession = {
@@ -236,6 +237,8 @@ export class GameManager {
         `scoped notation will not be available in the editor: ${gameDir}`)
     }
 
+    const metadataUri = pathToFileURL(path.join(gameDir, 'Game', 'Metadata.lean')).href
+
     /** Sending messages from the client to the server */
     socketConnection.forward(serverConnection, (message: any) => {
       if (message?.error) {
@@ -268,7 +271,7 @@ export class GameManager {
         worldId = path.basename(pathParts.dir)
         levelId = pathParts.name
 
-        replaceUri(message, `file://${gameDir}/Game/Metadata.lean`)
+        replaceUri(message, metadataUri)
 
         // Read level data from JSON file
         const levelDataPath = path.join(gameDir, '.lake', 'gamedata', `level__${worldId}__${levelId}.json`)
@@ -297,7 +300,7 @@ export class GameManager {
           `(inventory := [${inventory.map(s => JSON.stringify(s)).join(',')}]) ` +
           `:= by\n${content}\n`
       } else {
-        replaceUri(message, `file://${gameDir}/Game/Metadata.lean`)
+        replaceUri(message, metadataUri)
       }
 
       shiftLines(message, +PROOF_START_LINE)
