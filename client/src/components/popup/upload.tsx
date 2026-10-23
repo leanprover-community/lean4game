@@ -11,6 +11,31 @@ import { progressAtom } from '../../store/progress-atoms'
 import { DEFAULT_DIFFICULTY, GameProgress } from '../../store/progress-types'
 import { Button } from '../button'
 
+/** Validate and normalize uploaded JSON into a `GameProgress` object */
+function validateGameProgress(text: string, gameId?: string): GameProgress | null {
+  try {
+    const parsed = JSON.parse(text)
+    // Support both single-game `GameProgress` JSON and `{ games: { [gameId]: GameProgress } }`
+    const rawProgress = (parsed?.games && gameId)
+      ? (parsed.games[gameId] ?? parsed.games[gameId.toLowerCase()])
+      : parsed
+    if (!rawProgress || typeof rawProgress !== 'object' || (!('data' in rawProgress) && !('inventory' in rawProgress))) {
+      console.error("Invalid game progress format")
+      return null
+    }
+    return {
+      ...rawProgress,
+      inventory: Array.isArray(rawProgress.inventory) ? rawProgress.inventory : [],
+      data: (rawProgress.data && typeof rawProgress.data === 'object') ? rawProgress.data : {},
+      readIntro: Boolean(rawProgress.readIntro),
+      difficulty: typeof rawProgress.difficulty === 'number' ? rawProgress.difficulty : DEFAULT_DIFFICULTY,
+    }
+  } catch (err) {
+    console.error("Failed to parse game progress file", err)
+    return null
+  }
+}
+
 /** Pop-up that is displaying the Game Info.
  *
  * `handleClose` is the function to close it again because it's open/closed state is
@@ -38,29 +63,12 @@ export function UploadPopup () {
     const fileReader = new FileReader()
     fileReader.readAsText(file, "UTF-8")
     fileReader.onload = (e: any) => {
-      try {
-        const parsed = JSON.parse(e.target.result.toString())
-        // Support both single-game `GameProgress` JSON and `{ games: { [gameId]: GameProgress } }`
-        const rawProgress = (parsed?.games && gameId)
-          ? (parsed.games[gameId] ?? parsed.games[gameId.toLowerCase()])
-          : parsed
-        if (!rawProgress || typeof rawProgress !== 'object' || (!('data' in rawProgress) && !('inventory' in rawProgress))) {
-          console.error("Invalid game progress format")
-          return
-        }
-        const data: GameProgress = {
-          ...rawProgress,
-          inventory: Array.isArray(rawProgress.inventory) ? rawProgress.inventory : [],
-          data: (rawProgress.data && typeof rawProgress.data === 'object') ? rawProgress.data : {},
-          readIntro: Boolean(rawProgress.readIntro),
-          difficulty: typeof rawProgress.difficulty === 'number' ? rawProgress.difficulty : DEFAULT_DIFFICULTY,
-        }
+      const data = validateGameProgress(e.target.result.toString(), gameId)
+      if (data) {
         console.debug("Json Data", data)
         setProgress(data)
         // Close the popup only after the async FileReader finishes updating progress
         setPopup(null)
-      } catch (err) {
-        console.error("Failed to parse game progress file", err)
       }
     }
   }
