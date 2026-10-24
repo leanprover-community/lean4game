@@ -239,3 +239,25 @@ footer .link {
 .info .languages span + span {
   margin-left: .5em;
 }
+
+.announcement + .announcement {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgb(200, 200, 200);
+}
+
+.announcement h2 {
+  margin-top: 0;
+}
+
+.announcement .markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.announcement {
+  overflow-wrap: anywhere;
+}
+
+.announcement a {
+  text-decoration: underline;
+}

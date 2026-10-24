@@ -32,6 +32,7 @@ The documentation is very much work in progress but the links below should be up
 
 ### Hosting
 * [How to host a lean4game instance yourself](doc/hosting.md): how to set up your own Lean Game Server
+* [Homepage announcements](doc/announcements.md): publish notices without rebuilding or restarting
 
 ## Contributing
 

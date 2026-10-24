@@ -10,11 +10,14 @@ import { GameManager } from './serverProcess.js';
 import { GameSessionsObserver } from './websocket.js';
 import { WebSocketServer } from 'ws';
 import { gameActivityStore } from './services/GameActivityStore.js';
+import { announcementsHandler } from './announcements.js';
 // import fs from 'fs'
 // const __filename = url.fileURLToPath(import.meta.url);
 
 const __dirname: string = url.fileURLToPath(new URL('.', import.meta.url));
 const clientDistPath: string = path.join(__dirname, '..', '..', '..', 'client', 'dist');
+const announcementsPath = process.env.ANNOUNCEMENTS_FILE ||
+  path.join(__dirname, '..', '..', '..', 'announcements.json');
 const app = express()
 const gameManager = new GameManager(__dirname)
 const PORT = process.env.PORT || 8080
@@ -50,6 +53,7 @@ router.get('/import/status/:owner/:repo', importStatus)
 router.get('/import/trigger/:owner/:repo', importTrigger)
 
 const server = app
+  .get('/data/announcements', announcementsHandler(announcementsPath))
   .use(express.static(clientDistPath)) // TODO: add a dist folder from inside the game
   .use('/i18n/g/:owner/:repo/:lang', (req, res, next) => {
     const owner = req.params.owner;
