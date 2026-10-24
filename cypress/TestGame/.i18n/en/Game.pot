@@ -1,119 +1,121 @@
 msgid ""
-msgstr "Project-Id-Version: Game v4.33.1\n"
+msgstr "Project-Id-Version: Game v4.35.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-21\n"
+"POT-Creation-Date: 2026-10-24\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../..\n"
+"X-Poedit-SearchPath-0: ."
 
-#. §0: `ℕ`
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "Commutativity on §0"
-msgstr ""
-
-#: Game.Levels.DemoWorld
-msgid "Test World"
-msgstr ""
-
-#: GameServer.RpcHandlers
-msgid "level completed! 🎉"
-msgstr ""
-
-#. §0: $\\textbf{LaTeX}$
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "This is a test level. There can be §0"
-msgstr ""
-
-#: GameServer.RpcHandlers
-msgid "intermediate goal solved! 🎉"
-msgstr ""
-
-#: Game.Levels.DemoWorld.L02_HypothesisNames
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "Done!"
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:34
 msgid "Addition"
 msgstr ""
 
-#: Game
-msgid "This is a test game."
-msgstr ""
-
-#: Game
-#: Game
-msgid "Test Game"
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:31
 msgid "An equality"
 msgstr ""
 
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "now apply!"
+#. §0: `ℕ`
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:28
+msgid "Commutativity on §0"
 msgstr ""
 
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "intro first!"
+#: Game/Levels/DemoWorld/L02_HypothesisNames.lean:15
+#: Game/Levels/DemoWorld/L03_NonProp.lean:17
+msgid "Done!"
 msgstr ""
 
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "Test Level"
-msgstr ""
-
-#: GameServer.RpcHandlers
-msgid "level completed with warnings… 🎭"
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "The way to proof reflexivity."
-msgstr ""
-
-#. §0: `«{g}»`
-#: Game.Levels.DemoWorld.L01_HelloWorld
-#: Game.Levels.DemoWorld.L02_HypothesisNames
-msgid "You should use §0 now."
-msgstr ""
-
-#. §0: `«{h}»`
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "Maybe you should use §0 now."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L02_HypothesisNames
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "This is a test level."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L03_NonProp
-msgid "Non-Prop-Valued"
-msgstr ""
-
-#: Game
-msgid "This is additional information about the game."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L01_HelloWorld
-msgid "This last message appears if the level is solved."
-msgstr ""
-
-#: Game
-msgid "This is the introduction text of the game."
-msgstr ""
-
-#: Game.Levels.DemoWorld.L02_HypothesisNames
+#: Game/Levels/DemoWorld/L02_HypothesisNames.lean:6
 msgid "Hypothesis Names"
 msgstr ""
 
-#: Game.Levels.DemoWorld
+#. §0: `«{h}»`
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:17
+msgid "Maybe you should use §0 now."
+msgstr ""
+
+#: Game/Levels/DemoWorld/L03_NonProp.lean:6
+msgid "Non-Prop-Valued"
+msgstr ""
+
+#: Game.lean:3
+#: Game.lean:15
+msgid "Test Game"
+msgstr ""
+
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:6
+msgid "Test Level"
+msgstr ""
+
+#: Game/Levels/DemoWorld.lean:6
+msgid "Test World"
+msgstr ""
+
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:25
+msgid "The way to proof reflexivity."
+msgstr ""
+
+#: Game.lean:16
+msgid "This is a test game."
+msgstr ""
+
+#: Game/Levels/DemoWorld/L02_HypothesisNames.lean:8
+#: Game/Levels/DemoWorld/L03_NonProp.lean:8
+msgid "This is a test level."
+msgstr ""
+
+#. §0: $\\textbf{LaTeX}$
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:8
+msgid "This is a test level. There can be §0"
+msgstr ""
+
+#: Game.lean:9
+msgid "This is additional information about the game."
+msgstr ""
+
+#: Game/Levels/DemoWorld.lean:8
 msgid "This is the introduction of Test World."
+msgstr ""
+
+#: Game.lean:4
+msgid "This is the introduction text of the game."
+msgstr ""
+
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:23
+msgid "This last message appears if the level is solved."
 msgstr ""
 
 #. §0: `«{h}»`
 #. §1: `«{g}»`
-#: Game.Levels.DemoWorld.L01_HelloWorld
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:13
 msgid "You can either start using §0 or §1."
+msgstr ""
+
+#. §0: `«{g}»`
+#: Game/Levels/DemoWorld/L01_HelloWorld.lean:20
+#: Game/Levels/DemoWorld/L02_HypothesisNames.lean:12
+msgid "You should use §0 now."
+msgstr ""
+
+#: GameServer/RpcHandlers.lean:190
+msgid "intermediate goal solved! 🎉"
+msgstr ""
+
+#: Game/Levels/DemoWorld/L03_NonProp.lean:12
+msgid "intro first!"
+msgstr ""
+
+#: GameServer/RpcHandlers.lean:177
+msgid "level completed with warnings… 🎭"
+msgstr ""
+
+#: GameServer/RpcHandlers.lean:169
+msgid "level completed! 🎉"
+msgstr ""
+
+#: Game/Levels/DemoWorld/L03_NonProp.lean:14
+msgid "now apply!"
 msgstr ""
