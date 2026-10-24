@@ -182,10 +182,12 @@ export const downloadFile = ({ data, fileName, fileType } :
   { data: string
     fileName: string
     fileType: string}) => {
+  if (!data) return
   const blob = new Blob([data], { type: fileType })
+  const url = window.URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.download = fileName
-  a.href = window.URL.createObjectURL(blob)
+  a.href = url
   const clickEvt = new MouseEvent('click', {
     view: window,
     bubbles: true,
@@ -193,6 +195,7 @@ export const downloadFile = ({ data, fileName, fileType } :
   })
   a.dispatchEvent(clickEvt)
   a.remove()
+  setTimeout(() => window.URL.revokeObjectURL(url), 1000)
 }
 
 /** The menu that is shown next to the world selection graph */

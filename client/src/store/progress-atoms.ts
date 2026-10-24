@@ -45,17 +45,20 @@ export const progressAtom = atom(
     console.debug(`progress for ${gameId}`)
     if (!gameId) return null
     const allProgress = get(allProgressAtom)
-    return allProgress.games[gameId] ?? defaultGameProgress
+    // Fall back to `gameId.toLowerCase()` since legacy Redux saves normalized game IDs to lowercase
+    return allProgress?.games?.[gameId] ?? allProgress?.games?.[gameId.toLowerCase()] ?? defaultGameProgress
   },
   (get, set, val: GameProgress | null) => {
     const gameId = get(gameIdAtom)
     if (!gameId) return
     set(allProgressAtom, prev => {
-      const games = { ...prev.games }
+      const games = { ...(prev?.games ?? {}) }
       if (val) {
-        games[gameId] = val
+        // Merge with `defaultGameProgress` so partial/uploaded saves always have all required fields
+        games[gameId] = { ...defaultGameProgress, ...val }
       } else {
         delete games[gameId]
+        delete games[gameId.toLowerCase()]
       }
       return { ...prev, games }
     })

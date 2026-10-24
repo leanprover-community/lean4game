@@ -9,13 +9,19 @@ import { useAtom } from 'jotai'
 import { popupAtom } from '../../store/popup-atoms'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../../store/location-atoms'
 import { levelProgressAtom, progressAtom, worldProgressAtom } from '../../store/progress-atoms'
+import { codeAtom } from '../../store/editor-atoms'
 import { GameProgress } from '../../store/progress-types'
 
 /** download the current progress (i.e. what's saved in the browser store) */
 export function downloadProgress(gameId: string, gameProgress: GameProgress) {
+  if (!gameId || !gameProgress) return
+  // Strip the leading `g/` route prefix and replace `/` so the browser doesn't treat it as a path separator
+  const safeGameId = gameId.replace(/^g\//, '').replace(/[^a-zA-Z0-9_.-]/g, '_')
+  const now = new Date()
+  const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
   downloadFile({
     data: JSON.stringify(gameProgress, null, 2),
-    fileName: `lean4game-${gameId}-${new Date().toLocaleDateString()}.json`,
+    fileName: `lean4game-${safeGameId}-${date}.json`,
     fileType: 'text/json',
   })
 }
@@ -68,11 +74,14 @@ export function ErasePopup () {
   const [gameProgress, setGameProgress] = useAtom(progressAtom)
   const [worldProgress, setWorldProgress] = useAtom(worldProgressAtom)
   const [levelProgress, setLevelProgress] = useAtom(levelProgressAtom)
+  const [, setCode] = useAtom(codeAtom)
 
   // const { setPage } = useContext(PageContext)
   const [, setPopup] = useAtom(popupAtom)
 
   const eraseProgress = () => {
+    // Clear the active Monaco editor model so its change listener doesn't re-save the old proof
+    setCode("")
     setGameProgress(null)
     setPopup(null)
     // setPage(0) // TODO: fix me
@@ -80,11 +89,13 @@ export function ErasePopup () {
   }
 
   function eraseLevel () {
+    setCode("")
     setLevelProgress(null)
     setPopup(null)
   }
 
   function eraseWorld () {
+    setCode("")
     setWorldProgress(null)
     setPopup(null)
   }
