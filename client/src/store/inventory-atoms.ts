@@ -170,13 +170,15 @@ export const inventorySubtabAtom = atom(
 export const currentInventoryTilesAtom = atom(get => {
   const tab = get(inventoryTabAtom)
   const subtab = get(inventorySubtabAtom)
-  const userInventory = get(userInventoryAtom)
+  const userInventory = get(inventoryAtom) ?? []
   const showLocked = get(preferencesAtom).showLockedInventory
 
   return get(inventoryTilesAtoms[tab])
+    // Unlock items present in the user's saved inventory before filtering by `showLocked`
+    .map(tile => userInventory.includes(tile.name) ? {...tile, locked: false} : tile)
     .filter(it =>
         !it.hidden &&
         it.category == subtab &&
         (showLocked || !it.locked)
-    ).map(tile => userInventory.includes(tile.name) ? {...tile, locked: false} : tile)
+    )
 })

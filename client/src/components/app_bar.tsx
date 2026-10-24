@@ -253,7 +253,7 @@ function DownloadButton () {
   return <Button
     title={t("Download Progress")}
     inverted={true}
-    disabled={!gameId}
+    disabled={!gameId || !gameProgress}
     onClick={(ev) => {
       ev.preventDefault()
       if (gameId && gameProgress) {

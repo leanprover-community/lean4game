@@ -3,7 +3,8 @@ import { atom } from "jotai";
 import { atomEffect } from 'jotai-effect';
 import { LeanMonaco, LeanMonacoOptions, RpcSessionAtPos, LeanClient} from 'lean4monaco'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from "./location-atoms";
-import { levelProgressAtom, progressAtom } from "./progress-atoms";
+import { completedAtom, levelProgressAtom, progressAtom } from "./progress-atoms";
+import { inventoryAtom } from "./inventory-atoms";
 import { Selection } from "./progress-types";
 import { levelInfoAtom } from "./query-atoms";
 import { Diagnostic, DiagnosticSeverity, DocumentUri } from 'vscode-languageserver-types'
@@ -150,13 +151,42 @@ export const proofQueryAtom = atomWithQuery<ProofState>((get) => {
   }
 })
 
+/** Persist level completion and unlock new inventory items when the proof is completed */
+export const completeLevelEffect = atomEffect((get, set) => {
+  const proof = get(proofQueryAtom).data
+  const { data: levelInfo, isLoading: levelInfoIsLoading } = get(levelInfoAtom)
+  const levelId = get(levelIdAtom)
+
+  // Wait until `levelInfo` for the current `levelId` has loaded so navigating
+  // from a completed level to the next level doesn't prematurely mark the new level completed
+  if (proof?.completed && !levelInfoIsLoading && levelInfo?.index === levelId) {
+    set(completedAtom, true)
+
+    // On completion, add the names of all new items to the local storage
+    const newTiles = [
+      ...levelInfo?.tactics ?? [],
+      ...levelInfo?.lemmas ?? [],
+      ...levelInfo?.definitions ?? []
+    ].filter((tile) => tile.new).map((tile) => tile.name)
+
+    // Add the proven statement to the local storage as well.
+    if (levelInfo?.statementName != null) {
+      newTiles.push(levelInfo.statementName)
+    }
+    set(inventoryAtom, newTiles)
+  }
+})
+
 /**
  * The proof consists of multiple steps that are processed one after the other.
  * In particular multi-line terms like `match`-statements will not be supported.
  *
  * Note that the first step will always have "" as command
  */
-export const proofAtom = atom(get => get(proofQueryAtom).data)
+export const proofAtom = atom(get => {
+  get(completeLevelEffect)
+  return get(proofQueryAtom).data
+})
 
 
 
