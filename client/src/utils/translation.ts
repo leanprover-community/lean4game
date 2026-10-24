@@ -4,6 +4,7 @@ import { useTranslation, UseTranslationResponse } from 'react-i18next'
 import { gameIdAtom } from '../store/location-atoms';
 import { gameInfoAtom } from '../store/query-atoms';
 import { getGameI18n } from '../i18n';
+import type { TFunction } from 'i18next';
 
 /**
  * This file provides the tools to process translations created by the Lean package `lean-i18n`.
@@ -53,6 +54,17 @@ function normalizeKeyString(key: string): string{
   return key.replace(/\n/g, '\\n')
 }
 
+/** Translate game text with the same placeholder handling on tiles and game pages. */
+export function translateGameText(gameT: TFunction, gameId: string | undefined, key: string | undefined): string {
+  if (!key) return ""
+  const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
+  // lean-i18n doubles backslashes outside code blocks in catalog keys.
+  const escapedKey = keyWithoutBlocks.replace(/\\/g, '\\\\')
+  // Keep the older placeholder and raw keys as fallbacks for existing catalogs.
+  const translatedKey = gameT([escapedKey, keyWithoutBlocks, key], {ns: gameId})
+  return translatedKey.replace(/(?<!\\)§(\d+)/g, (_, num: string) => codeBlocks[Number(num)] ?? num);
+}
+
 /**
  * Wrapper around the hook obtained from `useTranslation`.
  * Add the game-ID namespace and replace code blocks according to
@@ -65,15 +77,6 @@ export function useGameTranslation(): UseTranslationResponse<'translation', unde
   const { t, i18n, ...rest } = useTranslation()
   const gameI18n = getGameI18n(gameInfo?.settings?.allowEmptyTranslations ?? false)
   const gameT = gameI18n.getFixedT(i18n.resolvedLanguage ?? i18n.language)
-  const pattern = /(?<!\\)§(\d+)/g;
-  const modifiedT = ((key: string | undefined) => {
-    if (!key) return ""
-    const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
-    // lean-i18n doubles backslashes outside code blocks in catalog keys.
-    const escapedKey = keyWithoutBlocks.replace(/\\/g, '\\\\')
-    // Keep the older placeholder and raw keys as fallbacks for existing catalogs.
-    let translatedKey = gameT([escapedKey, keyWithoutBlocks, key], {ns: gameId})
-    return translatedKey.replace(pattern, (_, num: string) => codeBlocks[Number(num)] ?? num);
-  }) as typeof t
+  const modifiedT = ((key: string | undefined) => translateGameText(gameT, gameId, key)) as typeof t
   return { t: modifiedT, i18n, ...rest }
 }
