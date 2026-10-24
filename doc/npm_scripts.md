@@ -34,8 +34,8 @@ For example for `npm start`, `npm run production`, `npm run start:relay`.
 | `GAME_ACTIVITY_FILE` | file path | `games/.lean4game/activity.json` | Optional path for the game activity metadata file. |
 | `LEAN4GAME_GITHUB_USER` | GitHub username | not set | GitHub username sent with GitHub artifact download requests. |
 | `LEAN4GAME_GITHUB_TOKEN` | GitHub access token | not set | Token used to request and download game artifacts from GitHub. For public games, a read-only token is enough. |
-| `ISSUE_CONTACT` | URL | not set | Link shown when an import cannot start because of the disk-space check. |
-| `RESERVED_DISC_SPACE_MB` | number of megabytes | not set | Value used by the disk-space check before importing a game artifact. |
+| `ISSUE_CONTACT` | URL | `https://github.com/leanprover-community/lean4game/issues` | Link shown when a game import fails. Unset or empty uses the default. |
+| `RESERVED_DISC_SPACE_MB` | non-negative integer in megabytes | not set | Maximum installed games directory usage, excluding `tmp`. Checked after extraction, accounting for replacement of the old game. Unset or `0` means unlimited. |
 | `NO_BWRAP` | `true`, `false` | `false` | to disable to use of `bubblewrap` in production mode. This means `Lean` runs without any container on your system, which imposes a security risk! |
 
 #### API
