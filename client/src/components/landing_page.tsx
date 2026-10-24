@@ -23,6 +23,7 @@ import { gameTilesAtom } from '../store/tiles-atoms';
 import { GameTileWithName } from '../store/api';
 import { getGameI18n } from '../i18n';
 import { translateGameText } from '../utils/translation';
+import { Announcements } from './announcements';
 
 function Tile({tileWithName}: {tileWithName: GameTileWithName}) {
   const gameId = `g/${tileWithName.owner}/${tileWithName.game}`
@@ -126,6 +127,7 @@ function LandingPage() {
         </p>
       </div>
     </header>
+    <Announcements />
     <div className="game-list">
       {
       tiles.map((tileWithName, i) => {
