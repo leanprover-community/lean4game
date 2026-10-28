@@ -13,7 +13,7 @@ export function LevelPage() {
   const completed = useAtomValue(completedAtom)
   return (
     <PanelLayout
-      leftTitle={t('game.introduction')}
+      leftTitle={t('game.chat')}
       rightTitle={t('game.inventory')}
       centerTitle={
         completed && (

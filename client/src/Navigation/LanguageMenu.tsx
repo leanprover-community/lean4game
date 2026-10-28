@@ -19,7 +19,8 @@ export function LanguageButton({
   return (
     <NavButton
       iconElement={
-        <span className="inline-flex w-6 justify-center">
+        // fixed height: the language code is lower than the icon and the flags
+        <span className="inline-flex h-4 w-6 items-center justify-center">
           {open ? (
             <FontAwesomeIcon icon={faXmark} />
           ) : (

@@ -87,6 +87,7 @@ export const de: DeepPartialTranslation<typeof en> = {
   },
   game: {
     introduction: 'Einführung',
+    chat: 'Chat',
     inventory: 'Inventar',
     worlds: 'Welten',
   },
