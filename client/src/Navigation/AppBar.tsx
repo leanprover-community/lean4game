@@ -4,6 +4,7 @@ import {
   faDownload,
   faEraser,
   faGear,
+  faHome,
   faLock,
   faLockOpen,
   faUnlock,
@@ -13,7 +14,12 @@ import {
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useTranslation } from 'react-i18next'
 
-import { routeAtom } from '../state/location-atoms'
+import {
+  gameIdAtom,
+  gamePath,
+  routeAtom,
+  worldIdAtom,
+} from '../state/location-atoms'
 import {
   langNavOpenAtom,
   navOpenAtom,
@@ -158,9 +164,20 @@ function CommonMenuEntries({
 }) {
   const { t } = useTranslation()
   const inGame = 'gameId' in useAtomValue(routeAtom)
+  const gameId = useAtomValue(gameIdAtom)
+  const worldId = useAtomValue(worldIdAtom)
   const downloadProgress = useSetAtom(downloadProgressAtom)
   return (
     <>
+      {/* in a world or level, back to the game overview */}
+      {gameId !== undefined && worldId !== undefined && (
+        <NavButton
+          icon={faHome}
+          text={t('appBar.home')}
+          title={t('appBar.backToGame')}
+          href={gamePath(gameId)}
+        />
+      )}
       {inGame && (
         <>
           <NavButton

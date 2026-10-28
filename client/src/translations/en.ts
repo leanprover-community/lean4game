@@ -101,6 +101,7 @@ export const en = {
     assumptions: 'Assumptions',
     theorem: 'Theorem',
     levelCompleted: 'Level completed! 🎉',
+    levelSolved: 'Level solved successfully',
     noGoalsLeft: 'no goals left',
     noGoalsLeftDescription:
       'This probably means you solved the level with warnings or Lean encountered a parsing error.',

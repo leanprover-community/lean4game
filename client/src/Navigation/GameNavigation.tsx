@@ -16,6 +16,7 @@ import {
   worldIdAtom,
 } from '../state/location-atoms'
 import { lastPageAtom } from '../state/navigation-atoms'
+import { completedAtom, difficultyAtom } from '../state/progress-atoms'
 import { gameInfoAtom } from '../state/query-atoms'
 import { NavButton } from './NavButton'
 import RotatingGlobe from './RotatingGlobe'
@@ -24,7 +25,8 @@ import RotatingGlobe from './RotatingGlobe'
  * Back and forward through a game: from the game overview `/owner/repo` to a world
  * `/owner/repo/world` and through its levels `/owner/repo/world/1`, `…/2`, ….
  * The world and its last level lead back to the game overview (home icon), everything
- * else back to the landing page (arrow and globe).
+ * else back to the landing page (arrow and globe). With the strictest rules, a level
+ * must be completed before going on.
  */
 export function GameNavigation() {
   const { t } = useTranslation()
@@ -34,11 +36,15 @@ export function GameNavigation() {
   const worldId = useAtomValue(worldIdAtom)
   const levelId = useAtomValue(levelIdAtom)
   const { data: gameInfo } = useAtomValue(gameInfoAtom)
+  const completed = useAtomValue(completedAtom)
+  const difficulty = useAtomValue(difficultyAtom)
 
   if (route.page === 'landing') return null
 
   if (gameId !== undefined && worldId !== undefined && levelId !== undefined) {
     const worldSize = gameInfo?.worldSize?.[worldId]
+    // with the strictest rules, a level must be completed to go on
+    const locked = !completed && difficulty >= 2
     return (
       <>
         {levelId > 1 ? (
@@ -60,12 +66,14 @@ export function GameNavigation() {
               icon={faArrowRight}
               title={t('appBar.nextLevel')}
               href={gamePath(gameId, worldId, levelId + 1)}
+              disabled={locked}
             />
           ) : (
             <NavButton
               icon={faHome}
               title={t('appBar.home')}
               href={gamePath(gameId)}
+              disabled={locked}
             />
           ))}
       </>

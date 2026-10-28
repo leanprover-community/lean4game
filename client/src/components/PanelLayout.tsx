@@ -29,8 +29,8 @@ type PanelLayoutProps = {
   /** shown in the top bar of the side panels and in the tooltips of their toggles */
   leftTitle?: string
   rightTitle?: string
-  /** shown in the top bar of the center */
-  centerTitle?: string
+  /** shown in the top bar of the center, e.g. an icon */
+  centerTitle?: ReactNode
 }
 
 /**
@@ -203,7 +203,13 @@ function MobileLayout({
  * The bar at the top of a panel with its `title`. The `children` are `ToggleButton`s,
  * placed before or after the title depending on their `side`.
  */
-function TopBar({ title, children }: { title?: string; children: ReactNode }) {
+function TopBar({
+  title,
+  children,
+}: {
+  title?: ReactNode
+  children: ReactNode
+}) {
   return (
     <div className="flex h-10 shrink-0 items-center gap-1 border-b border-(--border) bg-(--section-bg) px-1">
       <span className="min-w-0 flex-1 truncate px-2 font-bold">{title}</span>
