@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
 import { PanelLayout } from '../components/PanelLayout'
+import { WorldImage } from '../components/WorldImage'
 
-/** A world of a game at `/owner/repo/world`. TODO: the panels are still empty */
+/** A world of a game at `/owner/repo/world`. TODO: the side panels are still empty */
 export function WorldPage() {
   const { t } = useTranslation()
   return (
@@ -10,7 +11,11 @@ export function WorldPage() {
       leftTitle={t('game.introduction')}
       rightTitle={t('game.inventory')}
       left={null}
-      center={null}
+      center={
+        <div className="relative h-full bg-(--section-bg)">
+          <WorldImage />
+        </div>
+      }
       right={null}
     />
   )

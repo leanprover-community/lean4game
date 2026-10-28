@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
 import { Markdown } from '../components/Markdown'
+import { WorldImage } from '../components/WorldImage'
 import { gameIdAtom } from '../state/location-atoms'
 import {
   hasError,
@@ -16,7 +17,7 @@ import {
   restartInstanceEffect,
 } from '../state/proof-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../state/query-atoms'
-import { HttpError, gameDataUrl } from '../utils/fetch'
+import { HttpError } from '../utils/fetch'
 import { useGameTranslation } from '../utils/translation'
 import { HoverProvider } from './HoverCode'
 import { ProofStep } from './ProofStep'
@@ -26,13 +27,11 @@ import { TypewriterInput } from './TypewriterInput'
 const KEEPALIVE_MS = 60_000
 
 /**
- * The typewriter: the proof steps on top of the level's image, and below them the input
+ * The typewriter: the proof steps on top of the world's image, and below them the input
  * line for the next command.
  */
 export function Typewriter() {
   const { t } = useTranslation()
-  const gameId = useAtomValue(gameIdAtom)
-  const { data: levelInfo } = useAtomValue(levelInfoAtom)
   const instance = useAtomValue(leanInstanceAtom)
   const check = useAtomValue(proofCheckAtom)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -58,76 +57,70 @@ export function Typewriter() {
   const error = instance.error ?? (checkStatus === 409 ? null : check.error)
 
   return (
-    <div className="flex-col h-full text-left">
-      <div
-        ref={scrollRef}
-        className={twMerge(
-          'relative flex-col min-h-0 flex-1 overflow-y-auto',
-          'bg-(--section-bg)',
-        )}
-      >
-        {levelInfo?.image && gameId && (
-          <img
-            className="absolute max-h-full w-full object-contain"
-            src={gameDataUrl(gameId, levelInfo.image)}
-            alt=""
-          />
-        )}
-        <div className="min-h-0 flex-1" />
-        <div className="z-1 rounded-t-lg bg-(--bg) px-2 pb-2">
-          <ExerciseStatement />
-          <HoverProvider
-            hovers={result?.hovers ?? []}
-            hoverDocs={result?.hoverDocs ?? []}
-          >
-            {steps.map((step, i) => (
-              <ProofStep
-                key={i}
-                step={step}
-                index={i}
-                current={i === steps.length - (failed ? 2 : 1)}
-                failed={failed && i === steps.length - 1}
-              />
-            ))}
-          </HoverProvider>
-          {last && !failed && last.goals.length === 0 && (
-            <div
-              className={twMerge(
-                'my-2.5 rounded-sm bg-sky-100 px-2.5 py-1.5 text-(--text-h)',
-                'dark:bg-sky-950',
-              )}
+    <div className="flex-col h-full bg-(--section-bg) text-left">
+      <div className="relative min-h-0 flex-1">
+        {/* behind the proof, it does not scroll with it */}
+        <WorldImage />
+        <div
+          ref={scrollRef}
+          className="relative flex-col h-full overflow-y-auto"
+        >
+          <div className="min-h-0 flex-1" />
+          <div className="z-1 rounded-t-lg bg-(--bg) px-2 pb-2">
+            <ExerciseStatement />
+            <HoverProvider
+              hovers={result?.hovers ?? []}
+              hoverDocs={result?.hoverDocs ?? []}
             >
-              {result?.completed ? (
-                <p>{t('typewriter.levelCompleted')}</p>
-              ) : (
-                <p>
-                  <b>{t('typewriter.noGoalsLeft')}</b>
-                  <br />
-                  <i>{t('typewriter.noGoalsLeftDescription')}</i>
-                </p>
-              )}
-            </div>
-          )}
-          {error && (
-            <div
-              className={twMerge(
-                'my-2.5 rounded-sm border border-error bg-error-bg px-2.5 py-1.5',
-                'text-error',
-              )}
-            >
-              {instance.error
-                ? t('typewriter.startError')
-                : t('typewriter.checkError')}
-              <pre className="m-0 text-sm whitespace-pre-wrap">
-                {error.message}
-              </pre>
-            </div>
-          )}
-          {!result && !error && (
-            <div className="flex justify-center p-4 text-3xl text-primary">
-              <FontAwesomeIcon icon={faSpinner} spinPulse />
-            </div>
-          )}
+              {steps.map((step, i) => (
+                <ProofStep
+                  key={i}
+                  step={step}
+                  index={i}
+                  current={i === steps.length - (failed ? 2 : 1)}
+                  failed={failed && i === steps.length - 1}
+                />
+              ))}
+            </HoverProvider>
+            {last && !failed && last.goals.length === 0 && (
+              <div
+                className={twMerge(
+                  'my-2.5 rounded-sm bg-sky-100 px-2.5 py-1.5 text-(--text-h)',
+                  'dark:bg-sky-950',
+                )}
+              >
+                {result?.completed ? (
+                  <p>{t('typewriter.levelCompleted')}</p>
+                ) : (
+                  <p>
+                    <b>{t('typewriter.noGoalsLeft')}</b>
+                    <br />
+                    <i>{t('typewriter.noGoalsLeftDescription')}</i>
+                  </p>
+                )}
+              </div>
+            )}
+            {error && (
+              <div
+                className={twMerge(
+                  'my-2.5 rounded-sm border border-error bg-error-bg px-2.5 py-1.5',
+                  'text-error',
+                )}
+              >
+                {instance.error
+                  ? t('typewriter.startError')
+                  : t('typewriter.checkError')}
+                <pre className="m-0 text-sm whitespace-pre-wrap">
+                  {error.message}
+                </pre>
+              </div>
+            )}
+            {!result && !error && (
+              <div className="flex justify-center p-4 text-3xl text-primary">
+                <FontAwesomeIcon icon={faSpinner} spinPulse />
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <TypewriterInput />
