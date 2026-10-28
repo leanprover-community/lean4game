@@ -1,4 +1,5 @@
 import { useAtomValue } from 'jotai'
+import { twMerge } from 'tailwind-merge'
 
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../state/location-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../state/query-atoms'
@@ -42,7 +43,10 @@ export function PageTitle() {
   if (!title) return null
   return (
     <h1
-      className="m-0 min-w-0 truncate text-center text-lg leading-normal font-bold text-white"
+      className={twMerge(
+        'm-0 min-w-0 truncate text-center text-lg leading-normal font-bold',
+        'text-white',
+      )}
       title={title}
     >
       {title}

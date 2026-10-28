@@ -13,6 +13,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useTranslation } from 'react-i18next'
+import { twMerge } from 'tailwind-merge'
 
 import {
   gameIdAtom,
@@ -94,7 +95,12 @@ export function AppBar() {
   )
 
   return (
-    <header className="relative flex shrink-0 items-center justify-between gap-2 bg-primary px-2 py-1 text-white">
+    <header
+      className={twMerge(
+        'relative flex shrink-0 items-center justify-between gap-2 bg-primary',
+        'px-2 py-1 text-white',
+      )}
+    >
       {mobile ? (
         <>
           {/* MOBILE VERSION */}

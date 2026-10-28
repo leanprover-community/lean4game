@@ -77,13 +77,21 @@ function Command({
   }
   if (editingStep === index) return <EditCommand step={step} index={index} />
   return (
-    <div className="mb-4 flex gap-2 rounded-sm bg-[light-dark(#bbb,#3a3c48)] p-2">
-      <div className="flex-1 bg-(--bg) px-2.5 pt-1.5 font-mono text-sm whitespace-pre-wrap text-(--text-h)">
+    <div className="mb-4 flex gap-2 rounded-sm bg-gray-300 p-2 dark:bg-gray-700">
+      <div
+        className={twMerge(
+          'flex-1 bg-(--bg) px-2.5 pt-1.5 font-mono text-sm whitespace-pre-wrap',
+          'text-(--text-h)',
+        )}
+      >
         {step.tactic}
       </div>
       <button
         type="button"
-        className="h-[30.4px] min-w-24 shrink-0 cursor-pointer self-start rounded-sm bg-(--bg) px-2 whitespace-nowrap text-[#888] hover:text-primary"
+        className={twMerge(
+          'h-7.5 min-w-24 shrink-0 cursor-pointer self-start rounded-sm bg-(--bg)',
+          'px-2 whitespace-nowrap text-gray-500 hover:text-primary',
+        )}
         title={t('typewriter.retryTitle')}
         onClick={() => (current ? retryFromStep(index) : setEditingStep(index))}
       >
@@ -129,7 +137,10 @@ function EditCommand({ step, index }: { step: ApiProofStep; index: number }) {
     >
       <button
         type="button"
-        className="size-[30.4px] shrink-0 cursor-pointer rounded-sm bg-(--bg) text-[#888] hover:text-primary"
+        className={twMerge(
+          'size-7.5 shrink-0 cursor-pointer rounded-sm bg-(--bg)',
+          'text-gray-500 hover:text-primary',
+        )}
         title={t('typewriter.cancelEdit')}
         aria-label={t('typewriter.cancelEdit')}
         onClick={() => setEditingStep(null)}
@@ -141,10 +152,10 @@ function EditCommand({ step, index }: { step: ApiProofStep; index: number }) {
 }
 
 const severityClass: Record<number, string> = {
-  1: 'bg-[light-dark(#ffbaba,#4a1c1f)] text-[light-dark(#d8000c,#ff8a8a)]',
-  2: 'bg-[light-dark(#feefb3,#463b14)] text-[light-dark(#9f6000,#f5d36b)]',
-  3: 'bg-[light-dark(#ddf6ff,#16384a)] text-(--text-h)',
-  4: 'bg-[light-dark(#ddf6ff,#16384a)] text-(--text-h)',
+  1: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300',
+  2: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200',
+  3: 'bg-sky-100 text-(--text-h) dark:bg-sky-950',
+  4: 'bg-sky-100 text-(--text-h) dark:bg-sky-950',
 }
 
 /** The messages (error/warning/information) produced by the command */
@@ -181,7 +192,7 @@ function GoalTabs({ goals, current }: { goals: ApiGoal[]; current: boolean }) {
             key={i}
             type="button"
             className={twMerge(
-              'mx-0.5 cursor-pointer border-b-[0.3em] border-transparent px-4 py-0.5',
+              'mx-0.5 cursor-pointer border-b-4 border-transparent px-4 py-0.5',
               goal === goals[i]
                 ? twMerge('text-(--text-h)', current && 'border-primary')
                 : 'text-(--text) hover:text-(--text-h)',

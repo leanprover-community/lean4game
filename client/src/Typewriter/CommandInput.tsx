@@ -56,7 +56,7 @@ export function CommandInput({
     <form
       className={twMerge(
         'flex items-end gap-2 bg-primary p-2',
-        disabled && 'bg-[light-dark(#bbb,#3a3c48)]',
+        disabled && 'bg-gray-300 dark:bg-gray-700',
         className,
       )}
       onSubmit={submit}
@@ -68,7 +68,12 @@ export function CommandInput({
         disabled={disabled}
         aria-label={placeholder}
         placeholder={placeholder}
-        className="min-h-[30.4px] min-w-0 flex-1 resize-none bg-(--bg) px-2.5 py-0.5 font-mono text-(--text-h) outline-none disabled:bg-[light-dark(#eee,#2a2c36)] disabled:text-[#777]"
+        className={twMerge(
+          'min-h-7.5 min-w-0 flex-1 resize-none bg-(--bg) px-2.5 py-0.5',
+          'font-mono text-(--text-h) outline-none',
+          'disabled:bg-gray-100 disabled:text-gray-500',
+          'dark:disabled:bg-gray-800 dark:disabled:text-gray-400',
+        )}
         spellCheck={false}
         autoCapitalize="off"
         autoCorrect="off"
@@ -99,7 +104,11 @@ export function CommandInput({
       <button
         type="submit"
         disabled={disabled}
-        className="h-[30.4px] min-w-24 shrink-0 cursor-pointer rounded-sm bg-(--bg) px-3 whitespace-nowrap text-primary disabled:cursor-default disabled:text-[#888]"
+        className={twMerge(
+          'h-7.5 min-w-24 shrink-0 cursor-pointer rounded-sm bg-(--bg) px-3',
+          'whitespace-nowrap text-primary',
+          'disabled:cursor-default disabled:text-gray-500',
+        )}
       >
         <FontAwesomeIcon icon={faWandMagicSparkles} />
         &nbsp;{t('typewriter.execute')}

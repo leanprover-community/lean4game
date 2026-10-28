@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { twMerge } from 'tailwind-merge'
 
 import type { ApiCode, ApiHover } from '../api'
 import { Markdown } from '../components/Markdown'
@@ -98,7 +99,12 @@ function HoverPopup({
       ref={ref}
       role="tooltip"
       // scrolling to its end must not scroll the proof, which would close the tooltip
-      className="fixed z-50 max-h-[40svh] max-w-[min(36rem,90svw)] overflow-auto overscroll-contain rounded border border-(--border) bg-(--bg) px-3 py-2 text-sm text-(--text-h) shadow-(--shadow)"
+      className={twMerge(
+        // at most 36rem, and smaller on small screens
+        'fixed z-50 max-h-[40svh] max-w-[min(36rem,90svw)]',
+        'overflow-auto overscroll-contain rounded border border-(--border)',
+        'bg-(--bg) px-3 py-2 text-sm text-(--text-h) shadow-(--shadow)',
+      )}
       style={{
         left: Math.max(8, Math.min(rect.left, window.innerWidth - 300)),
         ...(below
@@ -141,7 +147,7 @@ export function LeanText({ text }: { text: string }) {
   if (!text.includes('✝')) return text
   return text.split('✝').map((part, i) => (
     <Fragment key={i}>
-      {i > 0 && <sup className="text-[0.6em]">✝</sup>}
+      {i > 0 && <sup className="text-xs">✝</sup>}
       {part}
     </Fragment>
   ))

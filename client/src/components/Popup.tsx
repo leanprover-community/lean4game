@@ -2,6 +2,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { type ReactNode, useEffect, useId, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { twMerge } from 'tailwind-merge'
 
 /**
  * A modal popup with a `title` and a close button. Closes with Escape and by clicking
@@ -44,7 +45,12 @@ export function Popup({
       onClick={e => {
         if (e.target === e.currentTarget) onClose()
       }}
-      className="m-auto max-h-[calc(100dvh-2rem)] w-[min(36rem,calc(100vw-2rem))] max-w-none rounded-lg bg-(--bg) p-0 text-left text-(--text) shadow-xl backdrop:bg-black/50"
+      className={twMerge(
+        // at most 36rem, with a margin of 1rem on small screens
+        'm-auto max-h-[calc(100dvh-2rem)] w-[min(36rem,calc(100vw-2rem))] max-w-none',
+        'rounded-lg bg-(--bg) p-0 text-left text-(--text) shadow-xl',
+        'backdrop:bg-black/50',
+      )}
     >
       <div className="relative px-6 pt-4 pb-6">
         <h2 id={titleId} className="mt-0 mb-3 pr-8 text-xl font-bold">
@@ -52,7 +58,10 @@ export function Popup({
         </h2>
         <button
           type="button"
-          className="absolute top-3 right-3 flex size-8 cursor-pointer items-center justify-center rounded text-primary hover:bg-primary/15"
+          className={twMerge(
+            'absolute top-3 right-3 flex size-8 cursor-pointer items-center',
+            'justify-center rounded text-primary hover:bg-primary/15',
+          )}
           title={t('popup.close')}
           aria-label={t('popup.close')}
           onClick={onClose}

@@ -3,6 +3,7 @@ import ReactMarkdown, { defaultUrlTransform } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
+import { twMerge } from 'tailwind-merge'
 
 /**
  * Renders Markdown with GitHub extensions and `$…$` math. For texts of a game, pass its
@@ -16,7 +17,21 @@ export function Markdown({
   game?: string
 }) {
   return (
-    <div className="[&_code]:rounded-[.3em] [&_code]:bg-[rgb(223,227,234)] [&_code]:px-[.3em] [&_code]:text-[85%] [&_code]:text-[rgba(0,32,90,0.87)] [&_li_ol]:mx-[1.5em] [&_li_ol]:mb-0 [&_li_ul]:mx-[1.5em] [&_li_ul]:mb-0 [&_ol]:mx-[1.5em] [&_ol]:mb-[1.5em] [&_ol]:list-decimal [&_pre]:overflow-auto [&_pre]:rounded-[.3em] [&_pre]:bg-[rgb(223,227,234)] [&_pre]:py-[.6em] [&_pre]:pl-[.3em] [&_pre]:leading-[1.45] [&_pre]:text-[rgba(0,32,90,0.87)] [&_pre_code]:p-0 [&_ul]:mx-[1.5em] [&_ul]:mb-[1.5em] [&_ul]:list-disc">
+    <div
+      className={twMerge(
+        // inline code and code blocks
+        '[&_code]:rounded-sm [&_code]:bg-slate-200 [&_code]:px-1 [&_code]:text-sm',
+        '[&_code]:text-slate-800',
+        'dark:[&_code]:bg-slate-800 dark:[&_code]:text-slate-200',
+        '[&_pre]:overflow-auto [&_pre]:rounded-sm [&_pre]:bg-slate-200 [&_pre]:py-2.5',
+        '[&_pre]:pl-1 [&_pre]:leading-normal [&_pre]:text-slate-800',
+        'dark:[&_pre]:bg-slate-800 dark:[&_pre]:text-slate-200 [&_pre_code]:p-0',
+        // lists
+        '[&_ol]:mx-6 [&_ol]:mb-6 [&_ol]:list-decimal',
+        '[&_ul]:mx-6 [&_ul]:mb-6 [&_ul]:list-disc',
+        '[&_li_ol]:mx-6 [&_li_ol]:mb-0 [&_li_ul]:mx-6 [&_li_ul]:mb-0',
+      )}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}

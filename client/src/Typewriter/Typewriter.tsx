@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { twMerge } from 'tailwind-merge'
 
 import { Markdown } from '../components/Markdown'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../state/location-atoms'
@@ -72,7 +73,10 @@ export function Typewriter() {
     <div className="flex-col h-full text-left">
       <div
         ref={scrollRef}
-        className="relative flex-col min-h-0 flex-1 overflow-y-auto bg-(--section-bg)"
+        className={twMerge(
+          'relative flex-col min-h-0 flex-1 overflow-y-auto',
+          'bg-(--section-bg)',
+        )}
       >
         {levelInfo?.image && gameId && (
           <img
@@ -99,7 +103,12 @@ export function Typewriter() {
             ))}
           </HoverProvider>
           {last && !failed && last.goals.length === 0 && (
-            <div className="my-2.5 rounded-sm bg-[light-dark(#ddf6ff,#16384a)] px-2.5 py-1.5 text-(--text-h)">
+            <div
+              className={twMerge(
+                'my-2.5 rounded-sm bg-sky-100 px-2.5 py-1.5 text-(--text-h)',
+                'dark:bg-sky-950',
+              )}
+            >
               {result?.completed ? (
                 <p>{t('typewriter.levelCompleted')}</p>
               ) : (
@@ -112,7 +121,12 @@ export function Typewriter() {
             </div>
           )}
           {error && (
-            <div className="my-2.5 rounded-sm border border-error bg-error-bg px-2.5 py-1.5 text-error">
+            <div
+              className={twMerge(
+                'my-2.5 rounded-sm border border-error bg-error-bg px-2.5 py-1.5',
+                'text-error',
+              )}
+            >
               {instance.error
                 ? t('typewriter.startError')
                 : t('typewriter.checkError')}

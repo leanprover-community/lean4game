@@ -137,7 +137,12 @@ function SidePanel({
 
 function PanelSeparator() {
   return (
-    <Separator className="w-px bg-(--border) outline-none focus-visible:bg-primary data-[separator=active]:bg-primary data-[separator=hover]:bg-primary" />
+    <Separator
+      className={twMerge(
+        'w-px bg-(--border) outline-none focus-visible:bg-primary',
+        'data-[separator=active]:bg-primary data-[separator=hover]:bg-primary',
+      )}
+    />
   )
 }
 
@@ -211,7 +216,12 @@ function TopBar({
   children: ReactNode
 }) {
   return (
-    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-(--border) bg-(--section-bg) px-1">
+    <div
+      className={twMerge(
+        'flex h-10 shrink-0 items-center gap-1 border-b border-(--border)',
+        'bg-(--section-bg) px-1',
+      )}
+    >
       <span className="min-w-0 flex-1 truncate px-2 font-bold">{title}</span>
       {children}
     </div>
@@ -237,7 +247,8 @@ function ToggleButton({
     <button
       type="button"
       className={twMerge(
-        'flex size-8 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-primary/15',
+        'flex size-8 shrink-0 cursor-pointer items-center justify-center rounded',
+        'hover:bg-primary/15',
         side === 'left' ? 'order-first' : 'order-last',
       )}
       title={label}

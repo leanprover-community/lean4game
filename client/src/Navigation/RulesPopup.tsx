@@ -9,12 +9,6 @@ import { difficultyAtom } from '../state/progress-atoms'
 
 const DIFFICULTIES = [2, 1, 0] as const
 
-/**
- * The hover background of a row, on its cells, as the slider's cell is part of the first
- * row, too
- */
-const HOVER = 'group-has-[button:hover]/row:bg-primary/10'
-
 /** The translation keys of the difficulties */
 const LABELS = {
   0: 'rules.none',
@@ -52,14 +46,14 @@ export function RulesPopup({
       {/* the slider next to the table of what the options lock, one row per option */}
       <table className="mx-auto mb-4 text-center">
         <thead>
-          <tr className="h-[2em]">
+          <tr className="h-8">
             <th scope="col" colSpan={2}>
               <span className="sr-only">{t('rules.gameRules')}</span>
             </th>
-            <th scope="col" className="px-[.5em]">
+            <th scope="col" className="px-2">
               {t('rules.levels')}
             </th>
-            <th scope="col" className="px-[.5em]">
+            <th scope="col" className="px-2">
               {t('rules.tactics')}
             </th>
           </tr>
@@ -70,7 +64,7 @@ export function RulesPopup({
               key={x}
               // the option's button covers the whole row, see below
               className={twMerge(
-                'group/row relative h-[2em]',
+                'group/row relative h-8',
                 x === difficulty && 'font-bold text-primary',
               )}
             >
@@ -78,7 +72,7 @@ export function RulesPopup({
                 <td
                   rowSpan={DIFFICULTIES.length}
                   // above the buttons covering the rows
-                  className="relative z-10 pr-[.8em]"
+                  className="relative z-10 pr-3"
                 >
                   <input
                     type="range"
@@ -92,11 +86,18 @@ export function RulesPopup({
                     // vertical, with the maximum at the top. From the middle of the first row to
                     // the middle of the last one, plus the thumb, so that the thumb is in line
                     // with the option's text
-                    className="block h-[calc(4em+16px)] cursor-pointer accent-primary [direction:rtl] [writing-mode:vertical-lr]"
+                    className={twMerge(
+                      // two rows of `h-8` plus the thumb of 16px
+                      'block h-20 cursor-pointer accent-primary',
+                      '[direction:rtl] [writing-mode:vertical-lr]',
+                    )}
                   />
                 </td>
               )}
-              <th scope="row" className={twMerge(HOVER, 'pr-[.5em] text-left')}>
+              <th
+                scope="row"
+                className="pr-2 text-left group-has-[button:hover]/row:bg-primary/10"
+              >
                 <button
                   type="button"
                   tabIndex={-1}
@@ -106,18 +107,21 @@ export function RulesPopup({
                   {label(x)}
                 </button>
               </th>
-              <td className={HOVER}>
+              <td className="group-has-[button:hover]/row:bg-primary/10">
                 <LockIcon locked={x >= 2} />
               </td>
-              <td className={HOVER}>
+              <td className="group-has-[button:hover]/row:bg-primary/10">
                 <LockIcon locked={x >= 1} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="[&_p]:my-[.5em]">
-        <Trans i18nKey="rules.help" components={{ p: <p />, code: <code /> }} />
+      <div>
+        <Trans
+          i18nKey="rules.help"
+          components={{ p: <p className="my-2" />, code: <code /> }}
+        />
       </div>
     </Popup>
   )

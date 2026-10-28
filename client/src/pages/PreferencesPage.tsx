@@ -1,6 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { twMerge } from 'tailwind-merge'
 
 import { Switch } from '../components/Switch'
 import config from '../config.json'
@@ -37,7 +38,10 @@ export function PreferencesPage() {
 
       <Category title={t('preferences.language')}>
         <select
-          className="w-72 rounded border border-(--border) bg-(--bg) px-3 py-2 text-(--text-h)"
+          className={twMerge(
+            'w-72 rounded border border-(--border) bg-(--bg) px-3 py-2',
+            'text-(--text-h)',
+          )}
           aria-label={t('preferences.language')}
           value={i18n.language}
           onChange={ev => setLanguage(ev.target.value)}
@@ -130,7 +134,11 @@ function Choice<T extends string>({
       {options.map(option => (
         <label
           key={option.value}
-          className="cursor-pointer px-4 py-2 has-checked:bg-primary has-checked:text-white has-focus-visible:outline-2 has-focus-visible:-outline-offset-4 has-focus-visible:outline-white"
+          className={twMerge(
+            'cursor-pointer px-4 py-2 has-checked:bg-primary has-checked:text-white',
+            'has-focus-visible:outline-2 has-focus-visible:-outline-offset-4',
+            'has-focus-visible:outline-white',
+          )}
         >
           <input
             type="radio"

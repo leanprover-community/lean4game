@@ -2,6 +2,7 @@ import cytoscape, { type LayoutOptions, type Position } from 'cytoscape'
 import klay from 'cytoscape-klay'
 import { useAtomValue } from 'jotai'
 import { type ReactNode, useEffect, useMemo, useRef } from 'react'
+import { twMerge } from 'tailwind-merge'
 
 import type { ApiGameData } from '../api'
 import { Link } from '../components/Link'
@@ -31,16 +32,6 @@ const NMAX = 16 // max. world size. Level icons start spiraling out if the world
 const NSPIRAL = 12 // world size if NMAX has been passed and need to spiral.
 
 const MINFONT = 12
-
-// colours
-const grey = '#999'
-const lightgrey = '#bbb'
-const green = 'green' // 118a11?
-const lightgreen = '#139e13'
-const blue = '#1976d2'
-const darkgrey = '#868686'
-const darkgreen = '#0e770e'
-const darkblue = '#1667b8'
 
 type Worlds = NonNullable<ApiGameData['worlds']>
 
@@ -107,7 +98,7 @@ function LevelLink({
       href={
         level > 0 ? gamePath(gameId, world, level) : gamePath(gameId, world)
       }
-      className={`${className} cursor-pointer no-underline`}
+      className={twMerge(className, 'cursor-pointer no-underline')}
     >
       {children}
     </Link>
@@ -191,7 +182,13 @@ function LevelIcon({
       className="group"
     >
       <circle
-        fill={completed ? lightgreen : unlocked ? blue : lightgrey}
+        className={
+          completed
+            ? 'fill-green-600'
+            : unlocked
+              ? 'fill-primary'
+              : 'fill-gray-300'
+        }
         cx={x}
         cy={y}
         r={r}
@@ -206,7 +203,11 @@ function LevelIcon({
       >
         <div className="flex size-full items-center justify-center overflow-visible">
           <p
-            className="m-0 p-0 text-center leading-none font-normal text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            className={twMerge(
+              'm-0 p-0 text-center leading-none font-normal text-white',
+              // shown on hover
+              'opacity-0 transition-opacity duration-300 group-hover:opacity-100',
+            )}
             style={{ fontSize: `${Math.floor(r)}px` }}
           >
             {level}
@@ -259,7 +260,13 @@ function WorldIcon({
         cx={s * position.x}
         cy={s * position.y}
         r={R}
-        fill={completed ? green : unlocked ? blue : grey}
+        className={
+          completed
+            ? 'fill-green-700'
+            : unlocked
+              ? 'fill-primary'
+              : 'fill-gray-400'
+        }
       />
       <foreignObject
         x={s * position.x - 75}
@@ -271,14 +278,14 @@ function WorldIcon({
         <div
           // the old client scrolled the tree to the world which can be played next
           data-playable={unlocked && !completed ? true : undefined}
-          className="rounded-[.5em] p-[.2em]"
-          style={{
-            backgroundColor: completed
-              ? darkgreen
+          className={twMerge(
+            'rounded-lg p-0.5',
+            completed
+              ? 'bg-green-800'
               : unlocked
-                ? darkblue
-                : darkgrey,
-          }}
+                ? 'bg-primary'
+                : 'bg-gray-500',
+          )}
         >
           <p
             className="m-0 p-0 text-center leading-normal font-bold text-white"
@@ -309,7 +316,7 @@ function WorldPath({
       y1={s * source.y}
       x2={s * target.x}
       y2={s * target.y}
-      stroke={sourceCompleted ? green : grey}
+      className={sourceCompleted ? 'stroke-green-700' : 'stroke-gray-400'}
       strokeWidth={lineWidth}
     />
   )

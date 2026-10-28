@@ -14,7 +14,10 @@ export function LandingPage() {
   return (
     <div className="flex-col">
       <header
-        className="flex-col gap-4 bg-[linear-gradient(180deg,var(--color-primary)_0%,rgba(0,212,255,1)_100%)] bg-size-[100%_100%] bg-center bg-no-repeat px-4 py-12 text-white"
+        className={twMerge(
+          'flex-col gap-4 bg-linear-to-b from-primary to-cyan-400 px-4 py-12',
+          'text-white',
+        )}
         // style={{ backgroundImage: `url(${bgImage})` }}
       >
         <h1 className="m-0 text-white">{t('landing.title')}</h1>

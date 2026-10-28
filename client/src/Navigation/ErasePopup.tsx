@@ -58,8 +58,11 @@ export function ErasePopup({
         )}
         <Button onClick={eraseAll}>{t('progress.deleteAll')}</Button>
       </div>
-      <div className="[&_p]:my-2">
-        <Trans i18nKey="progress.deleteAllWarning" components={{ p: <p /> }} />
+      <div>
+        <Trans
+          i18nKey="progress.deleteAllWarning"
+          components={{ p: <p className="my-2" /> }}
+        />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         <Button

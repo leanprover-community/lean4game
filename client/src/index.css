@@ -27,6 +27,9 @@
 
   --color-primary: #1070b0;
 
+  /* the offset shadow of the game tiles on the landing page */
+  --shadow-tile: 5px 5px 8px var(--color-neutral-400);
+
   /* error messages, e.g. `border-error bg-error-bg` */
   --color-error: #d8000c;
   --color-error-bg: #ffbaba;

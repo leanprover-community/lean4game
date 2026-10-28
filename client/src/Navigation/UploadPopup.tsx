@@ -1,6 +1,7 @@
 import { useSetAtom } from 'jotai'
 import { type ChangeEvent, type ReactNode, useId, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import { twMerge } from 'tailwind-merge'
 
 import { Button } from '../components/Button'
 import { Popup } from '../components/Popup'
@@ -43,11 +44,11 @@ export function UploadPopup({
 
   return (
     <Popup open={open} onClose={close} title={t('progress.uploadTitle')}>
-      <div className="[&_p]:my-2">
+      <div>
         <Trans
           i18nKey="progress.uploadDescription"
           components={{
-            p: <p />,
+            p: <p className="my-2" />,
             strong: <strong />,
             downloadLink: <DownloadLink onClick={downloadProgress} />,
           }}
@@ -64,11 +65,16 @@ export function UploadPopup({
           type="file"
           accept=".json,application/json"
           onChange={e => void onFileChange(e)}
-          className="max-w-full file:mr-3 file:cursor-pointer file:rounded file:bg-primary file:px-3 file:py-1.5 file:text-white hover:file:bg-primary/85"
+          className={twMerge(
+            'max-w-full',
+            // the button to choose a file
+            'file:mr-3 file:cursor-pointer file:rounded file:bg-primary file:px-3',
+            'file:py-1.5 file:text-white hover:file:bg-primary/85',
+          )}
         />
       </p>
       {upload && 'error' in upload && (
-        <p role="alert" className="my-2 break-words text-error">
+        <p role="alert" className="my-2 wrap-break-word text-error">
           {t('progress.invalidFile', { error: upload.error })}
         </p>
       )}
