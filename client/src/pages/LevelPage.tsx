@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
 import { PanelLayout } from '../components/PanelLayout'
+import { Typewriter } from '../Typewriter/Typewriter'
 
-/** A level of a game at `/owner/repo/world/level`. TODO: the panels are still empty */
 export function LevelPage() {
   const { t } = useTranslation()
   return (
@@ -10,7 +10,7 @@ export function LevelPage() {
       leftTitle={t('game.introduction')}
       rightTitle={t('game.inventory')}
       left={null}
-      center={null}
+      center={<Typewriter />}
       right={null}
     />
   )

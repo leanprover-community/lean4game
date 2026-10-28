@@ -1,11 +1,7 @@
 import { atom } from 'jotai'
 
 import type { ApiHint } from '../api'
-import {
-  levelProgressAtom,
-  progressAtom,
-  defaultLevelProgress,
-} from './progress-atoms'
+import { levelProgressAtom, progressAtom } from './progress-atoms'
 
 /** User read the game introduction. Only relevant on mobile */
 export const readGameIntroAtom = atom(

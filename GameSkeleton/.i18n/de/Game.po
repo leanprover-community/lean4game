@@ -101,7 +101,7 @@ msgstr ""
 msgid "This text is shown as first message when the level is played.\n"
 "You can insert hints in the proof below. They will appear in this side panel\n"
 "depending on the proof a user provides. There can be §0"
-msgstr "Dieser Text wird als erste Nachricht angezeigt, wenn das Level gespielt wird."
+msgstr "Dieser Text wird als erste Nachricht angezeigt, wenn der Level gespielt wird."
 "Im Beweis unten kannst du Hinweise einfügen. Sie erscheinen in dieser Seitenleiste,"
 "je nachdem, welchen Beweis ein Spieler angibt. Der Text kann §0 beinhalten"
 

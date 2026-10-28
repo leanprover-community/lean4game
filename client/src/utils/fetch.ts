@@ -25,3 +25,14 @@ export function retryUnlessClientError(failureCount: number, error: Error) {
     return false
   return failureCount < 3
 }
+
+/** POSTs `body` as json to `url`, throws an `HttpError` if the server answers with an error */
+export async function postJson<T>(url: string, body?: unknown): Promise<T> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body ?? {}),
+  })
+  if (!res.ok) throw new HttpError(url, res)
+  return res.json() as Promise<T>
+}
