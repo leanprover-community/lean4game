@@ -1,4 +1,5 @@
 import { atom } from 'jotai'
+import { atomEffect } from 'jotai-effect'
 import { atomWithLocation } from 'jotai-location'
 
 import { gameInfoAtomFamily } from './game-info-atoms'
@@ -115,6 +116,29 @@ export function gamePath(gameId: string, worldId?: string, levelId?: number) {
   if (levelId !== undefined) path += `/${levelId}`
   return path.toLowerCase()
 }
+
+/**
+ * Replaces the URL of a game page by its canonical form: lowercase, as game and world
+ * are case-insensitive, e.g. `/g/Owner/Repo/World/1` → `/g/owner/repo/world/1`, and old
+ * URLs `/#/g/owner/repo/world/World/level/1` by the new ones.
+ */
+export const canonicalGamePathEffect = atomEffect((get, set) => {
+  const location = get(locationAtom)
+  const route = get(routeAtom)
+  const canonical =
+    route.page === 'game'
+      ? gamePath(route.gameId)
+      : route.page === 'world'
+        ? gamePath(route.gameId, route.world)
+        : route.page === 'level'
+          ? gamePath(route.gameId, route.world, route.levelId)
+          : undefined
+  if (canonical === undefined) return
+  if (location.pathname === canonical && !location.hash) return
+  set(locationAtom, prev => ({ ...prev, pathname: canonical, hash: '' }), {
+    replace: true,
+  })
+})
 
 /** The game in the URL, e.g. `g/owner/repo`, lowercase */
 export const gameIdAtom = atom(

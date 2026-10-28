@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  editInTypewriterAtom,
   hasError,
   proofCheckAtom,
   submitTacticAtom,
@@ -20,32 +19,11 @@ export function TypewriterInput() {
   const { t } = useTranslation()
   const [input, setInput] = useAtom(typewriterInputAtom)
   const submitTactic = useSetAtom(submitTacticAtom)
-  const editInTypewriter = useSetAtom(editInTypewriterAtom)
   const focusRequest = useAtomValue(typewriterFocusAtom)
   const { data, error, isFetching } = useAtomValue(proofCheckAtom)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   // a new command must be based on the result of the previous one
   const disabled = isFetching || (!data && !error)
-
-  // the submitted command stays in the input line until its result arrives
-  const submitted = useRef(false)
-
-  // when a new result arrives: clear the submitted command if it worked, otherwise keep it
-  // to modify and try again. A failed command is also put into an empty input line, e.g.
-  // after loading the level.
-  useEffect(() => {
-    if (!data) return
-    const last = data.steps.at(-1)
-    const failed = data.steps.length > 1 && hasError(last)
-    if (submitted.current) {
-      submitted.current = false
-      editInTypewriter(failed ? last!.tactic : '')
-    } else if (failed && !input) {
-      editInTypewriter(last!.tactic)
-    }
-    // only when a new result arrives, not when the player edits the input
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
 
   // nothing to do once there are no goals left
   const last = data?.steps.at(-1)
@@ -64,10 +42,9 @@ export function TypewriterInput() {
       ref={textareaRef}
       value={input}
       onChange={setInput}
-      // an unchanged proof is not checked again, the command just stays
-      onSubmit={() => {
-        submitted.current = submitTactic(input)
-      }}
+      // the command stays until its result arrives, see `proofResultEffect`. An
+      // unchanged proof is not checked again, the command just stays.
+      onSubmit={() => submitTactic(input)}
       disabled={disabled}
       placeholder={t('typewriter.inputPlaceholder')}
       className="shrink-0"

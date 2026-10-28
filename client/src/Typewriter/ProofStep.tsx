@@ -111,25 +111,19 @@ function EditCommand({ step, index }: { step: ApiProofStep; index: number }) {
   const [text, setText] = useState(step.tactic)
   const setEditingStep = useSetAtom(editingStepAtom)
   const replaceStep = useSetAtom(replaceStepAtom)
-  const { data, isFetching } = useAtomValue(proofCheckAtom)
+  const { isFetching } = useAtomValue(proofCheckAtom)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const submitted = useRef(false)
 
   useEffect(() => focusAtEnd(textareaRef.current), [])
-
-  // done once the result of the new proof arrives
-  useEffect(() => {
-    if (submitted.current) setEditingStep(null)
-  }, [data, setEditingStep])
 
   return (
     <CommandInput
       ref={textareaRef}
       value={text}
       onChange={setText}
+      // closed once the result of the new proof arrives, see `proofResultEffect`
       onSubmit={() => {
-        if (replaceStep(index, text)) submitted.current = true
-        else setEditingStep(null)
+        if (!replaceStep(index, text)) setEditingStep(null)
       }}
       onCancel={() => setEditingStep(null)}
       disabled={isFetching}

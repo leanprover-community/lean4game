@@ -1,5 +1,6 @@
 import { keepPreviousData } from '@tanstack/query-core'
 import { atom } from 'jotai'
+import { atomEffect } from 'jotai-effect'
 import { atomWithQuery } from 'jotai-tanstack-query'
 
 import type {
@@ -9,10 +10,14 @@ import type {
   ApiProofStep,
 } from '../api'
 import i18n from '../i18n'
-import { postJson, retryUnlessClientError } from '../utils/fetch'
+import { HttpError, postJson, retryUnlessClientError } from '../utils/fetch'
 import { inventoryAtom } from './inventory-atoms'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from './location-atoms'
-import { difficultyAtom, levelProgressAtom } from './progress-atoms'
+import {
+  completedAtom,
+  difficultyAtom,
+  levelProgressAtom,
+} from './progress-atoms'
 
 /** The proof of the current level as stored in local storage, one tactic per line */
 export const codeAtom = atom(
@@ -136,7 +141,9 @@ export const submitTacticAtom = atom(null, (get, set, text: string) => {
     code = codeOfSteps(steps.slice(0, -1))
   }
   set(codeAtom, code.length > 0 ? `${code}\n${input}` : input)
-  return get(tacticsAtom).join('\n') !== before
+  const changed = get(tacticsAtom).join('\n') !== before
+  if (changed) set(submittedFromAtom, 'typewriter')
+  return changed
 })
 
 /**
@@ -166,6 +173,57 @@ export const replaceStepAtom = atom(
     const before = get(tacticsAtom).join('\n')
     const code = codeOfSteps(steps.slice(0, i))
     set(codeAtom, code.length > 0 ? `${code}\n${input}` : input)
-    return get(tacticsAtom).join('\n') !== before
+    const changed = get(tacticsAtom).join('\n') !== before
+    if (changed) set(submittedFromAtom, 'step')
+    return changed
   },
 )
+
+/**
+ * Where the command which is being checked was entered: in the input line at the
+ * bottom, or in place of an earlier step. See `proofResultEffect`.
+ */
+const submittedFromAtom = atom<'typewriter' | 'step' | null>(null)
+
+/** The result of the proof check, only changes when a new result arrives */
+const proofResultAtom = atom(get => get(proofCheckAtom).data)
+
+/**
+ * When a new result arrives after a submit: a command from the input line is cleared
+ * if it worked, otherwise it stays to modify and try again; a step edited in place is
+ * closed. A failed command is also put into an empty input line, e.g. after loading the
+ * level.
+ */
+export const proofResultEffect = atomEffect((get, set) => {
+  const result = get(proofResultAtom)
+  if (!result) return
+  const last = result.steps.at(-1)
+  const failed = result.steps.length > 1 && hasError(last)
+  const submittedFrom = get.peek(submittedFromAtom)
+  set(submittedFromAtom, null)
+  if (submittedFrom === 'step') set(editingStepAtom, null)
+  if (submittedFrom === 'typewriter') {
+    set(editInTypewriterAtom, failed ? last!.tactic : '')
+  } else if (failed && !get.peek(typewriterInputAtom)) {
+    set(editInTypewriterAtom, last!.tactic)
+  }
+  if (result.completed && !get.peek(completedAtom)) set(completedAtom, true)
+})
+
+/** Stops editing a step when going to another level */
+export const resetEditingStepEffect = atomEffect((get, set) => {
+  get(worldIdAtom)
+  get(levelIdAtom)
+  set(editingStepAtom, null)
+})
+
+/** The HTTP status of a failed proof check */
+const checkStatusAtom = atom(get => {
+  const { error } = get(proofCheckAtom)
+  return error instanceof HttpError ? error.status : undefined
+})
+
+/** Starts a new Lean instance if it is gone, e.g. stopped after being idle */
+export const restartInstanceEffect = atomEffect(get => {
+  if (get(checkStatusAtom) === 404) void get.peek(leanInstanceAtom).refetch()
+})

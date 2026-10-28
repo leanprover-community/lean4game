@@ -1,18 +1,19 @@
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtomValue } from 'jotai'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
 import { Markdown } from '../components/Markdown'
-import { gameIdAtom, levelIdAtom, worldIdAtom } from '../state/location-atoms'
-import { completedAtom } from '../state/progress-atoms'
+import { gameIdAtom } from '../state/location-atoms'
 import {
-  editingStepAtom,
   hasError,
   leanInstanceAtom,
   proofCheckAtom,
+  proofResultEffect,
+  resetEditingStepEffect,
+  restartInstanceEffect,
 } from '../state/proof-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../state/query-atoms'
 import { HttpError, gameDataUrl } from '../utils/fetch'
@@ -34,29 +35,16 @@ export function Typewriter() {
   const { data: levelInfo } = useAtomValue(levelInfoAtom)
   const instance = useAtomValue(leanInstanceAtom)
   const check = useAtomValue(proofCheckAtom)
-  const [completed, setCompleted] = useAtom(completedAtom)
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  useAtomValue(proofResultEffect)
+  useAtomValue(resetEditingStepEffect)
+  useAtomValue(restartInstanceEffect)
   useLeanKeepalive()
 
-  // stop editing a step when going to another level
-  const worldId = useAtomValue(worldIdAtom)
-  const levelId = useAtomValue(levelIdAtom)
-  const setEditingStep = useSetAtom(editingStepAtom)
-  useEffect(() => setEditingStep(null), [worldId, levelId, setEditingStep])
-
-  // the instance is gone, e.g. stopped after being idle
-  const { refetch: restartInstance } = instance
   const checkStatus =
     check.error instanceof HttpError ? check.error.status : undefined
-  useEffect(() => {
-    if (checkStatus === 404) void restartInstance()
-  }, [checkStatus, restartInstance])
-
   const result = check.data
-  useEffect(() => {
-    if (result?.completed && !completed) setCompleted(true)
-  }, [result, completed, setCompleted])
 
   // show the newest step
   useEffect(() => {

@@ -3,9 +3,7 @@ import { useAtomValue } from 'jotai'
 
 import { NotFound } from './ErrorPage/NotFound'
 import { GamePage } from './GamePage/GamePage'
-import { useCanonicalGamePath } from './hooks/useCanonicalGamePath'
 import { useLanguageInUrl } from './hooks/useLanguageInUrl'
-import { useLastPage } from './hooks/useLastPage'
 import { useTheme } from './hooks/useTheme'
 import { LandingPage } from './LandingPage/LandingPage'
 import { AppBar } from './Navigation/AppBar'
@@ -15,12 +13,13 @@ import { LevelPage } from './pages/LevelPage'
 import { PreferencesPage } from './pages/PreferencesPage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { WorldPage } from './pages/WorldPage'
-import { routeAtom } from './state/location-atoms'
+import { canonicalGamePathEffect, routeAtom } from './state/location-atoms'
+import { lastPageEffect } from './state/navigation-atoms'
 
 export function App() {
   useLanguageInUrl()
-  useCanonicalGamePath()
-  useLastPage()
+  useAtomValue(canonicalGamePathEffect)
+  useAtomValue(lastPageEffect)
   useTheme()
   return (
     <>

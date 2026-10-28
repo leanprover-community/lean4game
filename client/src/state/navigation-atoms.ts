@@ -1,4 +1,7 @@
 import { atom } from 'jotai'
+import { atomEffect } from 'jotai-effect'
+
+import { isMenuPage, locationAtom, routeAtom } from './location-atoms'
 
 /** Controls if the expandable menu in the navigation bar is open or closed */
 export const navOpenAtom = atom(false)
@@ -33,3 +36,11 @@ export const popupAtom = atom<PopupType | null>(null)
  * The menu's pages lead back to it, or to the landing page if they were opened directly.
  */
 export const lastPageAtom = atom('/')
+
+/** Keeps `lastPageAtom` up to date */
+export const lastPageEffect = atomEffect((get, set) => {
+  if (isMenuPage(get(routeAtom))) return
+  const location = get(locationAtom)
+  const search = location.searchParams?.toString()
+  set(lastPageAtom, `${location.pathname ?? '/'}${search ? `?${search}` : ''}`)
+})
