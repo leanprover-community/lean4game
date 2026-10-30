@@ -41,13 +41,20 @@ export function ChatPanel({lastLevel, visible = true}: {lastLevel: boolean, visi
     }
   }
 
+  // Texts of the chat messages shown so far in this level
+  const shownMessages = useRef(new Set<string>())
+
+  // Scroll to the top of the first message that was not shown before. If there is
+  // none, e.g. after a step with an error, the chat stays where the player is reading.
   useEffect(() => {
-    // TODO: For some reason this is always called twice
-    console.debug('scroll chat')
-    if (!mobile) {
-      chatRef.current!.lastElementChild?.scrollIntoView() //scrollTo(0,0)
+    const messages = Array.from(chatRef.current!.children)
+    const first = messages.find(elem => !shownMessages.current.has(elem.textContent ?? ''))
+    messages.forEach(elem => shownMessages.current.add(elem.textContent ?? ''))
+    if (!mobile && first) {
+      console.debug('scroll chat')
+      first.scrollIntoView()
     }
-  }, [proof, help])
+  })
 
   // Scroll to element if selection changes
   useEffect(() => {
