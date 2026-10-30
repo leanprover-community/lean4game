@@ -85,6 +85,39 @@ describe('Basic Lean4Game Features', () => {
       cy.contains('Maybe you should use h now').should('be.visible')
     })
 
+    it('should keep the chat scroll position when no new hint appears', () => {
+      navigateToLevel()
+      cy.contains('You can either start using')
+
+      // Make the chat smaller than its content so that it can scroll
+      cy.get('.chat').invoke('css', 'max-height', '40px')
+      cy.get('.chat').scrollTo('top')
+
+      // An invalid step adds no hint
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('rw [x]{enter}')
+      cy.contains('Invalid rewrite argument')
+      cy.get('.chat').should(chat => {
+        expect(chat[0].scrollTop).to.equal(0)
+      })
+    })
+
+    it('should scroll to the top of a new hint', () => {
+      navigateToLevel()
+      cy.contains('You can either start using')
+
+      cy.get('.chat').invoke('css', 'max-height', '40px')
+      cy.get('.chat').scrollTo('top')
+
+      cy.get('.typewriter-input .monaco-editor .view-lines').type('rw [h]{enter}')
+      cy.contains('2 + 2 = y', { timeout: 10000 })
+      cy.get('.chat').contains('.message', 'You should use g now').then(hint => {
+        cy.get('.chat').should(chat => {
+          const top = hint[0].getBoundingClientRect().top - chat[0].getBoundingClientRect().top
+          expect(Math.abs(top)).to.be.lessThan(2)
+        })
+      })
+    })
+
     it('should show goal and hint in editor mode', () => {
       navigateToLevel()
 
