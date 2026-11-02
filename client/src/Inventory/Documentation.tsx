@@ -1,6 +1,7 @@
 import { faLock, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useAtomValue, useSetAtom } from 'jotai'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
@@ -42,10 +43,19 @@ export function Documentation({ tile }: { tile: ApiInventoryTile }) {
   const closeDoc = useSetAtom(closeDocAtom)
   // on the easiest difficulty, everything can be used
   const locked = difficulty > 0 && tile.locked
+  const worldTitle = (world: string) =>
+    gameT(gameInfo?.worlds?.nodes[world]?.title ?? world)
+  /** a link to the level, closing the documentation */
+  const levelLink = (world: string, level: number) =>
+    gameId && (
+      <Link href={gamePath(gameId, world, level)} onClick={closeDoc}>
+        {t('inventory.worldLevel', { world: worldTitle(world), level })}
+      </Link>
+    )
   const world = tile.world ?? undefined
-  const worldTitle = world
-    ? gameT(gameInfo?.worlds?.nodes[world]?.title ?? world)
-    : ''
+  const proven = tile.proven && world !== undefined && tile.level !== null
+  const introducedIn = doc?.introducedIn ?? []
+  const mathlibDoc = doc?.mathlibDoc
 
   return (
     <div className="absolute inset-0 z-10 overflow-y-auto bg-(--bg) p-4">
@@ -93,24 +103,35 @@ export function Documentation({ tile }: { tile: ApiInventoryTile }) {
       <Markdown game={gameId?.replace(/^g\//, '')}>
         {gameT(doc?.content ?? '')}
       </Markdown>
-      {tile.proven && gameId && world && tile.level !== null && (
+      {(proven || introducedIn.length > 0 || mathlibDoc) && (
         <>
           <h2 className="mt-4 mb-1 text-xl font-bold text-(--text-h)">
             {t('inventory.furtherDetails')}
           </h2>
           <ul className="mx-6 list-disc">
-            <li>
-              {t('inventory.provenIn')}{' '}
-              <Link
-                href={gamePath(gameId, world, tile.level)}
-                onClick={closeDoc}
-              >
-                {t('inventory.worldLevel', {
-                  world: worldTitle,
-                  level: tile.level,
-                })}
-              </Link>
-            </li>
+            {introducedIn.length > 0 && (
+              <li>
+                {t('inventory.introducedIn')}{' '}
+                {introducedIn.map((it, i) => (
+                  <Fragment key={`${it.world}-${it.level}`}>
+                    {i > 0 && ', '}
+                    {levelLink(it.world, it.level)}
+                  </Fragment>
+                ))}
+              </li>
+            )}
+            {proven && (
+              <li>
+                {t('inventory.provenIn')} {levelLink(world, tile.level!)}
+              </li>
+            )}
+            {mathlibDoc && (
+              <li>
+                <a href={mathlibDoc} target="_blank" rel="noopener noreferrer">
+                  {t('inventory.mathlibDoc')}
+                </a>
+              </li>
+            )}
           </ul>
         </>
       )}

@@ -106,6 +106,8 @@ export const de: DeepPartialTranslation<typeof en> = {
     unlock: 'Freischalten!',
     furtherDetails: 'Weitere Details',
     provenIn: 'Bewiesen in:',
+    introducedIn: 'Eingeführt in:',
+    mathlibDoc: 'Mathlib-Dokumentation',
     worldLevel: '{{world}} Level {{level}}',
   },
   typewriter: {

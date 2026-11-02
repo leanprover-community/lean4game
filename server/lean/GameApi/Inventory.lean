@@ -30,36 +30,56 @@ partial def getHeadTk (e : Expr) : Option String :=
 
 /-! ## Doc entries -/
 
-/-- Modified from `#help` in `Mathlib.Tactic.HelpCmd`
+/-- The syntax kinds of the tactic `name`, i.e. the ones starting with the token `name`.
+
+Modified from `#help` in `Mathlib.Tactic.HelpCmd`
 
 TODO: the original source is now in Batteries: see `licenses/LICENSE_BATTERIES_APACHE`
 and `licenses/LICENSE_MATHLIB4_APACHE`
 -/
+def getTacticKinds (env : Environment) (name : String) : Array SyntaxNodeKind := Id.run do
+  let some cat := (Parser.parserExtension.getState env).categories.find? `tactic
+    | return #[]
+  let mut kinds := #[]
+  for (k, _) in cat.kinds do
+    if let some tk := do getHeadTk (← (← env.find? k).value?) then
+      if name == tk.trimAscii.copy then -- was `!name.isPrefixOf tk`
+        kinds := kinds.push k
+  return kinds
+
 def getTacticDocstring (env : Environment) (name: Name) : CommandElabM (Option String) := do
   let name := name.toString (escape := false)
-  let mut decls : Lean.RBMap String (Array SyntaxNodeKind) compare := {}
 
   let catName : Name := `tactic
   let catStx : Ident := mkIdent catName -- TODO
-  let some cat := (Parser.parserExtension.getState env).categories.find? catName
+  let some _ := (Parser.parserExtension.getState env).categories.find? catName
     | throwErrorAt catStx "{catStx} is not a syntax category"
   liftTermElabM <| Term.addCategoryInfo catStx catName
-  for (k, _) in cat.kinds do
-    let mut used := false
-    if let some tk := do getHeadTk (← (← env.find? k).value?) then
-      let tk := tk.trimAscii.copy
-      if name ≠ tk then -- was `!name.isPrefixOf tk`
-        continue
-      used := true
-      decls := decls.insert tk ((decls.findD tk #[]).push k)
-  for (_name, ks) in decls do
-    for k in ks do
-      if let some doc ← findDocString? env k then
-        return doc
+  for k in getTacticKinds env name do
+    if let some doc ← findDocString? env k then
+      return doc
 
   logWarning <| m!"Could not find a docstring for tactic {name}, consider adding one " ++
     m!"using `TacticDoc {name} \"some doc\"`"
   return none
+
+/-- Whether the declaration `name` is documented in the mathlib docs, i.e. comes from
+mathlib or from Lean itself, unlike the declarations of the game -/
+def isInMathlibDocs (env : Environment) (name : Name) : Bool :=
+  match env.getModuleIdxFor? name with
+  | none => false
+  | some idx =>
+    let root := (env.header.moduleNames[idx.toNat]?.getD .anonymous).getRoot
+    [`Mathlib, `Batteries, `Init, `Std, `Lean, `ImportGraph, `Aesop, `Plausible, `Qq].contains root
+
+/-- The link to the mathlib documentation of an inventory item, if it is documented there -/
+def getMathlibDoc (env : Environment) (name : Name) : InventoryType → Option String
+  | .Tactic =>
+    let tactic := name.toString (escape := false)
+    if (getTacticKinds env tactic).any (isInMathlibDocs env) then
+      some s!"https://leanprover-community.github.io/mathlib4_docs/tactics.html#userName-{tactic}"
+    else none
+  | _ => if isInMathlibDocs env name then some (mathlibDocUrl name) else none
 
 /-- Retrieve the docstring associated to an inventory item. For Tactics, this
 is not guaranteed to work. -/

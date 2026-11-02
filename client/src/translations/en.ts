@@ -103,6 +103,8 @@ export const en = {
     unlock: 'Unlock this item!',
     furtherDetails: 'Further details',
     provenIn: 'Proven in:',
+    introducedIn: 'Introduced in:',
+    mathlibDoc: 'Mathlib documentation',
     worldLevel: '{{world}} level {{level}}',
   },
   typewriter: {

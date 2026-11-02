@@ -62,20 +62,27 @@ elab "MakeGame" : command => do
     | template =>
       -- TODO: Process content template.
       -- TODO: Add information about inventory items
-      pure $ template.replace "[[mathlib_doc]]"
-        s!"[mathlib doc](https://leanprover-community.github.io/mathlib4_docs/find/?pattern={name}#doc)"
+      pure $ template.replace "[[mathlib_doc]]" s!"[mathlib doc]({mathlibDocUrl name})"
 
+    -- the levels introducing the item
+    let mut introducedIn : Array LevelRef := #[]
+    for (worldId, world) in game.worlds.nodes.toArray.insertionSort (·.1.toString < ·.1.toString) do
+      for (levelId, level) in world.levels.toArray.insertionSort (·.1 < ·.1) do
+        if (level.getInventory item.type).new.contains name then
+          introducedIn := introducedIn.push { world := worldId, level := levelId }
+
+    let mathlibDoc := getMathlibDoc env name item.type
+
+    let item : InventoryItem :=
+      { toInventoryTemplate := { item with content }, introducedIn, mathlibDoc }
     match item.type with
     | .Theorem =>
       modifyEnv (inventoryExt.addEntry · { item with
-        content := content
         -- Add the theorem statement to the doc
         statement := (← getStatementString name)
       })
     | _ =>
-      modifyEnv (inventoryExt.addEntry · { item with
-        content := content
-      })
+      modifyEnv (inventoryExt.addEntry · item)
 
   -- For each `worldId` this contains a set of items used in this world
   let mut usedItemsInWorld : HashMap Name (HashSet Name) := {}

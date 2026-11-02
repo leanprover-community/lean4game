@@ -193,6 +193,10 @@ export interface ApiDoc {
   statement: string
   type: string
   category: string
+  /** the levels introducing the item, missing in games built before this was added */
+  introducedIn?: { world: string; level: number }[]
+  /** the link to the mathlib documentation, if the declaration is documented there */
+  mathlibDoc?: string | null
 }
 
 /**

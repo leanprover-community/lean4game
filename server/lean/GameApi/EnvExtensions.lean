@@ -71,14 +71,28 @@ structure InventoryTemplate where
   category: String := default
   /-- Free-text short name -/
   displayName: String := name.toString
-  /-- Template documentation. Allows for special tags to insert mathlib info [TODO!] -/
+  /-- Template documentation. `[[mathlib_doc]]` is replaced by a link to the mathlib docs. -/
   content: String := ""
   deriving ToJson, Repr, Inhabited
+
+/-- A level of the game, by its world and its index. -/
+structure LevelRef where
+  world : Name
+  level : Nat
+  deriving ToJson, FromJson, Repr, Inhabited
+
+/-- The link to the mathlib documentation of the declaration `name`. -/
+def mathlibDocUrl (name : Name) : String :=
+  s!"https://leanprover-community.github.io/mathlib4_docs/find/?pattern={name}#doc"
 
 /-- A full inventory item including the processing by `MakeGame`, which creates these
 from the `InventoryTemplate`s and modifies them. -/
 structure InventoryItem extends InventoryTemplate where
   statement: String := ""
+  /-- The levels introducing the item with `NewTactic`, `NewTheorem` or `NewDefinition`. -/
+  introducedIn : Array LevelRef := #[]
+  /-- The link to the mathlib documentation, if the declaration is documented there. -/
+  mathlibDoc : Option String := none
   deriving ToJson, Repr, Inhabited
 
 /-- A reduced variant of `InventoryItem` which is used for the tiles in the doc -/
