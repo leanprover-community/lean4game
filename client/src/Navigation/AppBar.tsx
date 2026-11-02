@@ -95,9 +95,10 @@ export function AppBar() {
   )
 
   return (
+    // above the page, e.g. the side panels on mobile, so that its dropdowns are visible
     <header
       className={twMerge(
-        'relative flex shrink-0 items-center justify-between gap-2 bg-primary',
+        'relative z-40 flex shrink-0 items-center justify-between gap-2 bg-primary',
         'px-2 py-1 text-white',
       )}
     >
