@@ -5,11 +5,13 @@ import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
+import { InlineNextButton } from '../Chat/Chat'
 import { Markdown } from '../components/Markdown'
 import { WorldImage } from '../components/WorldImage'
 import { useScrollToSelectedStep } from '../hooks/useStepSelection'
 import { resetSelectedStepEffect } from '../state/chat-atoms'
 import { gameIdAtom } from '../state/location-atoms'
+import { mobileAtom } from '../state/preferences-atoms'
 import {
   hasError,
   leanInstanceAtom,
@@ -37,6 +39,7 @@ export function Typewriter() {
   const instance = useAtomValue(leanInstanceAtom)
   const check = useAtomValue(proofCheckAtom)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const mobile = useAtomValue(mobileAtom)
 
   useAtomValue(proofResultEffect)
   useAtomValue(resetEditingStepEffect)
@@ -70,7 +73,7 @@ export function Typewriter() {
           className="relative flex-col h-full overflow-y-auto"
         >
           <div className="min-h-0 flex-1" />
-          <div className="z-1 rounded-t-lg bg-(--bg) px-2 pb-2">
+          <div className="z-1 rounded-t-lg bg-(--bg) px-2 pb-2 shadow-[0_-4px_10px_rgba(0,0,0,0.24)]">
             <ExerciseStatement />
             <HoverProvider
               hovers={result?.hovers ?? []}
@@ -128,6 +131,7 @@ export function Typewriter() {
         </div>
       </div>
       <TypewriterInput />
+      {mobile && <InlineNextButton />}
     </div>
   )
 }

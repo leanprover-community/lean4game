@@ -5,7 +5,7 @@ import type { ApiHint } from '../api'
 import { levelIdAtom, worldIdAtom } from './location-atoms'
 import { levelProgressAtom, progressAtom } from './progress-atoms'
 
-/** User read the game introduction. Only relevant on mobile */
+/** User read the game introduction, see `leftPanelOpenAtom`. Only relevant on mobile */
 export const readGameIntroAtom = atom(
   get => {
     const progress = get(progressAtom)

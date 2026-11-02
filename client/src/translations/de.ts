@@ -108,7 +108,7 @@ export const de: DeepPartialTranslation<typeof en> = {
     assumptions: 'Annahmen',
     theorem: 'Satz',
     levelCompleted: 'Level abgeschlossen! 🎉',
-    levelSolved: 'Level wurde erfolgreich gelöst',
+    levelSolved: 'Level wurde einmal erfolgreich gelöst',
     noGoalsLeft: 'keine Ziele mehr',
     noGoalsLeftDescription:
       'Wahrscheinlich hast du den Level mit Warnungen gelöst oder Lean hatte einen Fehler beim Parsen.',

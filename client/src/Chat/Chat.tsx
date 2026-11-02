@@ -1,6 +1,6 @@
 import { faArrowRight, faHome } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { type HTMLAttributes, type ReactNode, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
@@ -12,17 +12,19 @@ import {
   useScrollToSelectedStep,
   useStepSelection,
 } from '../hooks/useStepSelection'
-import { helpAtom } from '../state/chat-atoms'
+import { readGameIntroAtom } from '../state/chat-atoms'
+import { leftPanelOpenAtom } from '../state/layout-atoms'
 import {
   gameIdAtom,
   gamePath,
   levelIdAtom,
   worldIdAtom,
 } from '../state/location-atoms'
+import { mobileAtom } from '../state/preferences-atoms'
 import { readWorldIntroAtom } from '../state/progress-atoms'
-import { hasError, proofCheckAtom } from '../state/proof-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../state/query-atoms'
 import { useGameTranslation } from '../utils/translation'
+import { useLevelHints } from './useLevelHints'
 
 type GameT = (key: string | undefined) => string
 
@@ -52,22 +54,6 @@ function hintText(hint: ApiHint, gameT: GameT) {
   return gameT(hint.rawText).replaceAll(
     /«\{(.*?)\}»/g,
     (_, v: string) => hint.varNames.find(x => x[0] === v)?.[1] ?? '',
-  )
-}
-
-/** The hints without the hidden ones, apart from the first `revealed` of them */
-function revealedHints(hints: ApiHint[], revealed: number) {
-  let n = 0
-  return hints.filter(hint => !hint.hidden || n++ < revealed)
-}
-
-/** Drops hints already shown in the previous step. Hidden hints are not filtered. */
-function filterHints(hints: ApiHint[], prevHints: ApiHint[] | undefined) {
-  if (!prevHints) return hints
-  return hints.filter(
-    hint =>
-      hint.hidden ||
-      !prevHints.some(x => x.text === hint.text && x.hidden === hint.hidden),
   )
 }
 
@@ -112,6 +98,15 @@ function StepMessage({ step, ...props }: ChatMessageProps & { step: number }) {
   )
 }
 
+/** A row of buttons below a thin line */
+function ButtonRow({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex shrink-0 flex-wrap gap-2 border-t border-(--border) p-2">
+      {children}
+    </div>
+  )
+}
+
 /**
  * The chat: the messages, scrolling to the ones of the selected proof step, and below
  * them a row of `buttons`. When `newestKey` changes, it scrolls to the newest message.
@@ -137,11 +132,7 @@ function Chat({
       <div ref={ref} className="min-h-0 flex-1 overflow-y-auto px-2">
         {children}
       </div>
-      {buttons && (
-        <div className="flex shrink-0 flex-wrap gap-2 border-t border-(--border) p-2">
-          {buttons}
-        </div>
-      )}
+      {buttons && <ButtonRow>{buttons}</ButtonRow>}
     </div>
   )
 }
@@ -262,11 +253,34 @@ function IntroMessages({
   )
 }
 
+/**
+ * On mobile, where the chat covers the world tree: closes the chat and remembers that
+ * the introduction was read, so it is closed from then on
+ */
+function GameStartButton() {
+  const { t } = useTranslation()
+  const setReadGameIntro = useSetAtom(readGameIntroAtom)
+  const setLeftPanelOpen = useSetAtom(leftPanelOpenAtom)
+  return (
+    <Button
+      className="ml-auto"
+      onClick={() => {
+        setReadGameIntro(true)
+        setLeftPanelOpen(false)
+      }}
+    >
+      {t('appBar.start')}&nbsp;
+      <FontAwesomeIcon icon={faArrowRight} />
+    </Button>
+  )
+}
+
 /** The chat on the game overview: the game's introduction */
 export function GameChat() {
   const { data: gameInfo } = useAtomValue(gameInfoAtom)
+  const mobile = useAtomValue(mobileAtom)
   return (
-    <Chat>
+    <Chat buttons={mobile && <GameStartButton />}>
       <IntroMessages text={gameInfo?.introduction} />
     </Chat>
   )
@@ -285,53 +299,103 @@ export function WorldChat() {
   )
 }
 
+/** Reveals the next hidden hint of the current proof step */
+function NextHintButton({
+  onClick,
+  className,
+}: {
+  onClick: () => void
+  className?: string
+}) {
+  const { t } = useTranslation()
+  return (
+    <Button className={className} onClick={onClick}>
+      {t('chat.nextHint')}
+    </Button>
+  )
+}
+
+/**
+ * The hints of the proof step `step`, as messages. In the chat they select the step on
+ * focus, inline in the proof the step itself does.
+ */
+function HintMessages({
+  hints,
+  step,
+  selectable = false,
+}: {
+  hints: ApiHint[]
+  step: number
+  selectable?: boolean
+}) {
+  const gameT = useChatTranslation()
+  return hints.map((hint, j) =>
+    selectable ? (
+      <StepMessage key={j} step={step} hidden={hint.hidden}>
+        {hintText(hint, gameT)}
+      </StepMessage>
+    ) : (
+      <ChatMessage key={j} hidden={hint.hidden}>
+        {hintText(hint, gameT)}
+      </ChatMessage>
+    ),
+  )
+}
+
 /**
  * The chat of a level: its introduction, followed by the hints of each proof step.
  * Hidden hints are revealed one by one with "Next hint", at the current step. Once
  * the current proof is complete without warnings, "Next" is enabled to go on.
  */
 export function LevelChat() {
-  const { t } = useTranslation()
-  const gameT = useChatTranslation()
   const { data: levelInfo } = useAtomValue(levelInfoAtom)
-  const check = useAtomValue(proofCheckAtom)
-  const [help, revealHint] = useAtom(helpAtom)
-  const steps = check.data?.steps ?? []
-  // a failed last step has the same hints as the step before
-  const shown =
-    steps.length > 1 && hasError(steps.at(-1)) ? steps.slice(0, -1) : steps
-  const current = shown.length - 1
-  const hiddenLeft =
-    (shown[current]?.goals[0]?.hints.filter(hint => hint.hidden).length ?? 0) >
-    (help.get(current) ?? 0)
-  // not while the previous result is shown during a new check
-  const completed = !check.isPlaceholderData && check.data?.completed
+  const { hints, hiddenLeft, revealNextHint, completed, newestKey } =
+    useLevelHints()
   const buttons = (
     <>
-      {hiddenLeft && (
-        <Button onClick={() => revealHint(current)}>
-          {t('chat.nextHint')}
-        </Button>
-      )}
+      {hiddenLeft && <NextHintButton onClick={revealNextHint} />}
       <NextButton disabled={!completed} />
     </>
   )
   return (
-    <Chat
-      buttons={buttons}
-      newestKey={`${shown.length}:${help.get(current) ?? 0}`}
-    >
+    <Chat buttons={buttons} newestKey={newestKey}>
       <IntroMessages text={levelInfo?.introduction} step={0} />
-      {shown.map((step, i) =>
-        filterHints(
-          revealedHints(step.goals[0]?.hints ?? [], help.get(i) ?? 0),
-          shown[i - 1]?.goals[0]?.hints,
-        ).map((hint, j) => (
-          <StepMessage key={`${i}-${j}`} step={i} hidden={hint.hidden}>
-            {hintText(hint, gameT)}
-          </StepMessage>
-        )),
-      )}
+      {hints.map((stepHints, i) => (
+        <HintMessages key={i} hints={stepHints} step={i} selectable />
+      ))}
     </Chat>
+  )
+}
+
+/**
+ * On mobile, where the chat is closed, its messages of the proof step `step` inside the
+ * proof: the level's introduction for the initial step, the hints, and at the current
+ * step "Next hint"
+ */
+export function InlineHints({ step }: { step: number }) {
+  const { data: levelInfo } = useAtomValue(levelInfoAtom)
+  const { hints, current, hiddenLeft, revealNextHint } = useLevelHints()
+  return (
+    <>
+      {step === 0 && <IntroMessages text={levelInfo?.introduction} />}
+      <HintMessages hints={hints[step] ?? []} step={step} />
+      {step === current && hiddenLeft && (
+        <NextHintButton className="mb-2.5" onClick={revealNextHint} />
+      )}
+    </>
+  )
+}
+
+/**
+ * On mobile, "Next" below the proof once one can go on. It takes the place of the input
+ * line, which is hidden then.
+ */
+export function InlineNextButton() {
+  const { completed } = useLevelHints()
+  if (!completed) return null
+  return (
+    <ButtonRow>
+      <NextButton disabled={false} />
+    </ButtonRow>
   )
 }

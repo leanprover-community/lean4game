@@ -1,4 +1,3 @@
-import { keepPreviousData } from '@tanstack/query-core'
 import { atom } from 'jotai'
 import { atomEffect } from 'jotai-effect'
 import { atomWithQuery } from 'jotai-tanstack-query'
@@ -98,8 +97,17 @@ export const proofCheckAtom = atomWithQuery<ApiProofCheckResult>(get => {
       } satisfies ApiProofCheckInput),
     enabled:
       instanceId !== undefined && world !== undefined && level !== undefined,
-    // keep showing the previous proof while the new one is checked
-    placeholderData: keepPreviousData,
+    // keep showing the previous proof of this level while the new one is checked,
+    // but not the proof of another level
+    placeholderData: (previousData, previousQuery) => {
+      const [, prevInstance, prevWorld, prevLevel] =
+        previousQuery?.queryKey ?? []
+      return prevInstance === instanceId &&
+        prevWorld === world &&
+        prevLevel === level
+        ? previousData
+        : undefined
+    },
     staleTime: Infinity,
     retry: false,
   }

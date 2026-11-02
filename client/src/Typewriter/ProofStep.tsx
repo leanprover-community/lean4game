@@ -11,6 +11,7 @@ import type {
   ApiHypothesis,
   ApiProofStep,
 } from '../api'
+import { InlineHints } from '../Chat/Chat'
 import { useStepSelection } from '../hooks/useStepSelection'
 import { mobileAtom } from '../state/preferences-atoms'
 import {
@@ -39,6 +40,7 @@ export function ProofStep({
   current: boolean
   failed: boolean
 }) {
+  const mobile = useAtomValue(mobileAtom)
   const selection = useStepSelection(index)
   return (
     <div
@@ -49,6 +51,7 @@ export function ProofStep({
         <Command step={step} index={index} current={current} failed={failed} />
       )}
       <Diagnostics diagnostics={step.diagnostics} />
+      {mobile && !failed && <InlineHints step={index} />}
       {!failed && <GoalTabs goals={step.goals} current={current} />}
     </div>
   )
