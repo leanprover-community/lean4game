@@ -1,7 +1,6 @@
 import { atom } from 'jotai'
 import { atomEffect } from 'jotai-effect'
 
-import type { ApiHint } from '../api'
 import { levelIdAtom, worldIdAtom } from './location-atoms'
 import { levelProgressAtom, progressAtom } from './progress-atoms'
 
@@ -40,12 +39,6 @@ export const helpAtom = atom(
     })
   },
 )
-
-/**
- * When deleting the proof, we want to keep to old messages around until
- * a new proof has been entered. e.g. to consult messages coming from dead ends
- */
-export const deletedChatAtom = atom<ApiHint[]>([])
 
 /** The selected proof step, highlighted with its chat messages, see `useStepSelection` */
 export const selectedStepAtom = atom<number>()

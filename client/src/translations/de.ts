@@ -111,7 +111,7 @@ export const de: DeepPartialTranslation<typeof en> = {
   typewriter: {
     execute: 'Ausführen',
     inputPlaceholder: 'Taktik eingeben',
-    retry: 'Wiederholen',
+    retry: 'Ändern',
     retryTitle: 'Beweis ab hier wiederholen',
     cancelEdit: 'Bearbeiten abbrechen',
     failedCommand: 'Fehlgeschlagener Befehl',

@@ -24,6 +24,7 @@ import {
 } from '../state/location-atoms'
 import { mobileAtom } from '../state/preferences-atoms'
 import { readWorldIntroAtom } from '../state/progress-atoms'
+import { editingStepAtom } from '../state/proof-atoms'
 import {
   gameInfoAtom,
   levelInfoAtom,
@@ -63,17 +64,28 @@ function hintText(hint: ApiHint, gameT: GameT) {
   )
 }
 
+/**
+ * The kind of a chat message: `hidden` for revealed hidden hints, and `deleted` for
+ * messages of proof steps which are removed once the edited command is executed
+ */
+type MessageVariant = 'default' | 'hidden' | 'conclusion' | 'deleted'
+
+const variantClass: Record<MessageVariant, string> = {
+  default: 'bg-sky-100 text-(--text-h) dark:bg-sky-950',
+  hidden: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200',
+  conclusion: 'bg-green-100 text-(--text-h) dark:bg-green-950',
+  deleted: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400',
+}
+
 type ChatMessageProps = {
   children: string
-  hidden?: boolean
-  conclusion?: boolean
+  variant?: MessageVariant
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
 
-/** A message of the chat, yellow for hidden hints and green for conclusions */
+/** A message of the chat, colored by its `variant` */
 function ChatMessage({
   children,
-  hidden = false,
-  conclusion = false,
+  variant = 'default',
   className,
   ...props
 }: ChatMessageProps) {
@@ -82,11 +94,7 @@ function ChatMessage({
     <div
       className={twMerge(
         'my-2.5 overflow-x-auto rounded-sm px-2.5 py-1.5',
-        hidden
-          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
-          : conclusion
-            ? 'bg-green-100 text-(--text-h) dark:bg-green-950'
-            : 'bg-sky-100 text-(--text-h) dark:bg-sky-950',
+        variantClass[variant],
         className,
       )}
       {...props}
@@ -249,26 +257,26 @@ function NextButton({ disabled }: { disabled: boolean }) {
 }
 
 /**
- * An introduction or a green conclusion, one message per paragraph. On a level, it
- * belongs to the proof step `step`.
+ * An introduction or a conclusion, one message per paragraph. On a level, it belongs to
+ * the proof step `step`.
  */
 function IntroMessages({
   text,
   step,
-  conclusion = false,
+  variant,
 }: {
   text: string | null | undefined
   step?: number
-  conclusion?: boolean
+  variant?: MessageVariant
 }) {
   const gameT = useChatTranslation()
   return splitIntro(gameT(text ?? '')).map((part, i) =>
     step === undefined ? (
-      <ChatMessage key={i} conclusion={conclusion}>
+      <ChatMessage key={i} variant={variant}>
         {part}
       </ChatMessage>
     ) : (
-      <StepMessage key={i} step={step} conclusion={conclusion}>
+      <StepMessage key={i} step={step} variant={variant}>
         {part}
       </StepMessage>
     ),
@@ -309,7 +317,7 @@ export function GameChat() {
     <Chat buttons={mobile && <GameStartButton />}>
       <IntroMessages text={gameInfo?.introduction} />
       {gameCompleted && (
-        <IntroMessages text={gameInfo?.conclusion} conclusion />
+        <IntroMessages text={gameInfo?.conclusion} variant="conclusion" />
       )}
     </Chat>
   )
@@ -333,7 +341,7 @@ export function WorldConclusionChat() {
   const worldConclusion = useAtomValue(worldConclusionAtom)
   return (
     <Chat buttons={<HomeButton />}>
-      <IntroMessages text={worldConclusion} conclusion />
+      <IntroMessages text={worldConclusion} variant="conclusion" />
     </Chat>
   )
 }
@@ -355,26 +363,39 @@ function NextHintButton({
 }
 
 /**
- * The hints of the proof step `step`, as messages. In the chat they select the step on
- * focus, inline in the proof the step itself does.
+ * Whether the messages of a proof step are `deleted`: while an earlier command is edited
+ * in place, the steps from there on are removed once it is executed
+ */
+function useDeletedSteps() {
+  const editingStep = useAtomValue(editingStepAtom)
+  return (step: number) => editingStep !== null && step >= editingStep
+}
+
+/**
+ * The hints of the proof step `step`, as messages, grey if `deleted`. In the chat they
+ * select the step on focus, inline in the proof the step itself does.
  */
 function HintMessages({
   hints,
   step,
   selectable = false,
+  deleted = false,
 }: {
   hints: ApiHint[]
   step: number
   selectable?: boolean
+  deleted?: boolean
 }) {
   const gameT = useChatTranslation()
+  const variant = (hint: ApiHint) =>
+    deleted ? 'deleted' : hint.hidden ? 'hidden' : 'default'
   return hints.map((hint, j) =>
     selectable ? (
-      <StepMessage key={j} step={step} hidden={hint.hidden}>
+      <StepMessage key={j} step={step} variant={variant(hint)}>
         {hintText(hint, gameT)}
       </StepMessage>
     ) : (
-      <ChatMessage key={j} hidden={hint.hidden}>
+      <ChatMessage key={j} variant={variant(hint)}>
         {hintText(hint, gameT)}
       </ChatMessage>
     ),
@@ -385,12 +406,14 @@ function HintMessages({
  * The chat of a level: its introduction, followed by the hints of each proof step.
  * Hidden hints are revealed one by one with "Next hint", at the current step. Once
  * the current proof is complete without warnings, the level's conclusion is shown and
- * "Next" is enabled to go on.
+ * "Next" is enabled to go on. While a command is edited, the messages of the steps it
+ * would remove are grey.
  */
 export function LevelChat() {
   const { data: levelInfo } = useAtomValue(levelInfoAtom)
   const { hints, current, hiddenLeft, revealNextHint, completed, newestKey } =
     useLevelHints()
+  const isDeleted = useDeletedSteps()
   const buttons = (
     <>
       {hiddenLeft && <NextHintButton onClick={revealNextHint} />}
@@ -401,10 +424,20 @@ export function LevelChat() {
     <Chat buttons={buttons} newestKey={newestKey}>
       <IntroMessages text={levelInfo?.introduction} step={0} />
       {hints.map((stepHints, i) => (
-        <HintMessages key={i} hints={stepHints} step={i} selectable />
+        <HintMessages
+          key={i}
+          hints={stepHints}
+          step={i}
+          selectable
+          deleted={isDeleted(i)}
+        />
       ))}
       {completed && (
-        <IntroMessages text={levelInfo?.conclusion} step={current} conclusion />
+        <IntroMessages
+          text={levelInfo?.conclusion}
+          step={current}
+          variant={isDeleted(current) ? 'deleted' : 'conclusion'}
+        />
       )}
     </Chat>
   )
@@ -418,10 +451,15 @@ export function LevelChat() {
 export function InlineHints({ step }: { step: number }) {
   const { data: levelInfo } = useAtomValue(levelInfoAtom)
   const { hints, current, hiddenLeft, revealNextHint } = useLevelHints()
+  const isDeleted = useDeletedSteps()
   return (
     <>
       {step === 0 && <IntroMessages text={levelInfo?.introduction} />}
-      <HintMessages hints={hints[step] ?? []} step={step} />
+      <HintMessages
+        hints={hints[step] ?? []}
+        step={step}
+        deleted={isDeleted(step)}
+      />
       {step === current && hiddenLeft && (
         <NextHintButton className="mb-2.5" onClick={revealNextHint} />
       )}
@@ -432,9 +470,15 @@ export function InlineHints({ step }: { step: number }) {
 /** On mobile, where the chat is closed, the level's conclusion below the proof */
 export function InlineConclusion() {
   const { data: levelInfo } = useAtomValue(levelInfoAtom)
-  const { completed } = useLevelHints()
+  const { current, completed } = useLevelHints()
+  const isDeleted = useDeletedSteps()
   if (!completed) return null
-  return <IntroMessages text={levelInfo?.conclusion} conclusion />
+  return (
+    <IntroMessages
+      text={levelInfo?.conclusion}
+      variant={isDeleted(current) ? 'deleted' : 'conclusion'}
+    />
+  )
 }
 
 /**
