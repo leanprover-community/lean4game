@@ -1,8 +1,8 @@
 import { useAtom, useAtomValue } from 'jotai'
 
 import type { ApiHint } from '../api'
-import { helpAtom } from '../state/chat-atoms'
 import { hasError, proofCheckAtom } from '../state/proof-atoms'
+import { helpAtom } from './chat-atoms'
 
 /** The hints without the hidden ones, apart from the first `revealed` of them */
 function revealedHints(hints: ApiHint[], revealed: number) {

@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
 import { InlineConclusion, InlineNextButton } from '../Chat/Chat'
+import { resetSelectedStepEffect } from '../Chat/chat-atoms'
 import { Markdown } from '../components/Markdown'
 import { WorldImage } from '../components/WorldImage'
 import { useScrollToSelectedStep } from '../hooks/useStepSelection'
-import { resetSelectedStepEffect } from '../state/chat-atoms'
 import { gameIdAtom } from '../state/location-atoms'
 import { mobileAtom } from '../state/preferences-atoms'
 import {

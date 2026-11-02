@@ -5,6 +5,9 @@ import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
 import type { ApiInventoryTile } from '../api'
+import { levelIdAtom } from '../state/location-atoms'
+import { difficultyAtom } from '../state/progress-atoms'
+import { Documentation } from './Documentation'
 import {
   currentInventoryTilesAtom,
   inventoryCurrentTabNewTilesAtom,
@@ -16,10 +19,7 @@ import {
   inventoryTabNewTilesAtom,
   inventoryTabRecentTilesAtom,
   selectedDocTileAtom,
-} from '../state/inventory-atoms'
-import { levelIdAtom } from '../state/location-atoms'
-import { difficultyAtom } from '../state/progress-atoms'
-import { Documentation } from './Documentation'
+} from './inventory-atoms'
 
 const tabTitles = {
   [InventoryTab.theorem]: 'inventory.theorems',

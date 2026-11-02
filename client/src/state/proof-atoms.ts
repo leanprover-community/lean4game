@@ -9,8 +9,8 @@ import type {
   ApiProofStep,
 } from '../api'
 import i18n from '../i18n'
+import { inventoryAtom } from '../Inventory/inventory-atoms'
 import { HttpError, postJson, retryUnlessClientError } from '../utils/fetch'
-import { inventoryAtom } from './inventory-atoms'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from './location-atoms'
 import {
   completedAtom,

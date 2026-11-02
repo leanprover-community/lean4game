@@ -2,7 +2,7 @@ import { useAtom, useAtomValue } from 'jotai'
 import { type FocusEvent, type RefObject, useEffect } from 'react'
 import { twMerge } from 'tailwind-merge'
 
-import { selectedStepAtom } from '../state/chat-atoms'
+import { selectedStepAtom } from '../Chat/chat-atoms'
 
 /** The attribute marking the elements of a step, i.e. a proof step and its hints */
 const STEP_ATTRIBUTE = 'data-step'

@@ -1,6 +1,6 @@
 import { type Getter, atom } from 'jotai'
 
-import { readGameIntroAtom } from './chat-atoms'
+import { readGameIntroAtom } from '../Chat/chat-atoms'
 import { locationAtom, routeAtom } from './location-atoms'
 import { mobileAtom } from './preferences-atoms'
 

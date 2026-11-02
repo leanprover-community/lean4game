@@ -13,7 +13,6 @@ import {
   useScrollToSelectedStep,
   useStepSelection,
 } from '../hooks/useStepSelection'
-import { readGameIntroAtom } from '../state/chat-atoms'
 import { leftPanelOpenAtom } from '../state/layout-atoms'
 import {
   gameIdAtom,
@@ -31,6 +30,7 @@ import {
   worldConclusionAtom,
 } from '../state/query-atoms'
 import { useGameTranslation } from '../utils/translation'
+import { readGameIntroAtom } from './chat-atoms'
 import { useLevelHints } from './useLevelHints'
 
 type GameT = (key: string | undefined) => string

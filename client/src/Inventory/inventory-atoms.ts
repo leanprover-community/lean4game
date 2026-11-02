@@ -3,11 +3,11 @@ import { atomFamily } from 'jotai-family'
 import { atomWithQuery } from 'jotai-tanstack-query'
 
 import type { ApiDoc, ApiInventoryOverview, ApiInventoryTile } from '../api'
+import { gameIdAtom, levelIdAtom, worldIdAtom } from '../state/location-atoms'
+import { preferencesAtom } from '../state/preferences-atoms'
+import { progressAtom } from '../state/progress-atoms'
+import { levelInfoAtom } from '../state/query-atoms'
 import { fetchJson, gameDataUrl } from '../utils/fetch'
-import { gameIdAtom, levelIdAtom, worldIdAtom } from './location-atoms'
-import { preferencesAtom } from './preferences-atoms'
-import { progressAtom } from './progress-atoms'
-import { levelInfoAtom } from './query-atoms'
 
 /** Valid inventory tabs */
 export const InventoryTab = {

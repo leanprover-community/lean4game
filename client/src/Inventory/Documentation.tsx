@@ -7,16 +7,16 @@ import { twMerge } from 'tailwind-merge'
 import type { ApiInventoryTile } from '../api'
 import { Link } from '../components/Link'
 import { Markdown } from '../components/Markdown'
+import { gameIdAtom, gamePath } from '../state/location-atoms'
+import { difficultyAtom } from '../state/progress-atoms'
+import { gameInfoAtom } from '../state/query-atoms'
+import { useGameTranslation } from '../utils/translation'
 import {
   closeDocAtom,
   docAtomFamily,
   inventoryAtom,
   inventoryTabAtom,
-} from '../state/inventory-atoms'
-import { gameIdAtom, gamePath } from '../state/location-atoms'
-import { difficultyAtom } from '../state/progress-atoms'
-import { gameInfoAtom } from '../state/query-atoms'
-import { useGameTranslation } from '../utils/translation'
+} from './inventory-atoms'
 
 const iconButtonClass = twMerge(
   'flex size-8 shrink-0 cursor-pointer items-center justify-center rounded',
