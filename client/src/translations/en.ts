@@ -84,6 +84,7 @@ export const en = {
   },
   game: {
     introduction: 'Introduction',
+    conclusion: 'Conclusion',
     chat: 'Chat',
     inventory: 'Inventory',
     worlds: 'Worlds',

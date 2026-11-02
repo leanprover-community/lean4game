@@ -6,6 +6,11 @@ Introduction
 This is the introduction text of the game.
 "
 
+Conclusion
+"
+This conclusion is shown on the game overview once all worlds are completed.
+"
+
 Info "
 Here you can put additional information about the game. It is accessible
 from the starting through the drop-down menu.

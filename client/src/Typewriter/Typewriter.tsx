@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
-import { InlineNextButton } from '../Chat/Chat'
+import { InlineConclusion, InlineNextButton } from '../Chat/Chat'
 import { Markdown } from '../components/Markdown'
 import { WorldImage } from '../components/WorldImage'
 import { useScrollToSelectedStep } from '../hooks/useStepSelection'
@@ -107,6 +107,7 @@ export function Typewriter() {
                 )}
               </div>
             )}
+            {mobile && <InlineConclusion />}
             {error && (
               <div
                 className={twMerge(

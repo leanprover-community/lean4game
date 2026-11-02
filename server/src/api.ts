@@ -131,6 +131,7 @@ export interface ApiGameData {
         id: string
         title: string
         introduction: string
+        conclusion?: string
         image: string
       }
     }

@@ -38,7 +38,8 @@ const PAGES = ['impressum', 'privacy', 'preferences'] as const
 /**
  * The page the URL points to. Game, world and level are lowercase, as they are
  * case-insensitive in the URL: `/g/owner/repo`, `/g/owner/repo/world`,
- * `/g/owner/repo/world/level` with levels numbered from 1. Games are under `/g/`, so
+ * `/g/owner/repo/world/level` with levels numbered from 1, and `/g/owner/repo/world/conclusion`
+ * after the last level. Games are under `/g/`, so
  * that they never collide with the other pages or the server's paths.
  */
 export type Route =
@@ -47,6 +48,7 @@ export type Route =
   | { page: 'game'; gameId: string }
   | { page: 'world'; gameId: string; world: string }
   | { page: 'level'; gameId: string; world: string; levelId: number }
+  | { page: 'worldConclusion'; gameId: string; world: string }
   | { page: 'notFound' }
 
 /** `segment` decoded and lowercase */
@@ -68,6 +70,8 @@ function gameRoute(segments: string[], levelPattern: RegExp): Route {
   if (world === undefined) return { page: 'game', gameId }
   if (level === undefined)
     return { page: 'world', gameId, world: lowercaseSegment(world) }
+  if (level.toLowerCase() === 'conclusion')
+    return { page: 'worldConclusion', gameId, world: lowercaseSegment(world) }
   if (!levelPattern.test(level)) return { page: 'notFound' }
   const levelId = Number(level)
   // old URLs use level 0 for the introduction of the world
@@ -117,6 +121,11 @@ export function gamePath(gameId: string, worldId?: string, levelId?: number) {
   return path.toLowerCase()
 }
 
+/** The URL path of the conclusion of the world `worldId`, shown after its last level */
+export function worldConclusionPath(gameId: string, worldId: string) {
+  return `${gamePath(gameId, worldId)}/conclusion`
+}
+
 /**
  * Replaces the URL of a game page by its canonical form: lowercase, as game and world
  * are case-insensitive, e.g. `/g/Owner/Repo/World/1` → `/g/owner/repo/world/1`, and old
@@ -132,7 +141,9 @@ export const canonicalGamePathEffect = atomEffect((get, set) => {
         ? gamePath(route.gameId, route.world)
         : route.page === 'level'
           ? gamePath(route.gameId, route.world, route.levelId)
-          : undefined
+          : route.page === 'worldConclusion'
+            ? worldConclusionPath(route.gameId, route.world)
+            : undefined
   if (canonical === undefined) return
   if (location.pathname === canonical && !location.hash) return
   set(locationAtom, prev => ({ ...prev, pathname: canonical, hash: '' }), {

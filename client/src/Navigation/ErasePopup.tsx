@@ -53,7 +53,7 @@ export function ErasePopup({
         {route.page === 'level' && (
           <Button onClick={eraseLevel}>{t('progress.deleteLevel')}</Button>
         )}
-        {(route.page === 'world' || route.page === 'level') && (
+        {'world' in route && (
           <Button onClick={eraseWorld}>{t('progress.deleteWorld')}</Button>
         )}
         <Button onClick={eraseAll}>{t('progress.deleteAll')}</Button>

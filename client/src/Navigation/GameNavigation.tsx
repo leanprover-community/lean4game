@@ -13,18 +13,20 @@ import {
   isMenuPage,
   levelIdAtom,
   routeAtom,
+  worldConclusionPath,
   worldIdAtom,
 } from '../state/location-atoms'
 import { lastPageAtom } from '../state/navigation-atoms'
 import { completedAtom, difficultyAtom } from '../state/progress-atoms'
-import { gameInfoAtom } from '../state/query-atoms'
+import { gameInfoAtom, worldConclusionAtom } from '../state/query-atoms'
 import { NavButton } from './NavButton'
 import RotatingGlobe from './RotatingGlobe'
 
 /**
  * Back and forward through a game: from the game overview `/owner/repo` to a world
  * `/owner/repo/world` and through its levels `/owner/repo/world/1`, `…/2`, ….
- * The world and its last level lead back to the game overview (home icon), everything
+ * The world and its last level lead back to the game overview (home icon), or the last
+ * level to the world's conclusion `/owner/repo/world/conclusion` if it has one, everything
  * else back to the landing page (arrow and globe). With the strictest rules, a level
  * must be completed before going on.
  */
@@ -38,6 +40,7 @@ export function GameNavigation() {
   const { data: gameInfo } = useAtomValue(gameInfoAtom)
   const completed = useAtomValue(completedAtom)
   const difficulty = useAtomValue(difficultyAtom)
+  const worldConclusion = useAtomValue(worldConclusionAtom)
 
   if (route.page === 'landing') return null
 
@@ -68,6 +71,13 @@ export function GameNavigation() {
               href={gamePath(gameId, worldId, levelId + 1)}
               disabled={locked}
             />
+          ) : worldConclusion ? (
+            <NavButton
+              icon={faArrowRight}
+              title={t('appBar.next')}
+              href={worldConclusionPath(gameId, worldId)}
+              disabled={locked}
+            />
           ) : (
             <NavButton
               icon={faHome}
@@ -76,6 +86,32 @@ export function GameNavigation() {
               disabled={locked}
             />
           ))}
+      </>
+    )
+  }
+
+  if (
+    route.page === 'worldConclusion' &&
+    gameId !== undefined &&
+    worldId !== undefined
+  ) {
+    const worldSize = gameInfo?.worldSize?.[worldId]
+    return (
+      <>
+        <NavButton
+          icon={faArrowLeft}
+          title={t('appBar.previousLevel')}
+          href={
+            worldSize
+              ? gamePath(gameId, worldId, worldSize)
+              : gamePath(gameId, worldId)
+          }
+        />
+        <NavButton
+          icon={faHome}
+          title={t('appBar.home')}
+          href={gamePath(gameId)}
+        />
       </>
     )
   }

@@ -34,11 +34,15 @@ function panelOpenAtom(openOnMobile: (get: Getter) => boolean = () => false) {
 }
 
 /**
- * On mobile, the chat is open on a world's introduction, and on the game overview until
- * its introduction was read
+ * On mobile, the chat is open on a world's introduction and conclusion, and on the game
+ * overview until its introduction was read
  */
 export const leftPanelOpenAtom = panelOpenAtom(get => {
   const { page } = get(routeAtom)
-  return page === 'world' || (page === 'game' && !get(readGameIntroAtom))
+  return (
+    page === 'world' ||
+    page === 'worldConclusion' ||
+    (page === 'game' && !get(readGameIntroAtom))
+  )
 })
 export const rightPanelOpenAtom = panelOpenAtom()

@@ -89,3 +89,10 @@ export const worldDependenciesCompletedAtomFamily = atomFamily(
         .every(([source]) => get(worldCompletedAtom(source)))
     }),
 )
+
+/** The game is completed if it has worlds and all of them are */
+export const gameCompletedAtom = atom<boolean>(get => {
+  const { data: gameInfo } = get(gameInfoAtom)
+  const worlds = Object.keys(gameInfo?.worlds?.nodes ?? {})
+  return worlds.length > 0 && worlds.every(w => get(worldCompletedAtom(w)))
+})

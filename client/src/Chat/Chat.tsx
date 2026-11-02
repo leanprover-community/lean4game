@@ -8,6 +8,7 @@ import { twMerge } from 'tailwind-merge'
 import type { ApiHint } from '../api'
 import { Button, LinkButton } from '../components/Button'
 import { Markdown } from '../components/Markdown'
+import { gameCompletedAtom } from '../GamePage/world-tree-atoms'
 import {
   useScrollToSelectedStep,
   useStepSelection,
@@ -18,11 +19,16 @@ import {
   gameIdAtom,
   gamePath,
   levelIdAtom,
+  worldConclusionPath,
   worldIdAtom,
 } from '../state/location-atoms'
 import { mobileAtom } from '../state/preferences-atoms'
 import { readWorldIntroAtom } from '../state/progress-atoms'
-import { gameInfoAtom, levelInfoAtom } from '../state/query-atoms'
+import {
+  gameInfoAtom,
+  levelInfoAtom,
+  worldConclusionAtom,
+} from '../state/query-atoms'
 import { useGameTranslation } from '../utils/translation'
 import { useLevelHints } from './useLevelHints'
 
@@ -60,12 +66,14 @@ function hintText(hint: ApiHint, gameT: GameT) {
 type ChatMessageProps = {
   children: string
   hidden?: boolean
+  conclusion?: boolean
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
 
-/** A message of the chat, yellow for hidden hints */
+/** A message of the chat, yellow for hidden hints and green for conclusions */
 function ChatMessage({
   children,
   hidden = false,
+  conclusion = false,
   className,
   ...props
 }: ChatMessageProps) {
@@ -76,7 +84,9 @@ function ChatMessage({
         'my-2.5 overflow-x-auto rounded-sm px-2.5 py-1.5',
         hidden
           ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
-          : 'bg-sky-100 text-(--text-h) dark:bg-sky-950',
+          : conclusion
+            ? 'bg-green-100 text-(--text-h) dark:bg-green-950'
+            : 'bg-sky-100 text-(--text-h) dark:bg-sky-950',
         className,
       )}
       {...props}
@@ -176,14 +186,7 @@ function StartButton() {
   const { data: gameInfo } = useAtomValue(gameInfoAtom)
   const readWorldIntro = useSetAtom(readWorldIntroAtom)
   if (gameId === undefined || worldId === undefined) return null
-  if (gameInfo?.worldSize?.[worldId] === 0) {
-    return (
-      <ForwardButton href={gamePath(gameId)}>
-        <FontAwesomeIcon icon={faHome} />
-        &nbsp;{t('appBar.home')}
-      </ForwardButton>
-    )
-  }
+  if (gameInfo?.worldSize?.[worldId] === 0) return <HomeButton />
   return (
     <ForwardButton
       href={gamePath(gameId, worldId, 1)}
@@ -195,13 +198,30 @@ function StartButton() {
   )
 }
 
-/** Goes to the next level, or home after the world's last level */
+/** Goes home, to the game overview */
+function HomeButton({ disabled = false }: { disabled?: boolean }) {
+  const { t } = useTranslation()
+  const gameId = useAtomValue(gameIdAtom)
+  if (gameId === undefined) return null
+  return (
+    <ForwardButton href={gamePath(gameId)} disabled={disabled}>
+      <FontAwesomeIcon icon={faHome} />
+      &nbsp;{t('appBar.home')}
+    </ForwardButton>
+  )
+}
+
+/**
+ * Goes to the next level. After the world's last level, it goes to the world's
+ * conclusion if it has one, otherwise home.
+ */
 function NextButton({ disabled }: { disabled: boolean }) {
   const { t } = useTranslation()
   const gameId = useAtomValue(gameIdAtom)
   const worldId = useAtomValue(worldIdAtom)
   const levelId = useAtomValue(levelIdAtom)
   const { data: gameInfo } = useAtomValue(gameInfoAtom)
+  const worldConclusion = useAtomValue(worldConclusionAtom)
   const worldSize =
     worldId === undefined ? undefined : gameInfo?.worldSize?.[worldId]
   if (
@@ -211,17 +231,15 @@ function NextButton({ disabled }: { disabled: boolean }) {
     worldSize === undefined
   )
     return null
-  if (levelId >= worldSize) {
-    return (
-      <ForwardButton href={gamePath(gameId)} disabled={disabled}>
-        <FontAwesomeIcon icon={faHome} />
-        &nbsp;{t('appBar.home')}
-      </ForwardButton>
-    )
-  }
+  if (levelId >= worldSize && !worldConclusion)
+    return <HomeButton disabled={disabled} />
   return (
     <ForwardButton
-      href={gamePath(gameId, worldId, levelId + 1)}
+      href={
+        levelId >= worldSize
+          ? worldConclusionPath(gameId, worldId)
+          : gamePath(gameId, worldId, levelId + 1)
+      }
       disabled={disabled}
     >
       {t('appBar.next')}&nbsp;
@@ -231,22 +249,26 @@ function NextButton({ disabled }: { disabled: boolean }) {
 }
 
 /**
- * An introduction, one message per paragraph. On a level, it belongs to the initial
- * proof step `step`.
+ * An introduction or a green conclusion, one message per paragraph. On a level, it
+ * belongs to the proof step `step`.
  */
 function IntroMessages({
   text,
   step,
+  conclusion = false,
 }: {
   text: string | null | undefined
   step?: number
+  conclusion?: boolean
 }) {
   const gameT = useChatTranslation()
   return splitIntro(gameT(text ?? '')).map((part, i) =>
     step === undefined ? (
-      <ChatMessage key={i}>{part}</ChatMessage>
+      <ChatMessage key={i} conclusion={conclusion}>
+        {part}
+      </ChatMessage>
     ) : (
-      <StepMessage key={i} step={step}>
+      <StepMessage key={i} step={step} conclusion={conclusion}>
         {part}
       </StepMessage>
     ),
@@ -275,13 +297,20 @@ function GameStartButton() {
   )
 }
 
-/** The chat on the game overview: the game's introduction */
+/**
+ * The chat on the game overview: the game's introduction, and its conclusion once all
+ * worlds are completed
+ */
 export function GameChat() {
   const { data: gameInfo } = useAtomValue(gameInfoAtom)
   const mobile = useAtomValue(mobileAtom)
+  const gameCompleted = useAtomValue(gameCompletedAtom)
   return (
     <Chat buttons={mobile && <GameStartButton />}>
       <IntroMessages text={gameInfo?.introduction} />
+      {gameCompleted && (
+        <IntroMessages text={gameInfo?.conclusion} conclusion />
+      )}
     </Chat>
   )
 }
@@ -295,6 +324,16 @@ export function WorldChat() {
   return (
     <Chat buttons={<StartButton />}>
       <IntroMessages text={world?.introduction} />
+    </Chat>
+  )
+}
+
+/** The chat after a world's last level: the world's conclusion */
+export function WorldConclusionChat() {
+  const worldConclusion = useAtomValue(worldConclusionAtom)
+  return (
+    <Chat buttons={<HomeButton />}>
+      <IntroMessages text={worldConclusion} conclusion />
     </Chat>
   )
 }
@@ -345,11 +384,12 @@ function HintMessages({
 /**
  * The chat of a level: its introduction, followed by the hints of each proof step.
  * Hidden hints are revealed one by one with "Next hint", at the current step. Once
- * the current proof is complete without warnings, "Next" is enabled to go on.
+ * the current proof is complete without warnings, the level's conclusion is shown and
+ * "Next" is enabled to go on.
  */
 export function LevelChat() {
   const { data: levelInfo } = useAtomValue(levelInfoAtom)
-  const { hints, hiddenLeft, revealNextHint, completed, newestKey } =
+  const { hints, current, hiddenLeft, revealNextHint, completed, newestKey } =
     useLevelHints()
   const buttons = (
     <>
@@ -363,6 +403,9 @@ export function LevelChat() {
       {hints.map((stepHints, i) => (
         <HintMessages key={i} hints={stepHints} step={i} selectable />
       ))}
+      {completed && (
+        <IntroMessages text={levelInfo?.conclusion} step={current} conclusion />
+      )}
     </Chat>
   )
 }
@@ -384,6 +427,14 @@ export function InlineHints({ step }: { step: number }) {
       )}
     </>
   )
+}
+
+/** On mobile, where the chat is closed, the level's conclusion below the proof */
+export function InlineConclusion() {
+  const { data: levelInfo } = useAtomValue(levelInfoAtom)
+  const { completed } = useLevelHints()
+  if (!completed) return null
+  return <IntroMessages text={levelInfo?.conclusion} conclusion />
 }
 
 /**

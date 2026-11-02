@@ -35,6 +35,8 @@ export function useLevelHints() {
     steps.length > 1 && hasError(steps.at(-1)) ? steps.slice(0, -1) : steps
   const current = shown.length - 1
   const revealed = help.get(current) ?? 0
+  // not while the previous result is shown during a new check
+  const completed = !check.isPlaceholderData && (check.data?.completed ?? false)
   return {
     hints: shown.map((step, i) =>
       filterHints(
@@ -47,9 +49,8 @@ export function useLevelHints() {
       (shown[current]?.goals[0]?.hints.filter(hint => hint.hidden).length ??
         0) > revealed,
     revealNextHint: () => revealHint(current),
-    // not while the previous result is shown during a new check
-    completed: !check.isPlaceholderData && (check.data?.completed ?? false),
+    completed,
     /** changes when a message is added at the end */
-    newestKey: `${shown.length}:${revealed}`,
+    newestKey: `${shown.length}:${revealed}:${completed}`,
   }
 }

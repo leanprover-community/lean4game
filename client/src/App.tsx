@@ -55,6 +55,12 @@ function Page() {
           <WorldPage />
         </GameRoute>
       )
+    case 'worldConclusion':
+      return (
+        <GameRoute>
+          <WorldPage conclusion />
+        </GameRoute>
+      )
     case 'level':
       return (
         <GameRoute>

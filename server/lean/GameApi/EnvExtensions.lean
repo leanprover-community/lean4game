@@ -349,7 +349,7 @@ structure World where
   title: String := default
   /-- World introduction to be shown before the first level is loaded. (markdown) -/
   introduction: String := default
-  /-- TODO: This is currently unused. -/
+  /-- World conclusion to be shown after the last level. (markdown) -/
   conclusion : String := default
   /-- The levels of the world. -/
   levels: HashMap Nat GameLevel := default
@@ -362,6 +362,7 @@ instance : ToJson World := ⟨
     ("name", toJson world.name),
     ("title", world.title),
     ("introduction", world.introduction),
+    ("conclusion", world.conclusion),
     ("image", world.image)]
 ⟩
 
