@@ -1,4 +1,5 @@
 import { type Getter, atom } from 'jotai'
+import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 
 import { readGameIntroAtom } from '../Chat/chat-atoms'
 import { locationAtom, routeAtom } from './location-atoms'
@@ -46,3 +47,14 @@ export const leftPanelOpenAtom = panelOpenAtom(get => {
   )
 })
 export const rightPanelOpenAtom = panelOpenAtom()
+
+/**
+ * The widths of the open side panels on desktop, in percent of the layout. They are kept
+ * for the session, so that they stay the same on all pages instead of being reset.
+ */
+export const panelSizesAtom = atomWithStorage<{ left: number; right: number }>(
+  'panel_sizes',
+  { left: 25, right: 25 },
+  createJSONStorage(() => sessionStorage),
+  { getOnInit: true },
+)

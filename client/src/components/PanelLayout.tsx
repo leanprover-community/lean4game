@@ -8,8 +8,8 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useAtom, useAtomValue } from 'jotai'
-import { type ReactNode, useEffect, useId, useRef } from 'react'
+import { useAtom, useAtomValue, useSetAtom, useStore } from 'jotai'
+import { type ReactNode, useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Group,
@@ -20,7 +20,11 @@ import {
 } from 'react-resizable-panels'
 import { twMerge } from 'tailwind-merge'
 
-import { leftPanelOpenAtom, rightPanelOpenAtom } from '../state/layout-atoms'
+import {
+  leftPanelOpenAtom,
+  panelSizesAtom,
+  rightPanelOpenAtom,
+} from '../state/layout-atoms'
 import { mobileAtom } from '../state/preferences-atoms'
 
 type Side = 'left' | 'right'
@@ -108,21 +112,28 @@ function SidePanel({
   children: ReactNode
 }) {
   const panelRef = usePanelRef()
-  // `expand()` would reopen the panel with its minimum size
-  const lastOpenSize = useRef('25%')
+  // The last width while open, the same on all pages. It is read without subscribing:
+  // `defaultSize` must not change while dragging, as the panel is registered again with
+  // the group whenever it changes, which ends the drag.
+  const store = useStore()
+  const setSizes = useSetAtom(panelSizesAtom)
+  const [defaultSize] = useState(() =>
+    open ? `${store.get(panelSizesAtom)[side]}%` : '0%',
+  )
 
-  // apply the toggles to the panel
+  // apply the toggles to the panel. `expand()` would reopen it with its minimum size
   useEffect(() => {
     const panel = panelRef.current
     if (!panel) return
-    if (open && panel.isCollapsed()) panel.resize(lastOpenSize.current)
+    if (open && panel.isCollapsed())
+      panel.resize(`${store.get(panelSizesAtom)[side]}%`)
     if (!open && !panel.isCollapsed()) panel.collapse()
-  }, [open, panelRef])
+  }, [open, panelRef, store, side])
 
   // and dragging the panel closed or open to the toggles
   const onResize = ({ asPercentage }: PanelSize) => {
     const isOpen = asPercentage > 0
-    if (isOpen) lastOpenSize.current = `${asPercentage}%`
+    if (isOpen) setSizes(prev => ({ ...prev, [side]: asPercentage }))
     if (isOpen !== open) setOpen(isOpen)
   }
 
@@ -130,7 +141,7 @@ function SidePanel({
     <Panel
       id={id}
       panelRef={panelRef}
-      defaultSize={open ? '25%' : '0%'}
+      defaultSize={defaultSize}
       minSize="15%"
       collapsible
       onResize={onResize}
