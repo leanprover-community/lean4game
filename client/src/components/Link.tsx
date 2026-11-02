@@ -1,9 +1,9 @@
 import { useSetAtom } from 'jotai'
-import type { AnchorHTMLAttributes, MouseEvent } from 'react'
+import type { ComponentProps, MouseEvent } from 'react'
 
 import { locationAtom } from '../state/location-atoms'
 
-type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
+type LinkProps = ComponentProps<'a'> & { href: string }
 
 /** A link to a page of the client, which navigates without reloading the page */
 export function Link({ href, onClick, children, ...props }: LinkProps) {

@@ -11,6 +11,7 @@ import type {
   ApiHypothesis,
   ApiProofStep,
 } from '../api'
+import { useStepSelection } from '../hooks/useStepSelection'
 import { mobileAtom } from '../state/preferences-atoms'
 import {
   editingStepAtom,
@@ -38,8 +39,12 @@ export function ProofStep({
   current: boolean
   failed: boolean
 }) {
+  const selection = useStepSelection(index)
   return (
-    <div className="my-2 rounded-lg p-2">
+    <div
+      {...selection.props}
+      className={twMerge('my-2 rounded-lg p-2', selection.className)}
+    >
       {index > 0 && (
         <Command step={step} index={index} current={current} failed={failed} />
       )}

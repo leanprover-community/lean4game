@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useAtomValue } from 'jotai'
 import { useTranslation } from 'react-i18next'
 
+import { LevelChat } from '../Chat/Chat'
 import { PanelLayout } from '../components/PanelLayout'
 import { completedAtom } from '../state/progress-atoms'
 import { Typewriter } from '../Typewriter/Typewriter'
@@ -32,7 +33,7 @@ export function LevelPage() {
           </span>
         )
       }
-      left={null}
+      left={<LevelChat />}
       center={<Typewriter />}
       right={null}
     />

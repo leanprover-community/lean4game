@@ -7,6 +7,8 @@ import { twMerge } from 'tailwind-merge'
 
 import { Markdown } from '../components/Markdown'
 import { WorldImage } from '../components/WorldImage'
+import { useScrollToSelectedStep } from '../hooks/useStepSelection'
+import { resetSelectedStepEffect } from '../state/chat-atoms'
 import { gameIdAtom } from '../state/location-atoms'
 import {
   hasError,
@@ -39,7 +41,9 @@ export function Typewriter() {
   useAtomValue(proofResultEffect)
   useAtomValue(resetEditingStepEffect)
   useAtomValue(restartInstanceEffect)
+  useAtomValue(resetSelectedStepEffect)
   useLeanKeepalive()
+  useScrollToSelectedStep(scrollRef)
 
   const checkStatus =
     check.error instanceof HttpError ? check.error.status : undefined

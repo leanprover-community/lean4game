@@ -20,6 +20,8 @@ Statement (h : x = 2) (g: y = 4) : x + x = y := by
     rw [h]
   rw [h]
   Hint "You should use `{g}` now."
+  Hint (hidden := true) "Hidden Hint 1"
+  Hint (hidden := true) "Hidden Hint 2"
   rw [g]
 
 Conclusion "This last message appears if the level is solved."

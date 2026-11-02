@@ -91,6 +91,9 @@ export const de: DeepPartialTranslation<typeof en> = {
     inventory: 'Inventar',
     worlds: 'Welten',
   },
+  chat: {
+    nextHint: 'Nächster Hinweis',
+  },
   typewriter: {
     execute: 'Ausführen',
     inputPlaceholder: 'Taktik eingeben',

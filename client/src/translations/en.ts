@@ -88,6 +88,9 @@ export const en = {
     inventory: 'Inventory',
     worlds: 'Worlds',
   },
+  chat: {
+    nextHint: 'Next hint',
+  },
   typewriter: {
     execute: 'Execute',
     inputPlaceholder: 'Enter a tactic',

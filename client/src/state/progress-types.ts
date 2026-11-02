@@ -8,7 +8,7 @@ export interface LevelProgress {
   code: string
   selections: Selection[]
   completed: boolean
-  help: number[] // A set of rows where hidden hints have been displayed
+  help: number[] // The proof step of each revealed hidden hint, see `helpAtom`
 }
 
 export interface WorldProgress {

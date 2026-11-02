@@ -1,6 +1,8 @@
 import { atom } from 'jotai'
+import { atomEffect } from 'jotai-effect'
 
 import type { ApiHint } from '../api'
+import { levelIdAtom, worldIdAtom } from './location-atoms'
 import { levelProgressAtom, progressAtom } from './progress-atoms'
 
 /** User read the game introduction. Only relevant on mobile */
@@ -17,15 +19,25 @@ export const readGameIntroAtom = atom(
   },
 )
 
+/**
+ * The number of revealed hidden hints by proof step. They are stored as a list of
+ * steps, one entry per revealed hint. Setting a step reveals its next hidden hint.
+ */
 export const helpAtom = atom(
   get => {
-    const levelProgress = get(levelProgressAtom)
-    return new Set(levelProgress?.help ?? [])
+    const counts = new Map<number, number>()
+    for (const step of get(levelProgressAtom)?.help ?? []) {
+      counts.set(step, (counts.get(step) ?? 0) + 1)
+    }
+    return counts
   },
-  (get, set, val: Set<number>) => {
+  (get, set, step: number) => {
     const levelProgress = get(levelProgressAtom)
     if (levelProgress == null) return
-    set(levelProgressAtom, { ...levelProgress, help: [...val] })
+    set(levelProgressAtom, {
+      ...levelProgress,
+      help: [...levelProgress.help, step],
+    })
   },
 )
 
@@ -35,5 +47,12 @@ export const helpAtom = atom(
  */
 export const deletedChatAtom = atom<ApiHint[]>([])
 
-/** Context to keep highlight selected proof step and corresponding chat messages. */
+/** The selected proof step, highlighted with its chat messages, see `useStepSelection` */
 export const selectedStepAtom = atom<number>()
+
+/** Clears the selection when going to another level */
+export const resetSelectedStepEffect = atomEffect((get, set) => {
+  get(worldIdAtom)
+  get(levelIdAtom)
+  set(selectedStepAtom, undefined)
+})

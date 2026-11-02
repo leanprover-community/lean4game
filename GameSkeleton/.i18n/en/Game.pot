@@ -61,6 +61,14 @@ msgid "Here you can put additional information about the game. It is accessible\
 "Use **markdown**."
 msgstr ""
 
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:23
+msgid "Hidden Hint 1"
+msgstr ""
+
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:24
+msgid "Hidden Hint 2"
+msgstr ""
+
 #: Game/Levels/HelloWorld/L02_HypothesisNames.lean:6
 msgid "Hypothesis Names"
 msgstr ""
@@ -95,7 +103,7 @@ msgstr ""
 msgid "This is the introduction text of the game."
 msgstr ""
 
-#: Game/Levels/HelloWorld/L01_HelloWorld.lean:25
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:28
 msgid "This last message appears if the level is solved."
 msgstr ""
 
