@@ -2,6 +2,9 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import {
   faAnglesLeft,
   faAnglesRight,
+  faBook,
+  faBookOpen,
+  faMessage,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -21,6 +24,12 @@ import { leftPanelOpenAtom, rightPanelOpenAtom } from '../state/layout-atoms'
 import { mobileAtom } from '../state/preferences-atoms'
 
 type Side = 'left' | 'right'
+
+/** The icon of the content of each side panel: the chat and the inventory */
+const panelIcons: Record<Side, (open: boolean) => IconDefinition> = {
+  left: () => faMessage,
+  right: open => (open ? faBookOpen : faBook),
+}
 
 type PanelLayoutProps = {
   left: ReactNode
@@ -232,14 +241,23 @@ function PanelBody({ children }: { children: ReactNode }) {
   return <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
 }
 
+/**
+ * Opens or closes the side panel `panel`, placed on `side` of the top bar. Shows the
+ * `icon` and the icon of the panel's content, which is after the icon if `iconAfter`,
+ * i.e. on the back side of the arrow.
+ */
 function ToggleButton({
   side,
+  panel,
   icon,
+  iconAfter,
   label,
   state: { open, setOpen, id },
 }: {
   side: Side
+  panel: Side
   icon: IconDefinition
+  iconAfter: boolean
   label: string
   state: ReturnType<typeof useSidePanel>
 }) {
@@ -247,9 +265,10 @@ function ToggleButton({
     <button
       type="button"
       className={twMerge(
-        'flex size-8 shrink-0 cursor-pointer items-center justify-center rounded',
-        'hover:bg-primary/15',
+        'flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded',
+        'px-2 hover:bg-primary/15',
         side === 'left' ? 'order-first' : 'order-last',
+        iconAfter && 'flex-row-reverse',
       )}
       title={label}
       aria-label={label}
@@ -257,6 +276,7 @@ function ToggleButton({
       aria-controls={id}
       onClick={() => setOpen(!open)}
     >
+      <FontAwesomeIcon icon={panelIcons[panel](open)} />
       <FontAwesomeIcon icon={icon} />
     </button>
   )
@@ -276,7 +296,9 @@ function OpenButton({
   return (
     <ToggleButton
       side={side}
+      panel={side}
       icon={side === 'left' ? faAnglesRight : faAnglesLeft}
+      iconAfter={side === 'right'}
       label={title ? t('layout.openPanel', { title }) : ''}
       state={state}
     />
@@ -299,7 +321,9 @@ function CloseButton({
   return (
     <ToggleButton
       side={side === 'left' ? 'right' : 'left'}
+      panel={side}
       icon={mobile ? faXmark : side === 'left' ? faAnglesLeft : faAnglesRight}
+      iconAfter={side === 'left'}
       label={title ? t('layout.closePanel', { title }) : ''}
       state={state}
     />
