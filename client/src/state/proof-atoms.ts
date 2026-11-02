@@ -48,6 +48,19 @@ export const tacticsAtom = atom(get =>
     .filter(line => line.trim().length > 0),
 )
 
+/** Keep track of all opened Lean instances to close them when
+ * the page is closed
+ */
+const startedInstances = new Set<string>()
+
+// stop Lean instance when the page is closed
+window.addEventListener('pagehide', () => {
+  for (const id of startedInstances) {
+    navigator.sendBeacon(`/api/lean/instances/${id}/stop`)
+  }
+  startedInstances.clear()
+})
+
 /**
  * The Lean instance of the current game on the server. It is started once per game and
  * kept alive by `useLeanKeepalive`; refetch the query to start a new one.
@@ -56,10 +69,13 @@ export const leanInstanceAtom = atomWithQuery<{ id: string }>(get => {
   const gameId = get(gameIdAtom)
   return {
     queryKey: ['leanInstance', gameId],
-    queryFn: () =>
-      postJson<{ id: string }>(
+    queryFn: async () => {
+      const instance = await postJson<{ id: string }>(
         `/api/lean/start/${gameId!.replace(/^g\//, '')}`,
-      ),
+      )
+      startedInstances.add(instance.id)
+      return instance
+    },
     enabled: gameId !== undefined,
     staleTime: Infinity,
     gcTime: Infinity,
