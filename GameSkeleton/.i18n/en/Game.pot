@@ -1,7 +1,7 @@
 msgid ""
 msgstr "Project-Id-Version: Game v4.35.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28\n"
+"POT-Creation-Date: 2026-11-02\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
@@ -86,6 +86,10 @@ msgstr ""
 msgid "Non-Prop-Valued"
 msgstr ""
 
+#: Game/Doc/Theorems.lean:6
+msgid "Proven in level 1"
+msgstr ""
+
 #: Game/Doc/Tactics.lean:3
 msgid "The way to proof reflexivity."
 msgstr ""
@@ -103,7 +107,7 @@ msgstr ""
 msgid "This is the introduction text of the game."
 msgstr ""
 
-#: Game/Levels/HelloWorld/L01_HelloWorld.lean:28
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:27
 msgid "This last message appears if the level is solved."
 msgstr ""
 

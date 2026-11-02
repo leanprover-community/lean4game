@@ -11,7 +11,7 @@ depending on the proof a user provides. There can be $\\textbf{LaTeX}$"
 
 variable (x y : Nat)
 
-Statement (h : x = 2) (g: y = 4) : x + x = y := by
+Statement MyLevel1 (h : x = 2) (g: y = 4) : x + x = y := by
   Hint "You can either start \
         using `{h}` or `{g}`."
   Branch

@@ -96,11 +96,11 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
     | none =>
       let docstring ← match (← getDocstring env name type) with
       | some ds =>
-        logInfoAt ref (m!"Missing {type} Documentation. Using existing docstring. " ++
-        m!"Add {name}\nAdd `{type}Doc {name}` somewhere above this statement.")
+        logInfoAt ref (m!"Missing {type} documentation. Using existing docstring. " ++
+        m!"Add {name}\nAdd `{(toString type).capitalize}Doc {name}` somewhere above this statement.")
         pure s!"*(lean docstring)*\\\n{ds}"
       | none =>
-        logWarningAt ref (m!"Missing {type} Documentation: {name}\nAdd `{type}Doc {name}` " ++
+        logWarningAt ref (m!"Missing {type} documentation: {name}\nAdd `{(toString type).capitalize}Doc {name}` " ++
         m!"somewhere above this statement.")
         pure "(missing)"
 
@@ -117,9 +117,9 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
         name := name
         category := if type == .Theorem then s!"{n.getPrefix}" else "📖︎"
         content := s })
-      logInfoAt ref (m!"Missing {type} Documentation: {name}, used default (e.g. provided " ++
+      logInfoAt ref (m!"Missing {type} documentation: {name}, used default (e.g. provided " ++
         m!"docstring) instead. If you want to write a different description, add " ++
-        m!"`{type}Doc {name}` somewhere above this statement.")
+        m!"`{(toString type).capitalize}Doc {name}` somewhere above this statement.")
 
 partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : CommandElabM UsedInventory := do
   match stx with
