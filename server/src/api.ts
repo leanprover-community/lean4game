@@ -165,11 +165,11 @@ export interface ApiLevelData {
   conclusion: null | string
   index: number
   tactics: ApiInventoryTile[]
-  lemmas: ApiInventoryTile[]
+  theorems: ApiInventoryTile[]
   definitions: ApiInventoryTile[]
   descrText: null | string
   descrFormat: null | string
-  lemmaTab: null | string
+  theoremTab: null | string
   statementName: null | string
   displayName: null | string
   template: null | string
@@ -179,9 +179,9 @@ export interface ApiLevelData {
 /** The inventory shown on a game's welcome page, see `/api/data/:owner/:game/inventory` */
 export interface ApiInventoryOverview {
   tactics: ApiInventoryTile[]
-  lemmas: ApiInventoryTile[]
+  theorems: ApiInventoryTile[]
   definitions: ApiInventoryTile[]
-  lemmaTab: null | string
+  theoremTab: null | string
 }
 
 /** Documentation of a tactic, theorem or definition, see `/api/data/:owner/:game/doc/:kind/:name` */

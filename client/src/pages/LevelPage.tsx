@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { LevelChat } from '../Chat/Chat'
 import { PanelLayout } from '../components/PanelLayout'
+import { Inventory } from '../Inventory/Inventory'
 import { completedAtom } from '../state/progress-atoms'
 import { Typewriter } from '../Typewriter/Typewriter'
 
@@ -35,7 +36,7 @@ export function LevelPage() {
       }
       left={<LevelChat />}
       center={<Typewriter />}
-      right={null}
+      right={<Inventory />}
     />
   )
 }

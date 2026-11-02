@@ -35,23 +35,20 @@ function docKind(tab: InventoryTab) {
   return tab.charAt(0).toUpperCase() + tab.slice(1)
 }
 
-/**
- * The documentation of a tactic, theorem or definition.
- * Older games call theorems "lemmas", so these are tried as a fallback.
- */
+/** The documentation of a tactic, theorem or definition */
 export const docAtomFamily = atomFamily(
   ([tab, name]: [InventoryTab, string]) =>
     atomWithQuery<ApiDoc>(get => {
       const gameId = get(gameIdAtom)
-      const url = (kind: string) =>
-        gameDataUrl(gameId!, `doc/${kind}/${encodeURIComponent(name)}`)
       return {
         queryKey: ['doc', gameId, tab, name],
         queryFn: () =>
-          fetchJson<ApiDoc>(url(docKind(tab))).catch((error: unknown) => {
-            if (tab !== InventoryTab.theorem) throw error
-            return fetchJson<ApiDoc>(url('Lemma'))
-          }),
+          fetchJson<ApiDoc>(
+            gameDataUrl(
+              gameId!,
+              `doc/${docKind(tab)}/${encodeURIComponent(name)}`,
+            ),
+          ),
         enabled: gameId !== undefined,
       }
     }),
@@ -119,7 +116,7 @@ export const inventoryTilesAtom: Atom<
 > = atom(get => {
   const data = get(inventoryDataAtom)
   return {
-    [InventoryTab.theorem]: data?.lemmas ?? [],
+    [InventoryTab.theorem]: data?.theorems ?? [],
     [InventoryTab.tactic]: data?.tactics ?? [],
     [InventoryTab.definition]: data?.definitions ?? [],
   }
@@ -181,9 +178,9 @@ export const inventorySubtabAtom = atom(
     const tab = get(inventoryTabAtom)
     const options = get(inventorySubtabOptionsAtom)
     const subtab = get(inventorySubtabAtoms[tab])
-    const lemmaTab =
-      tab === InventoryTab.theorem ? get(inventoryDataAtom)?.lemmaTab : null
-    return subtab ?? lemmaTab ?? options[0]
+    const data = get(inventoryDataAtom)
+    const theoremTab = tab === InventoryTab.theorem ? data?.theoremTab : null
+    return subtab ?? theoremTab ?? options[0]
   },
   (get, set, val: string) => {
     const tab = get(inventoryTabAtom)

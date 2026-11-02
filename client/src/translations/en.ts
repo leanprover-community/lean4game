@@ -91,6 +91,19 @@ export const en = {
   chat: {
     nextHint: 'Next hint',
   },
+  inventory: {
+    theorems: 'Theorems',
+    tactics: 'Tactics',
+    definitions: 'Definitions',
+    notUnlocked: 'Not unlocked yet',
+    notAvailable: 'Not available in this level',
+    insert: "Insert '{{name}}'",
+    close: 'Close',
+    unlock: 'Unlock this item!',
+    furtherDetails: 'Further details',
+    provenIn: 'Proven in:',
+    worldLevel: '{{world}} level {{level}}',
+  },
   typewriter: {
     execute: 'Execute',
     inputPlaceholder: 'Enter a tactic',

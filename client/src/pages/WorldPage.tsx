@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { WorldChat } from '../Chat/Chat'
 import { PanelLayout } from '../components/PanelLayout'
 import { WorldImage } from '../components/WorldImage'
+import { Inventory } from '../Inventory/Inventory'
 
-/** A world of a game at `/owner/repo/world`. TODO: the inventory is still empty */
+/** A world of a game at `/owner/repo/world`. */
 export function WorldPage() {
   const { t } = useTranslation()
   return (
@@ -17,7 +18,7 @@ export function WorldPage() {
           <WorldImage />
         </div>
       }
-      right={null}
+      right={<Inventory />}
     />
   )
 }

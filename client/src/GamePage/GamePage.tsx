@@ -2,9 +2,10 @@ import { useTranslation } from 'react-i18next'
 
 import { GameChat } from '../Chat/Chat'
 import { PanelLayout } from '../components/PanelLayout'
+import { Inventory } from '../Inventory/Inventory'
 import { WorldTree } from './WorldTree'
 
-/** The overview of a game at `/g/owner/repo`, with its world tree. TODO: the inventory is still empty */
+/** The overview of a game at `/g/owner/repo`, with its world tree. */
 export function GamePage() {
   const { t } = useTranslation()
   return (
@@ -13,7 +14,7 @@ export function GamePage() {
       rightTitle={t('game.inventory')}
       left={<GameChat />}
       center={<WorldTree />}
-      right={null}
+      right={<Inventory />}
     />
   )
 }

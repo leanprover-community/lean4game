@@ -94,6 +94,19 @@ export const de: DeepPartialTranslation<typeof en> = {
   chat: {
     nextHint: 'Nächster Hinweis',
   },
+  inventory: {
+    theorems: 'Theoreme',
+    tactics: 'Taktiken',
+    definitions: 'Definitionen',
+    notUnlocked: 'Noch nicht freigeschaltet',
+    notAvailable: 'In diesem Level nicht verfügbar',
+    insert: "'{{name}}' einfügen",
+    close: 'Schließen',
+    unlock: 'Freischalten!',
+    furtherDetails: 'Weitere Details',
+    provenIn: 'Bewiesen in:',
+    worldLevel: '{{world}} Level {{level}}',
+  },
   typewriter: {
     execute: 'Ausführen',
     inputPlaceholder: 'Taktik eingeben',
