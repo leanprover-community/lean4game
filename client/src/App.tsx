@@ -3,6 +3,7 @@ import { useAtomValue } from 'jotai'
 
 import { NotFound } from './ErrorPage/NotFound'
 import { GamePage } from './GamePage/GamePage'
+import { useDocumentTitle } from './hooks/useDocumentTitle'
 import { useLanguageInUrl } from './hooks/useLanguageInUrl'
 import { useTheme } from './hooks/useTheme'
 import { LandingPage } from './LandingPage/LandingPage'
@@ -21,6 +22,7 @@ export function App() {
   useAtomValue(canonicalGamePathEffect)
   useAtomValue(lastPageEffect)
   useTheme()
+  useDocumentTitle()
   return (
     <>
       <AppBar />
