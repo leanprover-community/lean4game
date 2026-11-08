@@ -151,7 +151,7 @@ export const uk: DeepPartialTranslation<typeof en> = {
     development: {
       title: 'Розробка',
       description:
-        'Ігровий рушій розробили <strong>Александер Бенткамп</strong> і <strong>Йон Ойгстер</strong> під керівництвом <strong>Маркуса Цібровіуса</strong>. Вихідний код цього ігрового рушія на базі Lean <githubLink>доступний на GitHub</githubLink>. Якщо ви зіткнетеся з будь-якими проблемами, будь ласка, створіть <issueLink>запит (Issue) на GitHub</issueLink> або зв’яжіться з нами безпосередньо.',
+        'Ігровий рушій розробили <strong>Александер Бенткамп</strong> і <strong>Йон Ойґстер</strong> під керівництвом <strong>Маркуса Цібровіуса</strong>. Вихідний код цього ігрового рушія на базі Lean <githubLink>доступний на GitHub</githubLink>. Якщо ви зіткнетеся з будь-якими проблемами, будь ласка, створіть <issueLink>запит (Issue) на GitHub</issueLink> або зв’яжіться з нами безпосередньо.',
     },
     funding: {
       title: 'Фінансування',

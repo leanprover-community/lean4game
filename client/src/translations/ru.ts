@@ -151,7 +151,7 @@ export const ru: DeepPartialTranslation<typeof en> = {
     development: {
       title: 'Разработка',
       description:
-        'Игровой движок создан <strong>Александром Бенткампом</strong> и <strong>Йоном Ойгстером</strong> под руководством <strong>Маркуса Цибровиуса</strong>. Исходный код этого игрового движка Lean <githubLink>доступен на GitHub</githubLink>. Если у вас возникнут какие-либо проблемы, создайте <issueLink>issue на GitHub</issueLink> или свяжитесь с нами напрямую.',
+        'Игровой движок создан <strong>Александром Бенткампом</strong> и <strong>Йон Ойґстер</strong> под руководством <strong>Маркуса Цибровиуса</strong>. Исходный код этого игрового движка Lean <githubLink>доступен на GitHub</githubLink>. Если у вас возникнут какие-либо проблемы, создайте <issueLink>issue на GitHub</issueLink> или свяжитесь с нами напрямую.',
     },
     funding: {
       title: 'Финансирование',
