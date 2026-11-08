@@ -22,7 +22,7 @@ Use **markdown**.
 
 Languages "en"
 CaptionShort "A small template game."
-CaptionLong "You should use this game as a template for your own game and add your own levels."
+CaptionLong "You should use this game as a template for your own game and add your own levels. `lean`"
 -- Prerequisites "NNG4" -- add this if your game builds on other games
 CoverImage "images/cover.png"
 

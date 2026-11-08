@@ -81,7 +81,8 @@ async function checkProofAux(
   const originalContent = await fs.readFile(sourcePath, 'utf-8')
 
   const tacticBlock = tactics.map(tactic => '  ' + tactic).join('\n')
-  const inventoryFormatted = '[' + inventory.join('\n') + ']'
+  const inventoryFormatted =
+    '[' + inventory.map(name => JSON.stringify(name)).join(', ') + ']'
   const header =
     'import GameServer\n' +
     `${originalContent}\n\n` +

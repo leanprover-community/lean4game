@@ -1,7 +1,7 @@
 msgid ""
 msgstr "Project-Id-Version: Game v4.35.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02\n"
+"POT-Creation-Date: 2026-11-08\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
@@ -140,8 +140,9 @@ msgstr ""
 msgid "You can either start using §0 or §1."
 msgstr ""
 
+#. §0: `lean`
 #: Game.lean:25
-msgid "You should use this game as a template for your own game and add your own levels."
+msgid "You should use this game as a template for your own game and add your own levels. §0"
 msgstr ""
 
 #. §0: `«{g}»`
