@@ -68,7 +68,7 @@ export const uk: DeepPartialTranslation<typeof en> = {
     language: 'Мова',
     languageNote:
       'Якщо гра не існує вибраною мовою, це налаштування не діє і використовується мова гри за замовчуванням.',
-    useFlags: 'Використовувати прапорці країни для представлення мов',
+    useFlags: 'Використовувати прапори країн для представлення мов',
     layout: 'Макет',
     layouts: {
       mobile: 'Мобільний',
@@ -83,7 +83,7 @@ export const uk: DeepPartialTranslation<typeof en> = {
       dark: 'Темна',
     },
     browserStorage: 'Браузерне сховище',
-    savePreferences: 'Зберегти мої налаштування (в сховищі браузера)',
+    savePreferences: 'Зберегти мої налаштування (у сховищі браузера)',
   },
   layout: {
     openPanel: 'Відкрити: {{title}}',
@@ -151,12 +151,12 @@ export const uk: DeepPartialTranslation<typeof en> = {
     development: {
       title: 'Розробка',
       description:
-        'Ігровий рушій розробили <strong>Александр Бенткамп</strong> і <strong>Джон Югстер</strong> під керівництвом <strong>Маркуса Цібровіуса</strong>. Вихідний код цього ігрового рушія на базі Lean <githubLink>доступний на GitHub</githubLink>. Якщо ви зіткнетеся з будь-якими проблемами, будь ласка, створіть <issueLink>запит (Issue) на GitHub</issueLink> або зв’яжіться з нами безпосередньо.',
+        'Ігровий рушій розробили <strong>Александер Бенткамп</strong> і <strong>Йон Ойгстер</strong> під керівництвом <strong>Маркуса Цібровіуса</strong>. Вихідний код цього ігрового рушія на базі Lean <githubLink>доступний на GitHub</githubLink>. Якщо ви зіткнетеся з будь-якими проблемами, будь ласка, створіть <issueLink>запит (Issue) на GitHub</issueLink> або зв’яжіться з нами безпосередньо.',
     },
     funding: {
       title: 'Фінансування',
       description:
-        'Цей сервер хоститься в Heinrich Heine University Düsseldorf. Програмне забезпечення lean4game було розроблено як частина проекту <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, профінансованого програмою <i>Freiraum 2022</i> від <i>Stiftung Innovation in der Hochschullehre</i>. Поточна підтримка та розробка щедро підтримуються <i>Renaissance Philanthropy</i> через <i>AI for Math Fund</i>.',
+        'Цей сервер розміщено в Heinrich Heine University Düsseldorf. Програмне забезпечення lean4game було розроблено як частина проєкту <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, профінансованого програмою <i>Freiraum 2022</i> від <i>Stiftung Innovation in der Hochschullehre</i>. Поточна підтримка та розробка щедро підтримуються <i>Renaissance Philanthropy</i> через <i>AI for Math Fund</i>.',
     },
   },
   progress: {
@@ -183,9 +183,9 @@ export const uk: DeepPartialTranslation<typeof en> = {
     locked: 'заблоковано',
     unlocked: 'розблоковано',
     none: 'без правил',
-    relaxed: 'розслаблений',
+    relaxed: 'послаблений',
     regular: 'звичайний',
-    help: '<p>Правила гри визначають, чи можна пропускати рівні та чи перевіряються ігри, щоб дозволити лише розблоковані тактики та теореми в доказах.</p><p>Примітка. "Розблоковані" тактики (або теореми) визначаються двома речами: набором мінімальних тактик, необхідних для вирішення рівня, плюс будь-які тактики, які ви розблокували на іншому рівні. Це означає, що якщо ви розблокуєте <code>simp</code> на рівні, ви зможете використовувати його на будь-якому рівні.</p>',
+    help: '<p>Правила гри визначають, чи можна пропускати рівні та чи перевіряються ігри, щоб дозволити лише розблоковані тактики та теореми в доказах.</p><p>Примітка. "Розблоковані" тактики (або теореми) визначаються двома речами: набором мінімальних тактик, необхідних для проходження рівня, плюс будь-які тактики, які ви розблокували на іншому рівні. Це означає, що якщо ви розблокуєте <code>simp</code> на рівні, ви зможете використовувати його на будь-якому рівні.</p>',
   },
   landing: {
     title: 'Ігровий сервер Lean',
@@ -228,7 +228,7 @@ export const uk: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Фінансування',
       description:
-        'Цей сервер хоститься в Heinrich Heine University Düsseldorf. Програмне забезпечення lean4game було розроблено як частина проекту <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, профінансованого програмою <i>Freiraum 2022</i> від <i>Stiftung Innovation in der Hochschullehre</i>. Поточна підтримка та розробка щедро підтримуються <i>Renaissance Philanthropy</i> через <i>AI for Math Fund</i>.',
+        'Цей сервер розміщено в Heinrich Heine University Düsseldorf. Програмне забезпечення lean4game було розроблено як частина проєкту <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, профінансованого програмою <i>Freiraum 2022</i> від <i>Stiftung Innovation in der Hochschullehre</i>. Поточна підтримка та розробка щедро підтримуються <i>Renaissance Philanthropy</i> через <i>AI for Math Fund</i>.',
     },
   },
 } as const
