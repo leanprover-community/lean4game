@@ -1,16 +1,16 @@
 export const en = {
-  helloWorld: 'Hello World',
   errorPage: {
     title: 'Oops!',
     description: 'Something unexpected happened:',
-    createIssue: 'Please create an issue at the <issueLink/>.',
+    createIssue:
+      'Please create an issue at the <issueLink>GitHub repository</issueLink>.',
   },
   notFound: {
     title: 'This page could not be found',
     description:
       '<code>(404)</code> page <code>{{pathname}}</code> seems not to exist.',
     createIssue:
-      'If you believe it should, please create an issue at the <issueLink/>.',
+      'If you believe it should, please create an issue at the <issueLink>GitHub repository</issueLink>.',
   },
   legal: {
     englishBelow: '(English version below)',
@@ -40,13 +40,9 @@ export const en = {
     backToWorld: 'Back to the world',
     start: 'Start',
     home: 'Home',
-    previous: 'Previous',
     previousLevel: 'Previous level',
     next: 'Next',
     nextLevel: 'Next level',
-    editorMode: 'Editor mode',
-    typewriterMode: 'Typewriter mode',
-    showInventory: 'Show inventory',
     gameInfo: 'Game Info',
     gameInfoTitle: 'Game Info & Credits',
     download: 'Download',
@@ -87,7 +83,6 @@ export const en = {
     conclusion: 'Conclusion',
     chat: 'Chat',
     inventory: 'Inventory',
-    worlds: 'Worlds',
   },
   chat: {
     nextHint: 'Next hint',
@@ -171,7 +166,6 @@ export const en = {
     load: 'Load selected file',
   },
   rules: {
-    rules: 'Rules',
     gameRules: 'Game Rules',
     levels: 'levels',
     tactics: 'tactics',

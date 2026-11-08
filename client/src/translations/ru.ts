@@ -2,10 +2,25 @@ import type { DeepPartialTranslation } from '../utils/DeepPartialTranslation'
 import type { en } from './en'
 
 export const ru: DeepPartialTranslation<typeof en> = {
+  errorPage: {
+    title: 'Ой!',
+    description: 'Произошло что-то непредвиденное:',
+    createIssue:
+      'Пожалуйста, создайте issue в <issueLink>репозитории GitHub</issueLink>.',
+  },
+  notFound: {
+    title: 'Эта страница не найдена',
+    description:
+      '<code>(404)</code> Страница <code>{{pathname}}</code>, похоже, не существует.',
+    createIssue:
+      'Если вы считаете, что она должна существовать, создайте issue в <issueLink>репозитории GitHub</issueLink>.',
+  },
   legal: {
+    englishBelow: '(Английская версия ниже)',
     contact: 'Контакты:',
     contactDetails: 'Контактные данные',
     technicalContact: 'Технический контакт',
+    loadError: 'Не удалось загрузить контактную информацию.',
   },
   impressum: {
     title: 'Юридическая информация',
@@ -19,18 +34,18 @@ export const ru: DeepPartialTranslation<typeof en> = {
       'Наш сервер собирает метаданные (например, IP-адрес, браузер, операционную систему), а также данные, которые пользователь вводит в редакторе. Эти данные используются для вычисления результата работы Lean и отображения его пользователю. Информация хранится, пока пользователь находится на нашем сайте, и удаляется сразу после этого. Мы ведём журналы для улучшения нашего программного обеспечения, однако содержащиеся в них данные обезличены.',
     browserStorage:
       'Мы не используем файлы cookie, однако ваш игровой прогресс сохраняется в браузере в виде данных сайта. Игровой прогресс не сохраняется на сервере; если вы очистите хранилище браузера, он будет полностью утерян.',
+    serverLocation: 'Расположение нашего сервера: {{location}}.',
   },
   appBar: {
     backToLanding: 'Вернуться к выбору игр',
+    back: 'Назад',
+    backToGame: 'Вернуться к обзору игры',
+    backToWorld: 'Вернуться к миру',
     start: 'Начать',
     home: 'Главная',
-    previous: 'Назад',
     previousLevel: 'Предыдущий уровень',
     next: 'Далее',
     nextLevel: 'Следующий уровень',
-    editorMode: 'Режим редактора',
-    typewriterMode: 'Режим печатной машинки',
-    showInventory: 'Показать инвентарь',
     gameInfo: 'Информация об игре',
     gameInfoTitle: 'Информация об игре и авторах',
     download: 'Скачать',
@@ -61,16 +76,27 @@ export const ru: DeepPartialTranslation<typeof en> = {
       desktop: 'Компьютер',
     },
     showLockedInventory: 'Показывать заблокированные элементы инвентаря',
+    theme: 'Тема',
+    themes: {
+      light: 'Светлая',
+      auto: 'Авто',
+      dark: 'Тёмная',
+    },
     browserStorage: 'Хранилище браузера',
     savePreferences: 'Сохранять мои настройки (в хранилище браузера)',
   },
+  layout: {
+    openPanel: 'Открыть: {{title}}',
+    closePanel: 'Закрыть: {{title}}',
+  },
   game: {
     introduction: 'Введение',
+    conclusion: 'Заключение',
+    chat: 'Чат',
     inventory: 'Инвентарь',
-    worlds: 'Миры',
   },
   chat: {
-    nextHint: 'Показать дополнительные подсказки!',
+    nextHint: 'Следующая подсказка',
   },
   inventory: {
     theorems: 'Теоремы',
@@ -78,19 +104,38 @@ export const ru: DeepPartialTranslation<typeof en> = {
     definitions: 'Определения',
     notUnlocked: 'Ещё не разблокировано',
     notAvailable: 'Недоступно на этом уровне',
+    insert: "Вставить '{{name}}'",
+    close: 'Закрыть',
     unlock: 'Разблокировать этот элемент!',
+    furtherDetails: 'Подробнее',
+    provenIn: 'Доказано в:',
+    introducedIn: 'Введено в:',
+    mathlibDoc: 'Документация Mathlib',
+    worldLevel: '{{world}}, уровень {{level}}',
   },
   typewriter: {
     execute: 'Выполнить',
+    inputPlaceholder: 'Введите тактику',
     retry: 'Повторить',
     retryTitle: 'Повторить доказательство отсюда',
+    cancelEdit: 'Отменить редактирование',
     failedCommand: 'Ошибка при выполнении команды',
     activeGoal: 'Активная цель',
+    goalN: 'Цель {{n}}',
     goal: 'Цель',
     objects: 'Объекты',
     assumptions: 'Предположения',
     theorem: 'Теорема',
     levelCompleted: 'Уровень пройден! 🎉',
+    levelSolved: 'Уровень уже был успешно пройден',
+    noGoalsLeft: 'целей не осталось',
+    noGoalsLeftDescription:
+      'Вероятно, это значит, что вы прошли уровень с предупреждениями или Lean столкнулся с ошибкой синтаксического анализа.',
+    startError: 'Не удалось запустить сервер Lean:',
+    checkError: 'Не удалось проверить доказательство:',
+  },
+  popup: {
+    close: 'Закрыть',
   },
   gameInfo: {
     progressSaving: {
@@ -128,13 +173,16 @@ export const ru: DeepPartialTranslation<typeof en> = {
     uploadTitle: 'Загрузить сохранённый прогресс',
     uploadDescription:
       '<p>Выберите файл JSON с сохранённым игровым прогрессом для его загрузки.</p><p><strong>Внимание:</strong> ваш текущий игровой прогресс будет удалён! Рекомендуем сначала <downloadLink>скачать файл с текущим прогрессом</downloadLink>!</p>',
+    selectFile: 'Файл прогресса',
+    invalidFile: 'Это недопустимый файл прогресса: {{error}}',
     load: 'Загрузить выбранный файл',
   },
   rules: {
-    rules: 'Правила',
     gameRules: 'Правила игры',
     levels: 'уровни',
     tactics: 'тактики',
+    locked: 'заблокировано',
+    unlocked: 'разблокировано',
     none: 'отключены',
     relaxed: 'свободные',
     regular: 'обычные',
@@ -144,15 +192,25 @@ export const ru: DeepPartialTranslation<typeof en> = {
     title: 'Игровой сервер Lean',
     subtitle:
       'Репозиторий обучающих игр для системы интерактивного доказательства теорем <leanLink>Lean</leanLink> <i>(Lean 4)</i> и её математической библиотеки <mathlibLink>mathlib</mathlibLink>',
+    games: {
+      loading: 'Загрузка игр…',
+      error: 'Не удалось загрузить игры.',
+      none: 'Нет доступных игр.',
+      noneDev:
+        'Локальные игры — это папки рядом с этим репозиторием, содержащие собранную игру, то есть файл `.lake/gamedata/game.json`.',
+    },
     tile: {
       prerequisites: 'Требования',
+      prerequisitesTitle: 'Рекомендуем сначала пройти эти игры.',
       worlds: 'Миры',
       levels: 'Уровни',
+      languages: 'Языки',
     },
     capacity: {
       title: 'Мощность сервера',
       description:
         'Поскольку этот сервер работает на наших университетских машинах, его мощность ограничена. По нашей оценке, он поддерживает около 50 одновременных игр с высокой производительностью и до 180 одновременных игр в более медленном темпе.',
+      players: 'Активные игроки: <strong>{{count}}</strong>',
       memory: 'RAM: <strong>{{value}} %</strong> использовано.',
       cpu: 'CPU: <strong>{{value}} %</strong> использовано.',
     },

@@ -2,18 +2,18 @@ import type { DeepPartialTranslation } from '../utils/DeepPartialTranslation'
 import type { en } from './en'
 
 export const de: DeepPartialTranslation<typeof en> = {
-  helloWorld: 'Hallo Welt',
   errorPage: {
     title: 'Oops!',
     description: 'Etwas Unerwartetes ist passiert:',
-    createIssue: 'Bitte erstelle ein Issue im <issueLink/>.',
+    createIssue:
+      'Bitte erstelle einen Issue im <issueLink>GitHub-Repository</issueLink>.',
   },
   notFound: {
     title: 'Diese Seite wurde nicht gefunden',
     description:
       '<code>(404)</code> Die Seite <code>{{pathname}}</code> scheint nicht zu existieren.',
     createIssue:
-      'Falls Du denkst, dass es sie geben sollte, erstelle bitte ein Issue im <issueLink/>.',
+      'Falls Du denkst, dass es sie geben sollte, erstelle bitte einen Issue im <issueLink>GitHub-Repository</issueLink>.',
   },
   legal: {
     englishBelow: '(Englische Version unten)',
@@ -43,13 +43,9 @@ export const de: DeepPartialTranslation<typeof en> = {
     backToWorld: 'Zurück zur Welt',
     start: 'Starten',
     home: 'Home',
-    previous: 'Zurück',
     previousLevel: 'Vorheriges Level',
     next: 'Weiter',
     nextLevel: 'Nächstes Level',
-    editorMode: 'Editor',
-    typewriterMode: 'Schreibmaschine',
-    showInventory: 'Inventar öffnen',
     gameInfo: 'Spielinfo',
     gameInfoTitle: 'Spielinfo & Credits',
     download: 'Herunterladen',
@@ -90,7 +86,6 @@ export const de: DeepPartialTranslation<typeof en> = {
     conclusion: 'Abschluss',
     chat: 'Chat',
     inventory: 'Inventar',
-    worlds: 'Welten',
   },
   chat: {
     nextHint: 'Nächster Hinweis',
@@ -174,7 +169,6 @@ export const de: DeepPartialTranslation<typeof en> = {
     load: 'Ausgewählte Datei hochladen',
   },
   rules: {
-    rules: 'Regeln',
     gameRules: 'Spielregeln',
     levels: 'Level',
     tactics: 'Taktiken',
