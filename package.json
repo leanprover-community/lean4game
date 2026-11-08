@@ -14,6 +14,7 @@
     "build": "concurrently -n client,server,lean -c green,blue,yellow \"npm run build:client\" \"npm run build:server\" \"npm run build:lean\"",
     "fmt:check": "oxfmt --check",
     "fmt": "oxfmt",
+    "i18n:check": "node client/scripts/check-translations.ts",
     "lint": "oxlint",
     "start:client": "npm --workspace client run dev",
     "start:server": "npm --workspace server run dev",

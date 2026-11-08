@@ -1,5 +1,13 @@
 # Scripts
 
+## Translation check
+
+`npm run i18n:check` compares the translations in `src/translations/` with `en.ts` and the code:
+
+- **Missing:** the number of keys each language has not translated yet. Use `npm run i18n:check -- es` to list them for one language. These do not fail the check.
+- **Superfluous:** keys in a language which are not in `en.ts`.
+- **Unused:** keys in `en.ts` which are never used.
+
 ## Python installation
 
 To run the scripts, you once need to set up a local python virtual environment `scripts/.python/` with the requirements from `scripts/requirements.txt`:

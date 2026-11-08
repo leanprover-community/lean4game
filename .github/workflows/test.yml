@@ -129,6 +129,10 @@ jobs:
         continue-on-error: true
         run: npm run fmt:check
 
+      - name: Check translations
+        continue-on-error: true
+        run: npm run i18n:check
+
   all:
     name: all
     needs: test

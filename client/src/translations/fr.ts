@@ -1,5 +1,5 @@
 import type { DeepPartialTranslation } from '../utils/DeepPartialTranslation'
-import { en } from './en'
+import type { en } from './en'
 
 export const fr: DeepPartialTranslation<typeof en> = {
   appBar: {

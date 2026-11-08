@@ -1,5 +1,5 @@
 import type { DeepPartialTranslation } from '../utils/DeepPartialTranslation'
-import { en } from './en'
+import type { en } from './en'
 
 export const zh: DeepPartialTranslation<typeof en> = {
   impressum: {
