@@ -130,8 +130,8 @@ function EditCommand({ step, index }: { step: ApiProofStep; index: number }) {
       value={text}
       onChange={setText}
       // closed once the result of the new proof arrives, see `proofResultEffect`
-      onSubmit={() => {
-        if (!replaceStep(index, text)) setEditingStep(null)
+      onSubmit={value => {
+        if (!replaceStep(index, value)) setEditingStep(null)
       }}
       onCancel={() => setEditingStep(null)}
       disabled={isFetching}

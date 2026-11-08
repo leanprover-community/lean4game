@@ -30,3 +30,10 @@ See the source repository https://github.com/hhu-adam/Robo-Images for more detai
 Further, some Lean snippets have been copied and modified from `lean4`, `batteries`, or `mathlib4` under Apache 2.0 licenses
 of these projects, which are included under `licenses/`. The files with reused code are marked and contain the relevant
 copyright information.
+
+## Credits
+
+Developed by: Alexander Bentkamp, Jon Eugster, Marcus Zibrowius
+
+- An early prototype by Patrick Massot inspired the first draft of this project
+- Parts of the unicode abbreviation feature were inspired by [@leanprover/unicode-input-component](https://www.npmjs.com/package/@leanprover/unicode-input-component).

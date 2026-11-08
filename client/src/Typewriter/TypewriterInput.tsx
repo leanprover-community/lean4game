@@ -44,7 +44,7 @@ export function TypewriterInput() {
       onChange={setInput}
       // the command stays until its result arrives, see `proofResultEffect`. An
       // unchanged proof is not checked again, the command just stays.
-      onSubmit={() => submitTactic(input)}
+      onSubmit={submitTactic}
       disabled={disabled}
       placeholder={t('typewriter.inputPlaceholder')}
       className="shrink-0"
