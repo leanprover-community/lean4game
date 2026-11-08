@@ -4,7 +4,7 @@ import Game.Levels.HelloWorld.L03_NonProp
 
 World "HelloWorld"
 Title "Hello World"
-Image "images/sample-bg.png"
+Image "images/cover.png"
 
 Conclusion "An optional world conclusion"
 
