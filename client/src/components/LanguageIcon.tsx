@@ -33,7 +33,8 @@ export function LanguageIcon({
   return (
     <span
       className={twMerge(
-        'inline-block w-6 text-center leading-none lowercase text-sm',
+        // longer codes like `pt-br` grow
+        'inline-block min-w-6 text-center leading-none lowercase text-sm',
         className,
       )}
       title={title}

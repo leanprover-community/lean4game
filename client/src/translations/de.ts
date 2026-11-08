@@ -148,7 +148,7 @@ export const de: DeepPartialTranslation<typeof en> = {
     development: {
       title: 'Entwicklung',
       description:
-        'Der Spieleserver wurde entwickelt von <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>. Basierend auf einem Prototyp von <strong>Patrick Massot</strong>. Der Sourcecode dieses Lean-Game-Engine ist <githubLink>auf Github verfügbar</githubLink>. Bei Problemen, bitte einen <issueLink>Github-Issue</issueLink> ausfüllen oder direkt mit uns Kontakt aufnehmen.',
+        'Der Spieleserver wurde entwickelt von <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>, unter der Leitung von <strong>Markus Zibrowius</strong>. Der Sourcecode dieses Lean-Game-Engine ist <githubLink>auf Github verfügbar</githubLink>. Bei Problemen, bitte einen <issueLink>Github-Issue</issueLink> ausfüllen oder direkt mit uns Kontakt aufnehmen.',
     },
     funding: {
       title: 'Finanzierung',

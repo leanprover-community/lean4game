@@ -6,6 +6,7 @@
     { "iso": "fr", "name": "Français", "flag": "FR" },
     { "iso": "it", "name": "Italiano", "flag": "IT" },
     { "iso": "ko", "name": "한국어", "flag": "KR" },
+    { "iso": "pt-BR", "name": "Português", "flag": "BR" },
     { "iso": "uk", "name": "Українська", "flag": "UA" },
     { "iso": "zh", "name": "中文", "flag": "CN" },
     { "iso": "ru", "name": "Русский" }

@@ -145,7 +145,7 @@ export const en = {
     development: {
       title: 'Development',
       description:
-        'The game engine has been created by <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>. On a prototype by <strong>Patrick Massot</strong>. The source code of this Lean game engine is <githubLink>available on Github</githubLink>. If you experience any problems, please file an <issueLink>Issue on Github</issueLink> or get directly in contact.',
+        'The game engine has been created by <strong>Alexander Bentkamp</strong>, <strong>Jon Eugster</strong>, under the lead of <strong>Markus Zibrowius</strong>. The source code of this Lean game engine is <githubLink>available on Github</githubLink>. If you experience any problems, please file an <issueLink>Issue on Github</issueLink> or get directly in contact.',
     },
     funding: {
       title: 'Funding',
