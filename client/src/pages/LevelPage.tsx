@@ -6,11 +6,13 @@ import { useTranslation } from 'react-i18next'
 import { LevelChat } from '../Chat/Chat'
 import { PanelLayout } from '../components/PanelLayout'
 import { Inventory } from '../Inventory/Inventory'
+import { mobileAtom } from '../state/preferences-atoms'
 import { completedAtom } from '../state/progress-atoms'
 import { Typewriter } from '../Typewriter/Typewriter'
 
 export function LevelPage() {
   const { t } = useTranslation()
+  const mobile = useAtomValue(mobileAtom)
   // stays once the level was solved, even if the proof is changed later
   const completed = useAtomValue(completedAtom)
   return (
@@ -34,7 +36,7 @@ export function LevelPage() {
           </span>
         )
       }
-      left={<LevelChat />}
+      left={mobile ? null : <LevelChat />}
       center={<Typewriter />}
       right={<Inventory />}
     />

@@ -36,6 +36,7 @@ const panelIcons: Record<Side, (open: boolean) => IconDefinition> = {
 }
 
 type PanelLayoutProps = {
+  /** the content of the side panels. With `null` the panel and its toggle are absent */
   left: ReactNode
   center: ReactNode
   right: ReactNode
@@ -76,25 +77,33 @@ function DesktopLayout({
   const rightPanel = useSidePanel('right')
   return (
     <Group orientation="horizontal" className="h-full">
-      <SidePanel side="left" title={leftTitle} state={leftPanel}>
-        {left}
-      </SidePanel>
-      <PanelSeparator />
+      {left != null && (
+        <>
+          <SidePanel side="left" title={leftTitle} state={leftPanel}>
+            {left}
+          </SidePanel>
+          <PanelSeparator />
+        </>
+      )}
       <Panel minSize="30%" className="flex-col">
         <TopBar title={centerTitle}>
-          {!leftPanel.open && (
+          {left != null && !leftPanel.open && (
             <OpenButton side="left" title={leftTitle} state={leftPanel} />
           )}
-          {!rightPanel.open && (
+          {right != null && !rightPanel.open && (
             <OpenButton side="right" title={rightTitle} state={rightPanel} />
           )}
         </TopBar>
         <PanelBody>{center}</PanelBody>
       </Panel>
-      <PanelSeparator />
-      <SidePanel side="right" title={rightTitle} state={rightPanel}>
-        {right}
-      </SidePanel>
+      {right != null && (
+        <>
+          <PanelSeparator />
+          <SidePanel side="right" title={rightTitle} state={rightPanel}>
+            {right}
+          </SidePanel>
+        </>
+      )}
     </Group>
   )
 }
@@ -188,8 +197,12 @@ function MobileLayout({
   return (
     <div className="relative flex-col h-full">
       <TopBar title={centerTitle}>
-        <OpenButton side="left" title={leftTitle} state={leftState} />
-        <OpenButton side="right" title={rightTitle} state={rightState} />
+        {left != null && (
+          <OpenButton side="left" title={leftTitle} state={leftState} />
+        )}
+        {right != null && (
+          <OpenButton side="right" title={rightTitle} state={rightState} />
+        )}
       </TopBar>
       <PanelBody>{center}</PanelBody>
       {[
@@ -207,6 +220,7 @@ function MobileLayout({
         },
       ].map(
         ({ side, title, state, body }) =>
+          body != null &&
           state.open && (
             <div
               key={side}

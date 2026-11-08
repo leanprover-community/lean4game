@@ -37,6 +37,6 @@ export default defineConfig({
     'unicorn/prefer-node-protocol': 'warn',
     'unicorn/numeric-separators-style': 'warn',
     'unicorn/catch-error-name': 'warn',
-    eqeqeq: 'warn',
+    eqeqeq: ['warn', 'smart'],
   },
 })
