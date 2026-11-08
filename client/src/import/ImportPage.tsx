@@ -1,3 +1,5 @@
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { type SubmitEvent, useEffect, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
@@ -46,8 +48,10 @@ export function ImportPage() {
   }
 
   const running = status?.state === 'running' && !statusError
-  const canStart =
-    owner.trim().length > 0 && repo.trim().length > 0 && !starting && !running
+  // the status of a new import has not arrived yet
+  const waitingForStatus = current !== null && !status && !statusError
+  const busy = starting || running || waitingForStatus
+  const canStart = owner.trim().length > 0 && repo.trim().length > 0 && !busy
 
   return (
     <div className="mx-auto flex-col w-full max-w-3xl gap-8 p-8 text-left">
@@ -72,9 +76,15 @@ export function ImportPage() {
         <NameInput
           label={t('import.owner')}
           value={owner}
+          disabled={busy}
           onChange={setOwner}
         />
-        <NameInput label={t('import.repo')} value={repo} onChange={setRepo} />
+        <NameInput
+          label={t('import.repo')}
+          value={repo}
+          disabled={busy}
+          onChange={setRepo}
+        />
         <Button type="submit" className="self-start" disabled={!canStart}>
           {t('import.start')}
         </Button>
@@ -90,7 +100,16 @@ export function ImportPage() {
         <Category title={t('import.messages')}>
           {status && (
             <>
-              <output>{t(`import.states.${status.state}`)}</output>
+              <output>
+                {t(`import.states.${status.state}`)}
+                {running && (
+                  <FontAwesomeIcon
+                    icon={faSpinner}
+                    spinPulse
+                    className="ml-2"
+                  />
+                )}
+              </output>
               {status.warnings.map(warning => (
                 <p
                   key={warning}
@@ -119,10 +138,12 @@ export function ImportPage() {
 function NameInput({
   label,
   value,
+  disabled,
   onChange,
 }: {
   label: string
   value: string
+  disabled: boolean
   onChange: (value: string) => void
 }) {
   return (
@@ -135,9 +156,10 @@ function NameInput({
         spellCheck={false}
         className={twMerge(
           'w-72 max-w-full rounded border border-(--border) bg-(--bg) px-3 py-2',
-          'text-(--text-h)',
+          'text-(--text-h) disabled:cursor-default disabled:opacity-50',
         )}
         value={value}
+        disabled={disabled}
         onChange={ev => onChange(ev.target.value)}
       />
     </label>
