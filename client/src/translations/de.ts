@@ -77,6 +77,29 @@ export const de: DeepPartialTranslation<typeof en> = {
     browserStorage: 'Browserspeicher',
     savePreferences: 'Einstellungen im Browser speichern',
   },
+  import: {
+    title: 'Spiel importieren',
+    description:
+      'Ein Spiel muss als öffentliches Github-Repo veröffentlicht sein und einen \
+      CI Workflow haben, welcher das Spiel baut und als Artifakt speichert. \
+      Das Spiel sollte den aktuellen Workflow von <skeletonLink>GameSkeleton</skeletonLink> \
+      kopieren.',
+    owner: 'Github Nutzer',
+    repo: 'Repository',
+    start: 'Import starten',
+    messages: 'Meldungen des Servers',
+    states: {
+      running: 'Wird importiert…',
+      done: 'Der Import ist abgeschlossen.',
+      failed: 'Der Import ist fehlgeschlagen.',
+    },
+    invalidName: 'Dies ist kein gültiger Besitzer- oder Repository-Name.',
+    rateLimited:
+      'Dieses Spiel wurde zu oft importiert. Versuche es in {{seconds}} s erneut.',
+    startError: 'Der Import konnte nicht gestartet werden: {{error}}',
+    statusError:
+      'Der Status des Imports konnte nicht geladen werden: {{error}}',
+  },
   layout: {
     openPanel: '{{title}} öffnen',
     closePanel: '{{title}} schließen',

@@ -1,9 +1,12 @@
 /** An error answer of the server, e.g. `status` 404 */
 export class HttpError extends Error {
   status: number
+  /** How long to wait after a `status` 429 */
+  retryAfterSeconds: number
   constructor(url: string, res: Response) {
     super(`${url}: ${res.status} ${res.statusText}`)
     this.status = res.status
+    this.retryAfterSeconds = Number(res.headers.get('Retry-After'))
   }
 }
 

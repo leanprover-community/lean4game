@@ -11,6 +11,7 @@ import { gameDataFilePath } from '../gameData.js'
 import { stopGameInstances } from '../lean/leanInstances.js'
 import { spawnGame } from '../lean/sandbox.js'
 import { GAMES_DIR, importedGamePath } from './imported.js'
+import { type ImportRateLimitHit, takeImportSlot } from './rateLimit.js'
 
 /*
 Imports a game from GitHub: the game's repository builds the game in a GitHub action and
@@ -66,11 +67,25 @@ export function getImportStatus(
   return imports.get(importKey(owner, repo))
 }
 
-/** Starts importing the game unless an import of it is already running. */
-export function startImport(owner: string, repo: string): ImportStatus {
+/**
+ * Starts importing the game unless an import of it is already running, which is returned
+ * then. If the game has been imported too often, nothing is started and the limit returned.
+ */
+export function startImport(
+  owner: string,
+  repo: string,
+): ImportStatus | ImportRateLimitHit {
   const key = importKey(owner, repo)
   const running = imports.get(key)
   if (running?.state === 'running') return running
+
+  const limit = takeImportSlot(key)
+  if (limit) {
+    console.warn(
+      `[import] ${key}: rate limit of ${limit.label} reached, possible again in ${limit.retryAfterSeconds} s`,
+    )
+    return limit
+  }
 
   const status: ImportStatus = {
     state: 'running',

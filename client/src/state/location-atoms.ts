@@ -33,7 +33,7 @@ const pathSegmentsAtom = atom(get => {
 })
 
 /** The pages which are not part of a game */
-const PAGES = ['impressum', 'privacy', 'preferences'] as const
+const PAGES = ['impressum', 'privacy', 'preferences', 'import'] as const
 
 /**
  * The page the URL points to. Game, world and level are lowercase, as they are
@@ -105,7 +105,7 @@ export const routeAtom = atom<Route>(get => {
   return { page: 'notFound' }
 })
 
-/** Whether `route` is one of the pages of the menu, e.g. the preferences */
+/** Whether `route` is a page outside of the games, e.g. the preferences */
 export function isMenuPage(route: Route) {
   return PAGES.some(p => p === route.page)
 }

@@ -240,6 +240,18 @@ export interface ApiClientConfig {
   }
 }
 
+/** The status of the import of a game */
+export interface ApiImportStatus {
+  state: 'running' | 'done' | 'failed'
+  startedAt: string
+  /** output of the import steps */
+  log: string[]
+  /** problems which don't stop the import, e.g. an incompletely built game */
+  warnings: string[]
+  /** progress of the artifact download, updated while downloading */
+  download?: { receivedBytes: number; totalBytes: number }
+}
+
 /** Statistic about a game's import history */
 export interface ApiGameImportStats {
   owner: string

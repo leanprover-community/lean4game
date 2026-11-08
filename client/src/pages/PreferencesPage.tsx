@@ -102,7 +102,13 @@ export function PreferencesPage() {
   )
 }
 
-function Category({ title, children }: { title: string; children: ReactNode }) {
+export function Category({
+  title,
+  children,
+}: {
+  title: string
+  children: ReactNode
+}) {
   return (
     <section className="flex-col gap-3">
       <h3 className="text-lg font-medium text-(--text-h)">{title}</h3>

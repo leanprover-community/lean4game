@@ -6,6 +6,7 @@ import { GamePage } from './GamePage/GamePage'
 import { useDocumentTitle } from './hooks/useDocumentTitle'
 import { useLanguageInUrl } from './hooks/useLanguageInUrl'
 import { useTheme } from './hooks/useTheme'
+import { ImportPage } from './import/ImportPage'
 import { LandingPage } from './LandingPage/LandingPage'
 import { AppBar } from './Navigation/AppBar'
 import { GameRoute } from './pages/GameRoute'
@@ -45,6 +46,8 @@ function Page() {
       return <PrivacyPage />
     case 'preferences':
       return <PreferencesPage />
+    case 'import':
+      return <ImportPage />
     case 'game':
       return (
         <GameRoute>

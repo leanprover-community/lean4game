@@ -74,6 +74,27 @@ export const en = {
     browserStorage: 'Browser Storage',
     savePreferences: 'Save my settings (in the browser storage)',
   },
+  import: {
+    title: 'Import a game',
+    description:
+      'A game needs to be published as public github repo and have a running CI workflow \
+      which builds the game and uploads a github artifact. Make sure your game has the \
+      worklow from <skeletonLink>GameSkeleton</skeletonLink>.',
+    owner: 'Github User',
+    repo: 'Repository',
+    start: 'Start import',
+    messages: 'Server messages',
+    states: {
+      running: 'Importing…',
+      done: 'The import has finished.',
+      failed: 'The import has failed.',
+    },
+    invalidName: 'This is not a valid owner or repository name.',
+    rateLimited:
+      'This game has been imported too often. Try again in {{seconds}} s.',
+    startError: 'The import could not be started: {{error}}',
+    statusError: 'The status of the import could not be loaded: {{error}}',
+  },
   layout: {
     openPanel: 'Open {{title}}',
     closePanel: 'Close {{title}}',

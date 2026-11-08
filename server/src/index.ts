@@ -187,7 +187,15 @@ app.post('/api/import/:owner/:repo/trigger', (req, res) => {
     res.status(400).json({ error: 'Invalid repository name' })
     return
   }
-  res.status(202).json(startImport(owner, repo))
+  const result = startImport(owner, repo)
+  if ('retryAfterSeconds' in result) {
+    res
+      .status(429)
+      .set('Retry-After', String(result.retryAfterSeconds))
+      .json({ error: `Rate limit of ${result.label} reached` })
+    return
+  }
+  res.status(202).json(result)
 })
 
 app.get('/api/import/:owner/:repo', (req, res) => {
