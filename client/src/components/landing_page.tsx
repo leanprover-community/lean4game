@@ -22,15 +22,16 @@ import { preferencesAtom } from '../store/preferences-atoms';
 import { gameTilesAtom } from '../store/tiles-atoms';
 import { GameTileWithName } from '../store/api';
 import { getGameI18n } from '../i18n';
+import { translateGameText } from '../utils/translation';
 import { Announcements } from './announcements';
 
 function Tile({tileWithName}: {tileWithName: GameTileWithName}) {
-  const { t, i18n } = useTranslation()
+  const gameId = `g/${tileWithName.owner}/${tileWithName.game}`
+  const { t, i18n } = useTranslation(['translation', gameId])
   const [, navigateToGame] = useAtom(gameIdAtom)
   const [preferences] = useAtom(preferencesAtom)
 
   const gameTile = tileWithName.tile
-  const gameId = `g/${tileWithName.owner}/${tileWithName.game}`
   const gameI18n = getGameI18n(tileWithName.settings?.allowEmptyTranslations ?? false)
   const gameT = gameI18n.getFixedT(i18n.resolvedLanguage ?? i18n.language)
 
@@ -40,7 +41,7 @@ function Tile({tileWithName}: {tileWithName: GameTileWithName}) {
         <div className="short-description">{gameT(gameTile.short, { ns: gameId })}
         </div>
         { gameTile.image ? <img className="image" src={path.join("data", gameId, gameTile.image)} alt="" /> : <div className="image"/> }
-        <div className="long description"><Markdown>{gameT(gameTile.long, { ns: gameId })}</Markdown></div>
+        <div className="long description"><Markdown>{translateGameText(gameT, gameId, gameTile.long)}</Markdown></div>
       </div>
       <table className="info">
         <tbody>
