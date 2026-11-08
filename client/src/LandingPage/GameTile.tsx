@@ -49,7 +49,7 @@ export function GameTile({
         <div className="mx-2.5 h-26 py-1.25">{gameT(tile.short)}</div>
         <div
           className={twMerge(
-            'relative h-50 w-full',
+            'h-50 w-full',
             // behind the image, or instead of it
             'bg-linear-137 from-purple-900 to-cyan-400',
           )}
