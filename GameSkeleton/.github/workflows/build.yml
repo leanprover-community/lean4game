@@ -26,6 +26,11 @@ jobs:
       - name: build game
         run: lake build
 
+      # The Lean server loads all `.ilean` files into RAM, which the game server does not need.
+      # Lake only needs the files to exist, otherwise it considers the game as not built.
+      - name: empty the .ilean files
+        run: find -L .lake -name '*.ilean' -exec truncate -s 0 {} +
+
       - name: compress built game
         #run: tar -czvf ../game.tar.gz .
         run: zip game.zip * .lake/ .i18n/ -r
