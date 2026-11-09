@@ -10,6 +10,7 @@ import { resetSelectedStepEffect } from '../Chat/chat-atoms'
 import { Markdown } from '../components/Markdown'
 import { WorldImage } from '../components/WorldImage'
 import { useScrollToSelectedStep } from '../hooks/useStepSelection'
+import { unlockLevelItemsEffect } from '../Inventory/inventory-atoms'
 import { gameIdAtom } from '../state/location-atoms'
 import { mobileAtom } from '../state/preferences-atoms'
 import {
@@ -42,6 +43,7 @@ export function Typewriter() {
   const mobile = useAtomValue(mobileAtom)
 
   useAtomValue(proofResultEffect)
+  useAtomValue(unlockLevelItemsEffect)
   useAtomValue(resetEditingStepEffect)
   useAtomValue(restartInstanceEffect)
   useAtomValue(resetSelectedStepEffect)

@@ -17,6 +17,7 @@ import {
   difficultyAtom,
   levelProgressAtom,
 } from './progress-atoms'
+import { levelInfoAtom } from './query-atoms'
 
 /** The proof of the current level as stored in local storage, one tactic per line */
 export const codeAtom = atom(
@@ -83,6 +84,24 @@ export const leanInstanceAtom = atomWithQuery<{ id: string }>(get => {
   }
 })
 
+/**
+ * The part of the inventory which can change the result of a check in this level. Other
+ * items, like the ones unlocked by completing this level, must not cause a new check.
+ */
+const inventoryForCheckAtom = atom(get => {
+  const inventory = get(inventoryAtom) ?? []
+  const level = get(levelInfoAtom).data
+  if (!level) return []
+  return [...level.tactics, ...level.theorems, ...level.definitions]
+    .filter(
+      tile =>
+        tile.locked &&
+        tile.name !== level.statementName &&
+        inventory.includes(tile.name),
+    )
+    .map(tile => tile.name)
+})
+
 /** The result of checking the current proof on the server */
 export const proofCheckAtom = atomWithQuery<ApiProofCheckResult>(get => {
   const instanceId = get(leanInstanceAtom).data?.id
@@ -90,6 +109,7 @@ export const proofCheckAtom = atomWithQuery<ApiProofCheckResult>(get => {
   const level = get(levelIdAtom)
   const tactics = get(tacticsAtom)
   const inventory = get(inventoryAtom) ?? []
+  const inventoryForCheck = get(inventoryForCheckAtom)
   const difficulty = get(difficultyAtom)
   return {
     queryKey: [
@@ -98,7 +118,7 @@ export const proofCheckAtom = atomWithQuery<ApiProofCheckResult>(get => {
       world,
       level,
       tactics,
-      inventory,
+      inventoryForCheck,
       difficulty,
     ],
     queryFn: () =>

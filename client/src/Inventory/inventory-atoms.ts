@@ -1,11 +1,12 @@
 import { type Atom, atom } from 'jotai'
+import { atomEffect } from 'jotai-effect'
 import { atomFamily } from 'jotai-family'
 import { atomWithQuery } from 'jotai-tanstack-query'
 
 import type { ApiDoc, ApiInventoryOverview, ApiInventoryTile } from '../api'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../state/location-atoms'
 import { preferencesAtom } from '../state/preferences-atoms'
-import { progressAtom } from '../state/progress-atoms'
+import { completedAtom, progressAtom } from '../state/progress-atoms'
 import { levelInfoAtom } from '../state/query-atoms'
 import { fetchJson, gameDataUrl } from '../utils/fetch'
 
@@ -197,10 +198,31 @@ export const currentInventoryTilesAtom = atom(get => {
   const tiles = get(inventoryTilesAtom)[tab]
 
   return tiles
-    .filter(
-      it => !it.hidden && it.category === subtab && (showLocked || !it.locked),
-    )
     .map(tile =>
       userInventory.includes(tile.name) ? { ...tile, locked: false } : tile,
     )
+    .filter(
+      it => !it.hidden && it.category === subtab && (showLocked || !it.locked),
+    )
+})
+
+/**
+ * Completing a level unlocks its new items and its own theorem for good. This also
+ * catches up when opening a level which was completed before this was stored.
+ */
+export const unlockLevelItemsEffect = atomEffect((get, set) => {
+  const level = get(levelInfoAtom).data
+  if (!level || !get(completedAtom)) return
+  const unlocked = [
+    ...[...level.tactics, ...level.theorems, ...level.definitions]
+      .filter(tile => tile.new)
+      .map(tile => tile.name),
+    ...level.theorems
+      .filter(tile => tile.name === level.statementName)
+      .map(tile => tile.name),
+  ]
+  const inventory = get.peek(inventoryAtom) ?? []
+  if (unlocked.some(name => !inventory.includes(name))) {
+    set(inventoryAtom, unlocked)
+  }
 })
