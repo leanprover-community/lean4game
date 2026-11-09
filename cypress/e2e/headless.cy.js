@@ -82,7 +82,7 @@ describe('Data', () => {
     cy.request('GET', '/api/data/test/testgame/game')
       .then(res => {
         const image = res.body.worlds.nodes.HelloWorld.image
-        expect(image).to.eq('images/cover.png')
+        expect(image).to.eq('images/sample-bg.png')
         return cy.request('GET', `/api/data/test/testgame/${image}`)
       })
       .then(res => {

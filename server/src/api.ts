@@ -110,7 +110,6 @@ export interface ApiGameTile {
   worlds: number
   levels: number
   languages: string[]
-  /** e.g. `images/cover.png` */
   image?: string
 }
 
