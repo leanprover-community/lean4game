@@ -114,7 +114,7 @@ export const de: DeepPartialTranslation<typeof en> = {
     nextHint: 'Nächster Hinweis',
   },
   inventory: {
-    theorems: 'Theoreme',
+    theorems: 'Sätze',
     tactics: 'Taktiken',
     definitions: 'Definitionen',
     notUnlocked: 'Noch nicht freigeschaltet',
