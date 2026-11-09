@@ -326,7 +326,8 @@ async function installToolchain(
   const { code, output } = await run(
     spawn('elan', ['toolchain', 'install', toolchain]),
   )
-  if (code !== 0) {
+  // before version 4.2.4, elan fails if the toolchain is already installed
+  if (code !== 0 && !output.includes('is already installed')) {
     throw new Error(`Could not install toolchain ${toolchain}:\n${output}`)
   }
   return toolchain
