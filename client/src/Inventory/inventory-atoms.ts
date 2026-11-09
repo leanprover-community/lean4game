@@ -31,11 +31,6 @@ export const inventoryOverviewAtom = atomWithQuery<ApiInventoryOverview>(
   },
 )
 
-/** The kind of a doc entry in the URL, e.g. `Theorem` */
-function docKind(tab: InventoryTab) {
-  return tab.charAt(0).toUpperCase() + tab.slice(1)
-}
-
 /** The documentation of a tactic, theorem or definition */
 export const docAtomFamily = atomFamily(
   ([tab, name]: [InventoryTab, string]) =>
@@ -45,10 +40,7 @@ export const docAtomFamily = atomFamily(
         queryKey: ['doc', gameId, tab, name],
         queryFn: () =>
           fetchJson<ApiDoc>(
-            gameDataUrl(
-              gameId!,
-              `doc/${docKind(tab)}/${encodeURIComponent(name)}`,
-            ),
+            gameDataUrl(gameId!, `doc/${tab}/${encodeURIComponent(name)}`),
           ),
         enabled: gameId !== undefined,
       }

@@ -241,7 +241,9 @@ app.get('/api/data/:owner/:game/doc/:kind/:name', (req, res) => {
     res,
     gameDataFilePath(
       gamePath,
-      `doc__${req.params.kind}__${req.params.name}.json`,
+      // the files are lowercase, e.g. `doc__tactic__rw.json`. Case-insensitive file
+      // systems like macOS's would hide a wrong case, so normalize it here.
+      `doc__${req.params.kind.toLowerCase()}__${req.params.name}.json`,
     ),
   )
 })

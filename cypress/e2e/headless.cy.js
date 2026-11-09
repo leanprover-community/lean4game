@@ -425,7 +425,7 @@ describe('Server communication', () => {
       expect(hovers[before.tag[0]].expr).to.eq('@Eq Nat x 2')
       expect(hovers[after.tag[0]].expr).to.eq('@Eq Nat 2 x')
       // `replace` creates a non-dependent `let` whose value isn't shown
-      expect(hypH(1).value).not.to.exist
+      expect(hypH(1).value).not.to.exist()
       // ... while the unchanged goal is shared
       expect(steps[1].goals[0].typeWithHover).to.deep.eq(
         steps[0].goals[0].typeWithHover,
