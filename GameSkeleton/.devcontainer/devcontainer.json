@@ -2,7 +2,9 @@
   "name": "game",
 
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    // the Dockerfile reads `lean-toolchain`
+    "context": ".."
   },
 
   "features": {
@@ -23,5 +25,14 @@
   "remoteUser": "node",
   "containerUser": "node",
 
-  "runArgs": ["--cap-drop=ALL", "--security-opt=no-new-privileges:true"]
+  "runArgs": ["--cap-drop=ALL", "--security-opt=no-new-privileges:true"],
+
+  // the game server, see `start-server.sh`
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "Game", "onAutoForward": "openBrowserOnce" }
+  },
+  // builds the game, see `post-create.sh`
+  "postCreateCommand": ".devcontainer/post-create.sh",
+  "postAttachCommand": ".devcontainer/start-server.sh"
 }
