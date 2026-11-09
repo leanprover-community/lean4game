@@ -25,4 +25,6 @@ jobs:
       - name: update dependencies
         run: lake update -R --keep-toolchain
       - name: build game
-        run: lake build
+        run: |
+          lake build
+          lake build GameServer

@@ -24,7 +24,9 @@ jobs:
       - name: update dependencies
         run: lake update -R --keep-toolchain
       - name: build game
-        run: lake build
+        run: |
+          lake build
+          lake build GameServer
 
       # The Lean server loads all `.ilean` files into RAM, which the game server does not need.
       # Lake only needs the files to exist, otherwise it considers the game as not built.
