@@ -208,8 +208,8 @@ describe('Server communication', () => {
       expect(steps[0].tactic).to.eq('')
       expect(steps[0].goals).to.have.length(1)
       expect(steps[0].goals[0].type).to.eq('x + x = y')
-      // unsolved goals
-      expect(steps[0].diagnostics.some(d => d.severity === 1)).to.eq(true)
+      // the "unsolved goals" of the whole proof are left out, as the goals are shown
+      expect(steps[0].diagnostics).to.deep.eq([])
     })
   })
   it('returns hypotheses and hints', () => {
@@ -310,6 +310,22 @@ describe('Server communication', () => {
       }
     })
   })
+  it('reports unsolved goals inside the proof, but not of the whole proof', () => {
+    checkProof({
+      world: 'HelloWorld',
+      level: 1,
+      tactics: ['have : 0 = 1 := by'],
+      inventory: [],
+      difficulty: 0,
+    }).then(({ completed, steps }) => {
+      expect(completed).to.eq(false)
+      const errors = steps[1].diagnostics.filter(d => d.severity === 1)
+      expect(errors).to.have.length(1)
+      expect(errors[0].message).to.match(/^unsolved goals\n[\s\S]*⊢ 0 = 1$/)
+      expect(errors[0].character).to.eq(18)
+    })
+  })
+
   it('can check a shorter proof after a longer one', () => {
     checkProof({
       world: 'HelloWorld',
@@ -327,7 +343,7 @@ describe('Server communication', () => {
     }).then(({ completed, steps }) => {
       expect(completed).to.eq(false)
       expect(steps).to.have.length(1)
-      expect(steps[0].diagnostics.some(d => d.severity === 1)).to.eq(true)
+      expect(steps[0].goals).to.have.length(1)
     })
   })
   it('returns the same result when checking the same proof twice', () => {
@@ -425,7 +441,7 @@ describe('Server communication', () => {
       expect(hovers[before.tag[0]].expr).to.eq('@Eq Nat x 2')
       expect(hovers[after.tag[0]].expr).to.eq('@Eq Nat 2 x')
       // `replace` creates a non-dependent `let` whose value isn't shown
-      expect(hypH(1).value).not.to.exist()
+      expect(hypH(1).value).to.eq(null)
       // ... while the unchanged goal is shared
       expect(steps[1].goals[0].typeWithHover).to.deep.eq(
         steps[0].goals[0].typeWithHover,

@@ -3,7 +3,6 @@ import { atomEffect } from 'jotai-effect'
 import { atomWithQuery } from 'jotai-tanstack-query'
 
 import type {
-  ApiDiagnostic,
   ApiProofCheckInput,
   ApiProofCheckResult,
   ApiProofStep,
@@ -149,17 +148,12 @@ export const proofCheckAtom = atomWithQuery<ApiProofCheckResult>(get => {
   }
 })
 
-/** The "unsolved goals" error, which is redundant as the goals are shown anyway */
-export function isUnsolvedGoals(diagnostic: ApiDiagnostic) {
-  return diagnostic.message.startsWith('unsolved goals')
-}
-
-/** The step has an error, apart from unsolved goals */
+/**
+ * The step has an error. The server leaves out the "unsolved goals" of the whole proof,
+ * but keeps others, e.g. of an empty `have : 0 = 1 := by`.
+ */
 export function hasError(step: ApiProofStep | undefined) {
-  return (
-    step?.diagnostics.some(d => d.severity === 1 && !isUnsolvedGoals(d)) ??
-    false
-  )
+  return step?.diagnostics.some(d => d.severity === 1) ?? false
 }
 
 /** The proof steps of the code, from the server's tactic texts */

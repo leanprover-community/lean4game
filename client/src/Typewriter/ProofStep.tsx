@@ -16,7 +16,6 @@ import { useStepSelection } from '../hooks/useStepSelection'
 import { mobileAtom } from '../state/preferences-atoms'
 import {
   editingStepAtom,
-  isUnsolvedGoals,
   proofCheckAtom,
   replaceStepAtom,
   retryFromStepAtom,
@@ -162,9 +161,7 @@ const severityClass: Record<number, string> = {
 
 /** The messages (error/warning/information) produced by the command */
 function Diagnostics({ diagnostics }: { diagnostics: ApiDiagnostic[] }) {
-  const shown = diagnostics.filter(
-    d => !isUnsolvedGoals(d) && d.message.trim().length > 0,
-  )
+  const shown = diagnostics.filter(d => d.message.trim().length > 0)
   return shown.map((d, i) => (
     <div
       key={i}
