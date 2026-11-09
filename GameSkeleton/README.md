@@ -12,7 +12,7 @@ The documentation about how to use this template are at the [lean4game repositor
 
 - Log into GitHub and click the "Use this template" > "Create a new repository" button.
 - Clone your newly created repo to your machine and open it with VSCode.
-- `Ctrl + Shift + P` and enter `Dev Containers: Rebuild and Reopen in Container`
+- `Ctrl + Shift + P` and enter `Dev Containers: Reopen in Container`
 - The server starts automatically, once it's started you should be able to play your game at http://localhost:3000.
 
 ## Contribute
