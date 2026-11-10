@@ -13,6 +13,7 @@ import {
   useScrollToSelectedStep,
   useStepSelection,
 } from '../hooks/useStepSelection'
+import { editingStepAtom } from '../Masks/Typewriter/typewriter-atoms'
 import { leftPanelOpenAtom } from '../state/layout-atoms'
 import {
   gameIdAtom,
@@ -23,7 +24,6 @@ import {
 } from '../state/location-atoms'
 import { mobileAtom } from '../state/preferences-atoms'
 import { readWorldIntroAtom } from '../state/progress-atoms'
-import { editingStepAtom } from '../state/proof-atoms'
 import {
   gameInfoAtom,
   levelInfoAtom,

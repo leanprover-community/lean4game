@@ -17,15 +17,15 @@ import {
   hasError,
   leanInstanceAtom,
   proofCheckAtom,
-  proofResultEffect,
-  resetEditingStepEffect,
   restartInstanceEffect,
+  levelCompletedEffect,
 } from '../../state/proof-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../../state/query-atoms'
 import { HttpError } from '../../utils/fetch'
 import { useGameTranslation } from '../../utils/translation'
 import { HoverProvider } from './HoverCode'
 import { ProofStep } from './ProofStep'
+import { proofResultEffect, resetEditingStepEffect } from './typewriter-atoms'
 import { TypewriterInput } from './TypewriterInput'
 
 /** Time between keepalives of the Lean instance, the server stops it after 5 idle minutes */
@@ -43,6 +43,7 @@ export function Typewriter() {
   const mobile = useAtomValue(mobileAtom)
 
   useAtomValue(proofResultEffect)
+  useAtomValue(levelCompletedEffect)
   useAtomValue(unlockLevelItemsEffect)
   useAtomValue(resetEditingStepEffect)
   useAtomValue(restartInstanceEffect)

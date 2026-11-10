@@ -14,14 +14,14 @@ import type {
 import { InlineHints } from '../../Chat/Chat'
 import { useStepSelection } from '../../hooks/useStepSelection'
 import { mobileAtom } from '../../state/preferences-atoms'
-import {
-  editingStepAtom,
-  proofCheckAtom,
-  replaceStepAtom,
-  retryFromStepAtom,
-} from '../../state/proof-atoms'
+import { proofCheckAtom } from '../../state/proof-atoms'
 import { CommandInput, focusAtEnd } from './CommandInput'
 import { HoverCode, LeanText } from './HoverCode'
+import {
+  editingStepAtom,
+  replaceStepAtom,
+  retryFromStepAtom,
+} from './typewriter-atoms'
 
 /**
  * A step of the proof: the entered command, the messages Lean produced and the goals

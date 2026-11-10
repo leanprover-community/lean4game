@@ -2,14 +2,13 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { hasError, proofCheckAtom } from '../../state/proof-atoms'
+import { CommandInput, focusAtEnd } from './CommandInput'
 import {
-  hasError,
-  proofCheckAtom,
   submitTacticAtom,
   typewriterFocusAtom,
   typewriterInputAtom,
-} from '../../state/proof-atoms'
-import { CommandInput, focusAtEnd } from './CommandInput'
+} from './typewriter-atoms'
 
 /**
  * The input line at the bottom of the typewriter. While the proof is checked, it is
