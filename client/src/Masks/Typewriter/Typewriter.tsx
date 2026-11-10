@@ -6,19 +6,15 @@ import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
 import { InlineConclusion, InlineNextButton } from '../../Chat/Chat'
-import { resetSelectedStepEffect } from '../../Chat/chat-atoms'
 import { Markdown } from '../../components/Markdown'
 import { WorldImage } from '../../components/WorldImage'
 import { useScrollToSelectedStep } from '../../hooks/useStepSelection'
-import { unlockLevelItemsEffect } from '../../Inventory/inventory-atoms'
 import { gameIdAtom } from '../../state/location-atoms'
 import { mobileAtom } from '../../state/preferences-atoms'
 import {
   hasError,
   leanInstanceAtom,
   proofCheckAtom,
-  restartInstanceEffect,
-  levelCompletedEffect,
 } from '../../state/proof-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../../state/query-atoms'
 import { HttpError } from '../../utils/fetch'
@@ -27,9 +23,6 @@ import { HoverProvider } from './HoverCode'
 import { ProofStep } from './ProofStep'
 import { proofResultEffect, resetEditingStepEffect } from './typewriter-atoms'
 import { TypewriterInput } from './TypewriterInput'
-
-/** Time between keepalives of the Lean instance, the server stops it after 5 idle minutes */
-const KEEPALIVE_MS = 60_000
 
 /**
  * The typewriter: the proof steps on top of the world's image, and below them the input
@@ -43,12 +36,7 @@ export function Typewriter() {
   const mobile = useAtomValue(mobileAtom)
 
   useAtomValue(proofResultEffect)
-  useAtomValue(levelCompletedEffect)
-  useAtomValue(unlockLevelItemsEffect)
   useAtomValue(resetEditingStepEffect)
-  useAtomValue(restartInstanceEffect)
-  useAtomValue(resetSelectedStepEffect)
-  useLeanKeepalive()
   useScrollToSelectedStep(scrollRef)
 
   const checkStatus =
@@ -138,23 +126,6 @@ export function Typewriter() {
       {mobile && <InlineNextButton />}
     </div>
   )
-}
-
-/** Keeps the Lean instance of the game running, and restarts it if it is gone */
-function useLeanKeepalive() {
-  const { data, refetch } = useAtomValue(leanInstanceAtom)
-  const id = data?.id
-  useEffect(() => {
-    if (!id) return
-    const interval = setInterval(() => {
-      void fetch(`/api/lean/instances/${id}/keepalive`, {
-        method: 'POST',
-      }).then(res => {
-        if (res.status === 404) void refetch()
-      })
-    }, KEEPALIVE_MS)
-    return () => clearInterval(interval)
-  }, [id, refetch])
 }
 
 /**
