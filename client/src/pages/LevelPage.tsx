@@ -30,7 +30,7 @@ export function LevelPage() {
             >
               <FontAwesomeIcon
                 icon={faCircleCheck}
-                className="text-green-600 dark:text-green-400"
+                className="cursor-help text-green-600 dark:text-green-400"
               />
             </span>
           </span>
