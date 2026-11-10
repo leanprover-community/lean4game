@@ -17,7 +17,7 @@ export function Announcements() {
         <article
           key={i}
           className={twMerge(
-            'wrap-anywhere [&_p+p]:mt-3',
+            'wrap-anywhere [&_a]:no-underline [&_p+p]:mt-3',
             // a line between the announcements
             i > 0 && 'mt-6 border-t border-neutral-300 pt-6',
             i > 0 && 'dark:border-neutral-600',
