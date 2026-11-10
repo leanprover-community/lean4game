@@ -147,20 +147,23 @@ export function Transcript({ text }: { text: string }) {
 
   return (
     // grows like the proof, see `Raw`. Without padding, which would count on top of it.
-    <div className="mt-3 flex-col max-h-max min-h-0 flex-[1_1_0]">
+    <div className="relative mt-2 flex-col max-h-max min-h-0 flex-[1_1_0]">
       <div
         role="log"
         aria-label={t('masks.transcript')}
         className={twMerge(
           'grid min-h-0 grid-cols-[auto_1fr] content-start gap-x-3 gap-y-1',
           'overflow-y-auto rounded-sm bg-(--section-bg) p-2.5 font-mono text-sm',
-          // the result of an older proof while the current one is checked
-          check.isPlaceholderData && 'opacity-60',
         )}
       >
         {entries.map((entry, i) => (
           <div key={i} className="contents">
-            <span className="text-right text-(--text) select-none">
+            <span
+              className={twMerge(
+                'text-right text-(--text) select-none',
+                check.isPlaceholderData && 'opacity-60',
+              )}
+            >
               {entry.line !== undefined && (
                 <>
                   <span className="sr-only">
@@ -175,6 +178,7 @@ export function Transcript({ text }: { text: string }) {
                 'min-w-0 wrap-break-word whitespace-pre-wrap',
                 kindClass[entry.kind],
                 gameTexts.includes(entry.kind) && 'font-sans whitespace-normal',
+                check.isPlaceholderData && 'opacity-60',
               )}
             >
               <span className="sr-only">

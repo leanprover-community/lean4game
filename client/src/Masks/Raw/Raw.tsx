@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
+import { WorldImage } from '../../components/WorldImage'
 import { proofOfCode } from '../../state/progress-schema'
 import {
   leanInstanceAtom,
@@ -54,46 +55,37 @@ export function Raw() {
         'leading-normal text-(--text-h)',
       )}
     >
-      {/*
-        The proof and the transcript start at no height and grow equally, each up to the
-        height of its content (`max-h-max`). So each gets its content or half of the
-        space, and space one does not need goes to the other. Both scroll if they are
-        longer.
-      */}
-      {/* the same padding as the text field, so that the proof looks indented */}
       <pre className="m-0 shrink-0 px-2 pb-1 wrap-break-word whitespace-pre-wrap [font:inherit]">
         {levelInfo?.descrFormat ?? ''}
       </pre>
-      <div className="relative flex max-h-max min-h-0 flex-[1_1_0]">
-        {/*
-          The indentation, as two spaces. Not `ml-[2ch]`: `ch` is the width of `0` in
-          the first font which has it, which is the emoji font, not the one of the code.
-        */}
-        <span aria-hidden className="whitespace-pre select-none">
-          {'  '}
-        </span>
-        <textarea
-          className={twMerge(
-            'block min-h-[calc(3lh+1rem)] min-w-0 flex-1 resize-none rounded-sm',
-            'border-0 bg-(--code-bg) p-2 [font:inherit] text-inherit',
-            'field-sizing-content focus:ring-1 focus:ring-primary focus:outline-none',
+      <div className="relative flex-col min-h-0 flex-1">
+        <WorldImage className="object-bottom opacity-50" />
+        <div className="relative flex max-h-max min-h-0 flex-[1_1_0] bg-(--bg)">
+          <span aria-hidden className="whitespace-pre select-none">
+            {'  '}
+          </span>
+          <textarea
+            className={twMerge(
+              'block min-h-[calc(3lh+1rem)] min-w-0 flex-1 resize-none rounded-sm',
+              'border-0 bg-(--code-bg) p-2 [font:inherit] text-inherit',
+              'field-sizing-content focus:ring-1 focus:ring-primary focus:outline-none',
+            )}
+            aria-label={t('masks.proof')}
+            value={text}
+            onChange={event => onChange(event.target.value)}
+            spellCheck={false}
+            autoCapitalize="off"
+            autoCorrect="off"
+          />
+          {waiting && (
+            <output className="pointer-events-none absolute right-2 bottom-1.5 opacity-50">
+              <span className="sr-only">{t('masks.checking')}</span>
+              <FontAwesomeIcon icon={faSpinner} spinPulse aria-hidden />
+            </output>
           )}
-          aria-label={t('masks.proof')}
-          value={text}
-          onChange={event => onChange(event.target.value)}
-          spellCheck={false}
-          autoCapitalize="off"
-          autoCorrect="off"
-        />
-        {/* in the corner of the visible part of the text field, also while it scrolls */}
-        {waiting && (
-          <output className="pointer-events-none absolute right-2 bottom-1.5 opacity-50">
-            <span className="sr-only">{t('masks.checking')}</span>
-            <FontAwesomeIcon icon={faSpinner} spinPulse aria-hidden />
-          </output>
-        )}
+        </div>
+        <Transcript text={text} />
       </div>
-      <Transcript text={text} />
     </div>
   )
 }
