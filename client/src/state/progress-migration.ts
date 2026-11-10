@@ -7,11 +7,13 @@ import type {
 } from './progress-types'
 
 /*
-The old client used the same storage key and format, apart from two things:
+The old client used the same storage key and format, apart from these things:
 
 - It stored the progress under the game as written in the URL, e.g.
   `g/leanprover-community/NNG4`. Now game IDs are lowercase, so the progress is moved to
   the lowercase key. Entries of the same game in different spellings are merged.
+- It stored the proof of a level as `code`, one step per line. Now it is the list of
+  steps `proof`, see `proofOfCode`.
 - Its older versions wrote less, e.g. levels without `help`, which it tolerated when
   reading. These fields get their defaults, the same as in an uploaded file.
 

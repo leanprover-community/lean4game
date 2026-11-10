@@ -25,7 +25,7 @@ const defaultProgress: Progress = {
 export const defaultWorldProgress: WorldProgress = { readIntro: false }
 
 export const defaultLevelProgress: LevelProgress = {
-  code: '',
+  proof: [],
   selections: [],
   completed: false,
   help: [],

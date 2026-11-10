@@ -80,7 +80,15 @@ async function checkProofAux(
   const sourcePath = path.join(instance.gamePath, modulePath)
   const originalContent = await fs.readFile(sourcePath, 'utf-8')
 
-  const tacticBlock = tactics.map(tactic => '  ' + tactic).join('\n')
+  // each tactic is a step of the proof, it may span several lines, e.g.
+  // `have h : P := by\n  simp`
+  const steps = tactics
+    .map(tactic => tactic.trimEnd().split('\n'))
+    .filter(lines => lines.some(line => line.trim().length > 0))
+  const tacticBlock = steps
+    .flat()
+    .map(line => '  ' + line)
+    .join('\n')
   const inventoryFormatted =
     '[' + inventory.map(name => JSON.stringify(name)).join(', ') + ']'
   const header =
@@ -125,6 +133,7 @@ async function checkProofAux(
           worldId: world,
           levelId: level,
           proofStartLine,
+          stepLines: steps.map(lines => lines.length),
           hovers: hovers,
         },
       },

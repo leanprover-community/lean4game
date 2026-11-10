@@ -18,12 +18,44 @@ const selectionSchema = z.object({
   positionColumn: z.number(),
 })
 
-const levelProgressSchema = z.object({
-  code: z.string(),
-  selections: z.array(selectionSchema).default([]),
-  completed: z.boolean().default(false),
-  help: z.array(z.number()).default([]),
-})
+/**
+ * The steps of a proof which older versions stored as `code`: one step per line, where
+ * lines indented more than the first step continue the step before them, e.g. the proof
+ * of `have h : P := by`. The indentation of the first step is removed.
+ */
+export function proofOfCode(code: string): string[] {
+  const indentation = (line: string) => line.length - line.trimStart().length
+  const lines = code.split('\n').filter(line => line.trim().length > 0)
+  if (lines.length === 0) return []
+  const base = indentation(lines[0])
+  const proof: string[] = []
+  for (const line of lines) {
+    const indent = indentation(line)
+    const text = line.slice(Math.min(indent, base)).trimEnd()
+    if (indent > base && proof.length > 0)
+      proof[proof.length - 1] += '\n' + text
+    else proof.push(text)
+  }
+  return proof
+}
+
+/** The progress of a level, older versions stored `code` instead of `proof` */
+const levelProgressSchema = z
+  .object({
+    proof: z.array(z.string()).optional(),
+    code: z.string().optional(),
+    selections: z.array(selectionSchema).default([]),
+    completed: z.boolean().default(false),
+    help: z.array(z.number()).default([]),
+  })
+  .refine(level => level.proof !== undefined || level.code !== undefined, {
+    message: 'Invalid input: expected array, received undefined',
+    path: ['proof'],
+  })
+  .transform(({ proof, code, ...level }) => ({
+    ...level,
+    proof: proof ?? proofOfCode(code ?? ''),
+  }))
 
 /** `readIntro`, and the progress of the levels by their number */
 const worldProgressSchema = z
@@ -52,7 +84,7 @@ export const gameProgressSchema = z.object({
 
 /**
  * The progress in the JSON `text`, or a description of what is wrong with it, e.g.
- * `data.Addition.1.code: Invalid input: expected string, received undefined`
+ * `data.Addition.1.proof: Invalid input: expected array, received undefined`
  */
 export function parseGameProgress(
   text: string,

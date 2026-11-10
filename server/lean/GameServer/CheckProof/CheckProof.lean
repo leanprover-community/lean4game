@@ -14,6 +14,9 @@ structure CheckProofParams where
   levelId : Nat
   /-- 0-based line in the document of the first tactic. -/
   proofStartLine : Nat
+  /-- The number of lines of each step, which follow each other from `proofStartLine` on.
+  A step can span several lines, e.g. `have h : P := by` and the proof of `P`. -/
+  stepLines : Array Nat
   /-- Whether to include hover information for goals and hypotheses. -/
   hovers : Bool := false
   deriving FromJson, ToJson
@@ -52,14 +55,23 @@ def checkProof (p : CheckProofParams) : RequestM (RequestTask CheckResult) := do
             return ⟨lineStart.byteIdx + line.utf8ByteSize - tactic.utf8ByteSize⟩
         return text.positions[p.proofStartLine]!
 
-      -- The position after each step together with its tactic.
+      -- The position after each step together with its tactic, without the indentation
+      -- of its first line, which is also removed from the other lines.
       let stepPositions : Array (String.Pos.Raw × String) := Id.run do
         let mut res := #[(startPos, "")]
-        for i in [p.proofStartLine : text.positions.size - 1] do
-          let source := Substring.Raw.toString ⟨text.source, text.positions[i]!, text.positions[i + 1]!⟩
-          let tactic := source.trimAscii.toString
-          if tactic.isEmpty then continue
-          res := res.push (text.positions[i + 1]!, tactic)
+        let mut line := p.proofStartLine
+        for n in p.stepLines do
+          let last := min (line + n) (text.positions.size - 1)
+          let source := Substring.Raw.toString ⟨text.source, text.positions[line]!, text.positions[last]!⟩
+          line := last
+          let lines := (source.trimAsciiEnd.toString.splitOn "\n").dropWhile (·.trimAscii.isEmpty)
+          let some first := lines.head? | continue
+          let indent := first.length - first.trimAsciiStart.toString.length
+          let dedent (l : String) : String :=
+            let ws := l.length - l.trimAsciiStart.toString.length
+            (l.drop (min ws indent)).toString
+          let tactic := "\n".intercalate (lines.map dedent)
+          res := res.push (text.positions[last]!, tactic)
         return res
 
       let mut steps : Array CheckStep := #[]

@@ -40,7 +40,8 @@ describe('Progress of the old client', () => {
     storedGames().then(games => {
       expect(Object.keys(games)).to.deep.equal(['g/test/testgame'])
       const level = games['g/test/testgame'].data.HelloWorld[1]
-      expect(level.code).to.equal('rw [h]\nrw [g]\n')
+      expect(level.proof).to.deep.equal(['rw [h]', 'rw [g]'])
+      expect(level).not.to.have.property('code')
       expect(level.completed).to.equal(true)
     })
   })
@@ -63,7 +64,28 @@ describe('Progress of the old client', () => {
       expect(game.difficulty).to.equal(1)
       expect(game.data.HelloWorld.readIntro).to.equal(true)
       expect(game.data.HelloWorld[1].completed).to.equal(true)
-      expect(game.data.HelloWorld[2].code).to.equal('rfl\n')
+      expect(game.data.HelloWorld[2].proof).to.deep.equal(['rfl'])
+    })
+  })
+
+  it('keeps indented lines in the step before them', () => {
+    visitWithProgress({
+      'g/test/TestGame': oldGame({
+        HelloWorld: {
+          readIntro: true,
+          1: oldLevel(
+            'have h : True := by\n  have h₂ : True := by\n    trivial\n\n  exact h₂\nrw [g]\n',
+            false,
+          ),
+        },
+      }),
+    })
+    cy.contains('rw [g]', { timeout: LEAN_TIMEOUT })
+    storedGames().then(games => {
+      expect(games['g/test/testgame'].data.HelloWorld[1].proof).to.deep.equal([
+        'have h : True := by\n  have h₂ : True := by\n    trivial\n  exact h₂',
+        'rw [g]',
+      ])
     })
   })
 

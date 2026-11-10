@@ -326,6 +326,31 @@ describe('Server communication', () => {
     })
   })
 
+  it('checks each tactic as one step, also over several lines', () => {
+    checkProof({
+      world: 'HelloWorld',
+      level: 1,
+      tactics: [
+        'have t : True := by\n  have t₂ : True := by\n    trivial\n  exact t₂',
+        'rw [h]\nrw [g]',
+        'rfl',
+      ],
+      inventory: [],
+      difficulty: 0,
+    }).then(({ steps }) => {
+      expect(steps.map(step => step.tactic)).to.deep.eq([
+        '',
+        'have t : True := by\n  have t₂ : True := by\n    trivial\n  exact t₂',
+        'rw [h]\nrw [g]',
+        'rfl',
+      ])
+      expect(steps[1].diagnostics).to.deep.eq([])
+      expect(steps[2].diagnostics).to.deep.eq([])
+      // the second line `rw [g]` already closes the goal
+      expect(steps[2].goals).to.deep.eq([])
+      expect(steps[3].diagnostics[0].message).to.contain('No goals')
+    })
+  })
   it('can check a shorter proof after a longer one', () => {
     checkProof({
       world: 'HelloWorld',

@@ -10,6 +10,7 @@ export interface ApiProofCheckInput {
   level: number
   difficulty: number
   inventory: string[]
+  /** the steps of the proof, a step may span several lines, e.g. `have h : P := by\n  simp` */
   tactics: string[]
   /** include hover information for goals and hypotheses */
   hovers?: boolean
@@ -110,7 +111,6 @@ export interface ApiGameTile {
   worlds: number
   levels: number
   languages: string[]
-  /** e.g. `images/cover.png` */
   image?: string
 }
 
