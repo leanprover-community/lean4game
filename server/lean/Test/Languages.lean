@@ -15,6 +15,6 @@ open GameServer
 
 Game "Test"
 
-/-- error: 'English' is not a language code. Use ISO codes like "en" or "pt-BR" instead. -/
+/-- warning: 'English' is not a language code. Use ISO codes like "en" or "pt-BR" instead. -/
 #guard_msgs in
 Languages "en" "English" "pt-BR"
