@@ -27,11 +27,26 @@ elab "CaptionLong" t:str : command => do
   modifyCurGame fun game => pure {game with
     tile := {game.tile with long := caption}}
 
+/--
+Whether `s` looks like a language code, e.g. `en`, `pt-BR` or `zh-Hans`: two or three
+lowercase letters, optionally followed by subtags of 2–8 letters or digits, each after a `-`.
+It is not checked that the code exists.
+-/
+def isLanguageCode (s : String) : Bool :=
+  match s.splitOn "-" with
+  | [] => false
+  | lang :: subtags =>
+    (lang.length == 2 ∨ lang.length == 3) ∧ lang.all (fun c => c.isLower) ∧
+    subtags.all fun tag => 2 ≤ tag.length ∧ tag.length ≤ 8 ∧ tag.all Char.isAlphanum
+
 /-- A list of Languages the game is translated to. For example `Languages "de" "en"`.
 
-The keys are ISO language codes.
+The keys are ISO language codes, e.g. `en` or `pt-BR`.
  -/
 elab "Languages" t:str* : command => do
+  for lang in t do
+    unless isLanguageCode lang.getString do
+      logWarningAt lang m!"'{lang.getString}' is not a language code. Use ISO codes like \"en\" or \"pt-BR\" instead."
   modifyCurGame fun game => pure {game with
     tile := {game.tile with languages := t.map (·.getString) |>.toList}}
 
