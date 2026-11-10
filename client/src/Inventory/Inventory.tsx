@@ -233,8 +233,9 @@ function InventoryItem({
               isTactic
                 ? // games built before templates existed have none
                   { kind: 'tactic', template: tile.insert ?? `${tile.name} $+` }
-                : // the full name, e.g. `Nat.add_comm`, the display name might not be Lean
-                  { kind: 'name', name: tile.name },
+                : // by default the full name, e.g. `Nat.add_comm`, the display name
+                  // might not be Lean
+                  { kind: 'name', name: tile.insert ?? tile.name },
             )
           }
         >

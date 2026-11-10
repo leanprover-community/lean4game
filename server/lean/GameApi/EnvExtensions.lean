@@ -73,7 +73,7 @@ structure InventoryTemplate where
   displayName: String := name.toString
   /-- Template documentation. `[[mathlib_doc]]` is replaced by a link to the mathlib docs. -/
   content: String := ""
-  /-- Only for tactics: what clicking the tactic in the inventory inserts, see `TacticDoc`. -/
+  /-- What clicking the item in the inventory inserts, see `TacticDoc` and `TheoremDoc`. -/
   insert: Option String := none
   deriving ToJson, Repr, Inhabited
 
@@ -127,7 +127,7 @@ structure InventoryTile where
   hidden := false
   /-- hover text -/
   altTitle : String := default
-  /-- Only for tactics: what clicking the tactic in the inventory inserts, see `TacticDoc`. -/
+  /-- What clicking the item in the inventory inserts, see `TacticDoc` and `TheoremDoc`. -/
   insert : Option String := none
 deriving ToJson, FromJson, Repr, Inhabited
 

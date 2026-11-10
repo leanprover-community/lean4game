@@ -158,8 +158,9 @@ export interface ApiInventoryTile {
   level: number | null
   proven: boolean
   /**
-   * Only for tactics: what clicking the tactic in the inventory inserts, with slots `$_`,
-   * `$,`, `$+` and `$;`, see `TacticDoc`. Missing for games built before it existed.
+   * What clicking the item in the inventory inserts. For tactics a template with slots
+   * `$_`, `$,`, `$+` and `$;`, see `TacticDoc`; missing for games built before it existed.
+   * For theorems and definitions plain text, missing for the default, see `TheoremDoc`.
    */
   insert?: string | null
 }

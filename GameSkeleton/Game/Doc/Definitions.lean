@@ -1,7 +1,7 @@
 import GameApi
 
 /-- An equality -/
-DefinitionDoc Eq as "equality" in "=="
+DefinitionDoc Eq as "equality" in "==" insert "="
 
 /-- Addition -/
-DefinitionDoc Add as "+"
+DefinitionDoc Add as "+" insert "+"
