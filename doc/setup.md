@@ -87,7 +87,7 @@ The Node server should only be reachable through nginx, so `ecosystem.config.cjs
 
 The Node server serves the client with suitable caching: the files in `client/dist/assets/`
 have a hash in their name and are cached for a year; `index.html` is never cached, so a new
-build is picked up immediately. Unknown paths outside `/api`, `/stats` and `/ping` get
+build is picked up immediately. Unknown paths outside `/api` and `/stats` get
 `index.html`, so that reloading a page of the client works.
 
 ## Deploying an update

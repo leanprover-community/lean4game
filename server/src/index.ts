@@ -41,10 +41,6 @@ const HOST = process.env.HOST
 const app = express()
 app.use(express.json())
 
-app.get('/ping', (_req, res) => {
-  res.send('pong')
-})
-
 app.post('/api/lean/start/:owner/:game', (req, res) => {
   const game = req.params.game
   const owner = req.params.owner
@@ -69,18 +65,18 @@ app.post('/api/lean/start/:owner/:game', (req, res) => {
   }
 })
 
-// TODO: this is for debugging only. We should remove it eventually
-app.get('/api/lean/instances', (req, res) => {
-  const instances = getAllInstances()
-  res.json(
-    instances.map(instance => ({
-      id: instance.id,
-      status: instance.status,
-      startedAt: instance.startedAt,
-      exitCode: instance.exitCode,
-    })),
-  )
-})
+// // TODO: this is for debugging only. We should remove it eventually
+// app.get('/api/lean/instances', (req, res) => {
+//   const instances = getAllInstances()
+//   res.json(
+//     instances.map(instance => ({
+//       id: instance.id,
+//       status: instance.status,
+//       startedAt: instance.startedAt,
+//       exitCode: instance.exitCode,
+//     })),
+//   )
+// })
 
 // must be registered before '/api/lean/instances/:id'
 app.get('/api/lean/instances/count', (_req, res) => {
@@ -265,19 +261,20 @@ app.get('/api/i18n/:owner/:game/:lang', (req, res) => {
   void sendJsonFile(res, i18nFilePath(gamePath, req.params.lang))
 })
 
-app.get('/stats/games', (req, res) => {
-  const { from, to } = req.query
-  res.json(
-    listGameActivity(
-      typeof from === 'string' ? from : undefined,
-      typeof to === 'string' ? to : undefined,
-    ),
-  )
-})
-
-app.get('/stats/imports', async (_req, res) => {
-  res.json(await listImportStats())
-})
+// // TODO: these endpoints need some sort of authentification
+// app.get('/stats/games', (req, res) => {
+//   const { from, to } = req.query
+//   res.json(
+//     listGameActivity(
+//       typeof from === 'string' ? from : undefined,
+//       typeof to === 'string' ? to : undefined,
+//     ),
+//   )
+// })
+//
+// app.get('/stats/imports', async (_req, res) => {
+//   res.json(await listImportStats())
+// })
 
 // in development, Vite serves the client
 if (!isDevMode()) serveClient(app)

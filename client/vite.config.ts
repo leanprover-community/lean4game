@@ -11,7 +11,6 @@ export default defineConfig({
     host: true,
     port: Number(clientPort),
     proxy: {
-      '/ping': { target: `http://localhost:${serverPort}` },
       '/api': { target: `http://localhost:${serverPort}` },
       '/stats': { target: `http://localhost:${serverPort}` },
     },
