@@ -95,6 +95,12 @@ export const en = {
     startError: 'The import could not be started: {{error}}',
     statusError: 'The status of the import could not be loaded: {{error}}',
   },
+  masks: {
+    select: 'Choose the interface',
+    // the name of each mask, see `Mask`
+    name_typewriter: 'Typewriter',
+    name_raw: 'Raw code',
+  },
   layout: {
     openPanel: 'Open {{title}}',
     closePanel: 'Close {{title}}',

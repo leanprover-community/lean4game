@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next'
 import { LevelChat } from '../Chat/Chat'
 import { PanelLayout } from '../components/PanelLayout'
 import { Inventory } from '../Inventory/Inventory'
+import { MaskMenu, SelectedMask } from '../Masks/MaskMenu'
 import { mobileAtom } from '../state/preferences-atoms'
 import { completedAtom } from '../state/progress-atoms'
-import { Typewriter } from '../Masks/Typewriter/Typewriter'
 
 export function LevelPage() {
   const { t } = useTranslation()
@@ -37,7 +37,8 @@ export function LevelPage() {
         )
       }
       left={mobile ? null : <LevelChat />}
-      center={<Typewriter />}
+      centerActions={<MaskMenu />}
+      center={<SelectedMask />}
       right={<Inventory />}
     />
   )

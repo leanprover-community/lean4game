@@ -45,6 +45,8 @@ type PanelLayoutProps = {
   rightTitle?: string
   /** shown in the top bar of the center, e.g. an icon */
   centerTitle?: ReactNode
+  /** buttons at the left of the top bar of the center, right of the chat toggle */
+  centerActions?: ReactNode
 }
 
 /**
@@ -72,6 +74,7 @@ function DesktopLayout({
   leftTitle,
   rightTitle,
   centerTitle,
+  centerActions,
 }: PanelLayoutProps) {
   const leftPanel = useSidePanel('left')
   const rightPanel = useSidePanel('right')
@@ -90,6 +93,7 @@ function DesktopLayout({
           {left != null && !leftPanel.open && (
             <OpenButton side="left" title={leftTitle} state={leftPanel} />
           )}
+          <CenterActions>{centerActions}</CenterActions>
           {right != null && !rightPanel.open && (
             <OpenButton side="right" title={rightTitle} state={rightPanel} />
           )}
@@ -182,6 +186,7 @@ function MobileLayout({
   leftTitle,
   rightTitle,
   centerTitle,
+  centerActions,
 }: PanelLayoutProps) {
   const leftPanel = useSidePanel('left')
   const rightPanel = useSidePanel('right')
@@ -200,6 +205,7 @@ function MobileLayout({
         {left != null && (
           <OpenButton side="left" title={leftTitle} state={leftState} />
         )}
+        <CenterActions>{centerActions}</CenterActions>
         {right != null && (
           <OpenButton side="right" title={rightTitle} state={rightState} />
         )}
@@ -259,6 +265,14 @@ function TopBar({
       <span className="min-w-0 flex-1 truncate px-2 font-bold">{title}</span>
       {children}
     </div>
+  )
+}
+
+/** The `centerActions` before the title, after the toggle of the left panel */
+function CenterActions({ children }: { children: ReactNode }) {
+  if (children == null) return null
+  return (
+    <div className="order-first flex shrink-0 items-center">{children}</div>
   )
 }
 

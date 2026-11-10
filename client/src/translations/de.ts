@@ -100,6 +100,11 @@ export const de: DeepPartialTranslation<typeof en> = {
     statusError:
       'Der Status des Imports konnte nicht geladen werden: {{error}}',
   },
+  masks: {
+    select: 'Oberfläche wählen',
+    name_typewriter: 'Schreibmaschine',
+    name_raw: 'Quellcode',
+  },
   layout: {
     openPanel: '{{title}} öffnen',
     closePanel: '{{title}} schließen',

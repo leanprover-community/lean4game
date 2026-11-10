@@ -58,18 +58,21 @@ function dynamicKeyPatterns(sources: string[]): RegExp[] {
   )
 }
 
-/** The keys of `keys` which the code mentions nowhere */
+/**
+ * The keys of `keys` which the code mentions nowhere. A key with a suffix of i18next,
+ * e.g. the context in `masks.name_raw` or the plural in `levels_one`, counts as used if
+ * the key without it is, e.g. in `t('masks.name', { context: mask })`.
+ */
 function findUnused(keys: string[]): string[] {
   const sources = readSources()
   const patterns = dynamicKeyPatterns(sources)
+  const isMentioned = (key: string) =>
+    patterns.some(pattern => pattern.test(key)) ||
+    sources.some(source =>
+      ["'", '"', '`'].some(quote => source.includes(`${quote}${key}${quote}`)),
+    )
   return keys.filter(
-    key =>
-      !patterns.some(pattern => pattern.test(key)) &&
-      !sources.some(source =>
-        ["'", '"', '`'].some(quote =>
-          source.includes(`${quote}${key}${quote}`),
-        ),
-      ),
+    key => !isMentioned(key) && !isMentioned(key.replace(/_[^.]*$/, '')),
   )
 }
 
