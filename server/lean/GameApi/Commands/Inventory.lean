@@ -22,22 +22,39 @@ open Lean
 TacticDoc rw
 
 /-- `rw` stands for rewrite, etc. -/
-TacticDoc rw in "Equalities"
+TacticDoc rw in "Equalities" insert "rw [$,]"
 ```
 
 * The identifier is the tactics name. Some need to be escaped like `«have»`.
+* The string after `in` is the category to group tactics by (in the Inventory).
+* The string after `insert` is what clicking the tactic in the inventory inserts, with
+  slots where the hypotheses and theorems clicked afterwards go, from left to right:
+  * `$_`: a single one, afterwards the next slot is filled
+  * `$,`: a comma-separated list, like in `rw [$,]`
+  * `$+`: a space-separated list, like in `exact $+`
+  * `$;`: a sequence of tactics separated by `;`, like in `have $_ : $+ := by $;`
+  * `$$`: a literal `$`
+
+  For example `apply $_ at $+`, or `tauto` without any slot. The default is the tactic's
+  name followed by `$+`.
 * The description is a string supporting Markdown.
  -/
-elab doc:docComment ? "TacticDoc" name:ident inArg?:((" in " str)?) content:str ? : command => do
+elab doc:docComment ? "TacticDoc" name:ident inArg?:((" in " str)?)
+    insertArg?:((&" insert " str)?) content:str ? : command => do
   let doc ← parseDocCommentLegacy doc content
   let doc ← doc.translate
   let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else "📖︎"
+  let insert : String := if insertArg?.raw.isNone then
+      s!"{name.getId.toString (escape := false)} $+"
+    else
+      (⟨insertArg?.raw[1]⟩ : TSyntax `str).getString
   modifyEnv (inventoryTemplateExt.addEntry · {
     type := .Tactic
     name := name.getId
     displayName := name.getId.toString
     category := cat
-    content := doc })
+    content := doc
+    insert := insert })
 
 /-- Documentation entry of a theorem. Example:
 

@@ -5,23 +5,20 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
-import type {
-  ApiDiagnostic,
-  ApiGoal,
-  ApiHypothesis,
-  ApiProofStep,
-} from '../../api'
+import type { ApiDiagnostic, ApiGoal, ApiProofStep } from '../../api'
 import { InlineHints } from '../../Chat/Chat'
 import { useStepSelection } from '../../hooks/useStepSelection'
 import { mobileAtom } from '../../state/preferences-atoms'
 import { proofCheckAtom } from '../../state/proof-atoms'
 import { CommandInput, focusAtEnd } from './CommandInput'
-import { HoverCode, LeanText } from './HoverCode'
+import { HoverCode } from './HoverCode'
+import { HypGroup } from './Hypothesis'
 import {
   editingStepAtom,
   replaceStepAtom,
   retryFromStepAtom,
 } from './typewriter-atoms'
+import { useInsertion } from './useInsertion'
 
 /**
  * A step of the proof: the entered command, the messages Lean produced and the goals
@@ -120,6 +117,8 @@ function EditCommand({ step, index }: { step: ApiProofStep; index: number }) {
   const replaceStep = useSetAtom(replaceStepAtom)
   const { isFetching } = useAtomValue(proofCheckAtom)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  // takes the insertions while it was focused last, which it is when it opens
+  const insertion = useInsertion(textareaRef, text, setText)
 
   useEffect(() => focusAtEnd(textareaRef.current), [])
 
@@ -127,7 +126,7 @@ function EditCommand({ step, index }: { step: ApiProofStep; index: number }) {
     <CommandInput
       ref={textareaRef}
       value={text}
-      onChange={setText}
+      {...insertion}
       // closed once the result of the new proof arrives, see `proofResultEffect`
       onSubmit={value => {
         if (!replaceStep(index, value)) setEditingStep(null)
@@ -244,43 +243,6 @@ function Goal({ goal }: { goal: ApiGoal }) {
           <HoverCode code={goal.typeWithHover} fallback={goal.type} />
         </div>
       </div>
-    </div>
-  )
-}
-
-function HypGroup({ title, hyps }: { title: string; hyps: ApiHypothesis[] }) {
-  return (
-    <div className="mb-1">
-      <div className="font-sans text-lg">{title}:</div>
-      {hyps.map((hyp, i) => (
-        <div key={i}>
-          <strong>
-            {hyp.names.map(name => (
-              <span
-                key={name}
-                className={twMerge(
-                  'm-0.5 inline-block h-6 min-w-6 rounded px-1 text-center',
-                  // inaccessible names like `x✝`
-                  name.includes('✝')
-                    ? 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-                    : 'border border-(--text) text-amber-700 dark:text-amber-300',
-                )}
-              >
-                <LeanText text={name} />
-              </span>
-            ))}
-          </strong>
-          &nbsp;:&nbsp;
-          <HoverCode code={hyp.typeWithHover} fallback={hyp.type} />
-          {/* never show the value of assumptions (proof irrelevance) */}
-          {!hyp.isAssumption && hyp.value != null && (
-            <>
-              &nbsp;:=&nbsp;
-              <HoverCode code={hyp.valueWithHover} fallback={hyp.value} />
-            </>
-          )}
-        </div>
-      ))}
     </div>
   )
 }

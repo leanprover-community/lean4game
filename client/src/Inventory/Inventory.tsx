@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
 import type { ApiInventoryTile } from '../api'
+import { insertAtom } from '../Masks/mask-atoms'
 import { levelIdAtom } from '../state/location-atoms'
 import { difficultyAtom } from '../state/progress-atoms'
 import { Documentation } from './Documentation'
@@ -180,6 +181,8 @@ function InventoryItem({
 }) {
   const { t } = useTranslation()
   const setDoc = useSetAtom(selectedDocTileAtom)
+  const insert = useSetAtom(insertAtom)
+  const isTactic = useAtomValue(inventoryTabAtom) === InventoryTab.tactic
   const levelId = useAtomValue(levelIdAtom)
   const locked = !enableAll && tile.locked
   const insertable =
@@ -225,8 +228,15 @@ function InventoryItem({
           )}
           title={t('inventory.insert', { name: tile.displayName })}
           aria-label={t('inventory.insert', { name: tile.displayName })}
-          // TODO: insert the name into the input line
-          onClick={() => {}}
+          onClick={() =>
+            insert(
+              isTactic
+                ? // games built before templates existed have none
+                  { kind: 'tactic', template: tile.insert ?? `${tile.name} $+` }
+                : // the full name, e.g. `Nat.add_comm`, the display name might not be Lean
+                  { kind: 'name', name: tile.name },
+            )
+          }
         >
           <FontAwesomeIcon icon={faReply} />
         </button>

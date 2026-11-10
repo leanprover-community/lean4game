@@ -9,6 +9,7 @@ import {
   typewriterFocusAtom,
   typewriterInputAtom,
 } from './typewriter-atoms'
+import { useInsertion } from './useInsertion'
 
 /**
  * The input line at the bottom of the typewriter. While the proof is checked, it is
@@ -21,6 +22,7 @@ export function TypewriterInput() {
   const focusRequest = useAtomValue(typewriterFocusAtom)
   const { data, error, isFetching } = useAtomValue(proofCheckAtom)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const insertion = useInsertion(textareaRef, input, setInput)
   // a new command must be based on the result of the previous one
   const disabled = isFetching || (!data && !error)
 
@@ -40,7 +42,7 @@ export function TypewriterInput() {
     <CommandInput
       ref={textareaRef}
       value={input}
-      onChange={setInput}
+      {...insertion}
       // the command stays until its result arrives, see `proofResultEffect`. An
       // unchanged proof is not checked again, the command just stays.
       onSubmit={submitTactic}

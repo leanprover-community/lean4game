@@ -73,6 +73,8 @@ structure InventoryTemplate where
   displayName: String := name.toString
   /-- Template documentation. `[[mathlib_doc]]` is replaced by a link to the mathlib docs. -/
   content: String := ""
+  /-- Only for tactics: what clicking the tactic in the inventory inserts, see `TacticDoc`. -/
+  insert: Option String := none
   deriving ToJson, Repr, Inhabited
 
 /-- A level of the game, by its world and its index. -/
@@ -125,12 +127,15 @@ structure InventoryTile where
   hidden := false
   /-- hover text -/
   altTitle : String := default
+  /-- Only for tactics: what clicking the tactic in the inventory inserts, see `TacticDoc`. -/
+  insert : Option String := none
 deriving ToJson, FromJson, Repr, Inhabited
 
 def InventoryItem.toTile (item : InventoryItem) : InventoryTile := {
       name := item.name,
       displayName := item.displayName
       category := item.category
+      insert := item.insert
 }
 
 /-- The extension that stores the doc templates. Note that you can only add, but never modify

@@ -293,6 +293,7 @@ elab "MakeGame" : command => do
               displayName := data.displayName
               category := data.category
               altTitle := data.statement
+              insert := data.insert
               -- TODO: we don't need `hidden` anymore
               hidden := false })
 
@@ -314,6 +315,7 @@ elab "MakeGame" : command => do
             category := data.category
             locked := false
             altTitle := data.statement
+            insert := data.insert
             hidden := hiddenItems.contains item }
       itemsInWorld := itemsInWorld.insert worldId items
 
@@ -335,6 +337,7 @@ elab "MakeGame" : command => do
             category := data.category
             locked := false
             altTitle := data.statement
+            insert := data.insert
             hidden := hiddenItems.contains item }
 
         -- add the exercise statement from the previous level
@@ -354,6 +357,7 @@ elab "MakeGame" : command => do
               level := (levelId - 1 : Nat)
               proven := true
               altTitle := data.statement
+              insert := data.insert
               locked := false }
 
         -- add marks for `disabled` and `new` theorems here, so that they only apply to

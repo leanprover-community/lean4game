@@ -157,6 +157,11 @@ export interface ApiInventoryTile {
   world: string | null
   level: number | null
   proven: boolean
+  /**
+   * Only for tactics: what clicking the tactic in the inventory inserts, with slots `$_`,
+   * `$,`, `$+` and `$;`, see `TacticDoc`. Missing for games built before it existed.
+   */
+  insert?: string | null
 }
 
 /** A level, see `/api/data/:owner/:game/level/:world/:level` */

@@ -73,6 +73,8 @@ export function CommandInput({
   onChange,
   onSubmit,
   onCancel,
+  onSelectionChange,
+  onFocus,
   disabled,
   placeholder,
   className,
@@ -84,6 +86,9 @@ export function CommandInput({
   /** called with the final text, in which all abbreviations are replaced */
   onSubmit: (value: string) => void
   onCancel?: () => void
+  /** called when the selection changes, also when only the caret moves */
+  onSelectionChange?: (selection: [number, number]) => void
+  onFocus?: () => void
   disabled: boolean
   placeholder?: string
   className?: string
@@ -135,7 +140,12 @@ export function CommandInput({
         autoCapitalize="off"
         autoCorrect="off"
         onChange={() => abbreviations.input()}
-        onSelect={() => abbreviations.select()}
+        onFocus={onFocus}
+        onSelect={ev => {
+          abbreviations.select()
+          const { selectionStart, selectionEnd } = ev.currentTarget
+          onSelectionChange?.([selectionStart, selectionEnd])
+        }}
         onCompositionStart={() => abbreviations.compositionStart()}
         onCompositionEnd={() => abbreviations.compositionEnd()}
         onKeyDown={ev => {

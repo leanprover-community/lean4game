@@ -1,4 +1,7 @@
+import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
+
+import { insertInTypewriterAtom } from './Typewriter/typewriter-insert-atoms'
 
 /**
  * The interfaces to play a level with, shown in the center of the level page. An object
@@ -25,3 +28,26 @@ export const maskAtom = atomWithStorage<Mask>(
     getOnInit: true,
   },
 )
+
+/**
+ * What to insert into the active mask: a tactic by its template, see `TacticDoc` on the
+ * Lean side, or the name of a theorem, definition or hypothesis
+ */
+export type Insertion =
+  | { kind: 'tactic'; template: string }
+  | { kind: 'name'; name: string }
+
+/**
+ * Asks the active mask to insert something, e.g. a tactic from the inventory or a
+ * hypothesis. How is up to the mask: the typewriter inserts it into its input line, the
+ * raw mask ignores it for now.
+ */
+export const insertAtom = atom(null, (get, set, insertion: Insertion) => {
+  switch (get(maskAtom)) {
+    case Mask.Typewriter:
+      set(insertInTypewriterAtom, insertion)
+      break
+    case Mask.Raw:
+      break
+  }
+})
