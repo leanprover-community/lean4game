@@ -5,8 +5,19 @@ import type { ApiGameInfo } from '../api'
 import { LanguageIcon } from '../components/LanguageIcon'
 import { Link } from '../components/Link'
 import { Markdown } from '../components/Markdown'
+import config from '../config.json'
 import { gamePath } from '../state/location-atoms'
 import { useGameTranslation } from '../utils/translation'
+
+/** Sort languages for uniformity */
+function sortLanguages(languages: string[]) {
+  const order = config.languages.map(language => language.iso)
+  const rank = (iso: string) => {
+    const i = order.indexOf(iso)
+    return i === -1 ? order.length : i
+  }
+  return languages.toSorted((a, b) => rank(a) - rank(b) || a.localeCompare(b))
+}
 
 /**
  * A game on the landing page. The styling is the one of the old client, in pixels as
@@ -95,7 +106,7 @@ export function GameTile({
           <tr>
             <td>{t('landing.tile.languages')}</td>
             <td>
-              {tile.languages.map((iso, i) => (
+              {sortLanguages(tile.languages).map((iso, i) => (
                 <LanguageIcon
                   key={iso}
                   iso={iso}

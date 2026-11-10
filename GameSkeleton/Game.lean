@@ -20,7 +20,7 @@ For example: Game version, Credits, Link to Github and Zulip, etc.
 Use **markdown**.
 "
 
-Languages "en"
+Languages "en" "de"
 CaptionShort "A small template game."
 CaptionLong "You should use this game as a template for your own game and add your own levels. `lean`"
 -- Prerequisites "NNG4" -- add this if your game builds on other games
