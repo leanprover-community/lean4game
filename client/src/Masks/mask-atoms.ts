@@ -1,6 +1,7 @@
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
+import { insertInRawAtom } from './Raw/raw-insert-atoms'
 import { insertInTypewriterAtom } from './Typewriter/typewriter-insert-atoms'
 
 /**
@@ -40,7 +41,7 @@ export type Insertion =
 /**
  * Asks the active mask to insert something, e.g. a tactic from the inventory or a
  * hypothesis. How is up to the mask: the typewriter inserts it into its input line, the
- * raw mask ignores it for now.
+ * raw mask copies it to the clipboard.
  */
 export const insertAtom = atom(null, (get, set, insertion: Insertion) => {
   switch (get(maskAtom)) {
@@ -48,6 +49,7 @@ export const insertAtom = atom(null, (get, set, insertion: Insertion) => {
       set(insertInTypewriterAtom, insertion)
       break
     case Mask.Raw:
+      void set(insertInRawAtom, insertion)
       break
   }
 })

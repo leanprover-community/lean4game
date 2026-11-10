@@ -13,6 +13,7 @@ import {
   proofCheckAtom,
 } from '../../state/proof-atoms'
 import { levelInfoAtom } from '../../state/query-atoms'
+import { CopyToast } from './CopyToast'
 import { Transcript } from './Transcript'
 
 /** Whether two proofs have the same steps */
@@ -49,43 +50,46 @@ export function Raw() {
   }
 
   return (
-    <div
-      className={twMerge(
-        'flex-col h-full overflow-y-auto p-2 text-left font-mono text-sm',
-        'leading-normal text-(--text-h)',
-      )}
-    >
-      <pre className="m-0 shrink-0 px-2 pb-1 wrap-break-word whitespace-pre-wrap [font:inherit]">
-        {levelInfo?.descrFormat ?? ''}
-      </pre>
-      <div className="relative flex-col min-h-0 flex-1">
-        <WorldImage className="object-bottom opacity-50" />
-        <div className="relative flex max-h-max min-h-0 flex-[1_1_0] bg-(--bg)">
-          <span aria-hidden className="whitespace-pre select-none">
-            {'  '}
-          </span>
-          <textarea
-            className={twMerge(
-              'block min-h-[calc(3lh+1rem)] min-w-0 flex-1 resize-none rounded-sm',
-              'border-0 bg-(--code-bg) p-2 [font:inherit] text-inherit',
-              'field-sizing-content focus:ring-1 focus:ring-primary focus:outline-none',
+    <div className="relative h-full">
+      <div
+        className={twMerge(
+          'flex-col h-full overflow-y-auto p-2 text-left font-mono text-sm',
+          'leading-normal text-(--text-h)',
+        )}
+      >
+        <pre className="m-0 shrink-0 px-2 pb-1 wrap-break-word whitespace-pre-wrap [font:inherit]">
+          {levelInfo?.descrFormat ?? ''}
+        </pre>
+        <div className="relative flex-col min-h-0 flex-1">
+          <WorldImage className="object-bottom opacity-50" />
+          <div className="relative flex max-h-max min-h-0 flex-[1_1_0] bg-(--bg)">
+            <span aria-hidden className="whitespace-pre select-none">
+              {'  '}
+            </span>
+            <textarea
+              className={twMerge(
+                'block min-h-[calc(3lh+1rem)] min-w-0 flex-1 resize-none rounded-sm',
+                'border-0 bg-(--code-bg) p-2 [font:inherit] text-inherit',
+                'field-sizing-content focus:ring-1 focus:ring-primary focus:outline-none',
+              )}
+              aria-label={t('masks.proof')}
+              value={text}
+              onChange={event => onChange(event.target.value)}
+              spellCheck={false}
+              autoCapitalize="off"
+              autoCorrect="off"
+            />
+            {waiting && (
+              <output className="pointer-events-none absolute right-2 bottom-1.5 opacity-50">
+                <span className="sr-only">{t('masks.checking')}</span>
+                <FontAwesomeIcon icon={faSpinner} spinPulse aria-hidden />
+              </output>
             )}
-            aria-label={t('masks.proof')}
-            value={text}
-            onChange={event => onChange(event.target.value)}
-            spellCheck={false}
-            autoCapitalize="off"
-            autoCorrect="off"
-          />
-          {waiting && (
-            <output className="pointer-events-none absolute right-2 bottom-1.5 opacity-50">
-              <span className="sr-only">{t('masks.checking')}</span>
-              <FontAwesomeIcon icon={faSpinner} spinPulse aria-hidden />
-            </output>
-          )}
+          </div>
+          <Transcript text={text} />
         </div>
-        <Transcript text={text} />
       </div>
+      <CopyToast />
     </div>
   )
 }
