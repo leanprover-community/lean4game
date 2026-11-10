@@ -8,7 +8,7 @@ import {
   submitTacticAtom,
   typewriterFocusAtom,
   typewriterInputAtom,
-} from '../state/proof-atoms'
+} from '../../state/proof-atoms'
 import { CommandInput, focusAtEnd } from './CommandInput'
 
 /**

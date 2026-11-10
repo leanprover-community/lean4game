@@ -10,16 +10,16 @@ import type {
   ApiGoal,
   ApiHypothesis,
   ApiProofStep,
-} from '../api'
-import { InlineHints } from '../Chat/Chat'
-import { useStepSelection } from '../hooks/useStepSelection'
-import { mobileAtom } from '../state/preferences-atoms'
+} from '../../api'
+import { InlineHints } from '../../Chat/Chat'
+import { useStepSelection } from '../../hooks/useStepSelection'
+import { mobileAtom } from '../../state/preferences-atoms'
 import {
   editingStepAtom,
   proofCheckAtom,
   replaceStepAtom,
   retryFromStepAtom,
-} from '../state/proof-atoms'
+} from '../../state/proof-atoms'
 import { CommandInput, focusAtEnd } from './CommandInput'
 import { HoverCode, LeanText } from './HoverCode'
 

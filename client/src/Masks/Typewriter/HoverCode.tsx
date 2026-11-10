@@ -11,8 +11,8 @@ import {
 import { createPortal } from 'react-dom'
 import { twMerge } from 'tailwind-merge'
 
-import type { ApiCode, ApiHover } from '../api'
-import { Markdown } from '../components/Markdown'
+import type { ApiCode, ApiHover } from '../../api'
+import { Markdown } from '../../components/Markdown'
 
 type HoverInfo = { hovers: ApiHover[]; hoverDocs: string[] }
 

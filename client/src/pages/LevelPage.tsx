@@ -8,7 +8,7 @@ import { PanelLayout } from '../components/PanelLayout'
 import { Inventory } from '../Inventory/Inventory'
 import { mobileAtom } from '../state/preferences-atoms'
 import { completedAtom } from '../state/progress-atoms'
-import { Typewriter } from '../Typewriter/Typewriter'
+import { Typewriter } from '../Masks/Typewriter/Typewriter'
 
 export function LevelPage() {
   const { t } = useTranslation()

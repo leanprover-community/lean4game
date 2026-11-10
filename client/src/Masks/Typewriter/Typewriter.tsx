@@ -5,14 +5,14 @@ import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
-import { InlineConclusion, InlineNextButton } from '../Chat/Chat'
-import { resetSelectedStepEffect } from '../Chat/chat-atoms'
-import { Markdown } from '../components/Markdown'
-import { WorldImage } from '../components/WorldImage'
-import { useScrollToSelectedStep } from '../hooks/useStepSelection'
-import { unlockLevelItemsEffect } from '../Inventory/inventory-atoms'
-import { gameIdAtom } from '../state/location-atoms'
-import { mobileAtom } from '../state/preferences-atoms'
+import { InlineConclusion, InlineNextButton } from '../../Chat/Chat'
+import { resetSelectedStepEffect } from '../../Chat/chat-atoms'
+import { Markdown } from '../../components/Markdown'
+import { WorldImage } from '../../components/WorldImage'
+import { useScrollToSelectedStep } from '../../hooks/useStepSelection'
+import { unlockLevelItemsEffect } from '../../Inventory/inventory-atoms'
+import { gameIdAtom } from '../../state/location-atoms'
+import { mobileAtom } from '../../state/preferences-atoms'
 import {
   hasError,
   leanInstanceAtom,
@@ -20,10 +20,10 @@ import {
   proofResultEffect,
   resetEditingStepEffect,
   restartInstanceEffect,
-} from '../state/proof-atoms'
-import { gameInfoAtom, levelInfoAtom } from '../state/query-atoms'
-import { HttpError } from '../utils/fetch'
-import { useGameTranslation } from '../utils/translation'
+} from '../../state/proof-atoms'
+import { gameInfoAtom, levelInfoAtom } from '../../state/query-atoms'
+import { HttpError } from '../../utils/fetch'
+import { useGameTranslation } from '../../utils/translation'
 import { HoverProvider } from './HoverCode'
 import { ProofStep } from './ProofStep'
 import { TypewriterInput } from './TypewriterInput'
