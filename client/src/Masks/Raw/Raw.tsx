@@ -1,25 +1,99 @@
-import { useAtomValue } from 'jotai'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useAtom, useAtomValue } from 'jotai'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { twMerge } from 'tailwind-merge'
 
-import { proofAtom } from '../../state/proof-atoms'
+import { proofOfCode } from '../../state/progress-schema'
+import {
+  leanInstanceAtom,
+  proofAtom,
+  proofCheckAtom,
+} from '../../state/proof-atoms'
 import { levelInfoAtom } from '../../state/query-atoms'
+import { Transcript } from './Transcript'
+
+/** Whether two proofs have the same steps */
+function sameProof(a: string[], b: string[]) {
+  return a.length === b.length && a.every((step, i) => step === b[i])
+}
 
 /**
- * A minimal alternative to the typewriter: the statement of the level and the player's
- * proof as plain Lean code, not editable.
+ * A minimalistic mask showing the source code. Mostly intended for debugging
+ * to copy code to and from the game.
  */
 export function Raw() {
+  const { t } = useTranslation()
   const levelInfo = useAtomValue(levelInfoAtom).data
-  const proof = useAtomValue(proofAtom)
-  const statement = levelInfo?.descrFormat ?? ''
-  const tactics = proof
-    .flatMap(step => step.split('\n'))
-    .map(line => '  ' + line)
-  const code = [statement, ...tactics].join('\n')
+  const [proof, setProof] = useAtom(proofAtom)
+  const instance = useAtomValue(leanInstanceAtom)
+  const check = useAtomValue(proofCheckAtom)
+  // the Lean instance is starting, or the proof is checked
+  const waiting = instance.isPending || check.isFetching
+  // the text as typed, which keeps e.g. empty lines that are not part of the proof
+  const [text, setText] = useState(() => proof.join('\n'))
+
+  // take over a proof changed elsewhere, e.g. when going to another level
+  const [shownProof, setShownProof] = useState(proof)
+  if (proof !== shownProof) {
+    setShownProof(proof)
+    if (!sameProof(proofOfCode(text), proof)) setText(proof.join('\n'))
+  }
+
+  const onChange = (value: string) => {
+    setText(value)
+    const newProof = proofOfCode(value)
+    if (!sameProof(newProof, proof)) setProof(newProof)
+  }
+
   return (
-    <div className="h-full overflow-auto p-2 text-left">
-      <pre className="m-0 rounded-sm bg-(--code-bg) p-2 font-mono text-sm wrap-break-word whitespace-pre-wrap text-(--text-h)">
-        <code className="block bg-transparent p-0">{code}</code>
+    <div
+      className={twMerge(
+        'flex-col h-full overflow-y-auto p-2 text-left font-mono text-sm',
+        'leading-normal text-(--text-h)',
+      )}
+    >
+      {/*
+        The proof and the transcript start at no height and grow equally, each up to the
+        height of its content (`max-h-max`). So each gets its content or half of the
+        space, and space one does not need goes to the other. Both scroll if they are
+        longer.
+      */}
+      {/* the same padding as the text field, so that the proof looks indented */}
+      <pre className="m-0 shrink-0 px-2 pb-1 wrap-break-word whitespace-pre-wrap [font:inherit]">
+        {levelInfo?.descrFormat ?? ''}
       </pre>
+      <div className="relative flex max-h-max min-h-0 flex-[1_1_0]">
+        {/*
+          The indentation, as two spaces. Not `ml-[2ch]`: `ch` is the width of `0` in
+          the first font which has it, which is the emoji font, not the one of the code.
+        */}
+        <span aria-hidden className="whitespace-pre select-none">
+          {'  '}
+        </span>
+        <textarea
+          className={twMerge(
+            'block min-h-[calc(3lh+1rem)] min-w-0 flex-1 resize-none rounded-sm',
+            'border-0 bg-(--code-bg) p-2 [font:inherit] text-inherit',
+            'field-sizing-content focus:ring-1 focus:ring-primary focus:outline-none',
+          )}
+          aria-label={t('masks.proof')}
+          value={text}
+          onChange={event => onChange(event.target.value)}
+          spellCheck={false}
+          autoCapitalize="off"
+          autoCorrect="off"
+        />
+        {/* in the corner of the visible part of the text field, also while it scrolls */}
+        {waiting && (
+          <output className="pointer-events-none absolute right-2 bottom-1.5 opacity-50">
+            <span className="sr-only">{t('masks.checking')}</span>
+            <FontAwesomeIcon icon={faSpinner} spinPulse aria-hidden />
+          </output>
+        )}
+      </div>
+      <Transcript text={text} />
     </div>
   )
 }

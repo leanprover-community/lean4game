@@ -33,10 +33,10 @@ import { useGameTranslation } from '../utils/translation'
 import { readGameIntroAtom } from './chat-atoms'
 import { useLevelHints } from './useLevelHints'
 
-type GameT = (key: string | undefined) => string
+export type GameT = (key: string | undefined) => string
 
 /** The translation of the current game's texts */
-function useChatTranslation() {
+export function useChatTranslation() {
   const gameId = useAtomValue(gameIdAtom)
   const { data: gameInfo } = useAtomValue(gameInfoAtom)
   const { t: gameT } = useGameTranslation(
@@ -47,7 +47,7 @@ function useChatTranslation() {
 }
 
 /** Splits an introduction into messages at blank lines */
-function splitIntro(text: string) {
+export function splitIntro(text: string) {
   return text.split(/\n(\s*\n)+/).filter(part => part.trim())
 }
 
@@ -55,7 +55,7 @@ function splitIntro(text: string) {
  * The translated text of a hint, with the variable names marked like `«{g}»` replaced
  * by the ones the player used
  */
-function hintText(hint: ApiHint, gameT: GameT) {
+export function hintText(hint: ApiHint, gameT: GameT) {
   // hints created in the frontend do not have a `rawText`
   if (!hint.rawText) return gameT(hint.text)
   return gameT(hint.rawText).replaceAll(

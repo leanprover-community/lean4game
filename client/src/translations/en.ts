@@ -97,6 +97,18 @@ export const en = {
   },
   masks: {
     select: 'Choose the interface',
+    proof: 'Proof',
+    checking: 'Checking the proof…',
+    transcript: 'Messages',
+    line: 'Line {{line}}',
+    kinds: {
+      error: 'Error',
+      warning: 'Warning',
+      information: 'Information',
+      introduction: 'Introduction',
+      hint: 'Hint',
+      conclusion: 'Conclusion',
+    },
     // the name of each mask, see `Mask`
     name_typewriter: 'Typewriter',
     name_raw: 'Raw code',

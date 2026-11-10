@@ -102,6 +102,18 @@ export const de: DeepPartialTranslation<typeof en> = {
   },
   masks: {
     select: 'Oberfläche wählen',
+    proof: 'Beweis',
+    checking: 'Beweis wird geprüft…',
+    transcript: 'Meldungen',
+    line: 'Zeile {{line}}',
+    kinds: {
+      error: 'Fehler',
+      warning: 'Warnung',
+      information: 'Information',
+      introduction: 'Einführung',
+      hint: 'Hinweis',
+      conclusion: 'Abschluss',
+    },
     name_typewriter: 'Schreibmaschine',
     name_raw: 'Quellcode',
   },
