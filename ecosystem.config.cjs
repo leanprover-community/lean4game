@@ -1,7 +1,7 @@
 /*
  * Start with `pm2 start ecosystem.config.cjs` from the repository root
  * after `npm run build`.
- * See `doc/server.md` for all environment variables.
+ * See `doc/server/server.md` for all environment variables.
  */
 
 const path = require('node:path')

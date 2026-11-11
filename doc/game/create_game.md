@@ -122,61 +122,22 @@ No world introducing sorry, but required by MyWorld
 which means that the world `MyWorld` uses the tactic `sorry` in a proof, but `sorry` has not been
 introduced anywhere.
 
-## 5. Refactoring an existing world
+### Refactoring
 
-The [GameSkeleton template](https://github.com/hhu-adam/GameSkeleton) contains a bash script `sofi.sh`
-(`s`ort `o`ut `f`ilnames and `i`mports),
-which can help restructure existing worlds, for example if you want to reorder or rename existing levels,
-or add additional levels in the middle. Say, for example, you have an “Arithmetic World” in the
-folder
+For assistant tooling helping with refactoring existing worlds, see. [Refactor a Game](refactoring.md)
 
-    Game/Levels/Arithmetic
-
-consisting of the three levels listed in the leftmost column of the table below. Suppose you want to
-switch the order of multiplication and addition, and insert an additional level on subtraction in
-between. Then you can simply edit the _file names_ as in the second column, and add the additional
-file for the level on substraction, so that the files are in the intended order when sorted
-alphabetically (as displayed in the third column).
-
-| existing levels    | manual changes           | files in alphabetical order | end result          |
-| ------------------ | ------------------------ | --------------------------- | ------------------- |
-| L01\_hello.lean    | L01\_hello.lean          | L01\_hello.lean             | L01\_hello.lean     |
-| L02\_multiply.lean | **L03**\_multiply.lean   | L02a\_add.lean              | L02\_add.lean       |
-| L03\_add.lean      | **L02a**\_add.lean       | L02b\_substract.lean        | L03\_substract.lean |
-|                    | **L02b\_substract.lean** | L03\_multiply.lean          | L04\_multiply.lean  |
-
-Calling
-
-    ./sofi.sh Game/Levels/Arithmetic
-
-will then
-
-- rename the files as in the last column,
-- update the level number in each file,
-- make a reasonable attempt to update the `import` statements in each of the
-  level files, and
-- update the imports in the base file `Game/Levels/Arithmetic.lean`.
-
-More details are documented in the script itself.
-
-Don't forget to add all your new/renamed files to git with
-
-    git add Game/Levels/Arithmetic/
-
-at the end.
-
-## 6. Testing the Game Locally
+## 5. Testing the Game Locally
 
 Now it's time to test the game locally and play it.
 
 There are multiple ways how you can start the game locally to test-play it described at [How to Run the Game Locally](running_locally.md). If you have problems getting one of the setups to work, please get in contact!
 
-## 7. Dive into Level creation
+## 6. Dive into Level creation
 
 Now that you have a running game, we have a closer look at the level files and all the options
 you have to design your game.
 
-### 7. a) Inventory
+### 6. a) Inventory
 
 The player has an inventory with tactics, theorems, and definitions that unlock during the game. You can unlock/introduce such items in a Level by adding one of the following below the `Statement`.
 
@@ -240,7 +201,7 @@ NewHiddenTactic rewrite nth_rewrite rwa
 
 and only `rw` would show up in the inventory.
 
-### 7. b) Statement
+### 6. b) Statement
 
 The statement is the exercise of the level. The basics work the same as they would in `example` or `theorem`. Note however, that you **must** do a tactic proof, i.e. the `:= by` is a hard-coded part of the syntax
 
@@ -261,7 +222,7 @@ Statement ...
 
 For more details and features, read [Writing Exercises](writing_exercises.md)
 
-### 7. c) Proof
+### 6. c) Proof
 
 The proof must always be a tactic proof, i.e. `:= by` is a mandatory part of the syntax.
 
@@ -281,7 +242,7 @@ which will support multi-line tactics better.
 
 One thing to keep in mind is that the game will look at the main proof to figure out which tactics and theorems are needed, but it ignores any `Branch`es.
 
-### 7. d) Hints
+### 6. d) Hints
 
 Most important for game development are probably the `Hints`.
 
@@ -290,7 +251,7 @@ placed at inside the sample proof. You can use `Branch` to place hints in dead e
 
 Read [More about Hints](hints.md) for how they work and what the options are.
 
-### 7. e) Extra: Images
+### 6. e) Extra: Images
 
 You can add images on any layer of the game (i.e. game/world/level). These will be displayed in your game.
 
@@ -301,15 +262,15 @@ NOTE: At present, only the images for a world are displayed. They appear in the 
 
 You can also embed images in the text as described in [Markdown](markdown.md).
 
-## 8. Update your game
+## 7. Update your game
 
 In principle, it is as simple as modifying `lean-toolchain` to update your game to a new Lean version. However, you should read about the details in [Update An Existing Game](update_game.md).
 
-## 9. Add translation
+## 8. Add translation
 
 See [Translating a game](translation-guide-for-game-maintainers.md).
 
-## 10. Publish your game
+## 9. Publish your game
 
 To publish your game on the official server, see [Publishing a game](publish_game.md)
 
@@ -329,7 +290,7 @@ CoverImage "images/cover.png"
 - `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
 - `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
-## 11. Advanced Topics
+## 10. Advanced Topics
 
 ### Customising Game UI
 

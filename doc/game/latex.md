@@ -1,6 +1,7 @@
 There are multiple ways how to format the text content of your game. Notably Markdown with KaTeX.
 
 # Escaping
+
 Generally, if you add text inside quotes `" "` (e.g. in `Hint`) you need to escape
 backslashes, but if you provide text inside a doc comment
 `/-- -/` (e.g. in the `Statement` description) you do not!

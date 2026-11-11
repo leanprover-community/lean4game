@@ -1,7 +1,5 @@
 # Running Games Locally
 
-Please also consult the [Troubleshooting Collection](../OLD/troubleshoot.md), where some known pitfalls are collected.
-
 There are several options to play a game locally:
 
 1. VSCode Dev Container: needs `docker` installed on your machine

@@ -4,14 +4,16 @@ This page deals in more details with the `Statement` command and all the options
 to write better exercises/levels.
 
 ## Descriptive Text
+
 You can write some text that would appear above the proof state in tactic mode:
+
 ```
 /-- some descriptive text -/
 Statement my_statement ...
 ```
 
-
 ## Local `let` definitions
+
 If you want to make a local definition/notation which only holds for this exercise (e.g.
 a function `f : ℤ → ℤ := fun x ↦ 2 * x`) the recommended way is to use a `let`-statement:
 
@@ -67,12 +69,15 @@ You can use markdown to format inside quotes like `Hint ""`.
 LaTeX is also supported, see [LaTeX in Games](latex.md).
 
 ## Adding A Named Statement As A Theorem
+
 This can be done like so:
+
 ```
 Statement my_statement ...
 
 NewTheorem my_statement
 ```
+
 To be able to use `my_statement` in future levels, you would have to import the level where `my_statement` was introduced.
 `my_statement` will be available to you even before finishing the level, but the game is smart enough to not allow you to use it to trivially solve the level. It's usable after the level but does appear as a theorem in your inventory.
 

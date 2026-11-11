@@ -49,8 +49,7 @@ Statement .... := by
 Put variables in the hint text inside brackets like this: `{h}`! This way the server can replace
 the variable's name with the one the user actually used.
 
-*Note*: This means you need to escape any other uses of **opening** curly brackets (i.e. `\{`). See also [LaTeX in Games](latex.md) for
-examples of this.
+_Note_: This means you need to escape any other uses of **opening** curly brackets (i.e. `\{`). See also [LaTeX in Games](latex.md) for further examples of this.
 
 For example, if the sample proof contains
 

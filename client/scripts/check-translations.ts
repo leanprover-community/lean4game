@@ -1,5 +1,5 @@
 /**
- * Compares the translations of the interface with `en.ts` and the code, see `README.md`:
+ * Compares the translations of the interface with `en.ts` and the code, see `doc/client/translation-interface.md`:
  *
  *   npm run i18n:check        a summary of all languages
  *   npm run i18n:check -- es  also lists the keys missing in `es`
