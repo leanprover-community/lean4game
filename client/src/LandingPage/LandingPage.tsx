@@ -1,3 +1,5 @@
+// the links get their content from the translations via `<Trans components={...}>`
+/* oxlint-disable jsx-a11y/anchor-has-content, jsx-a11y/control-has-associated-label */
 import { useAtomValue } from 'jotai'
 import { Trans, useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'

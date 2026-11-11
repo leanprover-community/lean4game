@@ -24,6 +24,7 @@ export default defineConfig({
     'react/react-in-jsx-scope': 'off', // not relevant for React 17+
     'oxc/no-async-endpoint-handlers': 'off', // not relevant for Express 5+
     'typescript/no-unsafe-type-assertion': 'off', // e.g. `err as Error` in `catch`
+    'typescript/consistent-return': 'off', // effect cleanups and exhaustive switches (see `switch-exhaustiveness-check`)
     'import/no-unassigned-import': 'off',
     'import/no-named-as-default-member': 'off', // e.g. `i18n.use(...)` of i18next
     'import/no-cycle': 'warn',

@@ -15,6 +15,8 @@ export function Dropdown({
 }) {
   if (!open) return null
   return (
+    // clicks on the (focusable) items bubble up here, also when triggered by keyboard
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       className={twMerge(
         'absolute top-full right-0 z-10 flex-col max-h-[calc(100dvh-100%)]',

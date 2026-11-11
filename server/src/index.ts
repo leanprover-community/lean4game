@@ -23,7 +23,6 @@ import {
 } from './import/gameImport.js'
 import {
   countActiveInstances,
-  getAllInstances,
   getInstance,
   startInstance,
   stopInstance,
@@ -35,7 +34,7 @@ import {
 } from './lean/openDocuments.js'
 import { checkProof } from './lean/proofCheck.js'
 import { getServerLoad } from './serverLoad.js'
-import { listGameActivity, listImportStats, recordCheck } from './stats.js'
+import { recordCheck } from './stats.js'
 import { isDevMode } from './utils/devMode.js'
 import { sendJsonFile } from './utils/response.js'
 

@@ -95,6 +95,8 @@ function HoverPopup({
   const rect = target.getBoundingClientRect()
   const below = rect.bottom < window.innerHeight / 2
   return (
+    // the mouse handlers only keep the tooltip open while the mouse is on it
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       ref={ref}
       role="tooltip"
@@ -168,11 +170,14 @@ function HoverTag({ index, code }: { index: number; code: ApiCode }) {
   return (
     <span
       className={hovered ? 'rounded-sm bg-primary/20' : undefined}
+      // TODO: hovers are not accessible by keyboard, the spans are not focusable
+      // oxlint-disable-next-line jsx-a11y/mouse-events-have-key-events
       onMouseOver={ev => {
         ev.stopPropagation()
         setHovered(true)
         context.show(ev.currentTarget, index)
       }}
+      // oxlint-disable-next-line jsx-a11y/mouse-events-have-key-events
       onMouseOut={ev => {
         ev.stopPropagation()
         setHovered(false)

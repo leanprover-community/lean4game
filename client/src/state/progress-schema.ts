@@ -18,13 +18,14 @@ const selectionSchema = z.object({
   positionColumn: z.number(),
 })
 
+const indentation = (line: string) => line.length - line.trimStart().length
+
 /**
  * The steps of a proof which older versions stored as `code`: one step per line, where
  * lines indented more than the first step continue the step before them, e.g. the proof
  * of `have h : P := by`. The indentation of the first step is removed.
  */
 export function proofOfCode(code: string): string[] {
-  const indentation = (line: string) => line.length - line.trimStart().length
   const lines = code.split('\n').filter(line => line.trim().length > 0)
   if (lines.length === 0) return []
   const base = indentation(lines[0])

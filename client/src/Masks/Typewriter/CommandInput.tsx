@@ -103,6 +103,7 @@ export function CommandInput({
     if (!textarea) return
     textarea.style.height = 'auto'
     textarea.style.height = `${Math.min(textarea.scrollHeight, window.innerHeight / 3)}px`
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- `value` triggers the resize
   }, [ref, value])
 
   const submit = (ev: SyntheticEvent) => {

@@ -21,7 +21,7 @@ function getGlobeIcon(timezone: string) {
 
 /** Globe Icon, rotated to fit the user's timezone */
 export default function RotatingGlobe() {
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const timezone = new Intl.DateTimeFormat().resolvedOptions().timeZone
   const icon = getGlobeIcon(timezone)
 
   return <FontAwesomeIcon icon={icon} />

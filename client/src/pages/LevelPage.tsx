@@ -37,6 +37,8 @@ export function LevelPage() {
           // the title of the bar is centered, the icon goes to the left
           <span className="block text-left">
             <span
+              // an `img` tag cannot wrap the svg icon
+              // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
               role="img"
               title={t('typewriter.levelSolved')}
               aria-label={t('typewriter.levelSolved')}

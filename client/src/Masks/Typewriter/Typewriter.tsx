@@ -49,6 +49,7 @@ export function Typewriter() {
   useEffect(() => {
     const scroll = scrollRef.current
     if (scroll) scroll.scrollTop = scroll.scrollHeight
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- `result` triggers the scroll
   }, [result])
 
   const steps = result?.steps ?? []
