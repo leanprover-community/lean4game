@@ -149,7 +149,8 @@ stay readable.
 
 #root {
   width: 100svw;
-  height: 100svh;
+  /* the part above the on-screen keyboard on iOS, see `useKeyboardViewport` */
+  height: var(--app-height, 100svh);
   margin: 0 auto;
   text-align: center;
   display: flex;

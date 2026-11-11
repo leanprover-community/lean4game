@@ -4,6 +4,7 @@ import { useAtomValue } from 'jotai'
 import { NotFound } from './ErrorPage/NotFound'
 import { GamePage } from './GamePage/GamePage'
 import { useDocumentTitle } from './hooks/useDocumentTitle'
+import { useKeyboardViewport } from './hooks/useKeyboardViewport'
 import { useLanguageInUrl } from './hooks/useLanguageInUrl'
 import { useTheme } from './hooks/useTheme'
 import { ImportPage } from './import/ImportPage'
@@ -24,6 +25,7 @@ export function App() {
   useAtomValue(lastPageEffect)
   useTheme()
   useDocumentTitle()
+  useKeyboardViewport()
   return (
     <>
       <AppBar />
