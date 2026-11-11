@@ -156,7 +156,7 @@ export const es: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Financiación',
       description:
-        'Este servidor está alojado en la Universidad Heinrich Heine de Düsseldorf. El software lean4game se desarrolló como parte del proyecto <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financiado por el programa <i>Freiraum 2022</i> de la <i>Stiftung Innovation in der Hochschullehre</i>. El mantenimiento y el desarrollo continuos cuentan con el generoso apoyo de <i>Renaissance Philanthropy</i> a través del <i>AI for Math Fund</i>.',
+        'Este servidor está alojado en la Universidad Heinrich Heine de Düsseldorf. El software leangame se desarrolló como parte del proyecto <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financiado por el programa <i>Freiraum 2022</i> de la <i>Stiftung Innovation in der Hochschullehre</i>. El mantenimiento y el desarrollo continuos cuentan con el generoso apoyo de <i>Renaissance Philanthropy</i> a través del <i>AI for Math Fund</i>.',
     },
   },
   progress: {
@@ -228,7 +228,7 @@ export const es: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Financiación',
       description:
-        'Este servidor está alojado en la Universidad Heinrich Heine de Düsseldorf. El software lean4game se desarrolló como parte del proyecto <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financiado por el programa <i>Freiraum 2022</i> de la <i>Stiftung Innovation in der Hochschullehre</i>. El mantenimiento y el desarrollo continuos cuentan con el generoso apoyo de <i>Renaissance Philanthropy</i> a través del <i>AI for Math Fund</i>.',
+        'Este servidor está alojado en la Universidad Heinrich Heine de Düsseldorf. El software leangame se desarrolló como parte del proyecto <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financiado por el programa <i>Freiraum 2022</i> de la <i>Stiftung Innovation in der Hochschullehre</i>. El mantenimiento y el desarrollo continuos cuentan con el generoso apoyo de <i>Renaissance Philanthropy</i> a través del <i>AI for Math Fund</i>.',
     },
   },
 } as const

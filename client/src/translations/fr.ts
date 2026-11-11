@@ -157,7 +157,7 @@ export const fr: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Financement',
       description:
-        "Ce serveur est hébergé à l'Université Heinrich Heine de Düsseldorf. Le logiciel lean4game a été développé dans le cadre du projet <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financé par le programme <i>Freiraum 2022</i> de la <i>Stiftung Innovation in der Hochschullehre</i>. La maintenance et le développement continus sont généreusement soutenus par <i>Renaissance Philanthropy</i> via l'<i>AI for Math Fund</i>.",
+        "Ce serveur est hébergé à l'Université Heinrich Heine de Düsseldorf. Le logiciel leangame a été développé dans le cadre du projet <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financé par le programme <i>Freiraum 2022</i> de la <i>Stiftung Innovation in der Hochschullehre</i>. La maintenance et le développement continus sont généreusement soutenus par <i>Renaissance Philanthropy</i> via l'<i>AI for Math Fund</i>.",
     },
   },
   progress: {
@@ -230,7 +230,7 @@ export const fr: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Financement',
       description:
-        "Ce serveur est hébergé à l'Université Heinrich Heine de Düsseldorf. Le logiciel lean4game a été développé dans le cadre du projet <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financé par le programme <i>Freiraum 2022</i> de la <i>Stiftung Innovation in der Hochschullehre</i>. La maintenance et le développement continus sont généreusement soutenus par <i>Renaissance Philanthropy</i> via l'<i>AI for Math Fund</i>.",
+        "Ce serveur est hébergé à l'Université Heinrich Heine de Düsseldorf. Le logiciel leangame a été développé dans le cadre du projet <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financé par le programme <i>Freiraum 2022</i> de la <i>Stiftung Innovation in der Hochschullehre</i>. La maintenance et le développement continus sont généreusement soutenus par <i>Renaissance Philanthropy</i> via l'<i>AI for Math Fund</i>.",
     },
   },
 } as const

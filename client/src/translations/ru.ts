@@ -156,7 +156,7 @@ export const ru: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Финансирование',
       description:
-        'Этот сервер размещён в Дюссельдорфском университете имени Генриха Гейне. Программное обеспечение lean4game было разработано в рамках проекта <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink> при финансовой поддержке программы <i>Freiraum 2022</i> фонда <i>Stiftung Innovation in der Hochschullehre</i>. Дальнейшая поддержка и разработка щедро финансируются организацией <i>Renaissance Philanthropy</i> в рамках фонда <i>AI for Math Fund</i>.',
+        'Этот сервер размещён в Дюссельдорфском университете имени Генриха Гейне. Программное обеспечение leangame было разработано в рамках проекта <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink> при финансовой поддержке программы <i>Freiraum 2022</i> фонда <i>Stiftung Innovation in der Hochschullehre</i>. Дальнейшая поддержка и разработка щедро финансируются организацией <i>Renaissance Philanthropy</i> в рамках фонда <i>AI for Math Fund</i>.',
     },
   },
   progress: {
@@ -229,7 +229,7 @@ export const ru: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Финансирование',
       description:
-        'Этот сервер размещён в Дюссельдорфском университете имени Генриха Гейне. Программное обеспечение lean4game было разработано в рамках проекта <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink> при финансовой поддержке программы <i>Freiraum 2022</i> фонда <i>Stiftung Innovation in der Hochschullehre</i>. Дальнейшая поддержка и разработка щедро финансируются организацией <i>Renaissance Philanthropy</i> в рамках фонда <i>AI for Math Fund</i>.',
+        'Этот сервер размещён в Дюссельдорфском университете имени Генриха Гейне. Программное обеспечение leangame было разработано в рамках проекта <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink> при финансовой поддержке программы <i>Freiraum 2022</i> фонда <i>Stiftung Innovation in der Hochschullehre</i>. Дальнейшая поддержка и разработка щедро финансируются организацией <i>Renaissance Philanthropy</i> в рамках фонда <i>AI for Math Fund</i>.',
     },
   },
 } as const

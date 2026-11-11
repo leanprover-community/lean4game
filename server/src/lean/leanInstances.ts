@@ -1,7 +1,6 @@
 import type { ChildProcessWithoutNullStreams } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 
-import type { ApiGameInstanceCount } from '../api.js'
 import { createLspClient, type LspClient } from './lspClient.js'
 import { forgetInstanceDocs } from './openDocuments.js'
 import { noBwrap, spawnGame } from './sandbox.js'
@@ -114,18 +113,13 @@ export function getAllInstances(): LeanInstance[] {
   return Array.from(instances.values())
 }
 
-/** The number of instances which have not exited, per game */
-export function countActiveInstances(): ApiGameInstanceCount[] {
-  const counts = new Map<string, ApiGameInstanceCount>()
+/** The number of instances which have not exited */
+export function countActiveInstances(): number {
+  let count = 0
   for (const instance of instances.values()) {
-    if (instance.status === 'exited') continue
-    const { owner, repo } = instance.game
-    const key = `${owner}/${repo}`
-    const entry = counts.get(key) ?? { owner, repo, count: 0 }
-    entry.count++
-    counts.set(key, entry)
+    if (instance.status !== 'exited') count++
   }
-  return Array.from(counts.values())
+  return count
 }
 
 /** Marks the instance as active, returns `false` if it doesn't exist or has exited */

@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai'
 import { useTranslation } from 'react-i18next'
 
 import { ContactInfo, LegalPage } from '../components/LegalPage'
-import { configAtom, localize } from '../state/config'
+import { configAtom, localise } from '../state/config'
 
 export function ImpressumPage() {
   return <LegalPage Content={Impressum} />
@@ -19,7 +19,7 @@ function Impressum({ lng }: { lng: string }) {
         <p>
           <strong>{t('impressum.legalForm')}</strong>
           <br />
-          {localize(impressum.legalForm, lng)}
+          {localise(impressum.legalForm, lng)}
         </p>
       )}
       {impressum?.vatId && (
@@ -34,7 +34,7 @@ function Impressum({ lng }: { lng: string }) {
       {impressum?.link && (
         <p>
           <a href={impressum.link.url} target="_blank" rel="noreferrer">
-            {localize(impressum.link.label, lng)}
+            {localise(impressum.link.label, lng)}
           </a>
         </p>
       )}

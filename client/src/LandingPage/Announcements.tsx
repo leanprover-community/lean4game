@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
 import { twMerge } from 'tailwind-merge'
 
-import { configAtom, localize } from '../state/config'
+import { configAtom, localise } from '../state/config'
 import { Section } from './Section'
 
 /** The announcements from the server config, if any */
@@ -23,8 +23,8 @@ export function Announcements() {
             i > 0 && 'dark:border-neutral-600',
           )}
         >
-          <h2>{localize(title, i18n.language)}</h2>
-          <Markdown>{localize(message, i18n.language)}</Markdown>
+          <h2>{localise(title, i18n.language)}</h2>
+          <Markdown>{localise(message, i18n.language)}</Markdown>
         </article>
       ))}
     </Section>

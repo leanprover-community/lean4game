@@ -157,7 +157,7 @@ export const ptBR: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Financiamento',
       description:
-        'Este servidor é hospedado na Heinrich Heine University Düsseldorf. O software lean4game foi desenvolvido como parte do projeto <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financiado pelo programa <i>Freiraum 2022</i> da <i>Stiftung Innovation in der Hochschullehre</i>. A manutenção e o desenvolvimento contínuos contam com o generoso apoio da <i>Renaissance Philanthropy</i> por meio do <i>AI for Math Fund</i>.',
+        'Este servidor é hospedado na Heinrich Heine University Düsseldorf. O software leangame foi desenvolvido como parte do projeto <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financiado pelo programa <i>Freiraum 2022</i> da <i>Stiftung Innovation in der Hochschullehre</i>. A manutenção e o desenvolvimento contínuos contam com o generoso apoio da <i>Renaissance Philanthropy</i> por meio do <i>AI for Math Fund</i>.',
     },
   },
   progress: {
@@ -230,7 +230,7 @@ export const ptBR: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Financiamento',
       description:
-        'Este servidor é hospedado na Heinrich Heine University Düsseldorf. O software lean4game foi desenvolvido como parte do projeto <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financiado pelo programa <i>Freiraum 2022</i> da <i>Stiftung Innovation in der Hochschullehre</i>. A manutenção e o desenvolvimento contínuos contam com o generoso apoio da <i>Renaissance Philanthropy</i> por meio do <i>AI for Math Fund</i>.',
+        'Este servidor é hospedado na Heinrich Heine University Düsseldorf. O software leangame foi desenvolvido como parte do projeto <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, financiado pelo programa <i>Freiraum 2022</i> da <i>Stiftung Innovation in der Hochschullehre</i>. A manutenção e o desenvolvimento contínuos contam com o generoso apoio da <i>Renaissance Philanthropy</i> por meio do <i>AI for Math Fund</i>.',
     },
   },
 } as const

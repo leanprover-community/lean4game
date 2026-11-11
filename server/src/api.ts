@@ -4,6 +4,20 @@ The types of the data exchanged between server and client. This file is identica
 import anything.
 */
 
+/**
+ * A Lean instance, see `/api/lean/instances/:id`. Not used by the client, which only
+ * keeps the `id` from starting an instance with `/api/lean/start/:owner/:game`.
+ */
+export interface ApiLeanInstance {
+  id: string
+  /** `exited` once the process ended, e.g. after it was stopped or stayed idle */
+  status: 'starting' | 'running' | 'exited'
+  /** ISO date, e.g. `"2026-11-10T19:45:35.123Z"` */
+  startedAt: string
+  /** set once the process exited by itself, `null` before or if it was killed */
+  exitCode: number | null
+}
+
 /** API input to validate a proof */
 export interface ApiProofCheckInput {
   world: string
@@ -209,12 +223,12 @@ export interface ApiDoc {
  * Text which may differ per language, either one string for all languages or e.g.
  * `{ "en": "Germany", "de": "Deutschland" }`. Missing languages fall back to `en`.
  */
-export type ApiLocalized = string | Partial<Record<string, string>>
+export type ApiLocalised = string | Partial<Record<string, string>>
 
 export interface ApiAnnouncement {
-  title: ApiLocalized
+  title: ApiLocalised
   /** in Markdown */
-  message: ApiLocalized
+  message: ApiLocalised
 }
 
 /** The part of the config which the client gets from `/api/config` */
@@ -225,7 +239,7 @@ export interface ApiClientConfig {
   contact?: {
     name: string
     /** One entry per line */
-    address: ApiLocalized[]
+    address: ApiLocalised[]
     phone?: string
     /** Link to further contact details */
     url?: string
@@ -234,15 +248,15 @@ export interface ApiClientConfig {
   }
   impressum?: {
     /** e.g. the legal form, representation and supervisory authority of the operator */
-    legalForm?: ApiLocalized
+    legalForm?: ApiLocalised
     /** VAT identification number according to §27a UStG */
     vatId?: string
     /** Link to the impressum of the operating institution */
-    link?: { label: ApiLocalized; url: string }
+    link?: { label: ApiLocalised; url: string }
   }
   privacy?: {
     /** Country where the server is located */
-    serverLocation?: ApiLocalized
+    serverLocation?: ApiLocalised
   }
 }
 
@@ -282,13 +296,6 @@ export interface ApiServerLoad {
   memory: number
   /** CPU usage over the last few seconds, over all cores */
   cpu: number
-}
-
-/** Number of Lean instances of a game which have not exited */
-export interface ApiGameInstanceCount {
-  owner: string
-  repo: string
-  count: number
 }
 
 /** Anonymous play statistics of a game in one 30-minute interval */

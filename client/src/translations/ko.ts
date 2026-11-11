@@ -155,7 +155,7 @@ export const ko: DeepPartialTranslation<typeof en> = {
     funding: {
       title: '재정 지원',
       description:
-        "이 서버는 뒤셀도르프의 하인리히-하이네 대학에서 호스팅합니다. lean4game 소프트웨어는 <i>Stiftung Innovation in der Hochschullehre</i>의 <i>Freiraum 2022</i> 프로그램이 재정을 지원한 <adamLink>'아담(ADAM): 수학의 디지털 시대 준비하기'</adamLink> 프로젝트의 일환으로 개발됐습니다. 지속적인 유지 보수와 개발은 <i>AI for Math Fund</i>를 통해 <i>Renaissance Philanthropy</i>가 아낌없이 지원하고 있습니다.",
+        "이 서버는 뒤셀도르프의 하인리히-하이네 대학에서 호스팅합니다. leangame 소프트웨어는 <i>Stiftung Innovation in der Hochschullehre</i>의 <i>Freiraum 2022</i> 프로그램이 재정을 지원한 <adamLink>'아담(ADAM): 수학의 디지털 시대 준비하기'</adamLink> 프로젝트의 일환으로 개발됐습니다. 지속적인 유지 보수와 개발은 <i>AI for Math Fund</i>를 통해 <i>Renaissance Philanthropy</i>가 아낌없이 지원하고 있습니다.",
     },
   },
   progress: {
@@ -227,7 +227,7 @@ export const ko: DeepPartialTranslation<typeof en> = {
     funding: {
       title: '재정 지원',
       description:
-        "이 서버는 뒤셀도르프의 하인리히-하이네 대학에서 호스팅합니다. lean4game 소프트웨어는 <i>Stiftung Innovation in der Hochschullehre</i>의 <i>Freiraum 2022</i> 프로그램이 재정을 지원한 <adamLink>'아담(ADAM): 수학의 디지털 시대 준비하기'</adamLink> 프로젝트의 일환으로 개발됐습니다. 지속적인 유지 보수와 개발은 <i>AI for Math Fund</i>를 통해 <i>Renaissance Philanthropy</i>가 아낌없이 지원하고 있습니다.",
+        "이 서버는 뒤셀도르프의 하인리히-하이네 대학에서 호스팅합니다. leangame 소프트웨어는 <i>Stiftung Innovation in der Hochschullehre</i>의 <i>Freiraum 2022</i> 프로그램이 재정을 지원한 <adamLink>'아담(ADAM): 수학의 디지털 시대 준비하기'</adamLink> 프로젝트의 일환으로 개발됐습니다. 지속적인 유지 보수와 개발은 <i>AI for Math Fund</i>를 통해 <i>Renaissance Philanthropy</i>가 아낌없이 지원하고 있습니다.",
     },
   },
 } as const

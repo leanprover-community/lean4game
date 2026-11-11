@@ -1,6 +1,6 @@
 import { atomWithQuery } from 'jotai-tanstack-query'
 
-import type { ApiClientConfig, ApiLocalized } from '../api'
+import type { ApiClientConfig, ApiLocalised } from '../api'
 import { fetchJson } from '../utils/fetch'
 
 /** The public part of the server config */
@@ -10,8 +10,8 @@ export const configAtom = atomWithQuery(() => ({
   staleTime: Infinity,
 }))
 
-/** The text of `localized` in the language `lng`, falling back to English */
-export function localize(localized: ApiLocalized, lng: string): string {
-  if (typeof localized === 'string') return localized
-  return localized[lng] ?? localized.en ?? Object.values(localized)[0] ?? ''
+/** The text of `localised` in the language `lng`, falling back to English */
+export function localise(localised: ApiLocalised, lng: string): string {
+  if (typeof localised === 'string') return localised
+  return localised[lng] ?? localised.en ?? Object.values(localised)[0] ?? ''
 }

@@ -165,12 +165,12 @@ export const downloadProgressAtom = atom(null, get => {
   const gameId = get(gameIdAtom)
   const progress = get(progressAtom)
   if (!gameId || !progress) return
-  // e.g. `lean4game-owner-repo-2026-10-27.json`
+  // e.g. `leangame-owner-repo-2026-10-27.json`
   const game = gameId.replace(/^g\//, '').replace('/', '-')
   const date = new Date().toISOString().slice(0, 10)
   downloadFile(
     JSON.stringify(progress, null, 2),
-    `lean4game-${game}-${date}.json`,
+    `leangame-${game}-${date}.json`,
     'application/json',
   )
 })

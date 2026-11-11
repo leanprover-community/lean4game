@@ -2,7 +2,11 @@ import path from 'node:path'
 
 import express from 'express'
 
-import type { ApiClientConfig, ApiProofCheckInput } from './api.js'
+import type {
+  ApiClientConfig,
+  ApiLeanInstance,
+  ApiProofCheckInput,
+} from './api.js'
 import { serveClient } from './client.js'
 import { readConfig } from './config.js'
 import {
@@ -92,12 +96,12 @@ app.get('/api/lean/instances/:id', (req, res) => {
   res.json({
     id: instance.id,
     status: instance.status,
-    startedAt: instance.startedAt,
+    startedAt: instance.startedAt.toISOString(),
     exitCode: instance.exitCode,
-  })
+  } satisfies ApiLeanInstance)
 })
 
-// TODO: we might not need this if we have the identical `/stop` below.
+// note: this is identical to the `/stop` below.
 app.delete('/api/lean/instances/:id', (req, res) => {
   const found = stopInstance(req.params.id)
   if (!found) {

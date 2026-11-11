@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai'
 import { type ComponentType, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { configAtom, localize } from '../state/config'
+import { configAtom, localise } from '../state/config'
 
 /**
  * Layout of the impressum and the privacy policy. If the current language is translated,
@@ -48,7 +48,7 @@ export function ContactInfo({ lng }: { lng: string }) {
       <br />
       {contact.address.map((line, i) => (
         <Fragment key={i}>
-          {localize(line, lng)}
+          {localise(line, lng)}
           <br />
         </Fragment>
       ))}
@@ -67,7 +67,7 @@ export function ContactInfo({ lng }: { lng: string }) {
         </>
       )}
       {contact.technicalEmail && (
-        <a href={`mailto:${contact.technicalEmail}?subject=Lean4Game`}>
+        <a href={`mailto:${contact.technicalEmail}?subject=leangame`}>
           {t('legal.technicalContact')}
         </a>
       )}

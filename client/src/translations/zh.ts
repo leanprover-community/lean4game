@@ -155,7 +155,7 @@ export const zh: DeepPartialTranslation<typeof en> = {
     funding: {
       title: '资助',
       description:
-        '本服务器托管于杜塞尔多夫海因里希·海涅大学。lean4game 软件是 <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink> 项目的一部分，该项目由 <i>Stiftung Innovation in der Hochschullehre</i> 的 <i>Freiraum 2022</i> 计划资助。后续的维护和开发由 <i>Renaissance Philanthropy</i> 通过 <i>AI for Math Fund</i> 慷慨支持。',
+        '本服务器托管于杜塞尔多夫海因里希·海涅大学。leangame 软件是 <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink> 项目的一部分，该项目由 <i>Stiftung Innovation in der Hochschullehre</i> 的 <i>Freiraum 2022</i> 计划资助。后续的维护和开发由 <i>Renaissance Philanthropy</i> 通过 <i>AI for Math Fund</i> 慷慨支持。',
     },
   },
   progress: {
@@ -227,7 +227,7 @@ export const zh: DeepPartialTranslation<typeof en> = {
     funding: {
       title: '资助',
       description:
-        '本服务器托管于杜塞尔多夫海因里希·海涅大学。lean4game 软件是 <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink> 项目的一部分，该项目由 <i>Stiftung Innovation in der Hochschullehre</i> 的 <i>Freiraum 2022</i> 计划资助。后续的维护和开发由 <i>Renaissance Philanthropy</i> 通过 <i>AI for Math Fund</i> 慷慨支持。',
+        '本服务器托管于杜塞尔多夫海因里希·海涅大学。leangame 软件是 <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink> 项目的一部分，该项目由 <i>Stiftung Innovation in der Hochschullehre</i> 的 <i>Freiraum 2022</i> 计划资助。后续的维护和开发由 <i>Renaissance Philanthropy</i> 通过 <i>AI for Math Fund</i> 慷慨支持。',
     },
   },
 } as const

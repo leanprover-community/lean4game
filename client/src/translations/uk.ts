@@ -156,7 +156,7 @@ export const uk: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Фінансування',
       description:
-        'Цей сервер розміщено в Heinrich Heine University Düsseldorf. Програмне забезпечення lean4game було розроблено як частина проєкту <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, профінансованого програмою <i>Freiraum 2022</i> від <i>Stiftung Innovation in der Hochschullehre</i>. Поточна підтримка та розробка щедро підтримуються <i>Renaissance Philanthropy</i> через <i>AI for Math Fund</i>.',
+        'Цей сервер розміщено в Heinrich Heine University Düsseldorf. Програмне забезпечення leangame було розроблено як частина проєкту <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, профінансованого програмою <i>Freiraum 2022</i> від <i>Stiftung Innovation in der Hochschullehre</i>. Поточна підтримка та розробка щедро підтримуються <i>Renaissance Philanthropy</i> через <i>AI for Math Fund</i>.',
     },
   },
   progress: {
@@ -228,7 +228,7 @@ export const uk: DeepPartialTranslation<typeof en> = {
     funding: {
       title: 'Фінансування',
       description:
-        'Цей сервер розміщено в Heinrich Heine University Düsseldorf. Програмне забезпечення lean4game було розроблено як частина проєкту <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, профінансованого програмою <i>Freiraum 2022</i> від <i>Stiftung Innovation in der Hochschullehre</i>. Поточна підтримка та розробка щедро підтримуються <i>Renaissance Philanthropy</i> через <i>AI for Math Fund</i>.',
+        'Цей сервер розміщено в Heinrich Heine University Düsseldorf. Програмне забезпечення leangame було розроблено як частина проєкту <adamLink>ADAM: Anticipating the Digital Age of Mathematics</adamLink>, профінансованого програмою <i>Freiraum 2022</i> від <i>Stiftung Innovation in der Hochschullehre</i>. Поточна підтримка та розробка щедро підтримуються <i>Renaissance Philanthropy</i> через <i>AI for Math Fund</i>.',
     },
   },
 } as const

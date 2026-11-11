@@ -1,6 +1,6 @@
 import { atomWithQuery } from 'jotai-tanstack-query'
 
-import type { ApiGameInfo, ApiGameInstanceCount, ApiServerLoad } from '../api'
+import type { ApiGameInfo, ApiServerLoad } from '../api'
 import { fetchJson } from '../utils/fetch'
 
 /** The featured games, and the local games in development */
@@ -19,8 +19,6 @@ export const serverLoadAtom = atomWithQuery(() => ({
 /** The number of players, i.e. running Lean instances of all games, updated every 15 seconds */
 export const activePlayersAtom = atomWithQuery(() => ({
   queryKey: ['activePlayers'],
-  queryFn: () => fetchJson<ApiGameInstanceCount[]>('/api/lean/instances/count'),
-  select: (counts: ApiGameInstanceCount[]) =>
-    counts.reduce((sum, { count }) => sum + count, 0),
+  queryFn: () => fetchJson<number>('/api/lean/instances/count'),
   refetchInterval: 15_000,
 }))
