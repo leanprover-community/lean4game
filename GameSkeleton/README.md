@@ -17,6 +17,6 @@ The documentation about how to use this template are at the [lean4game repositor
 
 ## Contribute
 
-This repo is created as a subtree of https://github.com/hhu-adam/leangame.
+This repo is created as a subtree of https://github.com/leanprover-community/lean4game.
 
 Any issues, PRs and other changes should be made to the parent repo.

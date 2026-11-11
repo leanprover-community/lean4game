@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/devcontainers/javascript-node:26-bookworm
 # root can write to. Docker caches this step: after a tag has moved, rebuild without cache.
 COPY lean-toolchain /tmp/lean-toolchain
 RUN version="$(sed -E 's/.*:(v[0-9.]+).*/\1/' /tmp/lean-toolchain)" \
-  && git clone --depth 1 --branch "$version" https://github.com/hhu-adam/leangame.git /workspaces/leangame \
+  && git clone --depth 1 --branch "$version" https://github.com/leanprover-community/lean4game.git /workspaces/leangame \
   && chown -R node:node /workspaces/leangame
 
 USER node

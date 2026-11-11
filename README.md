@@ -1,8 +1,8 @@
-[![Lean](https://img.shields.io/badge/Lean-v4.35.0-blue)](https://github.com/hhu-adam/leangame/blob/main/server/lean/lean-toolchain)
+[![Lean](https://img.shields.io/badge/Lean-v4.35.0-blue)](https://github.com/leanprover-community/lean4game/blob/main/server/lean/lean-toolchain)
 [![Node](https://img.shields.io/badge/Node-26-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![Live](https://img.shields.io/badge/live-adam.math.hhu.de-brightgreen)](https://adam.math.hhu.de)
-[![GitHub license](https://img.shields.io/badge/License-GPL_3.0-blue.svg)](https://github.com/hhu-adam/leangame/blob/main/LICENSE)
-[![ci status](https://github.com/hhu-adam/leangame/actions/workflows/test.yml/badge.svg)](https://github.com/hhu-adam/leangame/actions/workflows/test.yml)
+[![GitHub license](https://img.shields.io/badge/License-GPL_3.0-blue.svg)](https://github.com/leanprover-community/lean4game/blob/main/LICENSE)
+[![ci status](https://github.com/leanprover-community/lean4game/actions/workflows/test.yml/badge.svg)](https://github.com/leanprover-community/lean4game/actions/workflows/test.yml)
 
 # Lean Games
 
