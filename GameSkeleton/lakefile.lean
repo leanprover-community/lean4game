@@ -103,3 +103,7 @@ package Game where
 
 @[default_target]
 lean_lib Game
+
+@[test_driver]
+lean_lib test where
+  globs := #[.submodules `Test]
