@@ -106,6 +106,7 @@ ressource to different languages:
 - Arnaud Bodin: french
 - Bulhwi Cha: korean
 - Federico Dal Pio Luogo: italian
+- Konstantin Belyanin: russian
 - Luís Felipe Marques: portugese
 - Violeta Hernández Palacios: spanish
 - WangZhihong (Rex): chinese
