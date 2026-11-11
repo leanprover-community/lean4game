@@ -18,7 +18,7 @@ Providing the use access to a Lean instance running on the server is a severe se
 
 TODO
 
-- [Development Instructions](./doc/development.md)
+- [Development Instructions](./doc/development/development.md)
 
 ## Licencing
 

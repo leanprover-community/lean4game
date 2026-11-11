@@ -4,9 +4,9 @@ This is a template for creating a game with [leangame](https://github.com/leanpr
 
 The documentation about how to use this template are at the [lean4game repository](https://github.com/leanprover-community/lean4game/):
 
-- [Creating a new game](https://github.com/leanprover-community/lean4game/blob/main/doc/create_game.md)
-  - [Updating an existing game](https://github.com/leanprover-community/lean4game/blob/main/doc/update_game.md)
-  - [Running a game locally](https://github.com/leanprover-community/lean4game/blob/main/doc/running_locally.md)
+- [Creating a new game](https://github.com/leanprover-community/lean4game/blob/main/doc/game/create_game.md)
+  - [Updating an existing game](https://github.com/leanprover-community/lean4game/blob/main/doc/game/update_game.md)
+  - [Running a game locally](https://github.com/leanprover-community/lean4game/blob/main/doc/game/running_locally.md)
 
 ## Quick start
 
