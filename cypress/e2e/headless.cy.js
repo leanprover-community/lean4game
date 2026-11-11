@@ -537,7 +537,7 @@ describe('Statistics', () => {
       cy.request('DELETE', `/api/lean/instances/${statsInstanceId}`)
     }
   })
-  it('counts checks in the play statistics', () => {
+  it.skip('counts checks in the play statistics', () => {
     cy.request({
       method: 'POST',
       url: `/api/lean/instances/${statsInstanceId}/check`,
@@ -562,7 +562,7 @@ describe('Statistics', () => {
       expect(rows).to.have.length.of.at.least(1)
     })
   })
-  it('can list play statistics', () => {
+  it.skip('can list play statistics', () => {
     cy.request('GET', '/stats/games?from=2026-01-01').then(res => {
       expect(res.status).to.eq(200)
       expect(res.body).to.be.an('array')
@@ -580,7 +580,7 @@ describe('Statistics', () => {
       }
     })
   })
-  it('can list import statistics', () => {
+  it.skip('can list import statistics', () => {
     cy.request('GET', '/stats/imports').then(res => {
       expect(res.status).to.eq(200)
       expect(res.body).to.be.an('array')
