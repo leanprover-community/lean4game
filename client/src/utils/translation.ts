@@ -1,10 +1,7 @@
-import { useAtom } from 'jotai';
-import { useContext } from 'react'
-import { useTranslation, UseTranslationResponse } from 'react-i18next'
-import { gameIdAtom } from '../store/location-atoms';
-import { gameInfoAtom } from '../store/query-atoms';
-import { getGameI18n } from '../i18n';
-import type { TFunction } from 'i18next';
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
+import { getGameI18n } from '../i18n'
 
 /**
  * This file provides the tools to process translations created by the Lean package `lean-i18n`.
@@ -16,7 +13,7 @@ import type { TFunction } from 'i18next';
  * these blocks are contained.
  * Thus, we mirror the block replacement `lean-i18n` does before trying to translate
  * the texts which have the blocks replaced.
-*/
+ */
 
 /**
  * Extract code blocks and latex blocks, search for translations and plug the translations
@@ -26,57 +23,70 @@ import type { TFunction } from 'i18next';
  * from the `lean-i18n` package!
  */
 function extractCodeBlocks(input: string): {
-  key: string,
-  codeBlocks: string[],
+  key: string
+  codeBlocks: string[]
 } {
-  const regex = /((?<!\\)(`+|\${1,2})([\s\S]*?)\2)/g;
+  const regex = /((?<!\\)(`+|\${1,2})([\s\S]*?)\2)/g
   const blocks: string[] = []
-  let modified = input
   let index = 0
   // Collect code blocks and replace them with placeholders
-  modified = modified.replace(regex, (match, _full, _ticks, _content) => {
+  const modified = input.replace(regex, match => {
     blocks.push(match)
     const placeholder = `§${index}`
     index++
     return placeholder
-  });
+  })
   return { key: modified, codeBlocks: blocks }
 }
 
 /**
- * This function exchanges implicit line breaks in a translation keys
- * to explicit ones. This is necessary as the translation keys generated
- * by lean-i18n do contain explit line breaks, i.e. `\n`. The keys that are originally
- * sources from the games .lean files do not contain explicit line breaks which leads to
- * key-errors, when trying to load translations.
+ * Translates texts of the game `gameId`, e.g. `g/owner/repo`, into the current language.
+ * Replaces code blocks according to the translation keys received from `lean-i18n`.
+ *
+ * With `allowEmptyTranslations` (from the game's settings), an empty translation hides
+ * the text, otherwise it counts as missing and the original text is shown.
  */
-function normalizeKeyString(key: string): string{
-  return key.replace(/\n/g, '\\n')
-}
+export function useGameTranslation(
+  gameId: string,
+  allowEmptyTranslations = false,
+) {
+  const { i18n } = useTranslation()
+  const lng = i18n.resolvedLanguage ?? i18n.language
 
-/** Translate game text with the same placeholder handling on tiles and game pages. */
-export function translateGameText(gameT: TFunction, gameId: string | undefined, key: string | undefined): string {
-  if (!key) return ""
-  const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
-  // lean-i18n doubles backslashes outside code blocks in catalog keys.
-  const escapedKey = keyWithoutBlocks.replace(/\\/g, '\\\\')
-  // Keep the older placeholder and raw keys as fallbacks for existing catalogs.
-  const translatedKey = gameT([escapedKey, keyWithoutBlocks, key], {ns: gameId})
-  return translatedKey.replace(/(?<!\\)§(\d+)/g, (_, num: string) => codeBlocks[Number(num)] ?? num);
-}
+  // the namespace of the game is loaded from the server, re-render once it is there.
+  // On a language change, i18next loads it in the new language by itself.
+  const [, setLoaded] = useState(0)
+  useEffect(() => {
+    let active = true
+    void i18n.loadNamespaces(gameId).then(() => {
+      if (active) setLoaded(n => n + 1)
+    })
+    return () => {
+      active = false
+    }
+  }, [i18n, gameId])
 
-/**
- * Wrapper around the hook obtained from `useTranslation`.
- * Add the game-ID namespace and replace code blocks according to
- * the translation keys received from `lean-i18n`.
- */
-export function useGameTranslation(): UseTranslationResponse<'translation', undefined> {
-  const [gameId] = useAtom(gameIdAtom)
-  const [{ data: gameInfo }] = useAtom(gameInfoAtom)
+  // the keys are whole texts, so `.` must not separate nested keys
+  const gameT = getGameI18n(allowEmptyTranslations).getFixedT(lng) as (
+    keys: string[],
+    options: { ns: string; keySeparator: false },
+  ) => string
+  const pattern = /(?<!\\)§(\d+)/g
 
-  const { t, i18n, ...rest } = useTranslation()
-  const gameI18n = getGameI18n(gameInfo?.settings?.allowEmptyTranslations ?? false)
-  const gameT = gameI18n.getFixedT(i18n.resolvedLanguage ?? i18n.language)
-  const modifiedT = ((key: string | undefined) => translateGameText(gameT, gameId, key)) as typeof t
-  return { t: modifiedT, i18n, ...rest }
+  const t = (key: string | undefined): string => {
+    if (!key) return ''
+    const { codeBlocks, key: keyWithoutBlocks } = extractCodeBlocks(key)
+    // lean-i18n doubles backslashes outside code blocks in catalog keys.
+    const escapedKey = keyWithoutBlocks.replace(/\\/g, '\\\\')
+    // Keep the older placeholder and raw keys as fallbacks for existing catalogs.
+    const translatedKey = gameT([escapedKey, keyWithoutBlocks, key], {
+      ns: gameId,
+      keySeparator: false,
+    })
+    return translatedKey.replace(
+      pattern,
+      (_, num: string) => codeBlocks[Number(num)] ?? num,
+    )
+  }
+  return { t, i18n }
 }

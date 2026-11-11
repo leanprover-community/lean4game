@@ -1,12 +1,55 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
 node_modules
-client/dist
-relay/dist
-games/
-server/.lake
-**/.DS_Store
-logs/
-relay/prev_cpu_metric
-test.ecosystem.config.cjs
-prod.ecosystem.config.cjs
-announcements.json
+**/dist
+dist-ssr
+*.local
+
+# TODO
+OLD_CLIENT/
+config-hhu.json
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# For example from `lake exe graph out.pdf`
+*.pdf
+
+# Lean
+**/.lake
+**/.i18n/**/*.mo
+
+# Locally fetched games
+/server/games
+
+# Database
+/server/data
+
+# The lake-manifest of the game skeleton contains links to
+# the local GameServer, therefore it must not be included
+# in the template game used to create a new game
+/GameSkeleton/lake-manifest.json
+
+# Python virtual environment for `client/scripts`
+client/scripts/.python
+
+# Cypress
 cypress/screenshots
+
+# Claude
+.claude

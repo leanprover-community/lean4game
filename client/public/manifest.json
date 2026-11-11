@@ -1,6 +1,8 @@
 {
-  "short_name": "Lean4game",
+  "id": "/",
+  "short_name": "LeanGame",
   "name": "Learning games for Lean",
+  "description": "Learn Lean by playing games",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,8 +20,9 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#1070b0",
   "background_color": "#ffffff"
 }

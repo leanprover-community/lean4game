@@ -1,0 +1,5 @@
+.DS_Store
+
+# Lean
+**/.lake
+**/.i18n/**/*.mo

@@ -1,25 +1,7 @@
 {
-  "compilerOptions": {
-    "composite": true,
-    "outDir": "./dist/",
-    "module": "esnext",
-    "target": "es5",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "jsx": "react",
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "lib": [
-      "ES2021.String",
-      "DOM"
-    ],
-    "strict": true,
-  },
-  "include": [
-    "./src/",
-    "./src/config.json", "../infoview", "../infoview", "../infoview",
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
   ]
 }

@@ -1,0 +1,30 @@
+name: build-non-main
+run-name: Build the game
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches-ignore:
+      - 'main'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      # `lean-action` refuses to run without a `lake-manifest.json`, but we do not want to include
+      # the manifest from the `leangame` repo.
+      # When using this template, you can replace the following steps with
+      # - uses: leanprover/lean-action@v1
+      #   with:
+      #     use-github-cache: false
+      - name: install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: update dependencies
+        run: lake update -R --keep-toolchain
+      - name: build game
+        run: |
+          lake build
+          lake build GameServer

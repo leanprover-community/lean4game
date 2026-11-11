@@ -1,0 +1,41 @@
+import GameApi
+
+/-!
+Test that hints inside a branch are translated.
+-/
+
+Game "Test"
+World "Test"
+Level 1
+
+/-- info: There are 0 keys marked for translation: [] -/
+#guard_msgs in
+print_translation_keys
+
+Statement (n : Nat) : 0 + n = n := by
+  Template
+    induction n
+    Hint "outside"
+    Branch
+      skip
+      Hint "inside"
+      simp
+    simp
+    Hint "outside again"
+  simp
+
+/-- info: There are 3 keys marked for translation: [outside, inside, outside again] -/
+#guard_msgs in
+print_translation_keys
+
+Level 2
+
+Statement : True := by
+  Branch
+    Hint "some hint inside branch"
+    skip
+  trivial
+
+/-- some hint inside branch -/
+#guard_msgs (substring := true) in
+print_translation_keys

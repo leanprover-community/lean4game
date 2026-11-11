@@ -1,0 +1,40 @@
+{
+  "name": "leangame-dev",
+
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "oxc.oxc-vscode",
+        "bradlc.vscode-tailwindcss",
+        "leanprover.lean4",
+        "qwtel.sqlite-viewer"
+      ]
+    }
+  },
+
+  "forwardPorts": [3000, 8000],
+
+  "containerEnv": {
+    "BWRAP_BIND_PROC": "true"
+  },
+
+  "remoteEnv": {
+    // don't expose the host's forwarded SSH agent
+    "SSH_AUTH_SOCK": ""
+  },
+
+  "remoteUser": "node",
+  "containerUser": "node",
+
+  "runArgs": ["--cap-drop=ALL", "--security-opt=no-new-privileges:true"],
+
+  "postCreateCommand": "npm ci && npx cypress install"
+}

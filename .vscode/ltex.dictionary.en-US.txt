@@ -1,7 +1,0 @@
-GameSkeleton
-HiddenTactic
-subgoals
-KaTex
-gameserver
-lakefile
-Zulip

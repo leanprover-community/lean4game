@@ -1,0 +1,163 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Roboto Slab';
+  src: url('./assets/fonts/RobotoSlab.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JuliaMono';
+  src: url('./assets/fonts/JuliaMono-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* only contains the emojis listed in `scripts/subset-font.sh` */
+@font-face {
+  font-family: 'Noto Color Emoji Subset';
+  src: url('./assets/fonts/NotoColorEmoji-Subset.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* used by tailwind's preflight and the `font-sans`/`font-mono` utilities */
+@theme {
+  --font-sans: 'Roboto Slab', serif;
+  --font-mono: 'Noto Color Emoji Subset', 'JuliaMono', monospace;
+
+  --color-primary: #1070b0;
+
+  /* the offset shadow of the game tiles on the landing page */
+  --shadow-tile: 5px 5px 8px var(--color-neutral-400);
+
+  /* error messages, e.g. `border-error bg-error-bg` */
+  --color-error: #d8000c;
+  --color-error-bg: #ffbaba;
+}
+
+/*
+Styles of elements, in the base layer so that Tailwind classes like `m-0`, `no-underline`
+or `text-white` override them. `--accent` is the theme colour, lighter in dark mode to
+stay readable.
+*/
+@layer base {
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--heading);
+    font-weight: 500;
+    color: var(--text-h);
+  }
+
+  h1 {
+    font-size: 56px;
+    line-height: 1.1;
+    margin: 32px 0;
+    @media (max-width: 1024px) {
+      font-size: 36px;
+      margin: 20px 0;
+    }
+  }
+  h2 {
+    font-size: 24px;
+    line-height: 118%;
+    margin: 0 0 8px;
+    @media (max-width: 1024px) {
+      font-size: 20px;
+    }
+  }
+  p {
+    margin: 0;
+  }
+
+  code,
+  .counter {
+    font-family: var(--mono);
+    display: inline-flex;
+    border-radius: 4px;
+    color: var(--text-h);
+  }
+
+  code {
+    font-size: 15px;
+    line-height: 135%;
+    padding: 4px 8px;
+    background: var(--code-bg);
+  }
+}
+
+/* `dark:` follows the `theme` preference, or the system if it is `auto` */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme]), :root:not([data-theme]) *) {
+      @slot;
+    }
+  }
+}
+
+/* `flex-col` implies `flex`, so `flex flex-col` can be shortened to `flex-col` */
+@utility flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+:root {
+  /* light and dark colours, see the `theme` preference */
+  --text: light-dark(#6b6375, #9ca3af);
+  --text-h: light-dark(#08060d, #f3f4f6);
+  --bg: light-dark(#fff, #16171d);
+  --border: light-dark(#e5e4e7, #2e303a);
+  --code-bg: light-dark(#f4f3ec, #1f2028);
+  /* every second section of the landing page */
+  --section-bg: light-dark(#f8f9fa, #1c1d24);
+  --accent: light-dark(#1070b0, #00b0e0);
+  --accent-bg: light-dark(rgba(16, 112, 176, 0.1), rgba(0, 176, 224, 0.15));
+  --accent-border: light-dark(rgba(16, 112, 176, 0.5), rgba(0, 176, 224, 0.5));
+  --shadow:
+    light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4)) 0 10px 15px -3px,
+    light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.25)) 0 4px 6px -2px;
+
+  --sans: var(--font-sans);
+  --heading: var(--font-sans);
+  --mono: var(--font-mono);
+
+  font: 16px/1.45 var(--sans);
+  letter-spacing: 0.18px;
+  /* `light-dark()` follows the system, unless the player chose a theme */
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  &[data-theme='light'] {
+    color-scheme: light;
+  }
+  &[data-theme='dark'] {
+    color-scheme: dark;
+  }
+}
+
+#root {
+  width: 100svw;
+  /* the part above the on-screen keyboard on iOS, see `useKeyboardViewport` */
+  height: var(--app-height, 100svh);
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}

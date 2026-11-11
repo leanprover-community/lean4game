@@ -1,54 +1,14 @@
 {
   "languages": [
-    {
-      "iso": "en",
-      "flag": "GB",
-      "name": "English"
-    },
-    {
-      "iso": "de",
-      "flag": "DE",
-      "name": "Deutsch"
-    },
-    {
-      "iso": "zh",
-      "flag": "CN",
-      "name": "中文"
-    },
-    {
-      "iso": "es",
-      "flag": "ES",
-      "name": "Español"
-    },
-    {
-      "iso": "ko",
-      "flag": "KR",
-      "name": "한국어"
-    },
-    {
-      "iso": "uk",
-      "flag": "UA",
-      "name": "Українська"
-    },
-    {
-      "iso": "it",
-      "flag": "IT",
-      "name": "Italiano"
-    },
-    {
-      "iso": "fr",
-      "flag": "FR",
-      "name": "Français"
-    },
-    {
-      "iso": "ru",
-      "flag": "RU",
-      "name": "Русский"
-    },
-    {
-      "iso": "pt-BR",
-      "flag": "BR",
-      "name": "Português"
-  }
+    { "iso": "en", "name": "English", "flag": "GB" },
+    { "iso": "de", "name": "Deutsch", "flag": "DE" },
+    { "iso": "es", "name": "Español", "flag": "ES" },
+    { "iso": "fr", "name": "Français", "flag": "FR" },
+    { "iso": "it", "name": "Italiano", "flag": "IT" },
+    { "iso": "ko", "name": "한국어", "flag": "KR" },
+    { "iso": "pt-BR", "name": "Português", "flag": "BR" },
+    { "iso": "uk", "name": "Українська", "flag": "UA" },
+    { "iso": "zh", "name": "中文", "flag": "CN" },
+    { "iso": "ru", "name": "Русский" }
   ]
 }

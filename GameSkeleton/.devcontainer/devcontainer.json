@@ -1,0 +1,38 @@
+{
+  "name": "game",
+
+  "build": {
+    "dockerfile": "Dockerfile",
+    // the Dockerfile reads `lean-toolchain`
+    "context": ".."
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["leanprover.lean4"]
+    }
+  },
+
+  "remoteEnv": {
+    // don't expose the host's forwarded SSH agent
+    "SSH_AUTH_SOCK": ""
+  },
+
+  "remoteUser": "node",
+  "containerUser": "node",
+
+  "runArgs": ["--cap-drop=ALL", "--security-opt=no-new-privileges:true"],
+
+  // the game server, see `start-server.sh`
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "Game", "onAutoForward": "openBrowserOnce" }
+  },
+  // builds the game, see `post-create.sh`
+  "postCreateCommand": ".devcontainer/post-create.sh",
+  "postAttachCommand": ".devcontainer/start-server.sh"
+}

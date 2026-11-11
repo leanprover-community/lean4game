@@ -6,8 +6,6 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - main
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -49,14 +47,14 @@ jobs:
         if: matrix.os == 'macos-latest' && matrix.browser == 'firefox'
         uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1
 
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - uses: leanprover/lean-action@f061402b660e0c34644504b324e830f2991d4865 # v1.6.1
+      - uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1.6.2
         with:
           build: true
           test: true
@@ -64,7 +62,7 @@ jobs:
           use-github-cache: false
           use-mathlib-cache: false
           check-reservoir-eligibility: false
-          lake-package-directory: "server"
+          lake-package-directory: 'server/lean'
 
       - run: elan default stable
 
@@ -72,23 +70,13 @@ jobs:
         run: |
           npm install
           npm run build
-          npm run build:test
 
       - name: Run Cypress tests (Development mode)
         run: npm run test
 
-      - name: Upload Cypress screenshots
-        if: failure()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
-        with:
-          name: "cypress-screenshots-${{ matrix.name }}-${{ matrix.browser }}"
-          path: cypress/screenshots
-          retention-days: 2
-          if-no-files-found: ignore
-
       - name: Install Bubblewrap
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get install bubblewrap
+        run: sudo apt-get update && sudo apt-get install -y bubblewrap
 
       - name: Configure AppArmor for Bubblewrap (https://etbe.coker.com.au/2024/04/24/ubuntu-24-04-bubblewrap/)
         if: matrix.os == 'ubuntu-latest'
@@ -106,9 +94,56 @@ jobs:
           EOF
           sudo systemctl reload apparmor
 
+      # the dev servers of the previous step can survive `concurrently -k` and keep the ports busy
+      - name: Stop leftover dev servers
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          for port in 3000 8000; do
+            pids=$(lsof -ti tcp:$port || true)
+            if [[ -n "$pids" ]]; then
+              echo "Killing processes on port $port: $pids"
+              kill $pids || true
+            fi
+          done
+
       - name: Run Cypress tests (Production mode)
         if: matrix.os == 'ubuntu-latest'
         run: npm run test:prod
+
+      - name: Upload Cypress screenshots
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: 'cypress-screenshots-${{ matrix.name }}-${{ matrix.browser }}'
+          path: cypress/screenshots
+          retention-days: 2
+          if-no-files-found: ignore
+
+  lint:
+    name: Lint and format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: npm ci
+
+      # all rules are warnings, shown as annotations in the PR
+      - name: Lint
+        continue-on-error: true
+        run: npm run lint -- --format=github
+
+      - name: Check formatting
+        continue-on-error: true
+        run: npm run fmt:check
+
+      - name: Check translations
+        continue-on-error: true
+        run: npm run i18n:check
 
   all:
     name: all

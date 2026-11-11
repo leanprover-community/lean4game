@@ -1,0 +1,162 @@
+msgid ""
+msgstr "Project-Id-Version: Game v4.35.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-08\n"
+"Last-Translator: \n"
+"Language-Team: none\n"
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../..\n"
+"X-Poedit-SearchPath-0: ."
+
+#: Game.lean:24
+msgid "A small template game."
+msgstr ""
+
+#: Game/Doc/Definitions.lean:6
+msgid "Addition"
+msgstr ""
+
+#: Game/Doc/Definitions.lean:3
+msgid "An equality"
+msgstr ""
+
+#: Game/Levels/HelloWorld.lean:9
+msgid "An optional world conclusion"
+msgstr ""
+
+#: Game/Doc/Tactics.lean:15
+msgid "Assume the premise of an induction."
+msgstr ""
+
+#: Game/Doc/Tactics.lean:9
+msgid "Can be proven by an existing result."
+msgstr ""
+
+#. §0: `ℕ`
+#: Game/Doc/Theorems.lean:3
+msgid "Commutativity on §0"
+msgstr ""
+
+#: Game/Levels/HelloWorld/L02_HypothesisNames.lean:15
+#: Game/Levels/HelloWorld/L03_NonProp.lean:17
+msgid "Done!"
+msgstr ""
+
+#: Game.lean:3
+msgid "Game Skeleton"
+msgstr ""
+
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:6
+msgid "Hello Level"
+msgstr "Hallo-Level auf Deutsch"
+
+#: Game/Levels/HelloWorld.lean:6
+msgid "Hello World"
+msgstr ""
+
+#: Game.lean:14
+msgid "Here you can put additional information about the game. It is accessible\n"
+"from the starting through the drop-down menu.\n"
+"\n"
+"For example: Game version, Credits, Link to Github and Zulip, etc.\n"
+"\n"
+"Use **markdown**."
+msgstr ""
+
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:23
+msgid "Hidden Hint 1"
+msgstr ""
+
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:24
+msgid "Hidden Hint 2"
+msgstr ""
+
+#: Game/Levels/HelloWorld/L02_HypothesisNames.lean:6
+msgid "Hypothesis Names"
+msgstr ""
+
+#: Game/Doc/Tactics.lean:12
+msgid "Introduce an auxilary result."
+msgstr ""
+
+#. §0: `«{h}»`
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:19
+msgid "Maybe you should use §0 now."
+msgstr "Jetzt §0 verwenden."
+
+#: Game/Levels/HelloWorld/L03_NonProp.lean:6
+msgid "Non-Prop-Valued"
+msgstr ""
+
+#: Game/Doc/Theorems.lean:6
+msgid "Proven in level 1"
+msgstr ""
+
+#: Game/Doc/Tactics.lean:3
+msgid "The way to proof reflexivity."
+msgstr ""
+
+#: Game.lean:9
+msgid "This conclusion is shown on the game overview once all worlds are completed."
+msgstr ""
+
+#: Game/Levels/HelloWorld.lean:11
+msgid "This introduction is shown before one enters level 1 of the hello world. Use markdown."
+msgstr ""
+
+#: Game/Levels/HelloWorld/L02_HypothesisNames.lean:8
+#: Game/Levels/HelloWorld/L03_NonProp.lean:8
+msgid "This is a test level."
+msgstr ""
+
+#: Game.lean:4
+msgid "This is the introduction text of the game."
+msgstr ""
+
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:27
+msgid "This last message appears if the level is solved."
+msgstr ""
+
+#. §0: $\\textbf{LaTeX}$
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:8
+msgid "This text is shown as first message when the level is played.\n"
+"You can insert hints in the proof below. They will appear in this side panel\n"
+"depending on the proof a user provides. There can be §0"
+msgstr "Dieser Text wird als erste Nachricht angezeigt, wenn der Level gespielt wird."
+"Im Beweis unten kannst du Hinweise einfügen. Sie erscheinen in dieser Seitenleiste,"
+"je nachdem, welchen Beweis ein Spieler angibt. Der Text kann §0 beinhalten"
+
+#: Game/Doc/Tactics.lean:6
+msgid "To change the goal using equalities."
+msgstr ""
+
+#: Game/Doc/Tactics.lean:18
+msgid "Use an existing result."
+msgstr ""
+
+#. §0: `«{h}»`
+#. §1: `«{g}»`
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:15
+msgid "You can either start using §0 or §1."
+msgstr "Du kannst mit §0 oder §1 starten."
+
+#. §0: `sample code`
+#: Game.lean:25
+msgid "You should use this game as a template for your own game and add your own levels. §0"
+msgstr "Dieses Spiel kann als Template verwendet werden. §0"
+
+#. §0: `«{g}»`
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:22
+#: Game/Levels/HelloWorld/L02_HypothesisNames.lean:12
+msgid "You should use §0 now."
+msgstr ""
+
+#: Game/Levels/HelloWorld/L03_NonProp.lean:12
+msgid "intro first!"
+msgstr ""
+
+#: Game/Levels/HelloWorld/L03_NonProp.lean:14
+msgid "now apply!"
+msgstr ""

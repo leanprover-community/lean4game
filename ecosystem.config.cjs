@@ -1,17 +1,25 @@
-// This is a configuration file for pm2, a production process manager for nodejs
+/*
+ * Start with `pm2 start ecosystem.config.cjs` from the repository root
+ * after `npm run build`.
+ * See `doc/server/server.md` for all environment variables.
+ */
+
+const path = require('node:path')
+
 module.exports = {
-  apps : [{
-    name   : "lean4game",
-    script : "relay/dist/src/index.js",
-    env: {
-      LEAN4GAME_GITHUB_USER: "",
-      LEAN4GAME_GITHUB_TOKEN: "",
-      RESERVED_DISC_SPACE_MB: 0,
-      ISSUE_CONTACT: "",
-      NODE_ENV: "production",
-      PORT: 8002,
-      API_PORT: 8010,
-      CPU_SCRIPT: ""
+  apps: [
+    {
+      name: 'leangame',
+      script: path.join(__dirname, 'server', 'dist', 'index.js'),
+      cwd: path.join(__dirname, 'server'),
+      env: {
+        NODE_ENV: 'production',
+        PORT: 8000,
+        // only reachable through nginx, see `deploy/nginx/leangame.conf`
+        HOST: '127.0.0.1',
+        LEANGAME_GITHUB_TOKEN: '',
+        LEANGAME_GITHUB_USER: '',
+      },
     },
-  }]
+  ],
 }

@@ -1,0 +1,32 @@
+{
+  "announcements": [],
+  "featuredGames": [
+    { "owner": "leanprover-community", "repo": "nng4" },
+    { "owner": "hhu-adam", "repo": "robo" },
+    { "owner": "alexkontorovich", "repo": "realanalysisgame" },
+    { "owner": "djvelleman", "repo": "stg4" },
+    { "owner": "trequetrum", "repo": "lean4game-logic" },
+    { "owner": "emilyriehl", "repo": "reintroductiontoproofs" },
+    { "owner": "jadabouhawili", "repo": "knightsandknaves-lean4game" },
+    { "owner": "zrtmrh", "repo": "linearalgebragame" }
+  ],
+  "listImportedGames": false,
+  "contact": {
+    "name": "unknown",
+    "address": [],
+    "phone": "",
+    "url": "",
+    "technicalEmail": ""
+  },
+  "impressum": {
+    "legalForm": "",
+    "vatId": "",
+    "link": {
+      "label": "",
+      "url": ""
+    }
+  },
+  "privacy": {
+    "serverLocation": ""
+  }
+}
