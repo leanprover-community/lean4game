@@ -24,7 +24,7 @@
     "test:client": "npm run test:build-game && concurrently -n app,cypress -c blue,green \"npm start\" \"cypress run\" -k -s first --hide app",
     "test:lean": "npm --workspace server run test:lean",
     "test:build-game": "cd GameSkeleton && rm -f lake-manifest.json && lake update -R -Kleangame.testgame --keep-toolchain && lake build && lake build GameServer",
-    "test:prod": "npm run build && npm run test:build-game && concurrently -n app,cypress -c blue,green \"npm prod\" \"cypress run --config baseUrl=http://localhost:8000\" -k -s first --hide app",
+    "test:prod": "npm run build && npm run test:build-game && concurrently -n app,cypress -c blue,green \"node server/dist/index.js\" \"cypress run --config baseUrl=http://localhost:8000\" -k -s first --hide app",
     "test:ui": "concurrently -n app,cypress -c blue,green \"npm start\" \"cypress open\" -k -s first --hide app",
     "api:check": "cmp server/src/api.ts client/src/api.ts && echo \"api.ts is identical on both sides\""
   },

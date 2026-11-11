@@ -94,6 +94,18 @@ jobs:
           EOF
           sudo systemctl reload apparmor
 
+      # the dev servers of the previous step can survive `concurrently -k` and keep the ports busy
+      - name: Stop leftover dev servers
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          for port in 3000 8000; do
+            pids=$(lsof -ti tcp:$port || true)
+            if [[ -n "$pids" ]]; then
+              echo "Killing processes on port $port: $pids"
+              kill $pids || true
+            fi
+          done
+
       - name: Run Cypress tests (Production mode)
         if: matrix.os == 'ubuntu-latest'
         run: npm run test:prod

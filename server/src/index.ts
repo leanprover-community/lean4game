@@ -283,8 +283,14 @@ app.get('/api/i18n/:owner/:game/:lang', (req, res) => {
 // in development, Vite serves the client
 if (!isDevMode()) serveClient(app)
 
-const onListening = () =>
+// Express 5 passes listen errors (e.g. `EADDRINUSE`) to this callback instead of throwing
+const onListening = (error?: Error) => {
+  if (error) {
+    console.error(`Failed to listen on ${HOST ?? ''}:${PORT}:`, error.message)
+    process.exit(1)
+  }
   console.log(`Server listening on ${HOST ?? ''}:${PORT}`)
+}
 // without a host, Node listens on all addresses (IPv4 and IPv6)
 if (HOST) app.listen(PORT, HOST, onListening)
 else app.listen(PORT, onListening)
