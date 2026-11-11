@@ -7,6 +7,7 @@ import { twMerge } from 'tailwind-merge'
 
 import { InlineConclusion, InlineNextButton } from '../../Chat/Chat'
 import { Markdown } from '../../components/Markdown'
+import { Toast } from '../../components/Toast'
 import { WorldImage } from '../../components/WorldImage'
 import { useScrollToSelectedStep } from '../../hooks/useStepSelection'
 import { gameIdAtom } from '../../state/location-atoms'
@@ -22,6 +23,7 @@ import { useGameTranslation } from '../../utils/translation'
 import { HoverProvider } from './HoverCode'
 import { ProofStep } from './ProofStep'
 import { proofResultEffect, resetEditingStepEffect } from './typewriter-atoms'
+import { typewriterToastAtom } from './typewriter-insert-atoms'
 import { TypewriterInput } from './TypewriterInput'
 
 /**
@@ -55,7 +57,9 @@ export function Typewriter() {
   const error = instance.error ?? (checkStatus === 409 ? null : check.error)
 
   return (
-    <div className="flex-col h-full bg-(--section-bg) text-left">
+    <div className="relative flex-col h-full bg-(--section-bg) text-left">
+      {/* what clicking an insertion button inserted */}
+      <Toast messageAtom={typewriterToastAtom} />
       <div className="relative min-h-0 flex-1">
         {/* behind the proof, it does not scroll with it */}
         <WorldImage />

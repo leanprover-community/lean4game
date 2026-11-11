@@ -269,3 +269,17 @@ export function insertName(state: InputState, name: string): InputState {
   const caret = next?.start ?? end
   return { text, slots: others, selection: [caret, caret] }
 }
+
+/**
+ * The plain text of an insertion, e.g. to show or copy it: a tactic's template without its
+ * slots, e.g. `rw []`, or a name
+ */
+export function insertionText(
+  insertion:
+    | { kind: 'tactic'; template: string }
+    | { kind: 'name'; name: string },
+) {
+  return insertion.kind === 'tactic'
+    ? parseTemplate(insertion.template).text.trim()
+    : insertion.name
+}

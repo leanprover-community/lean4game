@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
+import { Toast } from '../../components/Toast'
 import { WorldImage } from '../../components/WorldImage'
 import { proofOfCode } from '../../state/progress-schema'
 import {
@@ -13,7 +14,7 @@ import {
   proofCheckAtom,
 } from '../../state/proof-atoms'
 import { levelInfoAtom } from '../../state/query-atoms'
-import { CopyToast } from './CopyToast'
+import { rawToastAtom } from './raw-insert-atoms'
 import { Transcript } from './Transcript'
 
 /** Whether two proofs have the same steps */
@@ -89,7 +90,7 @@ export function Raw() {
           <Transcript text={text} />
         </div>
       </div>
-      <CopyToast />
+      <Toast messageAtom={rawToastAtom} />
     </div>
   )
 }

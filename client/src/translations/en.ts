@@ -100,6 +100,7 @@ export const en = {
     proof: 'Proof',
     checking: 'Checking the proof…',
     transcript: 'Messages',
+    inserted: "Inserted '{{text}}'",
     copied: "Copied '{{text}}' to the clipboard",
     copyFailed: "Could not copy '{{text}}' to the clipboard",
     line: 'Line {{line}}',

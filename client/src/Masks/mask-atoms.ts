@@ -1,6 +1,8 @@
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
+import { rightPanelOpenAtom } from '../state/layout-atoms'
+import { mobileAtom } from '../state/preferences-atoms'
 import { insertInRawAtom } from './Raw/raw-insert-atoms'
 import { insertInTypewriterAtom } from './Typewriter/typewriter-insert-atoms'
 
@@ -44,6 +46,8 @@ export type Insertion =
  * raw mask copies it to the clipboard.
  */
 export const insertAtom = atom(null, (get, set, insertion: Insertion) => {
+  // on mobile, the inventory covers the mask, so it gets out of the way
+  if (get(mobileAtom)) set(rightPanelOpenAtom, false)
   switch (get(maskAtom)) {
     case Mask.Typewriter:
       set(insertInTypewriterAtom, insertion)

@@ -1,6 +1,9 @@
 import { atom } from 'jotai'
 
+import { toastAtom } from '../../components/Toast'
+import i18n from '../../i18n'
 import type { Insertion } from '../mask-atoms'
+import { insertionText } from './insertion'
 
 /** An input field of the typewriter which takes insertions, see `useInsertion` */
 export interface InsertTarget {
@@ -22,15 +25,22 @@ export function nextFocusTime() {
  */
 export const insertTargetsAtom = atom<InsertTarget[]>([])
 
+/** Says what was inserted, shown by `Typewriter` */
+export const typewriterToastAtom = toastAtom()
+
 /** Inserts into the input field which was focused last, see `useInsertion` */
 export const insertInTypewriterAtom = atom(
   null,
-  (get, _set, insertion: Insertion) => {
+  (get, set, insertion: Insertion) => {
     const targets = get(insertTargetsAtom)
     const target = targets.reduce<InsertTarget | undefined>(
       (latest, t) => (!latest || t.focusedAt > latest.focusedAt ? t : latest),
       undefined,
     )
-    target?.insert(insertion)
+    if (!target) return
+    target.insert(insertion)
+    set(typewriterToastAtom, {
+      text: i18n.t('masks.inserted', { text: insertionText(insertion) }),
+    })
   },
 )
