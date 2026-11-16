@@ -64,6 +64,7 @@ Download dependencies and build the game:
 cd GameSkeleton
 lake update -R
 lake build
+lake build GameServer
 ```
 
 (If your game depends on Mathlib, `lake update` should automatically download the Mathlib cache. If `lake build` starts to re-build Mathlib files, abort and fetch the cache again with `lake exe cache get` before building. In rare erroneous states, you might need to use `lake exe cache get!` to invalidate previously downloaded cache.)
