@@ -15,6 +15,7 @@ Then, depending on the setup you use, do one of the following:
   ```
   lake update -R
   lake build
+  lake build GameServer
   ```
 
   (If `lake update -R` gives you errors, delete a bunch of files with `rm -rf .lake lake-manifest.json` and try again.
