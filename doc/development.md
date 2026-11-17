@@ -28,7 +28,7 @@ the devcontainer.
 
 It is important that the data stored to the database is anonymised and does not contain any personal data.
 
-### Lean interaction 
+### Lean interaction
 
 Each player starts a Lean instance which they then repeatedly ask through the `check` request. Navigating away will close
 the instance.
@@ -62,13 +62,15 @@ To test changes in `server/lean` with a local game, see
 ## Updating Lean version
 
 1. make sure `lean-i18n` has been updated
-2. edit `server/lean/lean-toolchain` to contain the desired version: `leanprover/lean4:v4.31.0`
-3. edit all `require` statements in `server/lean/lakefile.lean` to contain the toolchain (e.g. `"v4.31.0"`) instead of `"main"`
-4. call `lake update --keep-toolchain`
-5. undo the changes in `server/lean/lakefile.lean`
+2. edit `server/lean/lean-toolchain` to contain the desired version: `leanprover/lean4:v4.X.0`
+3. call `lake update -R --keep-toolchain` inside `server/lean`
+4. edit `GameSkeleton/lean-toolchain` to contain the same version: `leanprover/lean4:v4.X.0`
+5. call `lake update -R -Kleangame.testgame --keep-toolchain` inside `GameSkeleton`
 6. `npm run build:server`
-7. on github, create a PR and merge it
-8. create a tag, e.g. `v4.31.0`, pointing to the bump commit
+7. `npm test`
+8. on github, create a PR and merge it.
+9. create a tag on the merged commit, e.g. `v4.X.0`
+10. deploy `GameSkeleton` and `GameServer` and push the tag to there (see below)
 
 ## Deploying GameSkeleton and GameServer
 
@@ -99,4 +101,3 @@ git tag v4.35.0
 git push origin v4.35.0
 git push gameserver "$(git subtree split --prefix=server/lean v4.35.0)":refs/tags/v4.35.0
 ```
-
