@@ -1,3 +1,4 @@
+import { type MouseEvent, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
@@ -21,7 +22,9 @@ function sortLanguages(languages: string[]) {
 
 /**
  * A game on the landing page. The styling is the one of the old client, in pixels as
- * there `1rem` was `16px`. The whole tile links to the game.
+ * there `1rem` was `16px`. The whole tile links to the game: clicks anywhere on it are
+ * forwarded to the link in the title, except clicks on other links and clicks that end
+ * a text selection.
  */
 export function GameTile({
   owner,
@@ -35,35 +38,42 @@ export function GameTile({
     `g/${game}`,
     settings?.allowEmptyTranslations,
   )
+  const titleLink = useRef<HTMLAnchorElement>(null)
+  const href = gamePath(`g/${game}`)
+
+  function handleClick(event: MouseEvent<HTMLElement>) {
+    const target = event.target as HTMLElement
+    if (target.closest('a') || window.getSelection()?.toString()) return
+    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+      window.open(href, '_blank', 'noopener')
+    } else {
+      titleLink.current?.click()
+    }
+  }
 
   return (
+    // The title receives focus and has the same action as the onClick here
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <article
+      onClick={handleClick}
       className={twMerge(
-        'relative flex-col w-full max-w-125 cursor-pointer justify-between',
+        'flex-col w-full max-w-125 cursor-pointer justify-between',
         'justify-self-center rounded-2xl border border-neutral-400 text-left',
         'text-base leading-normal tracking-normal text-(--text-h) shadow-tile',
-        // links in the text are above the link covering the whole tile
-        '[&_a]:no-underline [&_a:not(.tile-link)]:relative',
-        '[&_a:not(.tile-link)]:z-10',
+        '[&_a]:no-underline',
       )}
     >
       <div>
         <div className="mx-2.5 pt-3.75 pb-1.25 text-2xl/normal font-bold">
-          {/* covers the whole tile, links in the text are placed above it */}
-          <Link
-            className="tile-link text-inherit after:absolute after:inset-0"
-            href={gamePath(`g/${game}`)}
-          >
+          <Link ref={titleLink} className="text-inherit" href={href}>
             {gameT(tile.title)}
           </Link>
         </div>
-        <div className="mx-2.5 h-26 py-1.25">{gameT(tile.short)}</div>
+        <div className="mx-2.5 box-content line-clamp-2 h-[2lh] pt-1.25 pb-4">
+          {gameT(tile.short)}
+        </div>
         <div
-          className={twMerge(
-            'h-50 w-full',
-            // behind the image, or instead of it
-            'bg-linear-137 from-purple-900 to-cyan-400',
-          )}
+          className={'h-50 w-full bg-linear-137 from-purple-900 to-cyan-400'}
         >
           <img
             className="h-full w-full object-cover"
@@ -72,7 +82,12 @@ export function GameTile({
           />
         </div>
 
-        <div className="mx-2.5">
+        <div
+          className={twMerge(
+            'mx-2.5 py-4 [&_p]:my-4',
+            '[&>div>:first-child]:mt-0 [&>div>:last-child]:mb-0',
+          )}
+        >
           <Markdown game={game}>{gameT(tile.long)}</Markdown>
         </div>
       </div>
