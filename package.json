@@ -28,21 +28,17 @@
     "test:ui": "concurrently -n app,cypress -c blue,green \"npm start\" \"cypress open\" -k -s first --hide app",
     "api:check": "cmp server/src/api.ts client/src/api.ts && echo \"api.ts is identical on both sides\""
   },
-  "dependencies": {
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
-  },
   "devDependencies": {
-    "concurrently": "^10.0.5",
+    "concurrently": "^10.0.7",
     "cross-env": "^10.1.0",
-    "cypress": "^15.21.0",
+    "cypress": "^16.3.0",
     "oxfmt": "^0.72.0",
-    "oxlint": "^1.79.0",
-    "oxlint-tsgolint": "^7.0.2005"
+    "oxlint": "^1.94.0",
+    "oxlint-tsgolint": "^7.0.2007"
   },
   "allowScripts": {
     "esbuild@0.28.2": true,
     "fsevents@2.3.3": true,
-    "cypress@15.21.0": true
+    "cypress@16.3.0": true
   }
 }

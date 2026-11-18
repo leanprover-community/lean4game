@@ -124,6 +124,24 @@ describe('Server communication', () => {
       })
   }
 
+  /**
+   * Checks the tactics on the shared Lean instance with `fetch` instead of `cy.request`,
+   * so that several checks can run in parallel. Resolves also on an error status.
+   */
+  async function postCheck(tactics) {
+    return fetch(`/api/lean/instances/${instanceId}/check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        world: 'HelloWorld',
+        level: 1,
+        tactics,
+        inventory: [],
+        difficulty: 0,
+      }),
+    }).then(async res => ({ status: res.status, body: await res.json() }))
+  }
+
   before(() => {
     cy.request('POST', '/api/lean/start/test/testgame').then(res => {
       expect(res.status).to.eq(201)
@@ -492,23 +510,13 @@ describe('Server communication', () => {
     })
   })
   it('replaces a waiting check by a newer one', () => {
-    const post = tactics =>
-      fetch(`/api/lean/instances/${instanceId}/check`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          world: 'HelloWorld',
-          level: 1,
-          tactics,
-          inventory: [],
-          difficulty: 0,
-        }),
-      }).then(async res => ({ status: res.status, body: await res.json() }))
     // parallel requests may reach the server in any order, so the later ones are delayed
     const after = (ms, tactics) =>
-      new Promise(resolve => setTimeout(resolve, ms)).then(() => post(tactics))
+      new Promise(resolve => setTimeout(resolve, ms)).then(() =>
+        postCheck(tactics),
+      )
     // `running` keeps Lean busy while the other two arrive
-    const runningPromise = post(['sleep 3000'])
+    const runningPromise = postCheck(['sleep 3000'])
     const replacedPromise = after(300, ['rw [g]'])
     const newestPromise = after(600, ['rw [g]', 'rw [h]'])
     cy.wrap(Promise.all([runningPromise, replacedPromise, newestPromise]), {
