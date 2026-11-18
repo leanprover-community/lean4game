@@ -47,25 +47,31 @@ function scrollParent(element: Element) {
   return null
 }
 
+/** The first element of the proof step `step` inside `container` */
+export function firstStepElement(container: Element | null, step: number) {
+  return container?.querySelector(`[${STEP_ATTRIBUTE}="${step}"]`) ?? null
+}
+
 /**
- * Scrolls to the start of the first element of the selected step inside `ref`. Unlike
- * `scrollIntoView`, smooth scrolling the chat and the proof at the same time works.
+ * Scrolls the closest scrolling ancestor of `element` to the top of `element`.
  */
+export function scrollToTop(
+  element: Element,
+  behavior: ScrollBehavior = 'auto',
+) {
+  const scroller = scrollParent(element)
+  if (!scroller) return
+  const offset =
+    element.getBoundingClientRect().top - scroller.getBoundingClientRect().top
+  scroller.scrollTo({ top: scroller.scrollTop + offset - 8, behavior })
+}
+
+/** Scrolls to the start of the first element of the selected step inside `ref` */
 export function useScrollToSelectedStep(ref: RefObject<HTMLElement | null>) {
   const selectedStep = useAtomValue(selectedStepAtom)
   useEffect(() => {
     if (selectedStep === undefined) return
-    const element = ref.current?.querySelector(
-      `[${STEP_ATTRIBUTE}="${selectedStep}"]`,
-    )
-    const scroller = element && scrollParent(element)
-    if (!scroller) return
-    const offset =
-      element.getBoundingClientRect().top - scroller.getBoundingClientRect().top
-    // leave room for the highlight
-    scroller.scrollTo({
-      top: scroller.scrollTop + offset - 8,
-      behavior: 'smooth',
-    })
+    const element = firstStepElement(ref.current, selectedStep)
+    if (element) scrollToTop(element, 'smooth')
   }, [ref, selectedStep])
 }

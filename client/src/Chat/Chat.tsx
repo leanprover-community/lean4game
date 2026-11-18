@@ -10,6 +10,8 @@ import { Button, LinkButton } from '../components/Button'
 import { Markdown } from '../components/Markdown'
 import { gameCompletedAtom } from '../GamePage/world-tree-atoms'
 import {
+  firstStepElement,
+  scrollToTop,
   useScrollToSelectedStep,
   useStepSelection,
 } from '../hooks/useStepSelection'
@@ -125,26 +127,37 @@ function ButtonRow({ children }: { children: ReactNode }) {
   )
 }
 
-/**
- * The chat: the messages, scrolling to the ones of the selected proof step, and below
- * them a row of `buttons`. When `newestKey` changes, it scrolls to the newest message.
- */
+/** The chat panel. */
 function Chat({
   children,
   buttons,
   newestKey,
+  newestStep,
 }: {
   children: ReactNode
   buttons?: ReactNode
   newestKey?: string
+  newestStep?: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
+  /** the step and the number of messages at the last scroll */
+  const previous = useRef<{ step?: number; count: number }>({ count: 0 })
   useScrollToSelectedStep(ref)
   useEffect(() => {
     const scroll = ref.current
-    if (scroll && newestKey !== undefined)
+    if (!scroll || newestKey === undefined) return
+    const messages = scroll.children
+    const element =
+      newestStep !== undefined && newestStep !== previous.current.step
+        ? firstStepElement(scroll, newestStep)
+        : messages[previous.current.count]
+    previous.current = { step: newestStep, count: messages.length }
+    if (element) {
+      scrollToTop(element)
+    } else {
       scroll.scrollTop = scroll.scrollHeight
-  }, [newestKey])
+    }
+  }, [newestKey, newestStep])
   return (
     <div className="flex-col h-full text-left">
       <div ref={ref} className="min-h-0 flex-1 overflow-y-auto px-2">
@@ -421,7 +434,7 @@ export function LevelChat() {
     </>
   )
   return (
-    <Chat buttons={buttons} newestKey={newestKey}>
+    <Chat buttons={buttons} newestKey={newestKey} newestStep={current}>
       <IntroMessages text={levelInfo?.introduction} step={0} />
       {hints.map((stepHints, i) => (
         <HintMessages
