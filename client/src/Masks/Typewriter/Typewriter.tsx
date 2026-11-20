@@ -9,7 +9,11 @@ import { InlineConclusion, InlineNextButton } from '../../Chat/Chat'
 import { Markdown } from '../../components/Markdown'
 import { Toast } from '../../components/Toast'
 import { WorldImage } from '../../components/WorldImage'
-import { useScrollToSelectedStep } from '../../hooks/useStepSelection'
+import {
+  firstStepElement,
+  scrollToTop,
+  useScrollToSelectedStep,
+} from '../../hooks/useStepSelection'
 import { gameIdAtom } from '../../state/location-atoms'
 import { mobileAtom } from '../../state/preferences-atoms'
 import {
@@ -45,11 +49,16 @@ export function Typewriter() {
     check.error instanceof HttpError ? check.error.status : undefined
   const result = check.data
 
-  // show the newest step
+  // show the last step from its top, i.e. its command, then its hints and goals;
+  // without any commands yet, the statement of the level above the initial step
   useEffect(() => {
-    const scroll = scrollRef.current
-    if (scroll) scroll.scrollTop = scroll.scrollHeight
-    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- `result` triggers the scroll
+    const count = result?.steps.length ?? 0
+    if (count <= 1) {
+      scrollRef.current?.scrollTo({ top: 0 })
+      return
+    }
+    const element = firstStepElement(scrollRef.current, count - 1)
+    if (element) scrollToTop(element)
   }, [result])
 
   const steps = result?.steps ?? []

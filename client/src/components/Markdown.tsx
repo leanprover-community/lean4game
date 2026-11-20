@@ -33,7 +33,7 @@ export function Markdown({
         '[&_h4]:mt-2 [&_h4]:mb-1 [&_h4]:font-semibold',
         '[&_h5]:mt-2 [&_h5]:mb-1 [&_h5]:font-semibold',
         '[&_h6]:mt-2 [&_h6]:mb-1 [&_h6]:font-semibold',
-        '[&>:first-child]:mt-0',
+        '*:first:mt-0',
         // lists
         '[&_ol]:mx-6 [&_ol]:mb-6 [&_ol]:list-decimal',
         '[&_ul]:mx-6 [&_ul]:mb-6 [&_ul]:list-disc',
