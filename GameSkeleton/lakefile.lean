@@ -101,8 +101,30 @@ package Game where
     -- TODO: replace with `leangame.verbose`
     ⟨`trace.debug, true⟩]
 
+/-- Non-Lean build targets: if the content of `images/` or `.i18n/config.json` changed,
+then we need to force `lake` to rebuild instead of replay. -/
+target makeGameInputs pkg : Unit := do
+  let imagesDir := pkg.dir / "images"
+  let imagesJob ← if ← imagesDir.isDir then
+      inputDir imagesDir (text := false) (fun _ => true)
+    else
+      pure (Job.pure #[])
+
+  let i18nConfig := pkg.dir / ".i18n" / "config.json"
+  let configJob ← if ← i18nConfig.pathExists then
+      inputTextFile i18nConfig
+    else
+      pure (Job.pure i18nConfig)
+
+  return imagesJob.mix configJob
+
+/-- Note: changes to any target in `needs` cause the entire game to be rebuilt. -/
 @[default_target]
-lean_lib Game
+lean_lib Game where
+  needs := #[
+    /- The library `GameServer` is not imported by the game, but needed to run it. -/
+    `@GameServer/GameServer, -- built the GameServer library, too
+    `@/makeGameInputs] -- ensure non-Lean inputs are up to date
 
 @[test_driver]
 lean_lib test where

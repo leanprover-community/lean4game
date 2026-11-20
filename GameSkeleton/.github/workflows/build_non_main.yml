@@ -27,4 +27,3 @@ jobs:
       - name: build game
         run: |
           lake build
-          lake build GameServer

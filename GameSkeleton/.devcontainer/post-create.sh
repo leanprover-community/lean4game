@@ -17,4 +17,3 @@ if ! lake exe cache get; then
 fi
 
 lake build
-lake build GameServer
