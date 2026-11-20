@@ -14,8 +14,29 @@ msgstr "Project-Id-Version: Game v4.36.0\n"
 msgid "A small template game."
 msgstr ""
 
+#: Game/Doc/Definitions.lean:6
+msgid "Addition"
+msgstr ""
+
+#: Game/Doc/Definitions.lean:3
+msgid "An equality"
+msgstr ""
+
 #: Game/Levels/HelloWorld.lean:9
 msgid "An optional world conclusion"
+msgstr ""
+
+#: Game/Doc/Tactics.lean:15
+msgid "Assume the premise of an induction."
+msgstr ""
+
+#: Game/Doc/Tactics.lean:9
+msgid "Can be proven by an existing result."
+msgstr ""
+
+#. §0: `ℕ`
+#: Game/Doc/Theorems.lean:3
+msgid "Commutativity on §0"
 msgstr ""
 
 #: Game/Levels/HelloWorld/L02_HypothesisNames.lean:15
@@ -56,6 +77,10 @@ msgstr ""
 msgid "Hypothesis Names"
 msgstr ""
 
+#: Game/Doc/Tactics.lean:12
+msgid "Introduce an auxilary result."
+msgstr ""
+
 #. §0: `«{h}»`
 #: Game/Levels/HelloWorld/L01_HelloWorld.lean:19
 msgid "Maybe you should use §0 now."
@@ -63,6 +88,14 @@ msgstr ""
 
 #: Game/Levels/HelloWorld/L03_NonProp.lean:6
 msgid "Non-Prop-Valued"
+msgstr ""
+
+#: Game/Doc/Theorems.lean:6
+msgid "Proven in level 1"
+msgstr ""
+
+#: Game/Doc/Tactics.lean:3
+msgid "The way to proof reflexivity."
 msgstr ""
 
 #: Game.lean:9
@@ -91,6 +124,14 @@ msgstr ""
 msgid "This text is shown as first message when the level is played.\n"
 "You can insert hints in the proof below. They will appear in this side panel\n"
 "depending on the proof a user provides. There can be §0"
+msgstr ""
+
+#: Game/Doc/Tactics.lean:6
+msgid "To change the goal using equalities."
+msgstr ""
+
+#: Game/Doc/Tactics.lean:18
+msgid "Use an existing result."
 msgstr ""
 
 #. §0: `«{h}»`

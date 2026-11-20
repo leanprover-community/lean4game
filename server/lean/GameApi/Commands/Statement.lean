@@ -43,7 +43,7 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     | `(preambleArg| (preamble := $tac)) => pure tac
     | _ => `(Parser.Tactic.tacticSeq|skip)
 
-  let docContent ← parseDocComment doc
+  let docContent ← parseDocComment? doc
   let docContent ← match docContent with
   | none => pure none
   | some d => d.translate
