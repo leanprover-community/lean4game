@@ -10,34 +10,36 @@ open Lean Meta Elab Command Std
 
 namespace GameServer
 
-/-- Read a doc comment and get its content. Return `""` if no doc comment available. -/
-def parseDocComment! (doc: Option (TSyntax `Lean.Parser.Command.docComment)) :
+/-- Read a doc comment and get its content. Return `default` if no doc comment available. -/
+def parseDocCommentD (doc: Option (TSyntax `Lean.Parser.Command.docComment)) (default := "") :
     CommandElabM String := do
   match doc with
   | none =>
     logWarning "Add a text to this command with `/-- yada yada -/ MyCommand`!"
-    pure ""
+    pure default
   | some s => match s.raw[1] with
-    | .atom _ val => pure <| val.dropEnd 2 |>.trimAscii.copy -- some (val.extract 0 (val.endPos - ⟨2⟩))
-    | _           => pure "" --panic "not implemented error message" --throwErrorAt s "unexpected doc string{indentD s.raw[1]}"
+    -- Since Lean v4.36 the body is a `commentBody` node containing the text atom
+    -- (without the closing `-/`) and the `-/` atom. Compare `Lean.getDocStringText`.
+    | .node _ ``Parser.Command.commentBody #[.atom _ val, _] => pure val.trimAscii.copy
+    | _ => pure default
 
 /-- Read a doc comment and get its content. Return `none` if no doc comment available. -/
-def parseDocComment (doc: Option (TSyntax `Lean.Parser.Command.docComment)) :
+def parseDocComment? (doc: Option (TSyntax `Lean.Parser.Command.docComment)) :
     CommandElabM <| Option String := do
   match doc with
   | none => pure none
-  | some _ => parseDocComment! doc
+  | some _ => parseDocCommentD doc
 
 
 /-- TODO: This is only used to provide some backwards compatibility and you can
-replace `parseDocCommentLegacy` with `parseDocComment` in the future. -/
+replace `parseDocCommentLegacy` with `parseDocCommentD` in the future. -/
 def parseDocCommentLegacy (doc: Option (TSyntax `Lean.Parser.Command.docComment))
     (t : Option (TSyntax `str)) : CommandElabM <| String := do
   match doc with
   | none =>
     match t with
     | none =>
-      pure <| ← parseDocComment! doc
+      pure <| ← parseDocCommentD doc
     | some t =>
       logWarningAt t "You should use the new Syntax:
 
@@ -52,7 +54,7 @@ def parseDocCommentLegacy (doc: Option (TSyntax `Lean.Parser.Command.docComment)
   | some _ =>
     match t with
       | none =>
-        pure <| ← parseDocComment! doc
+        pure <| ← parseDocCommentD doc
       | some t =>
         logErrorAt t "You must not provide both, a docstring and a string following the command!
         Only use
@@ -61,7 +63,7 @@ def parseDocCommentLegacy (doc: Option (TSyntax `Lean.Parser.Command.docComment)
         YourCommand
 
         and remove the string following it!"
-        pure <| ← parseDocComment! doc
+        pure <| ← parseDocCommentD doc
 
 /-- A `attr := ...` option for `Statement`. Add attributes to the defined theorem. -/
 syntax statementAttr := "(" &"attr" ":=" Parser.Term.attrInstance,* ")"
