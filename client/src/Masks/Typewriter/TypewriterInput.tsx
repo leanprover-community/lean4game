@@ -22,7 +22,6 @@ export function TypewriterInput() {
   const focusRequest = useAtomValue(typewriterFocusAtom)
   const { data, error, isFetching } = useAtomValue(proofCheckAtom)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const insertion = useInsertion(textareaRef, input, setInput)
   // a new command must be based on the result of the previous one
   const disabled = isFetching || (!data && !error)
 
@@ -30,6 +29,8 @@ export function TypewriterInput() {
   const last = data?.steps.at(-1)
   const hidden =
     last !== undefined && !hasError(last) && last.goals.length === 0
+  // while hidden, there is no goal to insert at, see `insertInTypewriterAtom`
+  const insertion = useInsertion(textareaRef, input, setInput, !hidden)
 
   // focus with the cursor at the end, also when it shows up again, e.g. after a retry
   useEffect(() => {

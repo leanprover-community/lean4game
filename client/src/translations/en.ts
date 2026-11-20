@@ -101,6 +101,7 @@ export const en = {
     checking: 'Checking the proof…',
     transcript: 'Messages',
     inserted: "Inserted '{{text}}'",
+    noGoal: 'There is no goal to insert at',
     copied: "Copied '{{text}}' to the clipboard",
     copyFailed: "Could not copy '{{text}}' to the clipboard",
     line: 'Line {{line}}',

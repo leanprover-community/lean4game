@@ -98,7 +98,7 @@ function TabBar() {
           hasNew={newTiles[type].length > 0}
           hasRecent={recentTiles[type].length > 0}
           onClick={() => setTab(type)}
-          className="flex-1 px-0 text-center"
+          className="flex-1 px-2 text-center"
         >
           {t(tabTitles[type])}
         </Tab>

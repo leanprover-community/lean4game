@@ -18,8 +18,6 @@ def parseDocCommentD (doc: Option (TSyntax `Lean.Parser.Command.docComment)) (de
     logWarning "Add a text to this command with `/-- yada yada -/ MyCommand`!"
     pure default
   | some s => match s.raw[1] with
-    -- Since Lean v4.36 the body is a `commentBody` node containing the text atom
-    -- (without the closing `-/`) and the `-/` atom. Compare `Lean.getDocStringText`.
     | .node _ ``Parser.Command.commentBody #[.atom _ val, _] => pure val.trimAscii.copy
     | _ => pure default
 

@@ -25,10 +25,9 @@ export function nextFocusTime() {
  */
 export const insertTargetsAtom = atom<InsertTarget[]>([])
 
-/** Says what was inserted, shown by `Typewriter` */
+/** Inofrmation about the insertion, shown by `Typewriter` */
 export const typewriterToastAtom = toastAtom()
 
-/** Inserts into the input field which was focused last, see `useInsertion` */
 export const insertInTypewriterAtom = atom(
   null,
   (get, set, insertion: Insertion) => {
@@ -37,7 +36,10 @@ export const insertInTypewriterAtom = atom(
       (latest, t) => (!latest || t.focusedAt > latest.focusedAt ? t : latest),
       undefined,
     )
-    if (!target) return
+    if (!target) {
+      set(typewriterToastAtom, { text: i18n.t('masks.noGoal'), error: true })
+      return
+    }
     target.insert(insertion)
     set(typewriterToastAtom, {
       text: i18n.t('masks.inserted', { text: insertionText(insertion) }),

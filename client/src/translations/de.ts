@@ -106,6 +106,7 @@ export const de: DeepPartialTranslation<typeof en> = {
     checking: 'Beweis wird geprüft…',
     transcript: 'Meldungen',
     inserted: "'{{text}}' eingefügt",
+    noGoal: 'Es gibt kein Beweisziel zum Einfügen',
     copied: "'{{text}}' in die Zwischenablage kopiert",
     copyFailed: "'{{text}}' konnte nicht in die Zwischenablage kopiert werden",
     line: 'Zeile {{line}}',

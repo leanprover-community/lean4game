@@ -24,7 +24,8 @@ function plainState(text: string): InputState {
  * the slots of inserted templates and the last selection, also while the focus is
  * elsewhere. They belong to the text, so when it is changed from outside, e.g. cleared
  * after submitting, they are dropped. While the field is shown, it gets the insertions if
- * it was focused last, or if no other field was focused since.
+ * it was focused last, or if no other field was focused since. While `enabled` is false,
+ * e.g. when the field is hidden because no goals are left, it takes no insertions.
  *
  * Returns the handlers to pass to `CommandInput`.
  */
@@ -32,6 +33,7 @@ export function useInsertion(
   ref: RefObject<HTMLTextAreaElement | null>,
   text: string,
   setText: (text: string) => void,
+  enabled = true,
 ) {
   const setTargets = useSetAtom(insertTargetsAtom)
   const [stored, setStored] = useState(() => plainState(text))
@@ -61,9 +63,10 @@ export function useInsertion(
 
   // while shown, the field takes insertions if no other one was focused after it
   useEffect(() => {
+    if (!enabled) return
     setTargets(targets => [...targets, target])
     return () => setTargets(targets => targets.filter(t => t !== target))
-  }, [setTargets, target])
+  }, [setTargets, target, enabled])
 
   const selection = state.selection
   useEffect(() => {
