@@ -280,14 +280,18 @@ elab "MakeGame" : command => do
               allItems := allItems.insert name
       newItemsInWorld := newItemsInWorld.insert worldId newItems
 
+    let undocumentedHidden (item : Name) : InventoryTile :=
+      { name := item, displayName := item.toString, category := "", hidden := true }
+
     -- Basic inventory item availability: all locked.
     let Availability₀ : HashMap Name InventoryTile :=
       HashMap.ofList $
         ← allItems.toList.filterMapM fun item => do
           match hiddenItems.contains item, (← getInventoryItem? item inventoryType) with
-          | true, _ =>
-            -- drop hidden items
-            return none
+          | true, none =>
+            return some (item, undocumentedHidden item)
+          | true, some data =>
+            return some (item, { data.toTile with hidden := true })
           | false, none =>
             -- Note: we did have a panic here before because theorem statement and doc entry
             -- had mismatching namespaces
@@ -314,7 +318,9 @@ elab "MakeGame" : command => do
       for predWorldId in predecessors do
         for item in newItemsInWorld.getD predWorldId {} do
           let some data ← getInventoryItem? item inventoryType
-            | continue
+            | if hiddenItems.contains item then
+                items := items.insert item { undocumentedHidden item with locked := false }
+              continue
           items := items.insert item {
             name := item
             displayName := data.displayName
@@ -336,7 +342,9 @@ elab "MakeGame" : command => do
         -- unlock items that are unlocked in this level
         for item in levelInfo.new do
           let some data ← getInventoryItem? item inventoryType
-            | continue
+            | if hiddenItems.contains item then
+                items := items.insert item { undocumentedHidden item with locked := false }
+              continue
           items := items.insert item {
             name := item
             displayName := data.displayName

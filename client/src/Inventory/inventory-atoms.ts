@@ -159,7 +159,9 @@ export const inventoryCurrentTabRecentTilesAtom = atom(get => {
 export const inventorySubtabOptionsAtom = atom(get => {
   const tab = get(inventoryTabAtom)
   const tiles = get(inventoryTilesAtom)[tab]
-  return [...new Set(tiles.map(item => item.category))]
+  return [
+    ...new Set(tiles.filter(item => !item.hidden).map(item => item.category)),
+  ]
 })
 
 /**

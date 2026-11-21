@@ -15,5 +15,6 @@ Statement (x y z : Nat) (h : x = y) : x + z = y + z := by
 Conclusion "Done!"
 
 NewTactic exact «have»
+NewHiddenTactic grind
 -- NewTheorem Nat.add_comm Nat.add_assoc
 -- NewDefinition Nat Add Eq
