@@ -6,17 +6,17 @@ open Lean Elab Command GameServer
 
 Game "TestGameSettings"
 
-Settings (unbundleHyps := true) (allowEmptyTranslations := true)
+Settings (unbundleHyps := true) (allowEmptyTranslations := true) (printGoalText := true)
 
 #eval show CommandElabM Unit from do
   let settings := (← getCurGame).settings
-  unless settings.unbundleHyps && settings.allowEmptyTranslations do
-    throwError "both settings should be enabled"
+  unless settings.unbundleHyps && settings.allowEmptyTranslations && settings.printGoalText do
+    throwError "all settings should be enabled"
 
--- setting one to `false` keeps the other
-Settings (allowEmptyTranslations := true) (unbundleHyps := false)
+-- setting one to `false` keeps the others
+Settings (allowEmptyTranslations := true) (printGoalText := true) (unbundleHyps := false)
 
 #eval show CommandElabM Unit from do
   let settings := (← getCurGame).settings
-  unless !settings.unbundleHyps && settings.allowEmptyTranslations do
-    throwError "only `allowEmptyTranslations` should be enabled"
+  unless !settings.unbundleHyps && settings.allowEmptyTranslations && settings.printGoalText do
+    throwError "only `unbundleHyps` should be disabled"

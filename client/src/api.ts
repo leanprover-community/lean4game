@@ -142,6 +142,8 @@ export interface ApiGameSettings {
   allowEmptyTranslations?: boolean
   /** show hypotheses `A B : Prop` as two lines `A : Prop` and `B : Prop` */
   unbundleHyps?: boolean
+  /** label the goal with "Goal:" */
+  printGoalText?: boolean
 }
 
 /** A game's `game.json`, see `/api/data/:owner/:game/game` */

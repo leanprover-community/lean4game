@@ -436,6 +436,10 @@ structure Game.Settings where
   empty instead of falling back to their source text.
   -/
   allowEmptyTranslations : Bool := false
+  /--
+  If `true`, the goal is labelled "Goal:".
+  -/
+  printGoalText : Bool := false
 deriving Repr, ToJson, FromJson
 
 instance : Inhabited Game.Settings where

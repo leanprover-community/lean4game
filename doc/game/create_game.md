@@ -310,6 +310,7 @@ Currently existing options are:
 - `allowEmptyTranslations` (default: `false`): if enabled, a text translated as an empty string is
   hidden instead of showing the original, see the
   [translation guide](translation-guide-for-game-maintainers.md).
+- `printGoalText` (default: `false`): if enabled, the goal is labelled "Goal:".
 
 ### Markdown
 

@@ -73,7 +73,8 @@ elab "Info" t:str : command => do
     pure ()
   | .Game => modifyCurGame  fun game => pure {game with info := info}
 
-syntax settingsArg := atomic(" (" (&"unbundleHyps" <|> &"allowEmptyTranslations") " := "
+syntax settingsArg := atomic(" ("
+  (&"unbundleHyps" <|> &"allowEmptyTranslations" <|> &"printGoalText") " := "
   withoutPosition(term) ")")
 
 open Elab in
@@ -84,6 +85,7 @@ Valid settings are:
 * `(unbundleHyps := false)`: show `A : Prop` and `B : Prop` instead of `A B : Prop`
 * `(allowEmptyTranslations := false)`: an empty translation hides a text instead of
   showing the original
+* `(printGoalText := false)`: label the goal with "Goal:"
  -/
 elab "Settings " args:settingsArg* : command => do
   let mut settings: Game.Settings := default
@@ -95,5 +97,8 @@ elab "Settings " args:settingsArg* : command => do
       settings := { settings with allowEmptyTranslations := true }
     | `(settingsArg| (allowEmptyTranslations := false)) =>
       settings := { settings with allowEmptyTranslations := false }
+    | `(settingsArg| (printGoalText := true)) => settings := { settings with printGoalText := true }
+    | `(settingsArg| (printGoalText := false)) =>
+      settings := { settings with printGoalText := false }
     | _ => throwUnsupportedSyntax
   modifyCurGame (pure { · with settings := settings })

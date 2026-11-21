@@ -56,7 +56,10 @@ export function GoalTabs({
 function Goal({ goal, insertable }: { goal: ApiGoal; insertable: boolean }) {
   const { t } = useTranslation()
   const mobile = useAtomValue(mobileAtom)
-  const unbundle = useAtomValue(gameInfoAtom).data?.settings?.unbundleHyps
+  const settings = useAtomValue(gameInfoAtom).data?.settings
+  const unbundle = settings?.unbundleHyps
+  // on mobile, the goal is below the hypotheses and always has the label
+  const goalText = mobile || settings?.printGoalText
   // `A B : Prop` as `A : Prop` and `B : Prop`, if the game says so
   const hyps = unbundle
     ? goal.hyps.flatMap(hyp =>
@@ -95,7 +98,7 @@ function Goal({ goal, insertable }: { goal: ApiGoal; insertable: boolean }) {
         </svg>
       )}
       <div className="flex-col flex-1 justify-center">
-        {mobile && (
+        {goalText && (
           <div className="font-sans text-lg">{t('typewriter.goal')}:</div>
         )}
         <div className="whitespace-pre-wrap">
