@@ -24,6 +24,7 @@ import {
 import {
   countActiveInstances,
   getInstance,
+  instancePhase,
   startInstance,
   stopInstance,
   touchInstance,
@@ -97,6 +98,7 @@ app.get('/api/lean/instances/:id', (req, res) => {
     status: instance.status,
     startedAt: instance.startedAt.toISOString(),
     exitCode: instance.exitCode,
+    phase: instancePhase(instance),
   } satisfies ApiLeanInstance)
 })
 

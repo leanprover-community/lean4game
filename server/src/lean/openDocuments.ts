@@ -65,6 +65,11 @@ export function scheduleCheck<T>(
   })
 }
 
+/** Whether a check of the instance is running */
+export function isCheckRunning(instanceId: string): boolean {
+  return slots.get(instanceId)?.running ?? false
+}
+
 function runCheck(slot: CheckSlot, check: QueuedCheck): void {
   slot.running = true
   let timer: NodeJS.Timeout | undefined
@@ -119,6 +124,8 @@ export async function closeDoc(
   if (!docs) return
   if (expected && docs.get(uri) !== expected) return
   docs.delete(uri)
+  // its file worker stops, and with it the progress reports
+  instance.processing.delete(uri)
   await instance.client
     .notify('textDocument/didClose', { textDocument: { uri } })
     .catch(() => {})

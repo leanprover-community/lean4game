@@ -1,8 +1,9 @@
 import type { ChildProcessWithoutNullStreams } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 
+import type { ApiLeanPhase } from '../api.js'
 import { createLspClient, type LspClient } from './lspClient.js'
-import { forgetInstanceDocs } from './openDocuments.js'
+import { forgetInstanceDocs, isCheckRunning } from './openDocuments.js'
 import { noBwrap, spawnGame } from './sandbox.js'
 
 export interface LeanInstance {
@@ -17,6 +18,13 @@ export interface LeanInstance {
   client: LspClient
   /** resolves once the LSP `initialize`/`initialized` handshake has completed */
   lspReady: Promise<void>
+  /** whether `lspReady` has resolved */
+  ready: boolean
+  /**
+   * The first lines of the ranges Lean is still processing, by document URI, from
+   * `$/lean/fileProgress`. Line `0` means it is still loading the imports.
+   */
+  processing: Map<string, number[]>
   /** the game as requested by the player, lower case, for the play statistics */
   game: { owner: string; repo: string }
   /** time in ms of the last start, check or keepalive, instances idle for too long are stopped */
@@ -76,8 +84,27 @@ export function startInstance(
     lastActivityAt: Date.now(),
     client,
     lspReady,
+    ready: false,
+    processing: new Map(),
     game,
   }
+  lspReady.then(
+    () => (instance.ready = true),
+    () => {},
+  )
+
+  client.onNotification(
+    '$/lean/fileProgress',
+    (params: {
+      textDocument: { uri: string }
+      processing: { range: { start: { line: number } } }[]
+    }) => {
+      const lines = params.processing.map(p => p.range.start.line)
+      if (lines.length === 0)
+        instance.processing.delete(params.textDocument.uri)
+      else instance.processing.set(params.textDocument.uri, lines)
+    },
+  )
 
   child.stderr.on('data', (chunk: Buffer) => {
     console.error(`[lean:${instance.id}] ${chunk.toString()}`)
@@ -106,6 +133,17 @@ export function startInstance(
 
 export function getInstance(id: string): LeanInstance | undefined {
   return instances.get(id)
+}
+
+/** What the instance is doing, see `ApiLeanPhase` */
+export function instancePhase(instance: LeanInstance): ApiLeanPhase {
+  if (instance.status === 'exited') return 'idle'
+  if (!instance.ready) return 'starting'
+  const lines = [...instance.processing.values()].flat()
+  // while loading the imports, Lean reports one range from the first line on
+  if (lines.includes(0)) return 'loading'
+  if (lines.length > 0 || isCheckRunning(instance.id)) return 'checking'
+  return 'idle'
 }
 
 // TODO: this is for debugging only. We should remove it eventually

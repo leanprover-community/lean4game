@@ -5,8 +5,8 @@ import anything.
 */
 
 /**
- * A Lean instance, see `/api/lean/instances/:id`. Not used by the client, which only
- * keeps the `id` from starting an instance with `/api/lean/start/:owner/:game`.
+ * A Lean instance, see `/api/lean/instances/:id`. The client keeps the `id` from starting
+ * an instance with `/api/lean/start/:owner/:game`, and polls `phase` while it waits.
  */
 export interface ApiLeanInstance {
   id: string
@@ -16,7 +16,15 @@ export interface ApiLeanInstance {
   startedAt: string
   /** set once the process exited by itself, `null` before or if it was killed */
   exitCode: number | null
+  /** what the instance is doing, see `ApiLeanPhase` */
+  phase: ApiLeanPhase
 }
+
+/**
+ * What a Lean instance is doing: `starting` the Lean server, `loading` the imports of a
+ * level (e.g. all of Mathlib, which can take a while), `checking` a proof, or `idle`.
+ */
+export type ApiLeanPhase = 'starting' | 'loading' | 'checking' | 'idle'
 
 /** API input to validate a proof */
 export interface ApiProofCheckInput {
@@ -191,6 +199,7 @@ export interface ApiLevelData {
   definitions: ApiInventoryTile[]
   descrText: null | string
   descrFormat: null | string
+  isProp?: null | boolean
   theoremTab: null | string
   statementName: null | string
   displayName: null | string

@@ -104,6 +104,13 @@ export const de: DeepPartialTranslation<typeof en> = {
     select: 'Oberfläche wählen',
     proof: 'Beweis',
     checking: 'Beweis wird geprüft…',
+    phase: {
+      starting: 'Lean wird gestartet…',
+      loading: 'Die Bibliotheken des Spiels werden geladen…',
+      loadingHint: 'Das erste Mal kann es eine Weile dauern.',
+      checking: 'Beweis wird geprüft…',
+    },
+    elapsed: '{{seconds}} s',
     transcript: 'Meldungen',
     inserted: "'{{text}}' eingefügt",
     noGoal: 'Es gibt kein Beweisziel zum Einfügen',

@@ -99,6 +99,13 @@ export const en = {
     select: 'Choose the interface',
     proof: 'Proof',
     checking: 'Checking the proof…',
+    phase: {
+      starting: 'Starting Lean…',
+      loading: 'Loading the libraries of the game…',
+      loadingHint: 'The first time can take a while.',
+      checking: 'Checking the proof…',
+    },
+    elapsed: '{{seconds}} s',
     transcript: 'Messages',
     inserted: "Inserted '{{text}}'",
     noGoal: 'There is no goal to insert at',

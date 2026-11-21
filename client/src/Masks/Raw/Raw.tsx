@@ -14,6 +14,7 @@ import {
   proofCheckAtom,
 } from '../../state/proof-atoms'
 import { levelInfoAtom } from '../../state/query-atoms'
+import { useLeanPhaseText } from '../LeanProgress'
 import { AbbreviationBar } from '../Typewriter/CommandInput'
 import { useAbbreviations } from '../Typewriter/useAbbreviations'
 import { rawToastAtom } from './raw-insert-atoms'
@@ -36,6 +37,9 @@ export function Raw() {
   const check = useAtomValue(proofCheckAtom)
   // the Lean instance is starting, or the proof is checked
   const waiting = instance.isPending || check.isFetching
+  // before the first result, e.g. while the imports of the game are loaded
+  const phaseText = useLeanPhaseText()
+  const waitingText = check.data === undefined ? phaseText : t('masks.checking')
   // the text as typed, which keeps e.g. empty lines that are not part of the proof
   const [text, setText] = useState(() => proof.join('\n'))
 
@@ -96,8 +100,11 @@ export function Raw() {
               autoCorrect="off"
             />
             {waiting && (
-              <output className="pointer-events-none absolute right-2 bottom-1.5 opacity-50">
-                <span className="sr-only">{t('masks.checking')}</span>
+              <output
+                className="pointer-events-none absolute right-2 bottom-1.5 opacity-50"
+                title={waitingText}
+              >
+                <span className="sr-only">{waitingText}</span>
                 <FontAwesomeIcon icon={faSpinner} spinPulse aria-hidden />
               </output>
             )}

@@ -24,6 +24,7 @@ import {
 import { gameInfoAtom, levelInfoAtom } from '../../state/query-atoms'
 import { HttpError } from '../../utils/fetch'
 import { useGameTranslation } from '../../utils/translation'
+import { LeanProgress } from '../LeanProgress'
 import { HoverProvider } from './HoverCode'
 import { ProofStep } from './ProofStep'
 import { proofResultEffect, resetEditingStepEffect } from './typewriter-atoms'
@@ -129,8 +130,13 @@ export function Typewriter() {
               </div>
             )}
             {!result && !error && (
-              <div className="flex justify-center p-4 text-3xl text-primary">
-                <FontAwesomeIcon icon={faSpinner} spinPulse />
+              <div className="flex-col items-center gap-3 p-4">
+                <FontAwesomeIcon
+                  icon={faSpinner}
+                  spinPulse
+                  className="text-3xl text-primary"
+                />
+                <LeanProgress />
               </div>
             )}
           </div>

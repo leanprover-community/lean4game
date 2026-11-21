@@ -3,13 +3,20 @@ import { atomEffect } from 'jotai-effect'
 import { atomWithQuery } from 'jotai-tanstack-query'
 
 import type {
+  ApiLeanInstance,
+  ApiLeanPhase,
   ApiProofCheckInput,
   ApiProofCheckResult,
   ApiProofStep,
 } from '../api'
 import i18n from '../i18n'
 import { inventoryAtom } from '../Inventory/inventory-atoms'
-import { HttpError, postJson, retryUnlessClientError } from '../utils/fetch'
+import {
+  fetchJson,
+  HttpError,
+  postJson,
+  retryUnlessClientError,
+} from '../utils/fetch'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from './location-atoms'
 import {
   completedAtom,
@@ -149,6 +156,34 @@ export const setProofAtom = atom(null, (get, set, proof: string[]) => {
   const changed = JSON.stringify(proof) !== JSON.stringify(get(proofAtom))
   set(proofAtom, proof)
   return changed
+})
+
+/**
+ * The Lean instance as the server reports it, polled while waiting for the first result
+ * of a level, which can take long when the imports are loaded, e.g. all of Mathlib.
+ */
+const leanInstanceStateAtom = atomWithQuery<ApiLeanInstance>(get => {
+  const instanceId = get(leanInstanceAtom).data?.id
+  const check = get(proofCheckAtom)
+  const waiting = check.isFetching && check.data === undefined
+  return {
+    queryKey: ['leanInstanceState', instanceId],
+    queryFn: () =>
+      fetchJson<ApiLeanInstance>(`/api/lean/instances/${instanceId}`),
+    enabled: instanceId !== undefined && waiting,
+    refetchInterval: 1000,
+    retry: false,
+  }
+})
+
+/**
+ * What the Lean instance is doing while waiting for the first result of a level. An `idle`
+ * instance is about to check: the request is on its way.
+ */
+export const leanPhaseAtom = atom<Exclude<ApiLeanPhase, 'idle'>>(get => {
+  if (get(leanInstanceAtom).isPending) return 'starting'
+  const phase = get(leanInstanceStateAtom).data?.phase ?? 'starting'
+  return phase === 'idle' ? 'checking' : phase
 })
 
 /** The result of the proof check, only changes when a new result arrives */
