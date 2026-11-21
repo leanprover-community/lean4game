@@ -10,7 +10,10 @@ import {
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
-import { abbreviationSuggestions, useAbbreviations } from './useAbbreviations'
+import {
+  abbreviationSuggestions,
+  useAbbreviations,
+} from '../../hooks/useAbbreviations'
 
 /**
  * While an abbreviation is typed, a bar with the first symbols it could become. The first

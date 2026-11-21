@@ -9,6 +9,7 @@ import { InlineConclusion, InlineNextButton } from '../../Chat/Chat'
 import { Markdown } from '../../components/Markdown'
 import { Toast } from '../../components/Toast'
 import { WorldImage } from '../../components/WorldImage'
+import { HoverProvider } from '../../GoalView/HoverCode'
 import {
   firstStepElement,
   scrollToTop,
@@ -25,7 +26,6 @@ import { gameInfoAtom, levelInfoAtom } from '../../state/query-atoms'
 import { HttpError } from '../../utils/fetch'
 import { useGameTranslation } from '../../utils/translation'
 import { LeanProgress } from '../LeanProgress'
-import { HoverProvider } from './HoverCode'
 import { ProofStep } from './ProofStep'
 import { proofResultEffect, resetEditingStepEffect } from './typewriter-atoms'
 import { typewriterToastAtom } from './typewriter-insert-atoms'

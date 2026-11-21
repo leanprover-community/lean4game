@@ -5,14 +5,13 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
-import type { ApiDiagnostic, ApiGoal, ApiProofStep } from '../../api'
+import type { ApiDiagnostic, ApiProofStep } from '../../api'
 import { InlineHints } from '../../Chat/Chat'
+import { GoalTabs } from '../../GoalView/GoalTabs'
 import { useStepSelection } from '../../hooks/useStepSelection'
 import { mobileAtom } from '../../state/preferences-atoms'
 import { proofCheckAtom } from '../../state/proof-atoms'
 import { CommandInput, focusAtEnd } from './CommandInput'
-import { HoverCode } from './HoverCode'
-import { HypGroup } from './Hypothesis'
 import {
   editingStepAtom,
   replaceStepAtom,
@@ -48,7 +47,7 @@ export function ProofStep({
       )}
       <Diagnostics diagnostics={step.diagnostics} />
       {mobile && !failed && <InlineHints step={index} />}
-      {!failed && <GoalTabs goals={step.goals} current={current} />}
+      {!failed && <GoalTabs goals={step.goals} current={current} insertable />}
     </div>
   )
 }
@@ -174,75 +173,4 @@ function Diagnostics({ diagnostics }: { diagnostics: ApiDiagnostic[] }) {
       </pre>
     </div>
   ))
-}
-
-/** The goals after the command, one tab per goal */
-function GoalTabs({ goals, current }: { goals: ApiGoal[]; current: boolean }) {
-  const { t } = useTranslation()
-  const [selected, setSelected] = useState(0)
-  const goal = goals.at(selected) ?? goals.at(0)
-  if (!goal) return null
-  return (
-    <div>
-      <div className="flex flex-wrap border-b border-(--border)">
-        {goals.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            className={twMerge(
-              'mx-0.5 cursor-pointer border-b-4 border-transparent px-4 py-0.5',
-              goal === goals[i]
-                ? twMerge('text-(--text-h)', current && 'border-primary')
-                : 'text-(--text) hover:text-(--text-h)',
-            )}
-            onClick={() => setSelected(i)}
-          >
-            {i === 0
-              ? t('typewriter.activeGoal')
-              : t('typewriter.goalN', { n: i + 1 })}
-          </button>
-        ))}
-      </div>
-      <Goal goal={goal} />
-    </div>
-  )
-}
-
-/** The hypotheses, split into objects and assumptions, and the goal */
-function Goal({ goal }: { goal: ApiGoal }) {
-  const { t } = useTranslation()
-  const mobile = useAtomValue(mobileAtom)
-  const objects = goal.hyps.filter(hyp => !hyp.isAssumption)
-  const assumptions = goal.hyps.filter(hyp => hyp.isAssumption)
-  return (
-    <div
-      className={twMerge(
-        'flex py-1 font-mono text-(--text-h)',
-        mobile && 'flex-col',
-      )}
-    >
-      <div className="flex-col flex-1 justify-center">
-        {objects.length > 0 && (
-          <HypGroup title={t('typewriter.objects')} hyps={objects} />
-        )}
-        {assumptions.length > 0 && (
-          <HypGroup title={t('typewriter.assumptions')} hyps={assumptions} />
-        )}
-      </div>
-      {!mobile && (
-        <svg className="mx-2 w-4 shrink-0 stroke-(--text) stroke-2">
-          <line x1="0%" y1="0%" x2="0%" y2="100%" />
-          <line x1="0%" y1="50%" x2="100%" y2="50%" />
-        </svg>
-      )}
-      <div className="flex-col flex-1 justify-center">
-        {mobile && (
-          <div className="font-sans text-lg">{t('typewriter.goal')}:</div>
-        )}
-        <div className="whitespace-pre-wrap">
-          <HoverCode code={goal.typeWithHover} fallback={goal.type} />
-        </div>
-      </div>
-    </div>
-  )
 }
