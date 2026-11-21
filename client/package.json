@@ -15,7 +15,6 @@
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@fortawesome/react-fontawesome": "^3.5.0",
     "@leanprover/unicode-input": "^0.1.13",
-    "@mui/material": "^9.5.0",
     "@tailwindcss/vite": "^4.3.5",
     "@tanstack/query-core": "^5.108.0",
     "cytoscape": "^3.35.0",
