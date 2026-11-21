@@ -13,13 +13,17 @@ import { twMerge } from 'tailwind-merge'
 import { abbreviationSuggestions, useAbbreviations } from './useAbbreviations'
 
 /**
- * While an abbreviation is typed, a bar on top of the input with the first symbols it
- * could become. The first one is what space or Tab would insert.
+ * While an abbreviation is typed, a bar with the first symbols it could become. The first
+ * one is what space or Tab would insert.
  */
-function AbbreviationBar({
+export function AbbreviationBar({
   abbreviations,
+  below = false,
+  className,
 }: {
   abbreviations: ReturnType<typeof useAbbreviations>
+  below?: boolean
+  className?: string
 }) {
   const typed = useSyncExternalStore(
     abbreviations.subscribe,
@@ -32,8 +36,12 @@ function AbbreviationBar({
   return (
     <div
       className={twMerge(
-        'absolute inset-x-0 bottom-full z-10 flex h-8 items-center gap-1 px-1',
-        'border-t border-primary bg-sky-100 text-(--text-h) dark:bg-sky-950 rounded-t-lg',
+        'absolute left-0 right-0 z-10 flex h-8 items-center gap-1 px-1',
+        'border-primary bg-sky-100 text-(--text-h) dark:bg-sky-950',
+        below
+          ? 'top-full rounded-b-lg border-b'
+          : 'bottom-full rounded-t-lg border-t',
+        className,
       )}
     >
       {suggestions.map(({ symbol, abbreviation }, i) => (

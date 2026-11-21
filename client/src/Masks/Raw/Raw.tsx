@@ -1,7 +1,7 @@
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useAtom, useAtomValue } from 'jotai'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
@@ -14,6 +14,8 @@ import {
   proofCheckAtom,
 } from '../../state/proof-atoms'
 import { levelInfoAtom } from '../../state/query-atoms'
+import { AbbreviationBar } from '../Typewriter/CommandInput'
+import { useAbbreviations } from '../Typewriter/useAbbreviations'
 import { rawToastAtom } from './raw-insert-atoms'
 import { Transcript } from './Transcript'
 
@@ -49,6 +51,8 @@ export function Raw() {
     const newProof = proofOfCode(value)
     if (!sameProof(newProof, proof)) setProof(newProof)
   }
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const abbreviations = useAbbreviations(textareaRef, text, onChange)
 
   return (
     <div className="relative h-full">
@@ -68,6 +72,7 @@ export function Raw() {
               {'  '}
             </span>
             <textarea
+              ref={textareaRef}
               className={twMerge(
                 'block min-h-[calc(3lh+1rem)] min-w-0 flex-1 resize-none rounded-sm',
                 'border-0 bg-(--code-bg) p-2 [font:inherit] text-inherit',
@@ -75,7 +80,17 @@ export function Raw() {
               )}
               aria-label={t('masks.proof')}
               value={text}
-              onChange={event => onChange(event.target.value)}
+              onChange={() => abbreviations.input()}
+              onSelect={() => abbreviations.select()}
+              onCompositionStart={() => abbreviations.compositionStart()}
+              onCompositionEnd={() => abbreviations.compositionEnd()}
+              onKeyDown={ev => {
+                // otherwise Tab moves the focus as usual
+                if (ev.key === 'Tab' && abbreviations.tracking) {
+                  ev.preventDefault()
+                  void abbreviations.replaceAll()
+                }
+              }}
               spellCheck={false}
               autoCapitalize="off"
               autoCorrect="off"
@@ -86,6 +101,11 @@ export function Raw() {
                 <FontAwesomeIcon icon={faSpinner} spinPulse aria-hidden />
               </output>
             )}
+            <AbbreviationBar
+              abbreviations={abbreviations}
+              below
+              className="left-[2ch] mt-px"
+            />
           </div>
           <Transcript text={text} />
         </div>
