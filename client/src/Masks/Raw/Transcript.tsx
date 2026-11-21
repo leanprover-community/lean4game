@@ -10,6 +10,7 @@ import { gameIdAtom } from '../../state/location-atoms'
 import { mobileAtom } from '../../state/preferences-atoms'
 import { hasError, proofCheckAtom } from '../../state/proof-atoms'
 import { levelInfoAtom } from '../../state/query-atoms'
+import { proofLines, stepStarts } from './proof-lines'
 
 /**
  * The kinds of entries: the severities of Lean's messages, and the texts of the game: the
@@ -51,16 +52,6 @@ interface Entry {
 }
 
 /**
- * The lines of the proof which Lean numbers, as indices of the lines of `text`: Lean gets
- * the proof without empty lines, see `proofOfCode`
- */
-function proofLines(text: string) {
-  return text
-    .split('\n')
-    .flatMap((line, i) => (line.trim().length > 0 ? [i] : []))
-}
-
-/**
  * The messages of the proof check as a compact transcript below the proof, with the line
  * they belong to. On mobile, where there is no chat, it also contains the chat's
  * messages: the level's introduction, the hints, and the conclusion once the level is
@@ -90,17 +81,7 @@ export function Transcript({ text }: { text: string }) {
   }
 
   const steps = check.data?.steps ?? []
-  // the first line of each step's tactic in the proof, the initial state has none
-  const stepStarts: (number | undefined)[] = []
-  let next = 0
-  for (const step of steps) {
-    if (step.tactic.length === 0) {
-      stepStarts.push(undefined)
-      continue
-    }
-    stepStarts.push(next)
-    next += step.tactic.split('\n').length
-  }
+  const starts = stepStarts(steps)
 
   const entries: Entry[] = []
   if (mobile)
@@ -115,7 +96,7 @@ export function Transcript({ text }: { text: string }) {
           content: d.message,
         })),
       ...(mobile ? (hints[i] ?? []) : []).map(hint => {
-        const start = stepStarts[i]
+        const start = starts[i]
         return {
           kind: 'hint' as const,
           line: start === undefined ? undefined : textLine(start),
@@ -146,8 +127,8 @@ export function Transcript({ text }: { text: string }) {
   if (entries.length === 0) return null
 
   return (
-    // grows like the proof, see `Raw`. Without padding, which would count on top of it.
-    <div className="relative mt-2 flex-col max-h-max min-h-0 flex-[1_1_0]">
+    // at most half of the space between the statement and the goals, see `Raw`
+    <div className="relative mt-2 flex-col max-h-1/2 min-h-0">
       <div
         role="log"
         aria-label={t('masks.transcript')}

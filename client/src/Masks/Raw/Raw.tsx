@@ -7,8 +7,12 @@ import { twMerge } from 'tailwind-merge'
 
 import { Toast } from '../../components/Toast'
 import { WorldImage } from '../../components/WorldImage'
+import { GoalTabs } from '../../GoalView/GoalTabs'
+import { HoverProvider } from '../../GoalView/HoverCode'
+import { useAbbreviations } from '../../hooks/useAbbreviations'
 import { proofOfCode } from '../../state/progress-schema'
 import {
+  hasError,
   leanInstanceAtom,
   proofAtom,
   proofCheckAtom,
@@ -16,7 +20,7 @@ import {
 import { levelInfoAtom } from '../../state/query-atoms'
 import { useLeanPhaseText } from '../LeanProgress'
 import { AbbreviationBar } from '../Typewriter/CommandInput'
-import { useAbbreviations } from '../Typewriter/useAbbreviations'
+import { stepAtLine } from './proof-lines'
 import { rawToastAtom } from './raw-insert-atoms'
 import { Transcript } from './Transcript'
 
@@ -57,12 +61,21 @@ export function Raw() {
   }
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const abbreviations = useAbbreviations(textareaRef, text, onChange)
+  const [cursorLine, setCursorLine] = useState(-1)
+  const updateCursorLine = () => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+    const lines = textarea.value.slice(0, textarea.selectionStart).split('\n')
+    const atLineStart = lines.at(-1)?.trim() === ''
+    setCursorLine(lines.length - (atLineStart ? 2 : 1))
+  }
 
   return (
     <div className="relative h-full">
+      <WorldImage className="object-center opacity-50" />
       <div
         className={twMerge(
-          'flex-col h-full overflow-y-auto p-2 text-left font-mono text-sm',
+          'relative flex-col h-full p-2 text-left font-mono text-sm',
           'leading-normal text-(--text-h)',
         )}
       >
@@ -70,22 +83,24 @@ export function Raw() {
           {levelInfo?.descrFormat ?? ''}
         </pre>
         <div className="relative flex-col min-h-0 flex-1">
-          <WorldImage className="object-bottom opacity-50" />
-          <div className="relative flex max-h-max min-h-0 flex-[1_1_0] bg-(--bg)">
-            <span aria-hidden className="whitespace-pre select-none">
-              {'  '}
-            </span>
+          <div className="relative flex-col max-h-1/2 min-h-0 bg-(--bg) pl-[2ch]">
             <textarea
               ref={textareaRef}
               className={twMerge(
-                'block min-h-[calc(3lh+1rem)] min-w-0 flex-1 resize-none rounded-sm',
+                'block min-h-[calc(3lh+1rem)] w-full resize-none rounded-sm',
                 'border-0 bg-(--code-bg) p-2 [font:inherit] text-inherit',
                 'field-sizing-content focus:ring-1 focus:ring-primary focus:outline-none',
               )}
               aria-label={t('masks.proof')}
               value={text}
-              onChange={() => abbreviations.input()}
-              onSelect={() => abbreviations.select()}
+              onChange={() => {
+                abbreviations.input()
+                updateCursorLine()
+              }}
+              onSelect={() => {
+                abbreviations.select()
+                updateCursorLine()
+              }}
               onCompositionStart={() => abbreviations.compositionStart()}
               onCompositionEnd={() => abbreviations.compositionEnd()}
               onKeyDown={ev => {
@@ -116,8 +131,52 @@ export function Raw() {
           </div>
           <Transcript text={text} />
         </div>
+        <CursorGoals text={text} cursorLine={cursorLine} />
       </div>
       <Toast messageAtom={rawToastAtom} />
     </div>
+  )
+}
+
+/**
+ * The goals after the step at the cursor, like in the typewriter, with a tab per goal, or
+ * before it if it has an error. At the bottom of the mask, at most a third of its height.
+ */
+function CursorGoals({
+  text,
+  cursorLine,
+}: {
+  text: string
+  cursorLine: number
+}) {
+  const { t } = useTranslation()
+  const check = useAtomValue(proofCheckAtom)
+  const result = check.data
+  if (!result) return null
+  let index = stepAtLine(result.steps, text, cursorLine)
+  // a step with an error has no goals: the goals it failed on
+  while (index > 0 && hasError(result.steps.at(index))) index--
+  const step = result.steps.at(index)
+  if (!step) return null
+  return (
+    <section
+      aria-label={t('typewriter.goal')}
+      className={twMerge(
+        'mt-2 max-h-1/3 shrink-0 overflow-y-auto rounded-sm bg-(--section-bg) px-2',
+        'font-sans text-base',
+        check.isPlaceholderData && 'opacity-60',
+      )}
+    >
+      <HoverProvider hovers={result.hovers} hoverDocs={result.hoverDocs}>
+        {step.goals.length > 0 ? (
+          // back to the first goal at another step
+          <GoalTabs key={index} goals={step.goals} current insertable={false} />
+        ) : (
+          <p className="m-0 py-2 text-(--text)">
+            {t('typewriter.noGoalsLeft')}
+          </p>
+        )}
+      </HoverProvider>
+    </section>
   )
 }
