@@ -97,7 +97,7 @@ export interface OpenDoc {
   text: string
 }
 
-const MAX_OPEN_DOCS = Math.max(1, Number(process.env.LEAN_MAX_OPEN_DOCS) || 1)
+const MAX_OPEN_DOCS = Math.max(1, Number(process.env.LEAN_MAX_OPEN_DOCS) || 2)
 
 /** All currently open documents.
  * Inside the map, the most recently used document always comes last
@@ -144,12 +144,7 @@ export async function syncDoc(
   }
   let doc = docs.get(uri)
   if (!doc) {
-    doc = { uri, version: 1, text }
-    await instance.client.notify('textDocument/didOpen', {
-      textDocument: { uri, languageId: 'lean4', version: doc.version, text },
-      // never let a check build the game or its dependencies. Imported games must come fully built.
-      dependencyBuildMode: 'never',
-    })
+    doc = await openNewDoc(instance, docs, uri, text)
   } else if (doc.text !== text) {
     doc.version++
     doc.text = text
@@ -161,9 +156,53 @@ export async function syncDoc(
   // move file to the end and delete files which haven't been used the longest
   docs.delete(uri)
   docs.set(uri, doc)
+  await closeOldDocs(instance, docs)
+  return doc
+}
+
+/**
+ * Opens a document unless it is already open, e.g. to let Lean load its imports before
+ * the first check. Unlike `syncDoc`, it neither changes nor moves an open document.
+ */
+export async function openDocIfClosed(
+  instance: LeanInstance,
+  uri: string,
+  text: string,
+): Promise<void> {
+  let docs = openDocs.get(instance.id)
+  if (!docs) {
+    docs = new Map()
+    openDocs.set(instance.id, docs)
+  }
+  if (docs.has(uri)) return
+  await openNewDoc(instance, docs, uri, text)
+  await closeOldDocs(instance, docs)
+}
+
+async function openNewDoc(
+  instance: LeanInstance,
+  docs: Map<string, OpenDoc>,
+  uri: string,
+  text: string,
+): Promise<OpenDoc> {
+  const doc = { uri, version: 1, text }
+  // before awaiting, so that a second call for the same document doesn't open it again
+  docs.set(uri, doc)
+  await instance.client.notify('textDocument/didOpen', {
+    textDocument: { uri, languageId: 'lean4', version: doc.version, text },
+    // never let a check build the game or its dependencies. Imported games must come fully built.
+    dependencyBuildMode: 'never',
+  })
+  return doc
+}
+
+/** Closes the documents which haven't been used the longest, above `MAX_OPEN_DOCS` */
+async function closeOldDocs(
+  instance: LeanInstance,
+  docs: Map<string, OpenDoc>,
+): Promise<void> {
   for (const oldUri of docs.keys()) {
     if (docs.size <= MAX_OPEN_DOCS) break
     await closeDoc(instance, oldUri)
   }
-  return doc
 }
