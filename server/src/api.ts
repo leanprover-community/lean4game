@@ -140,6 +140,8 @@ export interface ApiGameTile {
 export interface ApiGameSettings {
   /** an empty translation hides a text instead of showing the original */
   allowEmptyTranslations?: boolean
+  /** show hypotheses `A B : Prop` as two lines `A : Prop` and `B : Prop` */
+  unbundleHyps?: boolean
 }
 
 /** A game's `game.json`, see `/api/data/:owner/:game/game` */

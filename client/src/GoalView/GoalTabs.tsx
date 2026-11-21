@@ -5,6 +5,7 @@ import { twMerge } from 'tailwind-merge'
 
 import type { ApiGoal } from '../api'
 import { mobileAtom } from '../state/preferences-atoms'
+import { gameInfoAtom } from '../state/query-atoms'
 import { HoverCode } from './HoverCode'
 import { HypGroup } from './Hypothesis'
 
@@ -55,8 +56,15 @@ export function GoalTabs({
 function Goal({ goal, insertable }: { goal: ApiGoal; insertable: boolean }) {
   const { t } = useTranslation()
   const mobile = useAtomValue(mobileAtom)
-  const objects = goal.hyps.filter(hyp => !hyp.isAssumption)
-  const assumptions = goal.hyps.filter(hyp => hyp.isAssumption)
+  const unbundle = useAtomValue(gameInfoAtom).data?.settings?.unbundleHyps
+  // `A B : Prop` as `A : Prop` and `B : Prop`, if the game says so
+  const hyps = unbundle
+    ? goal.hyps.flatMap(hyp =>
+        hyp.names.map(name => ({ ...hyp, names: [name] })),
+      )
+    : goal.hyps
+  const objects = hyps.filter(hyp => !hyp.isAssumption)
+  const assumptions = hyps.filter(hyp => hyp.isAssumption)
   return (
     <div
       className={twMerge(
