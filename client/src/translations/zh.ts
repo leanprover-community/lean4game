@@ -125,6 +125,7 @@ export const zh: DeepPartialTranslation<typeof en> = {
     objects: '对象',
     assumptions: '假设',
     theorem: '定理',
+    definition: '定义',
     levelCompleted: '关卡完成！🎉',
     levelSolved: '此关卡已成功解决过',
     noGoalsLeft: '没有剩余目标',

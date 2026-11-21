@@ -241,15 +241,17 @@ elab "MakeGame" : command => do
         let newTheorems := (level.getInventory inventoryType).new
         newItems := newItems.insertMany newTheorems
         allItems := allItems.insertMany newTheorems
-        if inventoryType == .Theorem then
+        -- a named statement is a theorem, or a definition if it is not a `Prop`
+        if inventoryType != .Tactic then
           -- For levels `2, 3, …` we check if the previous level was named
-          -- in which case we add it as available theorem.
+          -- in which case we add it as available theorem or definition.
           match levelId with
           | 0 => pure ()
           | 1 => pure () -- level ids start with 1, so we need to skip 1, too.
           | i₀ + 1 =>
             -- add named statement from previous level to the available theorems.
             let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀ + 1} not found for world {worldId}!"
+            if idx.isProp != (inventoryType == .Theorem) then continue
             match (idx).statementName with
             | .anonymous => pure ()
             | .num _ _ => panic "Did not expect to get a numerical statement name!"
@@ -258,20 +260,24 @@ elab "MakeGame" : command => do
               newItems := newItems.insert name
               allItems := allItems.insert name
               theoremStatements := theoremStatements.insert (worldId, levelId) name
-      if inventoryType == .Theorem then
-        -- if named, add the theorem from the last level of the world to the inventory
+      if inventoryType != .Tactic then
+        -- if named, add the theorem or definition from the last level of the world to
+        -- the inventory
         let i₀ := world.levels.size
         match i₀ with
-        | 0 => logWarning m!"World `{worldId}` contains no levels."
+        | 0 =>
+          if inventoryType == .Theorem then
+            logWarning m!"World `{worldId}` contains no levels."
         | i₀ =>
           let some idx := world.levels.get? (i₀) | throwError s!"Level {i₀} not found for world {worldId}!"
-          match (idx).statementName with
-          | .anonymous => pure ()
-          | .num _ _ => panic "Did not expect to get a numerical statement name!"
-          | .str pre s =>
-            let name := Name.str pre s
-            newItems := newItems.insert name
-            allItems := allItems.insert name
+          if idx.isProp == (inventoryType == .Theorem) then
+            match (idx).statementName with
+            | .anonymous => pure ()
+            | .num _ _ => panic "Did not expect to get a numerical statement name!"
+            | .str pre s =>
+              let name := Name.str pre s
+              newItems := newItems.insert name
+              allItems := allItems.insert name
       newItemsInWorld := newItemsInWorld.insert worldId newItems
 
     -- Basic inventory item availability: all locked.
@@ -342,7 +348,7 @@ elab "MakeGame" : command => do
 
         -- add the exercise statement from the previous level
         -- if it was named
-        if inventoryType == .Theorem then
+        if inventoryType != .Tactic then
           match theoremStatements.get? (worldId, levelId) with
           | none => pure ()
           | some name =>

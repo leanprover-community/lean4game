@@ -158,6 +158,7 @@ export const en = {
     objects: 'Objects',
     assumptions: 'Assumptions',
     theorem: 'Theorem',
+    definition: 'Definition',
     levelCompleted: 'Level completed! 🎉',
     levelSolved: 'Level has once been solved successfully',
     noGoalsLeft: 'no goals left',

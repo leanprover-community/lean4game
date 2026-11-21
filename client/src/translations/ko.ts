@@ -125,6 +125,7 @@ export const ko: DeepPartialTranslation<typeof en> = {
     objects: '객체',
     assumptions: '가정',
     theorem: '정리',
+    definition: '정의',
     levelCompleted: '단계 완료! 🎉',
     levelSolved: '이 단계는 이미 성공적으로 풀었습니다',
     noGoalsLeft: '남은 목표 없음',

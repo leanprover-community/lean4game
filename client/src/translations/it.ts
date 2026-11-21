@@ -125,6 +125,7 @@ export const it: DeepPartialTranslation<typeof en> = {
     objects: 'Oggetti',
     assumptions: 'Ipotesi',
     theorem: 'Teorema',
+    definition: 'Definizione',
     levelCompleted: 'Livello completato! 🎉',
     levelSolved: 'Il livello è già stato risolto con successo',
     noGoalsLeft: 'nessun goal rimasto',

@@ -190,6 +190,7 @@ export interface ApiLevelData {
   definitions: ApiInventoryTile[]
   descrText: null | string
   descrFormat: null | string
+  isProp?: null | boolean
   theoremTab: null | string
   statementName: null | string
   displayName: null | string

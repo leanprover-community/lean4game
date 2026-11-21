@@ -126,6 +126,7 @@ export const ru: DeepPartialTranslation<typeof en> = {
     objects: 'Объекты',
     assumptions: 'Предположения',
     theorem: 'Теорема',
+    definition: 'Определение',
     levelCompleted: 'Уровень пройден! 🎉',
     levelSolved: 'Уровень уже был успешно пройден',
     noGoalsLeft: 'целей не осталось',

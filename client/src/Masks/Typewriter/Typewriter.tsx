@@ -155,9 +155,14 @@ function ExerciseStatement() {
     gameId ?? '',
     gameInfo?.settings?.allowEmptyTranslations,
   )
-  if (!levelInfo?.descrText && !levelInfo?.descrFormat) return null
+  if (!levelInfo?.descrText && !levelInfo?.displayName) return null
+
   const theorem = levelInfo.displayName
-    ? `**${t('typewriter.theorem')}** \`${levelInfo.displayName}\`: `
+    ? `**${t(
+        levelInfo.isProp === false
+          ? 'typewriter.definition'
+          : 'typewriter.theorem',
+      )}** \`${levelInfo.displayName}\`: `
     : ''
   return (
     <div className="px-2 py-4">
@@ -165,11 +170,6 @@ function ExerciseStatement() {
         <Markdown game={gameId?.replace(/^g\//, '')}>
           {theorem + gameT(levelInfo.descrText ?? '')}
         </Markdown>
-      )}
-      {levelInfo.descrFormat && (
-        <p>
-          <code className="text-xs">{levelInfo.descrFormat}</code>
-        </p>
       )}
     </div>
   )
