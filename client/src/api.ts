@@ -147,6 +147,7 @@ export interface ApiGameData {
         introduction: string
         conclusion?: string
         image: string
+        levels?: { title: string; statement: string }[]
       }
     }
     edges: string[][]

@@ -3,7 +3,7 @@ import Game.Metadata
 World "HelloWorld"
 Level 2
 
-Title "Hypothesis Names"
+Title ""
 
 Introduction "This is a test level."
 
