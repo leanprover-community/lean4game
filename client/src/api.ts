@@ -147,10 +147,6 @@ export interface ApiGameData {
         introduction: string
         conclusion?: string
         image: string
-        /**
-         * The title (empty if it has none) and the statement of each level, the first
-         * level first. Missing for games built before it existed.
-         */
         levels?: { title: string; statement: string }[]
       }
     }
