@@ -6,6 +6,7 @@ import {
   editText,
   type InputState,
   insertName,
+  insertSymbol,
   insertTemplate,
 } from './insertion'
 import {
@@ -49,11 +50,17 @@ export function useInsertion(
   // the latest `insert`, called through the stable `target`
   const insertRef = useRef<(insertion: Insertion) => void>(undefined)
   insertRef.current = (insertion: Insertion) => {
-    update(
-      insertion.kind === 'tactic'
-        ? insertTemplate(state, insertion.template)
-        : insertName(state, insertion.name),
-    )
+    switch (insertion.kind) {
+      case 'tactic':
+        update(insertTemplate(state, insertion.template))
+        break
+      case 'name':
+        update(insertName(state, insertion.name))
+        break
+      case 'symbol':
+        update(insertSymbol(state, insertion.symbol))
+        break
+    }
     setFocusRequest(n => n + 1)
   }
   const [target] = useState<InsertTarget>(() => ({

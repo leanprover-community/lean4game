@@ -2,12 +2,13 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { hasError, proofCheckAtom } from '../../state/proof-atoms'
+import { proofCheckAtom } from '../../state/proof-atoms'
 import { CommandInput, focusAtEnd } from './CommandInput'
 import {
   submitTacticAtom,
   typewriterFocusAtom,
   typewriterInputAtom,
+  typewriterInputHiddenAtom,
 } from './typewriter-atoms'
 import { useInsertion } from './useInsertion'
 
@@ -26,9 +27,7 @@ export function TypewriterInput() {
   const disabled = isFetching || (!data && !error)
 
   // nothing to do once there are no goals left
-  const last = data?.steps.at(-1)
-  const hidden =
-    last !== undefined && !hasError(last) && last.goals.length === 0
+  const hidden = useAtomValue(typewriterInputHiddenAtom)
   // while hidden, there is no goal to insert at, see `insertInTypewriterAtom`
   const insertion = useInsertion(textareaRef, input, setInput, !hidden)
 

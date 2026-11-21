@@ -302,6 +302,8 @@ structure GameLevel where
   image : String := default
   /-- A sequence of tactics the game automatically executes before the first step. -/
   preamble : TSyntax `Lean.Parser.Tactic.tacticSeq := default
+  /-- The Unicode symbols of the sample proof, see `collectSymbols`. -/
+  symbols : Array Char := #[]
 deriving Inhabited, Repr
 
 /-- Json-encodable version of `GameLevel`
@@ -465,6 +467,8 @@ structure Game where
   image : String := default
   /-- Settings to individualise the game's UI. -/
   settings : Game.Settings := default
+  /-- The Unicode symbols of all sample proofs. -/
+  symbols : Array String := #[]
 deriving Inhabited, ToJson, FromJson
 
 def getGameJson (game : «Game») : Json := Id.run do

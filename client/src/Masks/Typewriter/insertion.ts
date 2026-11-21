@@ -5,6 +5,8 @@
  * when the player edits the text, so typing and clicking can be mixed.
  */
 
+import type { Insertion } from '../mask-atoms'
+
 /** What a slot takes and how its items are separated, see `parseTemplate` */
 export type SlotKind = 'single' | 'comma' | 'space' | 'tactics'
 
@@ -234,6 +236,10 @@ export function insertTemplate(
   }
 }
 
+function endsWithSymbol(text: string) {
+  return /[^\p{ASCII}\p{L}\p{N}\s]$/u.test(text)
+}
+
 /**
  * Inserts the name of a theorem or hypothesis. If the caret is in a slot (the innermost
  * one, see `slotAt`), the name is added at the end of the slot's content, separated as
@@ -251,7 +257,11 @@ export function insertName(state: InputState, name: string): InputState {
   const content = state.text.slice(slot.start, slot.end)
   let separator = ''
   if (content.trim().length > 0) {
-    if (slot.kind === 'comma' && !content.trimEnd().endsWith(','))
+    if (
+      slot.kind === 'comma' &&
+      !content.trimEnd().endsWith(',') &&
+      !endsWithSymbol(content)
+    )
       separator = ', '
     else if (!/\s$/.test(content)) separator = ' '
   }
@@ -270,16 +280,28 @@ export function insertName(state: InputState, name: string): InputState {
   return { text, slots: others, selection: [caret, caret] }
 }
 
+export function insertSymbol(state: InputState, symbol: string): InputState {
+  const [from, to] = state.selection
+  const text = state.text.slice(0, from) + symbol + state.text.slice(to)
+  const caret = from + symbol.length
+  return {
+    text,
+    slots: shiftSlots(state.slots, from, to - from, symbol.length),
+    selection: [caret, caret],
+  }
+}
+
 /**
  * The plain text of an insertion, e.g. to show or copy it: a tactic's template without its
- * slots, e.g. `rw []`, or a name
+ * slots, e.g. `rw []`, a name, or a symbol
  */
-export function insertionText(
-  insertion:
-    | { kind: 'tactic'; template: string }
-    | { kind: 'name'; name: string },
-) {
-  return insertion.kind === 'tactic'
-    ? parseTemplate(insertion.template).text.trim()
-    : insertion.name
+export function insertionText(insertion: Insertion) {
+  switch (insertion.kind) {
+    case 'tactic':
+      return parseTemplate(insertion.template).text.trim()
+    case 'name':
+      return insertion.name
+    case 'symbol':
+      return insertion.symbol
+  }
 }

@@ -170,6 +170,7 @@ export interface ApiGameData {
   tile: null | ApiGameTile
   image: null | string
   settings?: null | ApiGameSettings
+  symbols?: string[]
 }
 
 export interface ApiInventoryTile {

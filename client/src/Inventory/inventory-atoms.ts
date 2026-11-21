@@ -7,7 +7,7 @@ import type { ApiDoc, ApiInventoryOverview, ApiInventoryTile } from '../api'
 import { gameIdAtom, levelIdAtom, worldIdAtom } from '../state/location-atoms'
 import { preferencesAtom } from '../state/preferences-atoms'
 import { completedAtom, progressAtom } from '../state/progress-atoms'
-import { levelInfoAtom } from '../state/query-atoms'
+import { gameInfoAtom, levelInfoAtom } from '../state/query-atoms'
 import { fetchJson, gameDataUrl } from '../utils/fetch'
 
 /** Valid inventory tabs */
@@ -69,6 +69,17 @@ export const inventoryAtom = atom(
 
 /** Curently selected tab */
 export const inventoryTabAtom = atom<InventoryTab>(InventoryTab.tactic)
+
+/**
+ * We need to handle the symbol tab on its own, as it does not have inventory items
+ */
+export const symbolsTabOpenAtom = atom(false)
+
+/** The game's symbols */
+export const insertableSymbolsAtom = atom(get => {
+  if ((get(levelIdAtom) ?? 0) === 0) return []
+  return get(gameInfoAtom).data?.symbols ?? []
+})
 
 /** Currently selected subtabs for all tabs, `null` for the default. The active one
  * should be accessed through `inventorySubtabAtom` below.

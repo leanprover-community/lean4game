@@ -53,10 +53,10 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   let defaultDeclName : Ident := mkIdent <| (← getCurGame).name ++ (← getCurWorld).name ++
     ("level" ++ toString lvlIdx : String)
 
-  -- Collect all used tactics/theorems in the sample proof:
-  let usedInventory ← match val with
+  -- Collect all used tactics/theorems and the Unicode symbols in the sample proof:
+  let (usedInventory, symbols) ← match val with
   | `(Parser.Command.declVal| := $proof:term) => do
-    collectUsedInventory proof
+    pure (← collectUsedInventory proof, collectSymbols proof)
   | _ => throwError "expected `:=`"
 
   -- extract the `tacticSeq` from `val` in order to add `let_intros` in front.
@@ -127,4 +127,5 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
     tactics := {level.tactics with used := usedInventory.tactics.toArray}
     definitions := {level.definitions with used := usedInventory.definitions.toArray}
     theorems := {level.theorems with used := usedInventory.theorems.toArray}
+    symbols := symbols.toArray
     }

@@ -16,6 +16,14 @@ const config: AbbreviationConfig = {
 }
 const provider = new AbbreviationProvider(config)
 
+/** The abbreviations of `symbol`, shortest first, e.g. `\l` and `\leftarrow` for `←` */
+export function abbreviationsOf(symbol: string) {
+  return provider
+    .collectAllAbbreviations(symbol)
+    .toSorted((a, b) => a.length - b.length)
+    .map(abbreviation => config.abbreviationCharacter + abbreviation)
+}
+
 /**
  * The first `count` distinct symbols for the abbreviation being typed, with their full
  * abbreviations. They are in the provider's order, so the first one is what the

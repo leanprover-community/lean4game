@@ -39,6 +39,7 @@ export const maskAtom = atomWithStorage<Mask>(
 export type Insertion =
   | { kind: 'tactic'; template: string }
   | { kind: 'name'; name: string }
+  | { kind: 'symbol'; symbol: string }
 
 /**
  * Asks the active mask to insert something, e.g. a tactic from the inventory or a
