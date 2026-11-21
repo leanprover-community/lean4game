@@ -6,10 +6,7 @@ import type { ApiHypothesis } from '../api'
 import { insertAtom } from '../Masks/mask-atoms'
 import { HoverCode, LeanText } from './HoverCode'
 
-/**
- * The hypotheses with a title. With `insertable`, clicking a name inserts it in the
- * active mask.
- */
+/** One or more hypotheses of the same type */
 export function HypGroup({
   title,
   hyps,

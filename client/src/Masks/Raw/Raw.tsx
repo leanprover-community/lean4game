@@ -61,9 +61,6 @@ export function Raw() {
   }
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const abbreviations = useAbbreviations(textareaRef, text, onChange)
-  // the 0-based line of the text field whose goals are shown below: the cursor's line, or
-  // the line above while the cursor is at the beginning of a line, i.e. before its tactic.
-  // `-1` before the first line, for the initial goals.
   const [cursorLine, setCursorLine] = useState(-1)
   const updateCursorLine = () => {
     const textarea = textareaRef.current
@@ -75,9 +72,7 @@ export function Raw() {
 
   return (
     <div className="relative h-full">
-      {/* behind the whole mask, so that it doesn't move when the parts change their size */}
       <WorldImage className="object-center opacity-50" />
-      {/* the statement and the goals stay, the proof and the messages in between scroll */}
       <div
         className={twMerge(
           'relative flex-col h-full p-2 text-left font-mono text-sm',
@@ -88,7 +83,6 @@ export function Raw() {
           {levelInfo?.descrFormat ?? ''}
         </pre>
         <div className="relative flex-col min-h-0 flex-1">
-          {/* at most half of the space, then the text field scrolls */}
           <div className="relative flex-col max-h-1/2 min-h-0 bg-(--bg) pl-[2ch]">
             <textarea
               ref={textareaRef}
