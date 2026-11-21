@@ -40,6 +40,13 @@ export function GameTile({
   )
   const titleLink = useRef<HTMLAnchorElement>(null)
   const href = gamePath(`g/${game}`)
+  // a list of games in games built with an older version
+  const prerequisites =
+    typeof tile.prerequisites === 'string'
+      ? tile.prerequisites
+      : tile.prerequisites.join(', ')
+  // without a text, or translated as empty, the row is left out
+  const prerequisitesText = prerequisites.trim() ? gameT(prerequisites) : ''
 
   function handleClick(event: MouseEvent<HTMLElement>) {
     const target = event.target as HTMLElement
@@ -100,16 +107,16 @@ export function GameTile({
         )}
       >
         <tbody>
-          <tr>
-            <td title={t('landing.tile.prerequisitesTitle')}>
-              {t('landing.tile.prerequisites')}
-            </td>
-            <td>
-              <Markdown game={game}>
-                {gameT(tile.prerequisites.join(', '))}
-              </Markdown>
-            </td>
-          </tr>
+          {prerequisitesText.trim() && (
+            <tr>
+              <td title={t('landing.tile.prerequisitesTitle')}>
+                {t('landing.tile.prerequisites')}
+              </td>
+              <td>
+                <Markdown game={game}>{prerequisitesText}</Markdown>
+              </td>
+            </tr>
+          )}
           <tr>
             <td>{t('landing.tile.worlds')}</td>
             <td>{tile.worlds}</td>

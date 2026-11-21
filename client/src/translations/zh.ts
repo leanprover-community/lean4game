@@ -200,7 +200,7 @@ export const zh: DeepPartialTranslation<typeof en> = {
     },
     tile: {
       prerequisites: '前置条件',
-      prerequisitesTitle: '建议先玩这些游戏。',
+      prerequisitesTitle: '玩这个游戏之前应该了解的内容。',
       worlds: '世界',
       levels: '关卡',
       languages: '语言',

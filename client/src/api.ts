@@ -129,7 +129,7 @@ export interface ApiGameTile {
   title: string
   short: string
   long: string
-  prerequisites: string[]
+  prerequisites: string | string[] // TODO: `string[]` only for backwards compatibility
   worlds: number
   levels: number
   languages: string[]

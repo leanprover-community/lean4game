@@ -24,7 +24,7 @@ Languages "en" "de"
 Settings
 CaptionShort "A small template game."
 CaptionLong "You should use this game as a template for your own game and add your own levels. `lean`"
--- Prerequisites "NNG4" -- add this if your game builds on other games
+-- Prerequisites "NNG & some Measure Theory"
 CoverImage "images/cover.png"
 
 /-! Build the game. Show's warnings if it found a problem with your game. -/

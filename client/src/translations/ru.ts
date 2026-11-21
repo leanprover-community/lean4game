@@ -202,7 +202,7 @@ export const ru: DeepPartialTranslation<typeof en> = {
     },
     tile: {
       prerequisites: 'Требования',
-      prerequisitesTitle: 'Рекомендуем сначала пройти эти игры.',
+      prerequisitesTitle: 'Что стоит знать перед этой игрой.',
       worlds: 'Миры',
       levels: 'Уровни',
       languages: 'Языки',

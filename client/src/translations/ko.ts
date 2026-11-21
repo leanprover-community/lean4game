@@ -200,7 +200,7 @@ export const ko: DeepPartialTranslation<typeof en> = {
     },
     tile: {
       prerequisites: '선행 요건',
-      prerequisitesTitle: '이 게임들을 먼저 해 보기를 권장합니다.',
+      prerequisitesTitle: '이 게임을 하기 전에 알아 두면 좋은 내용입니다.',
       worlds: '세계',
       levels: '단계',
       languages: '언어',

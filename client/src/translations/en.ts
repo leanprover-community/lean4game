@@ -240,7 +240,7 @@ export const en = {
     },
     tile: {
       prerequisites: 'Prerequisites',
-      prerequisitesTitle: 'Consider playing these games first.',
+      prerequisitesTitle: 'What you should know before playing this game.',
       worlds: 'Worlds',
       levels: 'Levels',
       languages: 'Languages',

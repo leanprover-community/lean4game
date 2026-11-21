@@ -201,7 +201,7 @@ export const es: DeepPartialTranslation<typeof en> = {
     },
     tile: {
       prerequisites: 'Requisitos previos',
-      prerequisitesTitle: 'Te recomendamos jugar primero a estos juegos.',
+      prerequisitesTitle: 'Lo que deberías saber antes de jugar a este juego.',
       worlds: 'Mundos',
       levels: 'Niveles',
       languages: 'Idiomas',

@@ -287,7 +287,7 @@ CoverImage "images/cover.png"
 - `Languages`: the languages of the game as ISO codes, e.g. `Languages "en" "de"`.
 - `CaptionShort`: One catchphrase. Appears above the image.
 - `CaptionLong`: 2-4 sentences to describe the game.
-- `Prerequisites` a list of other games you should play before this one, e.g. `Prerequisites "NNG" "STG"`. The game names are free-text.
+- `Prerequisites`: what players should know before playing, e.g. which games to play first. One translatable Markdown text. (Formerly a list of games like `Prerequisites "NNG" "STG"`, whose strings are now joined with `, `.)
 - `CoverImage`: You can create a folder `images/` and put images there for the game to use. The maximal ratio is ca. 500x200 (W x H) but it might be cropped horizontally on narrow screens.
 
 ## 10. Advanced Topics

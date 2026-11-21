@@ -244,7 +244,7 @@ export const de: DeepPartialTranslation<typeof en> = {
     },
     tile: {
       prerequisites: 'Voraussetzungen',
-      prerequisitesTitle: 'Diese Spiele am besten vorher spielen.',
+      prerequisitesTitle: 'Was du vor diesem Spiel kennen solltest.',
       worlds: 'Welten',
       levels: 'Level',
       languages: 'Sprachen',

@@ -10,7 +10,7 @@
     { "owner": "jadabouhawili", "repo": "knightsandknaves-lean4game" },
     { "owner": "zrtmrh", "repo": "linearalgebragame" }
   ],
-  "listImportedGames": false,
+  "listImportedGames": true,
   "contact": {
     "name": "unknown",
     "address": [],
