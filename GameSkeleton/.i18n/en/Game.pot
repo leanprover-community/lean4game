@@ -10,7 +10,7 @@ msgstr "Project-Id-Version: Game v4.36.0\n"
 "X-Poedit-Basepath: ../..\n"
 "X-Poedit-SearchPath-0: ."
 
-#: Game.lean:24
+#: Game.lean:25
 msgid "A small template game."
 msgstr ""
 
@@ -137,7 +137,7 @@ msgid "You can either start using §0 or §1."
 msgstr ""
 
 #. §0: `lean`
-#: Game.lean:25
+#: Game.lean:26
 msgid "You should use this game as a template for your own game and add your own levels. §0"
 msgstr ""
 
