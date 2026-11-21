@@ -73,21 +73,27 @@ elab "Info" t:str : command => do
     pure ()
   | .Game => modifyCurGame  fun game => pure {game with info := info}
 
--- Note: the syntax to add multiple is `(&"anotherOption" <|> &"unbundleHyps")`
-syntax settingsArg := atomic(" (" (&"unbundleHyps") " := " withoutPosition(term) ")")
+syntax settingsArg := atomic(" (" (&"unbundleHyps" <|> &"allowEmptyTranslations") " := "
+  withoutPosition(term) ")")
 
 open Elab in
 /--
 Settings to customise the game appearance. Usage `Settings (setting1 := val1) (setting2 := val2)`.
 Valid settings are:
 
-* (unbundleHyps := false)
+* `(unbundleHyps := false)`: show `A : Prop` and `B : Prop` instead of `A B : Prop`
+* `(allowEmptyTranslations := false)`: an empty translation hides a text instead of
+  showing the original
  -/
 elab "Settings " args:settingsArg* : command => do
   let mut settings: Game.Settings := default
   for arg in args do
     match arg with
     | `(settingsArg| (unbundleHyps := true)) => settings := { settings with unbundleHyps := true }
-    | `(settingsArg| (unbundleHyps := false)) => settings := { unbundleHyps := false }
+    | `(settingsArg| (unbundleHyps := false)) => settings := { settings with unbundleHyps := false }
+    | `(settingsArg| (allowEmptyTranslations := true)) =>
+      settings := { settings with allowEmptyTranslations := true }
+    | `(settingsArg| (allowEmptyTranslations := false)) =>
+      settings := { settings with allowEmptyTranslations := false }
     | _ => throwUnsupportedSyntax
   modifyCurGame (pure { · with settings := settings })

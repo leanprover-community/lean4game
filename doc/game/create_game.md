@@ -300,13 +300,16 @@ can be configured using the following command inside `Game.lean`
 ```
 Settings
   (unbundleHyps := true)
-  (anotherOption := false)
+  (allowEmptyTranslations := true)
 ```
 
 Currently existing options are:
 
 - `unbundleHyps` (default: `false`): if enabled, display two lines `A : Prop` and `B : Prop` instead
   of a single `A B : Prop`.
+- `allowEmptyTranslations` (default: `false`): if enabled, a text translated as an empty string is
+  hidden instead of showing the original, see the
+  [translation guide](translation-guide-for-game-maintainers.md).
 
 ### Markdown
 

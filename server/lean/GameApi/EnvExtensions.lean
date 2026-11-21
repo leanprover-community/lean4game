@@ -431,6 +431,11 @@ structure Game.Settings where
   instead of a joint `A B : Prop`.
   -/
   unbundleHyps : Bool := false
+  /--
+  If `true`, translations explicitly exported as empty strings are rendered as
+  empty instead of falling back to their source text.
+  -/
+  allowEmptyTranslations : Bool := false
 deriving Repr, ToJson, FromJson
 
 instance : Inhabited Game.Settings where
