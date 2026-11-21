@@ -132,7 +132,6 @@ jobs:
 
       - run: npm ci
 
-      # all rules are warnings, shown as annotations in the PR
       - name: Lint
         continue-on-error: true
         run: npm run lint -- --format=github
@@ -144,6 +143,9 @@ jobs:
       - name: Check translations
         continue-on-error: true
         run: npm run i18n:check
+
+      - name: Check that both api.ts are in sync
+        run: npm run api:check
 
   all:
     name: all
