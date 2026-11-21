@@ -412,8 +412,8 @@ structure GameTile where
   TODO: Must be a list with a single language currently
    -/
   languages: List String := default
-  /-- A list of games which this one builds upon -/
-  prerequisites: List String := default
+  /-- What players should know before playing, e.g. other games. Markdown. -/
+  prerequisites: String := default
   /-- Number of worlds in the game -/
   worlds: Nat := default
   /-- Number of levels in the game -/

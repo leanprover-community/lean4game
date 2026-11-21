@@ -10,10 +10,18 @@ namespace GameServer
 
 open Lean
 
-/-- A list of games that should be played before this one. Example `Prerequisites "NNG" "STG"`. -/
+/--
+What the player should know for this game.
+
+TODO: backwards compatibility: multiple strings. Could be one
+-/
 elab "Prerequisites" t:str* : command => do
+  if t.size > 1 then
+    logWarning m!"Prerequisites are one text now, e.g. `Prerequisites \"NNG, STG\"`. \
+      The {t.size} strings are joined with \", \"."
+  let text ← (", ".intercalate (t.map (·.getString)).toList).translate
   modifyCurGame fun game => pure {game with
-    tile := {game.tile with prerequisites := t.map (·.getString) |>.toList}}
+    tile := {game.tile with prerequisites := text}}
 
 /-- Short caption for the game (1 sentence) -/
 elab "CaptionShort" t:str : command => do

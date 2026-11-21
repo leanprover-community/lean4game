@@ -201,7 +201,7 @@ export const uk: DeepPartialTranslation<typeof en> = {
     },
     tile: {
       prerequisites: 'Передумови',
-      prerequisitesTitle: 'Радимо спершу пройти ці ігри.',
+      prerequisitesTitle: 'Що варто знати перед цією грою.',
       worlds: 'Світи',
       levels: 'Рівні',
       languages: 'Мови',

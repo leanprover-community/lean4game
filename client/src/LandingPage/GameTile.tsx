@@ -106,7 +106,11 @@ export function GameTile({
             </td>
             <td>
               <Markdown game={game}>
-                {gameT(tile.prerequisites.join(', '))}
+                {gameT(
+                  typeof tile.prerequisites === 'string'
+                    ? tile.prerequisites
+                    : tile.prerequisites.join(', '),
+                )}
               </Markdown>
             </td>
           </tr>
