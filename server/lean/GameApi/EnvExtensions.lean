@@ -382,7 +382,13 @@ instance : ToJson World := ⟨
     ("title", world.title),
     ("introduction", world.introduction),
     ("conclusion", world.conclusion),
-    ("image", world.image)]
+    ("image", world.image),
+    -- the title and statement of each level, first level first, e.g. for the overview
+    -- tree. The statement is `descrFormat` without the trailing ` := by`.
+    ("levels", toJson <| (world.levels.toArray.qsort (·.1 < ·.1)).map fun (_, lvl) =>
+      Json.mkObj [
+        ("title", lvl.title),
+        ("statement", (lvl.descrFormat.dropSuffix " := by").toString)])]
 ⟩
 
 /-! ## Game -/

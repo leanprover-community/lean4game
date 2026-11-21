@@ -132,6 +132,18 @@ function LevelIcon({
 
   const N = useDrawnWorldSize(world)
 
+  // shown on hover: the level's title, or the statement it proves if it has none
+  const gameId = useAtomValue(gameIdAtom)
+  const { data: gameInfo } = useAtomValue(gameInfoAtom)
+  const { t: gameT } = useGameTranslation(
+    gameId ?? '',
+    gameInfo?.settings?.allowEmptyTranslations,
+  )
+  const levelData = gameInfo?.worlds?.nodes[world]?.levels?.[level - 1]
+  const tooltip = levelData?.title
+    ? gameT(levelData.title)
+    : levelData?.statement
+
   // divide circle into `N+2` equal pieces.
   // only for non-spiraling case
   const beta =
@@ -181,6 +193,7 @@ function LevelIcon({
       disabled={levelDisabled}
       className="group"
     >
+      {tooltip && <title>{tooltip}</title>}
       <circle
         className={
           completed
