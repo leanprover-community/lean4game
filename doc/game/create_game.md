@@ -280,7 +280,7 @@ There are a few more options you can add in `Game.lean` before the `MakeGame` co
 Languages "en"
 CaptionShort "Game Template"
 CaptionLong "You should use this game as a template for your own game and add your own levels."
-Prerequisites "The [Natural Number Game](https://adam.math.hhu.de/#/g/leanprover-community/nng4)"
+Prerequisites "NNG"
 CoverImage "images/cover.png"
 ```
 
