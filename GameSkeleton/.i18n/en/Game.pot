@@ -1,7 +1,7 @@
 msgid ""
 msgstr "Project-Id-Version: Game v4.36.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-20\n"
+"POT-Creation-Date: 2026-11-21\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
@@ -40,7 +40,7 @@ msgid "Commutativity on §0"
 msgstr ""
 
 #: Game/Levels/HelloWorld/L02_HypothesisNames.lean:15
-#: Game/Levels/HelloWorld/L03_NonProp.lean:17
+#: Game/Levels/HelloWorld/L03_NonProp.lean:20
 msgid "Done!"
 msgstr ""
 
@@ -151,10 +151,14 @@ msgstr ""
 msgid "You should use §0 now."
 msgstr ""
 
-#: Game/Levels/HelloWorld/L03_NonProp.lean:12
+#: Game/Levels/HelloWorld/L03_NonProp.lean:15
 msgid "intro first!"
 msgstr ""
 
-#: Game/Levels/HelloWorld/L03_NonProp.lean:14
+#: Game/Levels/HelloWorld/L03_NonProp.lean:10
+msgid "level 3"
+msgstr ""
+
+#: Game/Levels/HelloWorld/L03_NonProp.lean:17
 msgid "now apply!"
 msgstr ""

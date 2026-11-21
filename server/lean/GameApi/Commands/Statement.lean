@@ -107,7 +107,8 @@ elab doc:docComment ? attrs:Parser.Term.attributes ?
   let currNamespace ← getCurrNamespace
 
   -- Format theorem statement for displaying
-  let sigString := sig.raw.reprint.getD ""
+  -- without the whitespace before `:=`, which belongs to the signature
+  let sigString := (sig.raw.reprint.getD "").trimAsciiEnd.copy
   let descrFormat : String := match statementName, isProp with
   | some name, true =>  s!"theorem {name.getId} {sigString} := by"
   | some name, false =>  s!"def {name.getId} {sigString} := by"

@@ -162,6 +162,7 @@ export const de: DeepPartialTranslation<typeof en> = {
     objects: 'Objekte',
     assumptions: 'Annahmen',
     theorem: 'Satz',
+    definition: 'Definition',
     levelCompleted: 'Level abgeschlossen! 🎉',
     levelSolved: 'Level wurde einmal erfolgreich gelöst',
     noGoalsLeft: 'keine Ziele mehr',

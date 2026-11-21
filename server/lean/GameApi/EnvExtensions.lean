@@ -319,6 +319,9 @@ structure LevelInfo where
   conclusion : String
   descrText : Option String := none
   descrFormat : String := ""
+  /-- whether the statement is a `Prop`, i.e. a theorem and not a definition.
+  `none` in the data of games built before this field existed. -/
+  isProp : Option Bool := none
   theoremTab : Option String
   module : Name
   displayName : Option String
@@ -334,6 +337,7 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
     theorems := lvl.theorems.tiles,
     definitions := lvl.definitions.tiles,
     descrText := lvl.descrText,
+    isProp := some lvl.isProp
     descrFormat := lvl.descrFormat --toExpr <| format (lvl.goal.raw) --toString <| Syntax.formatStx (lvl.goal.raw) --Syntax.formatStx (lvl.goal.raw) , -- TODO
     introduction := lvl.introduction
     conclusion := lvl.conclusion
@@ -349,7 +353,8 @@ def GameLevel.toInfo (lvl : GameLevel) (env : Environment) : LevelInfo :=
     displayName := match lvl.statementName with
       | .anonymous => none
       | name => match (inventoryExt.getState env).find?
-          (fun x => x.name == name && x.type == .Theorem) with
+          (fun x => x.name == name &&
+            x.type == if lvl.isProp then .Theorem else .Definition) with
         | some n => n.displayName
         | none => name.toString
         -- Note: we could call `.find!` because we check in `Statement` that the
