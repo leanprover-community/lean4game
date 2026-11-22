@@ -82,11 +82,16 @@ export function GameTile({
         <div
           className={'h-50 w-full bg-linear-137 from-purple-900 to-cyan-400'}
         >
-          <img
-            className="h-full w-full object-cover"
-            src={`/api/data/${game}/${tile.image}`}
-            alt=""
-          />
+          {tile.image && (
+            <img
+              className="h-full w-full object-cover"
+              src={`/api/data/${game}/${tile.image}`}
+              alt=""
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+          )}
         </div>
 
         <div

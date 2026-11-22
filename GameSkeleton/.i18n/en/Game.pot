@@ -1,7 +1,7 @@
 msgid ""
 msgstr "Project-Id-Version: Game v4.36.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21\n"
+"POT-Creation-Date: 2026-11-22\n"
 "Last-Translator: \n"
 "Language-Team: none\n"
 "Language: en\n"
@@ -65,11 +65,11 @@ msgid "Here you can put additional information about the game. It is accessible\
 "Use **markdown**."
 msgstr ""
 
-#: Game/Levels/HelloWorld/L01_HelloWorld.lean:32
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:23
 msgid "Hidden Hint 1"
 msgstr ""
 
-#: Game/Levels/HelloWorld/L01_HelloWorld.lean:33
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:24
 msgid "Hidden Hint 2"
 msgstr ""
 
@@ -78,7 +78,7 @@ msgid "Introduce an auxilary result."
 msgstr ""
 
 #. §0: `«{h}»`
-#: Game/Levels/HelloWorld/L01_HelloWorld.lean:28
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:19
 msgid "Maybe you should use §0 now."
 msgstr ""
 
@@ -111,7 +111,7 @@ msgstr ""
 msgid "This is the introduction text of the game."
 msgstr ""
 
-#: Game/Levels/HelloWorld/L01_HelloWorld.lean:36
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:27
 msgid "This last message appears if the level is solved."
 msgstr ""
 
@@ -142,7 +142,7 @@ msgid "You should use this game as a template for your own game and add your own
 msgstr ""
 
 #. §0: `«{g}»`
-#: Game/Levels/HelloWorld/L01_HelloWorld.lean:31
+#: Game/Levels/HelloWorld/L01_HelloWorld.lean:22
 #: Game/Levels/HelloWorld/L02_HypothesisNames.lean:12
 msgid "You should use §0 now."
 msgstr ""
