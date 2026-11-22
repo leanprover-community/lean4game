@@ -138,6 +138,7 @@ export const en = {
     nextHint: 'Next hint',
   },
   inventory: {
+    symbols: 'Symbols',
     theorems: 'Theorems',
     tactics: 'Tactics',
     definitions: 'Definitions',

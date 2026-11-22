@@ -223,6 +223,14 @@ elab "MakeGame" : command => do
     levels := nrLevels
     worlds := nrWorlds }}
 
+  -- The Unicode symbols of all sample proofs, for the inventory's symbols tab
+  modifyCurGame fun game => do
+    let mut symbols : Std.HashSet Char := {}
+    for (_, world) in game.worlds.nodes.toArray do
+      for (_, level) in world.levels.toArray do
+        symbols := symbols.insertMany level.symbols
+    return {game with symbols := sortedSymbols symbols}
+
   -- Apparently we need to reload `game` to get the changes to `game.worlds` we just made
   let game ← getCurGame
 

@@ -19,8 +19,11 @@ import {
   inventoryTabAtom,
   inventoryTabNewTilesAtom,
   inventoryTabRecentTilesAtom,
+  insertableSymbolsAtom,
   selectedDocTileAtom,
+  symbolsTabOpenAtom,
 } from './inventory-atoms'
+import { SymbolList } from './SymbolList'
 
 const tabTitles = {
   [InventoryTab.theorem]: 'inventory.theorems',
@@ -34,11 +37,19 @@ const tabTitles = {
  */
 export function Inventory() {
   const doc = useAtomValue(selectedDocTileAtom)
+  const symbols = useAtomValue(insertableSymbolsAtom)
+  const symbolsOpen = useAtomValue(symbolsTabOpenAtom) && symbols.length > 0
   return (
     <div className="relative flex-col h-full text-left">
       <TabBar />
-      <SubtabBar />
-      <InventoryList />
+      {symbolsOpen ? (
+        <SymbolList symbols={symbols} />
+      ) : (
+        <>
+          <SubtabBar />
+          <InventoryList />
+        </>
+      )}
       {doc && <Documentation tile={doc} />}
     </div>
   )
@@ -83,26 +94,52 @@ function Tab({
   )
 }
 
-/** Choose between theorems, tactics and definitions */
+/**
+ * Choose between theorems, tactics and definitions, and the symbols if the game has
+ * any
+ */
 function TabBar() {
   const { t } = useTranslation()
   const [tab, setTab] = useAtom(inventoryTabAtom)
+  const [symbolsOpen, setSymbolsOpen] = useAtom(symbolsTabOpenAtom)
+  const hasSymbols = useAtomValue(insertableSymbolsAtom).length > 0
   const newTiles = useAtomValue(inventoryTabNewTilesAtom)
   const recentTiles = useAtomValue(inventoryTabRecentTilesAtom)
+  const showSymbols = hasSymbols && symbolsOpen
   return (
-    <div className="flex shrink-0 flex-wrap border-b border-(--border) font-bold">
+    <div
+      className={twMerge(
+        'flex shrink-0 flex-wrap border-b border-(--border) font-bold',
+        // four tabs fit next to each other
+        hasSymbols && 'text-sm',
+      )}
+    >
       {Object.values(InventoryTab).map(type => (
         <Tab
           key={type}
-          active={tab === type}
+          active={!showSymbols && tab === type}
           hasNew={newTiles[type].length > 0}
           hasRecent={recentTiles[type].length > 0}
-          onClick={() => setTab(type)}
-          className="flex-1 px-2 text-center"
+          onClick={() => {
+            setTab(type)
+            setSymbolsOpen(false)
+          }}
+          className="flex-1 px-1 text-center"
         >
           {t(tabTitles[type])}
         </Tab>
       ))}
+      {hasSymbols && (
+        <Tab
+          active={showSymbols}
+          hasNew={false}
+          hasRecent={false}
+          onClick={() => setSymbolsOpen(true)}
+          className="flex-1 px-1 text-center"
+        >
+          {t('inventory.symbols')}
+        </Tab>
+      )}
     </div>
   )
 }

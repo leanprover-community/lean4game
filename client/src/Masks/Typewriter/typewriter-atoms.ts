@@ -11,6 +11,12 @@ import {
   setProofAtom,
 } from '../../state/proof-atoms'
 
+/** The input line is hidden once no goals are left: there is nothing to do */
+export const typewriterInputHiddenAtom = atom(get => {
+  const last = get(proofCheckAtom).data?.steps.at(-1)
+  return last !== undefined && !hasError(last) && last.goals.length === 0
+})
+
 /** The text in the input line of the typewriter */
 export const typewriterInputAtom = atom('')
 

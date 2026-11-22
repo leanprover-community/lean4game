@@ -141,6 +141,24 @@ def checkInventoryDoc (type : InventoryType) (ref : Ident) (name : Name := ref.g
         m!"docstring) instead. If you want to write a different description, add " ++
         m!"`{(toString type).capitalize}Doc {name}` somewhere above this statement.")
 
+/-- Find all unicode symbols used -/
+partial def collectSymbols (stx : Syntax) (acc : Std.HashSet Char := {}) : Std.HashSet Char :=
+  collectSymbolsAux acc stx
+where
+  collectSymbolsAux (acc : Std.HashSet Char) (stx : Syntax):=
+    match stx with
+    | .missing => acc
+    | .node _ ``GameServer.Tactic.Hint _ => acc -- no symbols from hints
+    | .node _ kind args => if kind == strLitKind then acc else args.foldl collectSymbolsAux acc
+    | .atom _ val => addSymbols acc val
+    | .ident _ rawVal _ _ => addSymbols acc rawVal.toString
+  addSymbols (acc : Std.HashSet Char) (text : String) : Std.HashSet Char :=
+    text.foldl (fun acc₂ c ↦ if c.toNat < 128 || c.isWhitespace then acc₂ else acc₂.insert c) acc
+
+/-- The symbols for the inventory's symbols tab, sorted by their code point -/
+def sortedSymbols (symbols : Std.HashSet Char) : Array String :=
+  symbols.toArray.qsort (·.toNat < ·.toNat) |>.map Char.toString
+
 partial def collectUsedInventory (stx : Syntax) (acc : UsedInventory := {}) : CommandElabM UsedInventory := do
   match stx with
   | .missing => return acc
