@@ -1,5 +1,9 @@
-import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
+import {
+  faSpinner,
+  faWandMagicSparkles,
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useAtomValue } from 'jotai'
 import {
   type ReactNode,
   type RefObject,
@@ -14,6 +18,7 @@ import {
   abbreviationSuggestions,
   useAbbreviations,
 } from '../../hooks/useAbbreviations'
+import { mobileAtom } from '../../state/preferences-atoms'
 
 /**
  * While an abbreviation is typed, a bar with the first symbols it could become. The first
@@ -73,7 +78,8 @@ export function AbbreviationBar({
 
 /**
  * The typewriter's input for Lean commands: a blue frame, grey while `disabled`, with an
- * execute button. Used for the input line at the bottom and for editing earlier steps.
+ * execute button, which shows a spinner while `pending` and has no label on mobile. Used
+ * for the input line at the bottom and for editing earlier steps.
  * Enter or the button submits it, Ctrl+Enter (or Shift+Enter) starts a new line, Escape
  * calls `onCancel`, Tab completes a unicode abbreviation like `\to`. It grows with its
  * content. `children` are further buttons after the execute button, `className` places it.
@@ -87,6 +93,7 @@ export function CommandInput({
   onSelectionChange,
   onFocus,
   disabled,
+  pending = false,
   placeholder,
   className,
   children,
@@ -101,11 +108,14 @@ export function CommandInput({
   onSelectionChange?: (selection: [number, number]) => void
   onFocus?: () => void
   disabled: boolean
+  /** while the result of the submitted command is awaited */
+  pending?: boolean
   placeholder?: string
   className?: string
   children?: ReactNode
 }) {
   const { t } = useTranslation()
+  const mobile = useAtomValue(mobileAtom)
   const abbreviations = useAbbreviations(ref, value, onChange)
 
   // grow with the content, up to a third of the window
@@ -191,14 +201,21 @@ export function CommandInput({
       <button
         type="submit"
         disabled={disabled}
+        title={t('typewriter.execute')}
+        aria-label={t('typewriter.execute')}
         className={twMerge(
-          'h-7.5 min-w-24 shrink-0 cursor-pointer rounded-sm bg-(--bg) px-3',
+          'h-7.5 shrink-0 cursor-pointer rounded-sm bg-(--bg)',
           'whitespace-nowrap text-primary',
           'disabled:cursor-default disabled:text-gray-500',
+          mobile ? 'w-7.5' : 'min-w-24 px-3',
         )}
       >
-        <FontAwesomeIcon icon={faWandMagicSparkles} />
-        &nbsp;{t('typewriter.execute')}
+        {pending ? (
+          <FontAwesomeIcon icon={faSpinner} spinPulse />
+        ) : (
+          <FontAwesomeIcon icon={faWandMagicSparkles} />
+        )}
+        {!mobile && <>&nbsp;{t('typewriter.execute')}</>}
       </button>
       {children}
     </form>

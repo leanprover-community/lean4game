@@ -68,6 +68,7 @@ function Command({
   failed: boolean
 }) {
   const { t } = useTranslation()
+  const mobile = useAtomValue(mobileAtom)
   const retryFromStep = useSetAtom(retryFromStepAtom)
   const [editingStep, setEditingStep] = useAtom(editingStepAtom)
   if (failed) {
@@ -92,14 +93,16 @@ function Command({
       <button
         type="button"
         className={twMerge(
-          'h-7.5 min-w-24 shrink-0 cursor-pointer self-start rounded-sm bg-(--bg)',
-          'px-2 whitespace-nowrap text-gray-500 hover:text-primary',
+          'h-7.5 shrink-0 cursor-pointer self-start rounded-sm bg-(--bg)',
+          'whitespace-nowrap text-gray-500 hover:text-primary',
+          mobile ? 'w-7.5' : 'min-w-24 px-2',
         )}
         title={t('typewriter.retryTitle')}
+        aria-label={t('typewriter.retry')}
         onClick={() => (current ? retryFromStep(index) : setEditingStep(index))}
       >
         <FontAwesomeIcon icon={faDeleteLeft} />
-        &nbsp;{t('typewriter.retry')}
+        {!mobile && <>&nbsp;{t('typewriter.retry')}</>}
       </button>
     </div>
   )
@@ -132,6 +135,7 @@ function EditCommand({ step, index }: { step: ApiProofStep; index: number }) {
       }}
       onCancel={() => setEditingStep(null)}
       disabled={isFetching}
+      pending={isFetching}
       className="mb-4 rounded-sm"
     >
       <button
