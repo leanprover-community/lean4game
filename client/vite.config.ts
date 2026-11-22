@@ -7,6 +7,9 @@ const serverPort = process.env.PORT || 8000
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    chunkSizeWarningLimit: 1500, // kB
+  },
   server: {
     host: true,
     port: Number(clientPort),
