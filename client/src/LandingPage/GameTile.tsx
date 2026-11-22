@@ -64,7 +64,7 @@ export function GameTile({
     <article
       onClick={handleClick}
       className={twMerge(
-        'flex-col w-full max-w-125 cursor-pointer justify-between',
+        'flex-col w-full max-w-125.5 cursor-pointer justify-between',
         'justify-self-center rounded-2xl border border-neutral-400 text-left',
         'text-base leading-normal tracking-normal text-(--text-h) shadow-tile',
         '[&_a]:no-underline',
@@ -76,7 +76,7 @@ export function GameTile({
             {gameT(tile.title)}
           </Link>
         </div>
-        <div className="mx-2.5 box-content line-clamp-2 h-[2lh] pt-1.25 pb-4">
+        <div className="mx-2.5 mt-1.25 mb-4 line-clamp-2 h-[2lh]">
           {gameT(tile.short)}
         </div>
         <div
@@ -87,7 +87,7 @@ export function GameTile({
               className="h-full w-full object-cover"
               src={`/api/data/${game}/${tile.image}`}
               alt=""
-              onError={(e) => {
+              onError={e => {
                 e.currentTarget.style.display = 'none'
               }}
             />

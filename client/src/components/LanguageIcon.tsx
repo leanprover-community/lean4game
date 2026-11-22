@@ -23,6 +23,7 @@ export function LanguageIcon({
       <span
         className={twMerge(
           'inline-flex h-4 w-6 items-center justify-center',
+          '[&_img]:drop-shadow-[1px_1px_1px_rgb(0_0_0/0.35)]',
           className,
         )}
         title={title}
@@ -33,7 +34,6 @@ export function LanguageIcon({
   return (
     <span
       className={twMerge(
-        // longer codes like `pt-br` grow
         'inline-block min-w-6 text-center leading-none lowercase text-sm',
         className,
       )}
