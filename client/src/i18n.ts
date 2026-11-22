@@ -1,18 +1,9 @@
-import i18n from 'i18next'
-import Backend from 'i18next-http-backend'
+import i18n, { type ReadCallback, type ResourceKey } from 'i18next'
+import HttpBackend from 'i18next-http-backend'
 import { initReactI18next } from 'react-i18next'
 
 import config from './config.json'
-import { de } from './translations/de'
 import { en } from './translations/en'
-import { es } from './translations/es'
-import { fr } from './translations/fr'
-import { it } from './translations/it'
-import { ko } from './translations/ko'
-import { ptBR } from './translations/pt-BR'
-import { ru } from './translations/ru'
-import { uk } from './translations/uk'
-import { zh } from './translations/zh'
 
 /** The language of new visitors, can be set at build time */
 export const DEFAULT_LANGUAGE: string =
@@ -52,6 +43,45 @@ export function setLanguage(lng: string) {
   }
 }
 
+/**
+ * The translations of the interface. Only English is bundled, as it is the fallback, the
+ * other languages are lazy loaded
+ */
+const uiTranslations: Partial<Record<string, () => Promise<ResourceKey>>> = {
+  en: () => Promise.resolve(en),
+  de: () => import('./translations/de').then(m => m.de),
+  es: () => import('./translations/es').then(m => m.es),
+  fr: () => import('./translations/fr').then(m => m.fr),
+  it: () => import('./translations/it').then(m => m.it),
+  ko: () => import('./translations/ko').then(m => m.ko),
+  'pt-BR': () => import('./translations/pt-BR').then(m => m.ptBR),
+  ru: () => import('./translations/ru').then(m => m.ru),
+  uk: () => import('./translations/uk').then(m => m.uk),
+  zh: () => import('./translations/zh').then(m => m.zh),
+}
+
+/**
+ * Loads the interface's translations from `uiTranslations`, and the translations of games
+ * (namespaces `g/owner/repo`) from the server.
+ */
+class Backend extends HttpBackend {
+  read(language: string, namespace: string, callback: ReadCallback) {
+    if (namespace !== 'translation') {
+      super.read(language, namespace, callback)
+      return
+    }
+    const load = uiTranslations[language]
+    if (!load) {
+      callback(null, {})
+      return
+    }
+    load().then(
+      data => callback(null, data),
+      (error: unknown) => callback(error as Error, false),
+    )
+  }
+}
+
 void i18n
   .use(initReactI18next)
   .use(Backend)
@@ -64,14 +94,10 @@ void i18n
         const ns = namespaces[0]
 
         // the translations of a game, see `useGameTranslation`
-        if (ns.startsWith('g/')) {
-          return `/api/i18n/${ns.slice(2)}/${lng}`
-        } else {
-          return `/locales/${lng}/${ns}.json`
-        }
+        return `/api/i18n/${ns.slice(2)}/${lng}`
       },
     },
-    // the interface's translations are bundled, but the games' ones are loaded
+    // English is bundled, the other languages and the games' translations are loaded
     partialBundledLanguages: true,
     // > language to use, more information here:
     // > https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
@@ -88,18 +114,7 @@ void i18n
       // > react already safes from xss
       escapeValue: false,
     },
-    resources: {
-      de: { translation: de },
-      en: { translation: en },
-      es: { translation: es },
-      fr: { translation: fr },
-      it: { translation: it },
-      ko: { translation: ko },
-      'pt-BR': { translation: ptBR },
-      ru: { translation: ru },
-      uk: { translation: uk },
-      zh: { translation: zh },
-    },
+    resources: { en: { translation: en } },
   })
 
 let emptyStringI18n: typeof i18n | undefined
