@@ -74,17 +74,19 @@ copyright information.
 
 In case of a server outage at `adam.math.hhu.de` please open an [issue](issues) and/or contact us by <a href="mailto:adam@math.hhu.de?subject=Server Outage">email</a>. Bug reports and feature requests regarding the game interface should be filed on the [issues page](issues) of this repository. For specific games on the [Lean Game Server](https://adam.math.hhu.de), please refer to the github repositories linked to below or contact the maintainers.
 
-| Game/repository                                                                   | Maintainer                                              |
-| --------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| [Knights and Knaves](https://github.com/jadabouhawili/knightsandknaves-lean4game) | [Jad Abou Hawili](https://github.com/JadAbouHawili)     |
-| [Linear Algebra Game](https://github.com/zrtmrh/linearalgebragame)                | [ZRTMRH](https://github.com/ZRTMRH)                     |
-| [Logic Game](https://github.com/trequetrum/lean4game-logic)                       | [Trequetrum](https://github.com/Trequetrum)             |
-| [Natural Number Game (NNG)](https://github.com/leanprover-community/nng4)         | [Kevin Buzzard](https://github.com/kbuzzard)            |
-| [Real Analysis Game](https://github.com/alexkontorovich/realanalysisgame)         | [Alex Kontorovich](https://github.com/AlexKontorovich)  |
-| [Reintroduction to Proofs](https://github.com/emilyriehl/reintroductiontoproofs)  | [Emily Riehl](https://github.com/emilyriehl)            |
-| [Robo / Scribble](https://github.com/hhu-adam/robo)                               | [Marcus Zibrowius](https://github.com/TentativeConvert) |
-| [Set Theory Game](https://github.com/djvelleman/stg4)                             | [Dan Velleman](https://github.com/djvelleman)           |
-| [Number Theory Game](https://github.com/k88-b/numbertheorygame)                   | [Konstantin Belyanin](https://github.com/k88-b)         |
+| Game/repository                                                                                    | Maintainer                                              |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| [Knights and Knaves](https://github.com/jadabouhawili/knightsandknaves-lean4game)                  | [Jad Abou Hawili](https://github.com/JadAbouHawili)     |
+| [Linear Algebra Game](https://github.com/zrtmrh/linearalgebragame)                                 | [`ZRTMRH`](https://github.com/ZRTMRH)                   |
+| [Logic Game](https://github.com/trequetrum/lean4game-logic)                                        | [Trequetrum](https://github.com/Trequetrum)             |
+| [Natural Number Game (NNG)](https://github.com/leanprover-community/nng4)                          | [Kevin Buzzard](https://github.com/kbuzzard)            |
+| [Real Analysis Game](https://github.com/alexkontorovich/realanalysisgame)                          | [Alex Kontorovich](https://github.com/AlexKontorovich)  |
+| [Reintroduction to Proofs](https://github.com/emilyriehl/reintroductiontoproofs)                   | [Emily Riehl](https://github.com/emilyriehl)            |
+| [Robo / Scribble](https://github.com/hhu-adam/robo)                                                | [Marcus Zibrowius](https://github.com/TentativeConvert) |
+| [Set Theory Game](https://github.com/djvelleman/stg4)                                              | [Dan Velleman](https://github.com/djvelleman)           |
+| [Number Theory Game](https://github.com/k88-b/numbertheorygame)                                    | [Konstantin Belyanin](https://github.com/k88-b)         |
+| [Introduction to Program Verification](https://github.com/GitHubAvailable/ProgramVerificationGame) | [`GitHubAvailable`](https://github.com/GitHubAvailable) |
+| [Hilbert Geometry Game](https://github.com/mmasdeu/geometry)                                       | [Marc Masdeu](https://github.com/mmasdeu)               |
 
 ## Credits
 

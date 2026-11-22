@@ -24,3 +24,9 @@ contact_links:
   - name: Linear Algebra Game
     url: https://github.com/zrtmrh/linearalgebragame/issues/new/choose
     about: Raise issues regarding the contents of the Linear Algebra Game
+  - name: Introduction to Proof Verification
+    url: https://github.com/GitHubAvailable/ProgramVerificationGame/issues/new/choose
+    about: Raise issues regarding the contents of the game Introduction to Proof Verification
+  - name: Hilbert Geometry Game
+    url: https://github.com/mmasdeu/geometry/issues/new/choose
+    about: Raise issues regarding the contents of the Hilbert Geometry Game
