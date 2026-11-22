@@ -12,9 +12,9 @@ This is the source code for the Lean Game Server hosted at [adam.math.hhu.de](ht
 
 Please follow the tutorial [Creating a Game](doc/game/create_game.md). In particular, the following steps may be of interest:
 
-- Step 6: [How to Run Games Locally](doc/game/running_locally.md)
-- Step 8: [How to Update an existing Game](doc/game/update_game.md)
-- Step 10: [How to Publish a Game](doc/game/publish_game.md)
+- Step 5: [How to Run Games Locally](doc/game/running_locally.md)
+- Step 7: [How to Update an existing Game](doc/game/update_game.md)
+- Step 9: [How to Publish a Game](doc/game/publish_game.md)
 
 ## Documentation
 
