@@ -78,8 +78,7 @@ export function AbbreviationBar({
 
 /**
  * The typewriter's input for Lean commands: a blue frame, grey while `disabled`, with an
- * execute button, which shows a spinner while `pending` and has no label on mobile. Used
- * for the input line at the bottom and for editing earlier steps.
+ * execute button. Used for the input line at the bottom and for editing earlier steps.
  * Enter or the button submits it, Ctrl+Enter (or Shift+Enter) starts a new line, Escape
  * calls `onCancel`, Tab completes a unicode abbreviation like `\to`. It grows with its
  * content. `children` are further buttons after the execute button, `className` places it.
@@ -101,14 +100,11 @@ export function CommandInput({
   ref: RefObject<HTMLTextAreaElement | null>
   value: string
   onChange: (value: string) => void
-  /** called with the final text, in which all abbreviations are replaced */
   onSubmit: (value: string) => void
   onCancel?: () => void
-  /** called when the selection changes, also when only the caret moves */
   onSelectionChange?: (selection: [number, number]) => void
   onFocus?: () => void
   disabled: boolean
-  /** while the result of the submitted command is awaited */
   pending?: boolean
   placeholder?: string
   className?: string
