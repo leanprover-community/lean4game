@@ -8,6 +8,7 @@
   ],
   "type": "module",
   "scripts": {
+    "analyse": "npm --workspace client run analyse",
     "build:client": "npm --workspace client run build",
     "build:server": "npm --workspace server run build",
     "build:lean": "npm --workspace server run build:lean",

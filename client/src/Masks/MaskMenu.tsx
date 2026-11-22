@@ -1,19 +1,31 @@
 import { faCheck, faTerminal } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useAtom, useAtomValue } from 'jotai'
-import { useEffect, useRef, useState, type JSX } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type JSX } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
+import { Spinner } from '../components/Spinner'
 import { Dropdown } from '../Navigation/Dropdown'
 import { NavButton } from '../Navigation/NavButton'
 import { Mask, maskAtom, masks } from './mask-atoms'
-import { Raw } from './Raw/Raw'
-import { Typewriter } from './Typewriter/Typewriter'
+
+// lazy loaded, so that only the selected mask is loaded, and only on level pages
+const Raw = lazy(() => import('./Raw/Raw').then(m => ({ default: m.Raw })))
+const Typewriter = lazy(() =>
+  import('./Typewriter/Typewriter').then(m => ({ default: m.Typewriter })),
+)
 
 /** The selected mask, see `maskAtom` */
 export function SelectedMask(): JSX.Element {
-  const mask = useAtomValue(maskAtom)
+  return (
+    <Suspense fallback={<Spinner />}>
+      <MaskOf mask={useAtomValue(maskAtom)} />
+    </Suspense>
+  )
+}
+
+function MaskOf({ mask }: { mask: Mask }): JSX.Element {
   switch (mask) {
     case Mask.Raw:
       return <Raw />
