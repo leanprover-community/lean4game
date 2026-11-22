@@ -85,6 +85,8 @@ In case of a server outage at `adam.math.hhu.de` please open an [issue](issues) 
 | [Robo / Scribble](https://github.com/hhu-adam/robo)                               | [Marcus Zibrowius](https://github.com/TentativeConvert) |
 | [Set Theory Game](https://github.com/djvelleman/stg4)                             | [Dan Velleman](https://github.com/djvelleman)           |
 | [Number Theory Game](https://github.com/k88-b/numbertheorygame)                   | [Konstantin Belyanin](https://github.com/k88-b)         |
+| [Introduction to Program Verification](https://github.com/GitHubAvailable/ProgramVerificationGame) | [GitHubAvailable](https://github.com/GitHubAvailable) |
+| [Hilbert Geometry Game](https://github.com/mmasdeu/geometry)                      | [Marc Masdeu](https://github.com/mmasdeu)         |
 
 ## Credits
 
