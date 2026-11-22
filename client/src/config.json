@@ -7,8 +7,8 @@
     { "iso": "it", "name": "Italiano", "flag": "IT" },
     { "iso": "ko", "name": "한국어", "flag": "KR" },
     { "iso": "pt-BR", "name": "Português", "flag": "BR" },
+    { "iso": "ru", "name": "Русский", "flag": "xx" },
     { "iso": "uk", "name": "Українська", "flag": "UA" },
-    { "iso": "zh", "name": "中文", "flag": "CN" },
-    { "iso": "ru", "name": "Русский" }
+    { "iso": "zh", "name": "中文", "flag": "CN" }
   ]
 }

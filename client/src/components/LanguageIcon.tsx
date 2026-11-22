@@ -23,6 +23,8 @@ export function LanguageIcon({
       <span
         className={twMerge(
           'inline-flex h-4 w-6 items-center justify-center',
+          // a drop shadow follows the flag's outline, so white flags stand out on white
+          '[&_img]:drop-shadow-[1px_1px_1px_rgb(0_0_0/0.35)]',
           className,
         )}
         title={title}

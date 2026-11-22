@@ -64,7 +64,8 @@ export function GameTile({
     <article
       onClick={handleClick}
       className={twMerge(
-        'flex-col w-full max-w-125 cursor-pointer justify-between',
+        // 500px inside the 1px border, the usual width of the cover image
+        'flex-col w-full max-w-[502px] cursor-pointer justify-between',
         'justify-self-center rounded-2xl border border-neutral-400 text-left',
         'text-base leading-normal tracking-normal text-(--text-h) shadow-tile',
         '[&_a]:no-underline',
@@ -76,7 +77,8 @@ export function GameTile({
             {gameT(tile.title)}
           </Link>
         </div>
-        <div className="mx-2.5 box-content line-clamp-2 h-[2lh] pt-1.25 pb-4">
+        {/* margins, not padding: `line-clamp` only clips at the padding edge */}
+        <div className="mx-2.5 mt-1.25 mb-4 line-clamp-2 h-[2lh]">
           {gameT(tile.short)}
         </div>
         <div
