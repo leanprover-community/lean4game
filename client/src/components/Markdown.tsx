@@ -1,9 +1,26 @@
-import 'katex/dist/katex.min.css'
+import { Suspense, use } from 'react'
 import ReactMarkdown, { defaultUrlTransform } from 'react-markdown'
-import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import { twMerge } from 'tailwind-merge'
+
+import { Spinner } from './Spinner'
+
+type RehypeKatex = typeof import('rehype-katex').default
+
+let rehypeKatexPromise: Promise<RehypeKatex> | undefined
+
+/**
+ * Loads `rehype-katex` and the KaTeX styles, only once. They are lazy loaded, so that
+ * KaTeX is not part of the index bundle and only loaded once a text contains math.
+ */
+function loadRehypeKatex(): Promise<RehypeKatex> {
+  rehypeKatexPromise ??= Promise.all([
+    import('rehype-katex'),
+    import('katex/dist/katex.min.css'),
+  ]).then(([module]) => module.default)
+  return rehypeKatexPromise
+}
 
 /**
  * Renders Markdown with GitHub extensions and `$…$` math. For texts of a game, pass its
@@ -40,17 +57,49 @@ export function Markdown({
         '[&_li_ol]:mx-6 [&_li_ol]:mb-0 [&_li_ul]:mx-6 [&_li_ul]:mb-0',
       )}
     >
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeKatex]}
-        urlTransform={url =>
-          game && url.startsWith('images/')
-            ? `/api/data/${game}/${url}`
-            : defaultUrlTransform(url)
-        }
-      >
-        {children}
-      </ReactMarkdown>
+      {/* `remark-math` only finds math between `$`, so other texts don't need KaTeX */}
+      {children.includes('$') ? (
+        <Suspense fallback={<Spinner />}>
+          <MathMarkdown game={game}>{children}</MathMarkdown>
+        </Suspense>
+      ) : (
+        <MarkdownContent game={game}>{children}</MarkdownContent>
+      )}
     </div>
+  )
+}
+
+/** `MarkdownContent` with math rendered by KaTeX, suspends while KaTeX is loading */
+function MathMarkdown({ children, game }: { children: string; game?: string }) {
+  const rehypeKatex = use(loadRehypeKatex())
+  return (
+    <MarkdownContent game={game} rehypeKatex={rehypeKatex}>
+      {children}
+    </MarkdownContent>
+  )
+}
+
+/** The rendered Markdown, with math rendered by `rehypeKatex` if it is given */
+function MarkdownContent({
+  children,
+  game,
+  rehypeKatex,
+}: {
+  children: string
+  game?: string
+  rehypeKatex?: RehypeKatex
+}) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={rehypeKatex ? [rehypeKatex] : []}
+      urlTransform={url =>
+        game && url.startsWith('images/')
+          ? `/api/data/${game}/${url}`
+          : defaultUrlTransform(url)
+      }
+    >
+      {children}
+    </ReactMarkdown>
   )
 }

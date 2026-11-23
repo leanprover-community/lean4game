@@ -8,7 +8,7 @@ const serverPort = process.env.PORT || 8000
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    chunkSizeWarningLimit: 1500, // kB
+    chunkSizeWarningLimit: 1000, // kB
   },
   server: {
     host: true,
