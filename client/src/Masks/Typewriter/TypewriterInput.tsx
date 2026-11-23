@@ -47,6 +47,7 @@ export function TypewriterInput() {
       // unchanged proof is not checked again, the command just stays.
       onSubmit={submitTactic}
       disabled={disabled}
+      pending={isFetching}
       placeholder={t('typewriter.inputPlaceholder')}
       className="shrink-0"
     />

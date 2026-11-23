@@ -1,5 +1,9 @@
-import { faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
+import {
+  faSpinner,
+  faWandMagicSparkles,
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useAtomValue } from 'jotai'
 import {
   type ReactNode,
   type RefObject,
@@ -14,6 +18,7 @@ import {
   abbreviationSuggestions,
   useAbbreviations,
 } from '../../hooks/useAbbreviations'
+import { mobileAtom } from '../../state/preferences-atoms'
 
 /**
  * While an abbreviation is typed, a bar with the first symbols it could become. The first
@@ -87,6 +92,7 @@ export function CommandInput({
   onSelectionChange,
   onFocus,
   disabled,
+  pending = false,
   placeholder,
   className,
   children,
@@ -94,18 +100,18 @@ export function CommandInput({
   ref: RefObject<HTMLTextAreaElement | null>
   value: string
   onChange: (value: string) => void
-  /** called with the final text, in which all abbreviations are replaced */
   onSubmit: (value: string) => void
   onCancel?: () => void
-  /** called when the selection changes, also when only the caret moves */
   onSelectionChange?: (selection: [number, number]) => void
   onFocus?: () => void
   disabled: boolean
+  pending?: boolean
   placeholder?: string
   className?: string
   children?: ReactNode
 }) {
   const { t } = useTranslation()
+  const mobile = useAtomValue(mobileAtom)
   const abbreviations = useAbbreviations(ref, value, onChange)
 
   // grow with the content, up to a third of the window
@@ -191,14 +197,21 @@ export function CommandInput({
       <button
         type="submit"
         disabled={disabled}
+        title={t('typewriter.execute')}
+        aria-label={t('typewriter.execute')}
         className={twMerge(
-          'h-7.5 min-w-24 shrink-0 cursor-pointer rounded-sm bg-(--bg) px-3',
+          'h-7.5 shrink-0 cursor-pointer rounded-sm bg-(--bg)',
           'whitespace-nowrap text-primary',
           'disabled:cursor-default disabled:text-gray-500',
+          mobile ? 'w-7.5' : 'min-w-24 px-3',
         )}
       >
-        <FontAwesomeIcon icon={faWandMagicSparkles} />
-        &nbsp;{t('typewriter.execute')}
+        {pending ? (
+          <FontAwesomeIcon icon={faSpinner} spinPulse />
+        ) : (
+          <FontAwesomeIcon icon={faWandMagicSparkles} />
+        )}
+        {!mobile && <>&nbsp;{t('typewriter.execute')}</>}
       </button>
       {children}
     </form>
