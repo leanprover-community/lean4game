@@ -13,7 +13,7 @@ tab.
 
 Open the URL listed under "What's Next?" in the latest action run:
 
-> adam.math.hhu.de/import
+> adam-dev.math.hhu.de/import
 
 There you enter your github username and the repo name and click the button to start the import.
 
@@ -21,7 +21,7 @@ It should eventually report "Done."
 
 ## 3. Play the game
 
-Now you can immediately play the game at `adam.math.hhu.de/g/{USER}/{REPOSITORY}`!
+Now you can immediately play the game at `adam-dev.math.hhu.de/g/{USER}/{REPOSITORY}`!
 
 ## 4. Update
 
