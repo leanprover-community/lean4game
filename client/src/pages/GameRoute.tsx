@@ -2,6 +2,7 @@ import { useAtomValue } from 'jotai'
 import type { ReactNode } from 'react'
 
 import { NotFound } from '../ErrorPage/NotFound'
+import { useLeanKeepalive } from '../hooks/useLeanKeepalive'
 import { levelIdAtom, routeAtom, worldIdAtom } from '../state/location-atoms'
 import { gameInfoAtom } from '../state/query-atoms'
 import { HttpError } from '../utils/fetch'
@@ -15,6 +16,9 @@ export function GameRoute({ children }: { children: ReactNode }) {
   const { data: gameInfo, error } = useAtomValue(gameInfoAtom)
   const worldId = useAtomValue(worldIdAtom)
   const levelId = useAtomValue(levelIdAtom)
+
+  // keep the Lean instance while the player is in the game
+  useLeanKeepalive()
 
   if (error) {
     if (error instanceof HttpError && error.status === 404) return <NotFound />

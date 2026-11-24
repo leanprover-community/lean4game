@@ -10,6 +10,7 @@ import {
   CheckTimeoutError,
   closeDoc,
   type OpenDoc,
+  openDocIfClosed,
   scheduleCheck,
   syncDoc,
 } from './openDocuments.js'
@@ -44,20 +45,20 @@ export function checkProof(input: ProofCheck): Promise<ApiProofCheckResult> {
   )
 }
 
-async function checkProofAux(
-  {
-    difficulty,
-    hovers = false,
-    instance,
-    inventory,
-    level,
-    tactics,
-    world,
-  }: ProofCheck,
-  current: CheckDoc,
-): Promise<ApiProofCheckResult> {
-  await instance.lspReady
+/** The document of a level, before the `Runner` of a check is appended */
+interface LevelDocument {
+  uri: string
+  /** `import GameServer` and the source of the level */
+  source: string
+  /** the name of the game as in `game.json` */
+  gameName: string
+}
 
+async function levelDocument(
+  instance: LeanInstance,
+  world: string,
+  level: number,
+): Promise<LevelDocument> {
   const levelDataPath = gameDataFilePath(
     instance.gamePath,
     `level__${world}__${level}.json`,
@@ -80,6 +81,46 @@ async function checkProofAux(
   const sourcePath = path.join(instance.gamePath, modulePath)
   const originalContent = await fs.readFile(sourcePath, 'utf-8')
 
+  const uri = pathToFileURL(
+    path.posix.join(instance.gamePathBwrap, modulePath),
+  ).toString()
+  return {
+    uri,
+    source: `import GameServer\n${originalContent}\n\n`,
+    gameName: gameData.name,
+  }
+}
+
+/**
+ * Opens the document of a level, so that Lean loads its imports, e.g. all of Mathlib,
+ * before the player opens the level. Doesn't wait for Lean, and doesn't change the
+ * document if it is open already. The first check only appends its `Runner`.
+ */
+export async function preloadLevel(
+  instance: LeanInstance,
+  world: string,
+  level: number,
+): Promise<void> {
+  await instance.lspReady
+  const { uri, source } = await levelDocument(instance, world, level)
+  await openDocIfClosed(instance, uri, source)
+}
+
+async function checkProofAux(
+  {
+    difficulty,
+    hovers = false,
+    instance,
+    inventory,
+    level,
+    tactics,
+    world,
+  }: ProofCheck,
+  current: CheckDoc,
+): Promise<ApiProofCheckResult> {
+  await instance.lspReady
+  const { uri, source, gameName } = await levelDocument(instance, world, level)
+
   // each tactic is a step of the proof, it may span several lines, e.g.
   // `have h : P := by\n  simp`
   const steps = tactics
@@ -92,19 +133,14 @@ async function checkProofAux(
   const inventoryFormatted =
     '[' + inventory.map(name => JSON.stringify(name)).join(', ') + ']'
   const header =
-    'import GameServer\n' +
-    `${originalContent}\n\n` +
-    `Runner "${gameData.name}" "${world}" ${level} ` +
+    source +
+    `Runner "${gameName}" "${world}" ${level} ` +
     `(difficulty := ${difficulty}) ` +
     `(inventory := ${inventoryFormatted}) ` +
     `:= by\n`
   const content = `${header}${tacticBlock}\n`
   // 0-based line of the first tactic
   const proofStartLine = header.split('\n').length - 1
-
-  const uri = pathToFileURL(
-    path.posix.join(instance.gamePathBwrap, modulePath),
-  ).toString()
 
   // a newer check may already be using the document
   if (current.timedOut) throw new CheckTimeoutError()
@@ -129,7 +165,7 @@ async function checkProofAux(
         sessionId,
         method: 'Game.checkProof',
         params: {
-          gameId: gameData.name,
+          gameId: gameName,
           worldId: world,
           levelId: level,
           proofStartLine,
@@ -139,14 +175,17 @@ async function checkProofAux(
       },
     )
   } catch (error) {
-    // start over with a fresh file worker on the next check
-    await closeDoc(instance, uri, current.doc)
     // the RPC method is missing if the imports (including `GameServer`)
     // could not be loaded. Checks never build them, see `syncDoc`.
-    if (
+    const importsFailed =
       error instanceof Error &&
       error.message.includes("No RPC method 'Game.checkProof'")
-    ) {
+    // start over with a fresh file worker on the next check. Otherwise keep the
+    // document: opening it again would load the imports again, e.g. all of Mathlib
+    if (importsFailed || isWorkerCrash(error)) {
+      await closeDoc(instance, uri, current.doc)
+    }
+    if (importsFailed) {
       throw new Error(
         'Could not load the imports of the level. Is the game fully built?',
         { cause: error },
@@ -154,4 +193,16 @@ async function checkProofAux(
     }
     throw error
   }
+}
+
+/** Lean's error code for a request to the file worker of a document which crashed */
+const WORKER_CRASHED = -32_902
+
+function isWorkerCrash(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === WORKER_CRASHED
+  )
 }

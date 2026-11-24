@@ -9,6 +9,7 @@ to `client/src/api.ts`.
 | `/api/lean/instances/:id`                    | GET    | get information about an existing instance (not used in leangame)                                                        |
 | `/api/lean/instances/:id`                    | DELETE | delete the instance. Same as `/api/lean/instances/:id/stop` (not used in leangame)                                       |
 | `/api/lean/instances/:id/check`              | POST   | submit a proof to the Lean instance to validate                                                                          |
+| `/api/lean/instances/:id/preload`            | POST   | preload a level before opening it                                                                                        |
 | `/api/lean/instances/:id/keepalive`          | POST   | keep the instance running. Should be called about once per minute (see `LEAN_IDLE_MINUTES`) if no other request occurred |
 | `/api/lean/instances/:id/stop`               | POST   | delete the instance. Same as `DELETE` on `/api/lean/instances/:id`                                                       |
 | `/api/lean/instances/count`                  | GET    | number of active instances                                                                                               |

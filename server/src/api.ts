@@ -40,6 +40,15 @@ export interface ApiProofCheckInput {
   language?: string
 }
 
+/**
+ * API input to preload a level, i.e. let the Lean instance load its imports before the
+ * player opens it, see `/api/lean/instances/:id/preload`
+ */
+export interface ApiPreloadInput {
+  world: string
+  level: number
+}
+
 /** API result of a proof validation */
 export interface ApiProofCheckResult {
   /** the initial state followed by one step per tactic */

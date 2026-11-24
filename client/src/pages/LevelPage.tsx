@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import { LevelChat } from '../Chat/Chat'
 import { resetSelectedStepEffect } from '../Chat/chat-atoms'
 import { PanelLayout } from '../components/PanelLayout'
-import { useLeanKeepalive } from '../hooks/useLeanKeepalive'
 import { Inventory } from '../Inventory/Inventory'
 import { unlockLevelItemsEffect } from '../Inventory/inventory-atoms'
 import { MaskMenu, SelectedMask } from '../Masks/MaskMenu'
@@ -14,6 +13,8 @@ import { mobileAtom } from '../state/preferences-atoms'
 import { completedAtom } from '../state/progress-atoms'
 import {
   levelCompletedEffect,
+  preloadNextLevelEffect,
+  requestLeanEffect,
   restartInstanceEffect,
 } from '../state/proof-atoms'
 
@@ -27,7 +28,8 @@ export function LevelPage() {
   useAtomValue(unlockLevelItemsEffect)
   useAtomValue(restartInstanceEffect)
   useAtomValue(resetSelectedStepEffect)
-  useLeanKeepalive()
+  useAtomValue(requestLeanEffect)
+  useAtomValue(preloadNextLevelEffect)
   return (
     <PanelLayout
       leftTitle={t('game.chat')}

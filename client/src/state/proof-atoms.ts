@@ -5,6 +5,7 @@ import { atomWithQuery } from 'jotai-tanstack-query'
 import type {
   ApiLeanInstance,
   ApiLeanPhase,
+  ApiPreloadInput,
   ApiProofCheckInput,
   ApiProofCheckResult,
   ApiProofStep,
@@ -17,13 +18,18 @@ import {
   postJson,
   retryUnlessClientError,
 } from '../utils/fetch'
-import { gameIdAtom, levelIdAtom, worldIdAtom } from './location-atoms'
+import {
+  gameIdAtom,
+  levelIdAtom,
+  routeAtom,
+  worldIdAtom,
+} from './location-atoms'
 import {
   completedAtom,
   difficultyAtom,
   levelProgressAtom,
 } from './progress-atoms'
-import { levelInfoAtom } from './query-atoms'
+import { gameInfoAtom, levelInfoAtom } from './query-atoms'
 
 /**
  * The steps of the proof of the current level as stored in local storage, which are sent
@@ -51,12 +57,26 @@ window.addEventListener('pagehide', () => {
   startedInstances.clear()
 })
 
+/** The game whose Lean instance is needed, see `requestLeanEffect` */
+const leanGameAtom = atom<string | undefined>(undefined)
+
 /**
- * The Lean instance of the current game on the server. It is started once per game and
- * kept alive by `useLeanKeepalive`; refetch the query to start a new one.
+ * Starts the Lean instance of the current game. Used on the pages of a world and a level,
+ * not on the game's start page, see `leanInstanceAtom`.
+ */
+export const requestLeanEffect = atomEffect((get, set) => {
+  const gameId = get(gameIdAtom)
+  if (gameId !== undefined) set(leanGameAtom, gameId)
+})
+
+/**
+ * The Lean instance of the current game on the server. It is started once per game, by
+ * `requestLeanEffect`, and kept alive by `useLeanKeepalive` on all pages of the game;
+ * refetch the query to start a new one.
  */
 export const leanInstanceAtom = atomWithQuery<{ id: string }>(get => {
   const gameId = get(gameIdAtom)
+  const requested = gameId !== undefined && get(leanGameAtom) === gameId
   return {
     queryKey: ['leanInstance', gameId],
     queryFn: async () => {
@@ -66,7 +86,7 @@ export const leanInstanceAtom = atomWithQuery<{ id: string }>(get => {
       startedInstances.add(instance.id)
       return instance
     },
-    enabled: gameId !== undefined,
+    enabled: requested,
     staleTime: Infinity,
     gcTime: Infinity,
     retry: retryUnlessClientError,
@@ -193,6 +213,45 @@ export const proofResultAtom = atom(get => get(proofCheckAtom).data)
 export const levelCompletedEffect = atomEffect((get, set) => {
   const result = get(proofResultAtom)
   if (result?.completed && !get.peek(completedAtom)) set(completedAtom, true)
+})
+
+/** The levels already preloaded, as `instance/world/level` */
+const preloadedLevels = new Set<string>()
+
+/**
+ * Lets the Lean instance load the imports of a level in the background, e.g. all of
+ * Mathlib, so that it is ready when the player opens it.
+ */
+function preloadLevel(instanceId: string, world: string, level: number) {
+  const key = `${instanceId}/${world}/${level}`
+  if (preloadedLevels.has(key)) return
+  preloadedLevels.add(key)
+  postJson(`/api/lean/instances/${instanceId}/preload`, {
+    world,
+    level,
+  } satisfies ApiPreloadInput).catch(() => preloadedLevels.delete(key))
+}
+
+/** On the introduction of a world, but not its conclusion, preloads its first level */
+export const preloadFirstLevelEffect = atomEffect(get => {
+  if (get(routeAtom).page !== 'world') return
+  const instanceId = get(leanInstanceAtom).data?.id
+  const world = get(worldIdAtom)
+  if (instanceId === undefined || world === undefined) return
+  preloadLevel(instanceId, world, 1)
+})
+
+/** Once the current level is completed, preloads the next level of the world */
+export const preloadNextLevelEffect = atomEffect(get => {
+  const instanceId = get(leanInstanceAtom).data?.id
+  const world = get(worldIdAtom)
+  const level = get(levelIdAtom)
+  const worldSize = world && get(gameInfoAtom).data?.worldSize?.[world]
+  if (!get(completedAtom)) return
+  if (instanceId === undefined || world === undefined || level === undefined)
+    return
+  if (!worldSize || level >= worldSize) return
+  preloadLevel(instanceId, world, level + 1)
 })
 
 /** The HTTP status of a failed proof check */

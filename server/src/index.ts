@@ -5,6 +5,7 @@ import express from 'express'
 import type {
   ApiClientConfig,
   ApiLeanInstance,
+  ApiPreloadInput,
   ApiProofCheckInput,
 } from './api.js'
 import { serveClient } from './client.js'
@@ -33,7 +34,7 @@ import {
   CheckSupersededError,
   CheckTimeoutError,
 } from './lean/openDocuments.js'
-import { checkProof } from './lean/proofCheck.js'
+import { checkProof, preloadLevel } from './lean/proofCheck.js'
 import { getServerLoad } from './serverLoad.js'
 import { recordCheck } from './stats.js'
 import { isDevMode } from './utils/devMode.js'
@@ -130,6 +131,20 @@ app.post('/api/lean/instances/:id/keepalive', (req, res) => {
     return
   }
   res.status(204).end()
+})
+
+app.post('/api/lean/instances/:id/preload', (req, res) => {
+  const input: ApiPreloadInput = req.body
+  const instance = getInstance(req.params.id)
+  if (!instance || !touchInstance(instance.id)) {
+    res.status(404).json({ error: 'Instance not found' })
+    return
+  }
+  // in the background: Lean loads the imports while the player reads, e.g. an introduction
+  preloadLevel(instance, input.world, input.level).catch((error: unknown) => {
+    console.error(`[lean:${instance.id}] preload failed:`, error)
+  })
+  res.status(202).end()
 })
 
 app.post('/api/lean/instances/:id/check', async (req, res) => {
