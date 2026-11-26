@@ -2,6 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useFocusOnLevelOpen } from '../../hooks/useFocusOnLevelOpen'
 import { proofCheckAtom } from '../../state/proof-atoms'
 import { CommandInput, focusAtEnd } from './CommandInput'
 import {
@@ -35,6 +36,9 @@ export function TypewriterInput() {
   useEffect(() => {
     if (focusRequest > 0 && !hidden) focusAtEnd(textareaRef.current)
   }, [focusRequest, hidden])
+
+  // focus input when page loaded
+  useFocusOnLevelOpen(textareaRef, !disabled && !hidden)
 
   if (hidden) return null
 

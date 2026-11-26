@@ -10,6 +10,7 @@ import { WorldImage } from '../../components/WorldImage'
 import { GoalTabs } from '../../GoalView/GoalTabs'
 import { HoverProvider } from '../../GoalView/HoverCode'
 import { useAbbreviations } from '../../hooks/useAbbreviations'
+import { useFocusOnLevelOpen } from '../../hooks/useFocusOnLevelOpen'
 import { proofOfCode } from '../../state/progress-schema'
 import {
   hasError,
@@ -69,6 +70,9 @@ export function Raw() {
     const atLineStart = lines.at(-1)?.trim() === ''
     setCursorLine(lines.length - (atLineStart ? 2 : 1))
   }
+
+  // focus input when page loaded
+  useFocusOnLevelOpen(textareaRef, true)
 
   return (
     <div className="relative h-full">
