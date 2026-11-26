@@ -71,7 +71,7 @@ structure InventoryTemplate where
   category: String := default
   /-- Free-text short name -/
   displayName: String := name.toString
-  /-- Template documentation. `[[mathlib_doc]]` is replaced by a link to the mathlib docs. -/
+  /-- The documentation, a string supporting Markdown. -/
   content: String := ""
   /-- What clicking the item in the inventory inserts, see `TacticDoc` and `TheoremDoc`. -/
   insert: Option String := none

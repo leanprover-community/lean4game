@@ -69,14 +69,12 @@ TheoremDoc Nat.succ_pos as "succ_pos" in "Nat" insert "Nat.succ_pos"
 * The first identifier is used in the commands `[New/Only/Disabled]Theorem`.
   It is preferably the true name of the theorem. However, this is not required.
 * The string following `as` is the displayed name (in the Inventory).
-* The identifier after `in` is the category to group theorems by (in the Inventory).
-* The string after `insert` is what clicking the theorem in the inventory inserts.
+* The string after `in` is the category to group theorems by (in the Inventory).
+* The string after `insert` is what clicking the theorem in the inventory inserts (plain text).
   The default is the first identifier.
 * The description is a string supporting Markdown.
 
-Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requires
-The theorem/definition to have the same fully qualified name as in mathlib.
- -/
+-/
 elab doc:docComment ? "TheoremDoc" name:ident "as" displayName:str inArg?:((" in " str)?)
     insertArg?:((&" insert " str)?) content:str ? : command => do
   let doc ← parseDocCommentLegacy doc content
@@ -112,16 +110,14 @@ DefinitionDoc Function.Bijective as "Bijective" in "Fun" insert "Function.Biject
   It is preferably the true name of the definition. However, this is not required.
 * The string following `as` is the displayed name (in the Inventory).
 * The string after `in` is the category to group definitions by (in the Inventory).
-* The string after `insert` is what clicking the definition in the inventory inserts.
+* The string after `insert` is what clicking the definition in the inventory inserts (plain text).
   The default is the first identifier.
 * The description is a string supporting Markdown.
 
-Use `[[mathlib_doc]]` in the string to insert a link to the mathlib doc page. This requires
-The theorem/definition to have the same fully qualified name as in mathlib.
- -/
+-/
 elab doc:docComment ? "DefinitionDoc" name:ident "as" displayName:str inArg?:((" in " str)?)
-    insertArg?:((&" insert " str)?) template:str ? : command => do
-  let doc ← parseDocCommentLegacy doc template
+    insertArg?:((&" insert " str)?) content:str ? : command => do
+  let doc ← parseDocCommentLegacy doc content
   let doc ← doc.translate
   let cat : String := if !inArg?.raw.isNone then (⟨inArg?.raw[1]⟩ : TSyntax `str).getString else "📖︎"
   let insert : Option String := if insertArg?.raw.isNone then none else
