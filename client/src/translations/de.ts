@@ -172,6 +172,7 @@ export const de: DeepPartialTranslation<typeof en> = {
     theorem: 'Satz',
     definition: 'Definition',
     levelCompleted: 'Level abgeschlossen! 🎉',
+    goalSolved: 'Zwischenziel gelöst! 🎉',
     levelSolved: 'Level wurde einmal erfolgreich gelöst',
     noGoalsLeft: 'keine Ziele mehr',
     noGoalsLeftDescription:

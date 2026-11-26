@@ -29,12 +29,16 @@ export function ProofStep({
   index,
   current,
   failed,
+  goalSolved,
 }: {
   step: ApiProofStep
   index: number
   current: boolean
   failed: boolean
+  /** the step solves an intermediate goal */
+  goalSolved: boolean
 }) {
+  const { t } = useTranslation()
   const mobile = useAtomValue(mobileAtom)
   const selection = useStepSelection(index)
   return (
@@ -46,6 +50,16 @@ export function ProofStep({
         <Command step={step} index={index} current={current} failed={failed} />
       )}
       <Diagnostics diagnostics={step.diagnostics} />
+      {goalSolved && (
+        <div
+          className={twMerge(
+            'my-2.5 rounded-sm px-2.5 py-1.5 text-sm',
+            severityClass[3],
+          )}
+        >
+          {t('typewriter.goalSolved')}
+        </div>
+      )}
       {mobile && !failed && <InlineHints step={index} />}
       {!failed && <GoalTabs goals={step.goals} current={current} insertable />}
     </div>

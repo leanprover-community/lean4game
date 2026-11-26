@@ -21,6 +21,7 @@ import {
   hasError,
   leanInstanceAtom,
   proofCheckAtom,
+  solvesGoal,
 } from '../../state/proof-atoms'
 import { gameInfoAtom, levelInfoAtom } from '../../state/query-atoms'
 import { HttpError } from '../../utils/fetch'
@@ -92,6 +93,7 @@ export function Typewriter() {
                   index={i}
                   current={i === steps.length - (failed ? 2 : 1)}
                   failed={failed && i === steps.length - 1}
+                  goalSolved={solvesGoal(steps, i)}
                 />
               ))}
             </HoverProvider>

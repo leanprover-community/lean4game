@@ -128,6 +128,7 @@ export const uk: DeepPartialTranslation<typeof en> = {
     theorem: 'Теорема',
     definition: 'Визначення',
     levelCompleted: 'Рівень пройдено! 🎉',
+    goalSolved: 'Проміжну ціль доведено! 🎉',
     levelSolved: 'Рівень уже було успішно пройдено',
     noGoalsLeft: 'цілей не залишилося',
     noGoalsLeftDescription:

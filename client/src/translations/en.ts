@@ -168,6 +168,7 @@ export const en = {
     theorem: 'Theorem',
     definition: 'Definition',
     levelCompleted: 'Level completed! 🎉',
+    goalSolved: 'Intermediate goal solved! 🎉',
     levelSolved: 'Level has once been solved successfully',
     noGoalsLeft: 'no goals left',
     noGoalsLeftDescription:
