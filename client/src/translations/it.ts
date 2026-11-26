@@ -30,9 +30,9 @@ export const it: DeepPartialTranslation<typeof en> = {
   privacy: {
     title: 'Informativa sulla privacy',
     collectedData:
-      "Il nostro server raccoglie metadati (come indirizzo IP, browser, sistema operativo) e i dati che l'utente inserisce nell'editor. Questi dati vengono usati per calcolare l'output di Lean e mostrarlo all'utente. Le informazioni vengono conservate finché l'utente resta sul nostro sito web e vengono eliminate subito dopo. Conserviamo dei log per migliorare il nostro software, ma i dati in essi contenuti sono anonimizzati.",
+      "Il nostro server raccoglie metadati (come indirizzo IP, browser, lingua preferita, sistema operativo) e i dati che l'utente inserisce nel gioco. Questi dati vengono usati per calcolare l'output di Lean e mostrarlo all'utente. Le informazioni vengono conservate finché l'utente rimane sul nostro sito e cancellate subito dopo. Inoltre, il server raccoglie statistiche di utilizzo anonime e aggregate. Queste non contengono alcuna informazione che permetta di risalire a singole persone. Conserviamo anche dei log per migliorare il nostro software, ma i dati contenuti sono anonimizzati.",
     browserStorage:
-      'Non usiamo cookie, ma il tuo progresso nel gioco viene salvato nel browser come dati del sito. Il tuo progresso non viene salvato sul server; se elimini la memoria del browser, va perso definitivamente.',
+      'Non usiamo cookie, ma le tue impostazioni e il tuo progresso nel gioco vengono salvati nel browser come dati del sito. In particolare, il tuo progresso non viene salvato sul server; se elimini la memoria del browser, va perso definitivamente.',
     serverLocation: 'Posizione del nostro server: {{location}}.',
   },
   appBar: {
@@ -82,7 +82,8 @@ export const it: DeepPartialTranslation<typeof en> = {
       dark: 'Scuro',
     },
     browserStorage: 'Memoria del browser',
-    savePreferences: 'Salva le mie opzioni (nella memoria del browser)',
+    browserStorageNote: 'Le impostazioni vengono salvate nella memoria del browser.',
+    reset: 'Ripristina le impostazioni predefinite',
   },
   layout: {
     openPanel: 'Apri {{title}}',

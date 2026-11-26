@@ -31,9 +31,9 @@ export const ptBR: DeepPartialTranslation<typeof en> = {
   privacy: {
     title: 'Política de privacidade',
     collectedData:
-      'Nosso servidor coleta metadados (como endereço IP, navegador, sistema operacional) e os dados que o usuário digita no editor. Esses dados são usados para calcular a saída do Lean e exibi-la ao usuário. As informações ficam armazenadas enquanto o usuário permanece em nosso site e são excluídas logo em seguida. Mantemos registros (logs) para melhorar nosso software, mas os dados neles contidos são anonimizados.',
+      'Nosso servidor coleta metadados (como endereço IP, navegador, idioma preferido, sistema operacional) e os dados que o usuário digita no jogo. Esses dados são usados para calcular a saída do Lean e exibi-la ao usuário. As informações ficam armazenadas enquanto o usuário permanece em nosso site e são apagadas imediatamente depois. Além disso, o servidor mantém estatísticas de uso anônimas e agregadas. Elas não contêm nenhuma informação que permita identificar pessoas individuais. Também mantemos registros (logs) para melhorar nosso software, mas os dados neles contidos são anonimizados.',
     browserStorage:
-      'Não usamos cookies, mas seu progresso no jogo é guardado no navegador como dados do site. Seu progresso não é salvo no servidor; se você apagar o armazenamento do navegador, ele se perde por completo.',
+      'Não usamos cookies, mas suas configurações e seu progresso no jogo são guardados no navegador como dados do site. Em particular, seu progresso não é salvo no servidor; se você apagar o armazenamento do navegador, ele se perde por completo.',
     serverLocation: 'Localização do nosso servidor: {{location}}.',
   },
   appBar: {
@@ -83,8 +83,8 @@ export const ptBR: DeepPartialTranslation<typeof en> = {
       dark: 'Escuro',
     },
     browserStorage: 'Armazenamento do navegador',
-    savePreferences:
-      'Salvar minhas configurações (no armazenamento do navegador)',
+    browserStorageNote: 'As configurações são salvas no armazenamento do navegador.',
+    reset: 'Restaurar padrões',
   },
   layout: {
     openPanel: 'Abrir {{title}}',

@@ -1,10 +1,10 @@
 import { atom } from 'jotai'
-import { atomWithStorage, createJSONStorage } from 'jotai/utils'
+import { atomWithStorage } from 'jotai/utils'
+
+import { conditionalStorage, isDefault } from '../utils/conditional-storage'
 
 export interface Preferences {
   layout: 'mobile' | 'auto' | 'desktop'
-  isSavePreferences: boolean
-  isSuggestionsMobileMode: boolean // TODO: remove me
   useFlags: boolean
   /** `auto` follows the system setting */
   theme: 'light' | 'auto' | 'dark'
@@ -20,24 +20,9 @@ export const AUTO_SWITCH_THRESHOLD = 800
 
 const defaultPreferences: Preferences = {
   layout: 'auto',
-  isSavePreferences: false,
-  isSuggestionsMobileMode: true,
   useFlags: false,
   theme: 'auto',
   showLockedInventory: true,
-}
-
-const storage = createJSONStorage<Preferences>(() => localStorage)
-
-const conditionalStorage = {
-  ...storage,
-  setItem: (key: string, value: Preferences) => {
-    if (value.isSavePreferences) {
-      storage.setItem(key, value)
-    } else {
-      storage.removeItem(key)
-    }
-  },
 }
 
 /**
@@ -46,8 +31,13 @@ const conditionalStorage = {
 export const preferencesAtom = atomWithStorage<Preferences>(
   'preferences',
   defaultPreferences,
-  conditionalStorage,
+  conditionalStorage(defaultPreferences),
   { getOnInit: true },
+)
+
+/** Whether all preferences have their default value */
+export const isDefaultPreferencesAtom = atom(get =>
+  isDefault(get(preferencesAtom), defaultPreferences),
 )
 
 const widthBelowThresholdAtom = atom(false)
@@ -75,7 +65,4 @@ export const mobileAtom = atom(get => {
 })
 
 /** The colour theme */
-export const themeAtom = atom(
-  get =>
-    (get(preferencesAtom).theme as Preferences['theme'] | undefined) ?? 'auto',
-)
+export const themeAtom = atom(get => get(preferencesAtom).theme)

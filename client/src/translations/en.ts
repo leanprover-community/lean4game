@@ -28,9 +28,9 @@ export const en = {
   privacy: {
     title: 'Privacy Policy',
     collectedData:
-      'Our server collects metadata (such as IP address, browser, operating system) and the data that the user enters into the editor. The data is used to compute the Lean output and display it to the user. The information will be stored as long as the user stays on our website and will be deleted immediately afterwards. We keep logs to improve our software, but the contained data is anonymized.',
+      'Our server collects metadata (such as IP address, browser, preferred language, operating system) and the data that the user enters into the game. The data is used to compute the Lean output and display it to the user. The information will be stored as long as the user stays on our website and will be deleted immediately afterwards. In addition, the server keeps anonymous and aggregated usage statistics. These contain no information that would allow them to be traced back to individual persons. We also keep logs to improve our software, but the contained data is anonymised.',
     browserStorage:
-      'We do not use cookies, but your game progress is stored in the browser as site data. Your game progress is not saved on the server; if you delete your browser storage, it is completely gone.',
+      'We do not use cookies, but your preferences and game progress are stored in the browser as site data. In particular, your game progress is not saved on the server; if you delete your browser storage, it is completely gone.',
     serverLocation: 'Our server is located in {{location}}.',
   },
   appBar: {
@@ -72,7 +72,8 @@ export const en = {
     theme: 'Theme',
     themes: { light: 'Light', auto: 'Auto', dark: 'Dark' },
     browserStorage: 'Browser Storage',
-    savePreferences: 'Save my settings (in the browser storage)',
+    browserStorageNote: 'Preferences are stored in the browser storage.',
+    reset: 'Reset to default',
   },
   import: {
     title: 'Import a game',

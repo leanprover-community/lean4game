@@ -31,9 +31,9 @@ export const fr: DeepPartialTranslation<typeof en> = {
   privacy: {
     title: 'Politique de confidentialité',
     collectedData:
-      "Notre serveur collecte des métadonnées (telles que l'adresse IP, le navigateur, le système d'exploitation) et les données que l'utilisateur saisit dans l'éditeur. Ces données servent à calculer la sortie de Lean et à l'afficher à l'utilisateur. Les informations sont conservées tant que l'utilisateur reste sur notre site web et sont supprimées immédiatement après. Nous conservons des journaux pour améliorer notre logiciel, mais les données qu'ils contiennent sont anonymisées.",
+      "Notre serveur collecte des métadonnées (telles que l'adresse IP, le navigateur, la langue préférée, le système d'exploitation) et les données que l'utilisateur saisit dans le jeu. Ces données servent à calculer la sortie de Lean et à l'afficher à l'utilisateur. Ces informations sont conservées tant que l'utilisateur reste sur notre site, puis supprimées immédiatement. En outre, le serveur conserve des statistiques d'utilisation anonymes et agrégées. Celles-ci ne contiennent aucune information permettant de remonter à des personnes individuelles. Nous conservons également des journaux afin d'améliorer notre logiciel, mais les données qu'ils contiennent sont anonymisées.",
     browserStorage:
-      "Nous n'utilisons pas de cookies, mais votre progression dans le jeu est stockée dans le navigateur en tant que données du site. Votre progression n'est pas enregistrée sur le serveur ; si vous supprimez le stockage de votre navigateur, elle est définitivement perdue.",
+      "Nous n'utilisons pas de cookies, mais vos paramètres et votre progression dans le jeu sont stockés dans le navigateur en tant que données du site. En particulier, votre progression n'est pas enregistrée sur le serveur ; si vous supprimez le stockage de votre navigateur, elle est définitivement perdue.",
     serverLocation: 'Emplacement de notre serveur : {{location}}.',
   },
   appBar: {
@@ -83,8 +83,8 @@ export const fr: DeepPartialTranslation<typeof en> = {
       dark: 'Sombre',
     },
     browserStorage: 'Stockage du navigateur',
-    savePreferences:
-      'Sauvegarder mes paramètres (dans le stockage du navigateur)',
+    browserStorageNote: 'Les paramètres sont enregistrés dans le stockage du navigateur.',
+    reset: 'Réinitialiser les paramètres par défaut',
   },
   layout: {
     openPanel: 'Ouvrir {{title}}',
