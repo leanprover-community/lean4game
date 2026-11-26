@@ -129,6 +129,7 @@ export const ptBR: DeepPartialTranslation<typeof en> = {
     theorem: 'Teorema',
     definition: 'Definição',
     levelCompleted: 'Nível completado! 🎉',
+    goalSolved: 'Objetivo intermediário resolvido! 🎉',
     levelSolved: 'O nível já foi resolvido com sucesso',
     noGoalsLeft: 'nenhum objetivo restante',
     noGoalsLeftDescription:

@@ -8,7 +8,11 @@ import { useLevelHints } from '../../Chat/useLevelHints'
 import { Markdown } from '../../components/Markdown'
 import { gameIdAtom } from '../../state/location-atoms'
 import { mobileAtom } from '../../state/preferences-atoms'
-import { hasError, proofCheckAtom } from '../../state/proof-atoms'
+import {
+  hasError,
+  proofCheckAtom,
+  solvesGoal,
+} from '../../state/proof-atoms'
 import { levelInfoAtom } from '../../state/query-atoms'
 import { proofLines, stepStarts } from './proof-lines'
 
@@ -95,6 +99,15 @@ export function Transcript({ text }: { text: string }) {
           line: textLine(d.line),
           content: d.message,
         })),
+      ...(solvesGoal(steps, i)
+        ? [
+            {
+              kind: 'information' as const,
+              line: starts[i] === undefined ? undefined : textLine(starts[i]),
+              content: t('typewriter.goalSolved'),
+            },
+          ]
+        : []),
       ...(mobile ? (hints[i] ?? []) : []).map(hint => {
         const start = starts[i]
         return {

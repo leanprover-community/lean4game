@@ -166,6 +166,18 @@ export function hasError(step: ApiProofStep | undefined) {
   return step?.diagnostics.some(d => d.severity === 1) ?? false
 }
 
+/** Checks if the step solves an intermediate goal */
+export function solvesGoal(steps: ApiProofStep[], i: number) {
+  const step = steps[i]
+  const prev = steps[i - 1] as ApiProofStep | undefined
+  return (
+    prev !== undefined &&
+    !hasError(step) &&
+    step.goals.length > 0 &&
+    step.goals.length < prev.goals.length
+  )
+}
+
 /** The proof of the steps after the initial state, from the server's tactic texts */
 export function proofOfSteps(steps: ApiProofStep[]) {
   return steps.slice(1).map(step => step.tactic)
