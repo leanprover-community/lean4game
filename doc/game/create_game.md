@@ -175,6 +175,21 @@ DefinitionDoc Pow as "^"
 
 If you do not provide any content for the inventory, the game will try to find a docstring of that item and display that docstring.
 
+All three commands take an optional category after `in`, which groups the items in the inventory, and an optional `insert` string, which is what the insert button next to the item in the inventory inserts into the typewriter (the raw editor copies the text without the slots to the clipboard). For theorems and definitions it defaults to the first identifier. For tactics it is a template with slots, which take the hypotheses, theorems and tactics clicked afterwards, from left to right:
+
+```lean
+TacticDoc rw in "Equalities" insert "rw [$,]"
+TacticDoc «have» insert "have $_ : $+ := by $;"
+```
+
+- `$_`: a single item, the next click fills the next slot
+- `$,`: a comma-separated list, like in `rw [$,]`
+- `$+`: a space-separated list, like in `exact $+`
+- `$;`: a sequence of tactics separated by `;`
+- `$$`: a literal `$`
+
+Without `insert`, the template of a tactic is its name followed by `$+`. A template without slots, like `insert "tauto"`, inserts just the text.
+
 #### Inventory management
 
 You have a few options to disable inventory items that have been unlocked in previous levels:
