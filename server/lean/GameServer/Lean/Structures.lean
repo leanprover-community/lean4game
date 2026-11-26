@@ -62,13 +62,6 @@ structure InteractiveGoal extends InteractiveGoalCore where
   isRemoved? : Option Bool := none
 deriving RpcEncodable
 
--- duplicated with custom `InteractiveGoalCore`
-@[inherit_doc Lean.Widget.InteractiveTermGoal]
-structure InteractiveTermGoal extends InteractiveGoalCore where
-  range : Lsp.Range
-  term : WithRpcRef Elab.TermInfo
-deriving RpcEncodable
-
 /-- A hint in the game at the corresponding goal. -/
 structure GameHint where
   /-- The text with the variable names already inserted.
@@ -83,37 +76,3 @@ structure GameHint where
   /-- The assignment of variable names in the `rawText` to the ones the player used. -/
   varNames : Array <| Name × Name
 deriving FromJson, ToJson
-
-/-- Bundled `InteractiveGoal` together with an array of hints that apply at this stage. -/
-structure InteractiveGoalWithHints where
-  goal : InteractiveGoal
-  /-- Extended the `InteractiveGoal` by an array of hints at that goal. -/
-  hints : Array GameHint
-deriving RpcEncodable
-
-structure InteractiveGoalsWithHints where
-  goals : Array InteractiveGoalWithHints
-  /-- The content of the line evaluated. -/
-  command : String
-  diags : Array InteractiveDiagnostic := default
-  line : Option Nat -- only for debugging
-  column : Option Nat -- only for debugging
-
-deriving RpcEncodable
-
-instance : Inhabited InteractiveGoalsWithHints := ⟨default, default, default, none, none⟩
-
-/-- Collected goals throughout the proof. Used for communication with the game client. -/
-structure ProofState where
-  /-- goals after each line. includes the hints. -/
-  steps : Array <| InteractiveGoalsWithHints
-  /-- diagnostics contains all errors and warnings.
-
-  TODO: I think they contain information about which line they belong to. Verify this.
-  -/
-  diagnostics : Array InteractiveDiagnostic := default
-  /-- Whether the level is considered solved. -/
-  completed : Bool
-  completedWithWarnings : Bool
-  lastPos : Nat -- only for debugging
-deriving RpcEncodable

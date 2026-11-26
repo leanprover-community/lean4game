@@ -54,7 +54,7 @@ elab (name := Hint) "Hint" args:hintArg* msg:interpolatedStr(term) : tactic => d
     let goalDecl ← goal.getDecl
     let fvars := goalDecl.lctx.decls.toArray.filterMap id |> Array.map (·.fvarId)
 
-    -- NOTE: This code about `hintFVarsNames` is duplicated from `RpcHandlers`
+    -- NOTE: This code about `hintFVarsNames` is duplicated in `GameServer.CheckProof.FindHints`
     -- where the variable bijection is constructed, and they
     -- need to be matching.
     -- NOTE: This is a bit a hack of somebody who does not know how meta-programming works.
