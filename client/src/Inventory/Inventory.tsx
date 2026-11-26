@@ -110,7 +110,6 @@ function TabBar() {
     <div
       className={twMerge(
         'flex shrink-0 flex-wrap border-b border-(--border) font-bold',
-        // four tabs fit next to each other
         hasSymbols && 'text-sm',
       )}
     >

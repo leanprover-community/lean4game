@@ -175,6 +175,16 @@ DefinitionDoc Pow as "^"
 
 If you do not provide any content for the inventory, the game will try to find a docstring of that item and display that docstring.
 
+All three commands take optional arguments `in "Category Name"` and `insert "code_to_insert"`. The category groups items in the inventory. The insertion pattern describes how the tactic should be inserted, the actual insertion logic depends on the "mask" (Typewriter, Raw Code, ...) the player currently uses. `$` represents a slot where something else should be inserted and there are a few patterns to describe a sequence of slots:
+
+```lean
+TacticDoc rw in "Equalities" insert "rw [$,]"
+TacticDoc «have» insert "have $_ : $+"
+```
+
+This says `rw [$,]` should take a comma-separated list of items inside the `[]`, or that `have $_ : $+` has one slot before the colon while further insertion should go after the colon.
+For more details, read the docstrings on the command `TacticDoc`, ...
+
 #### Inventory management
 
 You have a few options to disable inventory items that have been unlocked in previous levels:

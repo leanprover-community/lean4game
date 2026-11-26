@@ -59,10 +59,7 @@ elab "MakeGame" : command => do
       match docstring with
       | some ds => pure s!"*(lean docstring)*\\\n{ds}"
       | none => pure "(missing)"
-    | template =>
-      -- TODO: Process content template.
-      -- TODO: Add information about inventory items
-      pure $ template.replace "[[mathlib_doc]]" s!"[mathlib doc]({mathlibDocUrl name})"
+    | content => pure content
 
     -- the levels introducing the item
     let mut introducedIn : Array LevelRef := #[]
