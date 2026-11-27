@@ -1,13 +1,16 @@
 import { useAtom, useAtomValue } from 'jotai'
+import { RESET } from 'jotai/utils'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { twMerge } from 'tailwind-merge'
 
+import { Button } from '../components/Button'
 import { Switch } from '../components/Switch'
 import config from '../config.json'
-import { setLanguage } from '../i18n'
+import { DEFAULT_LANGUAGE, resetLanguage, setLanguage } from '../i18n'
 import {
   type Preferences,
+  isDefaultPreferencesAtom,
   preferencesAtom,
   themeAtom,
 } from '../state/preferences-atoms'
@@ -29,6 +32,7 @@ export function PreferencesPage() {
   const { t, i18n } = useTranslation()
   const [preferences, setPreferences] = useAtom(preferencesAtom)
   const theme = useAtomValue(themeAtom)
+  const isDefaultPreferences = useAtomValue(isDefaultPreferencesAtom)
   const update = (changes: Partial<Preferences>) =>
     setPreferences(prev => ({ ...prev, ...changes }))
 
@@ -92,11 +96,17 @@ export function PreferencesPage() {
       </Category>
 
       <Category title={t('preferences.browserStorage')}>
-        <Switch
-          checked={preferences.isSavePreferences}
-          onChange={isSavePreferences => update({ isSavePreferences })}
-          label={t('preferences.savePreferences')}
-        />
+        <p>{t('preferences.browserStorageNote')}</p>
+        <Button
+          className="self-start"
+          disabled={isDefaultPreferences && i18n.language === DEFAULT_LANGUAGE}
+          onClick={() => {
+            setPreferences(RESET) // remove from local storage
+            resetLanguage()
+          }}
+        >
+          {t('preferences.reset')}
+        </Button>
       </Category>
     </div>
   )

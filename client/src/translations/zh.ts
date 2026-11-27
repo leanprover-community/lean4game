@@ -30,9 +30,9 @@ export const zh: DeepPartialTranslation<typeof en> = {
   privacy: {
     title: '隐私政策',
     collectedData:
-      '我们的服务器会收集元数据（例如 IP 地址、浏览器、操作系统）以及用户在编辑器中输入的数据。这些数据用于计算 Lean 的输出并显示给用户。这些信息仅在用户停留在我们网站期间保存，之后会立即删除。我们保留日志以改进软件，但其中的数据已匿名化。',
+      '我们的服务器会收集元数据（例如 IP 地址、浏览器、首选语言、操作系统）以及用户在游戏中输入的数据。这些数据用于计算 Lean 的输出并显示给用户。这些信息仅在用户停留在我们网站期间保存，之后会立即删除。此外，服务器会保存匿名且汇总的使用统计数据。这些数据不包含任何可追溯到个人的信息。我们还会保留日志以改进软件，但其中包含的数据均已匿名化。',
     browserStorage:
-      '我们不使用 Cookie，但你的游戏进度会作为网站数据保存在浏览器中。你的游戏进度不会保存在服务器上；如果你删除浏览器存储，进度将彻底丢失。',
+      '我们不使用 Cookie，但你的设置和游戏进度会作为网站数据保存在浏览器中。特别是，你的游戏进度不会保存在服务器上；如果你删除浏览器存储，进度将彻底丢失。',
     serverLocation: '服务器所在地：{{location}}。',
   },
   appBar: {
@@ -82,7 +82,8 @@ export const zh: DeepPartialTranslation<typeof en> = {
       dark: '深色',
     },
     browserStorage: '浏览器存储',
-    savePreferences: '保存我的设置（在浏览器中存储）',
+    browserStorageNote: '设置保存在浏览器存储中。',
+    reset: '恢复默认设置',
   },
   layout: {
     openPanel: '打开{{title}}',

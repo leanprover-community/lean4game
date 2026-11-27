@@ -31,9 +31,9 @@ export const de: DeepPartialTranslation<typeof en> = {
   privacy: {
     title: 'Datenschutzerklärung',
     collectedData:
-      'Unser Server verarbeitet Metadaten (zum Beispiel IP-Adresse, Browser, Betriebssystem) sowie die Eingaben in den Editor. Diese Daten werden verwendet, um die Lean-Ausgabe zu berechnen und anzuzeigen. Die Informationen werden nur gespeichert, solange man auf unserer Webseite bleibt, und anschließend sofort gelöscht. Wir führen Log-Dateien, um die Software zu verbessern, aber die enthaltenen Daten sind anonymisiert.',
+      'Unser Server verarbeitet Metadaten (zum Beispiel IP-Adresse, Browser, bevorzugte Sprache, Betriebssystem) sowie die Eingaben im Spiel. Diese Daten werden verwendet, um die Lean-Ausgabe zu berechnen und anzuzeigen. Die Informationen werden nur gespeichert, solange man sich auf unserer Website aufhält, und danach sofort gelöscht. Darüber hinaus erstellt der Server anonyme und aggregierte Nutzungsstatistiken. Diese enthalten keine Informationen, die einen Rückschluss auf einzelne Personen zulassen. Außerdem führen wir Logs, um unsere Software zu verbessern; die darin enthaltenen Daten sind anonymisiert.',
     browserStorage:
-      'Wir verwenden keine Cookies, aber der Spielstand wird im Browser als „Website-Daten“ gespeichert. Der Spielstand wird nicht auf dem Server gespeichert; wird er im Browser gelöscht, kann er nicht wiederhergestellt werden.',
+      'Wir verwenden keine Cookies, aber die Einstellungen und der Spielstand werden im Browser als „Website-Daten“ gespeichert. Insbesondere wird der Spielstand nicht auf dem Server gespeichert; wird er im Browser gelöscht, kann er nicht wiederhergestellt werden.',
     serverLocation: 'Unser Server steht in {{location}}.',
   },
   appBar: {
@@ -75,7 +75,8 @@ export const de: DeepPartialTranslation<typeof en> = {
     theme: 'Farbschema',
     themes: { light: 'Hell', auto: 'Auto', dark: 'Dunkel' },
     browserStorage: 'Browserspeicher',
-    savePreferences: 'Einstellungen im Browser speichern',
+    browserStorageNote: 'Einstellungen werden im Browserspeicher gespeichert.',
+    reset: 'Auf Standard zurücksetzen',
   },
   import: {
     title: 'Spiel importieren',

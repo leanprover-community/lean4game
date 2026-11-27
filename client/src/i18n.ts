@@ -33,13 +33,27 @@ function savedLanguage(): string | undefined {
   }
 }
 
-/** Switches to the language `lng` and remembers it in the browser */
+/**
+ * Switches to the language `lng` and remembers it in the browser, unless it is the
+ * default language
+ */
 export function setLanguage(lng: string) {
   void i18n.changeLanguage(lng)
   try {
-    localStorage.setItem(LANGUAGE_KEY, lng)
+    if (lng === DEFAULT_LANGUAGE) localStorage.removeItem(LANGUAGE_KEY)
+    else localStorage.setItem(LANGUAGE_KEY, lng)
   } catch {
     // the language is just not remembered
+  }
+}
+
+/** Switches back to the default language and forgets the saved one */
+export function resetLanguage() {
+  void i18n.changeLanguage(DEFAULT_LANGUAGE)
+  try {
+    localStorage.removeItem(LANGUAGE_KEY)
+  } catch {
+    // storage can be blocked by the browser
   }
 }
 

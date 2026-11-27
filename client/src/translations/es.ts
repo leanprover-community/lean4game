@@ -31,9 +31,9 @@ export const es: DeepPartialTranslation<typeof en> = {
   privacy: {
     title: 'Política de privacidad',
     collectedData:
-      'Nuestro servidor recopila metadatos (como la dirección IP, el navegador o el sistema operativo) y los datos que el usuario introduce en el editor. Estos datos se utilizan para calcular la salida de Lean y mostrársela al usuario. La información se almacena mientras el usuario permanece en nuestro sitio web y se elimina inmediatamente después. Guardamos registros para mejorar nuestro software, pero los datos que contienen están anonimizados.',
+      'Nuestro servidor recopila metadatos (como la dirección IP, el navegador, el idioma preferido o el sistema operativo) y los datos que el usuario introduce en el juego. Estos datos se utilizan para calcular la salida de Lean y mostrársela al usuario. La información se almacena mientras el usuario permanece en nuestro sitio web y se elimina inmediatamente después. Además, el servidor guarda estadísticas de uso anónimas y agregadas. Estas no contienen ninguna información que permita identificar a personas concretas. También guardamos registros para mejorar nuestro software, pero los datos que contienen están anonimizados.',
     browserStorage:
-      'No usamos cookies, pero tu progreso en el juego se guarda en el navegador como datos del sitio. Tu progreso no se guarda en el servidor; si borras el almacenamiento del navegador, se pierde por completo.',
+      'No usamos cookies, pero tus ajustes y tu progreso en el juego se guardan en el navegador como datos del sitio. En particular, tu progreso no se guarda en el servidor; si borras el almacenamiento del navegador, se pierde por completo.',
     serverLocation: 'Ubicación de nuestro servidor: {{location}}.',
   },
   appBar: {
@@ -83,7 +83,8 @@ export const es: DeepPartialTranslation<typeof en> = {
       dark: 'Oscuro',
     },
     browserStorage: 'Almacenamiento del navegador',
-    savePreferences: 'Guardar mis ajustes (en el navegador)',
+    browserStorageNote: 'Los ajustes se guardan en el almacenamiento del navegador.',
+    reset: 'Restablecer valores predeterminados',
   },
   layout: {
     openPanel: 'Abrir {{title}}',
