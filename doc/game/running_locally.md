@@ -26,7 +26,7 @@ The template game [GameSkeleton](https://github.com/hhu-adam/GameSkeleton) conta
     A message appears asking you to "Reopen in Container". You can also trigger this under `Ctrl+Shift+P` and `Dev Containers: Reopen in Container`
 
     - The first start will take a while, ca. 2-15 minutes. After the first
-      start this should be very quickly.
+      start this should be very quick.
     - Once built, you can open http://localhost:3000 in your browser, which should load the game.
 
 3.  **Editing Files** _(everytime)_:<br/>
