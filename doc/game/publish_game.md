@@ -21,7 +21,7 @@ It should eventually report "Done."
 
 ## 3. Play the game
 
-Now you can immediately play the game at `adam.math.hhu.de/g/{USER}/{REPOSITORY}`!
+Now you can immediately play the game at `adam.math.hhu.de/#/g/{USER}/{REPOSITORY}`!
 
 ## 4. Update
 
